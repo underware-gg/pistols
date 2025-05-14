@@ -10,7 +10,7 @@ import { DuelPoster, DuelPosterHandle } from '/src/components/DuelPoster'
 import { PosterGrid, PosterGridHandle } from '/src/components/PosterGrid'
 import { InteractibleScene } from '/src/three/InteractibleScene'
 import { _currentScene } from '/src/three/game'
-import { ActionButton } from '../ui/Buttons'
+import { ActionButton } from '/src/components/ui/Buttons'
 import { SceneName } from '/src/data/assets'
 
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { MenuDuel, MenuDuelControl } from '/src/components/Menus';
-import { DojoSetupErrorDetector } from '../../account/DojoSetupErrorDetector';
+import { DojoSetupErrorDetector } from '/src/components/account/DojoSetupErrorDetector';
 import { MenuDebugAnimations } from '/src/components/MenusDebug';
 
 interface DuelUIControlsProps {

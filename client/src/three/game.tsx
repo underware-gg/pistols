@@ -27,7 +27,7 @@ import { map } from '@underware/pistols-sdk/utils'
 import { SpriteSheet } from './SpriteSheetMaker.tsx'
 import { DuelistsManager } from './DuelistsManager.tsx'
 import { Action } from '/src/utils/pistols.tsx'
-import { DuelistState } from '../components/ui/duel/DuelContext.tsx'
+import { DuelistState } from '/src/components/ui/duel/DuelContext.tsx'
 
 
 //---------------------------

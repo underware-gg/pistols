@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { usePistolsScene, usePistolsContext } from '/src/hooks/PistolsContext'
 import { _currentScene } from '/src/three/game'
-import { DuelistsBook } from '../ui/DuelistsBook'
-import { DuelistsBookAlwaysOpen } from '../ui/DuelistsBookAlwaysOpen'
-import { ActionButton } from '../ui/Buttons'
+import { DuelistsBook } from '/src/components/ui/DuelistsBook'
+import { DuelistsBookAlwaysOpen } from '/src/components/ui/DuelistsBookAlwaysOpen'
+import { ActionButton } from '/src/components/ui/Buttons'
 import { SceneName } from '/src/data/assets'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 

@@ -6,12 +6,12 @@ import { useGameEvent } from '/src/hooks/useGameEvent'
 import { useQueryPlayerIds } from '/src/stores/playerStore'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { DojoSetupErrorDetector } from '/src/components/account/DojoSetupErrorDetector'
-import { POSTER_HEIGHT_SMALL, POSTER_WIDTH_SMALL, ProfilePoster, ProfilePosterHandle } from '../ui/ProfilePoster'
+import { POSTER_HEIGHT_SMALL, POSTER_WIDTH_SMALL, ProfilePoster, ProfilePosterHandle } from '/src/components/ui/ProfilePoster'
 import { SceneName } from '/src/data/assets'
 import { useQueryChallengeIds } from '/src/stores/challengeQueryStore'
 import { useAccount } from '@starknet-react/core'
 import { LiveChallengeStates } from '/src/utils/pistols'
-import DuelTutorialOverlay from '../ui/duel/DuelTutorialOverlay'
+import DuelTutorialOverlay from '/src/components/ui/duel/DuelTutorialOverlay'
 
 export default function ScDuelists() {
   const { address } = useAccount()

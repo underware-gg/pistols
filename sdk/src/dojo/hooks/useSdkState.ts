@@ -28,7 +28,7 @@ export type useSdkStateResult = {
 // as: EntityMap
 //
 
-export const useSdkStateEntitiesGet = ({
+export const useSdkEntitiesGetState = ({
   query,
   enabled = true,
 }: Omit<UseSdkGetProps, 'setEntities'>): useSdkStateResult => {
@@ -39,7 +39,7 @@ export const useSdkStateEntitiesGet = ({
     query,
     enabled,
     setEntities: (entities: PistolsEntity[]) => {
-      console.log('useSdkStateEntitiesGet() GOT:', entities, query)
+      console.log('useSdkEntitiesGetState() GOT:', entities, query)
       state.setEntities([...entities]);
     },
   })
@@ -52,7 +52,7 @@ export const useSdkStateEntitiesGet = ({
   }
 }
 
-export const useSdkStateEntitiesSub = ({
+export const useSdkEntitiesSubState = ({
   query,
   enabled = true,
 }: Omit<UseSdkSubProps, 'setEntities' | 'updateEntity'>): useSdkStateResult => {
@@ -63,11 +63,11 @@ export const useSdkStateEntitiesSub = ({
     query,
     enabled,
     setEntities: (entities: PistolsEntity[]) => {
-      console.log('useSdkStateEntitiesSub() GOT:', entities, query)
+      console.log('useSdkEntitiesSubState() GOT:', entities, query)
       state.setEntities([...entities]);
     },
     updateEntity: (entity: PistolsEntity) => {
-      console.log('useSdkStateEntitiesSub() SUB:', entity, query)
+      console.log('useSdkEntitiesSubState() SUB:', entity, query)
       state.updateEntity(entity);
     },
   })

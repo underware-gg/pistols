@@ -300,12 +300,12 @@ const DuelContent: React.FC<{
 // import Cards, { CardsHandle, DuelistHand } from '/src/components/cards/DuelCards'
 // import * as Constants from '/src/data/cardConstants'
 // import { DuelTutorialLevel } from '/src/data/tutorialConstants'
-// import DuelProgress from '../ui/duel/DuelProgress'
-// import DuelistProfile from '../ui/duel/DuelistProfile'
-// import DuelProfile from '../ui/duel/DuelProfile'
-// import DuelHeader from '../ui/duel/DuelHeader'
-// import DuelStateDisplay from '../ui/duel/DuelStateDispaly'
-// import DuelTutorialOverlay from '../ui/duel/DuelTutorialOverlay'
+// import DuelProgress from '/src/components/ui/duel/DuelProgress'
+// import DuelistProfile from '/src/components/ui/duel/DuelistProfile'
+// import DuelProfile from '/src/components/ui/duel/DuelProfile'
+// import DuelHeader from '/src/components/ui/duel/DuelHeader'
+// import DuelStateDisplay from '/src/components/ui/duel/DuelStateDispaly'
+// import DuelTutorialOverlay from '/src/components/ui/duel/DuelTutorialOverlay'
 
 // export type DuelistState = {
 //   damage: number, 

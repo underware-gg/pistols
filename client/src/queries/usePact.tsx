@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
-import { formatQueryValue, getEntityModel, useSdkStateEntitiesSub } from '@underware/pistols-sdk/dojo'
+import { formatQueryValue, getEntityModel, useSdkEntitiesSubState } from '@underware/pistols-sdk/dojo'
 import { PistolsQueryBuilder, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols/sdk'
 import { makePactPair } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
@@ -29,7 +29,7 @@ export const usePact = (duel_type: constants.DuelType, address_a: BigNumberish, 
       : null
   ), [duel_type, pair])
 
-  const { entities } = useSdkStateEntitiesSub({
+  const { entities } = useSdkEntitiesSubState({
     query,
     enabled,
   })

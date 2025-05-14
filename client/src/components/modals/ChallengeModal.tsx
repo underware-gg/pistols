@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { Modal } from 'semantic-ui-react'
 
 import { usePistolsContext } from '/src/hooks/PistolsContext'
-import { DuelPoster } from '../DuelPoster'
+import { DuelPoster } from '/src/components/DuelPoster'
 
 export default function ChallengeModal() {
   const { selectedDuelId } = usePistolsContext()

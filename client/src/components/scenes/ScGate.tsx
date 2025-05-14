@@ -3,14 +3,14 @@ import { usePistolsScene } from '/src/hooks/PistolsContext'
 import { SceneName, TextureName } from '/src/data/assets'
 import { useGameEvent } from '/src/hooks/useGameEvent'
 import { useTextureShift } from '/src/hooks/useTextureShift'
-import { DojoSetupErrorDetector } from '../account/DojoSetupErrorDetector'
-import Logo from '/src/components/Logo'
-import AnimatedText from '../ui/AnimatedText'
-import TWEEN from '@tweenjs/tween.js'
+import { DojoSetupErrorDetector } from '/src/components/account/DojoSetupErrorDetector'
 import { _currentScene } from '/src/three/game'
 import { InteractibleScene } from '/src/three/InteractibleScene'
 import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
 import { AudioName } from '/src/data/audioAssets'
+import Logo from '/src/components/Logo'
+import AnimatedText from '/src/components/ui/AnimatedText'
+import TWEEN from '@tweenjs/tween.js'
 
 export default function ScGate() {
   const { dispatchSetScene } = usePistolsScene()

@@ -1,5 +1,5 @@
 import React, { forwardRef, useImperativeHandle, useRef } from 'react'
-import { useDuelistsOfPlayer } from '../hooks/useTokenDuelists'
+import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
 import { InteractibleComponent, InteractibleComponentHandle, InteractibleComponentProps } from '/src/components/InteractibleComponent'
 import { CardColor } from '@underware/pistols-sdk/pistols/constants'
 import { useGameAspect } from '/src/hooks/useGameAspect'

@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { useMemoGate } from '@underware/pistols-sdk/utils/hooks'
-import { getEntityModel, useSdkStateEntitiesGet } from '@underware/pistols-sdk/dojo'
+import { getEntityModel, useSdkEntitiesGetState } from '@underware/pistols-sdk/dojo'
 import { PistolsClauseBuilder, PistolsQueryBuilder } from '@underware/pistols-sdk/pistols/sdk'
 import { formatQueryValue } from '@underware/pistols-sdk/dojo'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
@@ -27,7 +27,7 @@ export const useGetSeasonScoreboard = (season_id: number, duelist_id: BigNumberi
   ), [season_id, duelist_id])
 
   const enabled = useMemo(() => (isPositiveBigint(duelist_id) && isPositiveBigint(season_id)), [duelist_id, season_id])
-  const { entities, isLoading } = useSdkStateEntitiesGet({
+  const { entities, isLoading } = useSdkEntitiesGetState({
     query,
     enabled,
   })

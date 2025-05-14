@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { Dropdown } from 'semantic-ui-react'
 import { useConfig } from '/src/stores/configStore'
-import { useAllSeasonIds } from '../stores/seasonStore'
+import { useAllSeasonIds } from '/src/stores/seasonStore'
 
 export function SeasonSelectDropdown({
   seasonId,

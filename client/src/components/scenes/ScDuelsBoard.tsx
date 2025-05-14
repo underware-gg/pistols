@@ -10,7 +10,7 @@ import { PosterGrid, PosterGridHandle } from '/src/components/PosterGrid'
 import { DuelPoster, DuelPosterHandle } from '/src/components/DuelPoster'
 import { _currentScene } from '/src/three/game'
 import { SceneName } from '/src/data/assets'
-import { ActionButton } from '../ui/Buttons'
+import { ActionButton } from '/src/components/ui/Buttons'
 
 export default function ScDuelsBoard() {
   const { address } = useAccount()

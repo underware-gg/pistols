@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useMemo, ReactNode, useState, useEffect } from 'react'
-import { useDuelistsOfPlayer } from '../hooks/useTokenDuelists'
-import { useDuelistStack, useDuelist } from '../stores/duelistStore'
+import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
+import { useDuelistStack, useDuelist } from '/src/stores/duelistStore'
 import { BigNumberish } from 'starknet';
 
 // Create context for organized duelists

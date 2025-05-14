@@ -11,7 +11,7 @@ import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { CharacterType } from '/src/data/assets'
 import { ArchetypeNames } from '/src/utils/pistols'
 import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
-import { useOwnerOfDuelist } from '../hooks/useTokenDuelists'
+import { useOwnerOfDuelist } from '/src/hooks/useTokenDuelists'
 
 export const useDuelistStore = createDojoStore<PistolsSchemaType>();
 export const useDuelistStackStore = createDojoStore<PistolsSchemaType>();

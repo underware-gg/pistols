@@ -12,7 +12,7 @@ import { InteractibleScene } from '/src/three/InteractibleScene'
 import { useCanClaimStarterPack } from '/src/hooks/usePistolsContractCalls'
 import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
 import { MAX_TILT } from '/src/data/cardConstants'
-import { CardPack } from '../ui/CardPack'
+import { CardPack } from '/src/components/ui/CardPack'
 import { CARD_PACK_SIZE } from '/src/data/cardConstants'
 
 export default function ScProfile() {

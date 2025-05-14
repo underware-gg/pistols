@@ -4,7 +4,7 @@ import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { useTutorialLevel, useTutorialPlayerId, useTutorialProgress } from '/src/hooks/useTutorial'
 import { useGetChallenge } from '/src/stores/challengeStore'
 import { ActionButton } from '/src/components/ui/Buttons'
-import { usePistolsContext } from '../hooks/PistolsContext'
+import { usePistolsContext } from '/src/hooks/PistolsContext'
 
 export function CreateTutorialChallengeButton({
   tutorial_id,

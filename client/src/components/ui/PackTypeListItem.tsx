@@ -1,6 +1,6 @@
 import React from 'react'
 import { CardPack } from './CardPack'
-import { FeesToPay } from '../account/LordsBalance'
+import { FeesToPay } from '/src/components/account/LordsBalance'
 import { useCalcFeePack } from '/src/hooks/usePistolsContractCalls'
 import { usePackType } from '/src/stores/packStore'
 import { constants } from '@underware/pistols-sdk/pistols/gen'

@@ -1,16 +1,16 @@
 import React, { useMemo, useState } from 'react'
 import { Container, Table } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
-import { useAllSeasonIds, useLeaderboard, useSeason } from '../../stores/seasonStore'
+import { useAllSeasonIds, useLeaderboard, useSeason } from '/src/stores/seasonStore'
 import { PistolsClauseBuilder, PistolsQueryBuilder } from '@underware/pistols-sdk/pistols/sdk'
 import { bigintToDecimal, bigintToHex, formatTimestampDeltaCountdown, formatTimestampDeltaTime, formatTimestampLocal } from '@underware/pistols-sdk/utils'
-import { getEntityModel, useDojoSystemCalls, useSdkStateEntitiesGet } from '@underware/pistols-sdk/dojo'
+import { getEntityModel, useDojoSystemCalls, useSdkEntitiesGetState } from '@underware/pistols-sdk/dojo'
 import { parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/starknet'
 import { useClientTimestamp, useMemoGate, useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useCanCollectSeason } from '/src/hooks/usePistolsContractCalls'
 import { useLordsReleaseEvents, LordsReleaseBill } from '/src/hooks/useLordsReleaseEvents'
 import { useSeasonPool } from '/src/stores/bankStore'
-import { useSeasonTotals } from '../../hooks/useSeason'
+import { useSeasonTotals } from '/src/queries/useSeason'
 import { useAccount } from '@starknet-react/core'
 import { useConfig } from '/src/stores/configStore'
 import { usePlayer } from '/src/stores/playerStore'
@@ -178,7 +178,7 @@ function DuelsReport({ seasonId }: { seasonId: number }) {
       .withLimit(10000)
       .includeHashedKeys()
   ), [seasonId])
-  const { entities, isLoading } = useSdkStateEntitiesGet({
+  const { entities, isLoading } = useSdkEntitiesGetState({
     query,
     enabled: mounted,
   })
@@ -287,7 +287,7 @@ function PacksReport({ seasonId }: { seasonId: number }) {
       .withLimit(10000)
       .includeHashedKeys()
   ), [seasonId])
-  const { entities, isLoading } = useSdkStateEntitiesGet({
+  const { entities, isLoading } = useSdkEntitiesGetState({
     query,
     enabled: mounted,
   })
@@ -362,7 +362,7 @@ function DuelistsReport({ seasonId }: { seasonId: number }) {
       .withLimit(10000)
       .includeHashedKeys()
   ), [seasonId])
-  const { entities, isLoading } = useSdkStateEntitiesGet({
+  const { entities, isLoading } = useSdkEntitiesGetState({
     query,
     enabled: mounted,
   })

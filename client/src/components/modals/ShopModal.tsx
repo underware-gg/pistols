@@ -11,7 +11,7 @@ import { Divider } from '/src/components/ui/Divider'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { useGetPack, usePackType } from '/src/stores/packStore'
 import { bigintToDecimal } from '@underware/pistols-sdk/utils'
-import { CardPack } from '../ui/CardPack'
+import { CardPack } from '/src/components/ui/CardPack'
 
 const Row = Grid.Row
 const Col = Grid.Column

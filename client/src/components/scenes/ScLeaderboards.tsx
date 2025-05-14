@@ -4,23 +4,21 @@ import { POSTER_HEIGHT_SMALL, POSTER_WIDTH_SMALL, ProfilePoster, ProfilePosterHa
 import { useGameAspect } from '/src/hooks/useGameAspect';
 import { usePlayer } from '/src/stores/playerStore';
 import { useDuelist } from '/src/stores/duelistStore';
-import { ProfilePic } from '../account/ProfilePic';
+import { ProfilePic } from '/src/components/account/ProfilePic';
 import { constants } from '@underware/pistols-sdk/pistols/gen';
 import { BigNumberish } from 'starknet';
-import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext';
+import { usePistolsContext } from '/src/hooks/PistolsContext';
 import { DuelistCard } from '/src/components/cards/DuelistCard';
 import { DUELIST_CARD_HEIGHT, DUELIST_CARD_WIDTH } from '/src/data/cardConstants';
-import { useConfig } from '/src/stores/configStore';
-import { formatTimestampDeltaCountdown, formatTimestampLocal } from '@underware/pistols-sdk/utils';
+import { formatTimestampDeltaCountdown } from '@underware/pistols-sdk/utils';
 import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks';
 import { useOwnerOfDuelist } from '/src/hooks/useTokenDuelists';
 import { useSeasonPool } from '/src/stores/bankStore';
-import { Balance } from '../account/Balance';
+import { Balance } from '/src/components/account/Balance';
 import { useIsMyAccount } from '/src/hooks/useIsYou';
 import { useDuelistSeasonStats } from '/src/stores/challengeQueryStore';
 import { useSeason, useAllSeasonIds, useLeaderboard } from '/src/stores/seasonStore';
-import { useSeasonTotals } from '/src/hooks/useSeason';
-import { ethToWei } from '@underware/pistols-sdk/starknet';
+import { useSeasonTotals } from '/src/queries/useSeason';
 
 export default function ScLeaderboards() {
   const { aspectWidth, aspectHeight } = useGameAspect();

@@ -5,9 +5,9 @@ import { Opener, useOpener } from '/src/hooks/useOpener'
 import { bigintToHex, bigintToDecimal, isPositiveBigint, bigintEquals } from '@underware/pistols-sdk/utils'
 import { DuelTutorialLevel, tutorialScenes } from '/src/data/tutorialConstants'
 import { SceneName } from '/src/data/assets'
-import { SCENE_CHANGE_ANIMATION_DURATION } from '../three/game'
+import { SCENE_CHANGE_ANIMATION_DURATION } from '/src/three/game'
 
-import { emitter } from '../three/game'
+import { emitter } from '/src/three/game'
 
 //
 // React + Typescript + Context

@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { Grid, Modal } from 'semantic-ui-react'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
-import { ProfilePoster } from '../ui/ProfilePoster'
+import { ProfilePoster } from '/src/components/ui/ProfilePoster'
 
 export default function PlayerModal() {
   const { selectedPlayerAddress } = usePistolsContext()

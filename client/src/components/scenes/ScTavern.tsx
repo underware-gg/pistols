@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
+import { usePistolsScene } from '/src/hooks/PistolsContext'
 import { SceneName, TextureName } from '/src/data/assets'
 import { useGameEvent } from '/src/hooks/useGameEvent'
-import { DojoSetupErrorDetector } from '../account/DojoSetupErrorDetector'
+import { DojoSetupErrorDetector } from '/src/components/account/DojoSetupErrorDetector'
 import { _currentScene } from '/src/three/game'
 import { InteractibleScene } from '/src/three/InteractibleScene'
-import { sceneBackgrounds } from '/src/data/assets'
 import BarkeepModal from '/src/components/modals/BarkeepModal'
-import ActivityPanel from '../ActivityPanel'
+import ActivityPanel from '/src/components/ActivityPanel'
 
 export default function ScTavern() {
   const { dispatchSetScene } = usePistolsScene()

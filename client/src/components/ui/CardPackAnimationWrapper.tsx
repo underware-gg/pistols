@@ -4,7 +4,7 @@ import { CardPack, CardPackHandle } from './CardPack'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import * as Constants from '/src/data/cardConstants'
-import { AnimationData } from '../InteractibleComponent'
+import { AnimationData } from '/src/components/InteractibleComponent'
 
 // Animation wrapper constants
 const CARD_PACK_WIDTH_RATIO = 0.75

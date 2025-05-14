@@ -7,8 +7,8 @@ import { useDojoSetup } from '@underware/pistols-sdk/dojo'
 import { useAllChallengesIds, useChallenge } from '/src/stores/challengeStore'
 import { useDuelist, useAllDuelistsIds } from '/src/stores/duelistStore'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
-import { useSeasonTotals } from '../../hooks/useSeason'
-import { useGetSeasonScoreboard } from '/src/hooks/useScore'
+import { useSeasonTotals } from '/src/queries/useSeason'
+import { useGetSeasonScoreboard } from '/src/queries/useScore'
 import { useDuelistFameBalance, fetchTokenBoundBalances } from '/src/stores/coinStore'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { ChallengeStoreSync } from '/src/stores/sync/ChallengeStoreSync'
@@ -17,7 +17,7 @@ import { InternalPageMenu, InternalPageWrapper } from '/src/pages/internal/Inter
 import { SeasonSelectDropdown } from '/src/components/SeasonSelectDropdown'
 import { CopyIcon, IconClick } from '/src/components/ui/Icons'
 import AppDojo from '/src/components/AppDojo'
-import { DuelistScore, useLeaderboard } from '../../stores/seasonStore'
+import { DuelistScore, useLeaderboard } from '/src/stores/seasonStore'
 
 
 const Row = Grid.Row
