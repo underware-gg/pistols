@@ -6,7 +6,6 @@ import { useSeasonConfigStore } from '/src/stores/seasonStore'
 import { useTokenConfigStore } from '/src/stores/tokenConfigStore'
 import { usePlayerStore } from '/src/stores/playerStore'
 import { useDuelistStore, useDuelistStackStore } from '/src/stores/duelistStore'
-import { useDuelistQueryStore } from '/src/stores/duelistQueryStore'
 import { useChallengeStore } from '/src/stores/challengeStore'
 import { useChallengeQueryStore } from '/src/stores/challengeQueryStore'
 import { usePackStore } from '/src/stores/packStore'
@@ -96,7 +95,6 @@ export function EntityStoreSync() {
   const playerState = usePlayerStore((state) => state)
   // duelists
   const duelistState = useDuelistStore((state) => state)
-  const duelistQueryState = useDuelistQueryStore((state) => state)
   const duelistStackState = useDuelistStackStore((state) => state)
   // challenges
   const challengeState = useChallengeStore((state) => state)
@@ -147,13 +145,11 @@ export function EntityStoreSync() {
     resetStore: () => {
       console.log("EntityStoreSync() RESET DUELISTS =======>")
       duelistState.resetStore()
-      duelistQueryState.resetStore()
     },
     setEntities: (entities: PistolsEntity[]) => {
       console.log("EntityStoreSync() SET DUELISTS =======> [entities]:", entities)
       // console.log("EntityStoreSync() SET DUELISTS =======> [Duelist]:", filterEntitiesByModels(entities, ['Duelist']))
       duelistState.setEntities(entities)
-      duelistQueryState.setEntities(entities)
     },
   })
 
@@ -207,7 +203,6 @@ export function EntityStoreSync() {
       }
       if (entityContainsModels(entity, ['Duelist', 'DuelistAssignment', 'DuelistMemorial'])) {
         duelistState.updateEntity(entity)
-        duelistQueryState.updateEntity(entity)
       }
       if (entityContainsModels(entity, ['PlayerDuelistStack'])) {
         duelistStackState.updateEntity(entity)

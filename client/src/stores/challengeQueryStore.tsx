@@ -3,7 +3,6 @@ import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
-import { useDuelistQueryStore } from '/src/stores/duelistQueryStore'
 import { useCallToActions } from './eventsModelStore'
 import { usePlayer, usePlayerStore } from '/src/stores/playerStore'
 import { ChallengeColumn, SortDirection } from '/src/stores/queryParamsStore'
@@ -110,9 +109,8 @@ export const useQueryChallengeIds = (
   const { requiredDuelIds } = useCallToActions()
 
   const entities = useChallengeQueryStore((state) => state.entities);
-  const duelistEntities = useDuelistQueryStore((state) => state.entities);
   const playerEntities = usePlayerStore((state) => state.players);
-  const targetId = useMemo(() => (isPositiveBigint(playerAddressOrDuelistId) ? BigInt(playerAddressOrDuelistId) : 0n), [playerAddressOrDuelistId, duelistEntities])
+  const targetId = useMemo(() => (isPositiveBigint(playerAddressOrDuelistId) ? BigInt(playerAddressOrDuelistId) : 0n), [playerAddressOrDuelistId])
 
   const [challengeIds, states, challengePlayerMap] = useMemo(() => {
     // get all challenges, by duelist (or all)
@@ -154,8 +152,6 @@ export const useQueryChallengeIds = (
     if (filterName) {
       const filterNameLower = filterName.toLowerCase();
       result = result.filter((e) => (
-        duelistEntities[e.duelist_entity_id_a]?.name?.toLowerCase().includes(filterNameLower) ||
-        duelistEntities[e.duelist_entity_id_b]?.name?.toLowerCase().includes(filterNameLower) ||
         playerEntities[bigintToHex(e.address_a)]?.name?.toLowerCase().includes(filterNameLower) ||
         playerEntities[bigintToHex(e.address_b)]?.name?.toLowerCase().includes(filterNameLower)
       ))
