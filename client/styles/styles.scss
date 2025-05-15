@@ -1373,7 +1373,7 @@ $logo-url: '/logos/logo_avante.svg';
 .DialogBalloon {
   width: aspect-width(25);
   height: auto;
-  min-height: aspect-width(6.25);
+  min-height: aspect-width(7);
   border: aspect-width(0.1875) solid var(--border-color);
   background-color: var(--bg-color);
   color: $color-darkest;

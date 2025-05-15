@@ -19,9 +19,13 @@ export default function BarkeepModal({ open, setOpen }) {
   }, [responses])
 
   useEffect(() => {
-    if (open) {
-      setDisplayText('Get lost, mortal. I\'m not serving weaklings today. Come back when you\'ve got some real guts... or never.')
-    }
+    setTimeout(() => {
+      if (open) {
+        setDisplayText('Get lost, mortal. I\'m not serving weaklings today. Come back when you\'ve got some real guts... or never.')
+      } else {
+        setDisplayText('')
+      }
+    }, 200)
   }, [open])
 
   if (!open) return null

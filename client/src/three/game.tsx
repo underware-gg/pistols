@@ -1172,7 +1172,10 @@ export function switchScene(sceneName) {
 
   if (!_currentScene) {
     _sceneName = sceneName
-    _currentScene = _scenes[sceneName]
+    _currentScene = _scenes[sceneName];
+    if (_currentScene instanceof InteractibleScene) {
+      (_currentScene as InteractibleScene).activate();
+    }
 
     setTimeout(() => {
       fadeInCurrentScene();
@@ -1185,8 +1188,11 @@ export function switchScene(sceneName) {
     }
   } else {
     fadeOutCurrentScene(() => {
-      _sceneName = sceneName
-      _currentScene = _scenes[sceneName]
+      if (_currentScene instanceof InteractibleScene) {
+        (_currentScene as InteractibleScene).deactivate();
+      }
+      _sceneName = sceneName;
+      _currentScene = _scenes[sceneName];
 
       emitter.emit('hover_description', null)
       emitter.emit('hover_item', null)
@@ -1244,6 +1250,11 @@ function fadeInCurrentScene() {
     .onUpdate(({ opacity }) => {
       if (overlay) {
         overlay.style.opacity = opacity.toString()
+      }
+    })
+    .onComplete(() => {
+      if (_currentScene instanceof InteractibleScene) {
+        (_currentScene as InteractibleScene).activate();
       }
     })
     .start();

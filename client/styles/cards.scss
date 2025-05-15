@@ -457,6 +457,12 @@
   left: 4%;
   width: 92%;
   height: 94%;
+  overflow: scroll;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
   background-color: rgba($color-darkest, 0.9);
   border-radius: aspect-width(0.6);
   border: aspect-width(0.1) solid $color-active;

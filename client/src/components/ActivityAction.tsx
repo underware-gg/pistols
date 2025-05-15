@@ -9,7 +9,7 @@ import { Icon, EmojiIcon } from '/src/components/ui/Icons'
 import { ChallengeLink, DuelistLink } from '/src/components/Links'
 import { bigintToDecimal, bigintToHex } from '@underware/pistols-sdk/utils'
 import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
-import { usePlayerDuelistsOrganized } from './PlayerDuelistsOrganized'
+import { usePlayerDuelistsOrganized } from '/src/stores/duelistStore'
 
 
 type ActionType = 'Waiting' | 'ReplyChallenge' | 'ActionRequired' | 'Idle';

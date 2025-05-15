@@ -13,9 +13,8 @@ import WalletHeader from '/src/components/account/WalletHeader'
 import AccountHeader from '/src/components/account/AccountHeader'
 import * as TWEEN from '@tweenjs/tween.js'
 import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
-import { useAllDuelistsIds } from '/src/stores/duelistStore'
+import { useAllDuelistsIds, usePlayerDuelistsOrganized } from '/src/stores/duelistStore'
 import DuelistData, { DuelistDataValues } from '/src/components/ui/DuelistData'
-import { usePlayerDuelistsOrganized } from './PlayerDuelistsOrganized'
 
 function DuelistStats() {
   // const { duelistIds } = useDuelistsOfPlayer();

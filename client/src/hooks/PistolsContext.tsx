@@ -198,7 +198,16 @@ const PistolsProvider = ({
         return state
     }
     return newState
-  }, initialState)
+  }, {
+    ...initialState,
+    connectOpener,
+    shopOpener,
+    tutorialOpener,
+    bookOpener,
+    duelistSelectOpener,
+    walletFinderOpener,
+    settingsOpener,
+  })
 
   emitter.on('searchParams', (data) => {
     setHasSearchParams(data)
