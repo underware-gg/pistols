@@ -7,14 +7,13 @@ import TWEEN from '@tweenjs/tween.js'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { BigNumberish } from 'starknet'
 import { Button } from 'semantic-ui-react'
-import { useDuellingDuelists } from '/src/stores/duelistStore'
+import { useDuellingDuelists, usePlayerDuelistsOrganized } from '/src/stores/duelistStore'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
 import { Opener } from '/src/hooks/useOpener'
 import { NoDuelistsSlip, NoDuelistsSlipHandle } from '../NoDuelistsSlip'
 import { emitter } from '/src/three/game'
 import { SceneName } from '/src/data/assets'
-import { usePlayerDuelistsOrganized } from '../PlayerDuelistsOrganized'
 
 const HAND_CARD_WIDTH = 110
 const HAND_CARD_HEIGHT = HAND_CARD_WIDTH * (1080/1920)

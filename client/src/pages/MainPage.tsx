@@ -37,7 +37,6 @@ import { helloPistols } from '@underware/pistols-sdk'
 import { useQuality } from '../hooks/useQuality'
 import ScCardPacks from '../components/scenes/ScCardPacks'
 import ScDuelistBook from '../components/scenes/ScDuelistBook'
-import { PlayerDuelistsProvider } from '../components/PlayerDuelistsOrganized'
 
 helloPistols();
 export default function MainPage({
@@ -91,22 +90,18 @@ export default function MainPage({
   return (
     <AppGame backgroundImage={null} networkId={showTutorial ? ENV.ACADEMY_NETWORK_ID : undefined} autoConnect={showTutorial}>
       <Background className={null}>
-        <PlayerDuelistsProvider>
-          <GameContainer isVisible={true} />
-          <MainUI />
-          <Modals />
-          {overlay}
-          <Header />
-          <CurrentChainHint />
-          <MouseToolTip />
-          <TavernAudios />
-        </PlayerDuelistsProvider>
+        <GameContainer isVisible={true} />
+        <MainUI />
+        <Modals />
+        {overlay}
+        <Header />
+        <CurrentChainHint />
+        <MouseToolTip />
+        <TavernAudios />
       </Background>
     </AppGame>
   );
 }
-
-
 
 function MainUI() {
   // sync game context with url params
@@ -204,7 +199,6 @@ function TutorialUI({
 
   return <ScTutorial currentTutorialScene={currentTutorialScene} />;
 }
-
 
 function Modals() {
   const { walletFinderOpener, duelistSelectOpener, settingsOpener } = usePistolsContext()

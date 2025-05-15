@@ -4,14 +4,17 @@ import { createDojoStore } from '@dojoengine/sdk/react'
 import { useEntityId, useEntityIds, getEntityModel, useEntityModel, useDojoSystem, keysToEntityId, getCustomEnumCalldata } from '@underware/pistols-sdk/dojo'
 import { useClientTimestamp, useMemoGate } from '@underware/pistols-sdk/utils/hooks'
 import { makeAbiCustomEnum, parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/starknet'
-import { isPositiveBigint, bigintToDecimal, bigintToHex } from '@underware/pistols-sdk/utils'
+import { isPositiveBigint, bigintToDecimal, bigintToHex, map } from '@underware/pistols-sdk/utils'
 import { PistolsSchemaType } from '@underware/pistols-sdk/pistols/sdk'
 import { getCollectionDescription, getProfileDescription, getProfileGender, getProfileId, DuelistProfileKey, DuelistGender, getProfileQuote } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { CharacterType } from '/src/data/assets'
 import { ArchetypeNames } from '/src/utils/pistols'
 import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
-import { useOwnerOfDuelist } from '../hooks/useTokenDuelists'
+import { useAccount } from '@starknet-react/core'
+import { useDuelistsOfPlayer, useOwnerOfDuelist } from '../hooks/useTokenDuelists'
+import { useSdkStateEntitiesGet, filterEntitiesByModel } from '@underware/pistols-sdk/dojo'
+import { PistolsQueryBuilder, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols/sdk'
 
 export const useDuelistStore = createDojoStore<PistolsSchemaType>();
 export const useDuelistStackStore = createDojoStore<PistolsSchemaType>();
@@ -281,5 +284,92 @@ export const useDuelistStack = (duelist_id: BigNumberish) => {
     activeDuelistId,
     stackedDuelistIds,
     level,
+  }
+}
+
+export function useDuelistStacks(player_address: BigNumberish) {
+  const query = useMemo(() => {
+    if (!player_address) return null;
+    const builder = new PistolsQueryBuilder();
+    builder
+      .withEntityModels(['pistols-PlayerDuelistStack'])
+      .withClause(
+        new PistolsClauseBuilder()
+          .where('pistols-PlayerDuelistStack', 'player_address', 'Eq', player_address)
+          .build()
+      )
+      .withLimit(100) //TODO adjust later or remove?
+      .includeHashedKeys();
+    return builder;
+  }, [player_address]);
+
+  const { entities: queryEntities, isLoading } = useSdkStateEntitiesGet({
+    query,
+    enabled: Boolean(query),
+  });
+
+  const stacks = useMemo(() => {
+    if (!queryEntities || !player_address) return [];
+    const playerStacks = filterEntitiesByModel(queryEntities, 'PlayerDuelistStack');
+    return playerStacks.map(entity => {
+      const stack = entity.models.pistols['PlayerDuelistStack'] as models.PlayerDuelistStack;
+      if (!stack.active_duelist_id) return null;
+      return {
+        activeDuelistId: stack.active_duelist_id,
+        stackedIds: stack.stacked_ids,
+        level: Number(stack.level ?? 0),
+      };
+    }).filter(Boolean);
+  }, [queryEntities, player_address]);
+
+  return {
+    stacks,
+    isLoading,
+  };
+}
+
+export const usePlayerDuelistsOrganized = () => {
+  const { address } = useAccount();
+  const { stacks, isLoading } = useDuelistStacks(address)
+  const { duelistIds } = useDuelistsOfPlayer()
+  const entities = useDuelistStore((state) => state.entities)
+
+  const organizedDuelists = useMemo(() => {
+    if (!stacks || stacks.length === 0) {
+      return { activeDuelists: [], deadDuelists: [] }
+    }
+
+    const activeDuelists: BigNumberish[] = []
+    const stackedDuelists: BigNumberish[] = []
+    const deadDuelists: BigNumberish[] = []
+
+    stacks.forEach(({ activeDuelistId, stackedIds }) => {
+      activeDuelists.push(activeDuelistId)
+      stackedDuelists.push(...stackedIds)
+    })
+
+    duelistIds.forEach(id => {
+      if (!activeDuelists.includes(id) && !stackedDuelists.includes(id)) {
+        const entityId = keysToEntityId([id])
+        const memorial = getEntityModel(entities[entityId], 'DuelistMemorial')
+        if (memorial) {
+          deadDuelists.push(id)
+        } 
+      }
+    })
+    
+    // Sort arrays by id
+    const sortById = (a: BigNumberish, b: BigNumberish) => 
+      BigInt(a) > BigInt(b) ? 1 : BigInt(a) < BigInt(b) ? -1 : 0;
+    
+    return {
+      activeDuelists: activeDuelists.sort(sortById),
+      deadDuelists: deadDuelists.sort(sortById)
+    }
+  }, [stacks, entities, duelistIds])
+
+  return {
+    ...organizedDuelists,
+    isLoading
   }
 }

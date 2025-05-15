@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useGameAspect } from '/src/hooks/useGameAspect';
 import { DuelistCard } from '../cards/DuelistCard';
-import { usePlayerDuelistsOrganized } from '/src/components/PlayerDuelistsOrganized';
+import { usePlayerDuelistsOrganized } from '/src/stores/duelistStore';
 import { DUELIST_CARD_HEIGHT, DUELIST_CARD_WIDTH } from '/src/data/cardConstants';
 import { usePistolsContext } from '/src/hooks/PistolsContext';
 import { CardColor } from '@underware/pistols-sdk/pistols/constants'
