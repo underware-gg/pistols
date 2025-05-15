@@ -1121,7 +1121,7 @@ const PlayerStats = ({ duelistId, isLeft, damage, hitChance, visible }) => {
             <div className="value red">{damage}/3</div>
           </div>
           <div className="text-container">
-            <div className="label yellow">Hit chace:</div>
+            <div className="label yellow">Hit chance:</div>
             <div className="value yellow">{hitChance}%</div>
           </div>
         </div>
