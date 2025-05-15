@@ -684,7 +684,7 @@ export const InteractibleComponent = forwardRef<InteractibleComponentHandle, Int
         </div>
       </>
     )
-  }, [props.isDisabled, props.isSelected, isDefeated, props.frontImagePath, props.backgroundImagePath, props.childrenBehindFront, props.childrenInFront, props.childrenInBack])
+  }, [props.isDisabled, props.isSelected, isDefeated, props.frontImagePath, props.backgroundImagePath, props.childrenBehindFront, props.childrenInFront, props.childrenInBack, visibility, props.mouseDisabled])
 
   const hangingNail = useMemo(() => {
     return (
