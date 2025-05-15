@@ -205,10 +205,18 @@ export default function ScLeaderboards() {
   };
 
   // Get leaderboard data for selected season
-  const { maxPositions = 0, scores = [] } = useLeaderboard(selectedSeasonId || 0);
-
+  const { maxPositions = 0, scores: leaderboardScores = [] } = useLeaderboard(selectedSeasonId || 0);
   const { seasonScoreboard } = useSeasonScoreboard(selectedSeasonId || 0);
-  useEffect(() => console.log(`seasonScoreboard:`, seasonScoreboard), [seasonScoreboard])
+
+  const scores = useMemo(() => {
+    return [
+      ...leaderboardScores,
+      ...seasonScoreboard.filter(s => !leaderboardScores.some(l => l.duelistId === s.duelistId))
+    ];
+  }, [leaderboardScores, seasonScoreboard])
+
+  useEffect(() => console.log(`scores:`, scores), [scores])
+
   
   // Calculate pagination
   const itemsPerPage = activePage === 1 ? 3 : 7;
