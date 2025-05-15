@@ -5,6 +5,8 @@ import { useSettings } from '/src/hooks/SettingsContext'
 import { IconClick } from '/src/components/ui/Icons'
 import { makeDuelDataUrl } from '/src/utils/pistols'
 import * as TWEEN from '@tweenjs/tween.js'
+import { AnimationState } from '../three/game'
+import { useGameplayContext } from '../hooks/GameplayContext'
 
 export function MenuDuel({
   duelId,
@@ -13,8 +15,10 @@ export function MenuDuel({
 }) {
   const { dispatchSetDuel, tutorialOpener, settingsOpener } = usePistolsContext()
   const { dispatchSceneBack } = usePistolsScene()
-
+  const { dispatchAnimated } = useGameplayContext()
+  
   const _backToTavern = () => {
+    dispatchAnimated(AnimationState.None)
     dispatchSceneBack()
     dispatchSetDuel(0n)
   }

@@ -28,7 +28,7 @@ const Col = Grid.Column
 export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
   const { aspectWidth, aspectHeight } = useGameAspect()
 
-  const { animated } = useGameplayContext()
+  const { animated, dispatchAnimated } = useGameplayContext()
 
   const { dispatchSetting } = useSettings()
   const { dispatchSetScene, dispatchSceneBack } = usePistolsScene()
@@ -98,6 +98,18 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
     await duel_token.reply_duel(account, duelistId, duelId, accepted)
   }
 
+  const _leaveDuel = () => {
+    dispatchSceneBack()
+    dispatchAnimated(AnimationState.None)
+  }
+
+  useEffect(() => {
+    setAnimatedText("")
+    setShowOutcome(false)
+    setShowRewards(false)
+    setShowDisplay(false)
+  }, [])
+
   // Reset animation states when duel state changes
   useEffect(() => {
     const callFinished = () => {
@@ -112,17 +124,25 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
       }, 300);
     }
     
+    let timeoutId: NodeJS.Timeout | null = null;
+    
     if (isCanceled || isExpired) {
-      callFinished()
+      timeoutId = setTimeout(() => callFinished(), 200);
     } else if (animated !== AnimationState.Finished) {
-      setAnimatedText("")
-      setShowOutcome(false)
-      setShowRewards(false)
-      setShowDisplay(false)
+      setAnimatedText("");
+      setShowOutcome(false);
+      setShowRewards(false);
+      setShowDisplay(false);
       animationSequenceStarted.current = false;
     } else if (!isTutorial && (isFinished || isCanceled || isExpired)) {
-      callFinished()
+      timeoutId = setTimeout(() => callFinished(), 200);
     }
+    
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   }, [animated, isTutorial, isFinished, isCanceled, isExpired, statusText]);
 
   const RewardRow = ({ show, delay, children, animation = 'fadeIn' }) => {
@@ -410,7 +430,7 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
                   <Grid className='YesMouse' textAlign='center' style={{ width: '100%' }}>
                     <Row columns='equal'>
                       <Col>
-                        <ActionButton large fillParent label='Leave Duel' className='FillParent' onClick={() => dispatchSceneBack()} />
+                        <ActionButton large fillParent label='Leave Duel' className='FillParent' onClick={() => _leaveDuel()} />
                       </Col>
                       {!isCanceled && !isExpired && (
                         <Col>
