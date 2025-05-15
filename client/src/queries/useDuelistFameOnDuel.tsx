@@ -1,9 +1,8 @@
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { PistolsClauseBuilder, PistolsQueryBuilder } from '@underware/pistols-sdk/pistols/sdk'
-import { useSdkEventsGetState, formatQueryValue, useEntitiesModel, useSdkEntitiesGetState } from '@underware/pistols-sdk/dojo'
+import { useSdkEventsGetState, formatQueryValue, useEntitiesModel } from '@underware/pistols-sdk/dojo'
 import { bigintEquals, isPositiveBigint } from '@underware/pistols-sdk/utils'
-import { ethToWei, weiToEth } from '@underware/pistols-sdk/starknet'
 import { models, constants } from '@underware/pistols-sdk/pistols/gen'
 
 export const useDuelistFameOnDuel = (duel_id: BigNumberish, duelist_id: BigNumberish) => {

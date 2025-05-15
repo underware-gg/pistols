@@ -19,6 +19,7 @@ import { useIsMyAccount } from '/src/hooks/useIsYou';
 import { useDuelistSeasonStats } from '/src/stores/challengeQueryStore';
 import { useSeason, useAllSeasonIds, useLeaderboard } from '/src/stores/seasonStore';
 import { useSeasonTotals } from '/src/queries/useSeason';
+import { useSeasonScoreboard } from '/src/stores/scoreboardStore';
 
 export default function ScLeaderboards() {
   const { aspectWidth, aspectHeight } = useGameAspect();
@@ -47,9 +48,9 @@ export default function ScLeaderboards() {
     const { accountsCount } = useSeasonTotals(season);
     const poolSeason = useSeasonPool(season);
 
-    useEffect(() => {
-      console.log(`SeasonR`, poolSeason)
-    }, [poolSeason])
+    // useEffect(() => {
+    //   console.log(`SeasonR`, poolSeason)
+    // }, [poolSeason])
     
     const timeLeft = useMemo(() => {
       if (!timestamp_end) return 'Unknown';
@@ -205,6 +206,9 @@ export default function ScLeaderboards() {
 
   // Get leaderboard data for selected season
   const { maxPositions = 0, scores = [] } = useLeaderboard(selectedSeasonId || 0);
+
+  const { seasonScoreboard } = useSeasonScoreboard(selectedSeasonId || 0);
+  useEffect(() => console.log(`seasonScoreboard:`, seasonScoreboard), [seasonScoreboard])
   
   // Calculate pagination
   const itemsPerPage = activePage === 1 ? 3 : 7;
@@ -552,7 +556,7 @@ export default function ScLeaderboards() {
                       color="silver"
                       height={67}
                       duelistId={Number(scores[1].duelistId)}
-                      score={scores[1].score}
+                      score={scores[1].points}
                     />
                   ) : (
                     <EmptyPodium rank={2} color="silver" height={67} />
@@ -564,7 +568,7 @@ export default function ScLeaderboards() {
                       color="gold"
                       height={69}
                       duelistId={Number(scores[0].duelistId)}
-                      score={scores[0].score}
+                      score={scores[0].points}
                       cardScale={0.6}
                     />
                   ) : (
@@ -577,7 +581,7 @@ export default function ScLeaderboards() {
                       color="#cd7f32"
                       height={65}
                       duelistId={Number(scores[2].duelistId)}
-                      score={scores[2].score}
+                      score={scores[2].points}
                     />
                   ) : (
                     <EmptyPodium rank={3} color="#cd7f32" height={65} />
@@ -592,7 +596,7 @@ export default function ScLeaderboards() {
                       key={entry.duelistId.toString()} 
                       duelistId={entry.duelistId}
                       rank={startIndex + index + 1}
-                      score={entry.score}
+                      score={entry.points}
                     />
                   ))}
                 </div>

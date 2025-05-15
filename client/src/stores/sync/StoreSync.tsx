@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { EventsHistoricalStoreSync } from '/src/stores/sync/EventsHistoricalStoreSync'
 import { EventsModelStoreSync } from './EventsModelStoreSync'
-import { ChallengeStoreSync } from '/src/stores/sync/ChallengeStoreSync'
+import { SeasonChallengeStoreSync, SeasonScoreboardStoreSync } from '/src/stores/sync/SeasonEntityStoreSync'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
 import { PlayerNameSync } from '/src/stores/sync/PlayerNameSync'
 import { PlayerOnlineSync } from '/src/stores/sync/PlayerOnlineSync'
@@ -21,11 +21,12 @@ export default function StoreSync() {
   return (
     <>
       {/* Torii */}
-      <EventsHistoricalStoreSync />
-      <EventsModelStoreSync />
-      <ChallengeStoreSync />
       <EntityStoreSync />
+      <SeasonChallengeStoreSync />
+      <SeasonScoreboardStoreSync />
       <TokenStoreSync />
+      <EventsModelStoreSync />
+      <EventsHistoricalStoreSync />
 
       {/* Controller */}
       <PlayerNameSync />

@@ -2,23 +2,24 @@ import { useSdkEntitiesSub, filterEntitiesByModels, entityContainsModels, useSdk
 import { PistolsQueryBuilder, PistolsEntity } from '@underware/pistols-sdk/pistols/sdk'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useConfigStore } from '/src/stores/configStore'
-import { useSeasonConfigStore } from '/src/stores/seasonStore'
+import { useSeasonStore } from '/src/stores/seasonStore'
 import { useTokenConfigStore } from '/src/stores/tokenConfigStore'
 import { usePlayerStore } from '/src/stores/playerStore'
 import { useDuelistStore, useDuelistStackStore } from '/src/stores/duelistStore'
 import { useChallengeStore } from '/src/stores/challengeStore'
 import { useChallengeQueryStore } from '/src/stores/challengeQueryStore'
-import { usePackStore } from '/src/stores/packStore'
 import { useBankStore } from '/src/stores/bankStore'
-import { useEffect } from 'react'
+import { usePackStore } from '/src/stores/packStore'
+import { useScoreboardStore } from '/src/stores/scoreboardStore'
 
-const _modelsAdmin = [
+const _modelsMisc = [
   // admin
   "pistols-Config",
   "pistols-TokenConfig",
+  "pistols-Pool",
+  // season
   "pistols-SeasonConfig",
   "pistols-Leaderboard",
-  "pistols-Pool",
   // Other
   "pistols-Pack",
 ];
@@ -39,17 +40,19 @@ const _modelsStacks = [
   // Stacks
   "pistols-PlayerDuelistStack",
 ];
-const _modelsChallenges = [
+const _modelsPerSeason = [
   // Challenges
   "pistols-Challenge",
   "pistols-ChallengeMessage",
   'pistols-Round',
+  // Scoreboards
+  "pistols-SeasonScoreboard",
 ];
 
 
 const _limit = 1500
-const query_get_admin: PistolsQueryBuilder = new PistolsQueryBuilder()
-  .withEntityModels(_modelsAdmin)
+const query_get_misc: PistolsQueryBuilder = new PistolsQueryBuilder()
+  .withEntityModels(_modelsMisc)
   .withLimit(_limit)
   .includeHashedKeys()
 const query_get_players: PistolsQueryBuilder = new PistolsQueryBuilder()
@@ -65,16 +68,16 @@ const query_get_duelist_stacks: PistolsQueryBuilder = new PistolsQueryBuilder()
   .withLimit(_limit)
   .includeHashedKeys()
 // const query_get_challenges: PistolsQueryBuilder = new PistolsQueryBuilder()
-//   .withEntityModels(_modelsChallenges)
+//   .withEntityModels(_modelsPerSeason)
 //   .withLimit(_limit)
 //   .includeHashedKeys()
 const query_sub: PistolsQueryBuilder = new PistolsQueryBuilder()
   .withEntityModels([
-    ..._modelsAdmin,
+    ..._modelsMisc,
     ..._modelsPlayers,
     ..._modelsDuelists,
     ..._modelsStacks,
-    ..._modelsChallenges,
+    ..._modelsPerSeason,
   ])
   .withLimit(10)
   .includeHashedKeys()
@@ -85,10 +88,10 @@ const query_sub: PistolsQueryBuilder = new PistolsQueryBuilder()
 // Sync entities: Add only once to a top level component
 //
 export function EntityStoreSync() {
-  // admin
+  // misc
   const configState = useConfigStore((state) => state)
   const tokenState = useTokenConfigStore((state) => state)
-  const seasonState = useSeasonConfigStore((state) => state)
+  const seasonState = useSeasonStore((state) => state)
   const bankState = useBankStore((state) => state)
   const packState = usePackStore((state) => state)
   // players
@@ -96,17 +99,18 @@ export function EntityStoreSync() {
   // duelists
   const duelistState = useDuelistStore((state) => state)
   const duelistStackState = useDuelistStackStore((state) => state)
-  // challenges
+  // per season (update only)
   const challengeState = useChallengeStore((state) => state)
   const challengeQueryState = useChallengeQueryStore((state) => state)
+  const scoreboardState = useScoreboardStore((state) => state)
 
   const mounted = useMounted()
 
-  const { isFinished: isFinishedAdmin } = useSdkEntitiesGet({
-    query: query_get_admin,
+  const { isFinished: isFinishedMisc } = useSdkEntitiesGet({
+    query: query_get_misc,
     enabled: mounted,
     resetStore: () => {
-      console.log("EntityStoreSync() RESET ADMIN =======>")
+      console.log("EntityStoreSync() RESET MISC =======>")
       configState.resetStore()
       tokenState.resetStore()
       seasonState.resetStore()
@@ -114,16 +118,16 @@ export function EntityStoreSync() {
       packState.resetStore()
     },
     setEntities: (entities: PistolsEntity[]) => {
-      console.log("EntityStoreSync() SET ADMIN =======> [entities]:", entities)
+      console.log("EntityStoreSync() SET MISC =======> [entities]:", entities)
       // console.log("EntityStoreSync() SET =======> [Config]:", filterEntitiesByModels(entities, ['Config']))
       // console.log("EntityStoreSync() SET =======> [TokenConfig]:", filterEntitiesByModels(entities, ['TokenConfig']))
+      // console.log("EntityStoreSync() SET =======> [Pool]:", filterEntitiesByModels(entities, ['Pool']))
       // console.log("EntityStoreSync() SET =======> [SeasonConfig]:", filterEntitiesByModels(entities, ['SeasonConfig', 'Leaderboard']))
       // console.log("EntityStoreSync() SET =======> [Leaderboard]:", filterEntitiesByModels(entities, ['Leaderboard']))
-      // console.log("EntityStoreSync() SET =======> [Pool]:", filterEntitiesByModels(entities, ['Pool']))
       configState.setEntities(filterEntitiesByModels(entities, ['Config']))
       tokenState.setEntities(filterEntitiesByModels(entities, ['TokenConfig']))
-      seasonState.setEntities(filterEntitiesByModels(entities, ['SeasonConfig', 'Leaderboard']))
       bankState.setEntities(filterEntitiesByModels(entities, ['Pool']))
+      seasonState.setEntities(filterEntitiesByModels(entities, ['SeasonConfig', 'Leaderboard']))
       packState.setEntities(filterEntitiesByModels(entities, ['Pack']))
     },
   })
@@ -167,20 +171,9 @@ export function EntityStoreSync() {
     },
   })
 
-  // challenge initial state is handled by <ChallengeStoreSync>
-  // useSdkEntitiesGet({
-  //   query: query_get_challenges,
-  //   enabled: mounted,
-  //   setEntities: (entities: PistolsEntity[]) => {
-  //     console.log("EntityStoreSync() SET CHALLENGES =======> [entities]:", entities)
-  //     challengeState.setEntities(entities)
-  //     challengeQueryState.setEntities(entities)
-  //   },
-  // })
-
   useSdkEntitiesSub({
     query: query_sub,
-    enabled: (mounted && isFinishedAdmin && isFinishedPlayers && isFinishedDuelists && isFinishedStacks),
+    enabled: (mounted && isFinishedMisc && isFinishedPlayers && isFinishedDuelists && isFinishedStacks),
     setEntities: (entities: PistolsEntity[]) => {
       console.log("EntityStoreSync() SET =======> [entities]: DISCARD!", entities.length)
     },
@@ -207,15 +200,19 @@ export function EntityStoreSync() {
       if (entityContainsModels(entity, ['PlayerDuelistStack'])) {
         duelistStackState.updateEntity(entity)
       }
-      if (entityContainsModels(entity, ['Challenge', 'ChallengeMessage', 'Round'])) {
-        challengeState.updateEntity(entity)
-        challengeQueryState.updateEntity(entity)
-      }
       if (entityContainsModels(entity, ['Pack'])) {
         packState.updateEntity(entity)
       }
       if (entityContainsModels(entity, ['Pool'])) {
         bankState.updateEntity(entity)
+      }
+      // per season models (update only)
+      if (entityContainsModels(entity, ['Challenge', 'ChallengeMessage', 'Round'])) {
+        challengeState.updateEntity(entity)
+        challengeQueryState.updateEntity(entity)
+      }
+      if (entityContainsModels(entity, ['SeasonScoreboard'])) {
+        scoreboardState.updateEntity(entity)
       }
     },
   })

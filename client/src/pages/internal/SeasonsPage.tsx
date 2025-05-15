@@ -439,8 +439,8 @@ function Leaderboards({
         </Row>
       </Header>
       <Body>
-        {scores.map(({ duelistId, score }, index) => (
-          <LeaderboardRow key={duelistId} duelistId={duelistId} score={score} index={index} />
+        {scores.map(({ duelistId, points }, index) => (
+          <LeaderboardRow key={duelistId} duelistId={duelistId} points={points} index={index} />
         ))}
       </Body>
     </Table>
@@ -448,11 +448,11 @@ function Leaderboards({
 }
 function LeaderboardRow({
   duelistId,
-  score,
+  points,
   index,
 }: {
   duelistId: BigNumberish,
-  score: number,
+  points: number,
   index: number,
 }) {
   const { owner, isLoading: isLoadingOwner } = useOwnerOfDuelist(duelistId)
@@ -465,7 +465,7 @@ function LeaderboardRow({
           {`Duelist #${duelistId}`}
         </span>
       </Cell>
-      <Cell className='Code'>{score}</Cell>
+      <Cell className='Code'>{points}</Cell>
       <Cell className='Code'>{isLoadingOwner ? '...' : bigintToHex(owner)}</Cell>
       {/* <Cell className='Code'>{isLoadingUsername ? '...' : username}</Cell> */}
       <Cell className='Code'>{username || '...'}</Cell>

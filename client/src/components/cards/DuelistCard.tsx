@@ -19,6 +19,7 @@ import { ActionButton } from '/src/components/ui/Buttons'
 import { ChallengeTableSelectedDuelist } from '/src/components/ChallengeTable'
 import { DUELIST_CARD_WIDTH } from '/src/data/cardConstants'
 import { emitter } from '/src/three/game'
+import { useDuelistCurrentSeasonScore } from '/src/stores/scoreboardStore'
 
 interface DuelistCardProps extends InteractibleComponentProps {
   duelistId: number
@@ -46,6 +47,9 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
   const { nameAndId: name, profilePic, profileType, isInAction, totals, quote, currentDuelId } = useDuelist(props.duelistId)
   const {isAlive} = useDuelistFameBalance(props.duelistId)
   const { stackedDuelistIds, level } = useDuelistStack(props.duelistId)
+
+  const { points, position } = useDuelistCurrentSeasonScore(props.duelistId)
+  // console.log(`DUELIST SCORE:`, props.duelistId, position, points)
 
   // Animation states
   const [isAnimatingSouls, setIsAnimatingSouls] = useState(false)

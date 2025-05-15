@@ -8,16 +8,15 @@ import { useAllChallengesIds, useChallenge } from '/src/stores/challengeStore'
 import { useDuelist, useAllDuelistsIds } from '/src/stores/duelistStore'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { useSeasonTotals } from '/src/queries/useSeason'
-import { useGetSeasonScoreboard } from '/src/queries/useScore'
+import { useSeasonScoreboard, DuelistScore } from '/src/stores/scoreboardStore'
 import { useDuelistFameBalance, fetchTokenBoundBalances } from '/src/stores/coinStore'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
-import { ChallengeStoreSync } from '/src/stores/sync/ChallengeStoreSync'
+import { SeasonChallengeStoreSync, SeasonScoreboardStoreSync } from '/src/stores/sync/SeasonEntityStoreSync'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
 import { InternalPageMenu, InternalPageWrapper } from '/src/pages/internal/InternalPageIndex'
 import { SeasonSelectDropdown } from '/src/components/SeasonSelectDropdown'
 import { CopyIcon, IconClick } from '/src/components/ui/Icons'
 import AppDojo from '/src/components/AppDojo'
-import { DuelistScore, useLeaderboard } from '/src/stores/seasonStore'
 
 
 const Row = Grid.Row
@@ -86,7 +85,7 @@ export function Snapshots() {
   const { duelIds: seasonDuelIds, duelistIds: seasonDuelistIds } = useSeasonTotals(seasonId)
   const { duelIds: allDuelIds } = useAllChallengesIds()
   const { duelistIds: allDuelistIds } = useAllDuelistsIds()
-  const { scores: leaderboardScores } = useLeaderboard(seasonId)
+  const { seasonScoreboard } = useSeasonScoreboard(seasonId)
   // console.log("______________Snapshots:", seasonId, leaderboardScores)
 
   useEffect(() => {
@@ -108,7 +107,8 @@ export function Snapshots() {
 
   return (
     <Container text>
-      <ChallengeStoreSync />
+      <SeasonChallengeStoreSync />
+      <SeasonScoreboardStoreSync />
       <EntityStoreSync />
 
       <Grid>
@@ -119,7 +119,7 @@ export function Snapshots() {
         </Row>
         <Row columns={'equal'}>
           <Col>
-            <SnapshotDuelists seasonId={seasonId} duelistIds={seasonId ? seasonDuelistIds : allDuelistIds} leaderboardScores={leaderboardScores} />
+            <SnapshotDuelists seasonId={seasonId} duelistIds={seasonId ? seasonDuelistIds : allDuelistIds} seasonScoreboard={seasonScoreboard} />
           </Col>
           <Col>
             <SnapshotChallenges seasonId={seasonId} duelIds={seasonId ? seasonDuelIds : allDuelIds} />
@@ -178,15 +178,15 @@ const useSnapping = (name: string, seasonId: number, limit: number) => {
 function SnapshotDuelists({
   seasonId,
   duelistIds,
-  leaderboardScores,
+  seasonScoreboard,
 }: {
   seasonId: number
   duelistIds: bigint[]
-  leaderboardScores: DuelistScore[]
+  seasonScoreboard: DuelistScore[]
 }) {
   const { snapping, count, limit, start } = useSnapping('duelists', seasonId, duelistIds.length)
   const loaders = useMemo(() => (
-    snapping ? duelistIds.map(duelistId => <SnapDuelist key={duelistId} seasonId={seasonId} duelistId={duelistId} leaderboardScores={leaderboardScores} />) : null
+    snapping ? duelistIds.map(duelistId => <SnapDuelist key={duelistId} seasonId={seasonId} duelistId={duelistId} seasonScoreboard={seasonScoreboard} />) : null
   ), [snapping, duelistIds])
   return (
     <>
@@ -201,20 +201,19 @@ function SnapshotDuelists({
 export function SnapDuelist({
   duelistId,
   seasonId,
-  leaderboardScores,
+  seasonScoreboard,
 }: {
   seasonId: number
   duelistId: bigint
-  leaderboardScores: DuelistScore[]
+  seasonScoreboard: DuelistScore[]
 }) {
   const insert = useStore((state) => state.insert)
   const duelist = useDuelist(duelistId)
   const { balance_eth, lives } = useDuelistFameBalance(duelistId)
-  const { points, isLoading } = useGetSeasonScoreboard(seasonId, duelistId)
   const mounted = useMounted()
   useEffect(() => {
-    if (mounted && duelist && (!seasonId || !isLoading)) {
-      const leaderboardIndex = leaderboardScores.findIndex(s => s.duelistId == duelistId)
+    if (mounted && duelist && seasonId && seasonScoreboard) {
+      const leaderboardIndex = seasonScoreboard.findIndex(s => s.duelistId == duelistId)
       insert('duelist', bigintToDecimal(duelistId.toString()), {
         ...duelist,
         fame_balance: bigintToDecimal(balance_eth),
@@ -231,13 +230,13 @@ export function SnapDuelist({
         },
         ...(seasonId ? {
           [seasonId]: {
-            score: points,
+            score: seasonScoreboard[leaderboardIndex]?.points ?? 0,
             position: (leaderboardIndex >= 0 ? leaderboardIndex + 1 : 0),
           }
         } : {}),
       })
     }
-  }, [mounted, duelist, isLoading, seasonId, points, isLoading])
+  }, [mounted, duelist, seasonId, seasonScoreboard])
   return <></>
 }
 

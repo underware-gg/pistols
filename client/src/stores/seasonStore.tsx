@@ -6,10 +6,10 @@ import { PistolsSchemaType } from '@underware/pistols-sdk/pistols/sdk'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { useConfig } from '/src/stores/configStore'
 
-export const useSeasonConfigStore = createDojoStore<PistolsSchemaType>();
+export const useSeasonStore = createDojoStore<PistolsSchemaType>();
 
 export const useAllSeasonIds = () => {
-  const entities = useSeasonConfigStore((state) => state.entities)
+  const entities = useSeasonStore((state) => state.entities)
   const seasonIds = useMemo(() => (
     Object.values(entities)
       .filter(e => Boolean(e.models?.pistols?.SeasonConfig))
@@ -26,7 +26,7 @@ export const useCurrentSeason = () => {
 }
 
 export const useSeason = (season_id: number) => {
-  const entities = useSeasonConfigStore((state) => state.entities);
+  const entities = useSeasonStore((state) => state.entities);
   const season = useEntityModelByKeys<models.SeasonConfig>(entities, 'SeasonConfig', [season_id])
   // console.log(`useSeason() =>`, season_id, season)
 
@@ -54,11 +54,11 @@ export const useSeason = (season_id: number) => {
 
 export type DuelistScore = {
   duelistId: bigint
-  score: number
+  points: number
 }
 
 export const useLeaderboard = (season_id: number) => {
-  const entities = useSeasonConfigStore((state) => state.entities);
+  const entities = useSeasonStore((state) => state.entities);
   const leaderboard = useEntityModelByKeys<models.Leaderboard>(entities, 'Leaderboard', [season_id])
   // console.log(`useLeaderboard() =>`, season_id, leaderboard)
 
@@ -74,7 +74,7 @@ export const useLeaderboard = (season_id: number) => {
       if (duelistId > 0n) {
         result.push({
           duelistId,
-          score: Number(score),
+          points: Number(score),
         })
       }
     }
