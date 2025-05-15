@@ -263,15 +263,6 @@ export class InteractibleScene extends THREE.Scene {
     this.backgroundBlurShader.setUniformValue('uResolution', new THREE.Vector2(sizes.canvasWidth, sizes.canvasHeight))
     this.backgroundBlurShader.setUniformValue('uExcludedColor', new THREE.Color(0, 0, 0))
     this.backgroundBlurShader.setUniformValue('uSamples', 0)
-
-    if (this.sceneData.backgrounds && this.sceneData.backgrounds.length > 0) {
-      document.addEventListener('mousemove', this.onMouseMove.bind(this), false);
-    } 
-    if (this.sceneData.items && this.sceneData.items.length > 0) {
-      document.addEventListener('click', this.onMouseClick.bind(this), false);
-    }
-
-    window.addEventListener('resize', this.onResize, false)
   }
 
   public dispose() {
@@ -318,14 +309,8 @@ export class InteractibleScene extends THREE.Scene {
         this.renderer.setRenderTarget(this.fbo_mask);
         this.renderer.clear();
         this.renderer.render(this.fbo_mask_scene, this.camera);
-
-        const maskRead = new Float32Array(4);
-        this.renderer.readRenderTargetPixels(this.fbo_mask, this.mousePos.x, this.mousePos.y, 1, 1, maskRead);
-
-        this.checkRenderOrders(maskRead);
-      } else {
-        this.renderer.setRenderTarget(null);
       }
+      this.renderer.setRenderTarget(null);
 
       this.renderer.render(this.backgroundScene, this.camera);
 
@@ -333,6 +318,13 @@ export class InteractibleScene extends THREE.Scene {
       this.timeOffset = 0
       this.pickColor(0, 0, 0)
     }
+  }
+
+  private performColorPick() {
+    const maskRead = new Float32Array(4);
+    this.renderer.readRenderTargetPixels(this.fbo_mask, this.mousePos.x, this.mousePos.y, 1, 1, maskRead);
+
+    this.checkRenderOrders(maskRead);
   }
 
   private checkRenderOrders(maskRead: Float32Array) {
@@ -378,6 +370,9 @@ export class InteractibleScene extends THREE.Scene {
     this.backgroundBlurShader?.setUniformValue('uResolution', new THREE.Vector2(sizes.canvasWidth, sizes.canvasHeight))
   }
 
+  private lastPickTime: number = 0;
+  private readonly PICK_INTERVAL = 80;
+
   // get mouse position over the canvas for bar interaction
   onMouseMove(event: MouseEvent) {
     event.preventDefault();
@@ -401,6 +396,14 @@ export class InteractibleScene extends THREE.Scene {
     const screenX = ((event.clientX - rect.left) / rect.width) * 2 - 1
     const screenY = -((event.clientY - rect.top) / rect.height) * 2 + 1
     this.mouseScreenPos.set(screenX, screenY)
+
+    if (this.sceneData.items) {
+      const now = performance.now();
+      if (now - this.lastPickTime > this.PICK_INTERVAL) {
+        this.lastPickTime = now;
+        this.performColorPick();
+      }
+    }
   }
 
   onMouseClick(event: PointerEvent) {
@@ -414,6 +417,40 @@ export class InteractibleScene extends THREE.Scene {
     } else {
       emitter.emit('scene_click', null)
     }
+  }
+
+  public activate() {
+    if (this.sceneData.backgrounds && this.sceneData.backgrounds.length > 0) {
+      document.addEventListener('mousemove', this.onMouseMove.bind(this), false);
+    } 
+    if (this.sceneData.items && this.sceneData.items.length > 0) {
+      document.addEventListener('click', this.onMouseClick.bind(this), false);
+    }
+    window.addEventListener('resize', this.onResize, false);
+  }
+
+  public deactivate() {
+    if (this.renderer) {
+      this.renderer.setRenderTarget(null);
+      
+      if (this.fbo_blur_background) {
+        this.renderer.setRenderTarget(this.fbo_blur_background);
+        this.renderer.clear();
+      }
+      
+      if (this.fbo_mask) {
+        this.renderer.setRenderTarget(this.fbo_mask);
+        this.renderer.clear();
+      }
+      
+      this.renderer.setRenderTarget(null);
+      this.renderer.clear();
+    }
+    this.pickColor(0, 0, 0);
+    this.pickedItem = null;
+    document.removeEventListener('mousemove', this.onMouseMove.bind(this), false);
+    document.removeEventListener('click', this.onMouseClick.bind(this), false);
+    window.removeEventListener('resize', this.onResize, false);
   }
 
   private resetRandomInterpolation() {
