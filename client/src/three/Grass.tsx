@@ -12,7 +12,7 @@ export class Grass extends THREE.Object3D {
 
   private totalTime = 0.0;
   private lastTime = 0.0;
-  private windUpdateFPS = 8;
+  private windUpdateFPS = 16;
   private geometryHigh: THREE.InstancedBufferGeometry;
   private materialHigh: shaders.ShaderMaterial;
   private depthMaterial: shaders.ShaderMaterial;
