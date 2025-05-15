@@ -24,7 +24,7 @@ export function EventsHistoricalStoreSync() {
     updateEntity: historicalEventsState.updateEvent,
   })
 
-  useEffect(() => console.log('EventsHistoricalStoreSync() =>', historicalEventsState.playerActivity), [historicalEventsState.playerActivity])
+  // useEffect(() => console.log('EventsHistoricalStoreSync() =>', historicalEventsState.playerActivity), [historicalEventsState.playerActivity])
 
   return (<></>)
 }
