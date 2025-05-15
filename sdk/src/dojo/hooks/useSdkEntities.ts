@@ -316,7 +316,7 @@ export const formatQueryValue = (value: BigNumberish): string => {
 //
 // Extract models from a stored entity
 //
-export const getEntityModel = <M extends PistolsModelType>(entity: PistolsEntity, modelName: PistolsSchemaModelNames): M => (
+export const getEntityModel = <M extends PistolsModelType>(entity: PistolsEntity, modelName: PistolsSchemaModelNames): M | undefined => (
   entity?.models.pistols?.[modelName] as M
 )
 export const entityContainsModels = (entity: PistolsEntity, modelNames: PistolsSchemaModelNames[]): boolean => (
@@ -324,14 +324,27 @@ export const entityContainsModels = (entity: PistolsEntity, modelNames: PistolsS
 )
 
 // as hooks
-export const useEntityModelByKeys = <M extends PistolsModelType>(entities: Record<string, PistolsEntity>, modelName: PistolsSchemaModelNames, keys: BigNumberish[]): M => {
+export const useEntityModelByKeys = <M extends PistolsModelType>(entities: Record<string, PistolsEntity>, modelName: PistolsSchemaModelNames, keys: BigNumberish[]): M | undefined => {
   const entityId = useEntityId(keys)
   return useEntityModelById(entities, modelName, entityId)
 }
-export const useEntityModelById = <M extends PistolsModelType>(entities: Record<string, PistolsEntity>, modelName: PistolsSchemaModelNames, entityId: string): M => {
+export const useEntityModelById = <M extends PistolsModelType>(entities: Record<string, PistolsEntity>, modelName: PistolsSchemaModelNames, entityId: string): M | undefined => {
   const entity = useMemo(() => entities[entityId], [entities[entityId]])
+  return useEntityModel(entity, modelName)
+}
+export const useEntityModel = <M extends PistolsModelType>(entity: PistolsEntity, modelName: PistolsSchemaModelNames): M | undefined => {
   const model = useMemo(() => getEntityModel<M>(entity, modelName), [entity, modelName])
   return model
+}
+export const useEntitiesModel = <M extends PistolsModelType>(entities: PistolsEntity[], modelName: PistolsSchemaModelNames): M[] => {
+  const models = useMemo(() => (
+    entities.reduce((acc, e) => {
+      const m = getEntityModel<M>(e, modelName);
+      if (m) acc.push(m);
+      return acc;
+    }, [] as M[])
+  ), [entities, modelName])
+  return models
 }
 
 //

@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { PistolsClauseBuilder, PistolsQueryBuilder } from '@underware/pistols-sdk/pistols/sdk'
-import { useSdkStateEventsGet, formatQueryValue, getEntityModel } from '@underware/pistols-sdk/dojo'
+import { useSdkStateEventsGet, formatQueryValue, useEntityModel } from '@underware/pistols-sdk/dojo'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { weiToEth } from '@underware/pistols-sdk/starknet'
 import { models } from '@underware/pistols-sdk/pistols/gen'
@@ -27,7 +27,8 @@ export const useGetChallengeRewards = (duel_id: BigNumberish, duelist_id: BigNum
     query,
     retryInterval: 1000,
   })
-  const rewards = useMemo(() => getEntityModel<models.ChallengeRewardsEvent>(entities?.[0], 'ChallengeRewardsEvent')?.rewards, [entities])
+  const event = useEntityModel<models.ChallengeRewardsEvent>(entities?.[0], 'ChallengeRewardsEvent')
+  const rewards = useMemo<models.RewardValues>(() => (event?.rewards), [event])
 
   const fame_lost_wei = useMemo(() => BigInt(rewards?.fame_lost ?? 0), [rewards])
   const fame_gained_wei = useMemo(() => BigInt(rewards?.fame_gained ?? 0), [rewards])

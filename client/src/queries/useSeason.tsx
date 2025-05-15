@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { useMemoGate } from '@underware/pistols-sdk/utils/hooks'
-import { formatQueryValue, getEntityModel, useSdkEntitiesGetState } from '@underware/pistols-sdk/dojo'
+import { useEntitiesModel, useSdkEntitiesGetState } from '@underware/pistols-sdk/dojo'
 import { PistolsQueryBuilder, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols/sdk'
 import { parseEnumVariant } from '@underware/pistols-sdk/starknet'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
@@ -26,7 +26,7 @@ const useGetChallengesBySeasonQuery = (seasonId: BigNumberish) => {
       .includeHashedKeys()
   ), [seasonId])
   const { entities } = useSdkEntitiesGetState({ query })
-  const challenges = useMemo(() => entities.map(e => getEntityModel<models.Challenge>(e, 'Challenge')), [entities])
+  const challenges = useEntitiesModel<models.Challenge>(entities, 'Challenge')
   // useEffect(() => console.log(`useGetChallengesBySeasonQuery()`, challenges), [challenges])
   return { challenges }
 }

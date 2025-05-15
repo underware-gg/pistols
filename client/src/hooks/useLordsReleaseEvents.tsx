@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { PistolsClauseBuilder, PistolsHistoricalQueryBuilder } from '@underware/pistols-sdk/pistols/sdk'
-import { useSdkStateEventsGet, getEntityModel, formatQueryValue } from '@underware/pistols-sdk/dojo'
+import { useSdkStateEventsGet, formatQueryValue, useEntitiesModel } from '@underware/pistols-sdk/dojo'
 import { parseCustomEnum } from '@underware/pistols-sdk/starknet'
 import { useMemoGate } from '@underware/pistols-sdk/utils/hooks'
 import { models, constants } from '@underware/pistols-sdk/pistols/gen'
@@ -37,10 +37,7 @@ export const useLordsReleaseEvents = (season_id: number) => {
   const { entities } = useSdkStateEventsGet({
     query,
   })
-  const events = useMemo(() => (
-    entities.map(e => getEntityModel<models.LordsReleaseEvent>(e, 'LordsReleaseEvent'))
-      .filter(Boolean) // TODO: remove when dojo.js#423 is fixed
-  ), [entities])
+  const events = useEntitiesModel<models.LordsReleaseEvent>(entities, 'LordsReleaseEvent')
 
   const bills = useMemo(() => (
     events.map(e => {

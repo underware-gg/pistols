@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
-import { formatQueryValue, getEntityModel, useSdkEntitiesSubState } from '@underware/pistols-sdk/dojo'
+import { formatQueryValue, useEntityModel, useSdkEntitiesSubState } from '@underware/pistols-sdk/dojo'
 import { PistolsQueryBuilder, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols/sdk'
 import { makePactPair } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
@@ -33,7 +33,7 @@ export const usePact = (duel_type: constants.DuelType, address_a: BigNumberish, 
     query,
     enabled,
   })
-  const pact = useMemo(() => entities.map(e => getEntityModel<models.Pact>(e, 'Pact'))?.[0], [entities])
+  const pact = useEntityModel<models.Pact>(entities?.[0], 'Pact')
   // useEffect(() => console.log(`usePact()`, duel_type, bigintToHex(pair), pacts), [duel_type, pair, pacts])
 
   const pactDuelId = useMemo(() => BigInt(pact?.duel_id ?? 0n), [pact])
