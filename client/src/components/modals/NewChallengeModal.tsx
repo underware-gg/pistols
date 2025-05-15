@@ -378,7 +378,7 @@ function NewChallengeForm({
           setValue={setMessage}
           code={true}
           disabled={false}
-          maxLength={31}
+          maxLength={128}
         />
       </Form.Field>
       
