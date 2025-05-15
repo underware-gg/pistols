@@ -1036,6 +1036,7 @@ const EnvironmentDeck = forwardRef<EnvironmentDeckHandle, EnvironmentDeckProps>(
           ref={card.ref}
           isLeft={false}
           isHighlightable={card.isDrawn && expanded}
+          isDraggable={card.isDrawn}
           width={Constants.CARD_WIDTH}
           height={Constants.CARD_HEIGHT}
           isVisible={false}
