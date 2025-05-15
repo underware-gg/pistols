@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
-import { useEntityIds, getEntityModel, useDojoSystem, keysToEntityId, getCustomEnumCalldata, useEntityModelByKeys, useEntityModelById } from '@underware/pistols-sdk/dojo'
+import { useEntityIds, getEntityModel, useDojoSystem, keysToEntityId, getCustomEnumCalldata, useEntityModelByKeys, useEntityModelById, useEntitiesModel } from '@underware/pistols-sdk/dojo'
 import { useClientTimestamp, useMemoGate } from '@underware/pistols-sdk/utils/hooks'
 import { isPositiveBigint, bigintToDecimal, bigintToHex } from '@underware/pistols-sdk/utils'
 import { makeAbiCustomEnum, parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/starknet'
@@ -299,16 +299,16 @@ export function useDuelistStacks(player_address: BigNumberish) {
     return builder;
   }, [player_address]);
 
-  const { entities: queryEntities, isLoading } = useSdkEntitiesGetState({
+  const { entities, isLoading } = useSdkEntitiesGetState({
     query,
     enabled: Boolean(query),
   });
 
+  const playerStacks = useEntitiesModel<models.PlayerDuelistStack>(entities, 'PlayerDuelistStack')
+
   const stacks = useMemo(() => {
-    if (!queryEntities || !player_address) return [];
-    const playerStacks = filterEntitiesByModels(queryEntities, ['PlayerDuelistStack']);
-    return playerStacks.map(entity => {
-      const stack = entity.models.pistols['PlayerDuelistStack'] as models.PlayerDuelistStack;
+    if (!playerStacks || !player_address) return [];
+    return playerStacks.map(stack => {
       if (!stack.active_duelist_id) return null;
       return {
         activeDuelistId: stack.active_duelist_id,
@@ -316,7 +316,7 @@ export function useDuelistStacks(player_address: BigNumberish) {
         level: Number(stack.level ?? 0),
       };
     }).filter(Boolean);
-  }, [queryEntities, player_address]);
+  }, [playerStacks, player_address]);
 
   return {
     stacks,
