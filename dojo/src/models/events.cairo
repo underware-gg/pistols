@@ -60,6 +60,7 @@ pub struct ChallengeRewardsEvent {
     pub duelist_id: u128,
     //-----------------------
     pub rewards: RewardValues,
+    pub timestamp: u64,
 }
 
 #[derive(Copy, Drop, Serde)]

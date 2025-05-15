@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { PistolsClauseBuilder, PistolsHistoricalQueryBuilder } from '@underware/pistols-sdk/pistols/sdk'
-import { useSdkStateEventsGet, formatQueryValue, useEntitiesModel } from '@underware/pistols-sdk/dojo'
+import { useSdkEventsGetState, formatQueryValue, useEntitiesModel } from '@underware/pistols-sdk/dojo'
 import { parseCustomEnum } from '@underware/pistols-sdk/starknet'
 import { useMemoGate } from '@underware/pistols-sdk/utils/hooks'
 import { models, constants } from '@underware/pistols-sdk/pistols/gen'
@@ -34,7 +34,7 @@ export const useLordsReleaseEvents = (season_id: number) => {
       .includeHashedKeys()
   ), [season_id])
 
-  const { entities } = useSdkStateEventsGet({
+  const { entities } = useSdkEventsGetState({
     query,
   })
   const events = useEntitiesModel<models.LordsReleaseEvent>(entities, 'LordsReleaseEvent')

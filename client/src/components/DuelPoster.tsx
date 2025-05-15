@@ -30,6 +30,7 @@ import { useCanCollectDuel } from '/src/hooks/usePistolsContractCalls'
 import { useDuelCallToAction } from '/src/stores/eventsModelStore'
 import { useDuelistFameBalance } from '/src/stores/coinStore'
 import { SceneName } from '/src/data/assets'
+import { useDuelistFameOnDuel } from '../queries/useDuelistFameOnDuel'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -92,6 +93,9 @@ const useDuelPosterData = (duelId?: bigint) => {
     return duelistId !== Number(winnerDuelistId) && isFinished
   }
 
+  const { fameBefore: fameBeforeA, fameAfter: fameAfterA } = useDuelistFameOnDuel(duelId, duelistIdA)
+  const { fameBefore: fameBeforeB, fameAfter: fameAfterB } = useDuelistFameOnDuel(duelId, duelistIdB)
+  
   return {
     leftDuelistId,
     leftDuelistAddress,
@@ -101,7 +105,11 @@ const useDuelPosterData = (duelId?: bigint) => {
     rightPlayerName,
     isDead,
     isYouA,
-    isYouB
+    isYouB,
+    fameBeforeA,
+    fameAfterA,
+    fameBeforeB,
+    fameAfterB,
   }
 }
 

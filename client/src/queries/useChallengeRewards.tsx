@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { PistolsClauseBuilder, PistolsQueryBuilder } from '@underware/pistols-sdk/pistols/sdk'
-import { useSdkStateEventsGet, formatQueryValue, useEntityModel } from '@underware/pistols-sdk/dojo'
+import { useSdkEventsGetState, formatQueryValue, useEntityModel } from '@underware/pistols-sdk/dojo'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { weiToEth } from '@underware/pistols-sdk/starknet'
 import { models } from '@underware/pistols-sdk/pistols/gen'
@@ -23,7 +23,7 @@ export const useGetChallengeRewards = (duel_id: BigNumberish, duelist_id: BigNum
       : null
   ), [duel_id, duelist_id])
 
-  const { entities } = useSdkStateEventsGet({
+  const { entities } = useSdkEventsGetState({
     query,
     retryInterval: 1000,
   })

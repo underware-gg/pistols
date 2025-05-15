@@ -89,7 +89,7 @@ export const useSdkEntitiesSubState = ({
 // as: EntityMap
 //
 
-export const useSdkStateEventsGet = ({
+export const useSdkEventsGetState = ({
   query,
   enabled = true,
   retryInterval = 0,
@@ -103,7 +103,7 @@ export const useSdkStateEventsGet = ({
     enabled,
     retryInterval,
     setEntities: (entities: PistolsEntity[]) => {
-      console.log('useSdkStateEventsGet() GOT:', entities, query)
+      console.log('useSdkEventsGetState() GOT:', entities, query)
       if (historical) {
         // historical events can have duplicated entityIds
         state.setEntities(entities.map((e, i) => ({...e, entityId: bigintToDecimal(i) })));
