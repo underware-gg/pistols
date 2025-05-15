@@ -82,13 +82,8 @@ export default function ScDuelsBoard() {
   const allDuelPosters = useMemo(() => {
     const posters = new Map<bigint, JSX.Element>()
 
-    const currentIds = new Set(challengeIds.map(id => Number(id)))
-    
-    Object.keys(posterRefs.current).forEach(key => {
-      const numKey = Number(key)
-      if (!currentIds.has(numKey)) {
-        delete posterRefs.current[numKey]
-      }
+    Object.values(posterRefs.current).forEach(posterRef => {
+      posterRef?.toggleVisibility(false)
     })
     
     const getStartPosition = (index: number) => {
@@ -104,6 +99,7 @@ export default function ScDuelsBoard() {
 
     const createPoster = (duel: bigint) => {
       const index = challengeIds.indexOf(duel) % duelsPerPage
+
       const rotation = Math.random() * 10 - 5 + (index - 2) * 5
       const position = getStartPosition(index)
 
@@ -127,7 +123,7 @@ export default function ScDuelsBoard() {
             }}
             duelId={duel}
             isSmall={true}
-            isVisible={false}
+            isVisible={true}
             isFlipped={true}
             isHighlightable={true}
             startPosition={position}
@@ -140,7 +136,9 @@ export default function ScDuelsBoard() {
     }
 
     challengeIds.forEach(duel => {
-      posters.set(duel, createPoster(duel))
+      if (!posters.has(duel)) {
+        posters.set(duel, createPoster(duel))
+      }
     })
 
     return posters

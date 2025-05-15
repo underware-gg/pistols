@@ -83,16 +83,11 @@ export default function ScGraveyard() {
 
   const allDuelPosters = useMemo(() => {
     const posters = new Map<bigint, JSX.Element>()
-    
-    const currentIds = new Set(challengeIds.map(id => Number(id)))
-    
-    Object.keys(posterRefs.current).forEach(key => {
-      const numKey = Number(key)
-      if (!currentIds.has(numKey)) {
-        delete posterRefs.current[numKey]
-      }
-    })
 
+    Object.values(posterRefs.current).forEach(posterRef => {
+      posterRef?.toggleVisibility(false)
+    })
+    
     const createPoster = (duel: bigint) => (
       <div 
         key={duel} 
@@ -123,11 +118,14 @@ export default function ScGraveyard() {
     )
 
     challengeIds.forEach(duel => {
-      posters.set(duel, createPoster(duel))
+      if (!posters.has(duel)) {
+        posters.set(duel, createPoster(duel))
+      }
     })
 
     return posters
   }, [challengeIds, aspectWidth, aspectHeight])
+
 
   useEffect(() => {
     setPageNumber(0)
