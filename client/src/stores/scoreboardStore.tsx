@@ -96,10 +96,6 @@ const _useMergeScoreboardWithLeaderboard = (scoreboard: DuelistScore[], seasonId
 
 export const useDuelistCurrentSeasonScore = (duelist_id: BigNumberish) => {
   const { seasonScoreboard } = useCurrentSeasonScoreboard();
-  return _useDuelistScoreboard(seasonScoreboard, duelist_id);
-}
-
-const _useDuelistScoreboard = (seasonScoreboard: DuelistScore[], duelist_id: BigNumberish) => {
   const { position, points } = useMemo(() => {
     const index = seasonScoreboard.findIndex(s => bigintEquals(s.duelistId, duelist_id));
     return {
