@@ -79,15 +79,15 @@
 
 .OnlineStatusSection {
   position: absolute;
-  top: 12%;
-  right: 22.5%;
+  top: 10.5%;
+  right: 20.5%;
   width: aspect-width(2);
   height: aspect-width(2);
   z-index: 10;
 
   &.Small {
     top: 18.5%;
-    right: 16%;
+    right: 8%;
     width: aspect-width(1.2);
     height: aspect-width(1.2);
   }

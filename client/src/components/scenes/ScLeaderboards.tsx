@@ -206,12 +206,15 @@ export default function ScLeaderboards() {
 
   // Get leaderboard data for selected season
   const { maxPositions = 0, scores: leaderboardScores = [] } = useLeaderboard(selectedSeasonId || 0);
-  const { seasonScoreboard } = useSeasonScoreboard(selectedSeasonId || 0);
+  const { seasonScoreboard = [] } = useSeasonScoreboard(selectedSeasonId || 0);
 
   const scores = useMemo(() => {
     return [
       ...leaderboardScores,
-      ...seasonScoreboard.filter(s => !leaderboardScores.some(l => l.duelistId === s.duelistId))
+      ...(seasonScoreboard || []).filter(s => 
+        s && s.duelistId !== undefined && 
+        !(leaderboardScores || []).some(l => l && l.duelistId === s.duelistId)
+      )
     ];
   }, [leaderboardScores, seasonScoreboard])
 
@@ -501,8 +504,8 @@ export default function ScLeaderboards() {
   return (
     <div style={{ position: 'absolute', bottom: 0, left: 0, width: aspectWidth(100), height: aspectHeight(87), display: 'flex' }}>
       {/* Left Side - Seasons */}
-      <div style={{ flex: '1', padding: aspectWidth(3), paddingRight: aspectWidth(1) }}>
-        <div style={{ height: '100%', display: 'flex', flexDirection: 'column', backgroundImage: 'url("/images/ui/leaderboards/seasons_board.png")', backgroundSize: '100% 100%', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', padding: aspectWidth(1.4) }}>
+      <div style={{ flex: '1', paddingTop: aspectWidth(3), paddingBottom: aspectWidth(3), paddingLeft: aspectWidth(3), paddingRight: aspectWidth(1) }}>
+        <div style={{ height: '100%', display: 'flex', flexDirection: 'column', backgroundImage: 'url("/images/ui/leaderboards/seasons_board.png")', backgroundSize: '100% 100%', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', paddingTop: aspectWidth(1.4), paddingBottom: aspectWidth(1.4), paddingLeft: aspectWidth(1.4), paddingRight: aspectWidth(1.4) }}>
           <Header as="h3" style={{ color: 'white', textAlign: 'center', marginBottom: '20px' }}>SEASONS</Header>
           
           <div className='TextDivider bright LeaderboardsDivider EqualMargin'>Current Season</div>
@@ -552,7 +555,7 @@ export default function ScLeaderboards() {
       </div>
 
       {/* Right Side - Leaderboard */}
-      <div style={{ flex: '1.5', padding: aspectWidth(3), paddingRight: aspectWidth(4), paddingLeft: aspectWidth(0) }}>
+      <div style={{ flex: '1.5', paddingTop: aspectWidth(3), paddingBottom: aspectWidth(3), paddingRight: aspectWidth(4), paddingLeft: aspectWidth(0) }}>
         <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column' }}>
           {selectedSeasonId ? (
             <>
