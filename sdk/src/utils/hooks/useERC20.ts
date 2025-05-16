@@ -37,6 +37,37 @@ export const useERC20Balance = (
   }
 }
 
+export const useERC20TotalSupply = (
+  contractAddress: BigNumberish,
+  watch: boolean = false,
+) => {
+  const contractIsValid = useMemo(() => (isPositiveBigint(contractAddress)), [contractAddress])
+
+  const { contract } = useContract({
+    abi: erc20_abi,
+    address: contractIsValid ? bigintToHex(contractAddress) : null,
+  })
+
+  const [totalSupply, setTotalSupply] = useState<bigint>(null)
+
+  useEffect(() => {
+    if (!contractIsValid) {
+      setTotalSupply(null)
+    }
+  }, [contractIsValid])
+
+  // try ByteArray
+  useEffect(() => {
+    contract?.call('total_supply').then((supply: bigint) => {
+      if (supply) setTotalSupply(supply)
+    })
+  }, [contract])
+
+  return {
+    totalSupply,
+  }
+}
+
 export const useERC20TokenName = (contractAddress: BigNumberish) => {
   const contractIsValid = useMemo(() => (isPositiveBigint(contractAddress)), [contractAddress])
 

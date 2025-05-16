@@ -11,7 +11,7 @@ import {
   Abi,
   ec,
 } from 'starknet'
-import { bigintToHex, isPositiveBigint } from 'src/utils/misc/types'
+import { bigintToHex, isBigint, isPositiveBigint } from 'src/utils/misc/types'
 
 //
 // Lenghts of a Starknet address
@@ -37,8 +37,8 @@ export const bigintToU256 = (v: BigNumberish): Uint256 => (uint256.bnToUint256(v
 //
 // ETH conversions
 export const ETH_TO_WEI = 1_000_000_000_000_000_000n
-export const ethToWei = (eth: BigNumberish): bigint => (BigInt(eth) * ETH_TO_WEI)
-export const weiToEth = (wei: BigNumberish): bigint => (BigInt(wei) / ETH_TO_WEI)
+export const ethToWei = (eth: BigNumberish): bigint => isBigint(eth) ? (BigInt(eth) * ETH_TO_WEI) : 0n
+export const weiToEth = (wei: BigNumberish): bigint => isBigint(wei) ? (BigInt(wei) / ETH_TO_WEI) : 0n
 export const weiToEthDecimals = (wei: BigNumberish): bigint => (BigInt(wei) % ETH_TO_WEI)
 export const weiToEthString = (wei: BigNumberish, decimals: number = 0, trailingZeros: boolean = false): string => {
   let result = Number(weiToEth(wei)).toLocaleString('en-US', { maximumFractionDigits: 8 })
