@@ -48,9 +48,7 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
     didPlayersInitA.current = false;
     didPlayersInitB.current = false;
     didTutorialRun.current = false;
-    console.log('resetting duel scene');
     if (gameImpl) {
-      console.log('resetting duel scene 2');
       gameImpl.resetDuelScene(true, true);
     }
   }, [duelId, gameImpl]);
@@ -121,6 +119,7 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
 
       const duelistLeft = context.isYouA ? context.leftDuelist.id : context.isYouB ? context.rightDuelist.id : context.leftDuelist.id
       const duelistRight = context.isYouA ? context.rightDuelist.id : context.isYouB ? context.leftDuelist.id : context.rightDuelist.id
+      
       // Initialize scene
       if (!didSceneInit.current) {
         try {          
@@ -238,6 +237,18 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
       }
     }, 1000);
   }, [didPlayersInitA.current, didPlayersInitB.current]);
+
+  // Cleanup effect
+  useEffect(() => {
+    return () => {
+      // Reset all flags on unmount
+      didSceneInit.current = false;
+      didPlayersInitA.current = false;
+      didPlayersInitB.current = false;
+      didTutorialRun.current = false;
+      didImmediateReset.current = false;
+    };
+  }, []);
 
   return null;
 }; 

@@ -476,7 +476,7 @@ export class ProgressDialogManager {
       this.dialogB.updateElementClick(onClick)
     }
 
-    if (!this.lastDuelStageA || !this.lastDuelStageB) return
+    if (!this.lastDuelStageA || !this.lastDuelStageB) return false
 
     const { stateA, stateB } = this.findCurrentDuelStates(this.lastDuelStageA, this.lastDuelStageB)
 
@@ -534,43 +534,38 @@ export class ProgressDialogManager {
   }
 
   public showDialogEnd(healthA: number, healthB: number) {
+    // Handle duelist A outcome independently
     let outcomeA: DuelOutcome
-    let outcomeB: DuelOutcome
-
     if (healthA > 0 && healthB == 0) {
-      if (healthA == 3) {
-        outcomeA = DuelOutcome.ALIVE_DEAD
-      } else {
-        outcomeA = DuelOutcome.INJURED_DEAD
-      }
-      outcomeB = DuelOutcome.DEAD_DEAD
-    } else if (healthA == 0 && healthB > 0) {
-      outcomeA = DuelOutcome.DEAD_DEAD
-      if (healthB == 3) {
-        outcomeB = DuelOutcome.ALIVE_DEAD
-      } else {
-        outcomeB = DuelOutcome.INJURED_DEAD
-      }
+      outcomeA = healthA == 3 ? DuelOutcome.ALIVE_DEAD : DuelOutcome.INJURED_DEAD
     } else {
       outcomeA = DuelOutcome.DEAD_DEAD
+    }
+
+    // Handle duelist B outcome independently
+    let outcomeB: DuelOutcome
+    if (healthB > 0 && healthA == 0) {
+      outcomeB = healthB == 3 ? DuelOutcome.ALIVE_DEAD : DuelOutcome.INJURED_DEAD
+    } else {
       outcomeB = DuelOutcome.DEAD_DEAD
     }
 
-    const messageA = duelEndingMessages[outcomeA][Math.floor(Math.random() * duelEndingMessages[outcomeA].length)]
-    const messageB = duelEndingMessages[outcomeB][Math.floor(Math.random() * duelEndingMessages[outcomeB].length)]
-
+    // Update dialog A independently
     if (this.lastDuelOutcomeA != outcomeA) {
+      const messageA = duelEndingMessages[outcomeA][Math.floor(Math.random() * duelEndingMessages[outcomeA].length)]
       this.dialogA.updateElementData(false, messageA)
-    }
-    if (this.lastDuelOutcomeB != outcomeB) {
-      this.dialogB.updateElementData(false, messageB)
+      if (outcomeA != DuelOutcome.DEAD_DEAD) {
+        this.dialogA.showElement()
+      }
     }
 
-    if (outcomeA != DuelOutcome.DEAD_DEAD) {
-      this.dialogA.showElement()
-    }
-    if (outcomeB != DuelOutcome.DEAD_DEAD) {
-      this.dialogB.showElement()
+    // Update dialog B independently
+    if (this.lastDuelOutcomeB != outcomeB) {
+      const messageB = duelEndingMessages[outcomeB][Math.floor(Math.random() * duelEndingMessages[outcomeB].length)]
+      this.dialogB.updateElementData(false, messageB)
+      if (outcomeB != DuelOutcome.DEAD_DEAD) {
+        this.dialogB.showElement()
+      }
     }
 
     this.lastDuelOutcomeA = outcomeA

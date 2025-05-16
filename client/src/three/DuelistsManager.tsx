@@ -41,6 +41,10 @@ export class DuelistsManager {
 
   private speedFactor: number = 1
 
+  private duelistASpawned = false
+  private duelistBSpawned = false
+  private onLoadCompleteCallback: () => void
+
   public duelistA: Duelist = {
     id: 'A',
     model: undefined,
@@ -127,7 +131,6 @@ export class DuelistsManager {
 
   private spawnHighlightA: () => void
   private spawnHighlightB: () => void
-  private duelistsSpawned = false
 
   public setupDuelistA(duelistName: string, duelistModel: CharacterType, isDuelistAYou: boolean, frontMaterialPath: string, backMaterialPath: string, spawnHighlight: () => void) {
     localStorage.setItem(DuelistsData.DUELIST_A_MODEL, duelistModel)
@@ -137,18 +140,15 @@ export class DuelistsManager {
     this.duelistA.actor.replaceSpriteSheets(this.spriteSheets[this.duelistA.model])
 
     this.spawnHighlightA = spawnHighlight
-
     this.duelProgressDialogManger.setDataA(duelistName, isDuelistAYou)
     
     const positionA = new THREE.Vector3(this.duelistA.actor.mesh.position.x + 0.1, ACTOR_HEIGHT * (this.duelistA.model == CharacterType.MALE ? 0.85 : 0.75), this.duelistA.actor.mesh.position.z)
     this.duelProgressDialogManger.updateDialogPositions(positionA)
 
     this.resetActorPositions()
-
-    // Reset card mesh to prepare for the animation
     this.duelistA.cardMesh.reset()
     this.duelistA.cardMesh.setLoadCompleteCallback(() => {
-      this.deferAnimateExplosion(true)
+      this.deferAnimateExplosionA()
     })
     this.duelistA.cardMesh.setFrontMaterialPath(frontMaterialPath)
     this.duelistA.cardMesh.setBackMaterialPath(backMaterialPath)
@@ -162,18 +162,15 @@ export class DuelistsManager {
     this.duelistB.actor.replaceSpriteSheets(this.spriteSheets[this.duelistB.model])
 
     this.spawnHighlightB = spawnHighlight
-
     this.duelProgressDialogManger.setDataB(duelistName, isDuelistBYou)
 
     const positionB = new THREE.Vector3(this.duelistB.actor.mesh.position.x - 0.1, ACTOR_HEIGHT * (this.duelistB.model == CharacterType.MALE ? 0.85 : 0.75), this.duelistB.actor.mesh.position.z)
     this.duelProgressDialogManger.updateDialogPositions(null, positionB)
 
     this.resetActorPositions()
-    
-    // Reset card mesh to prepare for the animation
     this.duelistB.cardMesh.reset()
     this.duelistB.cardMesh.setLoadCompleteCallback(() => {
-      this.deferAnimateExplosion(false)
+      this.deferAnimateExplosionB()
     })
     this.duelistB.cardMesh.setFrontMaterialPath(frontMaterialPath)
     this.duelistB.cardMesh.setBackMaterialPath(backMaterialPath)
@@ -183,6 +180,7 @@ export class DuelistsManager {
   private animateExplosionTimeoutB: NodeJS.Timeout
   private showActorTimeoutA: NodeJS.Timeout
   private showActorTimeoutB: NodeJS.Timeout
+  private showDialogsTimeout: NodeJS.Timeout
 
   public clearAnimationTimeouts(timeout: NodeJS.Timeout) {
     if (timeout) {
@@ -191,64 +189,71 @@ export class DuelistsManager {
     }
   }
 
-  private deferAnimateExplosion(isA: boolean, delay: number = 1000) {
-    this.clearAnimationTimeouts(isA ? this.animateExplosionTimeoutA : this.animateExplosionTimeoutB)
-    this.clearAnimationTimeouts(isA ? this.showActorTimeoutA : this.showActorTimeoutB)
+  private deferAnimateExplosionA(delay: number = 1000) {
+    this.clearAnimationTimeouts(this.animateExplosionTimeoutA)
+    this.clearAnimationTimeouts(this.showActorTimeoutA)
     
-    if (this.duelistsSpawned) {
+    if (this.duelistASpawned) {
       this.onLoadCompleteCallback?.()
-      this.showActor(isA)
-      if (isA) {
-        this.spawnHighlightA()
-      } else {
-        this.spawnHighlightB()
-      }
+      this.showActor(true)
+      this.spawnHighlightA?.()
       this.duelProgressDialogManger.showDialogs()
       return
     }
 
-    let timeout;
-    let showActorTimeout;
-    
-    timeout = setTimeout(() => {
-      const duelist = isA ? this.duelistA : this.duelistB;
-    
-      duelist.cardMesh.playEnter(() => {
-        this.duelistsSpawned = true
-        this.animateExplosion(isA)
+    this.animateExplosionTimeoutA = setTimeout(() => {
+      this.duelistA.cardMesh.playEnter(() => {
+        this.duelistASpawned = true
+        this.animateExplosion(true)
         
-        showActorTimeout = setTimeout(() => {
+        this.showActorTimeoutA = setTimeout(() => {
           this.onLoadCompleteCallback?.()
-          this.showActor(isA)
-          if (isA) {
-            this.spawnHighlightA()
-          } else {
-            this.spawnHighlightB()
-          }
+          this.showActor(true)
+          this.spawnHighlightA?.()
           this.showDialogsTimeout = setTimeout(() => {
             this.duelProgressDialogManger.showDialogs()
           }, 400 / this.speedFactor)
         }, (400 + ((1000 / 8.0) * 3.0)) / this.speedFactor)
       });
     }, delay)
-
-    if (isA) {
-      this.animateExplosionTimeoutA = timeout
-      this.showActorTimeoutA = showActorTimeout
-    } else {
-      this.animateExplosionTimeoutB = timeout
-      this.showActorTimeoutB = showActorTimeout
-    }
   }
 
-  private onLoadCompleteCallback: () => void
+  private deferAnimateExplosionB(delay: number = 1000) {
+    this.clearAnimationTimeouts(this.animateExplosionTimeoutB)
+    this.clearAnimationTimeouts(this.showActorTimeoutB)
+    
+    if (this.duelistBSpawned) {
+      this.onLoadCompleteCallback?.()
+      this.showActor(false)
+      this.spawnHighlightB?.()
+      this.duelProgressDialogManger.showDialogs()
+      return
+    }
+
+    this.animateExplosionTimeoutB = setTimeout(() => {
+      this.duelistB.cardMesh.playEnter(() => {
+        this.duelistBSpawned = true
+        this.animateExplosion(false)
+        
+        this.showActorTimeoutB = setTimeout(() => {
+          this.onLoadCompleteCallback?.()
+          this.showActor(false)
+          this.spawnHighlightB?.()
+          this.showDialogsTimeout = setTimeout(() => {
+            this.duelProgressDialogManger.showDialogs()
+          }, 400 / this.speedFactor)
+        }, (400 + ((1000 / 8.0) * 3.0)) / this.speedFactor)
+      });
+    }, delay)
+  }
 
   public setLoadCompleteCallback(callback: () => void) {
     this.onLoadCompleteCallback = callback
   }
 
   public resetDuelistsSpawned() {
-    this.duelistsSpawned = false;
+    this.duelistASpawned = false;
+    this.duelistBSpawned = false;
     
     this.clearAnimationTimeouts(this.animateExplosionTimeoutA);
     this.clearAnimationTimeouts(this.animateExplosionTimeoutB);
@@ -261,8 +266,6 @@ export class DuelistsManager {
     }
   }
 
-  private showDialogsTimeout
-
   public resetDuelists(): boolean {
     if (!this.duelistA.model || !this.duelistB.model) return false //TODO change if duelistmanager makes it so its always created to remove this if not check in duelist manager
 
@@ -272,7 +275,7 @@ export class DuelistsManager {
     this.playActorAnimation(this.duelistA, AnimName.STILL, null, true)
     this.playActorAnimation(this.duelistB, AnimName.STILL, null, true)
 
-    if (!this.duelistsSpawned) {
+    if (!this.duelistASpawned && !this.duelistBSpawned) {
       this.duelistA.spawnCard.playLoop(AnimName.STILL, null, () => {
         this.duelistA.spawnCard.mesh.visible = true
       }, null)
