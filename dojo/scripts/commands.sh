@@ -24,8 +24,8 @@ fi
 # sozo -P mainnet model get pistols-Config 1
 #
 
-# admin::urgent_update
-# sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait admin urgent_update
+# admin::set_paused
+# sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait admin set_paused 1
 # sozo -P $PROFILE model get pistols-Config 1
 
 # admin::set_treasury
@@ -41,6 +41,21 @@ fi
 # export PLAYER_ACCOUNT=0x1234
 # sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait admin set_is_blocked $PLAYER_ACCOUNT 1
 # sozo -P $PROFILE model get pistols-PlayerFlags $PLAYER_ACCOUNT
+
+# admin::disqualify_duelist
+# export SEASON_ID=1
+# export DUELIST_ID=457
+# export BLOCK_DUELIST=0
+# sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait admin disqualify_duelist $SEASON_ID $DUELIST_ID $BLOCK_DUELIST
+
+# admin::qualify_duelist
+# export SEASON_ID=1
+# export DUELIST_ID=457
+# sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait admin qualify_duelist $SEASON_ID $DUELIST_ID
+
+# admin::urgent_update
+# sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait admin urgent_update
+# sozo -P $PROFILE model get pistols-Config 1
 
 
 #------------------------------------------------------------------------------
