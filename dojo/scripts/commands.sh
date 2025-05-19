@@ -37,6 +37,11 @@ fi
 # sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait admin set_is_team_member $MEMBER_ACCOUNT 1 1
 # sozo -P $PROFILE model get pistols-PlayerTeamFlags $MEMBER_ACCOUNT
 
+# admin::set_is_blocked
+# export PLAYER_ACCOUNT=0x1234
+# sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait admin set_is_blocked $PLAYER_ACCOUNT 1
+# sozo -P $PROFILE model get pistols-PlayerFlags $PLAYER_ACCOUNT
+
 
 #------------------------------------------------------------------------------
 # game::

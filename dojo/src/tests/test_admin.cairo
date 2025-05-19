@@ -72,11 +72,16 @@ mod tests {
         assert!(!sys.admin.am_i_admin(OTHER()), "admin_am_i_admin_1");
         assert!(!sys.store.get_player_is_admin(OTHER()), "store_am_i_admin_1");
         assert!(!sys.store.get_player_is_team_member(OTHER()), "store_am_i_team_member_1");
-        // set team member
+        // set only team member
         tester::execute_admin_set_is_team_member(@sys.admin, OWNER(), OTHER(), true, false);
         assert!(!sys.admin.am_i_admin(OTHER()), "admin_am_i_admin_2");
         assert!(!sys.store.get_player_is_admin(OTHER()), "store_am_i_admin_2");
         assert!(sys.store.get_player_is_team_member(OTHER()), "store_am_i_team_member_2");
+        // set only admin
+        tester::execute_admin_set_is_team_member(@sys.admin, OWNER(), BUMMER(), false, true);
+        assert!(sys.admin.am_i_admin(BUMMER()), "admin_am_i_admin_3");
+        assert!(sys.store.get_player_is_admin(BUMMER()), "store_am_i_admin_3");
+        assert!(!sys.store.get_player_is_team_member(BUMMER()), "store_am_i_team_member_3");
     }
 
     #[test]
@@ -126,10 +131,14 @@ mod tests {
 
     #[test]
     #[should_panic(expected:('ADMIN: Caller not admin', 'ENTRYPOINT_FAILED'))]
-    fn test_set_paused_not_owner() {
+    fn test_set_paused_not_admin() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
         tester::execute_admin_set_paused(@sys.admin, OTHER(), true);
     }
+
+    //
+    // set_treasury
+    //
 
     #[test]
     fn test_set_treasury() {
@@ -155,9 +164,33 @@ mod tests {
 
     #[test]
     #[should_panic(expected:('ADMIN: Caller not admin', 'ENTRYPOINT_FAILED'))]
-    fn test_set_treasury_not_owner() {
+    fn test_set_treasury_not_admin() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
         tester::execute_admin_set_treasury(@sys.admin, OTHER(), BUMMER());
+    }
+
+    //
+    // set_is_blocked
+    //
+
+    #[test]
+    fn test_set_is_blocked() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
+        // not blocked
+        assert!(!sys.store.get_player_is_blocked(OTHER()), "store_am_i_blocked_1");
+        // set blocked
+        tester::execute_admin_set_is_blocked(@sys.admin, OWNER(), OTHER(), true);
+        assert!(sys.store.get_player_is_blocked(OTHER()), "store_am_i_blocked_2");
+        // unset blocked
+        tester::execute_admin_set_is_blocked(@sys.admin, OWNER(), OTHER(), false);
+        assert!(!sys.store.get_player_is_blocked(OTHER()), "store_am_i_blocked_3");
+    }
+
+    #[test]
+    #[should_panic(expected:('ADMIN: Caller not admin', 'ENTRYPOINT_FAILED'))]
+    fn test_set_is_blocked_not_admin() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
+        tester::execute_admin_set_is_blocked(@sys.admin, OTHER(), OTHER(), false);
     }
 
 }

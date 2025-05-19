@@ -18,6 +18,7 @@ pub use pistols::models::{
     player::{
         Player, PlayerValue,
         PlayerTeamFlags,
+        PlayerFlags,
         PlayerDuelistStack, PlayerDuelistStackValue,
     },
     pack::{
@@ -96,6 +97,10 @@ pub impl StoreImpl of StoreTrait {
     }
     #[inline(always)]
     fn get_player_team_flags(self: @Store, address: ContractAddress) -> PlayerTeamFlags {
+        (self.world.read_model(address))
+    }
+    #[inline(always)]
+    fn get_player_flags(self: @Store, address: ContractAddress) -> PlayerFlags {
         (self.world.read_model(address))
     }
 
@@ -293,6 +298,19 @@ pub impl StoreImpl of StoreTrait {
     fn set_player_team_flags(ref self: Store, model: @PlayerTeamFlags) {
         self.world.write_model(model);
     }
+    #[inline(always)]
+    fn delete_player_team_flags(ref self: Store, model: @PlayerTeamFlags) {
+        self.world.erase_model(model);
+    }
+
+    #[inline(always)]
+    fn set_player_flags(ref self: Store, model: @PlayerFlags) {
+        self.world.write_model(model);
+    }
+    #[inline(always)]
+    fn delete_player_flags(ref self: Store, model: @PlayerFlags) {
+        self.world.erase_model(model);
+    }
 
     #[inline(always)]
     fn set_player_duelist_stack(ref self: Store, model: @PlayerDuelistStack) {
@@ -484,6 +502,10 @@ pub impl StoreImpl of StoreTrait {
     #[inline(always)]
     fn get_player_is_team_member(self: @Store, address: ContractAddress) -> bool {
         (self.world.read_member(Model::<PlayerTeamFlags>::ptr_from_keys(address), selector!("is_team_member")))
+    }
+    #[inline(always)]
+    fn get_player_is_blocked(self: @Store, address: ContractAddress) -> bool {
+        (self.world.read_member(Model::<PlayerFlags>::ptr_from_keys(address), selector!("is_blocked")))
     }
     #[inline(always)]
     fn get_player_totals(self: @Store, address: ContractAddress) -> Totals {

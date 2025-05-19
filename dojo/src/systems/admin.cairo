@@ -12,6 +12,7 @@ pub trait IAdmin<TState> {
     fn set_paused(ref self: TState, paused: bool);
     fn set_treasury(ref self: TState, treasury_address: ContractAddress);
     fn set_is_team_member(ref self: TState, account_address: ContractAddress, is_team_member: bool, is_admin: bool);
+    fn set_is_blocked(ref self: TState, account_address: ContractAddress, is_blocked: bool);
     fn urgent_update(ref self: TState);
 }
 
@@ -24,7 +25,7 @@ pub mod admin {
     use pistols::models::{
         config::{Config, ConfigManagerTrait},
         season::{SeasonManagerTrait},
-        player::{PlayerTeamFlags},
+        player::{PlayerTeamFlags, PlayerFlags},
     };
     use pistols::interfaces::dns::{DnsTrait, SELECTORS};
     use pistols::libs::store::{Store, StoreTrait};
@@ -92,11 +93,28 @@ pub mod admin {
             assert(account_address.is_non_zero(), Errors::INVALID_ACCOUNT);
             let mut store: Store = StoreTrait::new(self.world_default());
             let mut player_flags: PlayerTeamFlags = store.get_player_team_flags(account_address);
-            player_flags.is_team_member = is_team_member;
-            player_flags.is_admin = is_admin;
-            store.set_player_team_flags(@player_flags);
+            if (is_team_member || is_admin) {
+                player_flags.is_team_member = is_team_member;
+                player_flags.is_admin = is_admin;
+                store.set_player_team_flags(@player_flags);
+            } else if (player_flags.is_team_member || player_flags.is_admin) {
+                store.delete_player_team_flags(@player_flags);
+            }
         }
 
+        fn set_is_blocked(ref self: ContractState, account_address: ContractAddress, is_blocked: bool) {
+            self._assert_caller_is_admin();
+            assert(account_address.is_non_zero(), Errors::INVALID_ACCOUNT);
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let mut player_flags: PlayerFlags = store.get_player_flags(account_address);
+            if (is_blocked) {
+                player_flags.is_blocked = is_blocked;
+                store.set_player_flags(@player_flags);
+            } else if (player_flags.is_blocked) {
+                store.delete_player_flags(@player_flags);
+            }
+        }
+        
         fn urgent_update(ref self: ContractState) {
             self._assert_caller_is_admin();
             // let mut store: Store = StoreTrait::new(self.world_default());

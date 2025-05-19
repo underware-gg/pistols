@@ -50,6 +50,14 @@ pub struct PlayerTeamFlags {
     pub is_team_member: bool,
     pub is_admin: bool,
 }
+#[derive(Clone, Drop, Serde)]
+#[dojo::model]
+pub struct PlayerFlags {
+    #[key]
+    pub player_address: ContractAddress,   // controller wallet
+    //-----------------------
+    pub is_blocked: bool,
+}
 
 
 //--------------------------
