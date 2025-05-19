@@ -121,6 +121,7 @@ pub mod game {
         pub const BAD_SHUFFLE_SEED: felt252          = 'PISTOLS: Bad shuffle seed';
         pub const INVALID_DUEL_TYPE: felt252         = 'PISTOLS: Invalid duel type';
         pub const IMPOSSIBLE_ERROR: felt252          = 'PISTOLS: Impossible error';
+        pub const DISABLED: felt252                  = 'PISTOLS: Please try later...';
     }
 
     fn dojo_init(ref self: ContractState) {
@@ -151,10 +152,10 @@ pub mod game {
             let mut challenge: Challenge = store.get_challenge(duel_id);
 
             // route to tutorial
-            if (challenge.is_tutorial()) {
-                store.world.tutorial_dispatcher().commit_moves(duelist_id, duel_id, hashed);
-                return;
-            }
+            // if (challenge.is_tutorial()) {
+            //     store.world.tutorial_dispatcher().commit_moves(duelist_id, duel_id, hashed);
+            //     return;
+            // }
 
             // validate challenge
             let owner: ContractAddress = self._validate_ownership(@store.world, duelist_id);
@@ -246,10 +247,10 @@ pub mod game {
             let mut challenge: Challenge = store.get_challenge(duel_id);
 
             // route to tutorial
-            if (challenge.is_tutorial()) {
-                store.world.tutorial_dispatcher().reveal_moves(duelist_id, duel_id, salt, moves);
-                return;
-            }
+            // if (challenge.is_tutorial()) {
+            //     store.world.tutorial_dispatcher().reveal_moves(duelist_id, duel_id, salt, moves);
+            //     return;
+            // }
 
             // validate challenge
             assert(challenge.state == ChallengeState::InProgress, Errors::CHALLENGE_NOT_IN_PROGRESS);
@@ -340,47 +341,50 @@ pub mod game {
         }
 
         fn collect_duel(ref self: ContractState, duel_id: u128) -> u8 {
-            let mut store: Store = StoreTrait::new(self.world_default());
-            let mut challenge: Challenge = store.get_challenge(duel_id);
-            let mut round: Round = store.get_round(duel_id);
+            assert(false, Errors::DISABLED);
+            (0)
 
-            if (store.world.caller_is_duel_contract()) {
-                // tournament unpaired player > declared winner
-                assert(challenge.duel_type == DuelType::Tournament, Errors::INVALID_DUEL_TYPE);
-                let winner: u8 = if (challenge.address_b.is_zero()) {1} else if (challenge.address_a.is_zero()) {2} else {0};
-                round.final_blow = FinalBlow::Unpaired;
-                self._finish_challenge(ref store, ref challenge, ref round, Option::Some(winner), Option::None);
-            // } else if (store.world.caller_is_tournament_contract()) {
-            //     // tournament collect previous round duel
+            // let mut store: Store = StoreTrait::new(self.world_default());
+            // let mut challenge: Challenge = store.get_challenge(duel_id);
+            // let mut round: Round = store.get_round(duel_id);
+
+            // if (store.world.caller_is_duel_contract()) {
+            //     // tournament unpaired player > declared winner
             //     assert(challenge.duel_type == DuelType::Tournament, Errors::INVALID_DUEL_TYPE);
-            //     let winner: u8 =
-            //         if (
-            //             (round.moves_a.has_comitted() && !round.moves_b.has_comitted()) ||
-            //             (round.moves_a.has_revealed() && !round.moves_b.has_revealed())
-            //         ) {1}
-            //         else if (
-            //             (round.moves_b.has_comitted() && !round.moves_a.has_comitted()) ||
-            //             (round.moves_b.has_revealed() && !round.moves_a.has_revealed())
-            //         ) {2}
-            //         else {0};
-            //     round.final_blow = FinalBlow::Forsaken;
+            //     let winner: u8 = if (challenge.address_b.is_zero()) {1} else if (challenge.address_a.is_zero()) {2} else {0};
+            //     round.final_blow = FinalBlow::Unpaired;
             //     self._finish_challenge(ref store, ref challenge, ref round, Option::Some(winner), Option::None);
-            } else {
-                // outside call
-                assert(self.can_collect_duel(duel_id), Errors::CHALLENGE_IN_PROGRESS);
-                // collect!
-                if (challenge.state == ChallengeState::Awaiting) {
-                    // if pending, set to expired...
-                    challenge.state = ChallengeState::Expired;
-                    self._finish_challenge(ref store, ref challenge, ref round, Option::None, Option::None);
-                } else {
-                    // some player timed out...
-                    assert(self._finish_challenge_if_timed_out(ref store, ref challenge, ref round), Errors::IMPOSSIBLE_ERROR);
-                }
-                // arcade
-                TrophyProgressTrait::collected_duel(@store.world, @starknet::get_caller_address());
-            }
-            (challenge.winner)
+            // // } else if (store.world.caller_is_tournament_contract()) {
+            // //     // tournament collect previous round duel
+            // //     assert(challenge.duel_type == DuelType::Tournament, Errors::INVALID_DUEL_TYPE);
+            // //     let winner: u8 =
+            // //         if (
+            // //             (round.moves_a.has_comitted() && !round.moves_b.has_comitted()) ||
+            // //             (round.moves_a.has_revealed() && !round.moves_b.has_revealed())
+            // //         ) {1}
+            // //         else if (
+            // //             (round.moves_b.has_comitted() && !round.moves_a.has_comitted()) ||
+            // //             (round.moves_b.has_revealed() && !round.moves_a.has_revealed())
+            // //         ) {2}
+            // //         else {0};
+            // //     round.final_blow = FinalBlow::Forsaken;
+            // //     self._finish_challenge(ref store, ref challenge, ref round, Option::Some(winner), Option::None);
+            // } else {
+            //     // outside call
+            //     assert(self.can_collect_duel(duel_id), Errors::CHALLENGE_IN_PROGRESS);
+            //     // collect!
+            //     if (challenge.state == ChallengeState::Awaiting) {
+            //         // if pending, set to expired...
+            //         challenge.state = ChallengeState::Expired;
+            //         self._finish_challenge(ref store, ref challenge, ref round, Option::None, Option::None);
+            //     } else {
+            //         // some player timed out...
+            //         assert(self._finish_challenge_if_timed_out(ref store, ref challenge, ref round), Errors::IMPOSSIBLE_ERROR);
+            //     }
+            //     // arcade
+            //     TrophyProgressTrait::collected_duel(@store.world, @starknet::get_caller_address());
+            // }
+            // (challenge.winner)
         }
 
 

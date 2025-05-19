@@ -45,7 +45,6 @@ pub impl LeaderboardImpl of LeaderboardTrait {
     fn exists(self: @Leaderboard) -> bool {
         (*self.positions > 0)
     }
-    #[inline(always)]
     fn is_qualified(self: @Leaderboard, store: @Store, address: ContractAddress) -> bool {
         (
             !store.get_player_is_team_member(address) &&
