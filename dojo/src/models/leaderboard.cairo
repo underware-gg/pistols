@@ -143,6 +143,40 @@ pub impl LeaderboardImpl of LeaderboardTrait {
         }
         (to_position)
     }
+    fn remove_duelist_score(ref self: Leaderboard, duelist_id: u128) -> bool {
+        let mut current_position: u8 = 0;
+        let mut scores: u256 = (self.scores).into();
+        let mut ids: u256 = (self.duelist_ids).into();
+        let mut p: u8 = 1;
+        while (p <= self.positions) {
+            if (p > 1) {
+                scores /= Self::SHIFT;
+                ids /= Self::SHIFT;
+            }
+            let id: u128 = (ids & Self::MASK).low;
+            let score: u16 = (scores & Self::MASK).try_into().unwrap();
+// println!("--> p[{}] id[{:x}] score[{:x}]", p, id, score);
+            if (id == duelist_id) {
+                current_position = p; // need to be removed
+                break; // current score is higher or already found to_position
+            }
+            if (score == 0) {
+                break; // end of existing positions
+            }
+            p += 1;
+        };
+        if (current_position > 0) {
+// println!("--> id[{:x}] >> @[{}]", duelist_id, current_position);
+            self.scores = Self::_remove_score_at_position(self.scores.into(), current_position, self.positions);
+            self.duelist_ids = Self::_remove_score_at_position(self.duelist_ids.into(), current_position, self.positions);
+            (true)
+        } else {
+            (false)
+        }
+    }
+    //
+    // internal functions
+    //
     fn _replace_value_at_position(previous: u256, value: u256, to_position: u8, max_positions: u8) -> felt252 {
         assert(to_position > 0 && to_position <= max_positions, 'LEADERBOARD: invalid replace');
         let result: u256 =
@@ -179,6 +213,16 @@ pub impl LeaderboardImpl of LeaderboardTrait {
             BitwiseU256::shl(previous & range_mask & ~Self::_position_mask(from_position), Self::BITS.into()) |
             // shift value to position
             if (to_position == 1) {value} else {(value * Self::_shift_mask(to_position))};
+        (result.try_into().unwrap())
+    }
+    fn _remove_score_at_position(previous: u256, position: u8, max_positions: u8) -> felt252 {
+        assert(position > 0 && position <= max_positions, 'LEADERBOARD: invalid position');
+        // mask for old-new range
+        let result: u256 = 
+            // keep previous values
+            (previous & Self::_pre_mask(position)) |
+            // shift range (less current pos)
+            BitwiseU256::shr(previous & ~(Self::_pre_mask(position) | Self::_position_mask(position)), Self::BITS.into());
         (result.try_into().unwrap())
     }
     // this mask represents the area occupied by scores at [position]
@@ -487,5 +531,69 @@ mod unit {
         assert_eq!(result, 0x222222333333444444555555666666777777888888999999ffffffaaaaaa, "0x11111122222333333..._at_10_2");
         let result: felt252 = LeaderboardTrait::_move_value_to_position(0x111111222222333333444444555555666666777777888888999999aaaaaa, 0xffffff, 10, 9, 10);
         assert_eq!(result, 0x222222ffffff333333444444555555666666777777888888999999aaaaaa, "0x11111122222333333..._at_10_9");
+    }
+
+    #[test]
+    fn test_remove_score() {
+        let mut count: usize = 10;
+        let mut lb: Leaderboard = Leaderboard {
+            season_id: 1,
+            positions: 10,
+            duelist_ids: IDS,
+            scores: SCORES,
+        };
+        let all_positions: Span<LeaderboardPosition> = lb.get_all_positions();
+        assert_eq!(all_positions.len(), lb.positions.into(), "all_positions.len()");
+        assert_eq!(all_positions.len(), count, "all_positions.len() == 10");
+        let id_1: u128 = (*all_positions.at(0)).duelist_id;
+        let id_2: u128 = (*all_positions.at(1)).duelist_id;
+        let id_3: u128 = (*all_positions.at(2)).duelist_id;
+        let id_4: u128 = (*all_positions.at(3)).duelist_id;
+        let id_5: u128 = (*all_positions.at(4)).duelist_id;
+        let id_6: u128 = (*all_positions.at(5)).duelist_id;
+        let id_7: u128 = (*all_positions.at(6)).duelist_id;
+        let id_8: u128 = (*all_positions.at(7)).duelist_id;
+        let id_9: u128 = (*all_positions.at(8)).duelist_id;
+        let id_10: u128 = (*all_positions.at(9)).duelist_id;
+        _test_order(lb, [id_1, id_2, id_3, id_4, id_5, id_6, id_7, id_8, id_9, id_10].span(), "full");
+        // remove from middle
+        assert!(lb.remove_duelist_score(id_5), "remove_id_5");
+        _test_order(lb, [id_1, id_2, id_3, id_4, id_6, id_7, id_8, id_9, id_10].span(), "id_5");
+        assert!(lb.remove_duelist_score(id_2), "remove_id_2");
+        _test_order(lb, [id_1, id_3, id_4, id_6, id_7, id_8, id_9, id_10].span(), "id_2");
+        assert!(lb.remove_duelist_score(id_9), "remove_id_9");
+        _test_order(lb, [id_1, id_3, id_4, id_6, id_7, id_8, id_10].span(), "id_9");
+        // remove from start
+        assert!(lb.remove_duelist_score(id_1), "remove_id_1");
+        _test_order(lb, [id_3, id_4, id_6, id_7, id_8, id_10].span(), "id_1");
+        // remove from end
+        assert!(lb.remove_duelist_score(id_10), "remove_id_10");
+        _test_order(lb, [id_3, id_4, id_6, id_7, id_8].span(), "id_10");
+        // remove inexistent
+        assert!(!lb.remove_duelist_score(0x123456), "inexistent");
+        _test_order(lb, [id_3, id_4, id_6, id_7, id_8].span(), "inexistent");
+        // remove remaining
+        assert!(lb.remove_duelist_score(id_3), "remove_id_3");
+        _test_order(lb, [id_4, id_6, id_7, id_8].span(), "id_3");
+        assert!(lb.remove_duelist_score(id_8), "remove_id_8");
+        _test_order(lb, [id_4, id_6, id_7].span(), "id_8");
+        assert!(lb.remove_duelist_score(id_6), "remove_id_6");
+        _test_order(lb, [id_4, id_7].span(), "id_6");
+        assert!(lb.remove_duelist_score(id_4), "remove_id_4");
+        _test_order(lb, [id_7].span(), "id_4");
+        assert!(lb.remove_duelist_score(id_7), "remove_id_7");
+        _test_order(lb, [].span(), "id_7");
+    }
+
+    fn _test_order(lb: Leaderboard, duelist_ids: Span<u128>, prefix: ByteArray) {
+        let positions: Span<LeaderboardPosition> = lb.get_all_positions();
+        assert_eq!(positions.len(), duelist_ids.len(), "[{}] bad len", prefix);
+        let mut p: usize = 1;
+        while (p <= duelist_ids.len()) {
+            let duelist_id: u128 = *duelist_ids.at(p-1);
+            let pos: LeaderboardPosition = *positions.at(p-1);
+            assert_eq!(pos.duelist_id, duelist_id, "[{}] duelist_id[{}]: {}", prefix, p, duelist_id);
+            p += 1;
+        };
     }
 }

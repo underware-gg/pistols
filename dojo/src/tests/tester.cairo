@@ -603,6 +603,11 @@ pub mod tester {
     //
 
     // ::admin
+    pub fn execute_admin_set_paused(system: @IAdminDispatcher, sender: ContractAddress, paused: bool) {
+        impersonate(sender);
+        (*system).set_paused(paused);
+        _next_block();
+    }
     pub fn execute_admin_set_treasury(system: @IAdminDispatcher, sender: ContractAddress, new_treasury_address: ContractAddress) {
         impersonate(sender);
         (*system).set_treasury(new_treasury_address);
@@ -618,10 +623,17 @@ pub mod tester {
         (*system).set_is_blocked(owner_address, is_blocked);
         _next_block();
     }
-    pub fn execute_admin_set_paused(system: @IAdminDispatcher, sender: ContractAddress, paused: bool) {
+    pub fn execute_admin_disqualify_duelist(system: @IAdminDispatcher, sender: ContractAddress, season_id: u32, duelist_id: u128, block_owner: bool) -> bool {
         impersonate(sender);
-        (*system).set_paused(paused);
+        let result: bool = (*system).disqualify_duelist(season_id, duelist_id, block_owner);
         _next_block();
+        (result)
+    }
+    pub fn execute_admin_qualify_duelist(system: @IAdminDispatcher, sender: ContractAddress, season_id: u32, duelist_id: u128) -> u8 {
+        impersonate(sender);
+        let result: u8 = (*system).qualify_duelist(season_id, duelist_id);
+        _next_block();
+        (result)
     }
 
     // ::ierc20

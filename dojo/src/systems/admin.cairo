@@ -13,6 +13,8 @@ pub trait IAdmin<TState> {
     fn set_treasury(ref self: TState, treasury_address: ContractAddress);
     fn set_is_team_member(ref self: TState, account_address: ContractAddress, is_team_member: bool, is_admin: bool);
     fn set_is_blocked(ref self: TState, account_address: ContractAddress, is_blocked: bool);
+    fn disqualify_duelist(ref self: TState, season_id: u32, duelist_id: u128, block_owner: bool) -> bool;
+    fn qualify_duelist(ref self: TState, season_id: u32, duelist_id: u128) -> u8;
     fn urgent_update(ref self: TState);
 }
 
@@ -26,8 +28,12 @@ pub mod admin {
         config::{Config, ConfigManagerTrait},
         season::{SeasonManagerTrait},
         player::{PlayerTeamFlags, PlayerFlags},
+        leaderboard::{Leaderboard, LeaderboardTrait},
     };
-    use pistols::interfaces::dns::{DnsTrait, SELECTORS};
+    use pistols::interfaces::dns::{
+        DnsTrait, SELECTORS,
+        IDuelistTokenDispatcherTrait,
+    };
     use pistols::libs::store::{Store, StoreTrait};
 
     mod Errors {
@@ -115,6 +121,35 @@ pub mod admin {
             }
         }
         
+        fn disqualify_duelist(ref self: ContractState, season_id: u32, duelist_id: u128, block_owner: bool) -> bool {
+            self._assert_caller_is_admin();
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let mut leaderboard: Leaderboard = store.get_leaderboard(season_id);
+            // remove this duelist from the Leaderaboard...
+            let removed_score: bool = leaderboard.remove_duelist_score(duelist_id);
+            if (removed_score) {
+                store.set_leaderboard(@leaderboard);
+            }
+            if (block_owner) {
+                let owner: ContractAddress = store.world.duelist_token_dispatcher().owner_of(duelist_id.into());
+                self.set_is_blocked(owner, true);
+            }
+            (removed_score)
+        }
+
+        fn qualify_duelist(ref self: ContractState, season_id: u32, duelist_id: u128) -> u8 {
+            self._assert_caller_is_admin();
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let mut leaderboard: Leaderboard = store.get_leaderboard(season_id);
+            let points: u16 = store.get_scoreboard(season_id, duelist_id.into()).points;
+            // ONLY inserts if the score is in top 10!!!!
+            let position: u8 = leaderboard.insert_score(duelist_id, points);
+            if (position != 0) {
+                store.set_leaderboard(@leaderboard);
+            }
+            (position)
+        }
+
         fn urgent_update(ref self: ContractState) {
             self._assert_caller_is_admin();
             // let mut store: Store = StoreTrait::new(self.world_default());

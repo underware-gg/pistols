@@ -193,4 +193,22 @@ mod tests {
         tester::execute_admin_set_is_blocked(@sys.admin, OTHER(), OTHER(), false);
     }
 
+    //
+    // disqualify_duelist
+    //
+
+    #[test]
+    #[should_panic(expected:('ADMIN: Caller not admin', 'ENTRYPOINT_FAILED'))]
+    fn test_disqualify_duelist() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
+        tester::execute_admin_disqualify_duelist(@sys.admin, OTHER(), 1, 1, true);
+    }
+
+    #[test]
+    #[should_panic(expected:('ADMIN: Caller not admin', 'ENTRYPOINT_FAILED'))]
+    fn test_qualify_duelist() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
+        tester::execute_admin_qualify_duelist(@sys.admin, OTHER(), 1, 1);
+    }
+
 }

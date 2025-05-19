@@ -1353,8 +1353,8 @@ pub mod tests {
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         tester::fund_duelists_pool(@sys, 2);
-        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys.pack, A)[0];
-        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys.pack, B)[0];
+        let duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys.pack, A)[0];
+        let duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys.pack, B)[0];
         // just draw...
         let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         sys.rng.mock_values(mocked);
@@ -1365,6 +1365,45 @@ pub mod tests {
         let leaderboard: Leaderboard = sys.store.get_leaderboard(SEASON_ID_1);
         let positions: Span<LeaderboardPosition> = leaderboard.get_all_positions();
         assert_eq!(positions.len(), 2, "positions.len()");
+        let pos_1: u128 = *positions[0].duelist_id;
+        let pos_2: u128 = *positions[1].duelist_id;
+        assert_eq!(pos_1, duelist_id_a, "positions[0]");
+        assert_eq!(pos_2, duelist_id_b, "positions[1]");
+        //
+        // disqualify_a...
+        let disqualified_a = tester::execute_admin_disqualify_duelist(@sys.admin, OWNER(), SEASON_ID_1, duelist_id_a, true);
+        assert!(disqualified_a, "disqualified_a");
+        let lb: Leaderboard = sys.store.get_leaderboard(SEASON_ID_1);
+        let ps: Span<LeaderboardPosition> = lb.get_all_positions();
+        assert_eq!(ps.len(), 1, "disqualify_a >> positions.len()");
+        assert_eq!(*ps[0].duelist_id, duelist_id_b, "disqualify_a >> positions[0]");
+        assert!(sys.store.get_player_is_blocked(A), "disqualify_a >> is_blocked_A");
+        assert!(!sys.store.get_player_is_blocked(B), "!is_blocked_B");
+        //
+        // disqualify_b...
+        let disqualified_b = tester::execute_admin_disqualify_duelist(@sys.admin, OWNER(), SEASON_ID_1, duelist_id_b, true);
+        assert!(disqualified_b, "disqualified_b");
+        let lb: Leaderboard = sys.store.get_leaderboard(SEASON_ID_1);
+        let ps: Span<LeaderboardPosition> = lb.get_all_positions();
+        assert_eq!(ps.len(), 0, "disqualify_b >> positions.len()");
+        assert!(sys.store.get_player_is_blocked(B), "disqualify_b >> is_blocked_B");
+        //
+        // re-qualify A...
+        let position_a = tester::execute_admin_qualify_duelist(@sys.admin, OWNER(), SEASON_ID_1, duelist_id_a);
+        assert_eq!(position_a, 1, "re-qualified_a");
+        let lb: Leaderboard = sys.store.get_leaderboard(SEASON_ID_1);
+        let ps: Span<LeaderboardPosition> = lb.get_all_positions();
+        assert_eq!(ps.len(), 1, "re-qualify_a >> positions.len()");
+        assert_eq!(*ps[0].duelist_id, duelist_id_a, "re-qualify_a >> positions[0]");
+        //
+        // re-qualify B...
+        let position_b = tester::execute_admin_qualify_duelist(@sys.admin, OWNER(), SEASON_ID_1, duelist_id_b);
+        assert_eq!(position_b, 2, "re-qualified_b");
+        let lb: Leaderboard = sys.store.get_leaderboard(SEASON_ID_1);
+        let ps: Span<LeaderboardPosition> = lb.get_all_positions();
+        assert_eq!(ps.len(), 2, "re-qualify_b >> positions.len()");
+        assert_eq!(*ps[0].duelist_id, duelist_id_a, "re-qualify_b >> positions[0]");
+        assert_eq!(*ps[1].duelist_id, duelist_id_b, "re-qualify_b >> positions[1]");
     }
 
     #[test]
