@@ -17,6 +17,7 @@ pub use pistols::models::{
     },
     player::{
         Player, PlayerValue,
+        PlayerTeamFlags,
         PlayerDuelistStack, PlayerDuelistStackValue,
     },
     pack::{
@@ -93,10 +94,10 @@ pub impl StoreImpl of StoreTrait {
     fn get_player(self: @Store, address: ContractAddress) -> Player {
         (self.world.read_model(address))
     }
-    // #[inline(always)]
-    // fn get_player_value(self: @Store, address: ContractAddress) -> PlayerValue {
-    //     (self.world.read_value(address))
-    // }
+    #[inline(always)]
+    fn get_player_team_flags(self: @Store, address: ContractAddress) -> PlayerTeamFlags {
+        (self.world.read_model(address))
+    }
 
     #[inline(always)]
     fn get_player_duelist_stack(self: @Store, address: ContractAddress, profile: DuelistProfile) -> PlayerDuelistStack {
@@ -106,10 +107,6 @@ pub impl StoreImpl of StoreTrait {
     fn get_player_duelist_stack_from_id(self: @Store, address: ContractAddress, duelist_id: u128) -> PlayerDuelistStack {
         (self.get_player_duelist_stack(address, self.get_duelist_profile(duelist_id)))
     }
-    // #[inline(always)]
-    // fn get_player_duelist_stack_value(self: @Store, address: ContractAddress) -> PlayerDuelistStackValue {
-    //     (self.world.read_value(address))
-    // }
 
     #[inline(always)]
     fn get_pack(self: @Store, pack_id: u128) -> Pack {
@@ -176,36 +173,20 @@ pub impl StoreImpl of StoreTrait {
     fn get_scoreboard(self: @Store, season_id: u32, holder: felt252) -> SeasonScoreboard {
         (self.world.read_model((season_id, holder),))
     }
-    // #[inline(always)]
-    // fn get_scoreboard_value(self: @Store, season_id: u32, holder: felt252) -> SeasonScoreboardValue {
-    //     (self.world.read_value((season_id, holder),))
-    // }
 
     #[inline(always)]
     fn get_leaderboard(self: @Store, season_id: u32) -> Leaderboard {
         (self.world.read_model(season_id))
     }
-    // #[inline(always)]
-    // fn get_leaderboard_value(self: @Store, season_id: u32) -> LeaderboardValue {
-    //     (self.world.read_value(season_id))
-    // }
 
     #[inline(always)]
     fn get_season_config(self: @Store, season_id: u32) -> SeasonConfig {
         (self.world.read_model(season_id))
     }
-    // #[inline(always)]
-    // fn get_season_config_value(self: @Store, season_id: u32) -> SeasonConfigValue {
-    //     (self.world.read_value(season_id))
-    // }
     #[inline(always)]
     fn get_current_season(self: @Store) -> SeasonConfig {
         (self.world.read_model(self.get_current_season_id()))
     }
-    // #[inline(always)]
-    // fn get_current_season_value(self: @Store) -> SeasonConfigValue {
-    //     (self.world.read_value(self.get_current_season_id()))
-    // }
 
     #[inline(always)]
     fn get_coin_config(self: @Store, contract_address: ContractAddress) -> CoinConfig {
@@ -309,11 +290,15 @@ pub impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn set_player_duelist_stack(ref self: Store, model: @PlayerDuelistStack) {
+    fn set_player_team_flags(ref self: Store, model: @PlayerTeamFlags) {
         self.world.write_model(model);
     }
 
     #[inline(always)]
+    fn set_player_duelist_stack(ref self: Store, model: @PlayerDuelistStack) {
+        self.world.write_model(model);
+    }
+
     fn set_pack(ref self: Store, model: @Pack) {
         self.world.write_model(model);
     }
@@ -427,9 +412,8 @@ pub impl StoreImpl of StoreTrait {
     // }
 
     //----------------------------------
-    // Single member setters
+    // Single member getters
     // https://book.dojoengine.org/framework/world/api#read_member-and-read_member_of_models
-    // https://book.dojoengine.org/framework/world/api#write_member-and-write_member_of_models
     //
 
     #[inline(always)]
@@ -494,6 +478,14 @@ pub impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
+    fn get_player_is_admin(self: @Store, address: ContractAddress) -> bool {
+        (self.world.read_member(Model::<PlayerTeamFlags>::ptr_from_keys(address), selector!("is_admin")))
+    }
+    #[inline(always)]
+    fn get_player_is_team_member(self: @Store, address: ContractAddress) -> bool {
+        (self.world.read_member(Model::<PlayerTeamFlags>::ptr_from_keys(address), selector!("is_team_member")))
+    }
+    #[inline(always)]
     fn get_player_totals(self: @Store, address: ContractAddress) -> Totals {
         (self.world.read_member(Model::<Player>::ptr_from_keys(address), selector!("totals")))
     }
@@ -509,7 +501,10 @@ pub impl StoreImpl of StoreTrait {
         ),), selector!("active_duelist_id")))
     }
 
-    // setters
+    //----------------------------------
+    // Single member setters
+    // https://book.dojoengine.org/framework/world/api#write_member-and-write_member_of_models
+    //
 
     #[inline(always)]
     fn set_config_is_paused(ref self: Store, is_paused: bool) {

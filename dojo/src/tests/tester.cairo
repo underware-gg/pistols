@@ -260,6 +260,7 @@ pub mod tester {
             TestResource::Model(pistols::models::pool::m_Pool::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::player::m_Player::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::player::m_PlayerDuelistStack::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::player::m_PlayerTeamFlags::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::season::m_SeasonScoreboard::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::season::m_SeasonConfig::TEST_CLASS_HASH),
             // TestResource::Model(pistols::models::tournament::m_TournamentPass::TEST_CLASS_HASH),
@@ -601,9 +602,9 @@ pub mod tester {
     //
 
     // ::admin
-    pub fn execute_admin_grant_admin(system: @IAdminDispatcher, sender: ContractAddress, owner_address: ContractAddress, granted: bool) {
+    pub fn execute_admin_set_is_team_member(system: @IAdminDispatcher, sender: ContractAddress, owner_address: ContractAddress, is_team_member: bool, is_admin: bool) {
         impersonate(sender);
-        (*system).grant_admin(owner_address, granted);
+        (*system).set_is_team_member(owner_address, is_team_member, is_admin);
         _next_block();
     }
     pub fn execute_admin_set_treasury(system: @IAdminDispatcher, sender: ContractAddress, new_treasury_address: ContractAddress) {

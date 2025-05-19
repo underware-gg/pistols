@@ -39,6 +39,20 @@ pub struct PlayerDuelistStack {
 
 
 //--------------------------
+// Player tags
+//
+#[derive(Clone, Drop, Serde)]
+#[dojo::model]
+pub struct PlayerTeamFlags {
+    #[key]
+    pub player_address: ContractAddress,   // controller wallet
+    //-----------------------
+    pub is_team_member: bool,
+    pub is_admin: bool,
+}
+
+
+//--------------------------
 // OFF-CHAIN signed messages
 //
 // all models need...

@@ -32,6 +32,10 @@ fi
 # sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait admin set_treasury 0x04D92577856263bDe8E7601Ee189b6dbe52aCb879462489B92c0789f6c157E6c
 # sozo -P $PROFILE model get pistols-Config 1
 
+# admin::set_is_team_member
+# export MEMBER_ACCOUNT=0x1234
+# sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait admin set_is_team_member $MEMBER_ACCOUNT 1 1
+# sozo -P $PROFILE model get pistols-PlayerTeamFlags $MEMBER_ACCOUNT
 
 
 #------------------------------------------------------------------------------

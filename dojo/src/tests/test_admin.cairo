@@ -2,8 +2,6 @@
 mod tests {
     use starknet::{ContractAddress};
 
-    use dojo::world::{IWorldDispatcherTrait};
-
     use pistols::systems::admin::{IAdminDispatcherTrait};
     use pistols::models::{
         config::{Config},
@@ -44,34 +42,70 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
-    fn test_grant_ungrant_admin() {
+    fn test_set_unset_is_admin() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
-        assert!(!sys.world.dispatcher.is_writer(CONFIG_HASH, OTHER()), "default_other_writer_false");
-        assert!(!sys.admin.am_i_admin(OTHER()), "owner_am_i_false");
-        tester::execute_admin_grant_admin(@sys.admin, OWNER(), OTHER(), true);
-        assert!(sys.world.dispatcher.is_writer(CONFIG_HASH, OTHER()), "new_other_true");
-        assert!(sys.admin.am_i_admin(OTHER()), "owner_am_i_true");
+        // not admin
+        assert!(!sys.admin.am_i_admin(OTHER()), "admin_am_i_admin_1");
+        assert!(!sys.store.get_player_is_admin(OTHER()), "store_am_i_admin_1");
+        assert!(!sys.store.get_player_is_team_member(OTHER()), "store_am_i_team_member_1");
+        // set admin
+        tester::execute_admin_set_is_team_member(@sys.admin, OWNER(), OTHER(), true, true);
+        assert!(sys.admin.am_i_admin(OTHER()), "admin_am_i_admin_2");
+        assert!(sys.store.get_player_is_admin(OTHER()), "store_am_i_admin_2");
+        assert!(sys.store.get_player_is_team_member(OTHER()), "store_am_i_team_member_2");
+        // test admin role
         tester::execute_admin_set_paused(@sys.admin, OTHER(), true);
         let config: Config = sys.store.get_config();
         assert!(config.is_paused, "paused");
-        tester::execute_admin_grant_admin(@sys.admin, OWNER(), OTHER(), false);
-        assert!(!sys.world.dispatcher.is_writer(CONFIG_HASH, OTHER()), "new_other_false");
-        assert!(!sys.admin.am_i_admin(OTHER()), "owner_am_i_false_again");
+        assert!(sys.store.get_config_is_paused(), "store_paused");
+        // unset admin
+        tester::execute_admin_set_is_team_member(@sys.admin, OWNER(), OTHER(), false, false);
+        assert!(!sys.admin.am_i_admin(OTHER()), "admin_am_i_admin_3");
+        assert!(!sys.store.get_player_is_admin(OTHER()), "store_am_i_admin_3");
+        assert!(!sys.store.get_player_is_team_member(OTHER()), "store_am_i_team_member_3");
     }
 
     #[test]
-    #[should_panic(expected:('ADMIN: Invalid account_address', 'ENTRYPOINT_FAILED'))]
-    fn test_grant_admin_null() {
+    fn test_set_is_team_member() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
-        tester::execute_admin_grant_admin(@sys.admin, OWNER(), ZERO(), true);
+        // not team member
+        assert!(!sys.admin.am_i_admin(OTHER()), "admin_am_i_admin_1");
+        assert!(!sys.store.get_player_is_admin(OTHER()), "store_am_i_admin_1");
+        assert!(!sys.store.get_player_is_team_member(OTHER()), "store_am_i_team_member_1");
+        // set team member
+        tester::execute_admin_set_is_team_member(@sys.admin, OWNER(), OTHER(), true, false);
+        assert!(!sys.admin.am_i_admin(OTHER()), "admin_am_i_admin_2");
+        assert!(!sys.store.get_player_is_admin(OTHER()), "store_am_i_admin_2");
+        assert!(sys.store.get_player_is_team_member(OTHER()), "store_am_i_team_member_2");
+    }
+
+    #[test]
+    fn test_set_is_admin_granted() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
+        tester::execute_admin_set_is_team_member(@sys.admin, OWNER(), OTHER(), true, true);
+        tester::execute_admin_set_treasury(@sys.admin, OTHER(), BUMMER());
+    }
+
+    #[test]
+    #[should_panic(expected:('ADMIN: Invalid account address', 'ENTRYPOINT_FAILED'))]
+    fn test_set_is_admin_null() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
+        tester::execute_admin_set_is_team_member(@sys.admin, OWNER(), ZERO(), true, true);
     }
 
     #[test]
     #[should_panic(expected:('ADMIN: Caller not admin', 'ENTRYPOINT_FAILED'))]
-    fn test_grant_admin_not_owner() {
+    fn test_caller_not_admin() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
-        tester::execute_admin_grant_admin(@sys.admin, OTHER(), BUMMER(), true);
+        tester::execute_admin_set_treasury(@sys.admin, OTHER(), BUMMER());
+    }
+
+    #[test]
+    #[should_panic(expected:('ADMIN: Caller not admin', 'ENTRYPOINT_FAILED'))]
+    fn test_member_not_admin() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
+        tester::execute_admin_set_is_team_member(@sys.admin, OWNER(), OTHER(), true, false);
+        tester::execute_admin_set_treasury(@sys.admin, OTHER(), BUMMER());
     }
 
     #[test]
@@ -113,7 +147,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('ADMIN: Invalid treasury_address', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('ADMIN: Invalid treasury address', 'ENTRYPOINT_FAILED'))]
     fn test_set_treasury_null() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
         tester::execute_admin_set_treasury(@sys.admin, OWNER(), ZERO());
