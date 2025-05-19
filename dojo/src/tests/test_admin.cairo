@@ -79,12 +79,15 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
         let config: Config = sys.store.get_config();
         assert!(!config.is_paused, "paused_1");
+        assert!(!sys.store.get_config_is_paused(), "store_paused_1");
         tester::execute_admin_set_paused(@sys.admin, OWNER(), true);
         let config: Config = sys.store.get_config();
         assert!(config.is_paused, "paused_2");
+        assert!(sys.store.get_config_is_paused(), "store_paused_2");
         tester::execute_admin_set_paused(@sys.admin, OWNER(), false);
         let config: Config = sys.store.get_config();
         assert!(!config.is_paused, "paused_3");
+        assert!(!sys.store.get_config_is_paused(), "store_paused_3");
     }
 
     #[test]

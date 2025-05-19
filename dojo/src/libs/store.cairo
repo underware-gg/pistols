@@ -448,6 +448,10 @@ pub impl StoreImpl of StoreTrait {
     fn get_config_treasury_address(self: @Store) -> ContractAddress {
         (self.world.read_member(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("treasury_address")))
     }
+    #[inline(always)]
+    fn get_config_is_paused(self: @Store) -> bool {
+        (self.world.read_member(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("is_paused")))
+    }
 
     #[inline(always)]
     fn get_current_season_rules(self: @Store) -> Rules {

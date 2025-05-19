@@ -75,6 +75,7 @@ pub mod bank {
         pub const INSUFFICIENT_FAME: felt252        = 'BANK: insufficient FAME pool';
         pub const INVALID_SEASON: felt252           = 'BANK: invalid season';
         pub const INVALID_TOURNAMENT: felt252       = 'BANK: invalid tournament';
+        pub const IS_PAUSED: felt252                = 'BANK: is paused';
     }
 
     #[generate_trait]
@@ -123,11 +124,15 @@ pub mod bank {
         fn can_collect_season(self: @ContractState) -> bool {
             let mut store: Store = StoreTrait::new(self.world_default());
             let season: SeasonConfig = store.get_current_season();
-            (season.can_collect())
+            (
+                season.can_collect() &&
+                !store.get_config_is_paused()
+            )
         }
 
         fn collect_season(ref self: ContractState) -> u32 {
             let mut store: Store = StoreTrait::new(self.world_default());
+            assert(!store.get_config_is_paused(), Errors::IS_PAUSED);
             // collect season if permitted
             let mut season: SeasonConfig = store.get_current_season();
             let new_season_id: u32 = season.collect(ref store);

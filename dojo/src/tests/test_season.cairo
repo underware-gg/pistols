@@ -113,6 +113,17 @@ mod tests {
     }
 
     #[test]
+    #[should_panic(expected:('BANK: is paused', 'ENTRYPOINT_FAILED'))]
+    fn test_collect_season_is_paused() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME);
+        let season: SeasonConfig = sys.store.get_current_season();
+        tester::set_block_timestamp(season.period.end);
+        tester::drop_dojo_events(@sys);
+        tester::execute_admin_set_paused(@sys.admin, OWNER(), true);
+        tester::execute_collect_season(@sys, OWNER());
+    }
+
+    #[test]
     #[should_panic(expected:('PISTOLS: Season is active', 'ENTRYPOINT_FAILED'))]
     fn test_collect_still_active() {
         let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME);
