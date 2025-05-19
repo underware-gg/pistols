@@ -274,6 +274,17 @@ export interface PlayerDuelistStackValue {
 	stacked_ids: Array<BigNumberish>;
 }
 
+// Type definition for `pistols::models::player::PlayerFlags` struct
+export interface PlayerFlags {
+	player_address: string;
+	is_blocked: boolean;
+}
+
+// Type definition for `pistols::models::player::PlayerFlagsValue` struct
+export interface PlayerFlagsValue {
+	is_blocked: boolean;
+}
+
 // Type definition for `pistols::models::player::PlayerOnline` struct
 export interface PlayerOnline {
 	identity: string;
@@ -283,6 +294,19 @@ export interface PlayerOnline {
 // Type definition for `pistols::models::player::PlayerOnlineValue` struct
 export interface PlayerOnlineValue {
 	timestamp: BigNumberish;
+}
+
+// Type definition for `pistols::models::player::PlayerTeamFlags` struct
+export interface PlayerTeamFlags {
+	player_address: string;
+	is_team_member: boolean;
+	is_admin: boolean;
+}
+
+// Type definition for `pistols::models::player::PlayerTeamFlagsValue` struct
+export interface PlayerTeamFlagsValue {
+	is_team_member: boolean;
+	is_admin: boolean;
 }
 
 // Type definition for `pistols::models::player::PlayerTimestamps` struct
@@ -832,8 +856,12 @@ export interface SchemaType extends ISchemaType {
 		PlayerBookmarkValue: PlayerBookmarkValue,
 		PlayerDuelistStack: PlayerDuelistStack,
 		PlayerDuelistStackValue: PlayerDuelistStackValue,
+		PlayerFlags: PlayerFlags,
+		PlayerFlagsValue: PlayerFlagsValue,
 		PlayerOnline: PlayerOnline,
 		PlayerOnlineValue: PlayerOnlineValue,
+		PlayerTeamFlags: PlayerTeamFlags,
+		PlayerTeamFlagsValue: PlayerTeamFlagsValue,
 		PlayerTimestamps: PlayerTimestamps,
 		PlayerValue: PlayerValue,
 		Pool: Pool,
@@ -1175,12 +1203,28 @@ export const schema: SchemaType = {
 			level: 0,
 			stacked_ids: [0],
 		},
+		PlayerFlags: {
+			player_address: "",
+			is_blocked: false,
+		},
+		PlayerFlagsValue: {
+			is_blocked: false,
+		},
 		PlayerOnline: {
 			identity: "",
 			timestamp: 0,
 		},
 		PlayerOnlineValue: {
 			timestamp: 0,
+		},
+		PlayerTeamFlags: {
+			player_address: "",
+			is_team_member: false,
+			is_admin: false,
+		},
+		PlayerTeamFlagsValue: {
+			is_team_member: false,
+			is_admin: false,
 		},
 		PlayerTimestamps: {
 			registered: 0,
@@ -1448,8 +1492,12 @@ export enum ModelsMapping {
 	PlayerBookmarkValue = 'pistols-PlayerBookmarkValue',
 	PlayerDuelistStack = 'pistols-PlayerDuelistStack',
 	PlayerDuelistStackValue = 'pistols-PlayerDuelistStackValue',
+	PlayerFlags = 'pistols-PlayerFlags',
+	PlayerFlagsValue = 'pistols-PlayerFlagsValue',
 	PlayerOnline = 'pistols-PlayerOnline',
 	PlayerOnlineValue = 'pistols-PlayerOnlineValue',
+	PlayerTeamFlags = 'pistols-PlayerTeamFlags',
+	PlayerTeamFlagsValue = 'pistols-PlayerTeamFlagsValue',
 	PlayerTimestamps = 'pistols-PlayerTimestamps',
 	PlayerValue = 'pistols-PlayerValue',
 	Pool = 'pistols-Pool',

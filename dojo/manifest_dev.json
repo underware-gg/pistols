@@ -1328,8 +1328,8 @@
   },
   "contracts": [
     {
-      "address": "0xfa81b4aa9894eee6fb59c2f8d5532e8427dfe2ef8a15c91b72576653930f69",
-      "class_hash": "0x25e4b5e39da410e3710a44c0a202a070f46923afad37cc168bbb1d7cf1a5e43",
+      "address": "0x574775ecfefed2a848c15f4170c0ecada76c95636c5212cedce20655d1d01f7",
+      "class_hash": "0x7a63a00a1ac85b1acdece7dc694a4da21268cb50ad29c300aa50ccdd95c18d9",
       "abi": [
         {
           "type": "impl",
@@ -1442,14 +1442,10 @@
             },
             {
               "type": "function",
-              "name": "grant_admin",
+              "name": "set_paused",
               "inputs": [
                 {
-                  "name": "account_address",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "granted",
+                  "name": "paused",
                   "type": "core::bool"
                 }
               ],
@@ -1470,14 +1466,82 @@
             },
             {
               "type": "function",
-              "name": "set_paused",
+              "name": "set_is_team_member",
               "inputs": [
                 {
-                  "name": "paused",
+                  "name": "account_address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "is_team_member",
+                  "type": "core::bool"
+                },
+                {
+                  "name": "is_admin",
                   "type": "core::bool"
                 }
               ],
               "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "set_is_blocked",
+              "inputs": [
+                {
+                  "name": "account_address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "is_blocked",
+                  "type": "core::bool"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "disqualify_duelist",
+              "inputs": [
+                {
+                  "name": "season_id",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "duelist_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "block_owner",
+                  "type": "core::bool"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "qualify_duelist",
+              "inputs": [
+                {
+                  "name": "season_id",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "duelist_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u8"
+                }
+              ],
               "state_mutability": "external"
             },
             {
@@ -1606,16 +1670,19 @@
       "selector": "0x36fd20372b5d47c092e2fede52897075978efb732aeaeb155d19eb8147f6497",
       "systems": [
         "dojo_init",
-        "grant_admin",
-        "set_treasury",
         "set_paused",
+        "set_treasury",
+        "set_is_team_member",
+        "set_is_blocked",
+        "disqualify_duelist",
+        "qualify_duelist",
         "urgent_update",
         "upgrade"
       ]
     },
     {
-      "address": "0x2fe631fc3dcb751ad3c9c76f80754de1d5eab7f37cbb24001856a535bb47c8f",
-      "class_hash": "0x380fd97074db2d44a4aca70fa9a4eac47ff1292453d1838278befecc2eaca08",
+      "address": "0x226a776706b84725f942cb37bb1dbea926467d7bb42a41a9fba2d5283e42475",
+      "class_hash": "0x6ccea34a847b69c420da2fbd4ffc5d7bb5a34f4e2f1e944b5928aa219490b79",
       "abi": [
         {
           "type": "impl",
@@ -6517,8 +6584,8 @@
       ]
     },
     {
-      "address": "0x54d1c47d0bd26c8882974d1d53dd5d4d74126e50713088b6882fc81a6408415",
-      "class_hash": "0x3f2249d94dbdaa5dada623a1385ae0a2db68db834e5e1d90ecd1c0e1abc82da",
+      "address": "0x7817279726126df6b934b2b0f907dac4d6177d6f44de91914be1017536507c8",
+      "class_hash": "0x7e1edb270ddebc3bb3765b0c5ba7ded36f55ef1e8d5a37d52a67b2e8f2a09f2",
       "abi": [
         {
           "type": "impl",
@@ -10678,9 +10745,21 @@
     },
     {
       "members": [],
+      "class_hash": "0x5d5c9b201fb263769884201e72d2b92b4aa2a9f242a914a78eda1fca60d4cd0",
+      "tag": "pistols-PlayerFlags",
+      "selector": "0x14dddd7c3b64adcbff56d72f482cf837ee1c24c81f28fe6edc10654b0b2c6ac"
+    },
+    {
+      "members": [],
       "class_hash": "0x5dc82b316b374bbe4e0c8ac5e29a9166679350afc68ba5039f175438c96ecb",
       "tag": "pistols-PlayerOnline",
       "selector": "0x6f3391bc3684ea92009be25543fc6cc734c1f756253523354efdf10e2a57dff"
+    },
+    {
+      "members": [],
+      "class_hash": "0x7b3c2334d9ffa8131f4990d07cd617bd72d929d21edbdd2dcfb933c9ef22719",
+      "tag": "pistols-PlayerTeamFlags",
+      "selector": "0x2489d18f02fac0971dd8e249bfa97f8b28d3d5527bc9db1517bb411abd07151"
     },
     {
       "members": [],

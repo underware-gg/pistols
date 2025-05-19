@@ -21,19 +21,82 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_admin_grantAdmin_calldata = (accountAddress: string, granted: boolean): DojoCall => {
+	const build_admin_disqualifyDuelist_calldata = (seasonId: BigNumberish, duelistId: BigNumberish, blockOwner: boolean): DojoCall => {
 		return {
 			contractName: "admin",
-			entrypoint: "grant_admin",
-			calldata: [accountAddress, granted],
+			entrypoint: "disqualify_duelist",
+			calldata: [seasonId, duelistId, blockOwner],
 		};
 	};
 
-	const admin_grantAdmin = async (snAccount: Account | AccountInterface, accountAddress: string, granted: boolean) => {
+	const admin_disqualifyDuelist = async (snAccount: Account | AccountInterface, seasonId: BigNumberish, duelistId: BigNumberish, blockOwner: boolean) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_admin_grantAdmin_calldata(accountAddress, granted),
+				build_admin_disqualifyDuelist_calldata(seasonId, duelistId, blockOwner),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_admin_qualifyDuelist_calldata = (seasonId: BigNumberish, duelistId: BigNumberish): DojoCall => {
+		return {
+			contractName: "admin",
+			entrypoint: "qualify_duelist",
+			calldata: [seasonId, duelistId],
+		};
+	};
+
+	const admin_qualifyDuelist = async (snAccount: Account | AccountInterface, seasonId: BigNumberish, duelistId: BigNumberish) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_admin_qualifyDuelist_calldata(seasonId, duelistId),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_admin_setIsBlocked_calldata = (accountAddress: string, isBlocked: boolean): DojoCall => {
+		return {
+			contractName: "admin",
+			entrypoint: "set_is_blocked",
+			calldata: [accountAddress, isBlocked],
+		};
+	};
+
+	const admin_setIsBlocked = async (snAccount: Account | AccountInterface, accountAddress: string, isBlocked: boolean) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_admin_setIsBlocked_calldata(accountAddress, isBlocked),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_admin_setIsTeamMember_calldata = (accountAddress: string, isTeamMember: boolean, isAdmin: boolean): DojoCall => {
+		return {
+			contractName: "admin",
+			entrypoint: "set_is_team_member",
+			calldata: [accountAddress, isTeamMember, isAdmin],
+		};
+	};
+
+	const admin_setIsTeamMember = async (snAccount: Account | AccountInterface, accountAddress: string, isTeamMember: boolean, isAdmin: boolean) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_admin_setIsTeamMember_calldata(accountAddress, isTeamMember, isAdmin),
 				"pistols",
 			);
 		} catch (error) {
@@ -3387,8 +3450,14 @@ export function setupWorld(provider: DojoProvider) {
 		admin: {
 			amIAdmin: admin_amIAdmin,
 			buildAmIAdminCalldata: build_admin_amIAdmin_calldata,
-			grantAdmin: admin_grantAdmin,
-			buildGrantAdminCalldata: build_admin_grantAdmin_calldata,
+			disqualifyDuelist: admin_disqualifyDuelist,
+			buildDisqualifyDuelistCalldata: build_admin_disqualifyDuelist_calldata,
+			qualifyDuelist: admin_qualifyDuelist,
+			buildQualifyDuelistCalldata: build_admin_qualifyDuelist_calldata,
+			setIsBlocked: admin_setIsBlocked,
+			buildSetIsBlockedCalldata: build_admin_setIsBlocked_calldata,
+			setIsTeamMember: admin_setIsTeamMember,
+			buildSetIsTeamMemberCalldata: build_admin_setIsTeamMember_calldata,
 			setPaused: admin_setPaused,
 			buildSetPausedCalldata: build_admin_setPaused_calldata,
 			setTreasury: admin_setTreasury,
