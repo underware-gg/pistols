@@ -1337,4 +1337,154 @@ pub mod tests {
         assert_lt!(score_a.points, score_b.points, "score_a.points < score_b.points");
     }
 
+
+    //-------------------------------
+    // leaderboard qualification
+    //
+
+    #[test]
+    fn test_leaderboard_qualify_ok() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        // empty leaderboards
+        let leaderboard: Leaderboard = sys.store.get_leaderboard(SEASON_ID_1);
+        let positions: Span<LeaderboardPosition> = leaderboard.get_all_positions();
+        assert_eq!(positions.len(), 0, "positions.len()");
+        // create duelists
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        tester::fund_duelists_pool(@sys, 2);
+        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys.pack, A)[0];
+        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys.pack, B)[0];
+        // just draw...
+        let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
+        sys.rng.mock_values(mocked);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, A, B, DuelType::Seasonal, 1);
+        let (challenge, _round) = prefabs::commit_reveal_get(@sys, duel_id, A, B, mocked, moves_a, moves_b);
+        assert_eq!(challenge.state, ChallengeState::Draw, "challenge.state");
+        // filled leaderboards
+        let leaderboard: Leaderboard = sys.store.get_leaderboard(SEASON_ID_1);
+        let positions: Span<LeaderboardPosition> = leaderboard.get_all_positions();
+        assert_eq!(positions.len(), 2, "positions.len()");
+    }
+
+    #[test]
+    fn test_leaderboard_qualify_team_a() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        // block A
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        tester::execute_admin_set_is_team_member(@sys.admin, OWNER(), A, true, true);
+        // create duelists
+        tester::fund_duelists_pool(@sys, 2);
+        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys.pack, A)[0];
+        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys.pack, B)[0];
+        // just draw...
+        let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
+        sys.rng.mock_values(mocked);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, A, B, DuelType::Seasonal, 1);
+        let (challenge, _round) = prefabs::commit_reveal_get(@sys, duel_id, A, B, mocked, moves_a, moves_b);
+        assert_eq!(challenge.state, ChallengeState::Draw, "challenge.state");
+        // filled leaderboards
+        let leaderboard: Leaderboard = sys.store.get_leaderboard(SEASON_ID_1);
+        let positions: Span<LeaderboardPosition> = leaderboard.get_all_positions();
+        assert_eq!(positions.len(), 1, "positions.len()");
+        assert_eq!(*positions[0].duelist_id, ID(B).into(), "positions[0]");
+    }
+
+    #[test]
+    fn test_leaderboard_qualify_team_b() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        // block A
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        tester::execute_admin_set_is_team_member(@sys.admin, OWNER(), B, true, true);
+        // create duelists
+        tester::fund_duelists_pool(@sys, 2);
+        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys.pack, A)[0];
+        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys.pack, B)[0];
+        // just draw...
+        let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
+        sys.rng.mock_values(mocked);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, A, B, DuelType::Seasonal, 1);
+        let (challenge, _round) = prefabs::commit_reveal_get(@sys, duel_id, A, B, mocked, moves_a, moves_b);
+        assert_eq!(challenge.state, ChallengeState::Draw, "challenge.state");
+        // filled leaderboards
+        let leaderboard: Leaderboard = sys.store.get_leaderboard(SEASON_ID_1);
+        let positions: Span<LeaderboardPosition> = leaderboard.get_all_positions();
+        assert_eq!(positions.len(), 1, "positions.len()");
+        assert_eq!(*positions[0].duelist_id, ID(A).into(), "positions[0]");
+    }
+
+    #[test]
+    fn test_leaderboard_qualify_blocked_a() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        // block A
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        tester::execute_admin_set_is_blocked(@sys.admin, OWNER(), A, true);
+        // create duelists
+        tester::fund_duelists_pool(@sys, 2);
+        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys.pack, A)[0];
+        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys.pack, B)[0];
+        // just draw...
+        let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
+        sys.rng.mock_values(mocked);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, A, B, DuelType::Seasonal, 1);
+        let (challenge, _round) = prefabs::commit_reveal_get(@sys, duel_id, A, B, mocked, moves_a, moves_b);
+        assert_eq!(challenge.state, ChallengeState::Draw, "challenge.state");
+        // filled leaderboards
+        let leaderboard: Leaderboard = sys.store.get_leaderboard(SEASON_ID_1);
+        let positions: Span<LeaderboardPosition> = leaderboard.get_all_positions();
+        assert_eq!(positions.len(), 1, "positions.len()");
+        assert_eq!(*positions[0].duelist_id, ID(B).into(), "positions[0]");
+    }
+
+    #[test]
+    fn test_leaderboard_qualify_blocked_b() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        // block A
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        tester::execute_admin_set_is_blocked(@sys.admin, OWNER(), B, true);
+        // create duelists
+        tester::fund_duelists_pool(@sys, 2);
+        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys.pack, A)[0];
+        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys.pack, B)[0];
+        // just draw...
+        let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
+        sys.rng.mock_values(mocked);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, A, B, DuelType::Seasonal, 1);
+        let (challenge, _round) = prefabs::commit_reveal_get(@sys, duel_id, A, B, mocked, moves_a, moves_b);
+        assert_eq!(challenge.state, ChallengeState::Draw, "challenge.state");
+        // filled leaderboards
+        let leaderboard: Leaderboard = sys.store.get_leaderboard(SEASON_ID_1);
+        let positions: Span<LeaderboardPosition> = leaderboard.get_all_positions();
+        assert_eq!(positions.len(), 1, "positions.len()");
+        assert_eq!(*positions[0].duelist_id, ID(A).into(), "positions[0]");
+    }
+
+    #[test]
+    fn test_leaderboard_qualify_blocked_a_b() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        // block A
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        tester::execute_admin_set_is_blocked(@sys.admin, OWNER(), A, true);
+        tester::execute_admin_set_is_blocked(@sys.admin, OWNER(), B, true);
+        // create duelists
+        tester::fund_duelists_pool(@sys, 2);
+        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys.pack, A)[0];
+        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys.pack, B)[0];
+        // just draw...
+        let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
+        sys.rng.mock_values(mocked);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, A, B, DuelType::Seasonal, 1);
+        let (challenge, _round) = prefabs::commit_reveal_get(@sys, duel_id, A, B, mocked, moves_a, moves_b);
+        assert_eq!(challenge.state, ChallengeState::Draw, "challenge.state");
+        // filled leaderboards
+        let leaderboard: Leaderboard = sys.store.get_leaderboard(SEASON_ID_1);
+        let positions: Span<LeaderboardPosition> = leaderboard.get_all_positions();
+        assert_eq!(positions.len(), 0, "positions.len()");
+    }
+
 }

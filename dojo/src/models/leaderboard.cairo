@@ -6,7 +6,7 @@ pub struct Leaderboard {
     pub season_id: u32,
     //-----------------------
     pub positions: u8,          // number of positions on the leaderboard (max 10)
-    pub duelist_ids: felt252,   // (positions * 24 bits) = 240 bits max
+    pub duelist_ids: felt252,   // (positions * 24 bits) = 240 bits max (max duelist id: 16,777,215)
     pub scores: felt252,        // (positions * 24 bits) = 240 bits max
 }
 
@@ -21,6 +21,8 @@ pub struct LeaderboardPosition {
 //----------------------------------
 // Traits
 //
+use starknet::{ContractAddress};
+use pistols::libs::store::{Store, StoreTrait};
 use pistols::utils::bitwise::{BitwiseU256};
 
 #[generate_trait]
@@ -42,6 +44,13 @@ pub impl LeaderboardImpl of LeaderboardTrait {
     #[inline(always)]
     fn exists(self: @Leaderboard) -> bool {
         (*self.positions > 0)
+    }
+    #[inline(always)]
+    fn is_qualified(self: @Leaderboard, store: @Store, address: ContractAddress) -> bool {
+        (
+            !store.get_player_is_team_member(address) &&
+            !store.get_player_is_blocked(address)
+        )
     }
     fn get_duelist_position(self: @Leaderboard, duelist_id: u128) -> LeaderboardPosition {
         let mut result: LeaderboardPosition = Default::default();
