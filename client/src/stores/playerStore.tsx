@@ -239,22 +239,6 @@ export const usePlayersOnline = () => {
   }
 }
 
-
-//----------------------------------------
-// vanilla getter
-// (non-React)
-//
-export const getPlayerName = (address: BigNumberish): string | undefined => {
-  const players_names = usePlayerDataStore.getState().players_names
-  return players_names[bigintToHex(address)]
-}
-
-export const getPlayerOnlineStatus = (address: BigNumberish): boolean => {
-  const players_online = usePlayerDataStore((state) => state.players_online);
-  return players_online[bigintToHex(address)] !== undefined
-}
-
-
 export const useQueryPlayerIds = (
   filterName: string,
   filterOnline: boolean,
@@ -268,7 +252,6 @@ export const useQueryPlayerIds = (
   const players = useEntitiesModel<models.Player>(Object.values(entities), 'Player')
 
   const players_online = usePlayerDataStore((state) => state.players_online);
-  const getPlayerName = usePlayerDataStore((state) => state.getPlayerName);
 
   const playerIds = useMemo(() => {
     let result = [
@@ -320,4 +303,20 @@ export const useQueryPlayerIds = (
   return {
     playerIds,
   }
+}
+
+
+
+
+//----------------------------------------
+// vanilla getters
+// (non-React)
+//
+export const getPlayerName = (address: BigNumberish): string | undefined => {
+  return usePlayerDataStore.getState().getPlayerName(address)
+}
+
+export const getPlayerOnlineStatus = (address: BigNumberish): boolean => {
+  const players_online = usePlayerDataStore((state) => state.players_online);
+  return players_online[bigintToHex(address)] !== undefined
 }

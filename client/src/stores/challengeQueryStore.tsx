@@ -4,11 +4,11 @@ import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useCallToActions } from './eventsModelStore'
-import { usePlayer, usePlayerDataStore } from '/src/stores/playerStore'
+import { usePlayer, getPlayerName } from '/src/stores/playerStore'
 import { ChallengeColumn, SortDirection } from '/src/stores/queryParamsStore'
 import { PistolsEntity } from '@underware/pistols-sdk/pistols/sdk'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
-import { bigintEquals, bigintToHex, bigintToNumber, isPositiveBigint } from '@underware/pistols-sdk/utils'
+import { bigintEquals, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { parseEnumVariant } from '@underware/pistols-sdk/starknet'
 import { keysToEntityId, getEntityModel } from '@underware/pistols-sdk/dojo'
 import { useChallengeStore } from './challengeStore'
@@ -109,7 +109,6 @@ export const useQueryChallengeIds = (
   const { requiredDuelIds } = useCallToActions()
 
   const entities = useChallengeQueryStore((state) => state.entities);
-  const getPlayerName = usePlayerDataStore((state) => state.getPlayerName);
   const targetId = useMemo(() => (isPositiveBigint(playerAddressOrDuelistId) ? BigInt(playerAddressOrDuelistId) : 0n), [playerAddressOrDuelistId])
 
   const [challengeIds, states, challengePlayerMap] = useMemo(() => {

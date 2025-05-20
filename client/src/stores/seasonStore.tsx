@@ -104,7 +104,10 @@ export const useFullLeaderboard = (season_id: number) => {
   const scores = useMemo(() => (
     [
       ...leaderboardScores,
-      ...seasonScoreboard.filter(s => !leaderboardScores.some(l => l.duelistId === s.duelistId))
+      ...(seasonScoreboard || []).filter(s =>
+        s && s.duelistId !== undefined &&
+        !(leaderboardScores || []).some(l => l && l.duelistId === s.duelistId)
+      ),
     ].filter(score => !blockedPlayersDuelistIds.includes(score.duelistId))
   ), [leaderboardScores, seasonScoreboard, blockedPlayersDuelistIds])
 
