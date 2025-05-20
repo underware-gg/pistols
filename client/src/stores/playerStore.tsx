@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
@@ -6,7 +6,7 @@ import { useAccount } from '@starknet-react/core'
 import { createDojoStore } from '@dojoengine/sdk/react'
 import { PistolsEntity, PistolsSchemaType } from '@underware/pistols-sdk/pistols/sdk'
 import { arrayRemoveValue, bigintEquals, bigintToHex, bigintToNumber, sortObjectByValue } from '@underware/pistols-sdk/utils'
-import { useEntitiesModel, useEntityModelByKeys } from '@underware/pistols-sdk/dojo'
+import { useAllStoreModels, useEntitiesModel, useStoreModelsByKeys } from '@underware/pistols-sdk/dojo'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { useTokenStore } from '/src/stores/tokenStore'
 import { SortDirection } from '/src/stores/queryParamsStore'
@@ -119,9 +119,9 @@ export const usePlayerDataStore = createStore();
 
 export const usePlayer = (address: BigNumberish) => {
   const entities = usePlayerStore((state) => state.entities);
-  const player = useEntityModelByKeys<models.Player>(entities, 'Player', [address])
-  const flags = useEntityModelByKeys<models.PlayerFlags>(entities, 'PlayerFlags', [address])
-  const teamFlags = useEntityModelByKeys<models.PlayerTeamFlags>(entities, 'PlayerTeamFlags', [address])
+  const player = useStoreModelsByKeys<models.Player>(entities, 'Player', [address])
+  const flags = useStoreModelsByKeys<models.PlayerFlags>(entities, 'PlayerFlags', [address])
+  const teamFlags = useStoreModelsByKeys<models.PlayerTeamFlags>(entities, 'PlayerTeamFlags', [address])
 
   const timestampRegistered = useMemo(() => Number(player?.timestamps.registered ?? 0), [player])
   const aliveDuelistCount = useMemo(() => Number(player?.alive_duelist_count ?? 0), [player])
@@ -173,7 +173,7 @@ export const usePlayer = (address: BigNumberish) => {
 
 export const usePlayersAccounts = () => {
   const entities = usePlayerStore((state) => state.entities)
-  const players = useEntitiesModel<models.Player>(Object.values(entities), 'Player')
+  const players = useAllStoreModels<models.Player>(entities, 'Player')
   const playersAccounts = useMemo(() => (
     players.map((p) => (p.player_address))
   ), [players])
@@ -184,7 +184,7 @@ export const usePlayersAccounts = () => {
 
 export const useTeamMembersAccounts = () => {
   const entities = usePlayerStore((state) => state.entities)
-  const teamFlags = useEntitiesModel<models.PlayerTeamFlags>(Object.values(entities), 'PlayerTeamFlags')
+  const teamFlags = useAllStoreModels<models.PlayerTeamFlags>(entities, 'PlayerTeamFlags')
   const teamMembersAccounts = useMemo(() => (
     teamFlags.filter((p) => (p.is_team_member || p.is_admin)).map((p) => (p.player_address))
   ), [teamFlags])
@@ -195,7 +195,7 @@ export const useTeamMembersAccounts = () => {
 
 export const useBlockedPlayersAccounts = () => {
   const entities = usePlayerStore((state) => state.entities)
-  const playerFlags = useEntitiesModel<models.PlayerFlags>(Object.values(entities), 'PlayerFlags')
+  const playerFlags = useAllStoreModels<models.PlayerFlags>(entities, 'PlayerFlags')
   const blockedPlayersAccounts = useMemo(() => (
     playerFlags.filter((p) => (p.is_blocked)).map((p) => (p.player_address))
   ), [playerFlags])
@@ -250,7 +250,7 @@ export const useQueryPlayerIds = (
   const { address } = useAccount()
   const { bookmarkedDuelists } = usePlayer(address)
   const entities = usePlayerStore((state) => state.entities);
-  const players = useEntitiesModel<models.Player>(Object.values(entities), 'Player')
+  const players = useAllStoreModels<models.Player>(entities, 'Player')
 
   const players_online = usePlayerDataStore((state) => state.players_online);
 

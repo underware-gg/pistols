@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { createDojoStore } from '@dojoengine/sdk/react'
-import { getEntityModel, keysToEntityId, useEntityModelById } from '@underware/pistols-sdk/dojo'
+import { getEntityModel, keysToEntityId, useStoreModelsById } from '@underware/pistols-sdk/dojo'
 import { PistolsSchemaType } from '@underware/pistols-sdk/pistols/sdk'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 
@@ -14,7 +14,7 @@ const configKey = keysToEntityId([constants.CONFIG.CONFIG_KEY])
 //
 export const useConfig = () => {
   const entities = useConfigStore((state) => state.entities);
-  const config = useEntityModelById<models.Config>(entities, 'Config', configKey)
+  const config = useStoreModelsById<models.Config>(entities, 'Config', configKey)
   // useEffect(() => console.log(`useConfig() =>`, config), [config])
 
   const isPaused = useMemo(() => (config?.is_paused ?? false), [config])

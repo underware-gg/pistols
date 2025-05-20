@@ -12,8 +12,8 @@ import { Connect } from '/src/pages/tests/ConnectTestPage'
 import { BigNumberish } from 'starknet'
 import { useFetchAccountsBalances } from '/src/stores/coinStore'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
+import { useAllStoreModels } from '@underware/pistols-sdk/dojo'
 import { useDelay } from '@underware/pistols-sdk/utils/hooks'
-import { useEntitiesModel } from '@underware/pistols-sdk/dojo'
 import { models } from '@underware/pistols-sdk/pistols/gen'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppDojo from '/src/components/AppDojo'
@@ -47,7 +47,7 @@ export default function PlayersPage() {
 
 function Players() {
   const entities = usePlayerStore((state) => state.entities)
-  const players = useEntitiesModel<models.Player>(Object.values(entities), 'Player')
+  const players = useAllStoreModels<models.Player>(entities, 'Player')
 
   const playerAddresses = useMemo(() => players.map((p) => p.player_address), [players])
 

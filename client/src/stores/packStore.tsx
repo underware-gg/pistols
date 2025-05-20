@@ -3,7 +3,7 @@ import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { parseEnumVariant } from '@underware/pistols-sdk/starknet'
-import { formatQueryValue, useSdkEntitiesGet, useEntityModelByKeys } from '@underware/pistols-sdk/dojo'
+import { formatQueryValue, useSdkEntitiesGet, useStoreModelsByKeys } from '@underware/pistols-sdk/dojo'
 import { PistolsSchemaType, PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols/sdk'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 
@@ -34,7 +34,7 @@ export const usePackType = (packType: constants.PackType) => {
 //
 export const usePack = (pack_id: BigNumberish) => {
   const entities = usePackStore((state) => state.entities);
-  const pack = useEntityModelByKeys<models.Pack>(entities, 'Pack', [pack_id])
+  const pack = useStoreModelsByKeys<models.Pack>(entities, 'Pack', [pack_id])
 
   const isOpen = useMemo(() => pack?.is_open ?? false, [pack])
   const packType = useMemo(() => parseEnumVariant<constants.PackType>(pack?.pack_type), [pack])

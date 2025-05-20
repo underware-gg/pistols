@@ -2,14 +2,14 @@ import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
 import { PistolsSchemaType } from '@underware/pistols-sdk/pistols/sdk'
-import { keysToEntityId, useEntityModelByKeys, getEntityModel } from '@underware/pistols-sdk/dojo'
+import { keysToEntityId, useStoreModelsByKeys, getEntityModel } from '@underware/pistols-sdk/dojo'
 import { models } from '@underware/pistols-sdk/pistols/gen'
 
 export const useTokenConfigStore = createDojoStore<PistolsSchemaType>();
 
 export const useTokenConfig = (contractAddress: BigNumberish) => {
   const entities = useTokenConfigStore((state) => state.entities);
-  const tokenConfig = useEntityModelByKeys<models.TokenConfig>(entities, 'TokenConfig', [contractAddress])
+  const tokenConfig = useStoreModelsByKeys<models.TokenConfig>(entities, 'TokenConfig', [contractAddress])
   // useEffect(() => console.log(`useTokenConfig() =>`, tokenConfig), [tokenConfig])
 
   const mintedCount = useMemo(() => (tokenConfig ? Number(tokenConfig.minted_count) : null), [tokenConfig])
