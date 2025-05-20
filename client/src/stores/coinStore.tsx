@@ -82,22 +82,23 @@ export const useCoinStore = createStore();
 // consumer hooks
 //
 
-export const useCoinBalance = (
+const useCoinBalance = (
   contractAddress: BigNumberish,
   accountAddress: BigNumberish,
-  fee: BigNumberish = 0n, // optionally calculate if there is enough balance to pay this fee
+  fee: BigNumberish,  // optionally calculate if there is enough balance to pay this fee
+  fetch: boolean,     // fetch new balance if not cached
 ) => {
   const state = useCoinStore((state) => state)
   const balance = useMemo(() => state.getBalance(contractAddress, accountAddress), [state.contracts, contractAddress, accountAddress])
   const balance_eth = useMemo(() => (balance != null ? weiToEth(balance) : balance), [balance])
-  // console.log(`COIN BALANCE`, (bigintToHex(contractAddress)), (bigintToHex(accountAddress)), balance)
 
   const { isLoading } = useSdkTokenBalancesGet({
     contract: bigintToHex(contractAddress || 0n),
     account: bigintToHex(accountAddress || 0n),
     setBalances: state.setBalances,
-    enabled: (balance == null),
+    enabled: (fetch && balance == null),
   })
+  // console.log(`COIN BALANCE`, (bigintToHex(contractAddress)), (bigintToHex(accountAddress)), balance, isLoading)
 
   const canAffordFee = useMemo(() => {
     if (balance == null || !fee) return undefined
@@ -119,17 +120,17 @@ export const useCoinBalance = (
 
 export const useLordsBalance = (address: BigNumberish, fee: BigNumberish = 0n) => {
   const { lordsContractAddress } = useTokenContracts()
-  return useCoinBalance(lordsContractAddress, address, fee)
+  return useCoinBalance(lordsContractAddress, address, fee, true)
 }
 
 export const useFoolsBalance = (address: BigNumberish, fee: BigNumberish = 0n) => {
   const { foolsContractAddress } = useTokenContracts()
-  return useCoinBalance(foolsContractAddress, address, fee)
+  return useCoinBalance(foolsContractAddress, address, fee, true)
 }
 
 export const useFameBalance = (address: BigNumberish, fee: BigNumberish = 0n) => {
   const { fameContractAddress } = useTokenContracts()
-  const result = useCoinBalance(fameContractAddress, address, fee)
+  const result = useCoinBalance(fameContractAddress, address, fee, true)
   // console.log('useFameBalance COIN FAME:', address, result)
   const lives = useMemo(() => Math.floor(Number(result.balance / constants.FAME.ONE_LIFE)), [result.balance])
   return {
@@ -159,7 +160,7 @@ export const useFetchAccountsBalances = (coinAddress: BigNumberish, newAccounts:
 }
 
 export const fetchAccountsBalances = async (sdk: SetupResult['sdk'], coinAddress: BigNumberish, newAccounts: BigNumberish[]) => {
-  // console.log("fetchAccountsBalances()...", tokenAddress, tokenIds, tokenBoundAddresses, accounts)
+  // console.log("fetchAccountsBalances()...", coinAddress, newAccounts)
   const accounts = useCoinStore.getState().getAccounts(coinAddress)
   const accountAddresses = newAccounts
     .map((address) => bigintToHex(address))
