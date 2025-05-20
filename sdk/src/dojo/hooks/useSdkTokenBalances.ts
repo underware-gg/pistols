@@ -82,7 +82,7 @@ export const useSdkTokenBalancesGet = ({
       // console.log("useSdkTokenBalancesGet() done!", account)
     }
     // get...
-    if (sdk && enabled && isPositiveBigint(contract) && (isPositiveBigint(account) || tokenIds)) _get()
+    if (sdk && enabled && isPositiveBigint(contract)) _get()
     return () => {
       _mounted = false
     }

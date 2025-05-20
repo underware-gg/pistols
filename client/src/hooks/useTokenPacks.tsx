@@ -1,7 +1,7 @@
 import { useAccount } from '@starknet-react/core'
 import { useTokenConfig } from '/src/stores/tokenConfigStore'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
-import { useTokenIdsByAccount } from '/src/stores/tokenStore'
+import { usePackTokenStore } from '/src/stores/tokenStore'
 import { useMemo } from 'react'
 
 export const usePackTokenCount = () => {
@@ -15,12 +15,10 @@ export const usePackTokenCount = () => {
 
 export const usePacksOfPlayer = () => {
   const { address } = useAccount()
-  const { packContractAddress } = useTokenContracts()
-  const { tokenIds, isLoading } = useTokenIdsByAccount(packContractAddress, address)
-
-  const packIds = useMemo(() => tokenIds.map(id => Number(id)), [tokenIds])
+  const state = usePackTokenStore((state) => state)
+  const packIds = useMemo(() => state.getTokenIdsOfOwner(address).map(id => Number(id)), [state.tokens, address])
   return {
     packIds,
-    isLoading,
+    isLoading: (state.tokens === null),
   }
 }

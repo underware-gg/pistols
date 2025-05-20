@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
@@ -6,9 +6,9 @@ import { useAccount } from '@starknet-react/core'
 import { createDojoStore } from '@dojoengine/sdk/react'
 import { PistolsEntity, PistolsSchemaType } from '@underware/pistols-sdk/pistols/sdk'
 import { arrayRemoveValue, bigintEquals, bigintToHex, bigintToNumber, sortObjectByValue } from '@underware/pistols-sdk/utils'
-import { useAllStoreModels, useEntitiesModel, useStoreModelsByKeys } from '@underware/pistols-sdk/dojo'
+import { useAllStoreModels, useStoreModelsByKeys } from '@underware/pistols-sdk/dojo'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
-import { useTokenStore } from '/src/stores/tokenStore'
+import { useDuelistTokenStore } from '/src/stores/tokenStore'
 import { SortDirection } from '/src/stores/queryParamsStore'
 import { PlayerColumn } from '/src/stores/queryParamsStore'
 import { useTotals } from '/src/stores/duelistStore'
@@ -206,13 +206,12 @@ export const useBlockedPlayersAccounts = () => {
 
 export const useBlockedPlayersDuelistIds = () => {
   const { blockedPlayersAccounts } = useBlockedPlayersAccounts()
-  const { duelistContractAddress } = useTokenContracts()
-  const contracts = useTokenStore((state) => state.contracts)
-  const getTokenIds = useTokenStore((state) => state.getTokenIds)
+  const tokens = useDuelistTokenStore((state) => state.tokens)
+  const getTokenIdsOfOwner = useDuelistTokenStore((state) => state.getTokenIdsOfOwner)
 
   const blockedPlayersDuelistIds = useMemo(() => (
-    blockedPlayersAccounts.reduce((acc, account) => [...acc, ...(getTokenIds(duelistContractAddress, account) ?? [])], [] as bigint[])
-  ), [blockedPlayersAccounts, getTokenIds, duelistContractAddress])
+    blockedPlayersAccounts.reduce((acc, account) => [...acc, ...getTokenIdsOfOwner(account)], [] as bigint[])
+  ), [blockedPlayersAccounts, tokens])
 
   return {
     blockedPlayersDuelistIds,

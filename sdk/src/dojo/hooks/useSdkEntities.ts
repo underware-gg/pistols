@@ -324,17 +324,17 @@ export const entityContainsModels = (entity: PistolsEntity, modelNames: PistolsS
 )
 
 // hooks on DojoStore entities
-export const useStoreModelsByKeys = <M extends PistolsModelType>(entities: Record<string, PistolsEntity>, modelName: PistolsSchemaModelNames, keys: BigNumberish[]): M | undefined => {
+export const useAllStoreModels = <M extends PistolsModelType>(entitiesMap: Record<string, PistolsEntity>, modelName: PistolsSchemaModelNames): M[] => {
+  const entities = useMemo(() => Object.values(entitiesMap), [entitiesMap])
+  return useEntitiesModel(entities, modelName)
+}
+export const useStoreModelsByKeys = <M extends PistolsModelType>(entitiesMap: Record<string, PistolsEntity>, modelName: PistolsSchemaModelNames, keys: BigNumberish[]): M | undefined => {
   const entityId = useEntityId(keys)
-  return useStoreModelsById(entities, modelName, entityId)
+  return useStoreModelsById(entitiesMap, modelName, entityId)
 }
-export const useStoreModelsById = <M extends PistolsModelType>(entities: Record<string, PistolsEntity>, modelName: PistolsSchemaModelNames, entityId: string): M | undefined => {
-  const entity = useMemo(() => entities[entityId], [entities[entityId]])
+export const useStoreModelsById = <M extends PistolsModelType>(entitiesMap: Record<string, PistolsEntity>, modelName: PistolsSchemaModelNames, entityId: string): M | undefined => {
+  const entity = useMemo(() => entitiesMap[entityId], [entitiesMap[entityId]])
   return useEntityModel(entity, modelName)
-}
-export const useAllStoreModels = <M extends PistolsModelType>(entities: Record<string, PistolsEntity>, modelName: PistolsSchemaModelNames): M[] => {
-  const _entities = useMemo(() => Object.values(entities), [entities])
-  return useEntitiesModel(_entities, modelName)
 }
 
 // hooks on PistolsEntity

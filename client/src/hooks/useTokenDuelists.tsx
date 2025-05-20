@@ -1,7 +1,9 @@
+import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
-import { useTokenIdsByAccount, useTokenIdsOfPlayer, useOwnerOfTokenId } from '/src/stores/tokenStore'
+import { useDuelistTokenStore } from '/src/stores/tokenStore'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { useTokenConfig } from '/src/stores/tokenConfigStore'
+import { useAccount } from '@starknet-react/core'
 
 
 export const useDuelistTokenCount = () => {
@@ -14,28 +16,29 @@ export const useDuelistTokenCount = () => {
 }
 
 export const useOwnerOfDuelist = (token_id: BigNumberish) => {
-  const { duelistContractAddress } = useTokenContracts()
-  const { owner, isLoading } = useOwnerOfTokenId(duelistContractAddress, token_id)
+  const state = useDuelistTokenStore((state) => state)
+  const owner = useMemo(() => state.getOwnerOfTokenId(token_id), [state.tokens, token_id])
   return {
     owner,
-    isLoading,
+    isLoading: (state.tokens === null),
   }
 }
 
 export const useDuelistsOfPlayer = () => {
-  const { duelistContractAddress } = useTokenContracts()
-  const { tokenIds, isLoading } = useTokenIdsOfPlayer(duelistContractAddress)
+  const { address } = useAccount()
+  const state = useDuelistTokenStore((state) => state)
+  const tokenIds = useMemo(() => state.getTokenIdsOfOwner(address), [state.tokens, address])
   return {
     duelistIds: tokenIds,
-    isLoading,
+    isLoading: (state.tokens === null),
   }
 }
 
 export const useDuelistsOfOwner = (owner: BigNumberish) => {
-  const { duelistContractAddress } = useTokenContracts()
-  const { tokenIds, isLoading } = useTokenIdsByAccount(duelistContractAddress, owner)
+  const state = useDuelistTokenStore((state) => state)
+  const tokenIds = useMemo(() => state.getTokenIdsOfOwner(owner), [state.tokens, owner])
   return {
     duelistIds: tokenIds,
-    isLoading,
+    isLoading: (state.tokens === null),
   }
 }
