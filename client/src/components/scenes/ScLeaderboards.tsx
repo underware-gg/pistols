@@ -205,7 +205,7 @@ export default function ScLeaderboards() {
 
   // Get leaderboard data for selected season
   const { scores } = useFullLeaderboard(selectedSeasonId || 0);
-
+ 
   useEffect(() => console.log(`scores:`, scores), [scores])
 
   

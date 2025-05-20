@@ -48,27 +48,100 @@ interface ProfilePosterProps {
 
 export interface ProfilePosterHandle extends InteractibleComponentHandle {}
 
-export const ProfilePoster = forwardRef<ProfilePosterHandle, ProfilePosterProps>((props: ProfilePosterProps = {
-  isSmall: true,
-  isVisible: false,
-  isHighlightable: false,
-  instantVisible: false,
-  width: null,
-  height: null,
-  startPosition: { x: 0, y: 0 },
-  startRotation: 0,
-  startScale: 1
-}, ref: React.Ref<ProfilePosterHandle>) => {
+// Shared data hook between small and full components
+const useProfilePosterData = (playerAddress?: BigNumberish) => {
+  const { name, isBlocked } = usePlayer(playerAddress)
+  const { isMyAccount } = useIsMyAccount(playerAddress)
+  const isOnline = getPlayerOnlineStatus(playerAddress)
+
+  return {
+    name,
+    isMyAccount,
+    isOnline,
+    isBlocked
+  }
+}
+
+// Small version of the ProfilePoster
+const ProfilePosterSmall = forwardRef<ProfilePosterHandle, ProfilePosterProps>((props, ref) => {
+  const { aspectWidth, aspectHeight } = useGameAspect()
+  const { name, isOnline, isBlocked } = useProfilePosterData(props.playerAddress)
+
+  const baseRef = useRef<InteractibleComponentHandle>(null)
+
+  useImperativeHandle(ref, () => ({
+    flip: (flipped, isLeft, duration, easing, interpolation) =>
+      baseRef.current?.flip(flipped, isLeft, duration, easing, interpolation),
+    setPosition: (x, y, duration, easing, interpolation) =>
+      baseRef.current?.setPosition(x, y, duration, easing, interpolation),
+    setScale: (scale, duration, easing, interpolation) =>
+      baseRef.current?.setScale(scale, duration, easing, interpolation),
+    setRotation: (rotation, duration, easing, interpolation) =>
+      baseRef.current?.setRotation(rotation, duration, easing, interpolation),
+    setZIndex: (index, backgroundIndex) =>
+      baseRef.current?.setZIndex(index, backgroundIndex),
+    toggleVisibility: (isVisible) =>
+      baseRef.current?.toggleVisibility(isVisible),
+    toggleHighlight: (isHighlighted, shouldBeWhite, color) =>
+      baseRef.current?.toggleHighlight(isHighlighted, shouldBeWhite, color),
+    toggleDefeated: (isDefeated) =>
+      baseRef.current?.toggleDefeated(isDefeated),
+    playHanging: () => baseRef.current?.playHanging(),
+    toggleIdle: (isPlaying) => baseRef.current?.toggleIdle(isPlaying),
+    toggleBlink: (isBlinking, duration) => baseRef.current?.toggleBlink(isBlinking, duration),
+    getStyle: () => baseRef.current?.getStyle() || { translateX: 0, translateY: 0, rotation: 0, scale: 1 },
+  }))
+
+  return (
+    <InteractibleComponent
+      width={aspectWidth(props.width || POSTER_WIDTH_SMALL)}
+      height={aspectHeight(props.height || POSTER_HEIGHT_SMALL)}
+      isLeft={false}
+      isFlipped={true}
+      isVisible={props.isVisible}
+      isHighlightable={props.isHighlightable}
+      instantFlip={true}
+      instantVisible={props.instantVisible}
+      hasBorder={false}
+      frontImagePath={"/images/ui/duel_paper.png"}
+      defaultHighlightColor={CardColor.WHITE}
+      startPosition={props.startPosition}
+      startRotation={props.startRotation}
+      startScale={props.startScale}
+      hasCenteredOrigin={true}
+      mouseDisabled={!props.isSmall}
+      onHover={props.onHover}
+      onClick={props.onClick}
+      ref={baseRef}
+      childrenInFront={
+        <div className='Poster'>
+          <div className='WantedText Small'>WANTED</div>
+          
+          <div className='ProfileSection Small'>
+            <ProfilePic profilePic={0} width={9} removeCorners borderColor='#201a18' borderWidth={0.3} />
+            <div className='PlayerName Small'>{name}</div>
+          </div>
+
+          {isBlocked && <div className='BlockedOverlay ProfileSmall Right' />}
+
+          <div className={`OnlineStatusSection ${ props.width && props.width !== POSTER_WIDTH_SMALL ? 'Smaller' : 'Small'}`}>
+            <div className={`OnlineStatus Small ${isOnline ? 'Online' : 'Offline'}`} />
+          </div>
+        </div>
+      }
+    />
+  )
+})
+
+// Full version of the ProfilePoster
+const ProfilePosterFull = forwardRef<ProfilePosterHandle, ProfilePosterProps>((props, ref) => {
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSetScene } = usePistolsScene()
   const { dispatchSelectDuelistId } = usePistolsContext()
-
-  const isOnline = getPlayerOnlineStatus(props.playerAddress)
-
-  const { name } = usePlayer(props.playerAddress)
-  const { isMyAccount } = useIsMyAccount(props.playerAddress)
+  const { name, isMyAccount, isOnline, isBlocked } = useProfilePosterData(props.playerAddress)
+  
+  // Full-specific data
   const { duelistIds, isLoading } = useDuelistsOfOwner(props.playerAddress)
-
   const { isBookmarked } = useIsBookmarked(props.playerAddress)
   const { publish } = usePlayerBookmarkSignedMessage(props.playerAddress, 0, !isBookmarked)
 
@@ -96,9 +169,8 @@ export const ProfilePoster = forwardRef<ProfilePosterHandle, ProfilePosterProps>
   }
 
   useEffect(() => {
-    // Add a small delay before updating the loading state
     const timer = setTimeout(() => {
-      setDeferredLoading(isLoading && duelistIds.length == 0) //TODO this shouldnt be needed, loading doesnt work because token is undefined this is quick fix for now
+      setDeferredLoading(isLoading && duelistIds.length == 0)
     }, 300)
     
     return () => clearTimeout(timer)
@@ -125,7 +197,7 @@ export const ProfilePoster = forwardRef<ProfilePosterHandle, ProfilePosterProps>
     toggleIdle: (isPlaying) => baseRef.current?.toggleIdle(isPlaying),
     toggleBlink: (isBlinking, duration) => baseRef.current?.toggleBlink(isBlinking, duration),
     getStyle: () => baseRef.current?.getStyle() || { translateX: 0, translateY: 0, rotation: 0, scale: 1 },
-  }));
+  }))
 
   const renderDuelistCards = useMemo(() => {
     return [...Array(3)].map((_, i) => {
@@ -156,12 +228,12 @@ export const ProfilePoster = forwardRef<ProfilePosterHandle, ProfilePosterProps>
         </div>
       )
     })
-  }, [paginatedDuelistIds, aspectWidth, dispatchSelectDuelistId]);
+  }, [paginatedDuelistIds, aspectWidth, dispatchSelectDuelistId])
 
   return (
     <InteractibleComponent
-      width={aspectWidth(props.width || (props.isSmall ? POSTER_WIDTH_SMALL : POSTER_WIDTH_BIG))}
-      height={aspectHeight(props.height || (props.isSmall ? POSTER_HEIGHT_SMALL : POSTER_HEIGHT_BIG))}
+      width={aspectWidth(props.width || POSTER_WIDTH_BIG)}
+      height={aspectHeight(props.height || POSTER_HEIGHT_BIG)}
       isLeft={false}
       isFlipped={true}
       isVisible={props.isVisible}
@@ -175,79 +247,85 @@ export const ProfilePoster = forwardRef<ProfilePosterHandle, ProfilePosterProps>
       startRotation={props.startRotation}
       startScale={props.startScale}
       hasCenteredOrigin={true}
-      mouseDisabled={!props.isSmall}
+      mouseDisabled={true}
       onHover={props.onHover}
       onClick={props.onClick}
       ref={baseRef}
       childrenInFront={
-        props.isSmall ? (
-          <div className='Poster'>
-            <div className='WantedText Small'>WANTED</div>
-            
-            <div className='ProfileSection Small'>
-              <ProfilePic profilePic={0} width={9} removeCorners borderColor='#201a18' borderWidth={0.3} />
-              <div className='PlayerName Small'>{name}</div>
-            </div>
-
-            <div className='OnlineStatusSection Small'>
-              <div className={`OnlineStatus Small ${isOnline ? 'Online' : 'Offline'}`} />
-            </div>
+        <div className='Poster'>
+          <div className='WantedText'>WANTED</div>
+          
+          <div className='ProfileSection'>
+            <ProfilePic profilePic={0} width={22} height={22} removeCorners borderColor='#201a18' borderWidth={0.4} />
+            <div className='PlayerName'>{name}</div>
+            <div className='PlayerAddress'><Address address={props.playerAddress} /></div>
           </div>
-        ) : (
-          <div className='Poster'>
-            <div className='WantedText'>WANTED</div>
-            
-            <div className='ProfileSection'>
-              <ProfilePic profilePic={0} width={22} height={22} removeCorners borderColor='#201a18' borderWidth={0.4} />
-              <div className='PlayerName'>{name}</div>
-              <div className='PlayerAddress'><Address address={props.playerAddress} /></div>
-            </div>
 
-            <div className='BookmarkSection PlayerPoster'>
-              <BookmarkIcon isBookmarked={isBookmarked} size='big' fitted onClick={publish} />
-            </div>
-
-            <div className='OnlineStatusSection'>
-              <div className={`OnlineStatus ${isOnline ? 'Online' : 'Offline'}`} />
-            </div>
-
-            <div className='TextDivider WantedDivider'>Duelists:</div>
-
-            <div className='DuelistsSection' style={{ height: `${aspectWidth(DUELIST_CARD_HEIGHT * 0.7)}px` }}>
-              <button 
-                className='NavButton' 
-                onClick={handlePrev}
-                disabled={pageNumber === 0}
-              >←</button>
-              {deferredLoading ? (
-                <div className='DuelistCard'>Loading...</div>
-              ) : duelistIds.length === 0 ? (
-                <div className='DuelistCard'>No Duelists</div>
-              ) : renderDuelistCards}
-              <button 
-                className='NavButton'
-                onClick={handleNext}
-                disabled={pageNumber >= pageCount - 1}
-              >→</button>
-            </div>
-
-            <div className='TextDivider WantedDivider'></div>
-
-            <Grid className='ButtonSection YesMouse' textAlign='center'>
-              <Row columns='equal'>
-                <Col>
-                  <ActionButton large fillParent label='Close' onClick={props._close} />
-                </Col>
-                <Col>
-                  {isMyAccount ? <ActionButton large fillParent important label='Manage Profile' onClick={() => dispatchSetScene(SceneName.Profile)} />
-                    : <ChallengeButton challengedPlayerAddress={props.playerAddress} fillParent={true} />
-                  }
-                </Col>
-              </Row>
-            </Grid>
+          <div className='BookmarkSection'>
+            <BookmarkIcon isBookmarked={isBookmarked} size='big' fitted onClick={publish} />
           </div>
-        )
+
+          {isBlocked && <div className='BlockedOverlay ProfileLarge Right' />}
+
+          <div className='OnlineStatusSection'>
+            <div className={`OnlineStatus ${isOnline ? 'Online' : 'Offline'}`} />
+          </div>
+
+          <div className='TextDivider WantedDivider'>Duelists:</div>
+
+          <div className='DuelistsSection' style={{ height: `${aspectWidth(DUELIST_CARD_HEIGHT * 0.7)}px` }}>
+            <button 
+              className='NavButton' 
+              onClick={handlePrev}
+              disabled={pageNumber === 0}
+            >←</button>
+            {deferredLoading ? (
+              <div className='DuelistCard'>Loading...</div>
+            ) : duelistIds.length === 0 ? (
+              <div className='DuelistCard'>No Duelists</div>
+            ) : renderDuelistCards}
+            <button 
+              className='NavButton'
+              onClick={handleNext}
+              disabled={pageNumber >= pageCount - 1}
+            >→</button>
+          </div>
+
+          <div className='TextDivider WantedDivider'></div>
+
+          <Grid className='ButtonSection YesMouse' textAlign='center'>
+            <Row columns='equal'>
+              <Col>
+                <ActionButton large fillParent label='Close' onClick={props._close} />
+              </Col>
+              <Col>
+                {isMyAccount ? <ActionButton large fillParent important label='Manage Profile' onClick={() => dispatchSetScene(SceneName.Profile)} />
+                  : <ChallengeButton challengedPlayerAddress={props.playerAddress} fillParent={true} />
+                }
+              </Col>
+            </Row>
+          </Grid>
+        </div>
       }
     />
+  )
+})
+
+// Main wrapper component
+export const ProfilePoster = forwardRef<ProfilePosterHandle, ProfilePosterProps>((props: ProfilePosterProps = {
+  isSmall: true,
+  isVisible: false,
+  isHighlightable: false,
+  instantVisible: false,
+  width: null,
+  height: null,
+  startPosition: { x: 0, y: 0 },
+  startRotation: 0,
+  startScale: 1
+}, ref: React.Ref<ProfilePosterHandle>) => {
+  return props.isSmall ? (
+    <ProfilePosterSmall {...props} ref={ref} />
+  ) : (
+    <ProfilePosterFull {...props} ref={ref} />
   )
 })

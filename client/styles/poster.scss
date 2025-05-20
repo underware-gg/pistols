@@ -86,8 +86,15 @@
   z-index: 10;
 
   &.Small {
-    top: 18.5%;
-    right: 8%;
+    top: aspect-width(2.8);
+    right: aspect-width(1.6);
+    width: aspect-width(1.2);
+    height: aspect-width(1.2);
+  }
+
+  &.Smaller {
+    top: aspect-width(3);
+    right: aspect-width(1);
     width: aspect-width(1.2);
     height: aspect-width(1.2);
   }
@@ -179,22 +186,11 @@
   justify-content: center;
   padding-top: aspect-width(2);
   z-index: 10;
-
-  &.PlayerPoster {
-    width: aspect-width(6);
-    height: aspect-width(9);
-    top: 52%;
-    right: 16%;
-    transform: rotateZ(-16deg);
-  }
-
-  &.DuelPoster {
-    width: aspect-width(6);
-    height: aspect-width(9);
-    top: -1%;
-    left: 0%;
-    transform: scaleX(-1) rotateZ(-20deg);
-  }
+  width: aspect-width(6);
+  height: aspect-width(9);
+  top: -1%;
+  left: 0%;
+  transform: scaleX(-1) rotateZ(-20deg);
 }
 
 .BookmarkIcon {
@@ -362,6 +358,74 @@
 
     &.visible {
       opacity: 1;
+    }
+  }
+}
+
+.BlockedOverlay {
+  position: absolute;
+  background-image: url('/images/ui/black_stamp_cork.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  
+  &.ProfileSmall {
+    width: aspect-width(2.4);
+    height: aspect-width(2.4);
+    
+    &.Left {
+      top: aspect-width(10.5);
+      left: aspect-width(1.4);
+    }
+
+    &.Right {
+      top: aspect-width(10.5);
+      right: aspect-width(1.4);
+    }
+  }
+
+  &.ProfileLarge {
+    width: aspect-width(5.2);
+    height: aspect-width(5.2);
+
+    &.Left {
+      top: aspect-width(24);
+      left: aspect-width(8);
+    }
+
+    &.Right { 
+      top: aspect-width(24);
+      right: aspect-width(8);
+    }
+  }
+
+  &.DuelSmall {
+    width: aspect-width(2.2);
+    height: aspect-width(2.2);
+
+    &.Left {  
+      top: aspect-width(-0.8);
+      left: aspect-width(-0.4);
+    }
+
+    &.Right { 
+      bottom: aspect-width(-0.8);
+      right: aspect-width(-0.4);
+    }
+  }
+
+  &.DuelLarge {
+    width: aspect-width(4.2);
+    height: aspect-width(4.2);
+
+    &.Left {
+      top: aspect-width(-0.8);
+      left: aspect-width(-0.4);
+    }
+
+    &.Right {
+      bottom: aspect-width(-0.8);
+      right: aspect-width(-0.4);
     }
   }
 }

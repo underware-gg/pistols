@@ -280,8 +280,8 @@ export const useQueryPlayerIds = (
       const isAscending = (sortDirection == SortDirection.Ascending)
 
       // Sort by names, or both rookies
-      const _sortByName = (a: string, b: string) => {
-        return isAscending ? a.localeCompare(b) : b.localeCompare(a)
+      const _sortByName = (a: string | undefined, b: string | undefined) => {
+        return isAscending ? a?.localeCompare(b) : b?.localeCompare(a)
       }
       if (sortColumn == PlayerColumn.Name) {
         return _sortByName(getPlayerName(player_a.player_address), getPlayerName(player_b.player_address))
