@@ -27,9 +27,9 @@ export default function ScDuelists() {
     return matchmakingPlayerIds.filter(id => !Array.from(challengePlayerMap.values()).some(player => player.addressA === id || player.addressB === id))
   }, [matchmakingPlayerIds, challengePlayerMap])
 
-  useEffect(() => {
-    console.log(matchmakingPlayerIds, challengePlayerMap, availableMatchmakingPlayers)
-  }, [matchmakingPlayerIds, challengePlayerMap, availableMatchmakingPlayers])
+  // useEffect(() => {
+  //   console.log(`matchmaking:`, matchmakingPlayerIds, challengePlayerMap, availableMatchmakingPlayers)
+  // }, [matchmakingPlayerIds, challengePlayerMap, availableMatchmakingPlayers])
 
   const { value: itemClicked, timestamp } = useGameEvent('scene_click', null)
   

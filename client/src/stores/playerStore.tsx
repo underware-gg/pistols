@@ -258,7 +258,7 @@ export const useQueryPlayerIds = (
       ...players,
     ];
 
-    result = result.filter((p) => (p.player_address !== bigintToHex(address)))
+    result = result.filter((p) => !bigintEquals(p.player_address, address))
 
     // filter by name
     if (filterName) {
@@ -272,7 +272,7 @@ export const useQueryPlayerIds = (
 
     // filter by active
     if (filterOnline) {
-      result = result.filter((e) => (players_online[e.player_address] !== undefined))
+      result = result.filter((e) => (players_online[bigintToHex(e.player_address)] !== undefined))
     }
 
     // sort...
