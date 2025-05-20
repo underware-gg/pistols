@@ -1,19 +1,21 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import { BigNumberish } from 'starknet'
-import { Container, Table } from 'semantic-ui-react'
-import { getAdminAddress, getBankAddress, getGameAddress, getWorldAddress } from '@underware/pistols-sdk/pistols/config'
-import { useStarknetContext } from '@underware/pistols-sdk/dojo'
-import { useTokenContracts } from '/src/hooks/useTokenContracts'
+import { Button, Checkbox, Container, FormInput, Input, Table } from 'semantic-ui-react'
+import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
+import { STARKNET_ADDRESS_LENGTHS } from '@underware/pistols-sdk/starknet'
 import { ExplorerLink } from '@underware/pistols-sdk/starknet/components'
 import { useConfig } from '/src/stores/configStore'
 import { Address } from '/src/components/ui/Address'
 import { LordsBalance } from '/src/components/account/LordsBalance'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
 import { InternalPageMenu, InternalPageWrapper } from '/src/pages/internal/InternalPageIndex'
-// import { AdminPanel } from '/src/components/admin/AdminPanel'
 import { Connect } from '/src/pages/tests/ConnectTestPage'
+import { useAccount } from '@starknet-react/core'
+import { useBlockedPlayers, usePlayer, useTeamMembers } from '/src/stores/playerStore'
+import { PlayerNameSync } from '/src/stores/sync/PlayerNameSync'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppDojo from '/src/components/AppDojo'
+import { useValidateWalletAddress } from '@underware/pistols-sdk/utils/hooks'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -32,11 +34,13 @@ export default function AdminPage() {
         <CurrentChainHint />
         <Connect />
         <EntityStoreSync />
+        <PlayerNameSync />
 
         <InternalPageWrapper>
-          {/* <AdminPanel /> */}
           <Config />
-          <Contracts />
+          <TeamMembers />
+          <BlockedPlayers />
+          {/* <TeamMembersEditor /> */}
           <br />
           <EntityStoreSync />
         </InternalPageWrapper>
@@ -48,8 +52,9 @@ export default function AdminPage() {
 
 
 function Config() {
-  const { isPaused, currentSeasonId, treasuryAddress, vrfAddress, lordsAddress  } = useConfig()
-
+  const { account } = useAccount()
+  const { isPaused, currentSeasonId, treasuryAddress, vrfAddress, lordsAddress } = useConfig()
+  const { admin } = useDojoSystemCalls()
   return (
     <Table celled striped size='small' color='orange'>
       <Header>
@@ -66,8 +71,12 @@ function Config() {
           <Cell textAlign='left'>
             {isPaused ? 'true' : 'false'}
           </Cell>
-          <Cell></Cell>
-          <Cell></Cell>
+          <Cell>
+            <Button disabled={isPaused} onClick={() => admin.set_paused(account, true)}>Pause</Button>
+          </Cell>
+          <Cell>
+            <Button disabled={!isPaused} onClick={() => admin.set_paused(account, false)}>Unpause</Button>
+          </Cell>
         </Row>
         <Row className='H5'>
           <Cell className='Important'>currentSeasonId</Cell>
@@ -82,7 +91,7 @@ function Config() {
           <Cell>
             <Address address={treasuryAddress} full />
           </Cell>
-          <Cell className='Smaller'>
+          <Cell>
             <ExplorerLink address={treasuryAddress} voyager />
           </Cell>
           <Cell>
@@ -94,7 +103,7 @@ function Config() {
           <Cell>
             <Address address={vrfAddress} full />
           </Cell>
-          <Cell className='Smaller'>
+          <Cell>
             <ExplorerLink address={vrfAddress} voyager />
           </Cell>
           <Cell></Cell>
@@ -104,7 +113,7 @@ function Config() {
           <Cell>
             <Address address={lordsAddress} full />
           </Cell>
-          <Cell className='Smaller'>
+          <Cell>
             <ExplorerLink address={lordsAddress} voyager />
           </Cell>
           <Cell></Cell>
@@ -115,103 +124,162 @@ function Config() {
 }
 
 
-function Contracts() {
-  const { selectedNetworkId } = useStarknetContext()
-  const worldContractAddress = useMemo(() => getWorldAddress(selectedNetworkId), [selectedNetworkId])
-  const gameContractAddress = useMemo(() => getGameAddress(selectedNetworkId), [selectedNetworkId])
-  const adminContractAddress = useMemo(() => getAdminAddress(selectedNetworkId), [selectedNetworkId])
-  const bankContractAddress = useMemo(() => getBankAddress(selectedNetworkId), [selectedNetworkId])
-  
-  const {
-    // lordsContractAddress,
-    fameContractAddress,
-    foolsContractAddress,
-    duelistContractAddress,
-    duelContractAddress,
-    packContractAddress,
-    tournamentContractAddress,
-  } = useTokenContracts()
 
+//--------------------------------
+// Team Members
+//
+function TeamMembers() {
+  const { teamMembers } = useTeamMembers()
   return (
-    <Table celled striped size='small' color='orange'>
+    <Table celled striped size='small' color='green'>
       <Header>
-        <Row className='H5'>
-          <HeaderCell width={3}><h3>Contracts</h3></HeaderCell>
+        <Row>
+          <HeaderCell width={3}><h3>Team Members</h3></HeaderCell>
           <HeaderCell></HeaderCell>
           <HeaderCell></HeaderCell>
-          <HeaderCell></HeaderCell>
-          <HeaderCell></HeaderCell>
-          <HeaderCell></HeaderCell>
+          <HeaderCell>Team Member</HeaderCell>
+          <HeaderCell>Admin</HeaderCell>
         </Row>
       </Header>
-      <Body className='H5 Code'>
-        <ContractRow name='World' address={worldContractAddress} />
-        <ContractRow name='Game' address={gameContractAddress} />
-        <ContractRow name='Admin' address={adminContractAddress} />
-        <ContractRow name='Bank' address={bankContractAddress} />
-      </Body>
-      <Header>
-        <Row className='H5'>
-          <HeaderCell width={3}><h3>ERC-20</h3></HeaderCell>
-          <HeaderCell></HeaderCell>
-          <HeaderCell></HeaderCell>
-          <HeaderCell></HeaderCell>
-          <HeaderCell></HeaderCell>
-          <HeaderCell></HeaderCell>
-        </Row>
-      </Header>
-      <Body className='H5 Code'>
-        <ContractRow name='Fame' address={fameContractAddress} />
-        <ContractRow name='Fools' address={foolsContractAddress} />
-      </Body>
-      <Header>
-        <Row className='H5'>
-          <HeaderCell width={3}><h3>ERC-721</h3></HeaderCell>
-          <HeaderCell></HeaderCell>
-          <HeaderCell></HeaderCell>
-          <HeaderCell></HeaderCell>
-          <HeaderCell></HeaderCell>
-          <HeaderCell></HeaderCell>
-        </Row>
-      </Header>
-      <Body className='H5 Code'>
-        <ContractRow name='Duels' address={duelContractAddress} />
-        <ContractRow name='Duelists' address={duelistContractAddress} />
-        <ContractRow name='Packs' address={packContractAddress} />
-        <ContractRow name='Tournaments' address={tournamentContractAddress} />
+      <Body>
+        {teamMembers.map((player) => (
+          <TeamMemberRow key={player.player_address} address={player.player_address} />
+        ))}
       </Body>
     </Table>
   )
 }
 
-function ContractRow({
-  name,
+function TeamMemberRow({
   address,
-  short = false,
 }: {
-  name: string,
-  address: BigNumberish,
-  short?: boolean,
+  address: BigNumberish
 }) {
+  const { username, isAdmin, isTeamMember } = usePlayer(address)
   return (
     <Row className='H5'>
-      <Cell>
-        {name}
+      <Cell className='Code'>
+        {username}
       </Cell>
       <Cell>
-        <Address address={address} full={!short} />
+        <Address address={address} full />
       </Cell>
-      <Cell className='Smaller'>
-        <ExplorerLink address={address} cartridge />
-      </Cell>
-      <Cell className='Smaller'>
+      <Cell className='Code'>
         <ExplorerLink address={address} voyager />
       </Cell>
-      <Cell className='Smaller'>
-        <ExplorerLink address={address} starkscan />
+      <Cell>
+        {isTeamMember && <span>Is Team Member</span>}
       </Cell>
-      <Cell className='Smaller'>
-        <ExplorerLink address={address} viewblock />
+      <Cell>
+        {isAdmin && <span>Is Admin</span>}
+      </Cell>
+    </Row>
+  )
+}
+
+function TeamMembersEditor() {
+  const { account } = useAccount()
+  const { admin } = useDojoSystemCalls()
+  const [address, setAddress] = useState('')
+  const [isTeamMember, setIsTeamMember] = useState(true)
+  const [isAdmin, setIsAdmin] = useState(false)
+  const { isStarknetAddress } = useValidateWalletAddress(address)
+  return (
+    <Table attached='top' celled striped size='small' color='green'>
+      <Header>
+        <Row>
+          <HeaderCell width={3}><h3>Edit Team Members</h3></HeaderCell>
+          <HeaderCell></HeaderCell>
+          <HeaderCell></HeaderCell>
+        </Row>
+      </Header>
+      <Body>
+        <Row>
+          <Cell className='Code'>
+            Wallet Address
+          </Cell>
+          <Cell>
+            <Input fluid className='Code'
+              value={address ?? ''}
+              onChange={(e) => setAddress(e.target.value)}
+              maxLength={STARKNET_ADDRESS_LENGTHS[0]}
+              placeholder={null}
+            />
+          </Cell>
+        </Row>
+        <Row>
+          <Cell className='Code'>
+            Is Team Member?
+          </Cell>
+          <Cell>
+            <Checkbox
+              checked={isTeamMember}
+              onChange={(e, data) => setIsTeamMember(data.checked)}
+            />
+          </Cell>
+        </Row>
+        <Row>
+          <Cell className='Code'>
+            Is Admin?
+          </Cell>
+          <Cell>
+            <Checkbox
+              checked={isAdmin}
+              onChange={(e, data) => setIsAdmin(data.checked)}
+            />
+          </Cell>
+        </Row>
+        <Row>
+          <Cell></Cell>
+          <Cell>
+            <Button disabled={!isStarknetAddress} onClick={() => admin.set_is_team_member(account, address, isTeamMember, isAdmin)}>Submit</Button>
+          </Cell>
+        </Row>
+      </Body>
+    </Table>
+  )
+}
+
+
+//--------------------------------
+// Blocked Players
+//
+function BlockedPlayers() {
+  const { blockedPlayers } = useBlockedPlayers()
+  return (
+    <Table celled striped size='small' color='red'>
+      <Header>
+        <Row>
+          <HeaderCell width={3}><h3>Blocked Players</h3></HeaderCell>
+          <HeaderCell></HeaderCell>
+          <HeaderCell></HeaderCell>
+        </Row>
+      </Header>
+      <Body>
+        {blockedPlayers.map((player) => (
+          <PlayerRow key={player.player_address} address={player.player_address} />
+        ))}
+      </Body>
+    </Table>
+  )
+}
+
+function PlayerRow({
+  address,
+}: {
+  address: BigNumberish
+}) {
+  const { username, isAdmin, isTeamMember } = usePlayer(address)
+  return (
+    <Row className='H5'>
+      <Cell className='Code'>
+        {username}
+      </Cell>
+      <Cell>
+        <Address address={address} full />
+      </Cell>
+      <Cell className='Code'>
+        <ExplorerLink address={address} voyager />
       </Cell>
     </Row>
   )

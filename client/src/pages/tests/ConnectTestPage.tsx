@@ -77,6 +77,7 @@ export function Connect() {
   const { connectors } = useConnect()
   const { chain } = useNetwork()
   const { username, openProfile } = useConnectedController()
+  const isCorrectNetwork = useMemo(() => (isConnected ? (selectedNetworkConfig.chainId === feltToString(chain.id)) : undefined), [isConnected, selectedNetworkConfig, chain])
   return (
     <>
       <StarknetConnectModal opener={connectOpener} />
@@ -100,6 +101,7 @@ export function Connect() {
                 ? <span className='Important'>{feltToString(chain.id)}</span>
                 : <span className='Negative'>Disconnected</span>
               }
+              {isCorrectNetwork === false && <h1 className='Negative'>WONG NETWORK!!!</h1>}
             </Cell>
             <Cell></Cell>
           </Row>

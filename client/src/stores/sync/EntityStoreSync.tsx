@@ -26,6 +26,8 @@ const _modelsMisc = [
 const _modelsPlayers = [
   // players
   "pistols-Player",
+  "pistols-PlayerFlags",
+  "pistols-PlayerTeamFlags",
   // off-chain signed messages
   "pistols-PlayerOnline",
   "pistols-PlayerBookmark",
@@ -138,7 +140,7 @@ export function EntityStoreSync() {
     setEntities: (entities: PistolsEntity[]) => {
       console.log("EntityStoreSync() SET PLAYERS =======> [entities]:", entities)
       // console.log("EntityStoreSync() SET PLAYERS =======> [Player]:", filterEntitiesByModels(entities, ['Player']))
-      playerState.setEntities(filterEntitiesByModels(entities, ['Player']))
+      playerState.setEntities(filterEntitiesByModels(entities, ['Player', 'PlayerFlags', 'PlayerTeamFlags']))
       playerState.updateMessages(filterEntitiesByModels(entities, ['PlayerOnline', 'PlayerBookmark']))
     },
   })
@@ -188,7 +190,7 @@ export function EntityStoreSync() {
       if (entityContainsModels(entity, ['SeasonConfig', 'Leaderboard'])) {
         seasonState.updateEntity(entity)
       }
-      if (entityContainsModels(entity, ['Player'])) {
+      if (entityContainsModels(entity, ['Player', 'PlayerFlags', 'PlayerTeamFlags'])) {
         playerState.updateEntity(entity)
       }
       if (entityContainsModels(entity, ['PlayerOnline', 'PlayerBookmark'])) {

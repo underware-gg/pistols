@@ -33,7 +33,7 @@ fi
 # sozo -P $PROFILE model get pistols-Config 1
 
 # admin::set_is_team_member
-# export MEMBER_ACCOUNT=0x1234
+# export MEMBER_ACCOUNT=0x0550212d3f13a373dfe9e3ef6aa41fba4124bde63fd7955393f879de19f3f47f
 # sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait admin set_is_team_member $MEMBER_ACCOUNT 1 1
 # sozo -P $PROFILE model get pistols-PlayerTeamFlags $MEMBER_ACCOUNT
 

@@ -268,24 +268,51 @@ export function createSystemCalls(
     // admin
     //
     admin: {
-      grant_admin: async (signer: AccountInterface, address: BigNumberish, granted: boolean): Promise<boolean> => {
-        // const calls: DojoCalls = [
-        //   contractCalls.admin.buildGrantAdminCalldata(
-        //     bigintToHex(address),
-        //     granted,
-        //   ),
-        // ]
-        // return await _executeTransaction(signer, calls)
-        console.warn(`FUNCTIONALITY DISABLED!`)
-        return false
+      set_paused: async (signer: AccountInterface, paused: boolean): Promise<boolean> => {
+        const calls: DojoCalls = [
+          contractCalls.admin.buildSetPausedCalldata(
+            paused,
+          ),
+        ]
+        return await _executeTransaction(signer, calls)
       },
-      set_config: async (signer: AccountInterface, values: any): Promise<boolean> => {
-        console.warn(`FUNCTIONALITY DISABLED!`)
-        return false
+      set_is_team_member: async (signer: AccountInterface, address: BigNumberish, is_team_member: boolean, is_admin: boolean): Promise<boolean> => {
+        const calls: DojoCalls = [
+          contractCalls.admin.buildSetIsTeamMemberCalldata(
+            bigintToHex(address),
+            is_team_member,
+            is_admin,
+          ),
+        ]
+        return await _executeTransaction(signer, calls)
       },
-      set_table: async (signer: AccountInterface, table: any): Promise<boolean> => {
-        console.warn(`FUNCTIONALITY DISABLED!`)
-        return false
+      set_is_blocked: async (signer: AccountInterface, address: BigNumberish, is_blocked: boolean): Promise<boolean> => {
+        const calls: DojoCalls = [
+          contractCalls.admin.buildSetIsBlockedCalldata(
+            bigintToHex(address),
+            is_blocked,
+          ),
+        ]
+        return await _executeTransaction(signer, calls)
+      },
+      disqualify_duelist: async (signer: AccountInterface, season_id: BigNumberish, duelist_id: BigNumberish, block_owner: boolean): Promise<boolean> => {
+        const calls: DojoCalls = [
+          contractCalls.admin.buildDisqualifyDuelistCalldata(
+            season_id,
+            duelist_id,
+            block_owner,
+          ),
+        ]
+        return await _executeTransaction(signer, calls)
+      },
+      qualify_duelist: async (signer: AccountInterface, season_id: BigNumberish, duelist_id: BigNumberish): Promise<boolean> => {
+        const calls: DojoCalls = [
+          contractCalls.admin.buildQualifyDuelistCalldata(
+            season_id,
+            duelist_id,
+          ),
+        ]
+        return await _executeTransaction(signer, calls)
       },
     },
   }

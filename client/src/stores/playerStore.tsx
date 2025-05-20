@@ -11,6 +11,7 @@ import { SortDirection } from './queryParamsStore'
 import { PlayerColumn } from './queryParamsStore'
 import { useTotals } from './duelistStore'
 
+
 export interface PlayerState {
   player_address: string
   timestamp_registered: number
@@ -19,6 +20,9 @@ export interface PlayerState {
   isNew: boolean
   totals: models.Totals
   aliveDuelistCount: number
+  isTeamMember: boolean
+  isAdmin: boolean
+  isBlocked: boolean
   // off-chain messages
   bookmarked_players: string[]
   bookmarked_tokens: {
@@ -42,15 +46,20 @@ interface State {
 
 const createStore = () => {
   const _parseEntity = (e: PistolsEntity): PlayerState | undefined => {
-    const model: Partial<models.Player> | undefined = e.models.pistols.Player
-    return isPositiveBigint(model?.player_address) ? {
-      player_address: bigintToHex(model.player_address),
-      timestamp_registered: bigintToNumber(model.timestamps.registered),
-      username: shortAddress(model.player_address),
-      name: shortAddress(model.player_address),
+    const _player: Partial<models.Player> | undefined = e.models.pistols.Player
+    const _flags: Partial<models.PlayerFlags> | undefined = e.models.pistols.PlayerFlags
+    const _teamFlags: Partial<models.PlayerTeamFlags> | undefined = e.models.pistols.PlayerTeamFlags
+    return isPositiveBigint(_player?.player_address) ? {
+      player_address: bigintToHex(_player.player_address),
+      timestamp_registered: bigintToNumber(_player.timestamps.registered),
+      username: shortAddress(_player.player_address),
+      name: shortAddress(_player.player_address),
       isNew: true,
-      totals: model.totals,
-      aliveDuelistCount: bigintToNumber(model.alive_duelist_count),
+      totals: _player.totals,
+      aliveDuelistCount: bigintToNumber(_player.alive_duelist_count),
+      isTeamMember: _teamFlags?.is_team_member ?? false,
+      isAdmin: _teamFlags?.is_admin ?? false,
+      isBlocked: _flags?.is_blocked ?? false,
       // off-chain messages
       bookmarked_players: [],
       bookmarked_tokens: {},
@@ -74,11 +83,11 @@ const createStore = () => {
       })
     },
     updateEntity: (e: PistolsEntity) => {
-      // console.log("updateEntity()[Player] =>", e)
+      console.log("updateEntity()[Player] =>", e)
       set((state: State) => {
         // only insert!
         const player = _parseEntity(e)
-        if (!state.players[player.player_address]) {
+        if (player && !state.players[player.player_address]) {
           state.players[player.player_address] = player
         }
       });
@@ -157,6 +166,9 @@ export const usePlayer = (address: BigNumberish) => {
   const name = useMemo(() => (player?.name ?? 'Unknown'), [player])
   const timestampRegistered = useMemo(() => (player?.timestamp_registered ?? 0), [player])
   const aliveDuelistCount = useMemo(() => (player?.aliveDuelistCount ?? 0), [player])
+  const isTeamMember = useMemo(() => (player?.isTeamMember ?? false), [player])
+  const isAdmin = useMemo(() => (player?.isAdmin ?? false), [player])
+  const isBlocked = useMemo(() => (player?.isBlocked ?? false), [player])
   const bookmarkedPlayers = useMemo(() => (player?.bookmarked_players ?? []), [player])
   const bookmarkedTokens = useMemo(() => (player?.bookmarked_tokens ?? {}), [player])
   const totals = useTotals(player?.totals)
@@ -181,6 +193,9 @@ export const usePlayer = (address: BigNumberish) => {
     name,
     timestampRegistered,
     aliveDuelistCount,
+    isTeamMember,
+    isAdmin,
+    isBlocked,
     bookmarkedPlayers,
     bookmarkedTokens,
     bookmarkedDuels,
@@ -188,6 +203,22 @@ export const usePlayer = (address: BigNumberish) => {
     hasFinishedTutorial,
     isAvailable,
     totals,
+  }
+}
+
+export const useTeamMembers = () => {
+  const players = usePlayerStore((state) => state.players)
+  const teamMembers = useMemo(() => (Object.values(players).filter((p) => (p.isTeamMember || p.isAdmin))), [players])
+  return {
+    teamMembers,
+  }
+}
+
+export const useBlockedPlayers = () => {
+  const players = usePlayerStore((state) => state.players)
+  const blockedPlayers = useMemo(() => (Object.values(players).filter((p) => (p.isBlocked))), [players])
+  return {
+    blockedPlayers,
   }
 }
 

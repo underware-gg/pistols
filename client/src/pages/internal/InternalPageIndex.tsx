@@ -7,6 +7,7 @@ import { useAccount } from '@starknet-react/core'
 import { bigintEquals } from '@underware/pistols-sdk/utils'
 
 const internalPages = [
+  { name: 'contracts', connected: true },
   { name: 'admin', connected: true },
   { name: 'pools', connected: true },
   { name: 'seasons', connected: true },

@@ -18,6 +18,7 @@ import PoolsPage from '/src/pages/internal/PoolsPage'
 import SeasonsPage from '/src/pages/internal/SeasonsPage'
 import PlayersPage from '/src/pages/internal/PlayersPage'
 import SnapshotPage from '/src/pages/internal/SnapshotPage'
+import ContractsPage from '/src/pages/internal/ContractsPage'
 import DuelDataPage from '/src/pages/DuelDataPage'
 import ErrorPage from '/src/pages/error/ErrorPage'
 import TestPageIndex from '/src/pages/tests/TestPageIndex'
@@ -63,18 +64,6 @@ const router = createBrowserRouter([
     ],
     errorElement: <ErrorPage />,
   },
-  // internal pages
-  {
-    path: '/internal',
-    children: [
-      { path: "", element: <InternalPageIndex /> },
-      { path: "admin", element: <AdminPage /> },
-      { path: "pools", element: <PoolsPage /> },
-      { path: "seasons", element: <SeasonsPage /> },
-      { path: "players", element: <PlayersPage /> },
-      { path: "snapshot", element: <SnapshotPage /> },
-    ],
-  },
   // test pages
   {
     path: '/tests',
@@ -87,6 +76,19 @@ const router = createBrowserRouter([
       { path: "profiles", element: <ProfilesTestPage /> },
       { path: "icons", element: <IconsTestPage /> },
       { path: "sign", element: <SignTestPage /> },
+    ],
+  },
+  // internal pages
+  {
+    path: '/internal',
+    children: [
+      { path: "", element: <InternalPageIndex /> },
+      { path: "admin", element: <AdminPage /> },
+      { path: "pools", element: <PoolsPage /> },
+      { path: "seasons", element: <SeasonsPage /> },
+      { path: "players", element: <PlayersPage /> },
+      { path: "snapshot", element: <SnapshotPage /> },
+      { path: "contracts", element: <ContractsPage /> },
     ],
   },
 ]);
