@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { duelist_token, SvgRenderOptions } from '@underware/pistols-sdk/pistols/tokens'
 import { bigintToHex } from '@underware/pistols-sdk/utils'
@@ -10,7 +10,7 @@ import { usePlayer } from '/src/stores/playerStore'
 
 export function useDuelistTokenProps(duelistId: BigNumberish) {
   const { profileType, profilePic, currentDuelId, currentPassId, totals, timestampRegistered, timestampActive } = useDuelist(duelistId)
-  const { balance_eth, lives, isLoading } = useDuelistFameBalance(duelistId)
+  const { balance_eth, lives } = useDuelistFameBalance(duelistId)
   const { owner } = useOwnerOfDuelist(duelistId)
   const { name } = usePlayer(owner)
   const { level } = useDuelistStack(duelistId)
@@ -35,8 +35,8 @@ export function useDuelistTokenProps(duelistId: BigNumberish) {
     timestamp_registered: timestampRegistered,
     timestamp_active: timestampActive,
     level,
-    is_loading: !!isLoading,
-  }), [name, profileType, profilePic, currentDuelId, currentPassId, balance_eth, lives, isLoading, owner, totals, level, duelistId])
+    // is_loading: !!isLoading,
+  }), [name, profileType, profilePic, currentDuelId, currentPassId, balance_eth, lives, owner, totals, level, duelistId])
 
   return props
 }

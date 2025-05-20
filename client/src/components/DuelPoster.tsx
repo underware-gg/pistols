@@ -244,7 +244,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
   const { seasonName: currentSeasonName } = useCurrentSeason()
   const seasonDescription = useMemo(() => (seasonName ?? currentSeasonName), [seasonName, currentSeasonName])
 
-  const { lives, isLoading } = useDuelistFameBalance(challengingDuelistId)
+  const { lives } = useDuelistFameBalance(challengingDuelistId)
   const isChallenger = useMemo(() => isYouA, [isYouA])
   const isChallenged = useMemo(() => isYouB, [isYouB])
   const { isInAction } = useDuelist(challengingDuelistId)

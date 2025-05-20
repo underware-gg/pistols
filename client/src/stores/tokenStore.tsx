@@ -1,13 +1,11 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
-import { useMounted } from '@underware/pistols-sdk/utils/hooks'
-import { useSdkTokenBalancesGet } from '@underware/pistols-sdk/dojo'
-import { arrayRemoveValue, bigintEquals, bigintToDecimal, bigintToHex, isPositiveBigint } from '@underware/pistols-sdk/utils'
+import { bigintEquals, bigintToDecimal, isPositiveBigint } from '@underware/pistols-sdk/utils'
+import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import * as torii from '@dojoengine/torii-client'
-import { useTokenContracts } from '../hooks/useTokenContracts'
 
 // interface totii.TokenBalance {
 //   balance: string;
@@ -19,8 +17,8 @@ import { useTokenContracts } from '../hooks/useTokenContracts'
 interface TokenState {
   owner: bigint,
 }
-
 interface State {
+  tokenName: string,
   tokens: Record<string, TokenState>,
   resetStore: () => void;
   setBalances: (balances: torii.TokenBalance[]) => void;
@@ -29,7 +27,7 @@ interface State {
   getOwnerOfTokenId: (tokenId: BigNumberish) => bigint | undefined | null;
 }
 
-const createStore = () => {
+const createStore = (tokenName: string) => {
   const _tokenKey = (token_id: BigNumberish): string => (
     bigintToDecimal(token_id)
   )
@@ -47,6 +45,7 @@ const createStore = () => {
     }
   }
   return create<State>()(immer((set, get) => ({
+    tokenName,
     tokens: {},
     resetStore: () => {
       set((state: State) => {
@@ -54,7 +53,7 @@ const createStore = () => {
       })
     },
     setBalances: (balances: torii.TokenBalance[]) => {
-      console.log("tokenStore() SET:", balances)
+      // console.log(`tokenStore(${get().tokenName}) SET:`, balances)
       set((state: State) => {
         balances.forEach((balance) => {
           _processBalance(state, balance);
@@ -63,7 +62,7 @@ const createStore = () => {
     },
     updateBalance: (balance: torii.TokenBalance) => {
       set((state: State) => {
-        console.log("tokenStore() UPDATE:", balance)
+        // console.log(`tokenStore(${get().tokenName}) UPDATE:`, balance)
         _processBalance(state, balance);
       });
     },
@@ -80,10 +79,10 @@ const createStore = () => {
   })))
 }
 
-export const useDuelistTokenStore = createStore();
-export const useDuelTokenStore = createStore();
-export const usePackTokenStore = createStore();
-export const useTournamentTokenStore = createStore();
+export const useDuelistTokenStore = createStore('duelist');
+export const useDuelTokenStore = createStore('duel');
+export const usePackTokenStore = createStore('pack');
+export const useTournamentTokenStore = createStore('tournament');
 
 export function useTokenStore(contractAddress: BigNumberish) {
   const {

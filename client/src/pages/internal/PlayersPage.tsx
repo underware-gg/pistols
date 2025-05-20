@@ -52,7 +52,7 @@ function Players() {
   const playerAddresses = useMemo(() => players.map((p) => p.player_address), [players])
 
   const { lordsContractAddress } = useTokenContracts()
-  useFetchAccountsBalances(lordsContractAddress, playerAddresses)
+  const { isFinished } = useFetchAccountsBalances(lordsContractAddress, playerAddresses, true)
 
   return (
     <Table celled color='orange'>
@@ -67,7 +67,7 @@ function Players() {
         </Row>
       </Header>
       <Body>
-        {playerAddresses.map(address => (
+        {isFinished && playerAddresses.map(address => (
           <PlayerRow key={address} address={address} />
         ))}
       </Body>

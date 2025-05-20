@@ -135,7 +135,7 @@ const ActionItem = ({
   actionType: ActionType
 }) => {
   // const { isInactive } = useDuelist(duelistId)
-  // const { lives, isLoading } = useDuelistFameBalance(duelistId)
+  // const { lives } = useDuelistFameBalance(duelistId)
 
   if (actionType === 'ReplyChallenge') {
     return (

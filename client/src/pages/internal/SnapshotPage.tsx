@@ -3,13 +3,11 @@ import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { Grid, Button, Container, Divider, TextArea } from 'semantic-ui-react'
 import { bigintToDecimal, bigintToHex } from '@underware/pistols-sdk/utils'
-import { useDojoSetup } from '@underware/pistols-sdk/dojo'
 import { useAllChallengesIds, useChallenge } from '/src/stores/challengeStore'
 import { useDuelist, useAllDuelistsIds } from '/src/stores/duelistStore'
-import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { useSeasonTotals } from '/src/queries/useSeason'
 import { useSeasonScoreboard, DuelistScore } from '/src/stores/scoreboardStore'
-import { useDuelistFameBalance, fetchTokenBoundBalances } from '/src/stores/coinStore'
+import { useDuelistFameBalance } from '/src/stores/coinStore'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { SeasonChallengeStoreSync, SeasonScoreboardStoreSync } from '/src/stores/sync/SeasonEntityStoreSync'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
@@ -100,10 +98,6 @@ export function Snapshots() {
     a.download = state.filename;
     a.click();
   }, [state.formatted, state.filename])
-
-  const { sdk } = useDojoSetup()
-  const { fameContractAddress, duelistContractAddress } = useTokenContracts()
-  fetchTokenBoundBalances(sdk, fameContractAddress, duelistContractAddress, allDuelistIds)
 
   return (
     <Container text>
