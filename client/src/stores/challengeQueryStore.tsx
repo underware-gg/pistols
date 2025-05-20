@@ -11,7 +11,7 @@ import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { bigintEquals, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { parseEnumVariant } from '@underware/pistols-sdk/starknet'
 import { keysToEntityId, getEntityModel } from '@underware/pistols-sdk/dojo'
-import { useChallengeStore } from './challengeStore'
+import { useChallengeStore } from '/src/stores/challengeStore'
 
 //-----------------------------------------
 // Stores only the entity ids and sorting data from a challenges query
@@ -62,20 +62,20 @@ const createStore = () => {
   return create<State>()(immer((set) => ({
     entities: {},
     resetStore: () => {
+      // console.warn("QUERY_STORE: resetStore()")
       set((state: State) => {
         state.entities = {}
       })
     },
     setEntities: (entities: PistolsEntity[]) => {
-      // console.warn("setEntities() =>", entities)
+      // console.warn("QUERY_STORE: setEntities() =>", entities)
       set((state: State) => {
-        state.entities = entities.reduce((acc, e) => {
+        entities.forEach((e) => {
           const value = _parseEntity(e)
           if (value) {
-            acc[e.entityId] = value
+            state.entities[e.entityId] = value
           }
-          return acc
-        }, {} as StateEntities)
+        })
       })
     },
     updateEntity: (e: PistolsEntity) => {
