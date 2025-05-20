@@ -17,9 +17,8 @@ import { useSeasonPool } from '/src/stores/bankStore';
 import { Balance } from '/src/components/account/Balance';
 import { useIsMyAccount } from '/src/hooks/useIsYou';
 import { useDuelistSeasonStats } from '/src/stores/challengeQueryStore';
-import { useSeason, useAllSeasonIds, useLeaderboard } from '/src/stores/seasonStore';
+import { useSeason, useAllSeasonIds, useFullLeaderboard } from '/src/stores/seasonStore';
 import { useSeasonTotals } from '/src/queries/useSeason';
-import { useSeasonScoreboard } from '/src/stores/scoreboardStore';
 
 export default function ScLeaderboards() {
   const { aspectWidth, aspectHeight } = useGameAspect();
@@ -205,15 +204,7 @@ export default function ScLeaderboards() {
   };
 
   // Get leaderboard data for selected season
-  const { maxPositions = 0, scores: leaderboardScores = [] } = useLeaderboard(selectedSeasonId || 0);
-  const { seasonScoreboard } = useSeasonScoreboard(selectedSeasonId || 0);
-
-  const scores = useMemo(() => {
-    return [
-      ...leaderboardScores,
-      ...seasonScoreboard.filter(s => !leaderboardScores.some(l => l.duelistId === s.duelistId))
-    ];
-  }, [leaderboardScores, seasonScoreboard])
+  const { scores } = useFullLeaderboard(selectedSeasonId || 0);
 
   useEffect(() => console.log(`scores:`, scores), [scores])
 

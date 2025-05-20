@@ -1,10 +1,12 @@
 import { useMemo } from 'react'
 import { createDojoStore } from '@dojoengine/sdk/react'
-import { useEntityModelByKeys } from '@underware/pistols-sdk/dojo'
-import { parseEnumVariant } from '@underware/pistols-sdk/starknet'
-import { PistolsSchemaType } from '@underware/pistols-sdk/pistols/sdk'
-import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { useConfig } from '/src/stores/configStore'
+import { useSeasonScoreboard } from '/src/stores/scoreboardStore'
+import { useEntityModelByKeys } from '@underware/pistols-sdk/dojo'
+import { PistolsSchemaType } from '@underware/pistols-sdk/pistols/sdk'
+import { parseEnumVariant } from '@underware/pistols-sdk/starknet'
+import { constants, models } from '@underware/pistols-sdk/pistols/gen'
+import { useBlockedPlayersDuelistIds } from '/src/stores/playerStore'
 
 export const useSeasonStore = createDojoStore<PistolsSchemaType>();
 
@@ -52,6 +54,12 @@ export const useSeason = (season_id: number) => {
   }
 }
 
+
+
+//----------------------------------------
+// Leaderboards
+//
+
 export type DuelistScore = {
   duelistId: bigint
   points: number
@@ -84,6 +92,23 @@ export const useLeaderboard = (season_id: number) => {
   return {
     seasonId: season_id,
     maxPositions,
+    scores,
+  }
+}
+
+export const useFullLeaderboard = (season_id: number) => {
+  const { scores: leaderboardScores } = useLeaderboard(season_id || 0);
+  const { seasonScoreboard } = useSeasonScoreboard(season_id || 0);
+  const { blockedPlayersDuelistIds } = useBlockedPlayersDuelistIds()
+
+  const scores = useMemo(() => (
+    [
+      ...leaderboardScores,
+      ...seasonScoreboard.filter(s => !leaderboardScores.some(l => l.duelistId === s.duelistId))
+    ].filter(score => !blockedPlayersDuelistIds.includes(score.duelistId))
+  ), [leaderboardScores, seasonScoreboard, blockedPlayersDuelistIds])
+
+  return {
     scores,
   }
 }

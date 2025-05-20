@@ -5,13 +5,14 @@ import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { createDojoStore } from '@dojoengine/sdk/react'
 import { PistolsEntity, PistolsSchemaType } from '@underware/pistols-sdk/pistols/sdk'
-import { arrayRemoveValue, bigintEquals, bigintToHex, bigintToNumber, isPositiveBigint, shortAddress, sortObjectByValue } from '@underware/pistols-sdk/utils'
+import { arrayRemoveValue, bigintEquals, bigintToHex, bigintToNumber, sortObjectByValue } from '@underware/pistols-sdk/utils'
+import { useEntitiesModel, useEntityModelByKeys } from '@underware/pistols-sdk/dojo'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
+import { useTokenStore } from '/src/stores/tokenStore'
 import { SortDirection } from '/src/stores/queryParamsStore'
 import { PlayerColumn } from '/src/stores/queryParamsStore'
 import { useTotals } from '/src/stores/duelistStore'
 import { models } from '@underware/pistols-sdk/pistols/gen'
-import { useEntitiesModel, useEntityModelByKeys } from '@underware/pistols-sdk/dojo'
 
 interface NamesByAddress {
   [address: string]: string
@@ -200,7 +201,21 @@ export const useBlockedPlayersAccounts = () => {
   return {
     blockedPlayersAccounts,
   }
+}
 
+export const useBlockedPlayersDuelistIds = () => {
+  const { blockedPlayersAccounts } = useBlockedPlayersAccounts()
+  const { duelistContractAddress } = useTokenContracts()
+  const contracts = useTokenStore((state) => state.contracts)
+  const getTokenIds = useTokenStore((state) => state.getTokenIds)
+
+  const blockedPlayersDuelistIds = useMemo(() => (
+    blockedPlayersAccounts.reduce((acc, account) => [...acc, ...(getTokenIds(duelistContractAddress, account) ?? [])], [] as bigint[])
+  ), [blockedPlayersAccounts, getTokenIds, duelistContractAddress])
+
+  return {
+    blockedPlayersDuelistIds,
+  }
 }
 
 export const useIsBookmarked = (target_address: BigNumberish, target_id: BigNumberish = 0) => {
