@@ -20,7 +20,7 @@ export default function ActivityOnline() {
       address={addr}
       timestamp={playersOnline[addr]}
       clientSeconds={clientSeconds}
-      isBookmarked={bookmarkedPlayers.includes(addr)}
+      isBookmarked={bookmarkedPlayers.includes(BigInt(addr))}
     />)
   ), [playersOnline, clientSeconds, bookmarkedPlayers])
 

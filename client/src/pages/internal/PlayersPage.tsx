@@ -9,12 +9,14 @@ import { ExplorerLink } from '@underware/pistols-sdk/starknet/components'
 import { LordsBalance } from '/src/components/account/LordsBalance'
 import { Address } from '/src/components/ui/Address'
 import { Connect } from '/src/pages/tests/ConnectTestPage'
-import CurrentChainHint from '/src/components/CurrentChainHint'
-import AppDojo from '/src/components/AppDojo'
 import { BigNumberish } from 'starknet'
 import { useFetchAccountsBalances } from '/src/stores/coinStore'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { useDelay } from '@underware/pistols-sdk/utils/hooks'
+import { useEntitiesModel } from '@underware/pistols-sdk/dojo'
+import { models } from '@underware/pistols-sdk/pistols/gen'
+import CurrentChainHint from '/src/components/CurrentChainHint'
+import AppDojo from '/src/components/AppDojo'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -44,9 +46,10 @@ export default function PlayersPage() {
 }
 
 function Players() {
-  const players = usePlayerStore.getState().players
+  const entities = usePlayerStore((state) => state.entities)
+  const players = useEntitiesModel<models.Player>(Object.values(entities), 'Player')
 
-  const playerAddresses = useMemo(() => Object.keys(players), [players])
+  const playerAddresses = useMemo(() => players.map((p) => p.player_address), [players])
 
   const { lordsContractAddress } = useTokenContracts()
   useFetchAccountsBalances(lordsContractAddress, playerAddresses)
@@ -77,7 +80,7 @@ function PlayerRow({
 }: {
   address: BigNumberish,
 }) {
-  const { isNew, username, timestampRegistered, aliveDuelistCount } = usePlayer(address)
+  const { username, timestampRegistered, aliveDuelistCount } = usePlayer(address)
   const ready = useDelay(true, 2000) // wait to batch fetch
   return (
     <Row className='H5 Number'>
@@ -88,7 +91,7 @@ function PlayerRow({
         <Address address={address} />
       </Cell>
       <Cell>
-        {isNew ? '...' : (username || '?')}
+        {username === undefined ? '...' : (username || '?')}
       </Cell>
       <Cell>
         {aliveDuelistCount}

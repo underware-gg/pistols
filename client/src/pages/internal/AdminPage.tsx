@@ -11,7 +11,7 @@ import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
 import { InternalPageMenu, InternalPageWrapper } from '/src/pages/internal/InternalPageIndex'
 import { Connect } from '/src/pages/tests/ConnectTestPage'
 import { useAccount } from '@starknet-react/core'
-import { useBlockedPlayers, usePlayer, useTeamMembers } from '/src/stores/playerStore'
+import { useBlockedPlayersAccounts, usePlayer, useTeamMembersAccounts } from '/src/stores/playerStore'
 import { PlayerNameSync } from '/src/stores/sync/PlayerNameSync'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppDojo from '/src/components/AppDojo'
@@ -44,7 +44,7 @@ export default function AdminPage() {
           <br />
           <EntityStoreSync />
         </InternalPageWrapper>
-        
+
       </Container>
     </AppDojo>
   );
@@ -129,7 +129,7 @@ function Config() {
 // Team Members
 //
 function TeamMembers() {
-  const { teamMembers } = useTeamMembers()
+  const { teamMembersAccounts } = useTeamMembersAccounts()
   return (
     <Table celled striped size='small' color='green'>
       <Header>
@@ -142,8 +142,8 @@ function TeamMembers() {
         </Row>
       </Header>
       <Body>
-        {teamMembers.map((player) => (
-          <TeamMemberRow key={player.player_address} address={player.player_address} />
+        {teamMembersAccounts.map((address) => (
+          <TeamMemberRow key={address} address={address} />
         ))}
       </Body>
     </Table>
@@ -155,11 +155,11 @@ function TeamMemberRow({
 }: {
   address: BigNumberish
 }) {
-  const { username, isAdmin, isTeamMember } = usePlayer(address)
+  const { name, isAdmin, isTeamMember } = usePlayer(address)
   return (
     <Row className='H5'>
       <Cell className='Code'>
-        {username}
+        {name}
       </Cell>
       <Cell>
         <Address address={address} full />
@@ -245,7 +245,7 @@ function TeamMembersEditor() {
 // Blocked Players
 //
 function BlockedPlayers() {
-  const { blockedPlayers } = useBlockedPlayers()
+  const { blockedPlayersAccounts } = useBlockedPlayersAccounts()
   return (
     <Table celled striped size='small' color='red'>
       <Header>
@@ -256,8 +256,8 @@ function BlockedPlayers() {
         </Row>
       </Header>
       <Body>
-        {blockedPlayers.map((player) => (
-          <PlayerRow key={player.player_address} address={player.player_address} />
+        {blockedPlayersAccounts.map((address) => (
+          <PlayerRow key={address} address={address} />
         ))}
       </Body>
     </Table>
@@ -269,11 +269,11 @@ function PlayerRow({
 }: {
   address: BigNumberish
 }) {
-  const { username, isAdmin, isTeamMember } = usePlayer(address)
+  const { name } = usePlayer(address)
   return (
     <Row className='H5'>
       <Cell className='Code'>
-        {username}
+        {name}
       </Cell>
       <Cell>
         <Address address={address} full />

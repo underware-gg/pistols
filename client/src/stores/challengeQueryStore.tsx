@@ -4,7 +4,7 @@ import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useCallToActions } from './eventsModelStore'
-import { usePlayer, usePlayerStore } from '/src/stores/playerStore'
+import { usePlayer, usePlayerDataStore } from '/src/stores/playerStore'
 import { ChallengeColumn, SortDirection } from '/src/stores/queryParamsStore'
 import { PistolsEntity } from '@underware/pistols-sdk/pistols/sdk'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
@@ -109,7 +109,7 @@ export const useQueryChallengeIds = (
   const { requiredDuelIds } = useCallToActions()
 
   const entities = useChallengeQueryStore((state) => state.entities);
-  const playerEntities = usePlayerStore((state) => state.players);
+  const getPlayerName = usePlayerDataStore((state) => state.getPlayerName);
   const targetId = useMemo(() => (isPositiveBigint(playerAddressOrDuelistId) ? BigInt(playerAddressOrDuelistId) : 0n), [playerAddressOrDuelistId])
 
   const [challengeIds, states, challengePlayerMap] = useMemo(() => {
@@ -152,8 +152,8 @@ export const useQueryChallengeIds = (
     if (filterName) {
       const filterNameLower = filterName.toLowerCase();
       result = result.filter((e) => (
-        playerEntities[bigintToHex(e.address_a)]?.name?.toLowerCase().includes(filterNameLower) ||
-        playerEntities[bigintToHex(e.address_b)]?.name?.toLowerCase().includes(filterNameLower)
+        getPlayerName(e.address_a)?.toLowerCase().includes(filterNameLower) ||
+        getPlayerName(e.address_b)?.toLowerCase().includes(filterNameLower)
       ))
     }
 

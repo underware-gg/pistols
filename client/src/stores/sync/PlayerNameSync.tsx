@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import { lookupAddresses } from '@cartridge/controller'
-import { usePlayerStore } from '/src/stores/playerStore'
+import { usePlayersAccounts, usePlayerDataStore } from '/src/stores/playerStore'
 import { useStarknetContext, useConnectedController, supportedConnetorIds } from '@underware/pistols-sdk/dojo'
 
 
@@ -8,12 +8,13 @@ import { useStarknetContext, useConnectedController, supportedConnetorIds } from
 // Add only once to a top level component
 //
 export function PlayerNameSync() {
-  const players = usePlayerStore((state) => state.players)
-  const updateUsernames = usePlayerStore((state) => state.updateUsernames)
-  
+  const updateUsernames = usePlayerDataStore((state) => state.updateUsernames)
+  const players_names = usePlayerDataStore((state) => state.players_names)
+  const { playersAccounts } = usePlayersAccounts()
+
   const newPlayerAddresses = useMemo(() => (
-    Object.keys(players).filter(p => players[p].isNew)
-  ), [players])
+    playersAccounts.filter(p => players_names[p] === undefined)
+  ), [playersAccounts, players_names])
 
   const { connectorId, isControllerConnected } = useConnectedController()
   const { selectedNetworkConfig } = useStarknetContext()

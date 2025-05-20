@@ -3,153 +3,112 @@ import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
-import { PistolsEntity } from '@underware/pistols-sdk/pistols/sdk'
+import { createDojoStore } from '@dojoengine/sdk/react'
+import { PistolsEntity, PistolsSchemaType } from '@underware/pistols-sdk/pistols/sdk'
 import { arrayRemoveValue, bigintEquals, bigintToHex, bigintToNumber, isPositiveBigint, shortAddress, sortObjectByValue } from '@underware/pistols-sdk/utils'
-import { models } from '@underware/pistols-sdk/pistols/gen'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
-import { SortDirection } from './queryParamsStore'
-import { PlayerColumn } from './queryParamsStore'
-import { useTotals } from './duelistStore'
+import { SortDirection } from '/src/stores/queryParamsStore'
+import { PlayerColumn } from '/src/stores/queryParamsStore'
+import { useTotals } from '/src/stores/duelistStore'
+import { models } from '@underware/pistols-sdk/pistols/gen'
+import { useEntitiesModel, useEntityModelByKeys } from '@underware/pistols-sdk/dojo'
 
-
-export interface PlayerState {
-  player_address: string
-  timestamp_registered: number
-  username: string
-  name: string
-  isNew: boolean
-  totals: models.Totals
-  aliveDuelistCount: number
-  isTeamMember: boolean
-  isAdmin: boolean
-  isBlocked: boolean
-  // off-chain messages
-  bookmarked_players: string[]
-  bookmarked_tokens: {
-    [address: string]: bigint[]
-  }
-}
-interface PlayersByAddress {
-  [address: string]: PlayerState
+interface NamesByAddress {
+  [address: string]: string
 }
 interface TimestampByAddress {
   [address: string]: number
 }
+interface PlayerBookmarksByAddress {
+  [address: string]: bigint[]
+}
+interface TokenBookmarksByAddress {
+  [address: string]: {
+    [address: string]: bigint[]
+  }
+}
 interface State {
-  players: PlayersByAddress,
+  players_names: NamesByAddress,
   players_online: TimestampByAddress,
-  setEntities: (entities: PistolsEntity[]) => void;
-  updateEntity: (entity: PistolsEntity) => void;
-  updateMessages: (entities: PistolsEntity[]) => void;
+  player_bookmarks: PlayerBookmarksByAddress,
+  token_bookmarks: TokenBookmarksByAddress,
   updateUsernames: (usernames: Map<string, string>) => void;
+  getPlayerName: (address: BigNumberish) => string | undefined;
+  updateMessages: (entities: PistolsEntity[]) => void;
 }
 
 const createStore = () => {
-  const _parseEntity = (e: PistolsEntity): PlayerState | undefined => {
-    const _player: Partial<models.Player> | undefined = e.models.pistols.Player
-    const _flags: Partial<models.PlayerFlags> | undefined = e.models.pistols.PlayerFlags
-    const _teamFlags: Partial<models.PlayerTeamFlags> | undefined = e.models.pistols.PlayerTeamFlags
-    return isPositiveBigint(_player?.player_address) ? {
-      player_address: bigintToHex(_player.player_address),
-      timestamp_registered: bigintToNumber(_player.timestamps.registered),
-      username: shortAddress(_player.player_address),
-      name: shortAddress(_player.player_address),
-      isNew: true,
-      totals: _player.totals,
-      aliveDuelistCount: bigintToNumber(_player.alive_duelist_count),
-      isTeamMember: _teamFlags?.is_team_member ?? false,
-      isAdmin: _teamFlags?.is_admin ?? false,
-      isBlocked: _flags?.is_blocked ?? false,
-      // off-chain messages
-      bookmarked_players: [],
-      bookmarked_tokens: {},
-    } : undefined
-  }
-  return create<State>()(immer((set) => ({
-    players: {},
+  return create<State>()(immer((set, get) => ({
+    players_names: {},
     players_online: {},
-    setEntities: (entities: PistolsEntity[]) => {
-      // console.log("setEntities()[Player] =>", entities)
+    player_bookmarks: {},
+    token_bookmarks: {},
+    updateUsernames: (usernames: Map<string, string>) => {
+      // console.log("updateUsername()[Player] =>", usernames)
       set((state: State) => {
-        state.players = entities.sort((a, b) => (
-          Number(b.models.pistols.Player?.timestamps.registered ?? 0) - Number(a.models.pistols.Player?.timestamps.registered ?? 0)
-        )).reduce((acc, e) => {
-          const player = _parseEntity(e)
-          if (player) {
-            acc[player.player_address] = player
-          }
-          return acc
-        }, {} as PlayersByAddress)
-      })
-    },
-    updateEntity: (e: PistolsEntity) => {
-      console.log("updateEntity()[Player] =>", e)
-      set((state: State) => {
-        // only insert!
-        const player = _parseEntity(e)
-        if (player && !state.players[player.player_address]) {
-          state.players[player.player_address] = player
-        }
+        usernames.forEach((value: string, key: string) => {
+          const _key = bigintToHex(key)
+          state.players_names[_key] = value
+        })
+        // console.log("updateUsername()[Player] =>", usernames, state.players)
       });
+    },
+    getPlayerName: (address: BigNumberish) => {
+      const players_names = get().players_names
+      return players_names[bigintToHex(address)]
     },
     updateMessages: (entities: PistolsEntity[]) => {
       // console.log("updateMessages()[Player] =>", entities)
       set((state: State) => {
         entities.forEach((e) => {
+          // PlayerOnline flags
           const online = e.models.pistols.PlayerOnline
           if (online) {
             const address = bigintToHex(online.identity)
             state.players_online[address] = bigintToNumber(online.timestamp)
           }
+          // Bookmarks
           const bookmark = e.models.pistols.PlayerBookmark
           if (bookmark) {
             const address = bigintToHex(bookmark.identity)
-            if (state.players[address]) {
+            const target_address = BigInt(bookmark.target_address)
+            const target_id = BigInt(bookmark.target_id)
+            if (target_id == 0n) {
+              // Bookmarking player
+              const isBookmarked = state.player_bookmarks[address]?.includes(target_address)
+              if (bookmark.enabled && !isBookmarked) {
+                if (!state.player_bookmarks[address]) {
+                  state.player_bookmarks[address] = []
+                }
+                state.player_bookmarks[address].push(target_address)
+              } else if (!bookmark.enabled && isBookmarked) {
+                state.player_bookmarks[address] = arrayRemoveValue(state.player_bookmarks[address], target_address)
+              }
+            } else {
+              // Bookmarking token
               const target_address = bigintToHex(bookmark.target_address)
-              const target_id = BigInt(bookmark.target_id)
-              if (target_id == 0n) {
-                // Bookmarking player
-                const isBookmarked = state.players[address].bookmarked_players.includes(target_address)
-                if (bookmark.enabled && !isBookmarked) {
-                  state.players[address].bookmarked_players.push(target_address)
-                } else if (!bookmark.enabled && isBookmarked) {
-                  state.players[address].bookmarked_players = arrayRemoveValue(state.players[address].bookmarked_players, target_address)
+              const isBookmarked = state.token_bookmarks[address]?.[target_address]?.includes(target_id)
+              if (bookmark.enabled && !isBookmarked) {
+                if (!state.token_bookmarks[address]) {
+                  state.token_bookmarks[address] = {}
                 }
-              } else {
-                // Bookmarking token
-                const isBookmarked = state.players[address].bookmarked_tokens[target_address]?.includes(target_id)
-                if (bookmark.enabled && !isBookmarked) {
-                  if (!state.players[address].bookmarked_tokens[target_address]) {
-                    state.players[address].bookmarked_tokens[target_address] = []
-                  }
-                  state.players[address].bookmarked_tokens[target_address].push(target_id)
-                } else if (!bookmark.enabled && isBookmarked) {
-                  state.players[address].bookmarked_tokens[target_address] = arrayRemoveValue(state.players[address].bookmarked_tokens[target_address], target_id)
+                if (!state.token_bookmarks[address][target_address]) {
+                  state.token_bookmarks[address][target_address] = []
                 }
+                state.token_bookmarks[address][target_address].push(target_id)
+              } else if (!bookmark.enabled && isBookmarked) {
+                state.token_bookmarks[address][target_address] = arrayRemoveValue(state.token_bookmarks[address][target_address], target_id)
               }
             }
           }
         })
       });
     },
-    updateUsernames: (usernames: Map<string, string>) => {
-      // console.log("updateUsername()[Player] =>", usernames)
-      set((state: State) => {
-        usernames.forEach((value: string, key: string) => {
-          const _key = bigintToHex(key)
-          if (state.players[_key]) {
-            state.players[_key].username = value
-            state.players[_key].name = value
-            state.players[_key].isNew = false
-          }
-        })
-        // console.log("updateUsername()[Player] =>", usernames, state.players)
-      });
-    },
   })))
 }
 
-export const usePlayerStore = createStore();
+export const usePlayerStore = createDojoStore<PistolsSchemaType>();
+export const usePlayerDataStore = createStore();
 
 
 //--------------------------------
@@ -157,37 +116,41 @@ export const usePlayerStore = createStore();
 //
 
 export const usePlayer = (address: BigNumberish) => {
-  const key = useMemo(() => (bigintToHex(address)), [address])
-  const players = usePlayerStore((state) => state.players)
-  const player = useMemo(() => (players[key]), [players[key]])
+  const entities = usePlayerStore((state) => state.entities);
+  const player = useEntityModelByKeys<models.Player>(entities, 'Player', [address])
+  const flags = useEntityModelByKeys<models.PlayerFlags>(entities, 'PlayerFlags', [address])
+  const teamFlags = useEntityModelByKeys<models.PlayerTeamFlags>(entities, 'PlayerTeamFlags', [address])
 
-  const isNew = useMemo(() => (player?.isNew ?? false), [player])
-  const username = useMemo(() => (player?.username ?? undefined), [player])
-  const name = useMemo(() => (player?.name ?? 'Unknown'), [player])
-  const timestampRegistered = useMemo(() => (player?.timestamp_registered ?? 0), [player])
-  const aliveDuelistCount = useMemo(() => (player?.aliveDuelistCount ?? 0), [player])
-  const isTeamMember = useMemo(() => (player?.isTeamMember ?? false), [player])
-  const isAdmin = useMemo(() => (player?.isAdmin ?? false), [player])
-  const isBlocked = useMemo(() => (player?.isBlocked ?? false), [player])
-  const bookmarkedPlayers = useMemo(() => (player?.bookmarked_players ?? []), [player])
-  const bookmarkedTokens = useMemo(() => (player?.bookmarked_tokens ?? {}), [player])
+  const timestampRegistered = useMemo(() => Number(player?.timestamps.registered ?? 0), [player])
+  const aliveDuelistCount = useMemo(() => Number(player?.alive_duelist_count ?? 0), [player])
+  const isBlocked = useMemo(() => (flags?.is_blocked ?? false), [flags])
+  const isTeamMember = useMemo(() => (teamFlags?.is_team_member ?? false), [teamFlags])
+  const isAdmin = useMemo(() => (teamFlags?.is_admin ?? false), [teamFlags])
   const totals = useTotals(player?.totals)
+
+  // get from player name store...
+  const playerKey = useMemo(() => bigintToHex(address), [address])
+  const players_names = usePlayerDataStore((state) => state.players_names);
+  const username = useMemo(() => (players_names[playerKey] ?? null), [players_names, playerKey])
+  const name = useMemo(() => (username || 'Unknown'), [username])
+
+  // get from player message store...
+  const players_bookmarks = usePlayerDataStore((state) => state.player_bookmarks);
+  const token_bookmarks = usePlayerDataStore((state) => state.token_bookmarks);
+  const bookmarkedPlayers = useMemo(() => (players_bookmarks[playerKey] ?? []), [players_bookmarks, playerKey])
+  const bookmarkedTokens = useMemo(() => (token_bookmarks[playerKey] ?? {}), [token_bookmarks, playerKey])
+
+  const { duelContractAddress, duelistContractAddress } = useTokenContracts()
+  const bookmarkedDuels = useMemo(() => (bookmarkedTokens[duelContractAddress as string] ?? []), [bookmarkedTokens])
+  const bookmarkedDuelists = useMemo(() => (bookmarkedTokens[duelistContractAddress as string] ?? []), [bookmarkedTokens])
 
   // TODO... check if completed tutorial from Activity events
   const hasFinishedTutorial = false
   const isAvailable = false
 
-  const {
-    duelContractAddress,
-    duelistContractAddress,
-  } = useTokenContracts()
-  const bookmarkedDuels = useMemo(() => (player?.bookmarked_tokens?.[duelContractAddress as string] ?? []), [player])
-  const bookmarkedDuelists = useMemo(() => (player?.bookmarked_tokens?.[duelistContractAddress as string] ?? []), [player])
-
   // useEffect(() => console.log("usePlayer() =>", username, key, player), [player, username])
 
   return {
-    isNew,
     address,
     username,
     name,
@@ -206,20 +169,38 @@ export const usePlayer = (address: BigNumberish) => {
   }
 }
 
-export const useTeamMembers = () => {
-  const players = usePlayerStore((state) => state.players)
-  const teamMembers = useMemo(() => (Object.values(players).filter((p) => (p.isTeamMember || p.isAdmin))), [players])
+export const usePlayersAccounts = () => {
+  const entities = usePlayerStore((state) => state.entities)
+  const players = useEntitiesModel<models.Player>(Object.values(entities), 'Player')
+  const playersAccounts = useMemo(() => (
+    players.map((p) => (p.player_address))
+  ), [players])
   return {
-    teamMembers,
+    playersAccounts,
   }
 }
 
-export const useBlockedPlayers = () => {
-  const players = usePlayerStore((state) => state.players)
-  const blockedPlayers = useMemo(() => (Object.values(players).filter((p) => (p.isBlocked))), [players])
+export const useTeamMembersAccounts = () => {
+  const entities = usePlayerStore((state) => state.entities)
+  const teamFlags = useEntitiesModel<models.PlayerTeamFlags>(Object.values(entities), 'PlayerTeamFlags')
+  const teamMembersAccounts = useMemo(() => (
+    teamFlags.filter((p) => (p.is_team_member || p.is_admin)).map((p) => (p.player_address))
+  ), [teamFlags])
   return {
-    blockedPlayers,
+    teamMembersAccounts,
   }
+}
+
+export const useBlockedPlayersAccounts = () => {
+  const entities = usePlayerStore((state) => state.entities)
+  const playerFlags = useEntitiesModel<models.PlayerFlags>(Object.values(entities), 'PlayerFlags')
+  const blockedPlayersAccounts = useMemo(() => (
+    playerFlags.filter((p) => (p.is_blocked)).map((p) => (p.player_address))
+  ), [playerFlags])
+  return {
+    blockedPlayersAccounts,
+  }
+
 }
 
 export const useIsBookmarked = (target_address: BigNumberish, target_id: BigNumberish = 0) => {
@@ -227,7 +208,7 @@ export const useIsBookmarked = (target_address: BigNumberish, target_id: BigNumb
   const { bookmarkedPlayers, bookmarkedTokens } = usePlayer(address)
   const isBookmarked = useMemo(() => (
     target_id == 0n
-      ? bookmarkedPlayers.includes(bigintToHex(target_address))
+      ? bookmarkedPlayers.includes(BigInt(target_address))
       : bookmarkedTokens[bigintToHex(target_address)]?.includes(BigInt(target_id))
   ), [bookmarkedPlayers, bookmarkedTokens, target_address, target_id])
   return {
@@ -236,24 +217,25 @@ export const useIsBookmarked = (target_address: BigNumberish, target_id: BigNumb
 }
 
 export const usePlayersOnline = () => {
-  const players_online = usePlayerStore((state) => state.players_online)
+  const players_online = usePlayerDataStore((state) => state.players_online)
   const playersOnline = useMemo(() => sortObjectByValue(players_online, (a, b) => (b - a)), [players_online])
   return {
     playersOnline,
   }
 }
 
+
 //----------------------------------------
 // vanilla getter
 // (non-React)
 //
-export const getPlayerName = (address: BigNumberish): string  | undefined => {
-  const players = usePlayerStore.getState().players
-  return players[bigintToHex(address)]?.name
+export const getPlayerName = (address: BigNumberish): string | undefined => {
+  const players_names = usePlayerDataStore.getState().players_names
+  return players_names[bigintToHex(address)]
 }
 
 export const getPlayerOnlineStatus = (address: BigNumberish): boolean => {
-  const players_online = usePlayerStore((state) => state.players_online);
+  const players_online = usePlayerDataStore((state) => state.players_online);
   return players_online[bigintToHex(address)] !== undefined
 }
 
@@ -267,18 +249,22 @@ export const useQueryPlayerIds = (
 ) => {
   const { address } = useAccount()
   const { bookmarkedDuelists } = usePlayer(address)
-  const entities = usePlayerStore((state) => state.players);
-  
-  const players_online = usePlayerStore((state) => state.players_online);
+  const entities = usePlayerStore((state) => state.entities);
+  const players = useEntitiesModel<models.Player>(Object.values(entities), 'Player')
+
+  const players_online = usePlayerDataStore((state) => state.players_online);
+  const getPlayerName = usePlayerDataStore((state) => state.getPlayerName);
 
   const playerIds = useMemo(() => {
-    let result = Object.values(entities);
+    let result = [
+      ...players,
+    ];
 
-    result = result.filter((e) => (e.player_address !== bigintToHex(address)))
+    result = result.filter((p) => (p.player_address !== bigintToHex(address)))
 
     // filter by name
     if (filterName) {
-      result = result.filter((e) => e.name.includes(filterName))
+      result = result.filter((p) => getPlayerName(p.player_address)?.toLowerCase().includes(filterName.toLowerCase()))
     }
 
     // filter by bookmarked duelists
@@ -293,13 +279,14 @@ export const useQueryPlayerIds = (
 
     // sort...
     result = result.sort((player_a, player_b) => {
+      const isAscending = (sortDirection == SortDirection.Ascending)
+
       // Sort by names, or both rookies
       const _sortByName = (a: string, b: string) => {
-        return isAscending ? a.localeCompare(player_b.name) : b.localeCompare(player_a.name)
+        return isAscending ? a.localeCompare(b) : b.localeCompare(a)
       }
-      const isAscending = (sortDirection == SortDirection.Ascending)
       if (sortColumn == PlayerColumn.Name) {
-        return _sortByName(player_a.name, player_b.name)
+        return _sortByName(getPlayerName(player_a.player_address), getPlayerName(player_b.player_address))
       }
 
       // Sort by values
@@ -307,13 +294,13 @@ export const useQueryPlayerIds = (
         return (!isAscending ? (b - a) : (a - b))
         // return (!isAscending ? (b - a) : (a && !b) ? -1 : (!a && b) ? 1 : (a - b))
       }
-      if (sortColumn == PlayerColumn.Timestamp) return _sortTotals(player_a.timestamp_registered, player_b.timestamp_registered)
+      if (sortColumn == PlayerColumn.Timestamp) return _sortTotals(Number(player_a.timestamps.registered), Number(player_b.timestamps.registered))
       return 0
     })
 
     // return ids only
     return result.map((e) => e.player_address)
-  }, [entities, filterName, filterOnline, sortColumn, sortDirection, filterBookmarked, bookmarkedDuelists, address, players_online])
+  }, [players, filterName, filterOnline, sortColumn, sortDirection, filterBookmarked, bookmarkedDuelists, address, players_online])
 
   return {
     playerIds,
