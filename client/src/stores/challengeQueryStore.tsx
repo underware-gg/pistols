@@ -10,7 +10,7 @@ import { PistolsEntity } from '@underware/pistols-sdk/pistols/sdk'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { bigintEquals, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { parseEnumVariant } from '@underware/pistols-sdk/starknet'
-import { keysToEntityId, getEntityModel } from '@underware/pistols-sdk/dojo'
+import { keysToEntityId, getEntityModel, useAllStoreModels } from '@underware/pistols-sdk/dojo'
 import { useChallengeStore } from '/src/stores/challengeStore'
 
 //-----------------------------------------
@@ -120,7 +120,7 @@ export const useQueryChallengeIds = (
 
     // get all current states by duelist
     const states = [] as constants.ChallengeState[]
-    
+
     // add awaiting state if there are required duels
     if (result.some(e => requiredDuelIds.includes(e.duel_id))) {
       states.push(constants.ChallengeState.Awaiting)
@@ -128,11 +128,11 @@ export const useQueryChallengeIds = (
 
     // add remaining states from filtered results
     result
-          .filter(e => !requiredDuelIds.includes(e.duel_id))
-          .reduce((acc, e) => {
-            if (!acc.includes(e.state)) acc.push(e.state)
-            return acc
-          }, states)
+      .filter(e => !requiredDuelIds.includes(e.duel_id))
+      .reduce((acc, e) => {
+        if (!acc.includes(e.state)) acc.push(e.state)
+        return acc
+      }, states)
 
     // filter by bookmarked duels
     if (filterBookmarked) {
@@ -165,7 +165,7 @@ export const useQueryChallengeIds = (
 
     // return ids only
     const challengeIds = result.map((e) => e.duel_id)
-    
+
     // create map of challenge ids to player addresses
     const challengePlayerMap = result.reduce((map, e) => {
       map.set(e.duel_id, {
@@ -193,50 +193,48 @@ export const useQueryChallengeIds = (
  */
 export function useDuelistSeasonStats(duelistId: BigNumberish, seasonId?: BigNumberish) {
   const entities = useChallengeStore((state) => state.entities);
+  const challenges = useAllStoreModels<models.Challenge>(entities, 'Challenge')
 
-  let result = Object.values(entities)
-    .map((e) => 
-      getEntityModel<models.Challenge>(e, 'Challenge')
-    )
-    ?.filter((e) => 
-      BigInt(e.duelist_id_a) === BigInt(duelistId) || BigInt(e.duelist_id_b) === BigInt(duelistId)
-    )
-    ?.filter((e) => {
-      const state = parseEnumVariant<constants.ChallengeState>(e.state)
-      return state === constants.ChallengeState.Resolved || 
-             state === constants.ChallengeState.Draw ||
-             state === constants.ChallengeState.Expired
-    })
+  const result = useMemo(() => (
+    challenges
+      .filter((e) => bigintEquals(e?.duelist_id_a, duelistId) || bigintEquals(e?.duelist_id_b, duelistId))
+      .filter((e) => {
+        const state = parseEnumVariant<constants.ChallengeState>(e.state)
+        return state === constants.ChallengeState.Resolved ||
+          state === constants.ChallengeState.Draw ||
+          state === constants.ChallengeState.Expired
+      })
     // .filter((e) => 
     //   BigInt(e.table_id) === BigInt(seasonId)
     // ) //TODO filter by correct season!
- 
+  ), [challenges, duelistId])
+
   const stats = useMemo(() => {
     if (!duelistId || !seasonId) {
       return { wins: 0, losses: 0 }
     }
     // Count wins, losses and draws
-    const stats = result.reduce((acc, challenge) => {      
+    const stats = result.reduce((acc, challenge) => {
       const isDuelistA = BigInt(challenge.duelist_id_a) === BigInt(duelistId)
       const winner = challenge.winner
-      
+
       // Draw case
       if (winner === 0n) {
         acc.losses++
-      } 
+      }
       // Win case
-      else if ((isDuelistA && winner === 1) || 
-               (!isDuelistA && winner === 2)) {
+      else if ((isDuelistA && winner === 1) ||
+        (!isDuelistA && winner === 2)) {
         acc.wins++
-      } 
+      }
       // Loss case
       else {
         acc.losses++
       }
-      
+
       return acc
     }, { wins: 0, losses: 0 })
-    
+
     return stats
   }, [result, duelistId, seasonId])
 
