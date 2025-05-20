@@ -13,6 +13,7 @@ import { SortDirection } from '/src/stores/queryParamsStore'
 import { PlayerColumn } from '/src/stores/queryParamsStore'
 import { useTotals } from '/src/stores/duelistStore'
 import { models } from '@underware/pistols-sdk/pistols/gen'
+import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
 
 interface NamesByAddress {
   [address: string]: string
@@ -253,6 +254,11 @@ export const useQueryPlayerIds = (
 
   const players_online = usePlayerDataStore((state) => state.players_online);
 
+  // consider online players who have been here for...
+  const minOnlineMinutes = 30;
+  const { clientTimestamp } = useClientTimestamp()
+  const minPlayerTimestamp = useMemo(() => (clientTimestamp - (minOnlineMinutes * 60)), [clientTimestamp])
+
   const playerIds = useMemo(() => {
     let result = [
       ...players,
@@ -272,7 +278,7 @@ export const useQueryPlayerIds = (
 
     // filter by active
     if (filterOnline) {
-      result = result.filter((e) => (players_online[bigintToHex(e.player_address)] !== undefined))
+      result = result.filter((e) => (players_online[bigintToHex(e.player_address)] ?? 0) >= minPlayerTimestamp)
     }
 
     // sort...
