@@ -208,8 +208,8 @@ export const useIsBookmarked = (target_address: BigNumberish, target_id: BigNumb
   const { bookmarkedPlayers, bookmarkedTokens } = usePlayer(address)
   const isBookmarked = useMemo(() => (
     target_id == 0n
-      ? bookmarkedPlayers.includes(BigInt(target_address))
-      : bookmarkedTokens[bigintToHex(target_address)]?.includes(BigInt(target_id))
+      ? bookmarkedPlayers.includes(BigInt(target_address ?? 0))
+      : bookmarkedTokens[bigintToHex(target_address ?? 0)]?.includes(BigInt(target_id))
   ), [bookmarkedPlayers, bookmarkedTokens, target_address, target_id])
   return {
     isBookmarked,

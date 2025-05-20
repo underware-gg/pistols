@@ -16,6 +16,7 @@ import { PlayerNameSync } from '/src/stores/sync/PlayerNameSync'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppDojo from '/src/components/AppDojo'
 import { useValidateWalletAddress } from '@underware/pistols-sdk/utils/hooks'
+import { Leaderboards } from './SeasonsPage'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -39,8 +40,14 @@ export default function AdminPage() {
         <InternalPageWrapper>
           <Config />
           <TeamMembers />
+          <TeamMembersEditor />
+          <br />
           <BlockedPlayers />
-          {/* <TeamMembersEditor /> */}
+          <BlockedPlayersEditor />
+          <br />
+
+          <LeaderboardsSection />
+          {/* <DisqualifyDuelistsEditor /> */}
           <br />
           <EntityStoreSync />
         </InternalPageWrapper>
@@ -282,5 +289,184 @@ function PlayerRow({
         <ExplorerLink address={address} voyager />
       </Cell>
     </Row>
+  )
+}
+
+function BlockedPlayersEditor() {
+  const { account } = useAccount()
+  const { admin } = useDojoSystemCalls()
+  const [address, setAddress] = useState('')
+  const [isBlocked, setIsBlocked] = useState(true)
+  const { isStarknetAddress } = useValidateWalletAddress(address)
+  return (
+    <Table attached='top' celled striped size='small' color='green'>
+      <Header>
+        <Row>
+          <HeaderCell width={3}><h3>Block Players</h3></HeaderCell>
+          <HeaderCell></HeaderCell>
+          <HeaderCell></HeaderCell>
+        </Row>
+      </Header>
+      <Body>
+        <Row>
+          <Cell className='ModalText Code'>
+            Wallet Address
+          </Cell>
+          <Cell>
+            <Input fluid className='Code'
+              value={address ?? ''}
+              onChange={(e) => setAddress(e.target.value)}
+              maxLength={STARKNET_ADDRESS_LENGTHS[0]}
+              placeholder={null}
+            />
+          </Cell>
+        </Row>
+        <Row>
+          <Cell className='ModalText Code'>
+            Is Blocked?
+          </Cell>
+          <Cell>
+            <Checkbox
+              checked={isBlocked}
+              onChange={(e, data) => setIsBlocked(data.checked)}
+            />
+          </Cell>
+        </Row>
+        <Row>
+          <Cell></Cell>
+          <Cell>
+            <Button disabled={!isStarknetAddress} onClick={() => admin.set_is_blocked(account, address, isBlocked)}>Submit</Button>
+          </Cell>
+        </Row>
+      </Body>
+    </Table>
+  )
+}
+
+
+//--------------------------------
+// Leaderboards
+//
+function LeaderboardsSection() {
+  const { currentSeasonId } = useConfig()
+  return (
+    <div>
+      <Leaderboards seasonId={currentSeasonId} />
+      <DisqualifyDuelistsEditor seasonId={currentSeasonId} />
+      <QualifyDuelistsEditor seasonId={currentSeasonId} />
+    </div>
+  )
+}
+
+
+function DisqualifyDuelistsEditor({
+  seasonId,
+}: {
+  seasonId: number
+}) {
+  const { account } = useAccount()
+  const { admin } = useDojoSystemCalls()
+  const [duelistId, setDuelistId] = useState('')
+  const [blockOwner, setBlockOwner] = useState(true)
+  return (
+    <Table attached='top' celled striped size='small' color='green'>
+      <Header>
+        <Row>
+          <HeaderCell width={3}><h3>Disqualify Duelists</h3></HeaderCell>
+          <HeaderCell></HeaderCell>
+          <HeaderCell></HeaderCell>
+        </Row>
+      </Header>
+      <Body>
+        <Row>
+          <Cell className='ModalText Code'>
+            Season
+          </Cell>
+          <Cell className='ModalText Code'>
+            {seasonId}
+          </Cell>
+        </Row>
+        <Row>
+          <Cell className='ModalText Code'>
+            Duelist ID
+          </Cell>
+          <Cell>
+            <Input fluid className='Code'
+              value={duelistId ?? ''}
+              onChange={(e) => setDuelistId(e.target.value)}
+              maxLength={6}
+              placeholder={null}
+            />
+          </Cell>
+        </Row>
+        <Row>
+          <Cell className='ModalText Code'>
+            Block Owner?
+          </Cell>
+          <Cell>
+            <Checkbox
+              checked={blockOwner}
+              onChange={(e, data) => setBlockOwner(data.checked)}
+            />
+          </Cell>
+        </Row>
+        <Row>
+          <Cell></Cell>
+          <Cell>
+            <Button disabled={!duelistId} onClick={() => admin.disqualify_duelist(account, seasonId, duelistId, blockOwner)}>Submit</Button>
+          </Cell>
+        </Row>
+      </Body>
+    </Table>
+  )
+}
+
+function QualifyDuelistsEditor({
+  seasonId,
+}: {
+  seasonId: number
+}) {
+  const { account } = useAccount()
+  const { admin } = useDojoSystemCalls()
+  const [duelistId, setDuelistId] = useState('')
+  return (
+    <Table attached='top' celled striped size='small' color='green'>
+      <Header>
+        <Row>
+          <HeaderCell width={3}><h3>Qualify Duelists</h3></HeaderCell>
+          <HeaderCell></HeaderCell>
+          <HeaderCell></HeaderCell>
+        </Row>
+      </Header>
+      <Body>
+        <Row>
+          <Cell className='ModalText Code'>
+            Season
+          </Cell>
+          <Cell className='ModalText Code'>
+            {seasonId}
+          </Cell>
+        </Row>
+        <Row>
+          <Cell className='ModalText Code'>
+            Duelist ID
+          </Cell>
+          <Cell>
+            <Input fluid className='Code'
+              value={duelistId ?? ''}
+              onChange={(e) => setDuelistId(e.target.value)}
+              maxLength={6}
+              placeholder={null}
+            />
+          </Cell>
+        </Row>
+        <Row>
+          <Cell></Cell>
+          <Cell>
+            <Button disabled={!duelistId} onClick={() => admin.qualify_duelist(account, seasonId, duelistId)}>Submit</Button>
+          </Cell>
+        </Row>
+      </Body>
+    </Table>
   )
 }

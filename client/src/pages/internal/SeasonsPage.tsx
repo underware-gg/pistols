@@ -420,7 +420,7 @@ function DuelistsReport({ seasonId }: { seasonId: number }) {
 //--------------------------------
 // Leaderboards
 //
-function Leaderboards({
+export function Leaderboards({
   seasonId,
 }: {
   seasonId: number,
@@ -432,6 +432,7 @@ function Leaderboards({
     <Table celled color='green'>
       <Header fullWidth>
         <Row>
+          <HeaderCell><h3 className='Important'>Position</h3></HeaderCell>
           <HeaderCell><h3 className='Important'>Leaderboards</h3></HeaderCell>
           <HeaderCell><h3 className='Important'>Points</h3></HeaderCell>
           <HeaderCell><h3 className='Important'>Wallet</h3></HeaderCell>
@@ -461,12 +462,15 @@ function LeaderboardRow({
   return (
     <Row key={duelistId}>
       <Cell>
+        {index + 1}
+      </Cell>
+      <Cell>
         <span className='Important'>
           {`Duelist #${duelistId}`}
         </span>
       </Cell>
       <Cell className='Code'>{points}</Cell>
-      <Cell className='Code'>{isLoadingOwner ? '...' : bigintToHex(owner)}</Cell>
+      <Cell className='Code'><Address address={owner} full /></Cell>
       {/* <Cell className='Code'>{isLoadingUsername ? '...' : username}</Cell> */}
       <Cell className='Code'>{username || '...'}</Cell>
     </Row>
