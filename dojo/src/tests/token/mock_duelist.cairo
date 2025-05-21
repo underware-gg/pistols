@@ -11,7 +11,7 @@ pub struct MockDuelistOwners {
 }
 
 #[starknet::interface]
-pub trait IDuelistToken<TState> {
+pub trait IMockDuelistToken<TState> {
     // ERC
     fn transfer_from(ref self: TState, from: ContractAddress, to: ContractAddress, token_id: u256);
     fn owner_of(self: @TState, token_id: u256) -> ContractAddress;
@@ -25,6 +25,7 @@ pub trait IDuelistToken<TState> {
     fn get_validated_active_duelist_id(ref self: TState, address: ContractAddress, duelist_id: u128, lives_staked: u8) -> u128;
     fn poke(ref self: TState, duelist_id: u128) -> bool;
     fn sacrifice(ref self: TState, duelist_id: u128);
+    fn update_token_metadata(ref self: TState, token_id: u128);
 }
 
 #[dojo::contract]
@@ -55,7 +56,7 @@ pub mod duelist_token {
     }
 
     #[abi(embed_v0)]
-    impl ERC721MockImpl of super::IDuelistToken<ContractState> {
+    impl ERC721MockImpl of super::IMockDuelistToken<ContractState> {
         fn transfer_from(ref self: ContractState, from: ContractAddress, to: ContractAddress, token_id: u256) {
             let mut world = self.world_default();
             world.write_model(
@@ -114,6 +115,7 @@ pub mod duelist_token {
             (true)
         }
         fn sacrifice(ref self: ContractState, duelist_id: u128) {}
+        fn update_token_metadata(ref self: ContractState, token_id: u128) {}
     }
 
 }
