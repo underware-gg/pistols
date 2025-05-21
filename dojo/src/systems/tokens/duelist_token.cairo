@@ -262,14 +262,19 @@ pub mod duelist_token {
         fn inactive_timestamp(self: @ContractState,
             duelist_id: u128,
         ) -> u64 {
-            let mut store: Store = StoreTrait::new(self.world_default());
-            let timestamp_active: u64 = store.get_duelist_timestamps(duelist_id).active;
-            if (timestamp_active.is_zero()) {
-                (0)
-            } else {
-                let timestamp: u64 = starknet::get_block_timestamp();
-                (timestamp - timestamp_active)
-            }
+            //-----------------------------------
+            // TEMP: disabled dripping
+            // when enabling, also activate tests with "TEMP: disabled dripping"
+            (0)
+            //-----------------------------------
+            // let mut store: Store = StoreTrait::new(self.world_default());
+            // let timestamp_active: u64 = store.get_duelist_timestamps(duelist_id).active;
+            // if (timestamp_active.is_zero()) {
+            //     (0)
+            // } else {
+            //     let timestamp: u64 = starknet::get_block_timestamp();
+            //     (timestamp - timestamp_active)
+            // }
         }
 
         #[inline(always)]

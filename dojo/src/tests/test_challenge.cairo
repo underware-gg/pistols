@@ -468,6 +468,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore] // TEMP: disabled dripping
     fn test_stacker_active_switch_OK() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE | FLAGS::DUELIST);
         let A = STACKER();
@@ -501,6 +502,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore] // TEMP: disabled dripping
     #[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
     fn test_stacker_not_stacked_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE | FLAGS::DUELIST);
@@ -516,6 +518,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore] // TEMP: disabled dripping
     #[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
     fn test_stacker_not_stacked_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE | FLAGS::DUELIST);

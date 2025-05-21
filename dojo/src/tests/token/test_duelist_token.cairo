@@ -498,6 +498,7 @@ fn test_fame() {
 //
 
 #[test]
+#[ignore] // TEMP: disabled dripping
 fn test_duelist_inactive() {
     let mut sys: TestSystems = setup(0);
 
@@ -633,6 +634,7 @@ fn _test_duelist_reactivate(ref sys: TestSystems, token_id: u128, dripped_fame: 
 }
 
 #[test]
+#[ignore] // TEMP: disabled dripping
 fn test_duelist_reactivate_OK_alive() {
     let mut sys: TestSystems = setup(0);
     let token_id: u128 = TOKEN_ID_1_1.low;
@@ -640,6 +642,7 @@ fn test_duelist_reactivate_OK_alive() {
 }
 
 #[test]
+#[ignore] // TEMP: disabled dripping
 #[should_panic(expected:('ERC721Combo: not owner', 'ENTRYPOINT_FAILED'))]
 fn test_duelist_reactivate_OK_alive_not_owner() {
     let mut sys: TestSystems = setup(0);
@@ -649,6 +652,7 @@ fn test_duelist_reactivate_OK_alive_not_owner() {
 }
 
 #[test]
+#[ignore] // TEMP: disabled dripping
 fn test_duelist_reactivate_OK_edge() {
     let mut sys: TestSystems = setup(0);
     let token_id: u128 = TOKEN_ID_1_1.low;
@@ -656,6 +660,7 @@ fn test_duelist_reactivate_OK_edge() {
 }
 
 #[test]
+#[ignore] // TEMP: disabled dripping
 fn test_duelist_reactivate_DEAD_by_1() {
     let mut sys: TestSystems = setup(0);
     let token_id: u128 = TOKEN_ID_1_1.low;
@@ -663,6 +668,7 @@ fn test_duelist_reactivate_DEAD_by_1() {
 }
 
 #[test]
+#[ignore] // TEMP: disabled dripping
 fn test_duelist_reactivate_DEAD_empty() {
     let mut sys: TestSystems = setup(0);
     let token_id: u128 = TOKEN_ID_1_1.low;
@@ -670,6 +676,7 @@ fn test_duelist_reactivate_DEAD_empty() {
 }
 
 #[test]
+#[ignore] // TEMP: disabled dripping
 fn test_duelist_reactivate_DEAD_empty_not_owner() {
     let mut sys: TestSystems = setup(0);
     let token_id: u128 = TOKEN_ID_1_1.low;
@@ -678,6 +685,7 @@ fn test_duelist_reactivate_DEAD_empty_not_owner() {
 }
 
 #[test]
+#[ignore] // TEMP: disabled dripping
 fn test_duelist_reactivate_DEAD_over() {
     let mut sys: TestSystems = setup(0);
     let token_id: u128 = TOKEN_ID_1_1.low;
@@ -685,6 +693,7 @@ fn test_duelist_reactivate_DEAD_over() {
 }
 
 #[test]
+#[ignore] // TEMP: disabled dripping
 fn test_duelist_reactivate_DEAD_over_not_owner() {
     let mut sys: TestSystems = setup(0);
     let token_id: u128 = TOKEN_ID_1_1.low;
@@ -693,6 +702,7 @@ fn test_duelist_reactivate_DEAD_over_not_owner() {
 }
 
 #[test]
+#[ignore] // TEMP: disabled dripping
 fn test_duelist_reactivate_DEAD_thrice() {
     let mut sys: TestSystems = setup(0);
     let token_id: u128 = TOKEN_ID_1_1.low;
@@ -702,6 +712,7 @@ fn test_duelist_reactivate_DEAD_thrice() {
 }
 
 #[test]
+#[ignore] // TEMP: disabled dripping
 #[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED'))]
 fn test_duelist_reactivate_already_dead() {
     let mut sys: TestSystems = setup(0);
@@ -777,6 +788,7 @@ fn test_duelist_sacrifice_OK() {
 }
 
 #[test]
+#[ignore] // TEMP: disabled dripping
 #[should_panic(expected:('DUELIST: Not implemented', 'ENTRYPOINT_FAILED'))]
 // #[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED'))]
 fn test_duelist_sacrifice_already_dead() {
@@ -805,6 +817,7 @@ fn test_duelist_memorialize_OK() {
 }
 
 #[test]
+#[ignore] // TEMP: disabled dripping
 #[should_panic(expected:('DUELIST: Not implemented', 'ENTRYPOINT_FAILED'))]
 // #[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED'))]
 fn test_duelist_memorialize_already_dead() {

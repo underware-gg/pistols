@@ -689,6 +689,7 @@ pub mod tests {
     }
 
     #[test]
+    #[ignore] // TEMP: disabled dripping
     #[should_panic(expected:('DUELIST: Insufficient lives', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
     fn test_duel_until_death_inactive_alive_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
@@ -703,6 +704,7 @@ pub mod tests {
         _duel_until_death(@sys, WIN_2, 1, 2);
     }
     #[test]
+    #[ignore] // TEMP: disabled dripping
     #[should_panic(expected:('DUELIST: Insufficient lives', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
     fn test_duel_until_death_inactive_alive_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
@@ -714,6 +716,7 @@ pub mod tests {
     }
 
     #[test]
+    #[ignore] // TEMP: disabled dripping
     #[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
     fn test_duel_until_death_inactive_dead_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
@@ -724,6 +727,7 @@ pub mod tests {
         _duel_until_death(@sys, WIN_2, 1, 2);
     }
     #[test]
+    #[ignore] // TEMP: disabled dripping
     #[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
     fn test_duel_until_death_inactive_dead_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
@@ -736,6 +740,16 @@ pub mod tests {
 // println!("> dripped [{}]: {}", ID(OWNER()), sys.duelists.inactive_fame_dripped(ID(OWNER())));
 // println!("> dripped [{}]: {}", ID(OTHER()), sys.duelists.inactive_fame_dripped(ID(OTHER())));
         _duel_until_death(@sys, WIN_1, 1, 2);
+    }
+
+    #[test] // TEMP: disabled dripping
+    fn test_duel_dripping_disabled() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        // duel once to create duelists
+        _duel_until_death(@sys, WIN_1, 1, 1);
+        tester::make_duelist_inactive(@sys, ID(OTHER()), 1100);
+        _duel_until_death(@sys, WIN_1, 1, 2);
+        // no panic!
     }
 
 
