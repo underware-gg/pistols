@@ -4,10 +4,9 @@ pub mod prefabs {
 
     // use dojo::world::{WorldStorage};
 
-    use pistols::models::challenge::{ChallengeValue, RoundValue, DuelType};
+    use pistols::models::challenge::{ChallengeValue, RoundValue, DuelType, MovesTrait};
     use pistols::types::challenge_state::{ChallengeState};
     use pistols::types::round_state::{RoundState};
-    use pistols::libs::game_loop::{make_moves_hash};
     use pistols::types::timestamp::{TimestampTrait};
     use pistols::tests::tester::{tester,
         tester::{
@@ -44,7 +43,7 @@ pub mod prefabs {
     #[generate_trait]
     pub impl PlayerMovesImpl of PlayerMovesTrait {
         fn new(salt: felt252, moves: Span<u8>) -> PlayerMoves {
-            (PlayerMoves{salt, moves, hashed: make_moves_hash(salt, moves)})
+            (PlayerMoves{salt, moves, hashed: MovesTrait::make_moves_hash(salt, moves)})
         }
     }
 

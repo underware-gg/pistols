@@ -52,7 +52,7 @@ pub mod tutorial {
         timestamp::{Period},
     };
     use pistols::libs::store::{Store, StoreTrait};
-    use pistols::libs::game_loop::{game_loop};
+    use pistols::libs::game_loop::{GameLoopContractTrait};
     use pistols::libs::tut::{TutorialLevel, TutorialLevelTrait};
 
     mod Errors {
@@ -208,7 +208,7 @@ pub mod tutorial {
             // execute game loop...
             let deck: Deck = challenge.get_deck();
             let wrapped = RngWrapTrait::wrap(store.world.rng_mock_address(), Option::Some(mocked));
-            let progress: DuelProgress = game_loop(wrapped, @deck, ref round);
+            let progress: DuelProgress = GameLoopContractTrait::execute(@store.world, wrapped, @deck, ref round);
 
             // end challenge
             challenge.winner = progress.winner;
@@ -226,7 +226,7 @@ pub mod tutorial {
                 let mut round: Round = store.get_round(duel_id);
                 let (_, mocked): (Span<u8>, Span<MockedValue>) = level.make_moves(@round.moves_b.as_hand());
                 let wrapped = RngWrapTrait::wrap(store.world.rng_mock_address(), Option::Some(mocked));
-                (game_loop(wrapped, @challenge.get_deck(), ref round))
+                (GameLoopContractTrait::execute(@store.world, wrapped, @challenge.get_deck(), ref round))
             } else {
                 {Default::default()}
             }

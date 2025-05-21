@@ -3,7 +3,7 @@ pub mod tests {
     use starknet::{ContractAddress};
 
     use pistols::models::{
-        challenge::{ChallengeTrait, ChallengeValue, RoundValue, DuelType},
+        challenge::{ChallengeTrait, ChallengeValue, RoundValue, DuelType, MovesTrait},
         duelist::{Totals},
         leaderboard::{Leaderboard, LeaderboardTrait, LeaderboardPosition},
         season::{SeasonScoreboard},
@@ -16,7 +16,6 @@ pub mod tests {
         round_state::{RoundState},
         constants::{CONST},
     };
-    use pistols::libs::game_loop::{make_moves_hash};
     use pistols::utils::arrays::{SpanUtilsTrait};
     use pistols::utils::math::{MathU8};
 
@@ -767,7 +766,7 @@ pub mod tests {
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         // try to commmit with another account
         let someone_else: ContractAddress = starknet::contract_address_const::<0x999>();
-        let hashed: u128 = make_moves_hash(0x12121, [1, 1].span());
+        let hashed: u128 = MovesTrait::make_moves_hash(0x12121, [1, 1].span());
         tester::execute_commit_moves(@sys.game, someone_else, duel_id, hashed);
     }
 
@@ -777,7 +776,7 @@ pub mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         // try to commmit with another account
-        let hashed: u128 = make_moves_hash(0x12121, [1, 1].span());
+        let hashed: u128 = MovesTrait::make_moves_hash(0x12121, [1, 1].span());
         tester::execute_commit_moves(@sys.game, FAKE_OWNER_OF_1(), duel_id, hashed);
     }
 
@@ -786,7 +785,7 @@ pub mod tests {
     fn test_commit_already_commit_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
-        let hashed: u128 = make_moves_hash(0x12121, [1, 1].span());
+        let hashed: u128 = MovesTrait::make_moves_hash(0x12121, [1, 1].span());
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, hashed);
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, hashed);
     }
@@ -795,7 +794,7 @@ pub mod tests {
     fn test_commit_already_commit_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
-        let hashed: u128 = make_moves_hash(0x12121, [1, 1].span());
+        let hashed: u128 = MovesTrait::make_moves_hash(0x12121, [1, 1].span());
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, hashed);
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, hashed);
     }

@@ -14,7 +14,7 @@ mod tests {
         EnvCard,
         FinalBlow,
     };
-    use pistols::libs::game_loop::{game_loop};
+    use pistols::libs::game_loop::{GameLoopTrait};
     use pistols::utils::short_string::{ShortString};
 
     use pistols::systems::rng_mock::{IRngMockDispatcherTrait, MockedValueTrait};
@@ -82,7 +82,7 @@ mod tests {
         round.state_a.initialize(hand_a);
         round.state_b.initialize(hand_b);
         let wrapped: @RngWrap = RngWrapTrait::wrap((*sys.rng).contract_address, Option::Some([].span())); // force using mocked rng
-        let progress: DuelProgress = game_loop(wrapped, @DeckType::Classic.build_deck(), ref round);
+        let progress: DuelProgress = GameLoopTrait::execute(wrapped, @DeckType::Classic.build_deck(), ref round);
         (round, progress)
     }
 

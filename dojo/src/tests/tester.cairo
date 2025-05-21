@@ -15,6 +15,7 @@ pub mod tester {
         bank::{bank, IBankDispatcher, IBankDispatcherTrait},
         admin::{admin, IAdminDispatcher, IAdminDispatcherTrait},
         game::{game, IGameDispatcher, IGameDispatcherTrait},
+        game_loop::{game_loop, IGameLoopDispatcher, IGameLoopDispatcherTrait},
         tutorial::{tutorial, ITutorialDispatcher, ITutorialDispatcherTrait},
         rng::{rng, IRngDispatcher, IRngDispatcherTrait},
         rng_mock::{rng_mock, IRngMockDispatcher, IRngMockDispatcherTrait},
@@ -173,6 +174,7 @@ pub mod tester {
         pub world: WorldStorage,
         pub store: Store,
         pub game: IGameDispatcher,
+        pub game_loop: IGameLoopDispatcher,
         pub tut: ITutorialDispatcher,
         pub admin: IAdminDispatcher,
         pub bank: IBankDispatcher,
@@ -195,6 +197,7 @@ pub mod tester {
             (TestSystems {
                 world,
                 game: world.game_dispatcher(),
+                game_loop: world.game_loop_dispatcher(),
                 store: StoreTrait::new(world),
                 tut: world.tutorial_dispatcher(),
                 admin: world.admin_dispatcher(),
@@ -225,22 +228,24 @@ pub mod tester {
         let mut deploy_fame: bool = (flags & FLAGS::FAME) != 0;
         let mut deploy_account: bool = (flags & FLAGS::ACCOUNT) != 0;
         let mut deploy_tournament: bool = (flags & FLAGS::TOURNAMENT) != 0;
+        let mut deploy_game_loop: bool = false;
         let mut deploy_duelist_mock: bool = false;
         let mut deploy_bank: bool = false;
         let mut deploy_pack: bool = false;
         let mut deploy_fools: bool = false;
         let mut deploy_vrf: bool = false;
         
-        deploy_game     = deploy_game || approve;
-        deploy_lords    = deploy_lords || deploy_game || deploy_duelist || approve;
-        deploy_admin    = deploy_admin || deploy_game || deploy_lords || deploy_tournament;
-        deploy_duel     = deploy_duel || deploy_game;
-        deploy_pack     = deploy_pack || deploy_duelist;
-        deploy_fame     = deploy_fame || deploy_game || deploy_duelist;
-        deploy_fools    = deploy_fools || deploy_game;
-        deploy_rng_mock = deploy_rng_mock || deploy_tutorial;
-        deploy_bank     = deploy_bank || deploy_fame || deploy_lords || deploy_duelist;
-        deploy_vrf      = deploy_vrf || deploy_game || deploy_pack || deploy_tournament;
+        deploy_game         = deploy_game || approve;
+        deploy_game_loop    = deploy_game || deploy_tutorial;
+        deploy_lords        = deploy_lords || deploy_game || deploy_duelist || approve;
+        deploy_admin        = deploy_admin || deploy_game || deploy_lords || deploy_tournament;
+        deploy_duel         = deploy_duel || deploy_game;
+        deploy_pack         = deploy_pack || deploy_duelist;
+        deploy_fame         = deploy_fame || deploy_game || deploy_duelist;
+        deploy_fools        = deploy_fools || deploy_game;
+        deploy_rng_mock     = deploy_rng_mock || deploy_tutorial;
+        deploy_bank         = deploy_bank || deploy_fame || deploy_lords || deploy_duelist;
+        deploy_vrf          = deploy_vrf || deploy_game || deploy_pack || deploy_tournament;
         deploy_duelist_mock = !deploy_duelist && (deploy_game || deploy_tournament);
         
         let mut resources: Array<TestResource> = array![
@@ -299,6 +304,12 @@ pub mod tester {
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"game")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
+            );
+        }
+        if (deploy_game_loop) {
+            resources.append(TestResource::Contract(game_loop::TEST_CLASS_HASH));
+            contract_defs.append(
+                ContractDefTrait::new(@"pistols", @"game_loop")
             );
         }
 

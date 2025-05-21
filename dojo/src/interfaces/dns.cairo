@@ -7,6 +7,7 @@ pub use pistols::systems::{
     admin::{IAdminDispatcher, IAdminDispatcherTrait},
     bank::{IBankDispatcher, IBankDispatcherTrait, IBankProtectedDispatcher, IBankProtectedDispatcherTrait},
     game::{IGameDispatcher, IGameDispatcherTrait},
+    game_loop::{IGameLoopDispatcher, IGameLoopDispatcherTrait},
     tutorial::{ITutorialDispatcher, ITutorialDispatcherTrait},
     rng::{IRngDispatcher, IRngDispatcherTrait},
     rng_mock::{IRngMockDispatcher, IRngMockDispatcherTrait},
@@ -35,6 +36,7 @@ pub mod SELECTORS {
     pub const ADMIN: felt252 = selector_from_tag!("pistols-admin");
     pub const BANK: felt252 = selector_from_tag!("pistols-bank");
     pub const GAME: felt252 = selector_from_tag!("pistols-game");
+    pub const GAME_LOOP: felt252 = selector_from_tag!("pistols-game_loop");
     pub const RNG: felt252 = selector_from_tag!("pistols-rng");
     pub const RNG_MOCK: felt252 = selector_from_tag!("pistols-rng_mock");
     // tokens
@@ -94,6 +96,10 @@ pub impl DnsImpl of DnsTrait {
     #[inline(always)]
     fn game_address(self: @WorldStorage) -> ContractAddress {
         (self.find_contract_address(@"game"))
+    }
+    #[inline(always)]
+    fn game_loop_address(self: @WorldStorage) -> ContractAddress {
+        (self.find_contract_address(@"game_loop"))
     }
     #[inline(always)]
     fn tutorial_address(self: @WorldStorage) -> ContractAddress {
@@ -189,6 +195,10 @@ pub impl DnsImpl of DnsTrait {
     #[inline(always)]
     fn game_dispatcher(self: @WorldStorage) -> IGameDispatcher {
         (IGameDispatcher{ contract_address: self.game_address() })
+    }
+    #[inline(always)]
+    fn game_loop_dispatcher(self: @WorldStorage) -> IGameLoopDispatcher {
+        (IGameLoopDispatcher{ contract_address: self.game_loop_address() })
     }
     #[inline(always)]
     fn tutorial_dispatcher(self: @WorldStorage) -> ITutorialDispatcher {

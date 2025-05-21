@@ -108,9 +108,11 @@ use pistols::types::{
     constants::{CONST},
 };
 use pistols::utils::arrays::{SpanUtilsTrait};
+use pistols::utils::bitwise::{BitwiseU32, BitwiseU128};
 use pistols::utils::hash::{hash_values};
 use pistols::utils::misc::{FeltToLossy, ZERO};
 use pistols::utils::math::{MathTrait};
+
 
 #[generate_trait]
 pub impl ChallengeImpl of ChallengeTrait {
@@ -213,6 +215,29 @@ pub impl MovesImpl of MovesTrait {
     #[inline(always)]
     fn has_timed_out(ref self: Moves, challenge: @Challenge) -> bool {
         (self.timeout.has_timed_out(challenge))
+    }
+    // a moves hash is composed of a hash of each move
+    // * salt is hashed with each move
+    // * only a 32-bit part of each has is used
+    // move 1: 0x00000000000000000000000011111111
+    // move 2: 0x00000000000000002222222200000000
+    // move 3: 0x00000000333333330000000000000000
+    // move 4: 0x44444444000000000000000000000000
+    // * finally composed into a single u128
+    // hash  : 0x44444444333333332222222211111111
+    fn make_moves_hash(salt: felt252, moves: Span<u8>) -> u128 {
+        let mut result: u128 = 0;
+        let mut index: usize = 0;
+        while (index < moves.len()) {
+            let move: felt252 = (*moves.at(index)).into();
+            if (move != 0) {
+                let mask: u128 = BitwiseU128::shl(BitwiseU32::max().into(), index * 32);
+                let hash: u128 = hash_values([salt, move].span()).to_u128_lossy();
+                result = result | (hash & mask);
+            }
+            index += 1;
+        };
+        (result)
     }
 }
 

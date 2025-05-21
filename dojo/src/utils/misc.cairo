@@ -5,13 +5,6 @@ use pistols::types::constants::{CONST};
 // https://github.com/smartcontractkit/chainlink-starknet/blob/develop/contracts/src/utils.cairo
 // use core::integer::{u128s_from_felt252, U128sFromFelt252Result};
 
-// consumes unused arguments to avoid warnings
-#[inline(always)]
-pub fn CONSUME_ADDRESS(_value: ContractAddress) {}
-#[inline(always)]
-pub fn CONSUME_BYTE_ARRAY(_value: @ByteArray) {}
-#[inline(always)]
-pub fn CONSUME_U256(_value: u256) {}
 
 #[inline(always)]
 pub fn WEI(value: u256) -> u256 {

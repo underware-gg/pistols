@@ -9,6 +9,7 @@ mod systems {
     pub mod admin;
     pub mod bank;
     pub mod game;
+    pub mod game_loop;
     pub mod rng;
     pub mod rng_mock;
     pub mod tutorial;

@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
     use pistols::models::{
-        challenge::{Challenge, ChallengeTrait, ChallengeValue, RoundValue, DuelType},
+        challenge::{Challenge, ChallengeTrait, ChallengeValue, RoundValue, DuelType, MovesTrait},
         duelist::{DuelistValue},
     };
     use pistols::types::{
@@ -19,7 +19,6 @@ mod tests {
         },
     };
     use pistols::libs::tut::{TutorialLevel, TutorialLevelTrait};
-    use pistols::libs::game_loop::{make_moves_hash};
     use pistols::utils::math::{MathU8};
 
     use pistols::tests::tester::{tester,
@@ -123,7 +122,7 @@ mod tests {
         assert_eq!(challenge.get_deck_type(), DeckType::PacesOnly, "challenge.deck_type");
         // commit
         let moves: Span<u8> = [fire.into(), dodge.into()].span();
-        let hashed: u128 = make_moves_hash(SALT_A, moves);
+        let hashed: u128 = MovesTrait::make_moves_hash(SALT_A, moves);
         tester::execute_commit_moves_tutorial(@sys.tut, OWNER(), challenge.duelist_id_b, duel_id, hashed);
         let round: RoundValue = sys.store.get_round_value(duel_id);
         assert_eq!(round.state, RoundState::Reveal, "round.state");
@@ -212,7 +211,7 @@ mod tests {
         assert_eq!(challenge.get_deck_type(), DeckType::Classic, "challenge.deck_type");
         // commit
         let moves: Span<u8> = [fire.into(), dodge.into(), tactics.into(), blades.into()].span();
-        let hashed: u128 = make_moves_hash(SALT_A, moves);
+        let hashed: u128 = MovesTrait::make_moves_hash(SALT_A, moves);
         tester::execute_commit_moves_tutorial(sys.tut, OWNER(), challenge.duelist_id_b, duel_id, hashed);
         let round: RoundValue = (*sys.store).get_round_value(duel_id);
         assert_eq!(round.state, RoundState::Reveal, "round.state");
@@ -250,7 +249,7 @@ mod tests {
         let duel_id: u128 = tester::execute_create_tutorial(sys.tut, OWNER(), tutorial_id);
         let challenge: Challenge = (*sys.store).get_challenge(duel_id);
         let moves: Span<u8> = [fire.into(), dodge.into(), tactics.into(), blades.into()].span();
-        let hashed: u128 = make_moves_hash(SALT_A, moves);
+        let hashed: u128 = MovesTrait::make_moves_hash(SALT_A, moves);
         tester::execute_commit_moves_ID(sys.game, OWNER(), challenge.duelist_id_b, duel_id, hashed);
         tester::execute_reveal_moves_ID(sys.game, OWNER(), challenge.duelist_id_b, duel_id, SALT_B, moves);
         // check challenge

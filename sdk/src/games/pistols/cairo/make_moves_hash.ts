@@ -4,7 +4,7 @@ import * as constants from '../generated/constants'
 
 //
 // IMPORTANT!!!
-// in sync with pistols::libs::utils::make_moves_hash
+// in sync with pistols:: models::challenge::MovesTrait::make_moves_hash()
 //
 
 export const make_moves_hash = (salt: BigNumberish, moves: number[]) => {

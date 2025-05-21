@@ -12,7 +12,7 @@ pub use pistols::types::shuffler::{Shuffler, ShufflerTrait};
 //    - game_loop() will use these values instead of seeded rng
 //
 // 2. tutorial scripting:
-//    - wrap MockedValues for game_loop()
+//    - wrap MockedValues for GameLoopTrait::execute()
 //
 
 
