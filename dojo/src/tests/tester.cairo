@@ -167,6 +167,7 @@ pub mod tester {
         pub const FAME: u16       = 0b100000000;
         pub const ACCOUNT: u16    = 0b1000000000;
         pub const TOURNAMENT: u16 = 0b10000000000;
+        pub const OWNER: u16      = 0b100000000000;
     }
 
     #[derive(Copy, Drop)]
@@ -228,6 +229,7 @@ pub mod tester {
         let mut deploy_fame: bool = (flags & FLAGS::FAME) != 0;
         let mut deploy_account: bool = (flags & FLAGS::ACCOUNT) != 0;
         let mut deploy_tournament: bool = (flags & FLAGS::TOURNAMENT) != 0;
+        let mut deploy_owner: bool = (flags & FLAGS::OWNER) != 0;
         let mut deploy_game_loop: bool = false;
         let mut deploy_duelist_mock: bool = false;
         let mut deploy_bank: bool = false;
@@ -468,6 +470,9 @@ pub mod tester {
         let sys: TestSystems = TestSystemsTrait::from_world(world, mock_account);
 
         // initializers
+        if (deploy_owner) {
+            world.dispatcher.grant_owner(dojo::utils::bytearray_hash(@"pistols"), OWNER());
+        }
         if (deploy_game) {
             world.dispatcher.grant_owner(selector_from_tag!("pistols-game"), OWNER());
         }
@@ -912,6 +917,10 @@ pub mod tester {
     }
     #[inline(always)]
     pub fn set_Pack(ref world: WorldStorage, model: @Pack) {
+        world.write_model_test(model);
+    }
+    #[inline(always)]
+    pub fn set_Pool(ref world: WorldStorage, model: @Pool) {
         world.write_model_test(model);
     }
     // #[inline(always)]

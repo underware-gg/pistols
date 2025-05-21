@@ -34,6 +34,7 @@ pub mod admin {
         DnsTrait, SELECTORS,
         IDuelistTokenDispatcherTrait,
     };
+    use pistols::libs::admin_fix::{AdminFixTrait};
     use pistols::libs::store::{Store, StoreTrait};
 
     mod Errors {
@@ -152,10 +153,9 @@ pub mod admin {
 
         fn urgent_update(ref self: ContractState) {
             self._assert_caller_is_admin();
-            // let mut store: Store = StoreTrait::new(self.world_default());
-            // let mut config: Config = store.get_config();
-            // config.is_paused = false;
-            // store.set_config(@config);
+            let mut store: Store = StoreTrait::new(self.world_default());
+            // post release fix: Introducing Claimable pool
+            AdminFixTrait::fix_claimable_pool(ref store);
         }
     }
 

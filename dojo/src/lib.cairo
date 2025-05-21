@@ -36,6 +36,7 @@ mod systems {
 }
 
 mod libs {
+    pub mod admin_fix;
     pub mod game_loop;
     pub mod seeder;
     pub mod store;
@@ -95,6 +96,7 @@ mod utils {
 #[cfg(test)]
 mod tests {
     pub mod test_admin;
+    pub mod test_admin_fix;
     pub mod test_bank;
     pub mod test_cards;
     pub mod test_challenge;
