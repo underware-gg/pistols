@@ -143,7 +143,7 @@ const genesisQuotes: Record<GenesisKey, string> = {
   [GenesisKey.ThePainter]: "Now lower your pistol. That's perfect, hold that pose.",
   [GenesisKey.Ashe]: "A sharp blade means little without a steady hand.",
   [GenesisKey.SerGogi]: "I just couldn't bear it, if we didn't have a shot together.",
-  [GenesisKey.TheSurvivor]: "I duel to die, about about you?",
+  [GenesisKey.TheSurvivor]: "I duel to die, how about you?",
   [GenesisKey.TheFrenchman]: "Freedom tastes like gunpowder.",
   [GenesisKey.SerFocger]: "I may have come here on my bike, but don't piss me off!",
   [GenesisKey.SillySosij]: "Locked, loaded, well-seasoned.",
