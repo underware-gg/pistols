@@ -33,7 +33,7 @@ fn setup(_fee_amount: u128) -> TestSystems {
     tester::fund_duelists_pool(@sys, 2);
 
     // initialize contracts
-    tester::execute_claim_starter_pack(@sys.pack, OWNER());
+    tester::execute_claim_starter_pack(@sys, OWNER());
 
     (sys)
 }
@@ -56,7 +56,7 @@ fn test_initializer() {
 #[test]
 fn test_token_bound_address() {
     let mut sys: TestSystems = setup(0);
-    tester::execute_claim_starter_pack(@sys.pack, OTHER());
+    tester::execute_claim_starter_pack(@sys, OTHER());
     // validate token_bound address
     let token_bound_address_1: ContractAddress = sys.fame.address_of_token(sys.duelists.contract_address, TOKEN_ID_1_1.low);
     let token_bound_address_2: ContractAddress = sys.fame.address_of_token(sys.duelists.contract_address, TOKEN_ID_2_1.low);

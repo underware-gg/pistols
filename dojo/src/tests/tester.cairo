@@ -660,17 +660,28 @@ pub mod tester {
     }
 
     // ::pack_token
-    pub fn execute_claim_starter_pack(system: @IPackTokenDispatcher, sender: ContractAddress) -> Span<u128> {
+    pub fn execute_claim_starter_pack(sys: @TestSystems, sender: ContractAddress) -> Span<u128> {
         impersonate(sender);
-        let token_ids: Span<u128> = (*system).claim_starter_pack();
+        let token_ids: Span<u128> = (*sys.pack).claim_starter_pack();
         _next_block();
         (token_ids)
     }
-    pub fn execute_claim_gift(system: @IPackTokenDispatcher, sender: ContractAddress) -> Span<u128> {
+    pub fn execute_claim_gift(sys: @TestSystems, sender: ContractAddress) -> Span<u128> {
         impersonate(sender);
-        let token_ids: Span<u128> = (*system).claim_gift();
+        let token_ids: Span<u128> = (*sys.pack).claim_gift();
         _next_block();
         (token_ids)
+    }
+    pub fn execute_pack_purchase(sys: @TestSystems, sender: ContractAddress, pack_type: PackType) -> Pack {
+        impersonate(sender);
+        let pack: Pack = (*sys.pack).purchase(pack_type);
+        _next_block();
+        (pack)
+    }
+    pub fn execute_pack_open(sys: @TestSystems, sender: ContractAddress, pack_id: u128) {
+        impersonate(sender);
+        (*sys.pack).open(pack_id);
+        _next_block();
     }
 
     // ::duelist_token

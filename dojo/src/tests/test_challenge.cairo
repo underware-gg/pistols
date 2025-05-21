@@ -435,8 +435,8 @@ mod tests {
 
     fn _mint_stacker_duelists(sys: @TestSystems, acc1: ContractAddress, acc2: ContractAddress) -> (u128, u128, u128, u128) {
         tester::fund_duelists_pool(sys, 2);
-        let tokens1: Span<u128> = tester::execute_claim_starter_pack(sys.pack, acc1);
-        let tokens2: Span<u128> = tester::execute_claim_starter_pack(sys.pack, acc2);
+        let tokens1: Span<u128> = tester::execute_claim_starter_pack(sys, acc1);
+        let tokens2: Span<u128> = tester::execute_claim_starter_pack(sys, acc2);
         let duelist_id_1_1: u128 = sys.store.get_duelist(*tokens1[0]).duelist_id;
         let duelist_id_1_2: u128 = sys.store.get_duelist(*tokens1[1]).duelist_id;
         let duelist_id_2_1: u128 = sys.store.get_duelist(*tokens2[0]).duelist_id;

@@ -104,8 +104,8 @@ pub mod tests {
         sys.rng.mock_values(mocked);
 
         tester::fund_duelists_pool(@sys, 2);
-        let duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys.pack, OWNER())[0];
-        let duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys.pack, OTHER())[0];
+        let duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, OWNER())[0];
+        let duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, OTHER())[0];
 
         let season_id: u32 = SEASON_ID_1;
 
@@ -232,8 +232,8 @@ pub mod tests {
         sys.rng.mock_values(mocked);
 
         tester::fund_duelists_pool(@sys, 2);
-        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys.pack, OWNER())[0];
-        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys.pack, OTHER())[0];
+        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, OWNER())[0];
+        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, OTHER())[0];
 
         let season_id: u32 = SEASON_ID_1;
 
@@ -529,8 +529,8 @@ pub mod tests {
         let mut duelist_id_b: u128 = 0;
         if ((*sys).duelists.total_supply() == 0) {
             tester::fund_duelists_pool(sys, 2);
-            duelist_id_a = *tester::execute_claim_starter_pack(sys.pack, OWNER())[0];
-            duelist_id_b = *tester::execute_claim_starter_pack(sys.pack, OTHER())[0];
+            duelist_id_a = *tester::execute_claim_starter_pack(sys, OWNER())[0];
+            duelist_id_b = *tester::execute_claim_starter_pack(sys, OTHER())[0];
             if (to_death) {
                 // println!("testing stack_1...");
                 let stack_a_1: PlayerDuelistStack = sys.store.get_player_duelist_stack_from_id(OWNER(), duelist_id_a);
@@ -1306,8 +1306,8 @@ pub mod tests {
             ].span()
         );
         tester::fund_duelists_pool(@sys, 2);
-        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys.pack, OWNER())[0];
-        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys.pack, OTHER())[0];
+        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, OWNER())[0];
+        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, OTHER())[0];
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
@@ -1334,8 +1334,8 @@ pub mod tests {
             ].span()
         );
         tester::fund_duelists_pool(@sys, 2);
-        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys.pack, OWNER())[0];
-        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys.pack, OTHER())[0];
+        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, OWNER())[0];
+        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, OTHER())[0];
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
@@ -1366,8 +1366,8 @@ pub mod tests {
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         tester::fund_duelists_pool(@sys, 2);
-        let duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys.pack, A)[0];
-        let duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys.pack, B)[0];
+        let duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
+        let duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
         // just draw...
         let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         sys.rng.mock_values(mocked);
@@ -1428,8 +1428,8 @@ pub mod tests {
         tester::execute_admin_set_is_team_member(@sys.admin, OWNER(), A, true, true);
         // create duelists
         tester::fund_duelists_pool(@sys, 2);
-        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys.pack, A)[0];
-        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys.pack, B)[0];
+        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
+        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
         // just draw...
         let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         sys.rng.mock_values(mocked);
@@ -1452,8 +1452,8 @@ pub mod tests {
         tester::execute_admin_set_is_team_member(@sys.admin, OWNER(), B, true, true);
         // create duelists
         tester::fund_duelists_pool(@sys, 2);
-        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys.pack, A)[0];
-        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys.pack, B)[0];
+        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
+        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
         // just draw...
         let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         sys.rng.mock_values(mocked);
@@ -1476,8 +1476,8 @@ pub mod tests {
         tester::execute_admin_set_is_blocked(@sys.admin, OWNER(), A, true);
         // create duelists
         tester::fund_duelists_pool(@sys, 2);
-        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys.pack, A)[0];
-        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys.pack, B)[0];
+        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
+        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
         // just draw...
         let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         sys.rng.mock_values(mocked);
@@ -1500,8 +1500,8 @@ pub mod tests {
         tester::execute_admin_set_is_blocked(@sys.admin, OWNER(), B, true);
         // create duelists
         tester::fund_duelists_pool(@sys, 2);
-        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys.pack, A)[0];
-        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys.pack, B)[0];
+        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
+        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
         // just draw...
         let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         sys.rng.mock_values(mocked);
@@ -1525,8 +1525,8 @@ pub mod tests {
         tester::execute_admin_set_is_blocked(@sys.admin, OWNER(), B, true);
         // create duelists
         tester::fund_duelists_pool(@sys, 2);
-        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys.pack, A)[0];
-        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys.pack, B)[0];
+        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
+        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
         // just draw...
         let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         sys.rng.mock_values(mocked);

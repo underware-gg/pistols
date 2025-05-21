@@ -57,7 +57,7 @@ fn setup(_fee_amount: u128) -> TestSystems {
     tester::fund_duelists_pool(@sys, 5);
 
     // initialize contracts
-    tester::execute_claim_starter_pack(@sys.pack, OWNER());
+    tester::execute_claim_starter_pack(@sys, OWNER());
 
     // drop all events
     tester::drop_all_events(sys.world.dispatcher.contract_address);
@@ -266,9 +266,9 @@ fn test_duelist_stack_random() {
     let acc1 = starknet::contract_address_const::<0x0201>();
     let acc2 = starknet::contract_address_const::<0x0102>();
     let acc3 = starknet::contract_address_const::<0x0303>();
-    let tokens1: Span<u128> = tester::execute_claim_starter_pack(@sys.pack, acc1);
-    let tokens2: Span<u128> = tester::execute_claim_starter_pack(@sys.pack, acc2);
-    let tokens3: Span<u128> = tester::execute_claim_starter_pack(@sys.pack, acc3);
+    let tokens1: Span<u128> = tester::execute_claim_starter_pack(@sys, acc1);
+    let tokens2: Span<u128> = tester::execute_claim_starter_pack(@sys, acc2);
+    let tokens3: Span<u128> = tester::execute_claim_starter_pack(@sys, acc3);
     let duelist_1_1: Duelist = sys.store.get_duelist(*tokens1[0]);
     let duelist_1_2: Duelist = sys.store.get_duelist(*tokens1[1]);
     let duelist_2_1: Duelist = sys.store.get_duelist(*tokens2[0]);
@@ -463,7 +463,7 @@ fn test_duelist_stack_deterministic() {
 fn test_fame() {
     let mut sys: TestSystems = setup(0);
 
-    tester::execute_claim_starter_pack(@sys.pack, OTHER());
+    tester::execute_claim_starter_pack(@sys, OTHER());
 
     // initial token balances
     let balance_1_initial: u256 = sys.fame.balance_of_token(sys.duelists.contract_address, TOKEN_ID_1_1.low);
@@ -514,7 +514,7 @@ fn test_duelist_inactive() {
     assert_eq!(tester::get_block_timestamp(), timestamp_registered + 1, "timestamps.registered");
 
     // OTHER will not drip until activated
-    let token_id_other: u128 = *tester::execute_claim_starter_pack(@sys.pack, OTHER())[0];
+    let token_id_other: u128 = *tester::execute_claim_starter_pack(@sys, OTHER())[0];
 
     let pool_flame: Pool = sys.store.get_pool(PoolType::Sacrifice);
     assert_eq!(pool_flame.balance_fame, 0, "pool_flame.balance_fame");
