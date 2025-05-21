@@ -5,12 +5,16 @@ use starknet::{ContractAddress};
 //
 // Everything that is deposited to pistols-bank contract must be assigned to a pool!
 // 
+// PoolType::Claimable
+//  - LORDS: from underware/sponsors (claimable packs)
+//  - FAME: -
+//
 // PoolType::Purchases
-//  - LORDS: from purchases (Packs)
+//  - LORDS: from purchases (packs)
 //  - FAME: -
 //
 // PoolType::FamePeg
-//  - LORDS: from PoolType::Purchases (Packs opened), pegged to FAME in circulation
+//  - LORDS: from PoolType::Purchases and PoolType::Claimable (packs opened), pegged to FAME in circulation
 //  - FAME: -
 //
 // PoolType::Season / PoolType::Tournament
@@ -31,6 +35,7 @@ pub enum PoolType {
     Season: u32,            // 3
     Tournament: u64,        // 4
     Sacrifice,              // 5
+    Claimable,           // 6
 }
 impl PoolTypeDefault of Default<PoolType> {
     fn default() -> PoolType {(PoolType::Undefined)}
@@ -120,6 +125,7 @@ impl PoolTypeIntoByteArray of core::traits::Into<PoolType, ByteArray> {
             PoolType::Season        =>  "Season",
             PoolType::Tournament    =>  "Tournament",
             PoolType::Sacrifice     =>  "Sacrifice",
+            PoolType::Claimable     =>  "Claimable",
         }
     }
 }

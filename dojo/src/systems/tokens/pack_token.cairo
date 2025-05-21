@@ -143,6 +143,7 @@ pub mod pack_token {
         pack::{Pack, PackTrait, PackValue, PackType, PackTypeTrait},
         player::{Player, PlayerTrait},
         events::{Activity},
+        pool::{PoolType},
     };
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::short_string::{ShortStringTrait};
@@ -314,7 +315,8 @@ pub mod pack_token {
             let token_ids: Span<u128> = pack.open(ref store, recipient);
 
             // minted fame, peg to paid LORDS
-            store.world.bank_protected_dispatcher().peg_minted_fame_to_purchased_lords(recipient, pack.lords_amount.into());
+            let from_pool_type: PoolType = pack.pack_type.deposited_pool_type();
+            store.world.bank_protected_dispatcher().peg_minted_fame_to_lords(recipient, pack.lords_amount.into(), from_pool_type);
 
             // burn!
             self.erc721.burn(pack_id.into());

@@ -92,6 +92,7 @@ use pistols::interfaces::dns::{
     DnsTrait,
     IDuelistTokenProtectedDispatcherTrait,
 };
+use pistols::models::pool::{PoolType};
 use pistols::types::duelist_profile::{DuelistProfile, GenesisKey};
 use pistols::utils::short_string::{ShortStringTrait};
 use pistols::libs::store::{Store, StoreTrait};
@@ -140,9 +141,11 @@ pub impl PackTypeImpl of PackTypeTrait {
             PackType::FreeDuelist           => PACK_TYPES::FreeDuelist,
         }
     }
+    #[inline(always)]
     fn identifier(self: @PackType) -> felt252 {
         ((*self).description().id)
     }
+    #[inline(always)]
     fn name(self: @PackType) -> ByteArray {
         ((*self).description().name.to_string())
     }
@@ -153,9 +156,19 @@ pub impl PackTypeImpl of PackTypeTrait {
             ((*self).description().image_url_closed.to_string())
         }
     }
+    #[inline(always)]
     fn can_purchase(self: @PackType) -> bool {
         ((*self).description().can_purchase)
     }
+    #[inline(always)]
+    fn deposited_pool_type(self: @PackType) -> PoolType {
+        if (self.can_purchase()) {
+            (PoolType::Purchases)
+        } else {
+            (PoolType::Claimable)
+        }
+    }
+    #[inline(always)]
     fn mint_fee(self: @PackType) -> u128 {
         ((*self).description().price_lords)
     }

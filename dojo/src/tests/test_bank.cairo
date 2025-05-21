@@ -433,42 +433,49 @@ tester::print_pools(@sys, 1, "COLLECTED");
 
         // initial balances
         let mut balance_bank: u128 = sys.lords.balance_of(bank_address).low;
-        let mut pool_bank: u128 = sys.store.get_pool(PoolType::Purchases).balance_lords;
+        let mut pool_claimable: u128 = sys.store.get_pool(PoolType::Claimable).balance_lords;
+        let mut pool_purchases: u128 = sys.store.get_pool(PoolType::Purchases).balance_lords;
         let mut pool_peg: u128 = sys.store.get_pool(PoolType::FamePeg).balance_lords;
         assert_eq!(balance_bank, 0, "balance_bank INIT");
-        assert_eq!(pool_bank, 0, "pool_bank INIT");
+        assert_eq!(pool_purchases, 0, "pool_purchases INIT");
         assert_eq!(pool_peg, 0, "pool_peg INIT");
 
         // fund PoolType::Purchases
         tester::fund_duelists_pool(@sys, 1);
         balance_bank = tester::assert_lords_balance(sys.lords, bank_address, balance_bank, 0, price_starter, "balance_bank FUND");
-        pool_bank = tester::assert_balance(sys.store.get_pool(PoolType::Purchases).balance_lords, pool_bank, 0, price_starter, "pool_bank FUND");
+        pool_claimable = tester::assert_balance(sys.store.get_pool(PoolType::Claimable).balance_lords, pool_claimable, 0, price_starter, "pool_claimable FUND");
+        pool_purchases = tester::assert_balance(sys.store.get_pool(PoolType::Purchases).balance_lords, pool_purchases, 0, 0, "pool_purchases FUND");
         pool_peg = tester::assert_balance(sys.store.get_pool(PoolType::FamePeg).balance_lords, pool_peg, 0, 0, "pool_peg FUND");
 
         // claim duelists -- transfered to PoolType::FamePeg
         tester::execute_claim_starter_pack(@sys.pack, OWNER());
         balance_bank = tester::assert_lords_balance(sys.lords, bank_address, balance_bank, 0, 0, "balance_bank CLAIM");
-        pool_bank = tester::assert_balance(sys.store.get_pool(PoolType::Purchases).balance_lords, pool_bank, price_starter, 0, "pool_bank CLAIM");
+        pool_claimable = tester::assert_balance(sys.store.get_pool(PoolType::Claimable).balance_lords, pool_claimable, price_starter, 0, "pool_claimable CLAIM");
+        pool_purchases = tester::assert_balance(sys.store.get_pool(PoolType::Purchases).balance_lords, pool_purchases, 0, 0, "pool_purchases CLAIM");
         pool_peg = tester::assert_balance(sys.store.get_pool(PoolType::FamePeg).balance_lords, pool_peg, 0, price_starter, "pool_peg CLAIM");
 
         // purchase to PoolType::Purchases
         let pack: Pack = sys.pack.purchase(PackType::GenesisDuelists5x);
         balance_bank = tester::assert_lords_balance(sys.lords, bank_address, balance_bank, 0, price_pack, "balance_bank PURCHASE");
-        pool_bank = tester::assert_balance(sys.store.get_pool(PoolType::Purchases).balance_lords, pool_bank, 0, price_pack, "pool_bank PURCHASE");
+        pool_claimable = tester::assert_balance(sys.store.get_pool(PoolType::Claimable).balance_lords, pool_claimable, 0, 0, "pool_claimable PURCHASE");
+        pool_purchases = tester::assert_balance(sys.store.get_pool(PoolType::Purchases).balance_lords, pool_purchases, 0, price_pack, "pool_purchases PURCHASE");
         pool_peg = tester::assert_balance(sys.store.get_pool(PoolType::FamePeg).balance_lords, pool_peg, 0, 0, "pool_peg PURCHASE");
 
         // open pack
         sys.pack.open(pack.pack_id);
         balance_bank = tester::assert_lords_balance(sys.lords, bank_address, balance_bank, 0, 0, "balance_bank PURCHASE");
-        pool_bank = tester::assert_balance(sys.store.get_pool(PoolType::Purchases).balance_lords, pool_bank, price_pack, 0, "pool_bank PURCHASE");
+        pool_claimable = tester::assert_balance(sys.store.get_pool(PoolType::Claimable).balance_lords, pool_claimable, 0, 0, "pool_claimable PURCHASE");
+        pool_purchases = tester::assert_balance(sys.store.get_pool(PoolType::Purchases).balance_lords, pool_purchases, price_pack, 0, "pool_purchases PURCHASE");
         pool_peg = tester::assert_balance(sys.store.get_pool(PoolType::FamePeg).balance_lords, pool_peg, 0, price_pack, "pool_peg PURCHASE");
 
         // final balances
         let mut balance_bank: u128 = sys.lords.balance_of(bank_address).low;
-        let mut pool_bank: u128 = sys.store.get_pool(PoolType::Purchases).balance_lords;
+        let mut pool_claimable: u128 = sys.store.get_pool(PoolType::Claimable).balance_lords;
+        let mut pool_purchases: u128 = sys.store.get_pool(PoolType::Purchases).balance_lords;
         let mut pool_peg: u128 = sys.store.get_pool(PoolType::FamePeg).balance_lords;
         assert_eq!(balance_bank, (price_starter + price_pack), "balance_bank END");
-        assert_eq!(pool_bank, 0, "pool_bank END");
+        assert_eq!(pool_claimable, 0, "pool_claimable END");
+        assert_eq!(pool_purchases, 0, "pool_purchases END");
         assert_eq!(pool_peg, (price_starter + price_pack), "pool_peg END");
     }
 
@@ -477,28 +484,55 @@ tester::print_pools(@sys, 1, "COLLECTED");
     // sponsoring
     //
     #[test]
-    fn test_sponsor_duelists() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::FAME | FLAGS::LORDS);
+    fn test_sponsor_claim_duelists() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::FAME | FLAGS::LORDS | FLAGS::DUELIST);
 
         // initial balances
         let balance_bank: u128 = sys.lords.balance_of(sys.bank.contract_address).low;
-        let pool_type: PoolType = PoolType::Purchases;
-        let pool: Pool = sys.store.get_pool(pool_type);
+        let pool_claimable: Pool = sys.store.get_pool(PoolType::Claimable);
+        let pool_peg: Pool = sys.store.get_pool(PoolType::FamePeg);
         assert_eq!(balance_bank, 0, "balance_bank INIT");
-        assert_eq!(pool.balance_lords, 0, "pool INIT lords");
-        assert_eq!(pool.balance_fame, 0, "pool INIT fame");
+        assert_eq!(pool_claimable.balance_lords, 0, "pool_claimable lords INIT");
+        assert_eq!(pool_claimable.balance_fame, 0, "pool_claimable fame INIT");
+        assert_eq!(pool_peg.balance_lords, 0, "pool_peg lords INIT");
+        assert_eq!(pool_peg.balance_fame, 0, "pool_peg fame INIT");
 
         // sponsor...
-        let amount: u128 = 1_000;
-        tester::execute_lords_approve(@sys.lords, OWNER(), sys.bank.contract_address, amount);
-        sys.bank.sponsor_duelists(OWNER(), amount);
+        let amount: u128 = tester::fund_duelists_pool(@sys, 2);
+        assert_gt!(amount, 0, "amount sponsored");
 
         // balances
-        let pool_sponsored: Pool = sys.store.get_pool(pool_type);
-        tester::assert_balance(sys.lords.balance_of(sys.bank.contract_address).low, balance_bank, 0, amount, "balance_bank AFTER");
-        tester::assert_balance(pool_sponsored.balance_lords, pool.balance_lords, 0, amount, "pool.balance_lords AFTER");
-        tester::assert_balance_equal(pool_sponsored.balance_fame, pool.balance_fame, "pool.balance_fame AFTER");
+        let balance_bank: u128 = sys.lords.balance_of(sys.bank.contract_address).low;
+        let pool_claimable: Pool = sys.store.get_pool(PoolType::Claimable);
+        let pool_purchases: Pool = sys.store.get_pool(PoolType::Purchases);
+        let pool_peg: Pool = sys.store.get_pool(PoolType::FamePeg);
+        assert_eq!(balance_bank, amount, "balance_bank SPONSORED");
+        assert_eq!(pool_claimable.balance_lords, amount, "pool_claimable lords SPONSORED");
+        assert_eq!(pool_claimable.balance_fame, 0, "pool_claimable fame SPONSORED");
+        assert_eq!(pool_purchases.balance_lords, 0, "pool_purchases lords SPONSORED");
+        assert_eq!(pool_purchases.balance_fame, 0, "pool_purchases fame SPONSORED");
+        assert_eq!(pool_peg.balance_lords, 0, "pool_peg lords SPONSORED");
+        assert_eq!(pool_peg.balance_fame, 0, "pool_peg fame SPONSORED");
+
+        // claim 1...
+        tester::execute_claim_starter_pack(@sys.pack, OWNER());
+        let balance_bank: u128 = sys.lords.balance_of(sys.bank.contract_address).low;
+        let pool_claimable: Pool = sys.store.get_pool(PoolType::Claimable);
+        let pool_peg: Pool = sys.store.get_pool(PoolType::FamePeg);
+        assert_eq!(balance_bank, amount, "balance_bank CLAIM_1");
+        assert_eq!(pool_claimable.balance_lords, amount / 2, "pool_claimable lords CLAIM_1");
+        assert_eq!(pool_peg.balance_lords, amount / 2, "pool_peg lords CLAIM_1");
+
+        // claim 2...
+        tester::execute_claim_starter_pack(@sys.pack, OTHER());
+        let balance_bank: u128 = sys.lords.balance_of(sys.bank.contract_address).low;
+        let pool_claimable: Pool = sys.store.get_pool(PoolType::Claimable);
+        let pool_peg: Pool = sys.store.get_pool(PoolType::FamePeg);
+        assert_eq!(balance_bank, amount, "balance_bank CLAIM_2");
+        assert_eq!(pool_claimable.balance_lords, 0, "pool_claimable lords CLAIM_2");
+        assert_eq!(pool_peg.balance_lords, amount, "pool_peg lords CLAIM_2");
     }
+
     #[test]
     #[should_panic(expected:('BANK: insufficient allowance', 'ENTRYPOINT_FAILED'))]
     fn test_sponsor_duelists_zero_allowance() {

@@ -27,10 +27,10 @@ pub trait IBankProtected<TState> {
     // transfer LORDS from payer, adding to PoolType::Purchases
     // (called by pack_token)
     fn charge_purchase(ref self: TState, payer: ContractAddress, lords_amount: u128);
-    // transfer LORDS from PoolType::Purchases to PoolType::FamePeg
+    // transfer LORDS from PoolType::Claimable/Purchases to PoolType::FamePeg
     // (called by pack_token)
-    fn peg_minted_fame_to_purchased_lords(ref self: TState, payer: ContractAddress, lords_amount: u128);
-    // transfer LORDS to recipient, removing from PoolType::Purchases
+    fn peg_minted_fame_to_lords(ref self: TState, payer: ContractAddress, lords_amount: u128, from_pool_type: PoolType);
+    // transfer LORDS to recipient, removing from PoolType::FamePeg
     // (called by duelist_token)
     fn release_lords_from_fame_to_be_burned(ref self: TState, season_id: u32, duel_id: u128, bills: Span<LordsReleaseBill>) -> u128;
     // transfer FAME to payer, adding to PoolType::Season(season_id)
@@ -94,7 +94,7 @@ pub mod bank {
         ) {
             assert(lords_amount != 0, Errors::INVALID_AMOUNT);
             let mut store: Store = StoreTrait::new(self.world_default());
-            self._transfer_lords_to_pool(store, payer, lords_amount.into(), PoolType::Purchases);
+            self._transfer_lords_to_pool(store, payer, lords_amount.into(), PoolType::Claimable);
         }
 
         fn sponsor_season(ref self: ContractState,
@@ -158,18 +158,19 @@ pub mod bank {
             self._transfer_lords_to_pool(store, payer, lords_amount, PoolType::Purchases);
         }
 
-        fn peg_minted_fame_to_purchased_lords(ref self: ContractState,
+        fn peg_minted_fame_to_lords(ref self: ContractState,
             payer: ContractAddress,
             lords_amount: u128,
+            from_pool_type: PoolType,
         ) {
             let mut store: Store = StoreTrait::new(self.world_default());
             assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
             assert(lords_amount != 0, Errors::INVALID_AMOUNT);
-            let mut pool_purchases: Pool = store.get_pool(PoolType::Purchases);
+            let mut pool_from: Pool = store.get_pool(from_pool_type);
             let mut pool_peg: Pool = store.get_pool(PoolType::FamePeg);
-            pool_purchases.withdraw_lords(lords_amount);
+            pool_from.withdraw_lords(lords_amount);
             pool_peg.deposit_lords(lords_amount);
-            store.set_pool(@pool_purchases);
+            store.set_pool(@pool_from);
             store.set_pool(@pool_peg);
         }
 

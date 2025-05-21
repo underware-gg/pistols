@@ -236,7 +236,7 @@ pub mod tester {
         let mut deploy_vrf: bool = false;
         
         deploy_game         = deploy_game || approve;
-        deploy_game_loop    = deploy_game || deploy_tutorial;
+        deploy_game_loop    = deploy_game_loop || deploy_game || deploy_tutorial;
         deploy_lords        = deploy_lords || deploy_game || deploy_duelist || approve;
         deploy_admin        = deploy_admin || deploy_game || deploy_lords || deploy_tournament;
         deploy_duel         = deploy_duel || deploy_game;
@@ -838,7 +838,7 @@ pub mod tester {
         (*sys.bank).sponsor_duelists(sender, amount);
         _next_block();
     }
-    pub fn fund_duelists_pool(sys: @TestSystems, quantity: u8) {
+    pub fn fund_duelists_pool(sys: @TestSystems, quantity: u8) -> u128 {
         // mint lords
         let sponsor: ContractAddress = starknet::contract_address_const::<0x12178517312>();
         execute_lords_faucet(sys.lords, sponsor);
@@ -846,8 +846,10 @@ pub mod tester {
         let balance: u256 = (*sys.lords).balance_of(sponsor);
         execute_lords_approve(sys.lords, sponsor, *sys.bank.contract_address, balance.low);
         // fund pool
-        let price: u128 = PackType::StarterPack.description().price_lords;
-        execute_sponsor_duelists(sys, sponsor, price * quantity.into());
+        let price_per_pack: u128 = PackType::StarterPack.description().price_lords;
+        let amount_sponsored: u128 = price_per_pack * quantity.into();
+        execute_sponsor_duelists(sys, sponsor, amount_sponsored);
+        (amount_sponsored)
     }
     pub fn execute_collect_season(sys: @TestSystems, sender: ContractAddress) -> u32 {
         impersonate(sender);
@@ -1033,6 +1035,7 @@ pub mod tester {
         let mut fame_balance_bank: u128 = (*sys.fame).balance_of(*sys.bank.contract_address).low;
         let mut lords_balance_bank: u128 = (*sys.lords).balance_of(*sys.bank.contract_address).low;
         let mut lords_balance_treasury: u128 = (*sys.lords).balance_of(TREASURY()).low;
+        let pool_claimable: Pool = (*sys.store).get_pool(PoolType::Claimable);
         let pool_purchases: Pool = (*sys.store).get_pool(PoolType::Purchases);
         let pool_peg: Pool = (*sys.store).get_pool(PoolType::FamePeg);
         let pool_season: Pool = (*sys.store).get_pool(PoolType::Season(season_id));
@@ -1040,6 +1043,7 @@ pub mod tester {
         println!(">>>>>>>>>>>>>>>>>> {}",  prefix);
         println!("BANK_______________LORDS:{} FAME:{}", ETH(lords_balance_bank), ETH(fame_balance_bank));
         println!("TREASURY___________LORDS:{}", ETH(lords_balance_treasury));
+        println!("Pool::Claimable____LORDS:{} FAME:{}", ETH(pool_claimable.balance_lords), ETH(pool_claimable.balance_fame));
         println!("Pool::Purchases____LORDS:{} FAME:{}", ETH(pool_purchases.balance_lords), ETH(pool_purchases.balance_fame));
         println!("Pool::FamePeg______LORDS:{} FAME:{}", ETH(pool_peg.balance_lords), ETH(pool_peg.balance_fame));
         println!("Pool::Season_______LORDS:{} FAME:{}", ETH(pool_season.balance_lords), ETH(pool_season.balance_fame));
