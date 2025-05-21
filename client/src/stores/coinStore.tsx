@@ -1,16 +1,15 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
 import { useERC20Balance } from '@underware/pistols-sdk/utils/hooks'
-import { useDojoSetup, useStarknetContext } from '@underware/pistols-sdk/dojo'
+import { useSdkTokenBalancesGet, useStarknetContext } from '@underware/pistols-sdk/dojo'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { useDuelistTokenBoundAddress } from '/src/hooks/useTokenBound'
 import { makeTokenBoundAddress } from '@underware/pistols-sdk/pistols'
 import { bigintEquals, bigintToHex, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { weiToEth } from '@underware/pistols-sdk/starknet'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
-import { Page } from '@dojoengine/torii-client'
 import * as torii from '@dojoengine/torii-client'
 
 // interface totii.TokenBalance {
@@ -57,10 +56,11 @@ const createStore = (coinName: string) => {
       })
     },
     initBalances: (accounts: BigNumberish[]) => {
+      // console.log(`coinStore(${get().coinName}) INIT:`, accounts)
       set((state: State) => {
         accounts.forEach((account) => {
           const _key = _accountKey(account);
-          if (state.accounts[_key] == undefined) {
+          if (state.accounts[_key] === undefined) {
             state.accounts[_key] = {
               balance: undefined,
             }
@@ -93,9 +93,9 @@ const createStore = (coinName: string) => {
   })))
 }
 
+export const useLordsCoinStore = createStore('lords');
 export const useFameCoinStore = createStore('fame');
 export const useFoolsCoinStore = createStore('fools');
-export const useLordsCoinStore = createStore('lords');
 
 export function useCoinStore(contractAddress: BigNumberish) {
   const {
@@ -145,7 +145,8 @@ export const useFoolsBalance = (address: BigNumberish) => {
   const state = useFoolsCoinStore((state) => state)
   const balance = useMemo(() => state.getBalance(address), [state.accounts, address])
   // fetch if not cached
-  useFetchAccountsBalances(foolsContractAddress, [address], balance == null)
+  const accounts = useMemo(() => [address], [address])
+  useFetchAccountsBalances(foolsContractAddress, accounts, balance == null)
   return {
     balance: (balance ?? 0n),
     balance_eth: weiToEth(balance),
@@ -158,7 +159,8 @@ export const useLordsBalance = (address: BigNumberish, fee: BigNumberish = 0n) =
   const state = useFoolsCoinStore((state) => state)
   const balance = useMemo(() => state.getBalance(address), [state.accounts, address])
   // fetch if not cached
-  useFetchAccountsBalances(lordsContractAddress, [address], balance == null)
+  const accounts = useMemo(() => [address], [address])
+  useFetchAccountsBalances(lordsContractAddress, accounts, balance == null)
   const { canAffordFee } = _useCalcFee(balance, fee)
   return {
     balance: (balance ?? 0n),
@@ -196,42 +198,16 @@ export const useFetchTokenboundAccountsBalances = (coinAddress: BigNumberish, to
 
 export const useFetchAccountsBalances = (coinAddress: BigNumberish, accounts: BigNumberish[], enabled: boolean) => {
   const state = useCoinStore(coinAddress)((state) => state)
-  const [isLoading, setIsLoading] = useState<boolean>(undefined)
-  const { sdk } = useDojoSetup()
-  useEffect(() => {
-    let _mounted = true
-    const _fetch = async () => {
-      const newAccounts = accounts.filter((a) => !state.hasBalance(a))
-      // fetch...
-      if (newAccounts.length > 0) {
-        setIsLoading(true)
-        // initialize balances
-        state.initBalances(newAccounts)
-        // fetch...
-        await sdk.getTokenBalances({
-          contractAddresses: [coinAddress as string],
-          accountAddresses: newAccounts.map((a) => bigintToHex(a)),
-          tokenIds: [],
-        }).then((balances: Page<torii.TokenBalance>) => {
-          // console.log("fetchAccountsBalances() GOT:", balances)
-          state.setBalances(balances.items)
-          if (balances.next_cursor) {
-            console.warn("fetchAccountsBalances() LIMIT REACHED!!!! Possible loss of data", coinAddress, newAccounts)
-          }
-        }).catch((error: Error) => {
-          console.error("fetchAccountsBalances().sdk.get() error:", error, newAccounts)
-        })
-      }
-      // done
-      if (_mounted) {
-        setIsLoading(false)
-      }
-    }
-    if (enabled && isPositiveBigint(coinAddress)) _fetch()
-    return () => {
-      _mounted = false
-    }
-  }, [sdk, coinAddress, accounts, enabled])
+  const newAccounts = useMemo(() => (
+    accounts.filter((a) => (isPositiveBigint(a) && !state.hasBalance(a)))
+  ), [accounts, state.accounts])
+  const { isLoading } = useSdkTokenBalancesGet({
+    contract: coinAddress,
+    accounts: newAccounts,
+    // initBalances: state.initBalances, // breaks fetch!!
+    setBalances: state.setBalances,
+    enabled: (enabled && isPositiveBigint(coinAddress) && newAccounts.length > 0),
+  })
   return {
     isLoading,
     isFinished: (isLoading === false),

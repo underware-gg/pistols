@@ -4,8 +4,8 @@ import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { useSdkTokenBalancesGet, useSdkTokenBalancesSub } from '@underware/pistols-sdk/dojo'
 import { useDuelistTokenStore, useDuelTokenStore, usePackTokenStore, useTournamentTokenStore } from '/src/stores/tokenStore'
-import { bigintToAddress, bigintToHex, isPositiveBigint } from '@underware/pistols-sdk/utils'
-import { useFameCoinStore, useLordsCoinStore, useFoolsCoinStore } from '/src/stores/coinStore'
+import { bigintToHex, isPositiveBigint } from '@underware/pistols-sdk/utils'
+import { useFameCoinStore, useLordsCoinStore, useFoolsCoinStore, useFetchAccountsBalances } from '/src/stores/coinStore'
 import * as torii from '@dojoengine/torii-client'
 
 
@@ -59,28 +59,33 @@ export function TokenStoreSync() {
   //
   const mounted = useMounted()
   const { address } = useAccount()
+  const accounts = useMemo(() => [address], [address])
 
-  // cache packs of player only
+  // cache player tokens
+  useFetchAccountsBalances(foolsContractAddress, accounts, true)
+  useFetchAccountsBalances(lordsContractAddress, accounts, true)
+
   useSdkTokenBalancesGet({
-    contract: bigintToAddress(packContractAddress),
-    account: address,
+    contract: packContractAddress,
+    accounts,
     setBalances: pack_state.setBalances,
     enabled: (mounted && isPositiveBigint(packContractAddress)),
   })
 
   // cache all duelists
   useSdkTokenBalancesGet({
-    contract: bigintToAddress(duelistContractAddress),
+    contract: duelistContractAddress,
     setBalances: duelist_state.setBalances,
     enabled: (mounted && isPositiveBigint(duelistContractAddress)),
   })
 
   // cache all FAME
   useSdkTokenBalancesGet({
-    contract: bigintToAddress(fameContractAddress),
+    contract: fameContractAddress,
     setBalances: fame_state.setBalances,
     enabled: (mounted && isPositiveBigint(fameContractAddress)),
   })
+
 
 
   //----------------------------------------

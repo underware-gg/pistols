@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { BigNumberish } from 'starknet'
 import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
-import { isPositiveBigint } from 'src/utils/misc/types'
+import { bigintToAddress, bigintToHex, isPositiveBigint } from 'src/utils/misc/types'
 import { SubscriptionCallbackArgs } from '@dojoengine/sdk'
 import { Page } from '@dojoengine/torii-client'
 import * as torii from '@dojoengine/torii-client'
@@ -20,14 +20,15 @@ type UseSdkTokenGetResult = {
 }
 
 export type UseSdkTokenBalancesGetProps = {
-  contract: string
-  account?: string
+  contract: BigNumberish
+  accounts?: BigNumberish[]
   tokenIds?: BigNumberish[]
   enabled?: boolean
+  // initBalances?: (accounts: BigNumberish[]) => void
   setBalances: (balances: torii.TokenBalance[]) => void
 }
 export type UseSdkTokenBalancesSubProps = {
-  contracts: string[]
+  contracts: BigNumberish[]
   enabled?: boolean
   updateBalance: (balance: torii.TokenBalance) => void
 }
@@ -37,8 +38,9 @@ export type UseSdkTokenBalancesSubProps = {
 //
 export const useSdkTokenBalancesGet = ({
   contract,
-  account,
+  accounts,
   tokenIds,
+  // initBalances,
   setBalances,
   enabled = true,
 }: UseSdkTokenBalancesGetProps): UseSdkTokenGetResult => {
@@ -48,11 +50,14 @@ export const useSdkTokenBalancesGet = ({
   useEffect(() => {
     let _mounted = true
     const _get = async () => {
-      // console.log("useSdkTokenBalancesGet() GET........", enabled, contract, account, tokenIds)
+      const _contract = bigintToAddress(contract)
+      const _accounts = accounts?.map(a => bigintToHex(a)) ?? []
+      // console.log("useSdkTokenBalancesGet() GET........", enabled, _contract, _accounts, tokenIds)
       setIsLoading(true)
+      // initBalances?.(_accounts);
       await sdk.getTokenBalances({
-        contractAddresses: [contract],
-        accountAddresses: account ? [account] : [],
+        contractAddresses: [_contract],
+        accountAddresses: _accounts,
         tokenIds: tokenIds?.map(a => toToriiTokenId(a)) ?? []
       }).then((balances: Page<torii.TokenBalance>) => {
         if (!_mounted) return
@@ -62,20 +67,20 @@ export const useSdkTokenBalancesGet = ({
         } else if (!tokenIds) {
           // initialize zero balance
           // console.log("useSdkTokenBalancesGet() initialize balance:", contract, account)
-          const _balances = [{
-            contract_address: contract,
-            account_address: account,
+          const _balances: torii.TokenBalance[] = _accounts.map(a => ({
+            contract_address: _contract,
+            account_address: a,
             token_id: '0x0',
             balance: '0x0',
-          }]
+          }))
           setBalances(_balances)
         }
         if (balances.next_cursor) {
-          console.warn("useSdkTokenBalancesGet() LOST PAGE!!!! ", contract, account, tokenIds)
+          console.warn("useSdkTokenBalancesGet() LOST PAGE!!!! ", contract, _accounts, tokenIds)
         }
       }).catch((error: Error) => {
         if (!_mounted) return
-        console.error("useSdkTokenBalancesGet().sdk.get() error:", error, contract, account)
+        console.error("useSdkTokenBalancesGet().sdk.get() error:", error, contract, _accounts, tokenIds)
       }).finally(() => {
         setIsLoading(false)
       })
@@ -86,7 +91,7 @@ export const useSdkTokenBalancesGet = ({
     return () => {
       _mounted = false
     }
-  }, [sdk, enabled, contract, account, tokenIds])
+  }, [sdk, enabled, contract, accounts, tokenIds])
 
   return {
     isLoading,
@@ -105,7 +110,7 @@ export const useSdkTokenBalancesSub = ({
     const _subscribe = () => {
       console.log(`useSdkTokenBalancesSub() SUBSCRIBE......`, contracts)
       _subscription = sdk.onTokenBalanceUpdated({
-        contractAddresses: contracts,
+        contractAddresses: contracts.map(c => bigintToHex(c)),
         accountAddresses: [],
         tokenIds: [],
         callback: (response: SubscriptionCallbackArgs<torii.TokenBalance>) => {
