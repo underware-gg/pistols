@@ -8,15 +8,16 @@ import { useConfig } from '/src/stores/configStore'
 import { Address } from '/src/components/ui/Address'
 import { LordsBalance } from '/src/components/account/LordsBalance'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
+import { TokenStoreSync } from '/src/stores/sync/TokenStoreSync'
 import { InternalPageMenu, InternalPageWrapper } from '/src/pages/internal/InternalPageIndex'
 import { Connect } from '/src/pages/tests/ConnectTestPage'
 import { useAccount } from '@starknet-react/core'
 import { useBlockedPlayersAccounts, usePlayer, useTeamMembersAccounts } from '/src/stores/playerStore'
 import { PlayerNameSync } from '/src/stores/sync/PlayerNameSync'
-import CurrentChainHint from '/src/components/CurrentChainHint'
-import AppDojo from '/src/components/AppDojo'
 import { useValidateWalletAddress } from '@underware/pistols-sdk/utils/hooks'
 import { Leaderboards } from './SeasonsPage'
+import CurrentChainHint from '/src/components/CurrentChainHint'
+import AppDojo from '/src/components/AppDojo'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -34,8 +35,6 @@ export default function AdminPage() {
         <InternalPageMenu />
         <CurrentChainHint />
         <Connect />
-        <EntityStoreSync />
-        <PlayerNameSync />
 
         <InternalPageWrapper>
           <Config />
@@ -49,9 +48,11 @@ export default function AdminPage() {
           <LeaderboardsSection />
           {/* <DisqualifyDuelistsEditor /> */}
           <br />
-          <EntityStoreSync />
         </InternalPageWrapper>
 
+        <EntityStoreSync />
+        <PlayerNameSync />
+        <TokenStoreSync />
       </Container>
     </AppDojo>
   );

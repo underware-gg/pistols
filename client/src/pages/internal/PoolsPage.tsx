@@ -35,7 +35,6 @@ export default function PoolsPage() {
       <Container>
         <InternalPageMenu />
         <CurrentChainHint />
-        <StoreSync />
 
         <InternalPageWrapper>
           <Connect />
@@ -46,6 +45,8 @@ export default function PoolsPage() {
           <Pools />
           <br />
         </InternalPageWrapper>
+
+        <StoreSync />
       </Container>
     </AppDojo>
   );

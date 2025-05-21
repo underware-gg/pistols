@@ -15,8 +15,6 @@ import { useAccount } from '@starknet-react/core'
 import { useConfig } from '/src/stores/configStore'
 import { usePlayer } from '/src/stores/playerStore'
 import { useOwnerOfDuelist } from '/src/hooks/useTokenDuelists'
-import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
-import { PlayerNameSync } from '/src/stores/sync/PlayerNameSync'
 import { ActionButton } from '/src/components/ui/Buttons'
 import { InternalPageMenu, InternalPageWrapper } from '/src/pages/internal/InternalPageIndex'
 import { Address } from '/src/components/ui/Address'
@@ -24,6 +22,7 @@ import { Balance } from '/src/components/account/Balance'
 import { Connect } from '/src/pages/tests/ConnectTestPage'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import CurrentChainHint from '/src/components/CurrentChainHint'
+import StoreSync from '/src/stores/sync/StoreSync'
 import AppDojo from '/src/components/AppDojo'
 
 // const Row = Grid.Row
@@ -43,11 +42,10 @@ export default function SeasonsPage() {
         <Connect />
 
         <InternalPageWrapper>
-          <EntityStoreSync />
-          <PlayerNameSync />
           <Seasons />
         </InternalPageWrapper>
 
+        <StoreSync />
       </Container>
     </AppDojo>
   );

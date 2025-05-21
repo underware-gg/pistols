@@ -28,8 +28,8 @@ export default function ContractsPage() {
         <CurrentChainHint />
         <Connect />
 
-          <Contracts />
-        
+        <Contracts />
+
       </Container>
     </AppDojo>
   );
