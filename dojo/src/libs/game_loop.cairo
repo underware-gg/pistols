@@ -223,14 +223,15 @@ pub impl GameLoopImpl of GameLoopTrait {
 
     fn _blades(blades_a: @BladesCard, blades_b: @BladesCard, ref state_a: DuelistState, ref state_b: DuelistState) {
         // Rock-Paper-Scissors
-        if (state_a.health != 0 && state_b.health != 0) {
-            let (died_a, died_b): (bool, bool) = blades_a.clash(blades_b);
-            if (died_a) {
-                state_a.health = 0;
-            }
-            if (died_b) {
-                state_b.health = 0;
-            }
+        let (died_a, died_b): (bool, bool) = blades_a.clash(blades_b);
+        if (died_a) {
+            state_a.health = 0;
         }
+        if (died_b) {
+            state_b.health = 0;
+        }
+        // apply honour modifier
+        blades_a.apply_honour(ref state_a);
+        blades_b.apply_honour(ref state_b);
     }
 }

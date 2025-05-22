@@ -80,6 +80,14 @@ pub impl BladesCardImpl of BladesCardTrait {
             (*self).get_points().apply(ref state_self, ref state_other, 1, EnvCard::None);
         }
     }
+    fn apply_honour(self: @BladesCard, ref state: DuelistState) {
+        match self {
+            BladesCard::Seppuku => {
+                state.honour = 100;
+            },
+            _ => {}
+        }
+    }
     //
     // Rock-Paper-Scissors mechanic
     // PocketPistol beats Behead
