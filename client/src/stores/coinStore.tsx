@@ -156,7 +156,7 @@ export const useFoolsBalance = (address: BigNumberish) => {
 
 export const useLordsBalance = (address: BigNumberish, fee: BigNumberish = 0n) => {
   const { lordsContractAddress } = useTokenContracts()
-  const state = useFoolsCoinStore((state) => state)
+  const state = useLordsCoinStore((state) => state)
   const balance = useMemo(() => state.getBalance(address), [state.accounts, address])
   // fetch if not cached
   const accounts = useMemo(() => [address], [address])
