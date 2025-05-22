@@ -170,7 +170,25 @@ pub impl TotalsImpl of TotalsTrait {
         self.honour_log =
             (self.honour_log & ~BitwiseU64::shl(0xff, log_pos)) |
             BitwiseU64::shl(duel_honour.into(), log_pos);
-        self.honour = (BytemapU64::sum_bytes(self.honour_log) / core::cmp::min(self.total_duels.into(), 8)).try_into().unwrap();
+        // sum honour non-zero honour values
+        // let mut sum_count: u64 = core::cmp::min(self.total_duels.into(), 8);
+        // let sum: u64 = BytemapU64::sum_bytes(self.honour_log);
+        let mut log: u64 = self.honour_log;
+        let mut sum_count: u64 = 0;
+        let mut sum: u64 = 0;
+        while (log != 0) {
+            let h: u64 = (log & 0xff);
+            if (h != 0) {
+                sum += h;
+                sum_count += 1;
+            }
+            log /= 0x100;
+        };
+        self.honour = if (sum_count != 0) {
+            (sum / sum_count).try_into().unwrap()
+        } else {
+            (0)
+        };
     }
 }
 
@@ -215,11 +233,63 @@ mod unit {
     use super::{Totals, TotalsTrait};
 
     #[test]
-    fn test_totals_honour_lord() {
+    fn test_totals_honour_archetype() {
+        // lord...
         let mut totals: Totals = Default::default();
-        totals.total_duels = 1;
+        totals.total_duels += 1;
         totals.update_honour(100);
+        totals.total_duels += 1;
+        totals.update_honour(60);
         assert!(totals.is_lord(), "is_lord()");
+        totals.total_duels += 1;
+        totals.update_honour(10);
+        assert!(totals.is_trickster(), "is_lord() > is_trickster()");
+        // trickster...
+        let mut totals: Totals = Default::default();
+        totals.total_duels += 1;
+        totals.update_honour(10);
+        totals.total_duels += 1;
+        totals.update_honour(100);
+        assert!(totals.is_trickster(), "is_trickster()");
+        totals.total_duels += 1;
+        totals.update_honour(100);
+        assert!(totals.is_lord(), "is_trickster() > is_lord()");
+        // villain...
+        let mut totals: Totals = Default::default();
+        totals.total_duels += 1;
+        totals.update_honour(10);
+        totals.total_duels += 1;
+        totals.update_honour(40);
+        assert!(totals.is_villain(), "is_villain()");
+        totals.total_duels += 1;
+        totals.update_honour(100);
+        assert!(totals.is_trickster(), "is_villain() > is_trickster()");
+        totals.total_duels += 1;
+        totals.update_honour(100);
+        totals.total_duels += 1;
+        totals.update_honour(100);
+        assert!(totals.is_lord(), "is_villain() > is_lord()");
+    }
+
+    #[test]
+    fn test_totals_honour_archetype_zero() {
+        // lord...
+        let mut totals: Totals = Default::default();
+        totals.total_duels += 1;
+        totals.update_honour(100);
+        totals.total_duels += 1;
+        totals.update_honour(60);
+        assert!(totals.is_lord(), "is_lord()");
+        totals.total_duels += 1;
+        totals.update_honour(0);
+        totals.total_duels += 1;
+        totals.update_honour(0);
+        totals.total_duels += 1;
+        totals.update_honour(0);
+        assert!(totals.is_lord(), "is_lord() > zero");
+        totals.total_duels += 1;
+        totals.update_honour(90);
+        assert!(totals.is_lord(), "is_lord() > still");
     }
 
     #[test]
@@ -227,18 +297,16 @@ mod unit {
         let mut totals: Totals = Default::default();
         let mut sum: u8 = 0;
         let mut n: u8 = 1;
-        loop {
-            if (n > 8) { break; }
+        while (n <= 8) {
             totals.total_duels += 1;
             totals.update_honour(n);
             sum += n;
             assert_eq!(totals.honour, (sum / n), "sum_8__{}", n);
             n += 1;
         };
-        assert_eq!(totals.honour_log, 0x0807060504030201, "0x0807060504030201");
+        assert_eq!(totals.honour_log, 0x0807060504030201, "{:x} != 0x0807060504030201", totals.honour_log);
         // loop totals
-        loop {
-            if (n > 16) { break; }
+        while (n <= 16) {
             totals.total_duels += 1;
             totals.update_honour(n);
             sum -= n - 8;
@@ -246,11 +314,46 @@ mod unit {
             assert_eq!(totals.honour, (sum / 8), "sum_16__{}", n);
             n += 1;
         };
-        assert_eq!(totals.honour_log, 0x100f0e0d0c0b0a09, "0x100f0e0d0c0b0a09");
+        assert_eq!(totals.honour_log, 0x100f0e0d0c0b0a09, "{:x} != 0x100f0e0d0c0b0a09", totals.honour_log);
         // new loop
         totals.total_duels += 1;
         totals.update_honour(n);
-        assert_eq!(totals.honour_log, 0x100f0e0d0c0b0a11, "0x100f0e0d0c0b0a11");
+        assert_eq!(totals.honour_log, 0x100f0e0d0c0b0a11, "{:x} != 0x100f0e0d0c0b0a11", totals.honour_log);
     }
 
+    #[test]
+    fn test_totals_honour_log_including_zeros() {
+        let mut totals: Totals = Default::default();
+        let mut count: u8 = 0;
+        let mut sum: u8 = 0;
+        let mut n: u8 = 1;
+        while (n <= 8) {
+            totals.total_duels += 1;
+            let h: u8 = if (n % 2 == 1) {n} else {0};
+            totals.update_honour(h);
+            if (h != 0) {
+                sum += h;
+                count += 1;
+            }
+            assert_eq!(totals.honour, (sum / count), "sum_8__[{}] sum: {}, count: {} log: {:x}", n, sum, count, totals.honour_log);
+           n += 1;
+        };
+        assert_eq!(totals.honour_log, 0x0007000500030001, "{:x} != 0x0007000500030001", totals.honour_log);
+        // loop totals
+        while (n <= 16) {
+            totals.total_duels += 1;
+            let h: u8 = if (n % 2 == 0) {n} else {0};
+            totals.update_honour(h);
+            if (h != 0) {
+                sum += n;
+                count += 1;
+            } else {
+                sum -= n - 8;
+                count -= 1;
+            }
+            assert_eq!(totals.honour, (sum / count), "sum_16__[{}] sum: {}, count: {} log: {:x}", n, sum, count, totals.honour_log);
+            n += 1;
+        };
+        assert_eq!(totals.honour_log, 0x10000e000c000a00, "{:x} != 0x10000e000c000a00", totals.honour_log);
+    }
 }

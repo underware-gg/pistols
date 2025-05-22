@@ -78,10 +78,10 @@ pub mod prefabs {
             [
                 MockedValueTrait::new('shoot_a', 1),
                 MockedValueTrait::new('shoot_b', 1),
-                MockedValueTrait::shuffled('env', 
-                    [ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL,
-                    ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL].span()
-                ),
+                MockedValueTrait::shuffled('env', [
+                    ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL,
+                    ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL,
+                ].span()),
             ].span(),
             PlayerMovesTrait::new(SALT_A, moves_a),
             PlayerMovesTrait::new(SALT_B, moves_b),
@@ -95,10 +95,10 @@ pub mod prefabs {
             [
                 MockedValueTrait::new('shoot_a', 100),
                 MockedValueTrait::new('shoot_b', 100),
-                MockedValueTrait::shuffled('env',
-                    [ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,
-                    ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,].span()
-                ),
+                MockedValueTrait::shuffled('env', [
+                    ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,
+                    ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,
+                ].span()),
             ].span(),
             PlayerMovesTrait::new(SALT_A, moves_a),
             PlayerMovesTrait::new(SALT_B, moves_b),
@@ -118,6 +118,22 @@ pub mod prefabs {
             PlayerMovesTrait::new(SALT_B, moves_b),
         )
     }
+    pub fn get_moves_dual_crit_at_10() -> (Span<MockedValue>, PlayerMoves, PlayerMoves) {
+        let moves_a: Span<u8> = [10, 1].span();
+        let moves_b: Span<u8> = [10, 1].span();
+        (
+            [
+                MockedValueTrait::new('shoot_a', 1),
+                MockedValueTrait::new('shoot_b', 1),
+                MockedValueTrait::shuffled('env', [
+                    ENV_CARD_CRIT,ENV_CARD_CRIT,ENV_CARD_CRIT,ENV_CARD_CRIT,ENV_CARD_CRIT,
+                    ENV_CARD_CRIT,ENV_CARD_CRIT,ENV_CARD_CRIT,ENV_CARD_CRIT,ENV_CARD_CRIT,
+                ].span()),
+            ].span(),
+            PlayerMovesTrait::new(SALT_A, moves_a),
+            PlayerMovesTrait::new(SALT_B, moves_b),
+        )
+    }
 
     pub fn get_moves_crit_a() -> (Span<MockedValue>, PlayerMoves, PlayerMoves) {
         let moves_a: Span<u8> = [1, 2].span();
@@ -132,15 +148,47 @@ pub mod prefabs {
             PlayerMovesTrait::new(SALT_B, moves_b),
         )
     }
+    pub fn get_moves_crit_a_at_10() -> (Span<MockedValue>, PlayerMoves, PlayerMoves) {
+        let moves_a: Span<u8> = [10, 1].span();
+        let moves_b: Span<u8> = [1, 2].span();
+        (
+            [
+                MockedValueTrait::new('shoot_a', 1),
+                MockedValueTrait::new('shoot_b', 1),
+                MockedValueTrait::shuffled('env', [
+                    ENV_CARD_CRIT,ENV_CARD_CRIT,ENV_CARD_CRIT,ENV_CARD_CRIT,ENV_CARD_CRIT,
+                    ENV_CARD_CRIT,ENV_CARD_CRIT,ENV_CARD_CRIT,ENV_CARD_CRIT,ENV_CARD_CRIT,
+                ].span()),
+            ].span(),
+            PlayerMovesTrait::new(SALT_A, moves_a),
+            PlayerMovesTrait::new(SALT_B, moves_b),
+        )
+    }
 
     pub fn get_moves_crit_b() -> (Span<MockedValue>, PlayerMoves, PlayerMoves) {
         let moves_a: Span<u8> = [2, 3].span();
         let moves_b: Span<u8> = [1, 2].span();
         (
             [
-                MockedValueTrait::new('shoot_a', 100),
+                MockedValueTrait::new('shoot_a', 1),
                 MockedValueTrait::new('shoot_b', 1),
                 MockedValueTrait::shuffled('env', [ENV_CARD_CRIT].span()),
+            ].span(),
+            PlayerMovesTrait::new(SALT_A, moves_a),
+            PlayerMovesTrait::new(SALT_B, moves_b),
+        )
+    }
+    pub fn get_moves_crit_b_at_10() -> (Span<MockedValue>, PlayerMoves, PlayerMoves) {
+        let moves_a: Span<u8> = [1, 2].span();
+        let moves_b: Span<u8> = [10, 1].span();
+        (
+            [
+                MockedValueTrait::new('shoot_a', 1),
+                MockedValueTrait::new('shoot_b', 1),
+                MockedValueTrait::shuffled('env', [
+                    ENV_CARD_CRIT,ENV_CARD_CRIT,ENV_CARD_CRIT,ENV_CARD_CRIT,ENV_CARD_CRIT,
+                    ENV_CARD_CRIT,ENV_CARD_CRIT,ENV_CARD_CRIT,ENV_CARD_CRIT,ENV_CARD_CRIT,
+                ].span()),
             ].span(),
             PlayerMovesTrait::new(SALT_A, moves_a),
             PlayerMovesTrait::new(SALT_B, moves_b),

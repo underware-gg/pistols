@@ -4,7 +4,7 @@ pub mod tests {
 
     use pistols::models::{
         challenge::{ChallengeTrait, ChallengeValue, RoundValue, DuelType, MovesTrait},
-        duelist::{Totals},
+        duelist::{Totals, TotalsTrait},
         leaderboard::{Leaderboard, LeaderboardTrait, LeaderboardPosition},
         season::{SeasonScoreboard},
         player::{PlayerDuelistStack},
@@ -754,6 +754,219 @@ pub mod tests {
 
 
     //-------------------------------
+    // Honour / Archetype
+    //
+
+    #[test]
+    fn test_duel_honour_a_b() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        tester::fund_duelists_pool(@sys, 2);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
+        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
+        //
+        // A wins at 10 paces
+        let (mocked, moves_a, moves_b) = prefabs::get_moves_crit_a_at_10();
+        sys.rng.mock_values(mocked);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, A, B, DuelType::Seasonal, 1);
+        let (challenge, _round) = prefabs::commit_reveal_get(@sys, duel_id, A, B, mocked, moves_a, moves_b);
+        assert_eq!(challenge.winner, 1, "challenge.winner 1");
+        // different archetypes...
+        let totals_a: Totals = sys.store.get_player_totals(A);
+        let totals_b: Totals = sys.store.get_player_totals(B);
+        assert_eq!(totals_a.total_duels, 1, "totals_a.total_duels 1");
+        assert_eq!(totals_b.total_duels, 1, "totals_b.total_duels 1");
+        assert_eq!(totals_a.honour, 100, "totals_a.honour 1");
+        assert_eq!(totals_b.honour, 10, "totals_b.honour 1");
+        assert!(totals_a.is_lord(), "totals_a.is_lord() 1");
+        assert!(totals_b.is_villain(), "totals_b.is_villain() 1");
+        //
+        // B wins at 10 paces
+        let (mocked, moves_a, moves_b) = prefabs::get_moves_crit_b_at_10();
+        sys.rng.mock_values(mocked);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, A, B, DuelType::Seasonal, 1);
+        let (challenge, _round) = prefabs::commit_reveal_get(@sys, duel_id, A, B, mocked, moves_a, moves_b);
+        assert_eq!(challenge.winner, 2, "challenge.winner 2");
+        // same archetypes...
+        let totals_a: Totals = sys.store.get_player_totals(A);
+        let totals_b: Totals = sys.store.get_player_totals(B);
+        assert_eq!(totals_a.total_duels, 2, "totals_a.total_duels 2");
+        assert_eq!(totals_b.total_duels, 2, "totals_b.total_duels 2");
+        assert_lt!(totals_a.honour, 100, "totals_a.honour 2");
+        assert_gt!(totals_b.honour, 10, "totals_b.honour 2");
+        assert!(totals_a.is_trickster(), "totals_a.is_trickster() 2");
+        assert!(totals_b.is_trickster(), "totals_b.is_trickster() 2");
+    }
+
+    #[test]
+    fn test_duel_honour_b_a() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        tester::fund_duelists_pool(@sys, 2);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
+        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
+        //
+        // A wins at 10 paces
+        let (mocked, moves_a, moves_b) = prefabs::get_moves_crit_b_at_10();
+        sys.rng.mock_values(mocked);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, A, B, DuelType::Seasonal, 1);
+        let (challenge, _round) = prefabs::commit_reveal_get(@sys, duel_id, A, B, mocked, moves_a, moves_b);
+        assert_eq!(challenge.winner, 2, "challenge.winner 1");
+        // different archetypes...
+        let totals_a: Totals = sys.store.get_player_totals(A);
+        let totals_b: Totals = sys.store.get_player_totals(B);
+        assert_eq!(totals_a.total_duels, 1, "totals_a.total_duels 1");
+        assert_eq!(totals_b.total_duels, 1, "totals_b.total_duels 1");
+        assert_eq!(totals_a.honour, 10, "totals_a.honour 1");
+        assert_eq!(totals_b.honour, 100, "totals_b.honour 1");
+        assert!(totals_a.is_villain(), "totals_a.is_villain() 1");
+        assert!(totals_b.is_lord(), "totals_b.is_lord() 1");
+        //
+        // B wins at 10 paces
+        let (mocked, moves_a, moves_b) = prefabs::get_moves_crit_a_at_10();
+        sys.rng.mock_values(mocked);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, A, B, DuelType::Seasonal, 1);
+        let (challenge, _round) = prefabs::commit_reveal_get(@sys, duel_id, A, B, mocked, moves_a, moves_b);
+        assert_eq!(challenge.winner, 1, "challenge.winner 2");
+        // same archetypes...
+        let totals_a: Totals = sys.store.get_player_totals(A);
+        let totals_b: Totals = sys.store.get_player_totals(B);
+        assert_eq!(totals_a.total_duels, 2, "totals_a.total_duels 2");
+        assert_eq!(totals_b.total_duels, 2, "totals_b.total_duels 2");
+        assert_gt!(totals_a.honour, 10, "totals_a.honour 2");
+        assert_lt!(totals_b.honour, 100, "totals_b.honour 2");
+        assert!(totals_a.is_trickster(), "totals_a.is_trickster() 2");
+        assert!(totals_b.is_trickster(), "totals_b.is_trickster() 2");
+    }
+
+    #[test]
+    fn test_duel_honour_zero_a() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        tester::fund_duelists_pool(@sys, 2);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
+        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
+        // dual crit at 10 paces
+        let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit_at_10();
+        sys.rng.mock_values(mocked);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, A, B, DuelType::Seasonal, 1);
+        let (challenge, _round) = prefabs::commit_reveal_get(@sys, duel_id, A, B, mocked, moves_a, moves_b);
+        assert_eq!(challenge.winner, 0, "challenge.winner 1");
+        // same archetypes...
+        let totals_a: Totals = sys.store.get_player_totals(A);
+        let totals_b: Totals = sys.store.get_player_totals(B);
+        assert_eq!(totals_a.total_duels, 1, "totals_a.total_duels 1");
+        assert_eq!(totals_b.total_duels, 1, "totals_b.total_duels 1");
+        assert_eq!(totals_a.honour, 100, "totals_a.honour 1");
+        assert_eq!(totals_b.honour, 100, "totals_b.honour 1");
+        assert!(totals_a.is_lord(), "totals_a.is_lord() 1");
+        assert!(totals_b.is_lord(), "totals_b.is_lord() 1");
+        // timeout...
+        let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_miss();
+        sys.rng.mock_values(mocked);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, A, B, DuelType::Seasonal, 1);
+        tester::execute_commit_moves(@sys.game, A, duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys.game, B, duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(@sys.game, A, duel_id, moves_a.salt, moves_a.moves);
+        // time travel...
+        let round: RoundValue = sys.store.get_round_value(duel_id);
+        tester::set_block_timestamp(round.moves_b.timeout + 1);
+        tester::execute_reveal_moves(@sys.game, B, duel_id, moves_b.salt, moves_b.moves);
+        _assert_timed_out(@sys, duel_id, 1); // 1 wins
+        // timeout duel, do not affect honour!
+        let totals_a: Totals = sys.store.get_player_totals(A);
+        let totals_b: Totals = sys.store.get_player_totals(B);
+        assert_eq!(totals_a.total_duels, 2, "totals_a.total_duels 2");
+        assert_eq!(totals_b.total_duels, 2, "totals_b.total_duels 2");
+        assert_eq!(totals_a.honour, 100, "totals_a.honour 2");
+        assert_eq!(totals_b.honour, 100, "totals_b.honour 2");
+        assert!(totals_a.is_lord(), "totals_a.is_lord() 2");
+        assert!(totals_b.is_lord(), "totals_b.is_lord() 2");
+    }
+
+    #[test]
+    fn test_duel_honour_zero_b() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        tester::fund_duelists_pool(@sys, 2);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
+        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
+        // dual crit at 10 paces
+        let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit_at_10();
+        sys.rng.mock_values(mocked);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, A, B, DuelType::Seasonal, 1);
+        let (challenge, _round) = prefabs::commit_reveal_get(@sys, duel_id, A, B, mocked, moves_a, moves_b);
+        assert_eq!(challenge.winner, 0, "challenge.winner 1");
+        // same archetypes...
+        let totals_a: Totals = sys.store.get_player_totals(A);
+        let totals_b: Totals = sys.store.get_player_totals(B);
+        assert_eq!(totals_a.total_duels, 1, "totals_a.total_duels 1");
+        assert_eq!(totals_b.total_duels, 1, "totals_b.total_duels 1");
+        assert_eq!(totals_a.honour, 100, "totals_a.honour 1");
+        assert_eq!(totals_b.honour, 100, "totals_b.honour 1");
+        assert!(totals_a.is_lord(), "totals_a.is_lord() 1");
+        assert!(totals_b.is_lord(), "totals_b.is_lord() 1");
+        // timeout...
+        let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_miss();
+        sys.rng.mock_values(mocked);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, A, B, DuelType::Seasonal, 1);
+        tester::execute_commit_moves(@sys.game, A, duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys.game, B, duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(@sys.game, B, duel_id, moves_b.salt, moves_b.moves);
+        // time travel...
+        let round: RoundValue = sys.store.get_round_value(duel_id);
+        tester::set_block_timestamp(round.moves_a.timeout + 1);
+        tester::execute_reveal_moves(@sys.game, A, duel_id, moves_a.salt, moves_a.moves);
+        _assert_timed_out(@sys, duel_id, 2); // 1 wins
+        // timeout duel, do not affect honour!
+        let totals_a: Totals = sys.store.get_player_totals(A);
+        let totals_b: Totals = sys.store.get_player_totals(B);
+        assert_eq!(totals_a.total_duels, 2, "totals_a.total_duels 2");
+        assert_eq!(totals_b.total_duels, 2, "totals_b.total_duels 2");
+        assert_eq!(totals_a.honour, 100, "totals_a.honour 2");
+        assert_eq!(totals_b.honour, 100, "totals_b.honour 2");
+        assert!(totals_a.is_lord(), "totals_a.is_lord() 2");
+        assert!(totals_b.is_lord(), "totals_b.is_lord() 2");
+    }
+
+    #[test]
+    fn test_duel_honour_seppuku() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        tester::fund_duelists_pool(@sys, 2);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
+        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
+        // dual crit at 10 paces
+        let moves_a: PlayerMoves = PlayerMovesTrait::new(SALT_A, [1, 2, 0, BladesCard::Seppuku.into()].span());
+        let moves_b: PlayerMoves = PlayerMovesTrait::new(SALT_B, [2, 1, 0, BladesCard::Seppuku.into()].span());
+        let mocked = [
+            MockedValueTrait::new('shoot_a', 99),
+            MockedValueTrait::new('shoot_b', 99),
+            MockedValueTrait::shuffled('env', [ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL].span()),
+        ].span();
+        sys.rng.mock_values(mocked);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, A, B, DuelType::Seasonal, 1);
+        let (challenge, round) = prefabs::commit_reveal_get(@sys, duel_id, A, B, mocked, moves_a, moves_b);
+        assert_eq!(challenge.winner, 0, "challenge.winner");
+        assert_eq!(round.final_blow, FinalBlow::Blades(BladesCard::Seppuku), "round.final_blow"); // ended in blades
+        // seppuku is hnourable for both
+        let totals_a: Totals = sys.store.get_player_totals(A);
+        let totals_b: Totals = sys.store.get_player_totals(B);
+        assert_eq!(totals_a.total_duels, 1, "totals_a.total_duels");
+        assert_eq!(totals_b.total_duels, 1, "totals_b.total_duels");
+        assert_eq!(totals_a.honour, 100, "totals_a.honour");
+        assert_eq!(totals_b.honour, 100, "totals_b.honour");
+        assert!(totals_a.is_lord(), "totals_a.is_lord()");
+        assert!(totals_b.is_lord(), "totals_b.is_lord()");
+    }
+
+
+    //-------------------------------
     // Commit/Reveal Fails
     //
 
@@ -1297,8 +1510,8 @@ pub mod tests {
     #[test]
     fn test_score_bonus_dodge_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
-        let moves_a: PlayerMoves = PlayerMovesTrait::new(SALT_B, [2, 1, 0, BladesCard::Seppuku.into()].span());
-        let moves_b: PlayerMoves = PlayerMovesTrait::new(SALT_A, [1, 3, 0, BladesCard::Seppuku.into()].span());
+        let moves_a: PlayerMoves = PlayerMovesTrait::new(SALT_A, [2, 1, 0, BladesCard::Seppuku.into()].span());
+        let moves_b: PlayerMoves = PlayerMovesTrait::new(SALT_B, [1, 3, 0, BladesCard::Seppuku.into()].span());
         sys.rng.mock_values([
                 MockedValueTrait::new('shoot_a', 99),
                 MockedValueTrait::new('shoot_b', 99),
