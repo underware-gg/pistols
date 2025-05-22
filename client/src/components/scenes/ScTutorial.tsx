@@ -19,6 +19,7 @@ import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
 import { SettingsActions, useSettings } from '/src/hooks/SettingsContext'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
+import { useTextureShift } from '/src/hooks/useTextureShift'
 
 export default function ScTutorial({ currentTutorialScene }: { currentTutorialScene: string }) {
   // Scene & Context
@@ -29,6 +30,7 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
   // Game Events
   const { value: itemHovered } = useGameEvent('hover_item', null)
   const { value: itemClicked, timestamp } = useGameEvent('scene_click', null)
+  const { x: demonShiftX, y: demonShiftY } = useTextureShift(2)
 
   // Web3 Hooks
   const { isConnecting } = useAccount()
@@ -465,7 +467,7 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
         </div>
       )}
       {currentTutorialScene === SceneName.TutorialScene4 && (
-        <div className='DemonTalkBaloon NoMouse NoDrag' style={{ opacity: textOpacity }}>
+        <div className='DemonTalkBaloon NoMouse NoDrag' style={{ opacity: textOpacity, transform: `translate(${demonShiftX}px, ${demonShiftY}px)` }}>
           <AnimatedText 
             text={displayText?.text} 
             delayPerCharacter={ANIMATION_TIME_PER_LETTER} 

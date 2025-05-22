@@ -1442,7 +1442,7 @@ $logo-url: '/logos/logo_avante.svg';
 
 .DemonTalkBaloon {
   @extend .DialogBalloon;
-  top: 20%;
+  top: 10%;
   left: 5%;
   font-size: aspect-width(2);
   color: $color-bright;
