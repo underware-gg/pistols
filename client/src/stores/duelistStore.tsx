@@ -362,6 +362,19 @@ export const usePlayerDuelistsOrganized = () => {
       activeDuelists: activeDuelists.sort(sortById),
       deadDuelists: deadDuelists.sort(sortById)
     }
+    
+    //To get all duelists minted in the duelist book
+    // const allDuelistIds = Object.entries(entities).map(([entityId, entity]) => {
+    //   const duelist = entity?.models?.pistols?.Duelist;
+    //   return duelist?.duelist_id;
+    // }).filter(Boolean);
+    
+    // const sortedDuelistIds = allDuelistIds.sort(sortById);
+    
+    // return {
+    //   activeDuelists: sortedDuelistIds,
+    //   deadDuelists: []
+    // }
   }, [stacks, entities, duelistIds])
 
   return {

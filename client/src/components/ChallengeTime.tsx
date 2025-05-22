@@ -4,6 +4,9 @@ import { formatTimestampLocal, formatTimestampDeltaElapsed, formatTimestampDelta
 import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
 import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
 
+const SIX_HOURS = 6 * 60 * 60
+const TWELVE_HOURS = 12 * 60 * 60
+
 export function ChallengeTime({
   duelId,
   prefixed = false,
@@ -31,16 +34,34 @@ export function ChallengeTime({
       : formatTimestampLocal(timestampStart)
   }, [isCanceled, isFinished, clientSeconds, timestampStart, timestampEnd])
 
+  // Get timer state based on time remaining
+  const getTimerState = (timeLeft: number) => {
+    // For both 7-day and 24h countdowns, use the same thresholds
+    if (timeLeft <= SIX_HOURS) return 'Critical'
+    if (timeLeft <= TWELVE_HOURS) return 'Warning'
+    return 'Normal'
+  }
+
+  // Calculate time remaining for the countdown timer
+  const countdownTimeLeft = useMemo(() => {
+    if (!isAwaiting && !isLive) return null
+    const timestamp = Math.max(timestampEnd, timeoutTimestamp)
+    return timestamp ? timestamp - clientSeconds : null
+  }, [isAwaiting, isLive, timestampEnd, timeoutTimestamp, clientSeconds])
+
   return (
     <>
       {elapsed && <>
-        {` ${EMOJIS.IN_PROGRESS} `} <span className='Number Smaller'>{elapsed}</span>
+        {` ${EMOJIS.IN_PROGRESS} `} <span className='Number Small'>{elapsed}</span>
       </>}
       {countdown && <>
-        {` ${EMOJIS.AWAITING} `} <span className='Number Smaller'>{countdown}</span>
+        {` ${EMOJIS.AWAITING} `} 
+        <span className={`Number Small TimerCountdown ${getTimerState(countdownTimeLeft || 0)}`}>
+          {countdown}
+        </span>
       </>}
       {(!elapsed && !countdown) && <>
-        <span className='Number Smaller'>{date}</span>
+        <span className='Number Small'>{date}</span>
       </>}
     </>
   )

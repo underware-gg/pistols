@@ -394,7 +394,24 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
               <Row columns='equal' textAlign='center'>
                 <Col>
                   <h3 className='Quote Darkest'>{`"${message}"`}</h3>
-                  <h3 className='Quote Darkest'>~ Staking {livesStaked} {livesStaked == 1 ? 'life' : 'lives!'} ~</h3>
+                  <h3 className='Quote Darkest'>
+                    ~ {livesStaked === 3 ? (
+                      <>
+                        <span className='HighStakesText'>Staking</span> {
+                          <span className='SpecialLives'>
+                            <div className='fire'>
+                              {Array.from({ length: 50 }).map((_, i) => (
+                                <div key={i} className='particle' />
+                              ))}
+                            </div>
+                            <span className='NumberThree'>&nbsp;3&nbsp;</span>
+                          </span>
+                        } <span className='HighStakesText'>lives!</span>
+                      </>
+                    ) : (
+                      <>Staking {livesStaked} {livesStaked === 1 ? 'life' : 'lives!'}</>
+                    )} ~
+                  </h3>
                 </Col>
               </Row>
 

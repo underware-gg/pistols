@@ -429,3 +429,95 @@
     }
   }
 }
+
+$fireColor: rgb(128,0,128);
+$fireColorT: rgba(128,0,128,0);
+$color-purple: #800080;
+$dur: 1s;
+$blur: aspect-width(0.02);
+$fireRad: aspect-width(3);
+$parts: 50;
+$partSize: aspect-width(4);
+
+.SpecialLives {
+  position: relative;
+  display: inline;
+  line-height: 1;
+
+  .fire {
+    font-size: aspect-width(20);
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.32);
+    width: aspect-width(8);
+    height: aspect-width(10);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .particle {
+    animation: rise $dur ease-in infinite;
+    background-image: radial-gradient($fireColor 20%,$fireColorT 70%);
+    border-radius: 50%;
+    mix-blend-mode: screen;
+    opacity: 0;
+    position: absolute;
+    bottom: 0;
+    width: $partSize;
+    height: $partSize;
+    @for $p from 1 through $parts {
+      &:nth-of-type(#{$p}) {
+        animation-delay: $dur * random();
+        left: calc((100% - #{$partSize}) * #{($p - 1)/$parts});
+      }
+    }
+  }
+
+  .NumberThree {
+    position: relative;
+    z-index: 2;
+    font-size: aspect-width(2);
+    color: white;
+    text-shadow: 
+      -1px -1px 0 $color-purple,
+      1px -1px 0 $color-purple,
+      -1px 1px 0 $color-purple,
+      1px 1px 0 $color-purple;
+  }
+}
+
+.HighStakesText {
+  background: linear-gradient(to bottom, #800080, #ff0000);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: bold;
+  text-shadow: 0 0 3px rgba(128, 0, 128, 0.4);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(0) scale(1);
+  }
+  25% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(aspect-width(-8)) scale(0);
+  }
+}
+
+.TimerCountdown {
+  &.Normal {
+    color: $color-darkest !important;
+  }
+  &.Warning {
+    color: $color-medium !important;
+  }
+  &.Critical {
+    color: $color-negative !important;
+  }
+}
