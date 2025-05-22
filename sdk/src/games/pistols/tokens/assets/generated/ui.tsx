@@ -3,6 +3,7 @@
 import { AssetFolder } from '../assets';
 
 export const assets: AssetFolder = {
+  _images_ui_black_stamp_cork_png: async () => (await import('./encoded/_images_ui_black_stamp_cork_png')).default,
   _images_ui_card_pack_edge_png: async () => (await import('./encoded/_images_ui_card_pack_edge_png')).default,
   _images_ui_card_pack_flap_background_png: async () => (await import('./encoded/_images_ui_card_pack_flap_background_png')).default,
   _images_ui_card_pack_flap_inner_png: async () => (await import('./encoded/_images_ui_card_pack_flap_inner_png')).default,
