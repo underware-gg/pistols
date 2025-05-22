@@ -17,7 +17,8 @@ import * as path from 'path';
 // const { makePistolsPolicies } = config
 // import { ChainId } from '../src/dojo/setup/chains'
 
-import { makePistolsPolicies, NetworkId } from '../pistols.js'
+import { NetworkId } from '../pistols_config.js'
+import { makePistolsPolicies } from '../pistols_dojo.js'
 
 function buildFileContents(chainId, existingContents) {
   let networkId;
