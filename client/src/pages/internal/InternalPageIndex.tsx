@@ -78,6 +78,7 @@ export function InternalPageWrapper({ children }: { children?: React.ReactNode }
     || bigintEquals(address, '0x0550212d3f13a373dfe9e3ef6aa41fba4124bde63fd7955393f879de19f3f47f') // mata
     || bigintEquals(address, '0x052eaece65e70b394f6907fbef609a143466ee0b861bc339306ab54dc8668a25') // reci
     || bigintEquals(address, '0x07e268203c670265e8af497a201d568947db4087438c7fdac2be3b956de73811') // fortuna
+    || bigintEquals(address, '0x0638c91e19171822a8521f206530278adf2530e06cb9ae2fb3adfac776ff8a73') // parsa
     || bigintEquals(address, '0x0458f10bf89dfd916eaeabbf6866870bd5bb8b05c6df7de0ad36bb8ad66dce69') // rogers
     || bigintEquals(address, '0x010b685e795f70a7fb32d473878154e38a2668372dfe5d01d6cbdd9309d1be7f') // calc
     || bigintEquals(address, '0x013f1386e3d4267a1502d8ca782d34b63634d969d3c527a511814c2ef67b84c4') // tarrence
