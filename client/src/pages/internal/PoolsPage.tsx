@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react'
 import { Container, Table } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSystem, useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
-import { usePool, useSeasonPool, UsePoolResult, useFundedStarterPackCount } from '/src/stores/bankStore'
+import { usePool, useSeasonPool, UsePoolResult, useFundedStarterPackCount, usePurchasedUnopenedDuelistPackCount } from '/src/stores/bankStore'
 import { useFameBalance, useLordsBalance } from '/src/stores/coinStore'
 import { useERC20TotalSupply } from '@underware/pistols-sdk/utils/hooks'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
@@ -84,12 +84,13 @@ function Account() {
 
 function Bank() {
   const { account } = useAccount()
-  const { priceLords } = usePackType(constants.PackType.StarterPack)
   const [packCount, setPackCount] = useState(1)
   const [sponsorLords, setSponsorLords] = useState(1000)
+
+  const { fundedCount, priceLords, balanceLords } = useFundedStarterPackCount()
   const fundAmount = useMemo(() => (priceLords * BigInt(packCount)), [priceLords, packCount])
 
-  const { fundedCount } = useFundedStarterPackCount()
+  const { fundedCount: duelistPackCount, priceLords: duelistPackPriceLords, balanceLords: duelistPackBalanceLords } = usePurchasedUnopenedDuelistPackCount()
 
   const { bank } = useDojoSystemCalls()
   const _fund_packs = () => {
@@ -99,25 +100,40 @@ function Bank() {
     bank.sponsor_season(account, ethToWei(sponsorLords))
   }
 
-  const poolPurchases = usePool(constants.PoolType.Purchases)
-
   return (
     <Table celled striped size='small' color='orange'>
       <Header>
         <Row>
           <HeaderCell width={4}><h3>Starter Packs</h3></HeaderCell>
-          <HeaderCell><h5></h5></HeaderCell>
+          <HeaderCell><h5>Quantity</h5></HeaderCell>
+          <HeaderCell><h5>Cost per Pack</h5></HeaderCell>
+          <HeaderCell><h5>Balance</h5></HeaderCell>
           <HeaderCell><h5></h5></HeaderCell>
         </Row>
       </Header>
       <Body className='H5'>
-        <PoolRow pool={poolPurchases}/>
         <Row className='ModalText'>
-          <Cell>Funded Packs:</Cell>
+          <Cell>Funded Starter Packs:</Cell>
           <Cell className='Code' textAlign='left'>
             {fundedCount}
           </Cell>
-          <Cell className='Code' textAlign='right'>
+          <Cell className='Code' textAlign='left'>
+            <Balance lords wei={priceLords} size='big' />
+          </Cell>
+          <Cell className='Code' textAlign='left'>
+            <Balance lords wei={balanceLords} size='big' />
+          </Cell>
+        </Row>
+        <Row className='ModalText'>
+          <Cell>Unopened Genesis Packs:</Cell>
+          <Cell className='Code' textAlign='left'>
+            {duelistPackCount}
+          </Cell>
+          <Cell className='Code' textAlign='left'>
+            <Balance lords wei={duelistPackPriceLords} size='big' />
+          </Cell>
+          <Cell className='Code' textAlign='left'>
+            <Balance lords wei={duelistPackBalanceLords} size='big' />
           </Cell>
         </Row>
         <Row>
@@ -133,7 +149,7 @@ function Bank() {
             &nbsp;
             <Balance lords wei={fundAmount} pre='Cost:' size='big' />
           </Cell>
-          <Cell className='Code' textAlign='right'>
+          <Cell className='Smaller'>
             <BalanceRequiredButton
               label={`Fund ${packCount} More Packs`}
               disabled={packCount === 0}
@@ -142,6 +158,7 @@ function Bank() {
               onClick={_fund_packs}
             />
           </Cell>
+          <Cell></Cell>
         </Row>
         <Row>
           <Cell className='ModalText'>Sponsor Season:</Cell>
@@ -157,7 +174,7 @@ function Bank() {
             &nbsp;
             <Balance lords eth={sponsorLords} size='big' />
           </Cell>
-          <Cell className='Code' textAlign='right'>
+          <Cell className='Smaller'>
             <BalanceRequiredButton
               label={`Sponsor Season`}
               disabled={sponsorLords === 0}
@@ -166,6 +183,7 @@ function Bank() {
               onClick={_sponsor_season}
             />
           </Cell>
+          <Cell></Cell>
         </Row>
       </Body>
     </Table>
@@ -190,6 +208,7 @@ function Pools() {
   const fameLivingDuelists = useMemo(() => ((fameSupply ?? 0n) - (bankFameBalance ?? 0n)), [fameSupply, bankFameBalance])
   const { fame: fameLivingIntoLords, percentage: fameLivingIntoLordsPercentage } = useFameIntoLords(fameLivingDuelists)
 
+  const poolClaimable = usePool(constants.PoolType.Claimable)
   const poolPurchases = usePool(constants.PoolType.Purchases)
   const poolFamePeg = usePool(constants.PoolType.FamePeg)
   const poolSacrifice = usePool(constants.PoolType.Sacrifice)
@@ -198,11 +217,11 @@ function Pools() {
   const poolSeason = useSeasonPool(currentSeasonId)
 
   const poolTotalLords = useMemo(() => (
-    poolPurchases.balanceLords + poolFamePeg.balanceLords + poolSacrifice.balanceLords + poolSeason.balanceLords
-  ), [poolPurchases, poolFamePeg, poolSacrifice, poolSeason])
+    poolClaimable.balanceLords + poolPurchases.balanceLords + poolFamePeg.balanceLords + poolSacrifice.balanceLords + poolSeason.balanceLords
+  ), [poolClaimable, poolPurchases, poolFamePeg, poolSacrifice, poolSeason])
   const poolTotalFame = useMemo(() => (
-    poolPurchases.balanceFame + poolFamePeg.balanceFame + poolSacrifice.balanceFame + poolSeason.balanceFame
-  ), [poolPurchases, poolFamePeg, poolSacrifice, poolSeason])
+    poolClaimable.balanceFame + poolPurchases.balanceFame + poolFamePeg.balanceFame + poolSacrifice.balanceFame + poolSeason.balanceFame
+  ), [poolClaimable, poolPurchases, poolFamePeg, poolSacrifice, poolSeason])
   const { fame: totalFameIntoLords, percentage: totalFameIntoLordsPercentage } = useFameIntoLords(poolTotalFame)
 
   const diffLords = useMemo(() => (bankLordsBalance - poolTotalLords), [bankLordsBalance, poolTotalLords])
@@ -278,11 +297,12 @@ function Pools() {
           </Cell>
         </Row>
 
-        <PoolRow pool={poolPurchases} description='Funded + unopened purchased packs' />
+        <PoolRow pool={poolClaimable} description='Sponsored free duelists' />
+        <PoolRow pool={poolPurchases} description='Unopened purchased packs' />
         <PoolRow pool={poolFamePeg} description='Pegged to full FAME supply' />
         <PoolRow pool={poolSeason} description='Season prizes (dead duelists)' />
         <PoolRow pool={poolSacrifice} description='Reserved for Sacrifice (dead duelists)' />
-        
+
         <Row className=''>
           <Cell className='ModalText'>Pools Total</Cell>
           <Cell className='Code' textAlign='left'>
@@ -305,12 +325,12 @@ function Pools() {
         <Row className=''>
           <Cell className='ModalText'>Surplus</Cell>
           <Cell className='Code' textAlign='left'>
-            {diffLords >= 0n ? <>✅</> : <>❌</>}
+            {diffLords == 0n ? <>✅</> : diffLords > 0n ? <>‼️</> : <>❌</>}
             &nbsp;
             <Balance lords wei={diffLords} size='big' />
           </Cell>
           <Cell className='Code' textAlign='left'>
-            {diffFame >= 0n ? <>✅</> : <>❌</>}
+            {diffFame == 0n ? <>✅</> : diffFame > 0n ? <>‼️</> : <>❌</>}
             &nbsp;
             <Balance fame wei={diffFame} size='big' />
           </Cell>
@@ -344,7 +364,7 @@ function PoolRow({
     <Row className=''>
       <Cell className='ModalText'>
         🏷️ Pool::{poolType}{seasonId ? `(${seasonId})` : ''}
-        </Cell>
+      </Cell>
       <Cell className='Code' textAlign='left'>
         {displayLords && <Balance lords wei={balanceLords} size='big' />}
       </Cell>
@@ -382,6 +402,6 @@ const useFameIntoLords = (balanceFame: bigint) => {
 
 const _formatWei = (wei: bigint) => {
   let dec = bigintToDecimal(wei);
-  if (dec.length < 19) dec =  `00000000000000000000${dec}`.slice(-19);
+  if (dec.length < 19) dec = `00000000000000000000${dec}`.slice(-19);
   return `${dec.slice(0, -18)}.${dec.slice(-18)}`;
 }

@@ -58,11 +58,24 @@ export const useTournamentPool = (tournament_id: BigNumberish) => {
 // count the number of funded Starter Packs
 // If zero, claiming will fail!
 export const useFundedStarterPackCount = () => {
-  const { balanceLords } = usePool(constants.PoolType.Purchases)
+  const { balanceLords } = usePool(constants.PoolType.Claimable)
   const { priceLords } = usePackType(constants.PackType.StarterPack)
   const fundedCount = useMemo(() => Number(balanceLords / priceLords), [balanceLords, priceLords])
   return {
     fundedCount,
+    priceLords,
+    balanceLords,
+  }
+}
+
+export const usePurchasedUnopenedDuelistPackCount = () => {
+  const { balanceLords } = usePool(constants.PoolType.Purchases)
+  const { priceLords } = usePackType(constants.PackType.GenesisDuelists5x)
+  const fundedCount = useMemo(() => Number(balanceLords / priceLords), [balanceLords, priceLords])
+  return {
+    fundedCount,
+    priceLords,
+    balanceLords,
   }
 }
 

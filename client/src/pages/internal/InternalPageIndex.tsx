@@ -1,10 +1,13 @@
 import React, { useMemo, useState } from 'react'
+import { useAccount } from '@starknet-react/core'
 import { useLocation, useNavigate } from 'react-router'
 import { Container, Menu, MenuItem } from 'semantic-ui-react'
 import { TestPageMainMenu } from '/src/pages/tests/TestPageIndex'
-import App from '/src/components/App'
-import { useAccount } from '@starknet-react/core'
 import { bigintEquals } from '@underware/pistols-sdk/utils'
+import { stringToFelt } from '@underware/pistols-sdk/starknet'
+import { ChainId } from '@underware/pistols-sdk/pistols/config'
+import App from '/src/components/App'
+import { usePlayer } from '/src/stores/playerStore'
 
 const internalPages = [
   { name: 'contracts', connected: true },
@@ -72,9 +75,12 @@ export function InternalPageMenu() {
 }
 
 export function InternalPageWrapper({ children }: { children?: React.ReactNode }) {
-  const { address, connector } = useAccount()
+  const { address, connector, chainId } = useAccount()
+  const { isAdmin, isTeamMember } = usePlayer(address)
   const isAuthorized = useMemo(() => (
     connector?.id === 'predeployed'
+    || chainId != stringToFelt(ChainId.SN_MAIN)
+    || isAdmin || isTeamMember
     || bigintEquals(address, '0x0550212d3f13a373dfe9e3ef6aa41fba4124bde63fd7955393f879de19f3f47f') // mata
     || bigintEquals(address, '0x052eaece65e70b394f6907fbef609a143466ee0b861bc339306ab54dc8668a25') // reci
     || bigintEquals(address, '0x07e268203c670265e8af497a201d568947db4087438c7fdac2be3b956de73811') // fortuna

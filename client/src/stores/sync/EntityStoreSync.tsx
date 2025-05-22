@@ -124,7 +124,7 @@ export function EntityStoreSync() {
       console.log("EntityStoreSync() SET MISC =======> [entities]:", entities)
       // console.log("EntityStoreSync() SET =======> [Config]:", filterEntitiesByModels(entities, ['Config']))
       // console.log("EntityStoreSync() SET =======> [TokenConfig]:", filterEntitiesByModels(entities, ['TokenConfig']))
-      // console.log("EntityStoreSync() SET =======> [Pool]:", filterEntitiesByModels(entities, ['Pool']))
+      console.log("EntityStoreSync() SET =======> [Pool]:", filterEntitiesByModels(entities, ['Pool']))
       // console.log("EntityStoreSync() SET =======> [SeasonConfig]:", filterEntitiesByModels(entities, ['SeasonConfig', 'Leaderboard']))
       // console.log("EntityStoreSync() SET =======> [Leaderboard]:", filterEntitiesByModels(entities, ['Leaderboard']))
       configState.setEntities(filterEntitiesByModels(entities, ['Config']))
