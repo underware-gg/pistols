@@ -20,8 +20,8 @@ transactions = true
 world_block = 1
 contracts = [
   "erc721:0x59df3645d3614c3cdd6d2d744c2ea90cc877ee4430dba98b2a2f82123dbe807", # duel_token
-  "erc721:0x55c8ecb7ef85097f15aaae24188b4c77e9a5fdd93d2a17b848d00c2483f18f0", # duelist_token
-  "erc721:0x630e0091703650f1fe2be501369acda2eacaaadee96c6ab24189750e1b73ffa", # pack_token
+  "erc721:0x351c40faf4b90a9124e1fa9de2e8cfd5dd4c00b30644db247a5d7a1ca2c2390", # duelist_token
+  "erc721:0x2d4fff346456045e7e423126db576a9e6a51c7f151780c731b645a40f2dfcfb", # pack_token
   # "erc721:$tournament_token", # tournament_token
   "erc20:0x51adc6aa7bf88a528ae5f7342d5a26a86610634da7e73f3b42ee6d6f86ce8d9", # fame_coin
   "erc20:0x7a9d496c57f5832230d2379300c49fd665378d79931e210af4f6a1b668b9bec", # fools_coin

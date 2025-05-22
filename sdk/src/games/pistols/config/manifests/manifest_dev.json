@@ -1328,8 +1328,8 @@
   },
   "contracts": [
     {
-      "address": "0x574775ecfefed2a848c15f4170c0ecada76c95636c5212cedce20655d1d01f7",
-      "class_hash": "0x7a63a00a1ac85b1acdece7dc694a4da21268cb50ad29c300aa50ccdd95c18d9",
+      "address": "0x8f9675d5578b15830e6cfd24b580d186201524d77b49a5310de5aa500d520",
+      "class_hash": "0x1c5e408f9fd6d73f9ef757650e59aae10c7ab9405abafce66bb5dd70425851a",
       "abi": [
         {
           "type": "impl",
@@ -1681,8 +1681,8 @@
       ]
     },
     {
-      "address": "0x226a776706b84725f942cb37bb1dbea926467d7bb42a41a9fba2d5283e42475",
-      "class_hash": "0x6ccea34a847b69c420da2fbd4ffc5d7bb5a34f4e2f1e944b5928aa219490b79",
+      "address": "0x2cf5dfe43ebbb0d28e5b8e2d9e5f598587dfc7201202d66a3bd498c1d7b3512",
+      "class_hash": "0x374a7552875e17fc977a51635f853b918fd55507f75e946eb358448d9a7c90a",
       "abi": [
         {
           "type": "impl",
@@ -1840,6 +1840,40 @@
         },
         {
           "type": "enum",
+          "name": "pistols::models::pool::PoolType",
+          "variants": [
+            {
+              "name": "Undefined",
+              "type": "()"
+            },
+            {
+              "name": "Purchases",
+              "type": "()"
+            },
+            {
+              "name": "FamePeg",
+              "type": "()"
+            },
+            {
+              "name": "Season",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "Tournament",
+              "type": "core::integer::u64"
+            },
+            {
+              "name": "Sacrifice",
+              "type": "()"
+            },
+            {
+              "name": "Claimable",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "enum",
           "name": "pistols::models::pool::ReleaseReason",
           "variants": [
             {
@@ -1905,36 +1939,6 @@
           ]
         },
         {
-          "type": "enum",
-          "name": "pistols::models::pool::PoolType",
-          "variants": [
-            {
-              "name": "Undefined",
-              "type": "()"
-            },
-            {
-              "name": "Purchases",
-              "type": "()"
-            },
-            {
-              "name": "FamePeg",
-              "type": "()"
-            },
-            {
-              "name": "Season",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "Tournament",
-              "type": "core::integer::u64"
-            },
-            {
-              "name": "Sacrifice",
-              "type": "()"
-            }
-          ]
-        },
-        {
           "type": "interface",
           "name": "pistols::systems::bank::IBankProtected",
           "items": [
@@ -1956,7 +1960,7 @@
             },
             {
               "type": "function",
-              "name": "peg_minted_fame_to_purchased_lords",
+              "name": "peg_minted_fame_to_lords",
               "inputs": [
                 {
                   "name": "payer",
@@ -1965,6 +1969,10 @@
                 {
                   "name": "lords_amount",
                   "type": "core::integer::u128"
+                },
+                {
+                  "name": "from_pool_type",
+                  "type": "pistols::models::pool::PoolType"
                 }
               ],
               "outputs": [],
@@ -2144,7 +2152,7 @@
         "sponsor_tournament",
         "collect_season",
         "charge_purchase",
-        "peg_minted_fame_to_purchased_lords",
+        "peg_minted_fame_to_lords",
         "release_lords_from_fame_to_be_burned",
         "duelist_lost_fame_to_pool",
         "upgrade"
@@ -3461,8 +3469,8 @@
       ]
     },
     {
-      "address": "0x55c8ecb7ef85097f15aaae24188b4c77e9a5fdd93d2a17b848d00c2483f18f0",
-      "class_hash": "0xf0400ea9af6515913e91b848a06c2b86d6b603a9e447ed9dfde8f24fa9d051",
+      "address": "0x351c40faf4b90a9124e1fa9de2e8cfd5dd4c00b30644db247a5d7a1ca2c2390",
+      "class_hash": "0x308de81feb305f8e73c4c21a030b0519751ea6580fa014334c32d1bf106f147",
       "abi": [
         {
           "type": "impl",
@@ -6584,8 +6592,8 @@
       ]
     },
     {
-      "address": "0x7817279726126df6b934b2b0f907dac4d6177d6f44de91914be1017536507c8",
-      "class_hash": "0x7e1edb270ddebc3bb3765b0c5ba7ded36f55ef1e8d5a37d52a67b2e8f2a09f2",
+      "address": "0x6c620f541ae79734046bbab4d7f6b35e29ca2d0de97fb469bd091995ba14568",
+      "class_hash": "0x5d2b69f58ef38a2e0b3e9eaa5b93db52888714c3e9b2c3359f52e00990c1573",
       "abi": [
         {
           "type": "impl",
@@ -7435,6 +7443,765 @@
       ]
     },
     {
+      "address": "0x1d162cdd2f8d0ad4b0e6b37ee7e949d19bb6595f49d3302317e45537b7784fd",
+      "class_hash": "0x4832270fad4cf7a0b4cbf3adbcbfa81d8f373a1495c60d785e50ce821b258d2",
+      "abi": [
+        {
+          "type": "impl",
+          "name": "game_loop__ContractImpl",
+          "interface_name": "dojo::contract::interface::IContract"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::interface::IContract",
+          "items": []
+        },
+        {
+          "type": "impl",
+          "name": "game_loop__DeployedContractImpl",
+          "interface_name": "dojo::meta::interface::IDeployedResource"
+        },
+        {
+          "type": "struct",
+          "name": "core::byte_array::ByteArray",
+          "members": [
+            {
+              "name": "data",
+              "type": "core::array::Array::<core::bytes_31::bytes31>"
+            },
+            {
+              "name": "pending_word",
+              "type": "core::felt252"
+            },
+            {
+              "name": "pending_word_len",
+              "type": "core::integer::u32"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "dojo::meta::interface::IDeployedResource",
+          "items": [
+            {
+              "type": "function",
+              "name": "dojo_name",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "GameLoopImpl",
+          "interface_name": "pistols::systems::game_loop::IGameLoop"
+        },
+        {
+          "type": "enum",
+          "name": "core::bool",
+          "variants": [
+            {
+              "name": "False",
+              "type": "()"
+            },
+            {
+              "name": "True",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "pistols::systems::rng_mock::MockedValue",
+          "members": [
+            {
+              "name": "salt",
+              "type": "core::felt252"
+            },
+            {
+              "name": "value",
+              "type": "core::felt252"
+            },
+            {
+              "name": "exists",
+              "type": "core::bool"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<pistols::systems::rng_mock::MockedValue>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<pistols::systems::rng_mock::MockedValue>"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "core::option::Option::<core::array::Span::<pistols::systems::rng_mock::MockedValue>>",
+          "variants": [
+            {
+              "name": "Some",
+              "type": "core::array::Span::<pistols::systems::rng_mock::MockedValue>"
+            },
+            {
+              "name": "None",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "pistols::systems::rng_mock::RngWrap",
+          "members": [
+            {
+              "name": "rng_address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "mocked",
+              "type": "core::option::Option::<core::array::Span::<pistols::systems::rng_mock::MockedValue>>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<core::integer::u8>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<core::integer::u8>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "pistols::types::cards::deck::Deck",
+          "members": [
+            {
+              "name": "fire_cards",
+              "type": "core::array::Span::<core::integer::u8>"
+            },
+            {
+              "name": "dodge_cards",
+              "type": "core::array::Span::<core::integer::u8>"
+            },
+            {
+              "name": "tactics_cards",
+              "type": "core::array::Span::<core::integer::u8>"
+            },
+            {
+              "name": "blades_cards",
+              "type": "core::array::Span::<core::integer::u8>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "pistols::models::challenge::Moves",
+          "members": [
+            {
+              "name": "salt",
+              "type": "core::felt252"
+            },
+            {
+              "name": "hashed",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "timeout",
+              "type": "core::integer::u64"
+            },
+            {
+              "name": "card_1",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "card_2",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "card_3",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "card_4",
+              "type": "core::integer::u8"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "pistols::models::challenge::DuelistState",
+          "members": [
+            {
+              "name": "chances",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "damage",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "health",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "dice_fire",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "honour",
+              "type": "core::integer::u8"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "pistols::types::round_state::RoundState",
+          "variants": [
+            {
+              "name": "Null",
+              "type": "()"
+            },
+            {
+              "name": "Commit",
+              "type": "()"
+            },
+            {
+              "name": "Reveal",
+              "type": "()"
+            },
+            {
+              "name": "Finished",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "pistols::types::cards::paces::PacesCard",
+          "variants": [
+            {
+              "name": "None",
+              "type": "()"
+            },
+            {
+              "name": "Paces1",
+              "type": "()"
+            },
+            {
+              "name": "Paces2",
+              "type": "()"
+            },
+            {
+              "name": "Paces3",
+              "type": "()"
+            },
+            {
+              "name": "Paces4",
+              "type": "()"
+            },
+            {
+              "name": "Paces5",
+              "type": "()"
+            },
+            {
+              "name": "Paces6",
+              "type": "()"
+            },
+            {
+              "name": "Paces7",
+              "type": "()"
+            },
+            {
+              "name": "Paces8",
+              "type": "()"
+            },
+            {
+              "name": "Paces9",
+              "type": "()"
+            },
+            {
+              "name": "Paces10",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "pistols::types::cards::blades::BladesCard",
+          "variants": [
+            {
+              "name": "None",
+              "type": "()"
+            },
+            {
+              "name": "Seppuku",
+              "type": "()"
+            },
+            {
+              "name": "PocketPistol",
+              "type": "()"
+            },
+            {
+              "name": "Behead",
+              "type": "()"
+            },
+            {
+              "name": "Grapple",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "pistols::types::cards::hand::FinalBlow",
+          "variants": [
+            {
+              "name": "Undefined",
+              "type": "()"
+            },
+            {
+              "name": "Paces",
+              "type": "pistols::types::cards::paces::PacesCard"
+            },
+            {
+              "name": "Blades",
+              "type": "pistols::types::cards::blades::BladesCard"
+            },
+            {
+              "name": "Forsaken",
+              "type": "()"
+            },
+            {
+              "name": "Unpaired",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "pistols::models::challenge::Round",
+          "members": [
+            {
+              "name": "duel_id",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "moves_a",
+              "type": "pistols::models::challenge::Moves"
+            },
+            {
+              "name": "moves_b",
+              "type": "pistols::models::challenge::Moves"
+            },
+            {
+              "name": "state_a",
+              "type": "pistols::models::challenge::DuelistState"
+            },
+            {
+              "name": "state_b",
+              "type": "pistols::models::challenge::DuelistState"
+            },
+            {
+              "name": "state",
+              "type": "pistols::types::round_state::RoundState"
+            },
+            {
+              "name": "final_blow",
+              "type": "pistols::types::cards::hand::FinalBlow"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "pistols::types::cards::env::EnvCard",
+          "variants": [
+            {
+              "name": "None",
+              "type": "()"
+            },
+            {
+              "name": "DamageUp",
+              "type": "()"
+            },
+            {
+              "name": "DamageDown",
+              "type": "()"
+            },
+            {
+              "name": "ChancesUp",
+              "type": "()"
+            },
+            {
+              "name": "ChancesDown",
+              "type": "()"
+            },
+            {
+              "name": "DoubleDamageUp",
+              "type": "()"
+            },
+            {
+              "name": "DoubleChancesUp",
+              "type": "()"
+            },
+            {
+              "name": "SpecialAllShotsHit",
+              "type": "()"
+            },
+            {
+              "name": "SpecialAllShotsMiss",
+              "type": "()"
+            },
+            {
+              "name": "SpecialDoubleTactics",
+              "type": "()"
+            },
+            {
+              "name": "SpecialNoTactics",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "pistols::types::cards::tactics::TacticsCard",
+          "variants": [
+            {
+              "name": "None",
+              "type": "()"
+            },
+            {
+              "name": "Insult",
+              "type": "()"
+            },
+            {
+              "name": "CoinToss",
+              "type": "()"
+            },
+            {
+              "name": "Vengeful",
+              "type": "()"
+            },
+            {
+              "name": "ThickCoat",
+              "type": "()"
+            },
+            {
+              "name": "Reversal",
+              "type": "()"
+            },
+            {
+              "name": "Bananas",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "pistols::types::duel_progress::SpecialsDrawn",
+          "members": [
+            {
+              "name": "tactics",
+              "type": "pistols::types::cards::tactics::TacticsCard"
+            },
+            {
+              "name": "coin_toss",
+              "type": "core::bool"
+            },
+            {
+              "name": "reversal",
+              "type": "core::bool"
+            },
+            {
+              "name": "shots_modifier",
+              "type": "pistols::types::cards::env::EnvCard"
+            },
+            {
+              "name": "tactics_modifier",
+              "type": "pistols::types::cards::env::EnvCard"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "pistols::types::duel_progress::DuelistDrawnCard",
+          "variants": [
+            {
+              "name": "None",
+              "type": "()"
+            },
+            {
+              "name": "Fire",
+              "type": "pistols::types::cards::paces::PacesCard"
+            },
+            {
+              "name": "Dodge",
+              "type": "pistols::types::cards::paces::PacesCard"
+            },
+            {
+              "name": "Blades",
+              "type": "pistols::types::cards::blades::BladesCard"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "pistols::types::duel_progress::DuelStep",
+          "members": [
+            {
+              "name": "pace",
+              "type": "pistols::types::cards::paces::PacesCard"
+            },
+            {
+              "name": "card_env",
+              "type": "pistols::types::cards::env::EnvCard"
+            },
+            {
+              "name": "dice_env",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "specials_a",
+              "type": "pistols::types::duel_progress::SpecialsDrawn"
+            },
+            {
+              "name": "specials_b",
+              "type": "pistols::types::duel_progress::SpecialsDrawn"
+            },
+            {
+              "name": "card_a",
+              "type": "pistols::types::duel_progress::DuelistDrawnCard"
+            },
+            {
+              "name": "card_b",
+              "type": "pistols::types::duel_progress::DuelistDrawnCard"
+            },
+            {
+              "name": "state_a",
+              "type": "pistols::models::challenge::DuelistState"
+            },
+            {
+              "name": "state_b",
+              "type": "pistols::models::challenge::DuelistState"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<pistols::types::duel_progress::DuelStep>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<pistols::types::duel_progress::DuelStep>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "pistols::types::cards::hand::DuelistHand",
+          "members": [
+            {
+              "name": "card_fire",
+              "type": "pistols::types::cards::paces::PacesCard"
+            },
+            {
+              "name": "card_dodge",
+              "type": "pistols::types::cards::paces::PacesCard"
+            },
+            {
+              "name": "card_tactics",
+              "type": "pistols::types::cards::tactics::TacticsCard"
+            },
+            {
+              "name": "card_blades",
+              "type": "pistols::types::cards::blades::BladesCard"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "pistols::types::duel_progress::DuelProgress",
+          "members": [
+            {
+              "name": "steps",
+              "type": "core::array::Span::<pistols::types::duel_progress::DuelStep>"
+            },
+            {
+              "name": "winner",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "hand_a",
+              "type": "pistols::types::cards::hand::DuelistHand"
+            },
+            {
+              "name": "hand_b",
+              "type": "pistols::types::cards::hand::DuelistHand"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "pistols::systems::game_loop::IGameLoop",
+          "items": [
+            {
+              "type": "function",
+              "name": "execute_game_loop",
+              "inputs": [
+                {
+                  "name": "wrapped",
+                  "type": "pistols::systems::rng_mock::RngWrap"
+                },
+                {
+                  "name": "deck",
+                  "type": "pistols::types::cards::deck::Deck"
+                },
+                {
+                  "name": "round",
+                  "type": "pistols::models::challenge::Round"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "(pistols::types::duel_progress::DuelProgress, pistols::models::challenge::Round)"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "function",
+          "name": "dojo_init",
+          "inputs": [],
+          "outputs": [],
+          "state_mutability": "view"
+        },
+        {
+          "type": "impl",
+          "name": "WorldProviderImpl",
+          "interface_name": "dojo::contract::components::world_provider::IWorldProvider"
+        },
+        {
+          "type": "struct",
+          "name": "dojo::world::iworld::IWorldDispatcher",
+          "members": [
+            {
+              "name": "contract_address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::components::world_provider::IWorldProvider",
+          "items": [
+            {
+              "type": "function",
+              "name": "world_dispatcher",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "dojo::world::iworld::IWorldDispatcher"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "UpgradeableImpl",
+          "interface_name": "dojo::contract::components::upgradeable::IUpgradeable"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::components::upgradeable::IUpgradeable",
+          "items": [
+            {
+              "type": "function",
+              "name": "upgrade",
+              "inputs": [
+                {
+                  "name": "new_class_hash",
+                  "type": "core::starknet::class_hash::ClassHash"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "constructor",
+          "name": "constructor",
+          "inputs": []
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "class_hash",
+              "type": "core::starknet::class_hash::ClassHash",
+              "kind": "data"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "Upgraded",
+              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
+              "kind": "nested"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::world_provider::world_provider_cpt::Event",
+          "kind": "enum",
+          "variants": []
+        },
+        {
+          "type": "event",
+          "name": "pistols::systems::game_loop::game_loop::Event",
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "UpgradeableEvent",
+              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
+              "kind": "nested"
+            },
+            {
+              "name": "WorldProviderEvent",
+              "type": "dojo::contract::components::world_provider::world_provider_cpt::Event",
+              "kind": "nested"
+            }
+          ]
+        }
+      ],
+      "init_calldata": [],
+      "tag": "pistols-game_loop",
+      "selector": "0x1bf3dd2b828d461e19dc794352723ae8d8a1760c61b936a916cf3b4de8d5b9f",
+      "systems": [
+        "upgrade"
+      ]
+    },
+    {
       "address": "0x42009edef8c8073d9fc6c8e41c7d034c7e0b0dce19ca7b48629d88abed9c26e",
       "class_hash": "0x1588ed91063d3b1c8d0c8121f9a0f99209cda8c4faee0beca20bc3e24aa7238",
       "abi": [
@@ -7975,8 +8742,8 @@
       ]
     },
     {
-      "address": "0x630e0091703650f1fe2be501369acda2eacaaadee96c6ab24189750e1b73ffa",
-      "class_hash": "0x69dfe6ecbf3c2c104b32d5a7e28ad58950aab42d65407e767424a82e5da9350",
+      "address": "0x2d4fff346456045e7e423126db576a9e6a51c7f151780c731b645a40f2dfcfb",
+      "class_hash": "0x2aa52f089e5f754d92b5f54cfe215802a70f9726ca755399b7f95aeb531a11d",
       "abi": [
         {
           "type": "impl",
@@ -9778,8 +10545,8 @@
       ]
     },
     {
-      "address": "0x7267dc5c676b0cc07e1609799408d1c93f4445c31a7df6f3036e4b089b6f2d7",
-      "class_hash": "0x5e5fc154ffdbcb4b74041b6f3ea640a985361f2cfa9ea5f23fc232a18bcf04e",
+      "address": "0x1280387732701fe82772441358e70192ba62171c646dea5fcba8603666f738",
+      "class_hash": "0x39c644bfddb9025f14c1250256c28e3cb7d1df2d3b5f82e5ff9b0151a2c94f4",
       "abi": [
         {
           "type": "impl",
@@ -10763,7 +11530,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x9bdbba9603e7a509078172fb6fc597986215803be57cd60130bc06042487f3",
+      "class_hash": "0x4e29528b41c56c75bf382febe9833b6cb301e058333cfaf207d6955a78b45a5",
       "tag": "pistols-Pool",
       "selector": "0xb4328e5f120dfe361a8f367e6ea51e2be55dbc6b1c9f2c17a87b7d06ab8972"
     },

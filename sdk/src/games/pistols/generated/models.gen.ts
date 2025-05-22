@@ -569,6 +569,7 @@ export const poolType = [
 	'Season',
 	'Tournament',
 	'Sacrifice',
+	'Claimable',
 ] as const;
 export type PoolType = { [key in typeof poolType[number]]: string };
 export type PoolTypeEnum = CairoCustomEnum;
@@ -875,8 +876,8 @@ export interface SchemaType extends ISchemaType {
 		MockedValue: MockedValue,
 		MockedValueValue: MockedValueValue,
 		Period: Period,
-	// },
-	// achievement: {
+	},
+	achievement: {
 		TrophyCreation: TrophyCreation,
 		TrophyCreationValue: TrophyCreationValue,
 		TrophyProgression: TrophyProgression,
@@ -1243,7 +1244,8 @@ export const schema: SchemaType = {
 				FamePeg: undefined,
 				Season: undefined,
 				Tournament: undefined,
-				Sacrifice: undefined, }),
+				Sacrifice: undefined,
+				Claimable: undefined, }),
 			balance_lords: 0,
 			balance_fame: 0,
 		},

@@ -248,19 +248,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_bank_pegMintedFameToPurchasedLords_calldata = (payer: string, lordsAmount: BigNumberish): DojoCall => {
+	const build_bank_pegMintedFameToLords_calldata = (payer: string, lordsAmount: BigNumberish, fromPoolType: CairoCustomEnum): DojoCall => {
 		return {
 			contractName: "bank",
-			entrypoint: "peg_minted_fame_to_purchased_lords",
-			calldata: [payer, lordsAmount],
+			entrypoint: "peg_minted_fame_to_lords",
+			calldata: [payer, lordsAmount, fromPoolType],
 		};
 	};
 
-	const bank_pegMintedFameToPurchasedLords = async (snAccount: Account | AccountInterface, payer: string, lordsAmount: BigNumberish) => {
+	const bank_pegMintedFameToLords = async (snAccount: Account | AccountInterface, payer: string, lordsAmount: BigNumberish, fromPoolType: CairoCustomEnum) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_bank_pegMintedFameToPurchasedLords_calldata(payer, lordsAmount),
+				build_bank_pegMintedFameToLords_calldata(payer, lordsAmount, fromPoolType),
 				"pistols",
 			);
 		} catch (error) {
@@ -2370,6 +2370,23 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
+	const build_game_loop_executeGameLoop_calldata = (wrapped: models.RngWrap, deck: models.Deck, round: models.Round): DojoCall => {
+		return {
+			contractName: "game_loop",
+			entrypoint: "execute_game_loop",
+			calldata: [wrapped, deck, round],
+		};
+	};
+
+	const game_loop_executeGameLoop = async (wrapped: models.RngWrap, deck: models.Deck, round: models.Round) => {
+		try {
+			return await provider.call("pistols", build_game_loop_executeGameLoop_calldata(wrapped, deck, round));
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 	const build_game_revealMoves_calldata = (duelistId: BigNumberish, duelId: BigNumberish, salt: BigNumberish, moves: Array<BigNumberish>): DojoCall => {
 		return {
 			contractName: "game",
@@ -3474,8 +3491,8 @@ export function setupWorld(provider: DojoProvider) {
 			buildCollectSeasonCalldata: build_bank_collectSeason_calldata,
 			duelistLostFameToPool: bank_duelistLostFameToPool,
 			buildDuelistLostFameToPoolCalldata: build_bank_duelistLostFameToPool_calldata,
-			pegMintedFameToPurchasedLords: bank_pegMintedFameToPurchasedLords,
-			buildPegMintedFameToPurchasedLordsCalldata: build_bank_pegMintedFameToPurchasedLords_calldata,
+			pegMintedFameToLords: bank_pegMintedFameToLords,
+			buildPegMintedFameToLordsCalldata: build_bank_pegMintedFameToLords_calldata,
 			releaseLordsFromFameToBeBurned: bank_releaseLordsFromFameToBeBurned,
 			buildReleaseLordsFromFameToBeBurnedCalldata: build_bank_releaseLordsFromFameToBeBurned_calldata,
 			sponsorDuelists: bank_sponsorDuelists,
@@ -3714,6 +3731,10 @@ export function setupWorld(provider: DojoProvider) {
 			buildGetTimestampCalldata: build_game_getTimestamp_calldata,
 			revealMoves: game_revealMoves,
 			buildRevealMovesCalldata: build_game_revealMoves_calldata,
+		},
+		game_loop: {
+			executeGameLoop: game_loop_executeGameLoop,
+			buildExecuteGameLoopCalldata: build_game_loop_executeGameLoop_calldata,
 		},
 		lords_mock: {
 			allowance: lords_mock_allowance,

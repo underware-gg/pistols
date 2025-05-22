@@ -569,6 +569,7 @@ export const poolType = [
 	'Season',
 	'Tournament',
 	'Sacrifice',
+	'Claimable',
 ] as const;
 export type PoolType = { [key in typeof poolType[number]]: string };
 export type PoolTypeEnum = CairoCustomEnum;
@@ -1243,7 +1244,8 @@ export const schema: SchemaType = {
 				FamePeg: undefined,
 				Season: undefined,
 				Tournament: undefined,
-				Sacrifice: undefined, }),
+				Sacrifice: undefined,
+				Claimable: undefined, }),
 			balance_lords: 0,
 			balance_fame: 0,
 		},
