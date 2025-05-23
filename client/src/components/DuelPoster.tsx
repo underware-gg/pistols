@@ -69,6 +69,7 @@ const useDuelPosterData = (duelId?: bigint) => {
     isFinished,
     winnerDuelistId,
   } = useChallenge(duelId)
+  const isCallToAction = useDuelCallToAction(duelId)
   
   const { name: playerNameA, isBlocked: isBlockedA } = usePlayer(duelistAddressA)
   const { name: playerNameB, isBlocked: isBlockedB } = usePlayer(duelistAddressB)
@@ -90,7 +91,7 @@ const useDuelPosterData = (duelId?: bigint) => {
   }, [isYouB, duelistIdA, duelistIdB, duelistAddressA, duelistAddressB, playerNameA, playerNameB, isBlockedA, isBlockedB])
 
   const isDead = (duelistId: number) => {
-    return duelistId !== Number(winnerDuelistId) && isFinished
+    return duelistId !== Number(winnerDuelistId) && isFinished && !isCallToAction
   }
 
   const { fameBefore: fameBeforeA, fameAfter: fameAfterA } = useDuelistFameOnDuel(duelId, duelistIdA)
@@ -112,15 +113,15 @@ const useDuelPosterData = (duelId?: bigint) => {
     fameAfterA,
     fameBeforeB,
     fameAfterB,
+    isCallToAction,
   }
 }
 
 // Small version of the DuelPoster
 const DuelPosterSmall = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref) => {
   const { aspectWidth, aspectHeight } = useGameAspect()
-  const { leftDuelistId, rightDuelistId, leftPlayerName, rightPlayerName, isDead, isYouA, isYouB, leftIsBlocked, rightIsBlocked } = useDuelPosterData(props.duelId)
+  const { leftDuelistId, rightDuelistId, leftPlayerName, rightPlayerName, isDead, isYouA, isYouB, leftIsBlocked, rightIsBlocked, isCallToAction } = useDuelPosterData(props.duelId)
   const { turnA, turnB } = useDuel(props.duelId)
-  const isCallToAction = useDuelCallToAction(props.duelId)
   const { seasonName, isFinished } = useChallenge(props.duelId)
   const { seasonName: currentSeasonName } = useCurrentSeason()
   const seasonDescription = useMemo(() => (seasonName ?? currentSeasonName), [seasonName, currentSeasonName])
@@ -224,9 +225,8 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
   const { challengingDuelistId, dispatchSelectPlayerAddress, dispatchSelectDuelistId, dispatchChallengingDuelistId } = usePistolsContext()
   const { duel_token, game } = useDojoSystemCalls()
   const { account } = useAccount()
-  const isCallToAction = useDuelCallToAction(props.duelId)
   const { duelistSelectOpener } = usePistolsContext()
-  const { leftDuelistId, rightDuelistId, leftDuelistAddress, rightDuelistAddress, leftPlayerName, rightPlayerName, isDead, isYouA, isYouB, leftIsBlocked, rightIsBlocked } = useDuelPosterData(props.duelId)
+  const { leftDuelistId, rightDuelistId, leftDuelistAddress, rightDuelistAddress, leftPlayerName, rightPlayerName, isDead, isYouA, isYouB, leftIsBlocked, rightIsBlocked, isCallToAction } = useDuelPosterData(props.duelId)
 
   const {
     state,
