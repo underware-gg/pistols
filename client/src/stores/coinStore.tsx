@@ -24,6 +24,7 @@ interface CoinState {
 }
 interface State {
   coinName: string,
+  addOnUpdate: boolean,
   accounts: Record<string, CoinState>,
   resetStore: () => void;
   initBalances: (accounts: BigNumberish[]) => void;
@@ -33,7 +34,7 @@ interface State {
   hasBalance: (accountAddress: BigNumberish | undefined) => boolean;
 }
 
-const createStore = (coinName: string) => {
+const createStore = (coinName: string, addOnUpdate: boolean) => {
   const _accountKey = (account: BigNumberish | undefined): string | null => (
     isPositiveBigint(account) ? bigintToHex(account) : null
   )
@@ -49,6 +50,7 @@ const createStore = (coinName: string) => {
   }
   return create<State>()(immer((set, get) => ({
     coinName,
+    addOnUpdate,
     accounts: {},
     resetStore: () => {
       set((state: State) => {
@@ -79,7 +81,7 @@ const createStore = (coinName: string) => {
     updateBalance: (balance: torii.TokenBalance) => {
       // console.log(`coinStore(${get().coinName}) UPDATE:`, balance)
       set((state: State) => {
-        _processBalance(state, balance, false)
+        _processBalance(state, balance, addOnUpdate)
       });
     },
     getBalance: (accountAddress: BigNumberish | undefined): bigint | undefined => {
@@ -93,9 +95,9 @@ const createStore = (coinName: string) => {
   })))
 }
 
-export const useLordsCoinStore = createStore('lords');
-export const useFameCoinStore = createStore('fame');
-export const useFoolsCoinStore = createStore('fools');
+export const useFameCoinStore = createStore('fame', true);
+export const useFoolsCoinStore = createStore('fools', true);
+export const useLordsCoinStore = createStore('lords', false);
 
 export function useCoinStore(contractAddress: BigNumberish) {
   const {
