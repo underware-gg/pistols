@@ -1,5 +1,5 @@
-import { useSdkEntitiesSub, filterEntitiesByModels, entityContainsModels, useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
-import { PistolsQueryBuilder, PistolsEntity } from '@underware/pistols-sdk/pistols/sdk'
+import { useSdkEntitiesSub, filterEntitiesByModels, entityContainsModels, useSdkEntitiesGet, formatQueryValue } from '@underware/pistols-sdk/dojo'
+import { PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols/sdk'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useConfigStore } from '/src/stores/configStore'
 import { useSeasonStore } from '/src/stores/seasonStore'
@@ -84,6 +84,17 @@ const query_sub: PistolsQueryBuilder = new PistolsQueryBuilder()
   .withLimit(10)
   .includeHashedKeys()
 
+// // TEMP: force load Claimable pool
+// const query_claimable_pool: PistolsQueryBuilder = new PistolsQueryBuilder()
+//   .withClause(
+//     new PistolsClauseBuilder().keys(
+//       ["pistols-Pool"],
+//       [formatQueryValue(6)] // PoolType::Claimable
+//     ).build()
+//   )
+//   .withEntityModels(['pistols-Pool'])
+//   .withLimit(1)
+//   .includeHashedKeys()
 
   
 //------------------------------------------------------
@@ -108,6 +119,16 @@ export function EntityStoreSync() {
   const scoreboardState = useScoreboardStore((state) => state)
 
   const mounted = useMounted()
+
+  // // TEMP: force load Claimable pool
+  // useSdkEntitiesGet({
+  //   query: query_claimable_pool,
+  //   enabled: mounted,
+  //   setEntities: (entities: PistolsEntity[]) => {
+  //     console.log("EntityStoreSync() SET CLAIMABLE POOL =======> [entities]:", entities)
+  //     bankState.setEntities(entities)
+  //   },
+  // })
 
   const { isFinished: isFinishedMisc } = useSdkEntitiesGet({
     query: query_get_misc,
