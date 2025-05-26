@@ -32,7 +32,7 @@ export default function AppDojo({
   }, [networkId])
   return (
     <App backgroundImage={backgroundImage}>
-      <Dojo dojoAppConfig={dojoAppConfig}>
+      <Dojo dojoAppConfig={dojoAppConfig} env={ENV}>
         {autoConnect ? <AutoConnect /> : <AutoDisconnect />}
         {children}
       </Dojo>

@@ -9,11 +9,14 @@ import { useDeployedSystem } from 'src/dojo/hooks/useDojoSystem'
 import { createSystemCalls } from 'src/games/pistols/config/createSystemCalls'
 import { setupWorld } from 'src/games/pistols/generated/contracts.gen'
 import { PistolsSchemaType } from 'src/games/pistols/sdk/types_web'
-import * as models from 'src/games/pistols/generated/models.gen'
 
 export type SetupResult = ReturnType<typeof useSetup> | null
 
-export function useSetup(dojoAppConfig: DojoAppConfig, selectedNetworkConfig: DojoNetworkConfig) {
+export function useSetup(dojoAppConfig: DojoAppConfig, selectedNetworkConfig: DojoNetworkConfig, env?: any) {
+
+  const rpcUrl = (env?.RPC_URL || selectedNetworkConfig.rpcUrl);
+  const toriiUrl = (env?.TORII_URL || selectedNetworkConfig.toriiUrl);
+  const relayUrl = (env?.TORII_RELAY_URL || selectedNetworkConfig.relayUrl);
 
   // avoid double effects
   const mounted = useMounted()
@@ -43,8 +46,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedNetworkConfig: Do
   } = useMemoAsync<DojoProvider>(async () => {
     if (!mounted) return undefined
     if (!manifest) return null
-    console.log(`DojoProvider...`, selectedNetworkConfig.rpcUrl)
-    const dojoProvider = new DojoProvider(manifest, selectedNetworkConfig.rpcUrl)
+    const dojoProvider = new DojoProvider(manifest, rpcUrl)
     console.log(`DojoProvider:`, dojoProvider)
     return dojoProvider
   }, [mounted, selectedNetworkConfig, manifest], undefined, null)
@@ -59,12 +61,12 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedNetworkConfig: Do
     if (!dojoProvider) return undefined
     if (!starknetDomain) return undefined
     if (!manifest) return null
-    console.log(`TORII CLIENT...`, selectedNetworkConfig.toriiUrl)
+    console.log(`TORII CLIENT...`, toriiUrl)
     let config: SDKConfig = {
       client: {
-        // rpcUrl: selectedNetworkConfig.rpcUrl,
-        toriiUrl: selectedNetworkConfig.toriiUrl,
-        relayUrl: selectedNetworkConfig.relayUrl ?? '',
+        // rpcUrl,
+        toriiUrl,
+        relayUrl,
         worldAddress: manifest.world.address ?? '',
       },
       domain: starknetDomain,
