@@ -113,7 +113,6 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
   }, [currentTextIndex])
 
   useEffect(() => {
-    console.log('currentTutorialScene', duelIdSimple, duelIdFull)
     if (currentTutorialScene === SceneName.TutorialScene2 && !duelIdSimple) {
       setIsSkipReady(false)
     } else if (currentTutorialScene === SceneName.TutorialScene3 && !duelIdFull) {

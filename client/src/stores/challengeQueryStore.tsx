@@ -204,9 +204,9 @@ export function useDuelistSeasonStats(duelistId: BigNumberish, seasonId?: BigNum
           state === constants.ChallengeState.Draw ||
           state === constants.ChallengeState.Expired
       })
-    // .filter((e) => 
-    //   BigInt(e.table_id) === BigInt(seasonId)
-    // ) //TODO filter by correct season!
+    .filter((e) =>  
+      BigInt(e.season_id) === BigInt(seasonId)
+    )
   ), [challenges, duelistId])
 
   const stats = useMemo(() => {

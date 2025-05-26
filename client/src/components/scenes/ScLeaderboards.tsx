@@ -89,7 +89,7 @@ const SeasonRow = memo(({
       <Grid columns={6}>
         <Grid.Column width={4} style={{ display: 'flex', alignItems: 'center' }}>
           <div style={{ fontSize: aspectWidth(1.4), color: 'lightskyblue' }}>
-            {season}
+            Season {season}
           </div>
         </Grid.Column>
 

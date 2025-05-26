@@ -275,7 +275,7 @@ const ProfilePosterFull = forwardRef<ProfilePosterHandle, ProfilePosterProps>((p
 
           <div className='DuelistsSection' style={{ height: `${aspectWidth(DUELIST_CARD_HEIGHT * 0.7)}px` }}>
             <button 
-              className='NavButton' 
+              className='NavButton YesMouse' 
               onClick={handlePrev}
               disabled={pageNumber === 0}
             >←</button>
@@ -285,7 +285,7 @@ const ProfilePosterFull = forwardRef<ProfilePosterHandle, ProfilePosterProps>((p
               <div className='DuelistCard'>No Duelists</div>
             ) : renderDuelistCards}
             <button 
-              className='NavButton'
+              className='NavButton YesMouse'
               onClick={handleNext}
               disabled={pageNumber >= pageCount - 1}
             >→</button>
