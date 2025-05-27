@@ -175,11 +175,6 @@ pub mod game {
             let mut round: Round = store.get_round(duel_id);
             assert(round.state == RoundState::Commit, Errors::ROUND_NOT_IN_COMMIT);
 
-            // check timeouts
-            if (self._finish_challenge_if_timed_out(ref store, ref challenge, ref round)) {
-                return;
-            }
-
             if (duelist_number == 1) {
                 // validate and store hash
                 assert(round.moves_a.hashed == 0, Errors::ALREADY_COMMITTED);
@@ -267,13 +262,7 @@ pub mod game {
             let duelist_number: u8 = challenge.duelist_number(duelist_id);
             assert(duelist_number != 0, Errors::NOT_YOUR_DUEL);
 
-            // check timeouts
-            if (self._finish_challenge_if_timed_out(ref store, ref challenge, ref round)) {
-                return;
-            }
-
             // validate salt
-            // TODO: verify salt with signature
             assert(salt != 0, Errors::INVALID_SALT);
 
             // validate moves
