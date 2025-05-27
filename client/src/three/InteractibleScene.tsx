@@ -34,6 +34,8 @@ export class InteractibleScene extends THREE.Scene {
 
   mousePos: THREE.Vector2
   mouseScreenPos: THREE.Vector2 // Normalized -1 to 1 screen coordinates
+  filteredMouseScreenPos: THREE.Vector2
+  mouseFilterStrength: number = 0.1 // Filter strength for mouse movement smoothing
   pickedColor: THREE.Color
   pickedItem: SceneObject
   timeOffset: number
@@ -94,6 +96,7 @@ export class InteractibleScene extends THREE.Scene {
 
     this.mousePos = new THREE.Vector2()
     this.mouseScreenPos = new THREE.Vector2()
+    this.filteredMouseScreenPos = new THREE.Vector2()
     this.pickedColor = new THREE.Color(0, 0, 0)
     this.timeOffset = 0
 
@@ -289,6 +292,12 @@ export class InteractibleScene extends THREE.Scene {
 
   public render(elapsedTime: number, enabled: boolean = true) {
     if (this.isClickable && this.sceneShiftEnabled) {
+      // Update filtered mouse position continuously
+      if (this.mouseScreenPos) {
+        this.filteredMouseScreenPos.x += (this.mouseScreenPos.x - this.filteredMouseScreenPos.x) * this.mouseFilterStrength
+        this.filteredMouseScreenPos.y += (this.mouseScreenPos.y - this.filteredMouseScreenPos.y) * this.mouseFilterStrength
+      }
+      
       this.calculateTextureShifts()
       this.updateAnimation(elapsedTime - this.timeOffset)
     }
@@ -495,7 +504,7 @@ export class InteractibleScene extends THREE.Scene {
         const screenSize = Math.min(window.innerWidth, window.innerHeight);
         const width = screenSize * aspectRatio;
         const height = screenSize;
-        const scaledMousePos = this.mouseScreenPos.clone();
+        const scaledMousePos = this.filteredMouseScreenPos.clone();
         scaledMousePos.x *= width/window.innerWidth;
         scaledMousePos.y *= height/window.innerHeight;
         const textureShift = scaledMousePos.multiplyScalar(background.shiftMultiplier);
@@ -515,7 +524,7 @@ export class InteractibleScene extends THREE.Scene {
           const screenSize = Math.min(window.innerWidth, window.innerHeight);
           const width = screenSize * aspectRatio;
           const height = screenSize;
-          const scaledMousePos = this.mouseScreenPos.clone();
+          const scaledMousePos = this.filteredMouseScreenPos.clone();
           scaledMousePos.x *= width/window.innerWidth;
           scaledMousePos.y *= height/window.innerHeight;
           scaledMousePos.multiplyScalar(-background.shiftMultiplier * 2);

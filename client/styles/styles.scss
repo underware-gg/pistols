@@ -1385,49 +1385,73 @@ $logo-url: '/logos/logo_avante.svg';
   -webkit-box-orient: vertical;
   border-radius: aspect-width(0.625);
   z-index: 999;
-  --tail-position: left; /* default value, can be overridden */
+  --tail-position: left;
+  --tail-vertical-position: 4.8125;
+  --tail-width: 1.875;
+  --tail-height: 0.9375;
+  --tail-triangle-point: 0.5;
+  --tail-offset-x: -1.875;
+  --tail-offset-y: 0;
+  --tail-inner-width: 1.25;
+  --tail-inner-height: 0.625;
+  --tail-inner-offset-x: -1.2;
+  --tail-inner-offset-y: 0.1875;
 
   &:before {
     content: "";
     position: absolute;
-    top: aspect-width(4.8125);
-    border-top: aspect-width(0.9375) solid transparent;
-    border-bottom: aspect-width(0) solid transparent;
+    top: calc(aspect-width(var(--tail-vertical-position)) + aspect-width(var(--tail-offset-y)));
+    width: aspect-width(var(--tail-width));
+    height: aspect-width(var(--tail-height));
+    background-color: var(--border-color);
   }
   
   &:after {
     content: "";
     position: absolute;
-    top: aspect-width(5);
-    border-top: aspect-width(0.625) solid transparent;
-    border-bottom: aspect-width(0) solid transparent;
+    top: calc(aspect-width(var(--tail-vertical-position)) + aspect-width(var(--tail-inner-offset-y)));
+    width: aspect-width(var(--tail-inner-width));
+    height: aspect-width(var(--tail-inner-height));
+    background-color: var(--bg-color);
   }
 
   &:has([data-tail="left"]), &[data-tail="left"] {
     &:before {
-      left: aspect-width(-1.875);
-      border-right: aspect-width(1.875) solid var(--border-color);
-      border-left: none;
+      left: calc(aspect-width(var(--tail-offset-x)) + aspect-width(var(--tail-offset-y)));
+      clip-path: polygon(
+        100% 0%, 
+        100% 100%, 
+        0% calc(var(--tail-triangle-point) * 100%)
+      );
     }
     
     &:after {
-      left: aspect-width(-1.24);
-      border-right: aspect-width(1.25) solid var(--bg-color);
-      border-left: none;
+      left: calc(aspect-width(var(--tail-inner-offset-x)) + aspect-width(var(--tail-offset-y)));
+      clip-path: polygon(
+        100% 0%, 
+        100% 100%, 
+        0% calc(var(--tail-triangle-point) * 100%)
+      );
     }
   }
 
   &:has([data-tail="right"]), &[data-tail="right"], &:not([data-tail="left"]) {
     &:before {
-      right: aspect-width(-1.875);
-      border-left: aspect-width(1.875) solid var(--border-color);
-      border-right: none;
+      right: calc(aspect-width(var(--tail-offset-x)) + aspect-width(var(--tail-offset-y)));
+      clip-path: polygon(
+        0% 0%, 
+        0% 100%, 
+        100% calc(var(--tail-triangle-point) * 100%)
+      );
     }
     
     &:after {
-      right: aspect-width(-1.24);
-      border-left: aspect-width(1.25) solid var(--bg-color);
-      border-right: none;
+      right: calc(aspect-width(var(--tail-inner-offset-x)) + aspect-width(var(--tail-offset-y)));
+      clip-path: polygon(
+        0% 0%, 
+        0% 100%, 
+        100% calc(var(--tail-triangle-point) * 100%)
+      );
     }
   }
 }
@@ -1471,6 +1495,28 @@ $logo-url: '/logos/logo_avante.svg';
   z-index: 800;
   --bg-color: #{$color-bright};
   --border-color: #{$color-dark};
+}
+
+.NotificationTalkBaloon {
+  @extend .DialogBalloon;
+  top: 16%;
+  left: 11%;
+  color: $color-darkest;
+  z-index: 800;
+  --bg-color: #{$color-bright};
+  --border-color: #{$color-dark};
+  --tail-vertical-position: 2;
+
+  .demon-text-wrapper {
+    width: 100%;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    
+    div {
+      white-space: normal;
+    }
+  }
 }
 
 .DialogOptionsContainer {
