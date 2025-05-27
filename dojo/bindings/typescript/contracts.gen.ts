@@ -42,6 +42,27 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
+	const build_admin_fixPlayerBookmark_calldata = (playerAddress: string, targetAddress: string, targetId: BigNumberish, enabled: boolean): DojoCall => {
+		return {
+			contractName: "admin",
+			entrypoint: "fix_player_bookmark",
+			calldata: [playerAddress, targetAddress, targetId, enabled],
+		};
+	};
+
+	const admin_fixPlayerBookmark = async (snAccount: Account | AccountInterface, playerAddress: string, targetAddress: string, targetId: BigNumberish, enabled: boolean) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_admin_fixPlayerBookmark_calldata(playerAddress, targetAddress, targetId, enabled),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 	const build_admin_qualifyDuelist_calldata = (seasonId: BigNumberish, duelistId: BigNumberish): DojoCall => {
 		return {
 			contractName: "admin",
@@ -2285,6 +2306,48 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
+	const build_game_emitPlayerBookmark_calldata = (targetAddress: string, targetId: BigNumberish, enabled: boolean): DojoCall => {
+		return {
+			contractName: "game",
+			entrypoint: "emit_player_bookmark",
+			calldata: [targetAddress, targetId, enabled],
+		};
+	};
+
+	const game_emitPlayerBookmark = async (snAccount: Account | AccountInterface, targetAddress: string, targetId: BigNumberish, enabled: boolean) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_game_emitPlayerBookmark_calldata(targetAddress, targetId, enabled),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_game_emitPlayerSocialLink_calldata = (socialPlatform: CairoCustomEnum, userName: ByteArray, userId: ByteArray): DojoCall => {
+		return {
+			contractName: "game",
+			entrypoint: "emit_player_social_link",
+			calldata: [socialPlatform, userName, userId],
+		};
+	};
+
+	const game_emitPlayerSocialLink = async (snAccount: Account | AccountInterface, socialPlatform: CairoCustomEnum, userName: ByteArray, userId: ByteArray) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_game_emitPlayerSocialLink_calldata(socialPlatform, userName, userId),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 	const build_game_getDuelDeck_calldata = (duelId: BigNumberish): DojoCall => {
 		return {
 			contractName: "game",
@@ -3469,6 +3532,8 @@ export function setupWorld(provider: DojoProvider) {
 			buildAmIAdminCalldata: build_admin_amIAdmin_calldata,
 			disqualifyDuelist: admin_disqualifyDuelist,
 			buildDisqualifyDuelistCalldata: build_admin_disqualifyDuelist_calldata,
+			fixPlayerBookmark: admin_fixPlayerBookmark,
+			buildFixPlayerBookmarkCalldata: build_admin_fixPlayerBookmark_calldata,
 			qualifyDuelist: admin_qualifyDuelist,
 			buildQualifyDuelistCalldata: build_admin_qualifyDuelist_calldata,
 			setIsBlocked: admin_setIsBlocked,
@@ -3719,6 +3784,10 @@ export function setupWorld(provider: DojoProvider) {
 			buildCreateTrophiesCalldata: build_game_createTrophies_calldata,
 			doThatThing: game_doThatThing,
 			buildDoThatThingCalldata: build_game_doThatThing_calldata,
+			emitPlayerBookmark: game_emitPlayerBookmark,
+			buildEmitPlayerBookmarkCalldata: build_game_emitPlayerBookmark_calldata,
+			emitPlayerSocialLink: game_emitPlayerSocialLink,
+			buildEmitPlayerSocialLinkCalldata: build_game_emitPlayerSocialLink_calldata,
 			getDuelDeck: game_getDuelDeck,
 			buildGetDuelDeckCalldata: build_game_getDuelDeck_calldata,
 			getDuelProgress: game_getDuelProgress,

@@ -1,5 +1,5 @@
 import { DojoProvider, DojoCall } from "@dojoengine/core";
-import { Account, AccountInterface, BigNumberish, CairoOption, CairoCustomEnum } from "starknet";
+import { Account, AccountInterface, BigNumberish, CairoOption, CairoCustomEnum, ByteArray } from "starknet";
 import * as models from "./models.gen";
 
 export function setupWorld(provider: DojoProvider) {
@@ -34,6 +34,27 @@ export function setupWorld(provider: DojoProvider) {
 			return await provider.execute(
 				snAccount,
 				build_admin_disqualifyDuelist_calldata(seasonId, duelistId, blockOwner),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_admin_fixPlayerBookmark_calldata = (playerAddress: string, targetAddress: string, targetId: BigNumberish, enabled: boolean): DojoCall => {
+		return {
+			contractName: "admin",
+			entrypoint: "fix_player_bookmark",
+			calldata: [playerAddress, targetAddress, targetId, enabled],
+		};
+	};
+
+	const admin_fixPlayerBookmark = async (snAccount: Account | AccountInterface, playerAddress: string, targetAddress: string, targetId: BigNumberish, enabled: boolean) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_admin_fixPlayerBookmark_calldata(playerAddress, targetAddress, targetId, enabled),
 				"pistols",
 			);
 		} catch (error) {
@@ -269,26 +290,26 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	// const build_bank_releaseLordsFromFameToBeBurned_calldata = (seasonId: BigNumberish, duelId: BigNumberish, bills: Array<LordsReleaseBill>): DojoCall => {
-	// 	return {
-	// 		contractName: "bank",
-	// 		entrypoint: "release_lords_from_fame_to_be_burned",
-	// 		calldata: [seasonId, duelId, bills],
-	// 	};
-	// };
+	const build_bank_releaseLordsFromFameToBeBurned_calldata = (seasonId: BigNumberish, duelId: BigNumberish, bills: Array<LordsReleaseBill>): DojoCall => {
+		return {
+			contractName: "bank",
+			entrypoint: "release_lords_from_fame_to_be_burned",
+			calldata: [seasonId, duelId, bills],
+		};
+	};
 
-	// const bank_releaseLordsFromFameToBeBurned = async (snAccount: Account | AccountInterface, seasonId: BigNumberish, duelId: BigNumberish, bills: Array<LordsReleaseBill>) => {
-	// 	try {
-	// 		return await provider.execute(
-	// 			snAccount,
-	// 			build_bank_releaseLordsFromFameToBeBurned_calldata(seasonId, duelId, bills),
-	// 			"pistols",
-	// 		);
-	// 	} catch (error) {
-	// 		console.error(error);
-	// 		throw error;
-	// 	}
-	// };
+	const bank_releaseLordsFromFameToBeBurned = async (snAccount: Account | AccountInterface, seasonId: BigNumberish, duelId: BigNumberish, bills: Array<LordsReleaseBill>) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_bank_releaseLordsFromFameToBeBurned_calldata(seasonId, duelId, bills),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
 
 	const build_bank_sponsorDuelists_calldata = (payer: string, lordsAmount: BigNumberish): DojoCall => {
 		return {
@@ -425,7 +446,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_duel_token_createDuel_calldata = (duelType: CairoCustomEnum, duelistId: BigNumberish, challengedAddress: string, livesStaked: BigNumberish, expireHours: BigNumberish, premise: CairoCustomEnum, message: string): DojoCall => {
+	const build_duel_token_createDuel_calldata = (duelType: CairoCustomEnum, duelistId: BigNumberish, challengedAddress: string, livesStaked: BigNumberish, expireHours: BigNumberish, premise: CairoCustomEnum, message: ByteArray): DojoCall => {
 		return {
 			contractName: "duel_token",
 			entrypoint: "create_duel",
@@ -433,7 +454,7 @@ export function setupWorld(provider: DojoProvider) {
 		};
 	};
 
-	const duel_token_createDuel = async (snAccount: Account | AccountInterface, duelType: CairoCustomEnum, duelistId: BigNumberish, challengedAddress: string, livesStaked: BigNumberish, expireHours: BigNumberish, premise: CairoCustomEnum, message: string) => {
+	const duel_token_createDuel = async (snAccount: Account | AccountInterface, duelType: CairoCustomEnum, duelistId: BigNumberish, challengedAddress: string, livesStaked: BigNumberish, expireHours: BigNumberish, premise: CairoCustomEnum, message: ByteArray) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -1534,26 +1555,26 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	// const build_duelist_token_transferRewards_calldata = (challenge: models.Challenge, tournamentId: BigNumberish, bonus: models.DuelBonus): DojoCall => {
-	// 	return {
-	// 		contractName: "duelist_token",
-	// 		entrypoint: "transfer_rewards",
-	// 		calldata: [challenge, tournamentId, bonus],
-	// 	};
-	// };
+	const build_duelist_token_transferRewards_calldata = (challenge: models.Challenge, tournamentId: BigNumberish, bonus: models.DuelBonus): DojoCall => {
+		return {
+			contractName: "duelist_token",
+			entrypoint: "transfer_rewards",
+			calldata: [challenge, tournamentId, bonus],
+		};
+	};
 
-	// const duelist_token_transferRewards = async (snAccount: Account | AccountInterface, challenge: models.Challenge, tournamentId: BigNumberish, bonus: models.DuelBonus) => {
-	// 	try {
-	// 		return await provider.execute(
-	// 			snAccount,
-	// 			build_duelist_token_transferRewards_calldata(challenge, tournamentId, bonus),
-	// 			"pistols",
-	// 		);
-	// 	} catch (error) {
-	// 		console.error(error);
-	// 		throw error;
-	// 	}
-	// };
+	const duelist_token_transferRewards = async (snAccount: Account | AccountInterface, challenge: models.Challenge, tournamentId: BigNumberish, bonus: models.DuelBonus) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_duelist_token_transferRewards_calldata(challenge, tournamentId, bonus),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
 
 	const build_duelist_token_updateContractMetadata_calldata = (): DojoCall => {
 		return {
@@ -2285,6 +2306,48 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
+	const build_game_emitPlayerBookmark_calldata = (targetAddress: string, targetId: BigNumberish, enabled: boolean): DojoCall => {
+		return {
+			contractName: "game",
+			entrypoint: "emit_player_bookmark",
+			calldata: [targetAddress, targetId, enabled],
+		};
+	};
+
+	const game_emitPlayerBookmark = async (snAccount: Account | AccountInterface, targetAddress: string, targetId: BigNumberish, enabled: boolean) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_game_emitPlayerBookmark_calldata(targetAddress, targetId, enabled),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_game_emitPlayerSocialLink_calldata = (socialPlatform: CairoCustomEnum, userName: ByteArray, userId: ByteArray): DojoCall => {
+		return {
+			contractName: "game",
+			entrypoint: "emit_player_social_link",
+			calldata: [socialPlatform, userName, userId],
+		};
+	};
+
+	const game_emitPlayerSocialLink = async (snAccount: Account | AccountInterface, socialPlatform: CairoCustomEnum, userName: ByteArray, userId: ByteArray) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_game_emitPlayerSocialLink_calldata(socialPlatform, userName, userId),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 	const build_game_getDuelDeck_calldata = (duelId: BigNumberish): DojoCall => {
 		return {
 			contractName: "game",
@@ -2370,22 +2433,22 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	// const build_game_loop_executeGameLoop_calldata = (wrapped: models.RngWrap, deck: models.Deck, round: models.Round): DojoCall => {
-	// 	return {
-	// 		contractName: "game_loop",
-	// 		entrypoint: "execute_game_loop",
-	// 		calldata: [wrapped, deck, round],
-	// 	};
-	// };
+	const build_game_loop_executeGameLoop_calldata = (wrapped: models.RngWrap, deck: models.Deck, round: models.Round): DojoCall => {
+		return {
+			contractName: "game_loop",
+			entrypoint: "execute_game_loop",
+			calldata: [wrapped, deck, round],
+		};
+	};
 
-	// const game_loop_executeGameLoop = async (wrapped: models.RngWrap, deck: models.Deck, round: models.Round) => {
-	// 	try {
-	// 		return await provider.call("pistols", build_game_loop_executeGameLoop_calldata(wrapped, deck, round));
-	// 	} catch (error) {
-	// 		console.error(error);
-	// 		throw error;
-	// 	}
-	// };
+	const game_loop_executeGameLoop = async (wrapped: models.RngWrap, deck: models.Deck, round: models.Round) => {
+		try {
+			return await provider.call("pistols", build_game_loop_executeGameLoop_calldata(wrapped, deck, round));
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
 
 	const build_game_revealMoves_calldata = (duelistId: BigNumberish, duelId: BigNumberish, salt: BigNumberish, moves: Array<BigNumberish>): DojoCall => {
 		return {
@@ -3237,94 +3300,94 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	// const build_rng_isMocked_calldata = (salt: BigNumberish): DojoCall => {
-	// 	return {
-	// 		contractName: "rng",
-	// 		entrypoint: "is_mocked",
-	// 		calldata: [salt],
-	// 	};
-	// };
+	const build_rng_isMocked_calldata = (salt: BigNumberish): DojoCall => {
+		return {
+			contractName: "rng",
+			entrypoint: "is_mocked",
+			calldata: [salt],
+		};
+	};
 
-	// const rng_isMocked = async (salt: BigNumberish) => {
-	// 	try {
-	// 		return await provider.call("pistols", build_rng_isMocked_calldata(salt));
-	// 	} catch (error) {
-	// 		console.error(error);
-	// 		throw error;
-	// 	}
-	// };
+	const rng_isMocked = async (salt: BigNumberish) => {
+		try {
+			return await provider.call("pistols", build_rng_isMocked_calldata(salt));
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
 
-	// const build_rng_mock_isMocked_calldata = (salt: BigNumberish): DojoCall => {
-	// 	return {
-	// 		contractName: "rng_mock",
-	// 		entrypoint: "is_mocked",
-	// 		calldata: [salt],
-	// 	};
-	// };
+	const build_rng_mock_isMocked_calldata = (salt: BigNumberish): DojoCall => {
+		return {
+			contractName: "rng_mock",
+			entrypoint: "is_mocked",
+			calldata: [salt],
+		};
+	};
 
-	// const rng_mock_isMocked = async (salt: BigNumberish) => {
-	// 	try {
-	// 		return await provider.call("pistols", build_rng_mock_isMocked_calldata(salt));
-	// 	} catch (error) {
-	// 		console.error(error);
-	// 		throw error;
-	// 	}
-	// };
+	const rng_mock_isMocked = async (salt: BigNumberish) => {
+		try {
+			return await provider.call("pistols", build_rng_mock_isMocked_calldata(salt));
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
 
-	// const build_rng_mock_mockValues_calldata = (mocked: Array<MockedValue>): DojoCall => {
-	// 	return {
-	// 		contractName: "rng_mock",
-	// 		entrypoint: "mock_values",
-	// 		calldata: [mocked],
-	// 	};
-	// };
+	const build_rng_mock_mockValues_calldata = (mocked: Array<MockedValue>): DojoCall => {
+		return {
+			contractName: "rng_mock",
+			entrypoint: "mock_values",
+			calldata: [mocked],
+		};
+	};
 
-	// const rng_mock_mockValues = async (snAccount: Account | AccountInterface, mocked: Array<MockedValue>) => {
-	// 	try {
-	// 		return await provider.execute(
-	// 			snAccount,
-	// 			build_rng_mock_mockValues_calldata(mocked),
-	// 			"pistols",
-	// 		);
-	// 	} catch (error) {
-	// 		console.error(error);
-	// 		throw error;
-	// 	}
-	// };
+	const rng_mock_mockValues = async (snAccount: Account | AccountInterface, mocked: Array<MockedValue>) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_rng_mock_mockValues_calldata(mocked),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
 
-	// const build_rng_mock_reseed_calldata = (seed: BigNumberish, salt: BigNumberish, mocked: Array<MockedValue>): DojoCall => {
-	// 	return {
-	// 		contractName: "rng_mock",
-	// 		entrypoint: "reseed",
-	// 		calldata: [seed, salt, mocked],
-	// 	};
-	// };
+	const build_rng_mock_reseed_calldata = (seed: BigNumberish, salt: BigNumberish, mocked: Array<MockedValue>): DojoCall => {
+		return {
+			contractName: "rng_mock",
+			entrypoint: "reseed",
+			calldata: [seed, salt, mocked],
+		};
+	};
 
-	// const rng_mock_reseed = async (seed: BigNumberish, salt: BigNumberish, mocked: Array<MockedValue>) => {
-	// 	try {
-	// 		return await provider.call("pistols", build_rng_mock_reseed_calldata(seed, salt, mocked));
-	// 	} catch (error) {
-	// 		console.error(error);
-	// 		throw error;
-	// 	}
-	// };
+	const rng_mock_reseed = async (seed: BigNumberish, salt: BigNumberish, mocked: Array<MockedValue>) => {
+		try {
+			return await provider.call("pistols", build_rng_mock_reseed_calldata(seed, salt, mocked));
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
 
-	// const build_rng_reseed_calldata = (seed: BigNumberish, salt: BigNumberish, mocked: Array<MockedValue>): DojoCall => {
-	// 	return {
-	// 		contractName: "rng",
-	// 		entrypoint: "reseed",
-	// 		calldata: [seed, salt, mocked],
-	// 	};
-	// };
+	const build_rng_reseed_calldata = (seed: BigNumberish, salt: BigNumberish, mocked: Array<MockedValue>): DojoCall => {
+		return {
+			contractName: "rng",
+			entrypoint: "reseed",
+			calldata: [seed, salt, mocked],
+		};
+	};
 
-	// const rng_reseed = async (seed: BigNumberish, salt: BigNumberish, mocked: Array<MockedValue>) => {
-	// 	try {
-	// 		return await provider.call("pistols", build_rng_reseed_calldata(seed, salt, mocked));
-	// 	} catch (error) {
-	// 		console.error(error);
-	// 		throw error;
-	// 	}
-	// };
+	const rng_reseed = async (seed: BigNumberish, salt: BigNumberish, mocked: Array<MockedValue>) => {
+		try {
+			return await provider.call("pistols", build_rng_reseed_calldata(seed, salt, mocked));
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
 
 	const build_tutorial_calcDuelId_calldata = (playerId: BigNumberish, tutorialId: BigNumberish): DojoCall => {
 		return {
@@ -3469,6 +3532,8 @@ export function setupWorld(provider: DojoProvider) {
 			buildAmIAdminCalldata: build_admin_amIAdmin_calldata,
 			disqualifyDuelist: admin_disqualifyDuelist,
 			buildDisqualifyDuelistCalldata: build_admin_disqualifyDuelist_calldata,
+			fixPlayerBookmark: admin_fixPlayerBookmark,
+			buildFixPlayerBookmarkCalldata: build_admin_fixPlayerBookmark_calldata,
 			qualifyDuelist: admin_qualifyDuelist,
 			buildQualifyDuelistCalldata: build_admin_qualifyDuelist_calldata,
 			setIsBlocked: admin_setIsBlocked,
@@ -3493,8 +3558,8 @@ export function setupWorld(provider: DojoProvider) {
 			buildDuelistLostFameToPoolCalldata: build_bank_duelistLostFameToPool_calldata,
 			pegMintedFameToLords: bank_pegMintedFameToLords,
 			buildPegMintedFameToLordsCalldata: build_bank_pegMintedFameToLords_calldata,
-			// releaseLordsFromFameToBeBurned: bank_releaseLordsFromFameToBeBurned,
-			// buildReleaseLordsFromFameToBeBurnedCalldata: build_bank_releaseLordsFromFameToBeBurned_calldata,
+			releaseLordsFromFameToBeBurned: bank_releaseLordsFromFameToBeBurned,
+			buildReleaseLordsFromFameToBeBurnedCalldata: build_bank_releaseLordsFromFameToBeBurned_calldata,
 			sponsorDuelists: bank_sponsorDuelists,
 			buildSponsorDuelistsCalldata: build_bank_sponsorDuelists_calldata,
 			sponsorSeason: bank_sponsorSeason,
@@ -3635,8 +3700,8 @@ export function setupWorld(provider: DojoProvider) {
 			buildTotalSupplyCalldata: build_duelist_token_totalSupply_calldata,
 			transferFrom: duelist_token_transferFrom,
 			buildTransferFromCalldata: build_duelist_token_transferFrom_calldata,
-			// transferRewards: duelist_token_transferRewards,
-			// buildTransferRewardsCalldata: build_duelist_token_transferRewards_calldata,
+			transferRewards: duelist_token_transferRewards,
+			buildTransferRewardsCalldata: build_duelist_token_transferRewards_calldata,
 			updateContractMetadata: duelist_token_updateContractMetadata,
 			buildUpdateContractMetadataCalldata: build_duelist_token_updateContractMetadata_calldata,
 			updateTokenMetadata: duelist_token_updateTokenMetadata,
@@ -3719,6 +3784,10 @@ export function setupWorld(provider: DojoProvider) {
 			buildCreateTrophiesCalldata: build_game_createTrophies_calldata,
 			doThatThing: game_doThatThing,
 			buildDoThatThingCalldata: build_game_doThatThing_calldata,
+			emitPlayerBookmark: game_emitPlayerBookmark,
+			buildEmitPlayerBookmarkCalldata: build_game_emitPlayerBookmark_calldata,
+			emitPlayerSocialLink: game_emitPlayerSocialLink,
+			buildEmitPlayerSocialLinkCalldata: build_game_emitPlayerSocialLink_calldata,
 			getDuelDeck: game_getDuelDeck,
 			buildGetDuelDeckCalldata: build_game_getDuelDeck_calldata,
 			getDuelProgress: game_getDuelProgress,
@@ -3732,10 +3801,10 @@ export function setupWorld(provider: DojoProvider) {
 			revealMoves: game_revealMoves,
 			buildRevealMovesCalldata: build_game_revealMoves_calldata,
 		},
-		// game_loop: {
-		// 	executeGameLoop: game_loop_executeGameLoop,
-		// 	buildExecuteGameLoopCalldata: build_game_loop_executeGameLoop_calldata,
-		// },
+		game_loop: {
+			executeGameLoop: game_loop_executeGameLoop,
+			buildExecuteGameLoopCalldata: build_game_loop_executeGameLoop_calldata,
+		},
 		lords_mock: {
 			allowance: lords_mock_allowance,
 			buildAllowanceCalldata: build_lords_mock_allowance_calldata,
@@ -3830,20 +3899,20 @@ export function setupWorld(provider: DojoProvider) {
 			updateTokensMetadata: pack_token_updateTokensMetadata,
 			buildUpdateTokensMetadataCalldata: build_pack_token_updateTokensMetadata_calldata,
 		},
-		// rng: {
-		// 	isMocked: rng_isMocked,
-		// 	buildIsMockedCalldata: build_rng_isMocked_calldata,
-		// 	reseed: rng_reseed,
-		// 	buildReseedCalldata: build_rng_reseed_calldata,
-		// },
-		// rng_mock: {
-		// 	isMocked: rng_mock_isMocked,
-		// 	buildIsMockedCalldata: build_rng_mock_isMocked_calldata,
-		// 	mockValues: rng_mock_mockValues,
-		// 	buildMockValuesCalldata: build_rng_mock_mockValues_calldata,
-		// 	reseed: rng_mock_reseed,
-		// 	buildReseedCalldata: build_rng_mock_reseed_calldata,
-		// },
+		rng: {
+			isMocked: rng_isMocked,
+			buildIsMockedCalldata: build_rng_isMocked_calldata,
+			reseed: rng_reseed,
+			buildReseedCalldata: build_rng_reseed_calldata,
+		},
+		rng_mock: {
+			isMocked: rng_mock_isMocked,
+			buildIsMockedCalldata: build_rng_mock_isMocked_calldata,
+			mockValues: rng_mock_mockValues,
+			buildMockValuesCalldata: build_rng_mock_mockValues_calldata,
+			reseed: rng_mock_reseed,
+			buildReseedCalldata: build_rng_mock_reseed_calldata,
+		},
 		tutorial: {
 			calcDuelId: tutorial_calcDuelId,
 			buildCalcDuelIdCalldata: build_tutorial_calcDuelId_calldata,

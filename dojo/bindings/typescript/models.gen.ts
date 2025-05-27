@@ -245,19 +245,6 @@ export interface Player {
 	alive_duelist_count: BigNumberish;
 }
 
-// Type definition for `pistols::models::player::PlayerBookmark` struct
-export interface PlayerBookmark {
-	identity: string;
-	target_address: string;
-	target_id: BigNumberish;
-	enabled: boolean;
-}
-
-// Type definition for `pistols::models::player::PlayerBookmarkValue` struct
-export interface PlayerBookmarkValue {
-	enabled: boolean;
-}
-
 // Type definition for `pistols::models::player::PlayerDuelistStack` struct
 export interface PlayerDuelistStack {
 	player_address: string;
@@ -505,6 +492,33 @@ export interface PlayerActivityEventValue {
 	activity: ActivityEnum;
 	identifier: BigNumberish;
 	is_public: boolean;
+}
+
+// Type definition for `pistols::models::events::PlayerBookmarkEvent` struct
+export interface PlayerBookmarkEvent {
+	player_address: string;
+	target_address: string;
+	target_id: BigNumberish;
+	enabled: boolean;
+}
+
+// Type definition for `pistols::models::events::PlayerBookmarkEventValue` struct
+export interface PlayerBookmarkEventValue {
+	enabled: boolean;
+}
+
+// Type definition for `pistols::models::events::PlayerSocialLinkEvent` struct
+export interface PlayerSocialLinkEvent {
+	player_address: string;
+	social_platform: SocialPlatformEnum;
+	user_name: string;
+	user_id: string;
+}
+
+// Type definition for `pistols::models::events::PlayerSocialLinkEventValue` struct
+export interface PlayerSocialLinkEventValue {
+	user_name: string;
+	user_id: string;
 }
 
 // Type definition for `pistols::models::pool::LordsReleaseBill` struct
@@ -811,6 +825,16 @@ export const activity = [
 export type Activity = { [key in typeof activity[number]]: string };
 export type ActivityEnum = CairoCustomEnum;
 
+// Type definition for `pistols::models::events::SocialPlatform` enum
+export const socialPlatform = [
+	'Undefined',
+	'Discord',
+	'Telegram',
+	'X',
+] as const;
+export type SocialPlatform = { [key in typeof socialPlatform[number]]: string };
+export type SocialPlatformEnum = CairoCustomEnum;
+
 // Type definition for `pistols::models::pool::ReleaseReason` enum
 export const releaseReason = [
 	'Undefined',
@@ -853,8 +877,6 @@ export interface SchemaType extends ISchemaType {
 		Pact: Pact,
 		PactValue: PactValue,
 		Player: Player,
-		PlayerBookmark: PlayerBookmark,
-		PlayerBookmarkValue: PlayerBookmarkValue,
 		PlayerDuelistStack: PlayerDuelistStack,
 		PlayerDuelistStackValue: PlayerDuelistStackValue,
 		PlayerFlags: PlayerFlags,
@@ -891,6 +913,10 @@ export interface SchemaType extends ISchemaType {
 		LordsReleaseEventValue: LordsReleaseEventValue,
 		PlayerActivityEvent: PlayerActivityEvent,
 		PlayerActivityEventValue: PlayerActivityEventValue,
+		PlayerBookmarkEvent: PlayerBookmarkEvent,
+		PlayerBookmarkEventValue: PlayerBookmarkEventValue,
+		PlayerSocialLinkEvent: PlayerSocialLinkEvent,
+		PlayerSocialLinkEventValue: PlayerSocialLinkEventValue,
 		LordsReleaseBill: LordsReleaseBill,
 		RewardValues: RewardValues,
 	},
@@ -1179,15 +1205,6 @@ export const schema: SchemaType = {
 		totals: { total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour: 0, honour_log: 0, },
 			alive_duelist_count: 0,
 		},
-		PlayerBookmark: {
-			identity: "",
-			target_address: "",
-			target_id: 0,
-			enabled: false,
-		},
-		PlayerBookmarkValue: {
-			enabled: false,
-		},
 		PlayerDuelistStack: {
 			player_address: "",
 		duelist_profile: new CairoCustomEnum({ 
@@ -1432,6 +1449,29 @@ export const schema: SchemaType = {
 			identifier: 0,
 			is_public: false,
 		},
+		PlayerBookmarkEvent: {
+			player_address: "",
+			target_address: "",
+			target_id: 0,
+			enabled: false,
+		},
+		PlayerBookmarkEventValue: {
+			enabled: false,
+		},
+		PlayerSocialLinkEvent: {
+			player_address: "",
+		social_platform: new CairoCustomEnum({ 
+					Undefined: "",
+				Discord: undefined,
+				Telegram: undefined,
+				X: undefined, }),
+		user_name: "",
+		user_id: "",
+		},
+		PlayerSocialLinkEventValue: {
+		user_name: "",
+		user_id: "",
+		},
 		LordsReleaseBill: {
 		reason: new CairoCustomEnum({ 
 					Undefined: "",
@@ -1490,8 +1530,6 @@ export enum ModelsMapping {
 	Pact = 'pistols-Pact',
 	PactValue = 'pistols-PactValue',
 	Player = 'pistols-Player',
-	PlayerBookmark = 'pistols-PlayerBookmark',
-	PlayerBookmarkValue = 'pistols-PlayerBookmarkValue',
 	PlayerDuelistStack = 'pistols-PlayerDuelistStack',
 	PlayerDuelistStackValue = 'pistols-PlayerDuelistStackValue',
 	PlayerFlags = 'pistols-PlayerFlags',
@@ -1540,6 +1578,11 @@ export enum ModelsMapping {
 	LordsReleaseEventValue = 'pistols-LordsReleaseEventValue',
 	PlayerActivityEvent = 'pistols-PlayerActivityEvent',
 	PlayerActivityEventValue = 'pistols-PlayerActivityEventValue',
+	PlayerBookmarkEvent = 'pistols-PlayerBookmarkEvent',
+	PlayerBookmarkEventValue = 'pistols-PlayerBookmarkEventValue',
+	PlayerSocialLinkEvent = 'pistols-PlayerSocialLinkEvent',
+	PlayerSocialLinkEventValue = 'pistols-PlayerSocialLinkEventValue',
+	SocialPlatform = 'pistols-SocialPlatform',
 	LordsReleaseBill = 'pistols-LordsReleaseBill',
 	ReleaseReason = 'pistols-ReleaseReason',
 	RewardValues = 'pistols-RewardValues',

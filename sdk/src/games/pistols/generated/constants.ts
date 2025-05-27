@@ -17,7 +17,9 @@ export const INTERFACE_DESCRIPTIONS: any = {
     commit_moves: 'Commit moves of a Duelist in a Duel',
     reveal_moves: 'Reveal moves of a Duelist in a Duel',
     collect_duel: 'Close expired duels',
-    clear_call_to_action: 'Clear the required action call for a duelist',
+    clear_call_to_action: 'Clear call to action for a duelist',
+    emit_player_bookmark: 'Bookmarks an address or token',
+    emit_player_social_link: 'Link to social platform',
   },
   // from: ../dojo/src/systems/tokens/duel_token.cairo
   IDuelTokenPublic: {
@@ -130,6 +132,17 @@ export enum Activity {
 export const getActivityValue = (name: Activity): number | undefined => _indexOrUndefined(Object.keys(Activity).indexOf(name));
 export const getActivityFromValue = (value: number): Activity | undefined => Object.keys(Activity)[value] as Activity;
 export const getActivityMap = (): Record<Activity, number> => Object.keys(Activity).reduce((acc, v, index) => { acc[v as Activity] = index; return acc; }, {} as Record<Activity, number>);
+
+// from: ../dojo/src/models/events.cairo
+export enum SocialPlatform {
+  Undefined = 'Undefined', // 0
+  Discord = 'Discord', // 1
+  Telegram = 'Telegram', // 2
+  X = 'X', // 3
+};
+export const getSocialPlatformValue = (name: SocialPlatform): number | undefined => _indexOrUndefined(Object.keys(SocialPlatform).indexOf(name));
+export const getSocialPlatformFromValue = (value: number): SocialPlatform | undefined => Object.keys(SocialPlatform)[value] as SocialPlatform;
+export const getSocialPlatformMap = (): Record<SocialPlatform, number> => Object.keys(SocialPlatform).reduce((acc, v, index) => { acc[v as SocialPlatform] = index; return acc; }, {} as Record<SocialPlatform, number>);
 
 // from: ../dojo/src/models/pack.cairo
 export enum PackType {
@@ -686,10 +699,6 @@ type type_SELECTORS = {
   FOOLS_COIN: bigint, // cairo: felt252
   LORDS_MOCK: bigint, // cairo: felt252
   VRF_MOCK: bigint, // cairo: felt252
-  CONFIG: bigint, // cairo: felt252
-  SEASON_CONFIG: bigint, // cairo: felt252
-  TOKEN_CONFIG: bigint, // cairo: felt252
-  COIN_CONFIG: bigint, // cairo: felt252
 };
 export const SELECTORS: type_SELECTORS = {
   ADMIN: BigInt('0x036fd20372b5d47c092e2fede52897075978efb732aeaeb155d19eb8147f6497'), // selector_from_tag!("pistols-admin")
@@ -706,10 +715,6 @@ export const SELECTORS: type_SELECTORS = {
   FOOLS_COIN: BigInt('0x058070034702ab2b03c2911459d7299e63048e70e3d41f77e1d806b4cb8f2dcd'), // selector_from_tag!("pistols-fools_coin")
   LORDS_MOCK: BigInt('0x02b1156e63a09854c3d8dba0cad93b41e1fc4662466a0ffc2a9ec9e54b4bc788'), // selector_from_tag!("pistols-lords_mock")
   VRF_MOCK: BigInt('0x07d13bd4624d7bc31b13c78648f762d0b293e1ca94e19173659859209082629e'), // selector_from_tag!("pistols-vrf_mock")
-  CONFIG: BigInt('0x060742fa7259b7ce3ebc0a2dde90b740d1234c770199a822fa2e7cf779dc0392'), // selector_from_tag!("pistols-Config")
-  SEASON_CONFIG: BigInt('0x0407b92d935dd7193931243082059cb7180309a73de27eea948ffa0649f6ebf3'), // selector_from_tag!("pistols-SeasonConfig")
-  TOKEN_CONFIG: BigInt('0x056ebd3387f45e8b292b472f3539e675031f12cf156c07c309c6403044f71fed'), // selector_from_tag!("pistols-TokenConfig")
-  COIN_CONFIG: BigInt('0x026fad4dff063a4f2c3b3889723194b9bdbbbf833e44ff2d573af01741b966ac'), // selector_from_tag!("pistols-CoinConfig")
 };
 
 // from: ../dojo/src/models/config.cairo
