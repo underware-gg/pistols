@@ -1,31 +1,48 @@
-import React, { useCallback, useEffect, useState, useMemo, useRef } from 'react'
+import React, { useCallback, useEffect, useState, useMemo, useRef, memo } from 'react'
 import { Image, Input, ButtonGroup, Divider } from 'semantic-ui-react'
-import { useAccount, useDisconnect } from '@starknet-react/core'
 import { useQueryParams, SortDirection, ChallengeColumn, PlayerColumn } from '/src/stores/queryParamsStore'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { ChallengeStateNames, LiveChallengeStates, PastChallengeStates } from '/src/utils/pistols'
-import { BackButton, MusicToggle, FilterButton, SettingsGearButton, HomeButton } from '/src/components/ui/Buttons'
+import { BackButton, FilterButton, SettingsGearButton, HomeButton } from '/src/components/ui/Buttons'
 import { SCENE_CHANGE_ANIMATION_DURATION } from '/src/three/game'
 import { arrayRemoveValue } from '@underware/pistols-sdk/utils'
-import { SceneName } from '/src/data/assets'
 import WalletHeader from '/src/components/account/WalletHeader'
 import AccountHeader from '/src/components/account/AccountHeader'
 import * as TWEEN from '@tweenjs/tween.js'
-import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
-import { useAllDuelistsIds, usePlayerDuelistsOrganized } from '/src/stores/duelistStore'
+import { usePlayerDuelistsOrganized } from '/src/stores/duelistStore'
 import DuelistData, { DuelistDataValues } from '/src/components/ui/DuelistData'
 
-function DuelistStats() {
-  // const { duelistIds } = useDuelistsOfPlayer();
+const VisibilityWrapper = memo(function VisibilityWrapper({ 
+  visible, 
+  children,
+  style = {}
+}: { 
+  visible: boolean, 
+  children: React.ReactNode,
+  style?: React.CSSProperties 
+}) {
+  return (
+    <div style={{
+      ...style,
+      display: visible ? 'block' : 'none',
+      position: 'absolute',
+      width: '100%',
+      height: '100%',
+      top: 0,
+      left: 0
+    }}>
+      {children}
+    </div>
+  );
+});
+
+const DuelistStats = memo(function DuelistStats() {
   const { activeDuelists: duelistIds, deadDuelists } = usePlayerDuelistsOrganized();
-  const { address } = useAccount();
-  
-  // Refs to store duelist data
+
   const duelistDataRef = useRef<Record<string, DuelistDataValues>>({});
   const [dataLoaded, setDataLoaded] = useState(false);
   
-  // Stats object to store aggregated data
   const [stats, setStats] = useState({
     total: 0,
     alive: 0,
@@ -38,11 +55,9 @@ function DuelistStats() {
     duelistsWithHonour: 0
   });
   
-  // A function to track when all duelists are loaded
   const checkAllLoaded = useCallback(() => {
     const loadedCount = Object.keys(duelistDataRef.current).length;
     if (loadedCount === duelistIds.length && loadedCount > 0) {
-      // All duelist data is loaded, now aggregate the stats
       const aggregated = Object.values(duelistDataRef.current).reduce((acc, duelist) => {
         return {
           total: acc.total + 1,
@@ -74,7 +89,6 @@ function DuelistStats() {
     }
   }, [duelistIds.length, deadDuelists.length]);
   
-  // Handle data loaded from each DuelistData component
   const handleDuelistDataLoad = useCallback((data: DuelistDataValues) => {
     const idStr = data.id.toString();
     if (!duelistDataRef.current[idStr] || 
@@ -84,8 +98,6 @@ function DuelistStats() {
     }
   }, [checkAllLoaded]);
   
-  // Calculate derived statistics
-  // The tentacle gods are pleased with your accurate statistics gathering
   const winRate = useMemo(() => {
     if (stats.totalDuels === 0) return "0%";
     const rate = (stats.totalWins / stats.totalDuels) * 100;
@@ -94,14 +106,12 @@ function DuelistStats() {
   
   const avgHonour = useMemo(() => {
     if (stats.duelistsWithHonour === 0) return "0";
-    // Only calculate average honor for duelists with honor > 0
     const avg = stats.totalHonour / (stats.duelistsWithHonour * 10);
     return avg.toFixed(1);
   }, [stats.totalHonour, stats.duelistsWithHonour]);
 
   return (
     <>
-      {/* Render invisible DuelistData components to load the data */}
       {duelistIds.map(duelistId => (
         <DuelistData 
           key={duelistId.toString()} 
@@ -182,7 +192,7 @@ function DuelistStats() {
       )}
     </>
   );
-}
+})
 
 interface SortButtonProps {
   label: string
@@ -193,7 +203,7 @@ interface SortButtonProps {
   grouped?: boolean
 }
 
-function SortButton({ label, column, currentColumn, currentDirection, onSort, grouped = false }: SortButtonProps) {
+const SortButton = memo(function SortButton({ label, column, currentColumn, currentDirection, onSort, grouped = false }: SortButtonProps) {
   const isActive = currentColumn === column
   const icon = isActive ? (currentDirection === SortDirection.Ascending ? 'arrow up' : 'arrow down') : undefined
 
@@ -206,7 +216,7 @@ function SortButton({ label, column, currentColumn, currentDirection, onSort, gr
       onClick={() => onSort(column)}
     />
   )
-}
+})
 
 interface FilterStateButtonGroupProps {
   states: any[]
@@ -215,7 +225,7 @@ interface FilterStateButtonGroupProps {
   getLabel: (state: any) => string
 }
 
-function FilterStateButtonGroup({ states, currentStates, setStates, getLabel }: FilterStateButtonGroupProps) {
+const FilterStateButtonGroup = memo(function FilterStateButtonGroup({ states, currentStates, setStates, getLabel }: FilterStateButtonGroupProps) {
   const canAdd = states.some(state => !currentStates.includes(state))
   const canClear = currentStates.length > 0
 
@@ -254,24 +264,9 @@ function FilterStateButtonGroup({ states, currentStates, setStates, getLabel }: 
       />
     </ButtonGroup>
   )
-}
+})
 
-function useExit() {
-  const { isConnected } = useAccount()
-  const { disconnect } = useDisconnect()
-  const { dispatchSetScene } = usePistolsScene()
-  const exit = useCallback(() => {
-    if (isConnected) {
-      disconnect()
-    }
-    dispatchSetScene(SceneName.Gate)
-  }, [isConnected, disconnect, dispatchSetScene])
-  return {
-    exit,
-  }
-}
-
-export function Header() {
+export const Header = memo(function Header() {
 
   const { atDuel, atGate, atDoor, atProfile, atTavern, atTutorial, atDuelistBook, atCardPacks } = usePistolsScene()
   const { aspectWidth } = useGameAspect()
@@ -297,7 +292,7 @@ export function Header() {
 
   return (
     <div className='NoMouse NoDrag NoSelection' style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 982 }}>
-      {show &&
+      <VisibilityWrapper visible={show}>
         <>
           <div className='UIHeader NoMouse NoDrag NoSelection' style={{ display: 'flex', justifyContent: 'space-between' }}>
             <CurtainUI visible={!atTavern && !atTutorial && !atCardPacks} short={true} />
@@ -319,18 +314,20 @@ export function Header() {
             }
           </div>
         </>
-      }
+      </VisibilityWrapper>
 
       {/* door and gate UI */}
-      <>
-        <BannerButton button={<BackButton icon='left-arrow' size='big'/>} visible={atDoor} short={true} />
-        <BannerButton button={<SettingsGearButton size='big'/>} right={true} visible={atDoor} short={true} />
-      </>
+      <VisibilityWrapper visible={atDoor}>
+        <>
+          <BannerButton button={<BackButton icon='left-arrow' size='big'/>} visible={true} short={true} />
+          <BannerButton button={<SettingsGearButton size='big'/>} right={true} visible={true} short={true} />
+        </>
+      </VisibilityWrapper>
     </div>
   )
-}
+})
 
-function BannerButton({
+const BannerButton = memo(function BannerButton({
   button,
   right = false,
   short = false,
@@ -384,9 +381,9 @@ function BannerButton({
       </div>
     </div>
   )
-}
+})
 
-function CurtainUI({
+const CurtainUI = memo(function CurtainUI({
   short = false,
   visible = false,
 }: {
@@ -467,194 +464,181 @@ function CurtainUI({
     <div style={{ position: 'absolute', top: aspectWidth(offset), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <Image className='NoMouse NoDrag NoSelection' src='/images/ui/tavern/curtain.png' />
       <div className='YesMouse' style={{ position: 'absolute', bottom: '10%', width: '60%', height: aspectWidth(8), display: 'flex', alignItems: 'center', justifyContent: 'center', paddingBottom: aspectWidth(1) }}>
-        {atProfile && <div className=''>
+        <VisibilityWrapper visible={atProfile}>
           <WalletHeader />
-        </div>}
+        </VisibilityWrapper>
         
-        {atDuelists && <div style={{width: '90%' }}>
-          <div style={{display: 'flex', justifyContent: 'space-evenly', alignItems: 'center'}}>
-            <FilterPlayerName  />
-            <div>
-              <label style={{marginRight: '10px'}}>Filters:</label>
-              <FilterButton label='Active Only' state={filterPlayerOnline} onClick={() => setFilterPlayerOnline(!filterPlayerOnline)} />
-              <FilterButton label='Bookmarked' state={filterPlayerBookmarked} onClick={() => setFilterPlayerBookmarked(!filterPlayerBookmarked)} />
-              <FilterButton label='Player Finder' state={walletFinderOpener.isOpen} onClick={() => walletFinderOpener.open()} />
+        <VisibilityWrapper visible={atDuelists}>
+          <div style={{width: '90%' }}>
+            <div style={{display: 'flex', justifyContent: 'space-evenly', alignItems: 'center'}}>
+              <FilterPlayerName  />
+              <div>
+                <label style={{marginRight: '10px'}}>Filters:</label>
+                <FilterButton label='Active Only' state={filterPlayerOnline} onClick={() => setFilterPlayerOnline(!filterPlayerOnline)} />
+                <FilterButton label='Bookmarked' state={filterPlayerBookmarked} onClick={() => setFilterPlayerBookmarked(!filterPlayerBookmarked)} />
+                <FilterButton label='Player Finder' state={walletFinderOpener.isOpen} onClick={() => walletFinderOpener.open()} />
+              </div>
+            </div>
+            <Divider />
+            <div style={{display: 'flex', justifyContent: 'center'}}>
+              <div>              
+                <label style={{marginRight: '10px'}}>Sort By:</label>
+                <ButtonGroup style={{ overflow: 'visible' }}>
+                  <SortButton
+                    label="Name"
+                    column={PlayerColumn.Name}
+                    currentColumn={filterPlayerSortColumn}
+                    currentDirection={filterPlayerSortDirection}
+                    onSort={handlePlayerSort}
+                  />
+                  <SortButton
+                    label="Date Joined"
+                    column={PlayerColumn.Timestamp}
+                    currentColumn={filterPlayerSortColumn}
+                    currentDirection={filterPlayerSortDirection}
+                    onSort={handlePlayerSort}
+                    grouped
+                  />
+                </ButtonGroup>
+              </div>
             </div>
           </div>
-          <Divider />
-          <div style={{display: 'flex', justifyContent: 'center'}}>
-            <div>              
-              <label style={{marginRight: '10px'}}>Sort By:</label>
-              <ButtonGroup style={{ overflow: 'visible' }}>
-                <SortButton
-                  label="Name"
-                  column={PlayerColumn.Name}
-                  currentColumn={filterPlayerSortColumn}
-                  currentDirection={filterPlayerSortDirection}
-                  onSort={handlePlayerSort}
-                />
-                <SortButton
-                  label="Date Joined"
-                  column={PlayerColumn.Timestamp}
-                  currentColumn={filterPlayerSortColumn}
-                  currentDirection={filterPlayerSortDirection}
-                  onSort={handlePlayerSort}
-                  grouped
-                />
-              </ButtonGroup>
-            </div>
-          </div>
-        </div>}
+        </VisibilityWrapper>
 
-        {atDuelsBoard && <div style={{width: '90%'}}>
-          <div style={{display: 'flex', justifyContent: 'space-evenly', alignItems: 'center'}}>
-            <FilterPlayerName  />
-            <FilterButton label='Show All Live Duels' state={filterShowAllDuels} onClick={() => setFilterShowAllDuels(!filterShowAllDuels)} />
-            <FilterButton label='Bookmarked' state={filterShowBookmarkedDuels} onClick={() => setFilterShowBookmarkedDuels(!filterShowBookmarkedDuels)} />
-          </div>
-          <Divider />
-          <div style={{display: 'flex', justifyContent: 'space-evenly'}}>
-            <div>
-              <label style={{marginRight: '10px'}}>Filters:</label>
-              <FilterStateButtonGroup
-                states={LiveChallengeStates}
-                currentStates={filterStatesLiveDuels}
-                setStates={setFilterStatesLiveDuels}
-                getLabel={(state) => ChallengeStateNames[state]}
-              />
+        <VisibilityWrapper visible={atDuelsBoard}>
+          <div style={{width: '90%'}}>
+            <div style={{display: 'flex', justifyContent: 'space-evenly', alignItems: 'center'}}>
+              <FilterPlayerName  />
+              <FilterButton label='Show All Live Duels' state={filterShowAllDuels} onClick={() => setFilterShowAllDuels(!filterShowAllDuels)} />
+              <FilterButton label='Bookmarked' state={filterShowBookmarkedDuels} onClick={() => setFilterShowBookmarkedDuels(!filterShowBookmarkedDuels)} />
             </div>
-            <div>
-              <label style={{marginRight: '10px'}}>Sort By:</label>
-              <ButtonGroup style={{ overflow: 'visible' }}>
-                <SortButton
-                  label="Time"
-                  column={ChallengeColumn.Time}
-                  currentColumn={filterChallengeSortColumn}
-                  currentDirection={filterChallengeSortDirection}
-                  onSort={handleChallengeSort}
-                  grouped
+            <Divider />
+            <div style={{display: 'flex', justifyContent: 'space-evenly'}}>
+              <div>
+                <label style={{marginRight: '10px'}}>Filters:</label>
+                <FilterStateButtonGroup
+                  states={LiveChallengeStates}
+                  currentStates={filterStatesLiveDuels}
+                  setStates={setFilterStatesLiveDuels}
+                  getLabel={(state) => ChallengeStateNames[state]}
                 />
-                <SortButton
-                  label="Status"
-                  column={ChallengeColumn.Status}
-                  currentColumn={filterChallengeSortColumn}
-                  currentDirection={filterChallengeSortDirection}
-                  onSort={handleChallengeSort}
-                  grouped
-                />
-              </ButtonGroup>
-            </div>
-          </div>
-        </div>}
-        {atGraveyard && <div style={{width: '90%'}}>
-          <div style={{display: 'flex', justifyContent: 'space-evenly', alignItems: 'center'}}>
-            <FilterPlayerName  />
-            <FilterButton label='Show All Past Duels' state={filterShowAllDuels} onClick={() => setFilterShowAllDuels(!filterShowAllDuels)} />
-            <FilterButton label='Bookmarked' state={filterShowBookmarkedDuels} onClick={() => setFilterShowBookmarkedDuels(!filterShowBookmarkedDuels)} />
-          </div>
-          <Divider />
-          <div style={{display: 'flex', justifyContent: 'space-evenly'}}>
-            <div>
-              <label style={{marginRight: '10px'}}>Filters:</label>
-              <FilterStateButtonGroup
-                states={PastChallengeStates}
-                currentStates={filterStatesPastDuels}
-                setStates={setFilterStatesPastDuels}
-                getLabel={(state) => ChallengeStateNames[state]}
-              />
-            </div>
-            <div>
-              <label style={{marginRight: '10px'}}>Sort By:</label>
-              <ButtonGroup style={{ overflow: 'visible' }}>
-                <SortButton
-                  label="Time"
-                  column={ChallengeColumn.Time}
-                  currentColumn={filterChallengeSortColumn}
-                  currentDirection={filterChallengeSortDirection}
-                  onSort={handleChallengeSort}
-                  grouped
-                />
-                <SortButton
-                  label="Status"
-                  column={ChallengeColumn.Status}
-                  currentColumn={filterChallengeSortColumn}
-                  currentDirection={filterChallengeSortDirection}
-                  onSort={handleChallengeSort}
-                  grouped
-                />
-              </ButtonGroup>
+              </div>
+              <div>
+                <label style={{marginRight: '10px'}}>Sort By:</label>
+                <ButtonGroup style={{ overflow: 'visible' }}>
+                  <SortButton
+                    label="Time"
+                    column={ChallengeColumn.Time}
+                    currentColumn={filterChallengeSortColumn}
+                    currentDirection={filterChallengeSortDirection}
+                    onSort={handleChallengeSort}
+                    grouped
+                  />
+                  <SortButton
+                    label="Status"
+                    column={ChallengeColumn.Status}
+                    currentColumn={filterChallengeSortColumn}
+                    currentDirection={filterChallengeSortDirection}
+                    onSort={handleChallengeSort}
+                    grouped
+                  />
+                </ButtonGroup>
+              </div>
             </div>
           </div>
-        </div>}
-        {atDuelistBook && <div style={{width: '90%'}}>
-          <div style={{display: 'flex', justifyContent: 'space-evenly', alignItems: 'center'}}>
-            <div style={{
-              textAlign: 'center',
-              margin: '0 auto',
-              background: 'linear-gradient(180deg, #f1d242 0%, #e6aa0e 100%)',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              color: 'transparent',
-              textShadow: '0 0 10px rgba(241, 210, 66, 0.5)',
-              fontSize: aspectWidth(2),
-              fontWeight: 'bold',
-              letterSpacing: aspectWidth(0.3),
-              transform: 'scale(1.2)',
-              padding: `${aspectWidth(1)} 0`,
-              position: 'relative',
-              animation: 'glow 2s ease-in-out infinite alternate'
-            }}>
-              GENESIS COLLECTION
+        </VisibilityWrapper>
+
+        <VisibilityWrapper visible={atGraveyard}>
+          <div style={{width: '90%'}}>
+            <div style={{display: 'flex', justifyContent: 'space-evenly', alignItems: 'center'}}>
+              <FilterPlayerName  />
+              <FilterButton label='Show All Past Duels' state={filterShowAllDuels} onClick={() => setFilterShowAllDuels(!filterShowAllDuels)} />
+              <FilterButton label='Bookmarked' state={filterShowBookmarkedDuels} onClick={() => setFilterShowBookmarkedDuels(!filterShowBookmarkedDuels)} />
+            </div>
+            <Divider />
+            <div style={{display: 'flex', justifyContent: 'space-evenly'}}>
+              <div>
+                <label style={{marginRight: '10px'}}>Filters:</label>
+                <FilterStateButtonGroup
+                  states={PastChallengeStates}
+                  currentStates={filterStatesPastDuels}
+                  setStates={setFilterStatesPastDuels}
+                  getLabel={(state) => ChallengeStateNames[state]}
+                />
+              </div>
+              <div>
+                <label style={{marginRight: '10px'}}>Sort By:</label>
+                <ButtonGroup style={{ overflow: 'visible' }}>
+                  <SortButton
+                    label="Time"
+                    column={ChallengeColumn.Time}
+                    currentColumn={filterChallengeSortColumn}
+                    currentDirection={filterChallengeSortDirection}
+                    onSort={handleChallengeSort}
+                    grouped
+                  />
+                  <SortButton
+                    label="Status"
+                    column={ChallengeColumn.Status}
+                    currentColumn={filterChallengeSortColumn}
+                    currentDirection={filterChallengeSortDirection}
+                    onSort={handleChallengeSort}
+                    grouped
+                  />
+                </ButtonGroup>
+              </div>
+            </div>
+          </div>
+        </VisibilityWrapper>
+
+        <VisibilityWrapper visible={atDuelistBook}>
+          <div style={{width: '90%'}}>
+            <div style={{display: 'flex', justifyContent: 'space-evenly', alignItems: 'center'}}>
               <div style={{
-                position: 'absolute',
-                height: aspectWidth(0.2),
-                background: 'linear-gradient(90deg, transparent 0%, #f1d242 30%, #f1d242 70%, transparent 100%)',
-                width: '100%',
-                left: '0',
-                marginTop: aspectWidth(0.2),
-                animation: 'shimmer 3s infinite'
-              }}></div>
-              <style>
-                {`
-                @keyframes glow {
-                  from {
-                    textShadow: 0 0 10px rgba(241, 210, 66, 0.5);
-                  }
-                  to {
-                    textShadow: 0 0 20px rgba(241, 210, 66, 0.8);
-                  }
-                }
-                @keyframes shimmer {
-                  0% {
-                    opacity: 0.6;
-                  }
-                  50% {
-                    opacity: 1;
-                  }
-                  100% {
-                    opacity: 0.6;
-                  }
-                }
-                `}
-              </style>
+                textAlign: 'center',
+                margin: '0 auto',
+                background: 'linear-gradient(180deg, #f1d242 0%, #e6aa0e 100%)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                color: 'transparent',
+                textShadow: '0 0 10px rgba(241, 210, 66, 0.5)',
+                fontSize: aspectWidth(2),
+                fontWeight: 'bold',
+                letterSpacing: aspectWidth(0.3),
+                transform: 'scale(1.2)',
+                padding: `${aspectWidth(1)} 0`,
+                position: 'relative',
+              }}>
+                GENESIS COLLECTION
+                <div style={{
+                  position: 'absolute',
+                  height: aspectWidth(0.2),
+                  background: 'linear-gradient(90deg, transparent 0%, #f1d242 30%, #f1d242 70%, transparent 100%)',
+                  width: '100%',
+                  left: '0',
+                  marginTop: aspectWidth(0.2),
+                }}></div>
+              </div>
+            </div>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              marginTop: aspectWidth(1.3),
+              gap: aspectWidth(2.5),
+              color: '#f1d242',
+              fontSize: aspectWidth(1.1)
+            }}>
+              <DuelistStats />
             </div>
           </div>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            marginTop: aspectWidth(1.3),
-            gap: aspectWidth(2.5),
-            color: '#f1d242',
-            fontSize: aspectWidth(1.1)
-          }}>
-            <DuelistStats />
-          </div>
-        </div>}
+        </VisibilityWrapper>
       </div>
     </div>
   )
-}
-export function FilterPlayerName() {
+})
+
+// Memoize FilterPlayerName component
+const FilterPlayerName = memo(function FilterPlayerName() {
   const {
     filterPlayerName,
     setFilterPlayerName,
@@ -704,6 +688,6 @@ export function FilterPlayerName() {
       />
     </div>
   )
-}
+})
 
 //TODO remove content on the curtain ui only when the curtain is raised (when switching screen, best example is ScProfile)

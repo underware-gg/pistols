@@ -831,7 +831,8 @@ $ui-container-gap: 1em;
 }
 
 .WalletHeader {
-  min-width: 350px;
+  width: aspect-width(60);
+  margin-top: aspect-width(-0.8) !important;
 }
 
 .FormLabel {

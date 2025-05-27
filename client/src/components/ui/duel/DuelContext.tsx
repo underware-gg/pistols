@@ -181,8 +181,7 @@ const StateTracker = {
 export const DuelContextProvider: React.FC<{ 
   children: React.ReactNode, 
   duelId: bigint,
-  cachedDuelData?: any 
-}> = ({ children, duelId, cachedDuelData }) => {
+}> = ({ children, duelId }) => {
   // State tracking
   const stateUpdateCount = useRef({
     sceneStarted: 0,
@@ -199,6 +198,18 @@ export const DuelContextProvider: React.FC<{
     isTutorial, isAwaiting, isInProgress, isFinished,
     isExpired, isCanceled
   } = useGetChallenge(duelId);
+
+  useEffect(() => {
+    console.log('duelId', duelId,  duelistIdA, duelistIdB, 
+    duelistAddressA, duelistAddressB, 
+    timestampStart, timestampEnd, 
+    isTutorial, isAwaiting, isInProgress, isFinished,
+    isExpired, isCanceled)
+  }, [duelId, duelistIdA, duelistIdB, 
+    duelistAddressA, duelistAddressB, 
+    timestampStart, timestampEnd, 
+    isTutorial, isAwaiting, isInProgress, isFinished,
+    isExpired, isCanceled])
 
   // Get duelist data
   const duelistA = useDuelist(duelistIdA);

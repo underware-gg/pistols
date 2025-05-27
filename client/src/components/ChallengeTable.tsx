@@ -148,6 +148,7 @@ function DuelItem({
   compact?: boolean
 }) {
   const { aspectWidth } = useGameAspect()
+  const { selectedDuelistId } = usePistolsContext()
 
   const {
     challenge: { duelistIdA, duelistIdB, state, isLive, isCanceled, isExpired, isDraw, winner, duelistAddressA, duelistAddressB },
@@ -161,32 +162,50 @@ function DuelItem({
   const { isMyAccount: isYouB } = useIsMyAccount(duelistAddressB)
 
   const [leftDuelistId, leftDuelistAddress, leftPlayerName] = useMemo(() => {
-    if (isYouB) {
+    if (selectedDuelistId === duelistIdA) {
+      return [duelistIdA, duelistAddressA, playerNameA]
+    }
+    if (selectedDuelistId === duelistIdB) {
       return [duelistIdB, duelistAddressB, playerNameB]
     }
     return [duelistIdA, duelistAddressA, playerNameA]
-  }, [isYouB, duelistIdA, duelistIdB, duelistAddressA, duelistAddressB, playerNameA, playerNameB])
+  }, [selectedDuelistId, duelistIdA, duelistIdB, duelistAddressA, duelistAddressB, playerNameA, playerNameB])
   
   const [rightDuelistId, rightDuelistAddress, rightPlayerName] = useMemo(() => {
-    if (isYouB) {
+    if (selectedDuelistId === duelistIdA) {
+      return [duelistIdB, duelistAddressB, playerNameB]
+    }
+    if (selectedDuelistId === duelistIdB) {
       return [duelistIdA, duelistAddressA, playerNameA]
     }
     return [duelistIdB, duelistAddressB, playerNameB]
-  }, [isYouB, duelistIdA, duelistIdB, duelistAddressA, duelistAddressB, playerNameA, playerNameB])
+  }, [selectedDuelistId, duelistIdA, duelistIdB, duelistAddressA, duelistAddressB, playerNameA, playerNameB])
 
   const winnerIsLeft = useMemo(() => {
-    if (isYouB) {
+    if (selectedDuelistId === duelistIdA) {
+      return winner == 1
+    }
+    if (selectedDuelistId === duelistIdB) {
       return winner == 2
     }
     return winner == 1
-  }, [winner, isYouB])
+  }, [winner, selectedDuelistId, duelistIdA, duelistIdB])
   
   const winnerIsRight = useMemo(() => {
-    if (isYouB) {
+    if (selectedDuelistId === duelistIdA) {
+      return winner == 2
+    }
+    if (selectedDuelistId === duelistIdB) {
       return winner == 1
     }
     return winner == 2
-  }, [winner, isYouB])
+  }, [winner, selectedDuelistId, duelistIdA, duelistIdB])
+
+  const isOpponentOnRight = useMemo(() => {
+    if (selectedDuelistId === duelistIdA && isYouB) return true
+    if (selectedDuelistId === duelistIdB && isYouA) return true
+    return false
+  }, [selectedDuelistId, duelistIdA, duelistIdB, isYouA, isYouB])
 
   const { dispatchSelectDuel } = usePistolsContext()
   const isCallToAction = useDuelCallToAction(duelId)
@@ -206,7 +225,15 @@ function DuelItem({
   }
 
   return (
-    <Table.Row textAlign='left' verticalAlign='middle' onClick={() => _gotoChallenge()} style={{ maxWidth: '100%' }}>
+    <Table.Row 
+      textAlign='left' 
+      verticalAlign='middle' 
+      onClick={() => _gotoChallenge()} 
+      style={{ 
+        maxWidth: '100%',
+        backgroundColor: isOpponentOnRight ? 'rgba(245, 180, 50, 0.15)' : undefined,
+      }}
+    >
       <Cell style={{ width: '40%' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: aspectWidth(0.8) }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>

@@ -22,16 +22,14 @@ import { usePistolsContext } from '/src/hooks/PistolsContext'
  */
 export default function Duel({
   duelId,
-  tutorial = DuelTutorialLevel.NONE,
-  cachedDuelData
+  tutorial = DuelTutorialLevel.NONE
 } : {
   duelId: bigint,
-  tutorial: DuelTutorialLevel,
-  cachedDuelData?: any
+  tutorial: DuelTutorialLevel
 }) {
 
   return (
-    <DuelContextProvider duelId={duelId} cachedDuelData={cachedDuelData}>
+    <DuelContextProvider duelId={duelId}>
       <DuelContent 
         duelId={duelId}
         tutorial={tutorial}

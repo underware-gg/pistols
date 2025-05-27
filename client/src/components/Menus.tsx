@@ -82,20 +82,6 @@ const ControlMenuItem = React.memo(({
   const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const tweenRef = useRef<TWEEN.Tween<{opacity: number}> | null>(null);
 
-  useEffect(() => {
-    // This effect runs when the component mounts
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('MenuDuelControl mounted');
-    }
-    
-    return () => {
-      // This cleanup function runs when the component unmounts
-      if (process.env.NODE_ENV !== 'production') {
-        console.log('MenuDuelControl unmounted');
-      }
-    };
-  }, []);
-
   const handleMouseEnter = useCallback(() => {
     if (leaveTimeoutRef.current) {
       clearTimeout(leaveTimeoutRef.current);
