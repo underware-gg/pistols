@@ -13,7 +13,7 @@ mod tests {
         tester::{
             TestSystems, FLAGS,
             rng, IRngDispatcher,
-            OWNER, ZERO,
+            ZERO, OWNER, TREASURY,
         }
     };
 
@@ -68,6 +68,11 @@ mod tests {
         // in alternative world...
         assert!(world.is_world_contract(rng.contract_address), "sys.is_world_contract(alternative)");
         assert!(!world.is_world_contract(sys.rng.contract_address), "!sys.is_world_contract(alternative)");
+        // deployed contract that is not a contract in this world
+        assert!(!sys.world.is_world_contract(sys.world.dispatcher.contract_address), "!is_world_contract(world)");
+        // random addresses
+        assert!(!sys.world.is_world_contract(OWNER()), "!is_world_contract(OWNER)");
+        assert!(!sys.world.is_world_contract(TREASURY()), "!is_world_contract(TREASURY)");
     }
 
     #[test]
@@ -83,20 +88,6 @@ mod tests {
         // tester::impersonate(sys.tournaments.contract_address);
         // assert!(!sys.world.caller_is_duel_contract(), "!caller_is_duel_contract(sys.tournaments)");
         // assert!(sys.world.caller_is_tournament_contract(), "caller_is_tournament_contract(sys.tournaments)");
-    }
-
-    #[test]
-    #[should_panic(expected:('ENTRYPOINT_NOT_FOUND', 'ENTRYPOINT_FAILED'))]
-    fn test_validator_outsider_contract() {
-        let mut sys: TestSystems = tester::setup_world(0);
-        sys.world.is_world_contract(sys.world.dispatcher.contract_address);
-    }
-
-    #[test]
-    #[should_panic(expected:('CONTRACT_NOT_DEPLOYED', 'ENTRYPOINT_FAILED'))]
-    fn test_validator_outsider_random_address() {
-        let mut sys: TestSystems = tester::setup_world(0);
-        sys.world.is_world_contract(OWNER());
     }
 
 }

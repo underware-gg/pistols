@@ -1,7 +1,10 @@
 use starknet::{ContractAddress};
 use core::num::traits::Zero;
 use dojo::world::{WorldStorage, WorldStorageTrait, IWorldDispatcher};
-use dojo::meta::interface::{IDeployedResourceDispatcher, IDeployedResourceDispatcherTrait};
+use dojo::meta::interface::{
+    IDeployedResourceDispatcher, IDeployedResourceDispatcherTrait,
+    IDeployedResourceSafeDispatcher, IDeployedResourceSafeDispatcherTrait,
+};
 
 pub use pistols::systems::{
     admin::{IAdminDispatcher, IAdminDispatcherTrait},
@@ -156,13 +159,17 @@ pub impl DnsImpl of DnsTrait {
     //--------------------------
     // address validators
     //
-    #[inline(always)]
+    #[feature("safe_dispatcher")]
     fn is_world_contract(self: @WorldStorage, contract_address: ContractAddress) -> bool {
-        // TODO: use safe dispatchers
+        // try calling dojo_name() with safe dispatchers
         // https://book.cairo-lang.org/ch102-02-interacting-with-another-contract.html#handling-errors-with-safe-dispatchers
-        (contract_address == self.find_contract_address(
-            @self.find_contract_name(contract_address)
-        ))
+        let response: Result<ByteArray, Array<felt252>> = IDeployedResourceSafeDispatcher{contract_address}.dojo_name();
+        (match response {
+            // it is a dojo contract... check if it's in this world
+            Result::Ok(contract_name) => (contract_address == self.find_contract_address(@contract_name)),
+            // failed to call dojo_name(), definitely not of this world
+            Result::Err(_panic_reason) => (false),
+        })
     }
     #[inline(always)]
     fn caller_is_world_contract(self: @WorldStorage) -> bool {

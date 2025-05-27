@@ -847,9 +847,7 @@ pub fn _protected(sys: @TestSystems) -> IDuelistTokenProtectedDispatcher {
 }
 
 #[test]
-// #[should_panic(expected: ('TOKEN: caller is not minter', 'ENTRYPOINT_FAILED'))] // for Dojo contracts
-// #[should_panic(expected: ('ENTRYPOINT_NOT_FOUND', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))] // for accounts
-#[should_panic(expected: ('CONTRACT_NOT_DEPLOYED', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))] // for random addresses
+#[should_panic(expected: ('DUELIST: Invalid caller', 'ENTRYPOINT_FAILED'))] // for Dojo contracts
 fn test_mint_duelist_not_minter() {
     let mut sys: TestSystems = setup(0);
     // let account: ContractAddress = tester::deploy_mock_account();
@@ -865,6 +863,7 @@ fn test_transfer_rewards_invalid_caller() {
     let mut sys: TestSystems = setup(0);
     let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), "", DuelType::Seasonal, 0, 1);
     let challenge: Challenge = sys.store.get_challenge(duel_id);
+    // use mock account
     // let account: ContractAddress = tester::deploy_mock_account();
     // tester::impersonate(account);
     _protected(@sys).transfer_rewards(challenge, 0, Default::default());
