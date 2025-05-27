@@ -1161,25 +1161,37 @@ pub mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('PISTOLS: Invalid moves count', 'ENTRYPOINT_FAILED'))]
-    fn test_reveal_invalid_moves_count_0() {
+    #[should_panic(expected:('PISTOLS: Invalid moves hash', 'ENTRYPOINT_FAILED'))]
+    fn test_reveal_invalid_moves_count_must_go_on_0_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
-        let (_mocked, moves_a, moves_b) = prefabs::get_moves_custom([1].span(), [1].span());
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_a.hashed);
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_b.hashed);
-        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        let (_mocked, moves_a, moves_b) = prefabs::get_moves_custom([].span(), [1,2].span());
+        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
     }
 
     #[test]
-    #[should_panic(expected:('PISTOLS: Invalid moves count', 'ENTRYPOINT_FAILED'))]
-    fn test_reveal_invalid_moves_count_1() {
+    #[should_panic(expected:('PISTOLS: Invalid moves hash', 'ENTRYPOINT_FAILED'))]
+    fn test_reveal_invalid_moves_count_must_go_on_0_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
-        let (_mocked, moves_a, moves_b) = prefabs::get_moves_custom([1,1].span(), [1,1].span());
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_a.hashed);
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_b.hashed);
-        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, 0x12121, [].span());
+        let (_mocked, moves_a, moves_b) = prefabs::get_moves_custom([1,2].span(), [].span());
+        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+    }
+
+    #[test]
+    // #[should_panic(expected:('PISTOLS: Invalid moves count', 'ENTRYPOINT_FAILED'))]
+    fn test_reveal_invalid_moves_count_must_go_on_1() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
+        let (_mocked, moves_a, moves_b) = prefabs::get_moves_custom([1].span(), [1].span());
+        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        // would panic hwre if Errors::INVALID_MOVES_COUNT is active
+        // instead duel is finished
+        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        let challenge: ChallengeValue = sys.store.get_challenge_value(duel_id);
+        assert_eq!(challenge.state, ChallengeState::Draw, "challenge.state");
     }
 
 

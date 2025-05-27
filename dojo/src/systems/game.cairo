@@ -113,6 +113,7 @@ pub mod game {
         pub const ROUND_NOT_IN_REVEAL: felt252       = 'PISTOLS: Round not in reveal';
         pub const ALREADY_COMMITTED: felt252         = 'PISTOLS: Already committed';
         pub const ALREADY_REVEALED: felt252          = 'PISTOLS: Already revealed';
+        pub const INVALID_MOVES_HASH: felt252        = 'PISTOLS: Invalid moves hash';
         pub const INVALID_SALT: felt252              = 'PISTOLS: Invalid salt';
         pub const INVALID_MOVES_COUNT: felt252       = 'PISTOLS: Invalid moves count';
         pub const MOVES_HASH_MISMATCH: felt252       = 'PISTOLS: Moves hash mismatch';
@@ -182,6 +183,7 @@ pub mod game {
             if (duelist_number == 1) {
                 // validate and store hash
                 assert(round.moves_a.hashed == 0, Errors::ALREADY_COMMITTED);
+                assert(hashed > 0, Errors::INVALID_MOVES_HASH);
                 round.moves_a.hashed = hashed;
                 // was duelist transferred?
                 if (challenge.address_a != owner) {
@@ -198,6 +200,7 @@ pub mod game {
             } else if (duelist_number == 2) {
                 // validate and store hash
                 assert(round.moves_b.hashed == 0, Errors::ALREADY_COMMITTED);
+                assert(hashed > 0, Errors::INVALID_MOVES_HASH);
                 round.moves_b.hashed = hashed;
                 // was duelist transferred?
                 if (challenge.address_b != owner) {
@@ -277,7 +280,7 @@ pub mod game {
             // since the hash was validated
             // we should not validate the actual moves
             // all we can do is skip if they are invalid
-            assert(moves.len() >= 2 && moves.len() <= 4, Errors::INVALID_MOVES_COUNT);
+            // assert(moves.len() >= 2 && moves.len() <= 4, Errors::INVALID_MOVES_COUNT);
 
             // validate hash
             let hashed: u128 = MovesTrait::make_moves_hash(salt, moves);
