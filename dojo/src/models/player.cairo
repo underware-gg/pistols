@@ -71,21 +71,42 @@ pub struct PlayerFlags {
 #[dojo::model]
 pub struct PlayerOnline {
     #[key]
-    pub identity: ContractAddress,
+    pub identity: ContractAddress,          // controller wallet
     //-----------------------
-    pub timestamp: u64,     // seconds since epoch
+    pub timestamp: u64,                     // seconds since epoch
 }
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
 pub struct PlayerBookmark {
     #[key]
-    pub identity: ContractAddress,
+    pub identity: ContractAddress,          // controller wallet
     #[key]
     pub target_address: ContractAddress,    // account or contract address
     #[key]
     pub target_id: u128,                    // (optional) token id
     //-----------------------
     pub enabled: bool,
+}
+//
+// Social Links
+//
+#[derive(Serde, Copy, Drop, PartialEq, Introspect)]
+pub enum SocialPlatform {
+    Undefined,  // 0
+    Discord,    // 1
+    Telegram,   // 2
+    X,          // 3
+}
+#[derive(Clone, Drop, Serde)]
+#[dojo::model]
+pub struct PlayerSocialLink {
+    #[key]
+    pub identity: ContractAddress,          // controller wallet
+    #[key]
+    pub social_platform: SocialPlatform,
+    //-----------------------
+    pub user_name: ByteArray,
+    pub user_id: ByteArray,
 }
 
 
