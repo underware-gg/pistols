@@ -6,6 +6,7 @@ import App from '/src/components/App'
 const testPages = [
   { name: 'connect', connected: true },
   { name: 'sign', connected: true },
+  { name: 'chainswitch', connected: true},
   { name: 'tokens', connected: true },
   { name: 'tutorial', connected: true },
   { name: 'timestamp', connected: true },
@@ -33,7 +34,7 @@ export function TestPageMainMenu() {
   return (
     <>
       <h3>Test pagess</h3>
-      <Menu inverted vertical>
+      <Menu inverted vertical size='small'>
         {testPages.map(page => (
           <MenuItem
             key={page.name}
@@ -56,7 +57,7 @@ export function TestPageMenu() {
   }
   return (
     <>
-      <Menu inverted>
+      <Menu inverted size='mini'>
         <MenuItem
           icon='arrow left'
           onClick={() => navigate('/tests')}

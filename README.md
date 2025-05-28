@@ -221,11 +221,23 @@ pnpm i
 Configure default [NetworkId](/sdk/src/dojo/setup/networks.ts) in your `.env` file:
 
 ```sh
-VITE_DEBUG=0
+# enable debug options
+VITE_DEBUG=1
+
+# Main network
 VITE_NETWORK_ID=KATANA_LOCAL
 #VITE_NETWORK_ID=STAGING
 #VITE_NETWORK_ID=SEPOLIA
 #VITE_NETWORK_ID=MAINNET
+
+# Academy chain (tutorials)
+VITE_ACADEMY_NETWORK_ID=ACADEMY
+
+# optional/alternative service urls
+# VITE_SALT_SERVER_URL=https://assets.underware.gg
+# VITE_RPC_URL=https://api.cartridge.gg/x/starknet/mainnet
+# VITE_TORII_URL=https://api.cartridge.gg/x/pistols-mainnet-2/torii
+# VITE_TORII_RELAY_URL=/dns4/api.cartridge.gg/tcp/443/x-parity-wss/%2Fx%2Fpistols-mainnet-2%2Ftorii%2Fwss
 ```
 
 Start the client
