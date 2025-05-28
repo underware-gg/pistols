@@ -1329,7 +1329,7 @@
   "contracts": [
     {
       "address": "0x610423526de7adfd8c18bd027111fcb7d1bc0de329f28fb651a34752273328a",
-      "class_hash": "0x1c5e408f9fd6d73f9ef757650e59aae10c7ab9405abafce66bb5dd70425851a",
+      "class_hash": "0x5dd20a705232f3476ac5e35c0aa7f980a7e383f9186645b938b9cf2bb8b240a",
       "abi": [
         {
           "type": "impl",
@@ -1550,6 +1550,30 @@
               "inputs": [],
               "outputs": [],
               "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "fix_player_bookmark",
+              "inputs": [
+                {
+                  "name": "player_address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "target_address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "target_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "enabled",
+                  "type": "core::bool"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
             }
           ]
         },
@@ -1677,12 +1701,13 @@
         "disqualify_duelist",
         "qualify_duelist",
         "urgent_update",
+        "fix_player_bookmark",
         "upgrade"
       ]
     },
     {
       "address": "0x426c16fe76f12586718c07e47c8e4312e9fee5e7dc849a75f3c587ad9e70b4f",
-      "class_hash": "0x374a7552875e17fc977a51635f853b918fd55507f75e946eb358448d9a7c90a",
+      "class_hash": "0x6f2b690dcc87d28793b1c7c40a3f2acec7f9d238b61c1e734d221dec59253b8",
       "abi": [
         {
           "type": "impl",
@@ -2160,7 +2185,7 @@
     },
     {
       "address": "0x2e9c711b1a7e2784570b1bda5082a92606044e836ba392d2b977d280fb74b3c",
-      "class_hash": "0x28c5fb409149a2eadc0046926db139e8d88f848e741b126310a08fc4dfc8b9",
+      "class_hash": "0x3836dce3421e0c18c6a737e3cc6b13f63dad93ea1c21d92831d972fcfb5e081",
       "abi": [
         {
           "type": "impl",
@@ -3470,7 +3495,7 @@
     },
     {
       "address": "0x7aaa9866750a0db82a54ba8674c38620fa2f967d2fbb31133def48e0527c87f",
-      "class_hash": "0x308de81feb305f8e73c4c21a030b0519751ea6580fa014334c32d1bf106f147",
+      "class_hash": "0x333f80c2cc9f0777701e5c8ba99507e3ac4d8b687e24e7ac78d7ef5559737e5",
       "abi": [
         {
           "type": "impl",
@@ -5370,7 +5395,7 @@
     },
     {
       "address": "0x2549653a4ae1ff8d04a20b8820a49cbe97486c536ec0e4c8f68aa33d80067cf",
-      "class_hash": "0x122a6f7c919d25520525e44073549a37e1413923f8ad324bb8cda51d0fd135f",
+      "class_hash": "0x414f90fda86a3845abc862227ee5d3d0031e45c48615c97d925febf4a114167",
       "abi": [
         {
           "type": "impl",
@@ -6073,7 +6098,7 @@
     },
     {
       "address": "0x68a7a07e08fc3e723a878223d00f669106780d5ea6665eb15d893476d47bf3b",
-      "class_hash": "0x578df810bfcf0c9842f7ea4068abe8090a5438f6ac3e423c632bf412cd2dbda",
+      "class_hash": "0x68c6ac2413dc1271fb10a22af0626066d8d27e1a04964ccbef991f5ec1deb25",
       "abi": [
         {
           "type": "impl",
@@ -6593,7 +6618,7 @@
     },
     {
       "address": "0x2c6a7c98a9dea8322b51018eef7be99ebedd209cebdaacb9f4c5bbf661c1cc9",
-      "class_hash": "0x5d2b69f58ef38a2e0b3e9eaa5b93db52888714c3e9b2c3359f52e00990c1573",
+      "class_hash": "0x3484b68d9f96e1ff925677d40d2a10c2d3f1b92d2133d56b1c8ca736565e0f5",
       "abi": [
         {
           "type": "impl",
@@ -6664,6 +6689,42 @@
             {
               "name": "snapshot",
               "type": "@core::array::Array::<core::integer::u8>"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "core::bool",
+          "variants": [
+            {
+              "name": "False",
+              "type": "()"
+            },
+            {
+              "name": "True",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "pistols::models::events::SocialPlatform",
+          "variants": [
+            {
+              "name": "Undefined",
+              "type": "()"
+            },
+            {
+              "name": "Discord",
+              "type": "()"
+            },
+            {
+              "name": "Telegram",
+              "type": "()"
+            },
+            {
+              "name": "X",
+              "type": "()"
             }
           ]
         },
@@ -6807,20 +6868,6 @@
             },
             {
               "name": "Bananas",
-              "type": "()"
-            }
-          ]
-        },
-        {
-          "type": "enum",
-          "name": "core::bool",
-          "variants": [
-            {
-              "name": "False",
-              "type": "()"
-            },
-            {
-              "name": "True",
               "type": "()"
             }
           ]
@@ -7165,6 +7212,46 @@
             },
             {
               "type": "function",
+              "name": "emit_player_bookmark",
+              "inputs": [
+                {
+                  "name": "target_address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "target_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "enabled",
+                  "type": "core::bool"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "emit_player_social_link",
+              "inputs": [
+                {
+                  "name": "social_platform",
+                  "type": "pistols::models::events::SocialPlatform"
+                },
+                {
+                  "name": "user_name",
+                  "type": "core::byte_array::ByteArray"
+                },
+                {
+                  "name": "user_id",
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
               "name": "get_duel_deck",
               "inputs": [
                 {
@@ -7437,6 +7524,8 @@
         "reveal_moves",
         "collect_duel",
         "clear_call_to_action",
+        "emit_player_bookmark",
+        "emit_player_social_link",
         "create_trophies",
         "do_that_thing",
         "upgrade"
@@ -10726,12 +10815,6 @@
     },
     {
       "members": [],
-      "class_hash": "0x1fa6a9ca91c5305b211c5f8b0aa8f48934d7597a0578d7cf0a643868f8911f7",
-      "tag": "pistols-PlayerBookmark",
-      "selector": "0x46db6150404dd9d739a2cd0c5e5036698ab3cfde3a5626ee798e1f1add13a63"
-    },
-    {
-      "members": [],
       "class_hash": "0x257b1c7f7d3e897f7fc99e911a61752ffd4f7ab57245c6d3a1b9f6b1d7e63b6",
       "tag": "pistols-PlayerDuelistStack",
       "selector": "0xb47a4ea3849ae004ed3d0ba58070c0eb3cdca2bed8c9a6ab6bfe01210effc6"
@@ -10815,6 +10898,18 @@
       "class_hash": "0x742a8b06468408b9086d21cd2515412728e1ff614c75752e2eb4d781b1851d2",
       "tag": "pistols-PlayerActivityEvent",
       "selector": "0x46a192c105a4598953e7aeaf3809703964eb9e6d65403156d0458dcd2ee379b"
+    },
+    {
+      "members": [],
+      "class_hash": "0x617a32d2569068cebd7e633e7e7b26ba207233494d324d0705b6aa695f340bc",
+      "tag": "pistols-PlayerBookmarkEvent",
+      "selector": "0x3075e796a774ce4fe1a6f34d9cf7915d5d76f0bcdec07acb8af65fbb3b23b4"
+    },
+    {
+      "members": [],
+      "class_hash": "0x259e19c55838965c9c268f76a2eb00cf2555105bba57b1338963a91fd8efcf3",
+      "tag": "pistols-PlayerSocialLinkEvent",
+      "selector": "0x480838a3c770e19dee008a3d8f3668402af487acf0d2ecacc584ec65a22f845"
     },
     {
       "members": [],
