@@ -70,9 +70,9 @@ const createStore = () => {
             state.players_online[address] = bigintToNumber(online.timestamp)
           }
           // Bookmarks
-          const bookmark = e.models.pistols.PlayerBookmark
+          const bookmark = e.models.pistols.PlayerBookmarkEvent
           if (bookmark) {
-            const address = bigintToHex(bookmark.identity)
+            const address = bigintToHex(bookmark.player_address)
             const target_address = BigInt(bookmark.target_address)
             const target_id = BigInt(bookmark.target_id)
             if (target_id == 0n) {

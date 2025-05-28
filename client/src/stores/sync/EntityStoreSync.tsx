@@ -31,7 +31,6 @@ const _modelsPlayers = [
   "pistols-PlayerTeamFlags",
   // off-chain signed messages
   "pistols-PlayerOnline",
-  "pistols-PlayerBookmark",
 ];
 const _modelsDuelists = [
   // Duelists
@@ -164,7 +163,7 @@ export function EntityStoreSync() {
       debug.log("EntityStoreSync() SET PLAYERS =======> [entities]:", entities)
       // debug.log("EntityStoreSync() SET PLAYERS =======> [Player]:", filterEntitiesByModels(entities, ['Player']))
       playerState.setEntities(filterEntitiesByModels(entities, ['Player', 'PlayerFlags', 'PlayerTeamFlags']))
-      playerDataState.updateMessages(filterEntitiesByModels(entities, ['PlayerOnline', 'PlayerBookmark']))
+      playerDataState.updateMessages(filterEntitiesByModels(entities, ['PlayerOnline']))
     },
   })
 
@@ -216,7 +215,7 @@ export function EntityStoreSync() {
       if (entityContainsModels(entity, ['Player', 'PlayerFlags', 'PlayerTeamFlags'])) {
         playerState.updateEntity(entity)
       }
-      if (entityContainsModels(entity, ['PlayerOnline', 'PlayerBookmark'])) {
+      if (entityContainsModels(entity, ['PlayerOnline'])) {
         playerDataState.updateMessages([entity])
       }
       if (entityContainsModels(entity, ['Duelist', 'DuelistAssignment', 'DuelistMemorial'])) {

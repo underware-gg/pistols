@@ -1,14 +1,12 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { usePlayer, usePlayersOnline } from '/src/stores/playerStore'
-import { usePlayerBookmarkSignedMessage } from '/src/hooks/useSignedMessages'
 import { formatTimestampDeltaElapsed } from '@underware/pistols-sdk/utils'
 import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
 import { PlayerLink } from '/src/components/Links'
 import { BookmarkIcon, OnlineStatusIcon } from '/src/components/ui/Icons'
-import { Divider } from 'semantic-ui-react'
-import { FilterButton } from './ui/Buttons'
+import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 
 export default function ActivityOnline() {
   const { address, isConnected } = useAccount()
@@ -53,12 +51,17 @@ const ActivityItem = ({
   isBookmarked: boolean
   isConnected: boolean
 }) => {
+  const { account } = useAccount()
+  const { game } = useDojoSystemCalls();
+  const _publish = useCallback(() => {
+    game.emit_player_bookmark(account, address, 0, !isBookmarked)
+  }, [address, isBookmarked])
+  
   const { isAvailable } = usePlayer(address)
-  const { publish } = usePlayerBookmarkSignedMessage(address, 0, !isBookmarked)
   const { result: time, isOnline, isAway } = useMemo(() => formatTimestampDeltaElapsed(timestamp, clientSeconds), [timestamp, clientSeconds])
   return (
     <>
-      <BookmarkIcon isBookmarked={isBookmarked} disabled={!isConnected} onClick={publish} />
+      <BookmarkIcon isBookmarked={isBookmarked} disabled={!isConnected} onClick={_publish} />
       <OnlineStatusIcon isOnline={isOnline} isAway={isAway} isAvailable={isAvailable} />
       <PlayerLink address={address} />
       {' '}

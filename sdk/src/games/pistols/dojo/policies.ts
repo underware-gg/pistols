@@ -10,7 +10,6 @@ import {
 } from 'src/games/pistols/config/config'
 import {
   make_typed_data_CommitMoveMessage,
-  make_typed_data_PlayerBookmark,
   make_typed_data_PlayerOnline,
 } from './signed_messages'
 import { Connector } from '@starknet-react/core'
@@ -103,16 +102,6 @@ export const makePistolsPolicies = (networkId: NetworkId, mock: boolean, admin: 
         identity: '0x0',
         timestamp: 0,
       }),
-    },
-    {
-      description: 'Notify when a player follows another player or token',
-      typedData: make_typed_data_PlayerBookmark({
-        networkId: networkId,
-        identity: '0x0',
-        target_address: '0x0',
-        target_id: '0x0',
-        enabled: false,
-      })
     },
   ]
   return makeControllerPolicies(

@@ -57,35 +57,3 @@ export function make_typed_data_PlayerOnline({
     },
   )
 }
-
-export function make_typed_data_PlayerBookmark({
-  networkId,
-  identity,
-  target_address,
-  target_id,
-  enabled,
-}: {
-  networkId: NetworkId,
-  identity: BigNumberish,
-  target_address: BigNumberish,
-  target_id: BigNumberish,
-  enabled: boolean,
-}) {
-  return generateTypedData<PistolsSchemaType, OmitFieldOrder<models.PlayerBookmark>>(
-    makeStarknetDomain(networkId),
-    'pistols-PlayerBookmark',
-    {
-      identity: bigintToHex(identity),
-      target_address: bigintToHex(target_address),
-      target_id: bigintToDecimal(target_id),
-      enabled,
-    },
-    {
-      identity: 'ContractAddress',
-      target_address: 'ContractAddress',
-      target_id: 'u128', // torii required data as decimal string
-      enabled: 'bool',
-    },
-  )
-}
-

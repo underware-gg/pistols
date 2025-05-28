@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState, useMemo } from 'react'
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState, useMemo, useCallback } from 'react'
 import { BigNumberish } from 'starknet'
 import { useChallengeDescription } from '/src/hooks/useChallengeDescription'
 import { useChallenge, useRound } from '/src/stores/challengeStore'
@@ -24,7 +24,6 @@ import { usePistolsScene } from '/src/hooks/PistolsContext'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
-import { usePlayerBookmarkSignedMessage } from '/src/hooks/useSignedMessages'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { useCanCollectDuel } from '/src/hooks/usePistolsContractCalls'
 import { useDuelCallToAction } from '/src/stores/eventsModelStore'
@@ -248,9 +247,12 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
   const isChallenger = useMemo(() => isYouA, [isYouA])
   const isChallenged = useMemo(() => isYouB, [isYouB])
   const { isInAction } = useDuelist(challengingDuelistId)
+
   const { duelContractAddress } = useTokenContracts()
   const { isBookmarked } = useIsBookmarked(duelContractAddress, props.duelId)
-  const { publish } = usePlayerBookmarkSignedMessage(duelContractAddress, props.duelId, !isBookmarked)
+  const _publish = useCallback(() => {
+    game.emit_player_bookmark(account, duelContractAddress, props.duelId, !isBookmarked)
+  }, [account, duelContractAddress, props.duelId, isBookmarked])
 
   const baseRef = useRef<InteractibleComponentHandle>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -335,7 +337,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
             }} />
           </div>
           <div className='BookmarkSection'>
-            <BookmarkIcon isBookmarked={isBookmarked} size='big' fitted onClick={publish} />
+            <BookmarkIcon isBookmarked={isBookmarked} size='big' fitted onClick={_publish} />
           </div>
 
           <div className='PlayerNameB Large'>
