@@ -77,6 +77,7 @@ export function usePlayersActions() {
     actionCount,
     waitingCount,
     idleCount,
+    duelistCount: duelistIds.length,
   }
 }
 
@@ -101,7 +102,8 @@ export const ActionIcon = (isActive: boolean) => {
 }
 
 export default function ActivityAction() {
-  const { actions, idleCount } = usePlayersActions()
+  const { isConnected } = useAccount()
+  const { actions, idleCount, duelistCount } = usePlayersActions()
   const items = useMemo(() => (actions.map((a) => {
     return (
       <ActionItem
@@ -120,6 +122,8 @@ export default function ActivityAction() {
         <b>+{idleCount}</b> Duelists ready to duel!
         <br />
       </>}
+      {!isConnected && <div className='Brightest'>Disconnected</div>}
+      {(isConnected && duelistCount > 0 && items.length == 0 && idleCount == 0) && <div className='Brightest'>Loading...</div>}
     </div>
   );
 }

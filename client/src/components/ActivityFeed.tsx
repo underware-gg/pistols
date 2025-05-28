@@ -28,6 +28,7 @@ export default function ActivityFeed() {
   return (
     <div className='FillParent'>
       {items}
+      {items.length == 0 && <div className='Brightest'>Loading...</div>}
     </div>
   );
 }

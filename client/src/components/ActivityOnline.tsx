@@ -7,9 +7,11 @@ import { formatTimestampDeltaElapsed } from '@underware/pistols-sdk/utils'
 import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
 import { PlayerLink } from '/src/components/Links'
 import { BookmarkIcon, OnlineStatusIcon } from '/src/components/ui/Icons'
+import { Divider } from 'semantic-ui-react'
+import { FilterButton } from './ui/Buttons'
 
 export default function ActivityOnline() {
-  const { address } = useAccount()
+  const { address, isConnected } = useAccount()
   const { bookmarkedPlayers } = usePlayer(address)
   const { playersOnline } = usePlayersOnline()
   const { clientSeconds, updateTimestamp } = useClientTimestamp(true, 60)
@@ -21,6 +23,7 @@ export default function ActivityOnline() {
       timestamp={playersOnline[addr]}
       clientSeconds={clientSeconds}
       isBookmarked={bookmarkedPlayers.includes(BigInt(addr))}
+      isConnected={isConnected}
     />)
   ), [playersOnline, clientSeconds, bookmarkedPlayers])
 
@@ -31,6 +34,7 @@ export default function ActivityOnline() {
   return (
     <div className='FillParent'>
       {items}
+      {items.length == 0 && <div className='Brightest'>Loading...</div>}
     </div>
   );
 }
@@ -41,18 +45,20 @@ const ActivityItem = ({
   timestamp,
   clientSeconds,
   isBookmarked,
+  isConnected,
 }: {
   address: BigNumberish
   timestamp: number
   clientSeconds: number
   isBookmarked: boolean
+  isConnected: boolean
 }) => {
   const { isAvailable } = usePlayer(address)
   const { publish } = usePlayerBookmarkSignedMessage(address, 0, !isBookmarked)
   const { result: time, isOnline, isAway } = useMemo(() => formatTimestampDeltaElapsed(timestamp, clientSeconds), [timestamp, clientSeconds])
   return (
     <>
-      <BookmarkIcon isBookmarked={isBookmarked} onClick={publish} />
+      <BookmarkIcon isBookmarked={isBookmarked} disabled={!isConnected} onClick={publish} />
       <OnlineStatusIcon isOnline={isOnline} isAway={isAway} isAvailable={isAvailable} />
       <PlayerLink address={address} />
       {' '}

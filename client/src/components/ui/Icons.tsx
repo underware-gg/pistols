@@ -127,9 +127,10 @@ interface IconClickProps extends IconProps {
   style?: any
   fitted?: boolean
   size?: IconSizeProp
+  disabled?: boolean
 }
 export function IconClick(props: IconClickProps) {
-  const classNames = props.onClick ? ['IconClick'] : ['IconNoClick']
+  const classNames = (props.onClick  && !props.disabled) ? ['IconClick'] : ['IconNoClick']
   if (props.important) classNames.push('Important')
   if (props.className) classNames.push(props.className)
   const iconProps = useMemo(() => ({ ...props, important: undefined }), [props])
@@ -164,6 +165,7 @@ interface BookmarkIconProps extends IconProps {
   onClick?: Function
   fitted?: boolean
   size?: IconSizeProp
+  disabled?: boolean
 }
 export function BookmarkIcon(props: BookmarkIconProps) {
   return (
@@ -172,6 +174,7 @@ export function BookmarkIcon(props: BookmarkIconProps) {
       onClick={props.onClick}
       fitted={props.fitted}
       size={props.size}
+      disabled={props.disabled}
     />
   )
 }
