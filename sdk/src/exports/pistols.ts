@@ -2,6 +2,7 @@ export * from '../games/pistols/misc/helpers'
 export * from '../games/pistols/misc/duel_progress'
 export * from '../games/pistols/misc/profiles'
 export * from '../games/pistols/misc/salt'
+export * from '../games/pistols/misc/debug'
 // in sync with cairo sources
 export * from '../games/pistols/cairo/pact'
 export * from '../games/pistols/cairo/make_moves_hash'

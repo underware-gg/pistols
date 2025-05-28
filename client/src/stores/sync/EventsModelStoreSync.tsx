@@ -5,7 +5,7 @@ import { formatQueryValue, getEntityModel, useSdkEventsSub } from '@underware/pi
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useEventsStore } from '/src/stores/eventsModelStore'
 import { bigintEquals, isPositiveBigint } from '@underware/pistols-sdk/utils'
-// import * as torii from '@dojoengine/torii-client'
+import { debug } from '@underware/pistols-sdk/pistols'
 
 
 // Sync entities: Add only once to a top level component
@@ -35,14 +35,14 @@ export function EventsModelStoreSync() {
     query,
     enabled: (mounted && Boolean(query)),
     setEntities: (entities: PistolsEntity[]) => {
-      // console.log(`GET CallToActionEvent() ======>`, entities)
+      // debug.log(`GET CallToActionEvent() ======>`, entities)
       eventsState.setEntities(entities)
     },
     updateEntity: (entity: PistolsEntity) => {
-      // console.log(`SUB CallToActionEvent() ======>`, entity)
+      // debug.log(`SUB CallToActionEvent() ======>`, entity)
       const model = getEntityModel(entity, 'CallToActionEvent')
       if (bigintEquals(model?.player_address, address)) {
-        // console.log(`SUB CallToActionEvent() ======> model:`, getEntityModel(entity, 'CallToActionEvent'))
+        // debug.log(`SUB CallToActionEvent() ======> model:`, getEntityModel(entity, 'CallToActionEvent'))
         eventsState.updateEntity(entity)
       }
     },
@@ -74,12 +74,12 @@ export function EventsModelStoreSync() {
   //       },
   //       false, // historical
   //     );
-  //     console.log("sdk.client.GET_EVENTS(false) =>", events)
+  //     debug.log("sdk.client.GET_EVENTS(false) =>", events)
   //   }
   //   if (sdk) _fetch()
   // }, [sdk])
 
-  useEffect(() => console.log("EventsModelStoreSync() =>", eventsState.entities), [eventsState.entities])
+  useEffect(() => debug.log("EventsModelStoreSync() =>", eventsState.entities), [eventsState.entities])
 
   return (<></>)
 }

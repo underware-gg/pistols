@@ -6,6 +6,7 @@ import { useSdkTokenBalancesGet, useSdkTokenBalancesSub } from '@underware/pisto
 import { useDuelistTokenStore, useDuelTokenStore, usePackTokenStore, useTournamentTokenStore } from '/src/stores/tokenStore'
 import { bigintToHex, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { useFameCoinStore, useLordsCoinStore, useFoolsCoinStore, useFetchAccountsBalances } from '/src/stores/coinStore'
+import { debug } from '@underware/pistols-sdk/pistols'
 import * as torii from '@dojoengine/torii-client'
 
 
@@ -95,7 +96,7 @@ export function TokenStoreSync() {
     contracts,
     updateBalance: (balance: torii.TokenBalance) => {
       const _contract = bigintToHex(balance.contract_address)
-      // console.log("TOKENS SUB >>>", balance, token_contracts.includes(_contract), coin_contracts.includes(_contract))
+      // debug.log("TOKENS SUB >>>", balance, token_contracts.includes(_contract), coin_contracts.includes(_contract))
       if (_contract == lordsContractAddress) {
         lords_state.updateBalance(balance)
       } else if (_contract == fameContractAddress) {
@@ -115,7 +116,7 @@ export function TokenStoreSync() {
     enabled: (mounted),
   })
 
-  // useEffect(() => console.log("TokenStoreSync() token_state =>", token_state.contracts), [token_state.contracts])
-  // useEffect(() => console.log("TokenStoreSync() coin_state =>", coin_state.contracts), [coin_state.contracts])
+  // useEffect(() => debug.log("TokenStoreSync() token_state =>", token_state.contracts), [token_state.contracts])
+  // useEffect(() => debug.log("TokenStoreSync() coin_state =>", coin_state.contracts), [coin_state.contracts])
   return (<></>)
 }

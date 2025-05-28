@@ -2,6 +2,7 @@ import { useEffect, useMemo } from 'react'
 import { lookupAddresses } from '@cartridge/controller'
 import { usePlayersAccounts, usePlayerDataStore } from '/src/stores/playerStore'
 import { useStarknetContext, useConnectedController, supportedConnetorIds } from '@underware/pistols-sdk/dojo'
+import { debug } from '@underware/pistols-sdk/pistols'
 
 
 //------------------------------------------------------
@@ -32,7 +33,7 @@ export function PlayerNameSync() {
     } else {
       // fetch controller names
       lookupAddresses(newPlayerAddresses).then((result) => {
-        // console.log("PlayerNameSync() GOT:", newPlayerAddresses, result)
+        // debug.log("PlayerNameSync() GOT:", newPlayerAddresses, result)
         updateUsernames(result)
       })
     } 

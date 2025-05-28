@@ -11,6 +11,7 @@ import { useChallengeQueryStore } from '/src/stores/challengeQueryStore'
 import { useBankStore } from '/src/stores/bankStore'
 import { usePackStore } from '/src/stores/packStore'
 import { useScoreboardStore } from '/src/stores/scoreboardStore'
+import { debug } from '@underware/pistols-sdk/pistols'
 
 const _modelsMisc = [
   // admin
@@ -125,7 +126,7 @@ export function EntityStoreSync() {
   //   query: query_claimable_pool,
   //   enabled: mounted,
   //   setEntities: (entities: PistolsEntity[]) => {
-  //     console.log("EntityStoreSync() SET CLAIMABLE POOL =======> [entities]:", entities)
+  //     debug.log("EntityStoreSync() SET CLAIMABLE POOL =======> [entities]:", entities)
   //     bankState.setEntities(entities)
   //   },
   // })
@@ -134,7 +135,7 @@ export function EntityStoreSync() {
     query: query_get_misc,
     enabled: mounted,
     resetStore: () => {
-      console.log("EntityStoreSync() RESET MISC =======>")
+      debug.log("EntityStoreSync() RESET MISC =======>")
       configState.resetStore()
       tokenState.resetStore()
       seasonState.resetStore()
@@ -142,12 +143,12 @@ export function EntityStoreSync() {
       packState.resetStore()
     },
     setEntities: (entities: PistolsEntity[]) => {
-      console.log("EntityStoreSync() SET MISC =======> [entities]:", entities)
-      // console.log("EntityStoreSync() SET =======> [Config]:", filterEntitiesByModels(entities, ['Config']))
-      // console.log("EntityStoreSync() SET =======> [TokenConfig]:", filterEntitiesByModels(entities, ['TokenConfig']))
-      console.log("EntityStoreSync() SET =======> [Pool]:", filterEntitiesByModels(entities, ['Pool']))
-      // console.log("EntityStoreSync() SET =======> [SeasonConfig]:", filterEntitiesByModels(entities, ['SeasonConfig', 'Leaderboard']))
-      // console.log("EntityStoreSync() SET =======> [Leaderboard]:", filterEntitiesByModels(entities, ['Leaderboard']))
+      debug.log("EntityStoreSync() SET MISC =======> [entities]:", entities)
+      // debug.log("EntityStoreSync() SET =======> [Config]:", filterEntitiesByModels(entities, ['Config']))
+      // debug.log("EntityStoreSync() SET =======> [TokenConfig]:", filterEntitiesByModels(entities, ['TokenConfig']))
+      debug.log("EntityStoreSync() SET =======> [Pool]:", filterEntitiesByModels(entities, ['Pool']))
+      // debug.log("EntityStoreSync() SET =======> [SeasonConfig]:", filterEntitiesByModels(entities, ['SeasonConfig', 'Leaderboard']))
+      // debug.log("EntityStoreSync() SET =======> [Leaderboard]:", filterEntitiesByModels(entities, ['Leaderboard']))
       configState.setEntities(filterEntitiesByModels(entities, ['Config']))
       tokenState.setEntities(filterEntitiesByModels(entities, ['TokenConfig']))
       bankState.setEntities(filterEntitiesByModels(entities, ['Pool']))
@@ -160,8 +161,8 @@ export function EntityStoreSync() {
     query: query_get_players,
     enabled: (mounted),
     setEntities: (entities: PistolsEntity[]) => {
-      console.log("EntityStoreSync() SET PLAYERS =======> [entities]:", entities)
-      // console.log("EntityStoreSync() SET PLAYERS =======> [Player]:", filterEntitiesByModels(entities, ['Player']))
+      debug.log("EntityStoreSync() SET PLAYERS =======> [entities]:", entities)
+      // debug.log("EntityStoreSync() SET PLAYERS =======> [Player]:", filterEntitiesByModels(entities, ['Player']))
       playerState.setEntities(filterEntitiesByModels(entities, ['Player', 'PlayerFlags', 'PlayerTeamFlags']))
       playerDataState.updateMessages(filterEntitiesByModels(entities, ['PlayerOnline', 'PlayerBookmark']))
     },
@@ -171,12 +172,12 @@ export function EntityStoreSync() {
     query: query_get_duelists,
     enabled: (mounted),
     resetStore: () => {
-      console.log("EntityStoreSync() RESET DUELISTS =======>")
+      debug.log("EntityStoreSync() RESET DUELISTS =======>")
       duelistState.resetStore()
     },
     setEntities: (entities: PistolsEntity[]) => {
-      console.log("EntityStoreSync() SET DUELISTS =======> [entities]:", entities)
-      // console.log("EntityStoreSync() SET DUELISTS =======> [Duelist]:", filterEntitiesByModels(entities, ['Duelist']))
+      debug.log("EntityStoreSync() SET DUELISTS =======> [entities]:", entities)
+      // debug.log("EntityStoreSync() SET DUELISTS =======> [Duelist]:", filterEntitiesByModels(entities, ['Duelist']))
       duelistState.setEntities(entities)
     },
   })
@@ -185,12 +186,12 @@ export function EntityStoreSync() {
     query: query_get_duelist_stacks,
     enabled: (mounted),
     resetStore: () => {
-      console.log("EntityStoreSync() RESET STACKS =======>")
+      debug.log("EntityStoreSync() RESET STACKS =======>")
       duelistStackState.resetStore()
     },
     setEntities: (entities: PistolsEntity[]) => {
-      console.log("EntityStoreSync() SET STACKS =======> [entities]:", entities)
-      // console.log("EntityStoreSync() SET STACKS =======> [PlayerDuelistStack]:", filterEntitiesByModels(entities, ['PlayerDuelistStack']))
+      debug.log("EntityStoreSync() SET STACKS =======> [entities]:", entities)
+      // debug.log("EntityStoreSync() SET STACKS =======> [PlayerDuelistStack]:", filterEntitiesByModels(entities, ['PlayerDuelistStack']))
       duelistStackState.setEntities(entities)
     },
   })
@@ -199,10 +200,10 @@ export function EntityStoreSync() {
     query: query_sub,
     enabled: (mounted && isFinishedMisc && isFinishedPlayers && isFinishedDuelists && isFinishedStacks),
     setEntities: (entities: PistolsEntity[]) => {
-      console.log("EntityStoreSync() SET =======> [entities]: DISCARD!", entities.length)
+      debug.log("EntityStoreSync() SET =======> [entities]: DISCARD!", entities.length)
     },
     updateEntity: (entity: PistolsEntity) => {
-      // console.log("EntityStoreSync() SUB UPDATE =======> [entity]:", entity)
+      // debug.log("EntityStoreSync() SUB UPDATE =======> [entity]:", entity)
       if (entityContainsModels(entity, ['Config'])) {
         configState.updateEntity(entity)
       }
@@ -241,13 +242,13 @@ export function EntityStoreSync() {
     },
   })
 
-  // useEffect(() => console.log("EntityStoreSync() [configStore.entities] =>", configState.entities), [configState.entities])
-  // useEffect(() => console.log("EntityStoreSync() [seasonState.entities] =>", seasonState.entities), [seasonState.entities])
-  // useEffect(() => console.log("EntityStoreSync() [tokenStore.entities] =>", tokenState.entities), [tokenState.entities])
-  // useEffect(() => console.log("EntityStoreSync() [duelistStore.entities] =>", duelistState.entities), [duelistState.entities])
-  // useEffect(() => console.log("EntityStoreSync() [duelistStackStore.entities] =>", duelistStackState.entities), [duelistStackState.entities])
-  // useEffect(() => console.log("EntityStoreSync() [playerDataState.players] =>", playerDataState.players), [playerDataState.players])
-  // useEffect(() => console.log("EntityStoreSync() [playerDataState.players_online] =>", playerDataState.players_online), [playerDataState.players_online])
+  // useEffect(() => debug.log("EntityStoreSync() [configStore.entities] =>", configState.entities), [configState.entities])
+  // useEffect(() => debug.log("EntityStoreSync() [seasonState.entities] =>", seasonState.entities), [seasonState.entities])
+  // useEffect(() => debug.log("EntityStoreSync() [tokenStore.entities] =>", tokenState.entities), [tokenState.entities])
+  // useEffect(() => debug.log("EntityStoreSync() [duelistStore.entities] =>", duelistState.entities), [duelistState.entities])
+  // useEffect(() => debug.log("EntityStoreSync() [duelistStackStore.entities] =>", duelistStackState.entities), [duelistStackState.entities])
+  // useEffect(() => debug.log("EntityStoreSync() [playerDataState.players] =>", playerDataState.players), [playerDataState.players])
+  // useEffect(() => debug.log("EntityStoreSync() [playerDataState.players_online] =>", playerDataState.players_online), [playerDataState.players_online])
 
   return (<></>)
 }

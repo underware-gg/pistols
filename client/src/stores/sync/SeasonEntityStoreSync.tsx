@@ -4,7 +4,8 @@ import { PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder } from '@under
 import { useChallengeQueryStore } from '/src/stores/challengeQueryStore'
 import { useChallengeStore } from '/src/stores/challengeStore'
 import { useConfig } from '/src/stores/configStore'
-import { useScoreboardStore } from '../scoreboardStore'
+import { useScoreboardStore } from '/src/stores/scoreboardStore'
+import { debug } from '@underware/pistols-sdk/pistols'
 
 const _limit = 1000
 
@@ -50,18 +51,18 @@ export function SeasonChallengeStoreSync() {
     query,
     enabled: mounted,
     resetStore: () => {
-      console.log("SeasonEntityStoreSync() RESET =======>")
+      debug.log("SeasonEntityStoreSync() RESET =======>")
       challengeState.resetStore()
       queryState.resetStore()
     },
     setEntities: (entities: PistolsEntity[]) => {
-      console.log("SeasonEntityStoreSync() SET =======> [entity]:", entities)
+      debug.log("SeasonEntityStoreSync() SET =======> [entity]:", entities)
       challengeState.setEntities(entities)
       queryState.setEntities(entities)
     },
   })
 
-  // useEffect(() => console.log(`SeasonEntityStoreSync() [${Object.keys(challengeState.entities).length}] =>`, challengeState.entities), [challengeState.entities])
+  // useEffect(() => debug.log(`SeasonEntityStoreSync() [${Object.keys(challengeState.entities).length}] =>`, challengeState.entities), [challengeState.entities])
 
   return (<></>)
 }
@@ -92,18 +93,18 @@ export function SeasonScoreboardStoreSync() {
     query,
     enabled: mounted,
     resetStore: () => {
-      console.log("SeasonScoreboardStoreSync() RESET =======>")
+      debug.log("SeasonScoreboardStoreSync() RESET =======>")
       scoreboardState.resetStore()
       scoreboardState.resetStore()
     },
     setEntities: (entities: PistolsEntity[]) => {
-      console.log("SeasonScoreboardStoreSync() SET =======> [entity]:", entities)
+      debug.log("SeasonScoreboardStoreSync() SET =======> [entity]:", entities)
       scoreboardState.setEntities(entities)
       scoreboardState.setEntities(entities)
     },
   })
 
-  // useEffect(() => console.log(`SeasonScoreboardStoreSync() [${Object.keys(challengeState.entities).length}] =>`, challengeState.entities), [challengeState.entities])
+  // useEffect(() => debug.log(`SeasonScoreboardStoreSync() [${Object.keys(challengeState.entities).length}] =>`, challengeState.entities), [challengeState.entities])
 
   return (<></>)
 }

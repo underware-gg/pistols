@@ -13,6 +13,7 @@ import {
   PistolsSchemaType,
 } from 'src/games/pistols/sdk/types_web'
 import { useStore } from 'zustand'
+import { debug } from 'src/games/pistols/misc/debug'
 
 export type useSdkStateResult = {
   entities: PistolsEntity[] | null
@@ -39,7 +40,7 @@ export const useSdkEntitiesGetState = ({
     query,
     enabled,
     setEntities: (entities: PistolsEntity[]) => {
-      console.log('useSdkEntitiesGetState() GOT:', entities, query)
+      debug.log('useSdkEntitiesGetState() GOT:', entities, query)
       state.setEntities([...entities]);
     },
   })
@@ -63,11 +64,11 @@ export const useSdkEntitiesSubState = ({
     query,
     enabled,
     setEntities: (entities: PistolsEntity[]) => {
-      console.log('useSdkEntitiesSubState() GOT:', entities, query)
+      debug.log('useSdkEntitiesSubState() GOT:', entities, query)
       state.setEntities([...entities]);
     },
     updateEntity: (entity: PistolsEntity) => {
-      console.log('useSdkEntitiesSubState() SUB:', entity, query)
+      debug.log('useSdkEntitiesSubState() SUB:', entity, query)
       state.updateEntity(entity);
     },
   })
@@ -103,7 +104,7 @@ export const useSdkEventsGetState = ({
     enabled,
     retryInterval,
     setEntities: (entities: PistolsEntity[]) => {
-      console.log('useSdkEventsGetState() GOT:', entities, query)
+      debug.log('useSdkEventsGetState() GOT:', entities, query)
       if (historical) {
         // historical events can have duplicated entityIds
         state.setEntities(entities.map((e, i) => ({...e, entityId: bigintToDecimal(i) })));

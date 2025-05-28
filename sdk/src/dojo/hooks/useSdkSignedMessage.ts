@@ -3,6 +3,7 @@ import { Account, TypedData, stark } from 'starknet'
 import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
 import { useStarknetContext } from 'src/dojo/contexts/StarknetProvider'
 import { useConnectedController } from 'src/dojo/hooks/useController'
+import { debug } from 'src/games/pistols/misc/debug'
 
 // export const useSdkPublishSignedMessage = <M extends PistolsModelType>(
 //   account: Account,
@@ -42,24 +43,24 @@ export const useSdkPublishTypedData = (
 
       setIsPublishing(true)
 
-      // console.log('ONLINE: publish...', typedData)
+      // debug.log('ONLINE: publish...', typedData)
       // await sdk.sendMessage(typedData, account)
 
       try {
-        // console.log('SIGNED_MESSAGE: sign...', serialize(typedData), typedData)
+        // debug.log('SIGNED_MESSAGE: sign...', serialize(typedData), typedData)
         let signature = await account.signMessage(typedData);
-        // console.log('SIGNED_MESSAGE: signature:', signature)
+        // debug.log('SIGNED_MESSAGE: signature:', signature)
         if (!Array.isArray(signature)) {
           signature = stark.formatSignature(signature)
         }
 
         try {
-          console.log(`SIGNED_MESSAGE: publish... (${signature.length})`)//, signature)
+          debug.log(`SIGNED_MESSAGE: publish... (${signature.length})`)//, signature)
           await sdk.client.publishMessage(
             JSON.stringify(typedData),
             signature as string[],
           );
-          console.log('SIGNED_MESSAGE: published!')
+          debug.log('SIGNED_MESSAGE: published!')
         } catch (error) {
           console.error("useSdkPublishSignedMessage() failed to publish message:", error, typedData, signature);
         }
@@ -67,7 +68,7 @@ export const useSdkPublishTypedData = (
         console.error("useSdkPublishSignedMessage() failed to sign message:", error, typedData);
       }
 
-      // console.log('SIGNED: done!')
+      // debug.log('SIGNED: done!')
       setIsPublishing(false)
     }
   }, [sdk, typedData, account, isControllerConnected])

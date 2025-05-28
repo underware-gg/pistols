@@ -12,7 +12,8 @@ import {
   PistolsGetParams,
 } from 'src/games/pistols/sdk/types_web'
 import * as torii from '@dojoengine/torii-client'
-import { useEntityId } from 'src/exports/dojo'
+import { useEntityId } from 'src/dojo/hooks/useEntityId'
+import { debug } from 'src/games/pistols/misc/debug'
 
 
 //---------------------------------------
@@ -80,14 +81,14 @@ const _useSdkGet = (prefix: string, {
         while (query) {
           const response: PistolsToriiResponse = await fn({ query });
           if (!_mounted) return
-          console.log(`${prefix} GOT[page:${pageIndex}]:`, response)
+          debug.log(`${prefix} GOT[page:${pageIndex}]:`, response)
           const entities = _filterItems(response.getItems())
           if (pageIndex == 0 && resetStore) {
-            // console.log(`${prefix} RESET>>>>>>>>>>>>`)
+            // debug.log(`${prefix} RESET>>>>>>>>>>>>`)
             resetStore?.()
           }
           if (entities.length > 0) {
-            // console.log(`${prefix} GOT>>>>>>>>>>>>`, entities)
+            // debug.log(`${prefix} GOT>>>>>>>>>>>>`, entities)
             setEntities(entities)
             query = (
               response.cursor && // has next cursor
@@ -97,7 +98,7 @@ const _useSdkGet = (prefix: string, {
           } else {
             query = null
             if (pageIndex == 0 && retryInterval > 0) {
-              console.log(`${prefix} retry...`, retryInterval)
+              debug.log(`${prefix} retry...`, retryInterval)
               setTimeout(() => _get(), retryInterval)
             }
           }
@@ -194,27 +195,27 @@ export const useSdkEntitiesSub = ({
     let _unsubscribe: (() => void) = undefined;
     const _subscribe = async () => {
       setIsLoading(true)
-      console.log("ENTITIES SUB _______ query:", query);
+      debug.log("ENTITIES SUB _______ query:", query);
       sdk.subscribeEntityQuery({
         query,
         callback: (response: SdkSubscriptionCallbackResponse) => {
           if (response.error) {
             console.error("useSdkEntitiesSub() callback error:", response.error, query)
           } else {
-            console.log("useSdkEntitiesSub() SUB:", response.data);
+            debug.log("useSdkEntitiesSub() SUB:", response.data);
             _filterItems(response.data).forEach(entity => updateEntity(entity))
           }
         },
       }).then((response: SdkSubscribeResponse) => {
         if (!_mounted) return
-        // console.log("useSdkEntitiesSub() ENTITIES SUB ====== initialEntities:", response);
+        // debug.log("useSdkEntitiesSub() ENTITIES SUB ====== initialEntities:", response);
         const [initialEntities, sub] = response;
         // if (initialEntities.getItems().length == limit) {
         //   console.warn("useSdkEntitiesSub() LIMIT REACHED!!!! Possible loss of data", limit, query)
         // }
         if (!_unsubscribe) {
           _unsubscribe = () => sub.cancel()
-          console.log("useSdkEntitiesSub() ====== initialEntities>>>>>", initialEntities)
+          debug.log("useSdkEntitiesSub() ====== initialEntities>>>>>", initialEntities)
           setEntities(_filterItems(initialEntities.getItems()))
         }
         setIsLoading(false)
@@ -256,27 +257,27 @@ export const useSdkEventsSub = ({
     let _unsubscribe: (() => void) = undefined;
     const _subscribe = async () => {
       setIsLoading(true)
-      console.log("useSdkEventsSub() _______ query:", query);
+      debug.log("useSdkEventsSub() _______ query:", query);
       await sdk.subscribeEventQuery({
         query,
         callback: (response: SdkSubscriptionCallbackResponse) => {
           if (response.error) {
             console.error("useSdkEventsSub() callback error:", historical, response.error, query)
           } else {
-            // console.log("useSdkEventsSub() SUB:", historical, response.data);
+            // debug.log("useSdkEventsSub() SUB:", historical, response.data);
             _filterItems(response.data).forEach(entity => updateEntity(entity))
           }
         },
       }).then((response: SdkSubscribeResponse) => {
         if (!_mounted) return
-        // console.log("useSdkEventsSub() ENTITIES SUB ====== initialEntities:", historical, response);
+        // debug.log("useSdkEventsSub() ENTITIES SUB ====== initialEntities:", historical, response);
         const [initialEntities, sub] = response;
         // if (initialEntities.getItems().length == limit) {
         //   console.warn("useSdkEventsSub() LIMIT REACHED!!!! Possible loss of data", limit, query)
         // }
         if (!_unsubscribe) {
           _unsubscribe = () => sub.cancel()
-          console.log("useSdkEventsSub() ====== initialEntities>>>>>", historical, initialEntities, _filterItems(initialEntities.getItems()))
+          debug.log("useSdkEventsSub() ====== initialEntities>>>>>", historical, initialEntities, _filterItems(initialEntities.getItems()))
           setEntities(_filterItems(initialEntities.getItems()))
           setIsLoading(false)
         }

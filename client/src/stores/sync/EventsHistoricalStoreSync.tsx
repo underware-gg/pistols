@@ -3,6 +3,7 @@ import { useSdkEventsSub } from '@underware/pistols-sdk/dojo'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useHistoricalEventsStore } from '/src/stores/eventsHistoricalStore'
 import { PistolsHistoricalQueryBuilder } from '@underware/pistols-sdk/pistols/sdk'
+import { debug } from '@underware/pistols-sdk/pistols'
 
 const query: PistolsHistoricalQueryBuilder = new PistolsHistoricalQueryBuilder()
   .withEntityModels([
@@ -24,7 +25,7 @@ export function EventsHistoricalStoreSync() {
     updateEntity: historicalEventsState.updateEvent,
   })
 
-  // useEffect(() => console.log('EventsHistoricalStoreSync() =>', historicalEventsState.playerActivity), [historicalEventsState.playerActivity])
+  // useEffect(() => debug.log('EventsHistoricalStoreSync() =>', historicalEventsState.playerActivity), [historicalEventsState.playerActivity])
 
   return (<></>)
 }

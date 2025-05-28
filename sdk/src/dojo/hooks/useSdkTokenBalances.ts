@@ -5,6 +5,7 @@ import { bigintToAddress, bigintToHex, isPositiveBigint } from 'src/utils/misc/t
 import { SubscriptionCallbackArgs } from '@dojoengine/sdk'
 import { Page } from '@dojoengine/torii-client'
 import * as torii from '@dojoengine/torii-client'
+import { debug } from 'src/games/pistols/misc/debug'
 
 
 //---------------------------------------
@@ -52,7 +53,7 @@ export const useSdkTokenBalancesGet = ({
     const _get = async () => {
       const _contract = bigintToAddress(contract)
       const _accounts = accounts?.map(a => bigintToHex(a)) ?? []
-      // console.log("useSdkTokenBalancesGet() GET........", enabled, _contract, _accounts, tokenIds)
+      // debug.log("useSdkTokenBalancesGet() GET........", enabled, _contract, _accounts, tokenIds)
       setIsLoading(true)
       // initBalances?.(_accounts);
       await sdk.getTokenBalances({
@@ -61,12 +62,12 @@ export const useSdkTokenBalancesGet = ({
         tokenIds: tokenIds?.map(a => toToriiTokenId(a)) ?? []
       }).then((balances: Page<torii.TokenBalance>) => {
         if (!_mounted) return
-        // console.log("useSdkTokenBalancesGet() GOT:", balances)
+        // debug.log("useSdkTokenBalancesGet() GOT:", balances)
         if (balances.items.length > 0) {
           setBalances(balances.items)
         } else if (!tokenIds) {
           // initialize zero balance
-          // console.log("useSdkTokenBalancesGet() initialize balance:", contract, account)
+          // debug.log("useSdkTokenBalancesGet() initialize balance:", contract, account)
           const _balances: torii.TokenBalance[] = _accounts.map(a => ({
             contract_address: _contract,
             account_address: a,
@@ -84,7 +85,7 @@ export const useSdkTokenBalancesGet = ({
       }).finally(() => {
         setIsLoading(false)
       })
-      // console.log("useSdkTokenBalancesGet() done!", account)
+      // debug.log("useSdkTokenBalancesGet() done!", account)
     }
     // get...
     if (sdk && enabled && isPositiveBigint(contract)) _get()
@@ -108,18 +109,18 @@ export const useSdkTokenBalancesSub = ({
   useEffect(() => {
     let _subscription: torii.Subscription = undefined;
     const _subscribe = () => {
-      console.log(`useSdkTokenBalancesSub() SUBSCRIBE......`, contracts)
+      debug.log(`useSdkTokenBalancesSub() SUBSCRIBE......`, contracts)
       _subscription = sdk.onTokenBalanceUpdated({
         contractAddresses: contracts.map(c => bigintToHex(c)),
         accountAddresses: [],
         tokenIds: [],
         callback: (response: SubscriptionCallbackArgs<torii.TokenBalance>) => {
-          // console.log("useSdkTokenBalancesSub() RESPONSE:", response);
+          // debug.log("useSdkTokenBalancesSub() RESPONSE:", response);
           let balance: torii.TokenBalance = response.data ??
             // it's actually returning a torii.TokenBalance!!!
             ((response as any).contract_address ? response as unknown as torii.TokenBalance : undefined);
           if (balance) {
-            console.log("useSdkTokenBalancesSub() SUB:", isPositiveBigint(balance.contract_address), balance);
+            debug.log("useSdkTokenBalancesSub() SUB:", isPositiveBigint(balance.contract_address), balance);
             if (isPositiveBigint(balance.contract_address)) {
               updateBalance(balance);
             }
