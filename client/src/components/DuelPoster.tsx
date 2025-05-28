@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState, useMemo, useCallback } from 'react'
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState, useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { useChallengeDescription } from '/src/hooks/useChallengeDescription'
 import { useChallenge, useRound } from '/src/stores/challengeStore'
@@ -28,8 +28,9 @@ import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { useCanCollectDuel } from '/src/hooks/usePistolsContractCalls'
 import { useDuelCallToAction } from '/src/stores/eventsModelStore'
 import { useDuelistFameBalance } from '/src/stores/coinStore'
+import { useDuelistFameOnDuel } from '/src/queries/useDuelistFameOnDuel'
+import { useExecuteEmitPlayerBookmark } from '/src/hooks/usePistolsSystemCalls'
 import { SceneName } from '/src/data/assets'
-import { useDuelistFameOnDuel } from '../queries/useDuelistFameOnDuel'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -250,9 +251,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
 
   const { duelContractAddress } = useTokenContracts()
   const { isBookmarked } = useIsBookmarked(duelContractAddress, props.duelId)
-  const _publish = useCallback(() => {
-    game.emit_player_bookmark(account, duelContractAddress, props.duelId, !isBookmarked)
-  }, [account, duelContractAddress, props.duelId, isBookmarked])
+  const { emit_player_bookmark, isDisabled: emitIsDisabled } = useExecuteEmitPlayerBookmark(duelContractAddress, props.duelId, !isBookmarked)
 
   const baseRef = useRef<InteractibleComponentHandle>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -337,7 +336,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
             }} />
           </div>
           <div className='BookmarkSection'>
-            <BookmarkIcon isBookmarked={isBookmarked} size='big' fitted onClick={_publish} />
+            <BookmarkIcon isBookmarked={isBookmarked} size='big' disabled={emitIsDisabled} fitted onClick={emit_player_bookmark} />
           </div>
 
           <div className='PlayerNameB Large'>

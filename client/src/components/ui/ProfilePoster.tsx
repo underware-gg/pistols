@@ -1,4 +1,5 @@
-import React, { forwardRef, useImperativeHandle, useRef, useState, useMemo, useEffect, useCallback } from 'react'
+import React, { forwardRef, useImperativeHandle, useRef, useState, useMemo, useEffect } from 'react'
+import { BigNumberish } from 'starknet'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { DUELIST_CARD_WIDTH, DUELIST_CARD_HEIGHT } from '/src/data/cardConstants'
 import { DuelistCard, DuelistCardHandle } from '/src/components/cards/DuelistCard'
@@ -14,11 +15,9 @@ import { usePistolsScene } from '/src/hooks/PistolsContext'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { SceneName } from '/src/data/assets'
 import { useDuelistsOfOwner } from '/src/hooks/useTokenDuelists'
+import { useExecuteEmitPlayerBookmark } from '/src/hooks/usePistolsSystemCalls'
 import { Address } from './Address'
 import { ChallengeButton } from '/src/components/ui/Buttons'
-import { BigNumberish } from 'starknet'
-import { useAccount } from '@starknet-react/core'
-import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -144,11 +143,7 @@ const ProfilePosterFull = forwardRef<ProfilePosterHandle, ProfilePosterProps>((p
   // Full-specific data
   const { duelistIds, isLoading } = useDuelistsOfOwner(props.playerAddress)
   const { isBookmarked } = useIsBookmarked(props.playerAddress)
-  const { account } = useAccount()
-  const { game } = useDojoSystemCalls();
-  const _publish = useCallback(() => {
-    game.emit_player_bookmark(account, props.playerAddress, 0, !isBookmarked)
-  }, [account, props.playerAddress, isBookmarked])
+  const { emit_player_bookmark, isDisabled: emitIsDisabled } = useExecuteEmitPlayerBookmark(props.playerAddress, 0, !isBookmarked)
 
   const baseRef = useRef<InteractibleComponentHandle>(null)
   const cardRefs = useRef<{ [key: number]: DuelistCardHandle }>({})
@@ -267,7 +262,7 @@ const ProfilePosterFull = forwardRef<ProfilePosterHandle, ProfilePosterProps>((p
           </div>
 
           <div className='BookmarkSection'>
-            <BookmarkIcon isBookmarked={isBookmarked} size='big' fitted onClick={_publish} />
+            <BookmarkIcon isBookmarked={isBookmarked} size='big' fitted disabled={emitIsDisabled} onClick={emit_player_bookmark} />
           </div>
 
           {isBlocked && <div className='BlockedOverlay ProfileLarge Right' />}
