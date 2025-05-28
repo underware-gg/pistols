@@ -21,19 +21,21 @@ export function PlayerNameSync() {
 
   useEffect(() => {
     if (newPlayerAddresses.length == 0) return
-    if (isControllerConnected) {
-      lookupAddresses(newPlayerAddresses).then((result) => {
-        // console.log("PlayerNameSync() GOT:", newPlayerAddresses, result)
-        updateUsernames(result)
-      })
-    } else if (connectorId == supportedConnetorIds.PREDEPLOYED) {
+    if (connectorId == supportedConnetorIds.PREDEPLOYED) {
+      // use predeployed accounts
       updateUsernames(
         selectedNetworkConfig.predeployedAccounts.reduce((acc, account) => {
           acc.set(account.address, account.name)
           return acc
         }, new Map<string, string>())
       )
-    }
+    } else {
+      // fetch controller names
+      lookupAddresses(newPlayerAddresses).then((result) => {
+        // console.log("PlayerNameSync() GOT:", newPlayerAddresses, result)
+        updateUsernames(result)
+      })
+    } 
   }, [newPlayerAddresses, connectorId, isControllerConnected, selectedNetworkConfig])
 
   return (<></>)
