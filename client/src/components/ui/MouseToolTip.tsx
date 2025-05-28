@@ -130,16 +130,10 @@ export function MouseToolTip({ text }: MouseToolTipProps) {
             pointing={isBelow ? 'above' : 'below'} 
             style={{
               position: 'relative',
-              textAlign: 'center',
-              display: 'inline-block',
-              minWidth: '200px'
             }}
             ref={setLabelReference}
           >
-            <div 
-              dangerouslySetInnerHTML={{ __html: displayText }} 
-              style={{ textAlign: 'center' }}
-            />
+            <div dangerouslySetInnerHTML={{ __html: displayText }} />
           </Label>
         )}
       </div>

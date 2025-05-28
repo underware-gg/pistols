@@ -36,7 +36,7 @@ function _NewChallengeModal({
 }) {
   const { duel_token } = useDojoSystemCalls()
   const { account, address } = useAccount()
-  const { aspectWidth, aspectHeight } = useGameAspect()
+  const { aspectWidth, aspectHeight, boxH, boxW } = useGameAspect()
 
   const { 
     duelistSelectOpener, 
@@ -96,7 +96,17 @@ function _NewChallengeModal({
 
   return (
     <>
-      <Modal open={isOpen} onClose={() => _close()}>
+      <Modal open={isOpen} onClose={() => _close()}
+        className='NoMargin NoPadding'
+        style={{
+          width: aspectWidth(60),
+          height: aspectHeight(76),
+          position: 'absolute',
+          top: aspectHeight((100 - 76) / 2) + boxH,
+          left: aspectWidth(20) + boxW,
+          display: 'flex',
+        }}
+      >
         <Modal.Header>
           <Grid>
             <Row>
