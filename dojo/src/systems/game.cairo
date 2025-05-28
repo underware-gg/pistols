@@ -1,6 +1,7 @@
-// use starknet::{ContractAddress};
+use starknet::{ContractAddress};
 use pistols::types::duel_progress::{DuelProgress};
 use pistols::models::leaderboard::{LeaderboardPosition};
+use pistols::models::events::{SocialPlatform};
 use pistols::types::rules::{RewardValues};
 
 // Exposed to clients
@@ -20,8 +21,11 @@ pub trait IGame<TState> {
         salt: felt252,
         moves: Span<u8>,
     );
-    fn collect_duel(ref self: TState, duel_id: u128) -> u8; // @description: Close expired duels
-    fn clear_call_to_action(ref self: TState, duelist_id: u128); // @description: Clear the required action call for a duelist
+    fn collect_duel(ref self: TState, duel_id: u128) -> u8; //@description: Close expired duels
+    // event emitters
+    fn clear_call_to_action(ref self: TState, duelist_id: u128); // @description: Clear call to action for a duelist
+    fn emit_player_bookmark(ref self: TState, target_address: ContractAddress, target_id: u128, enabled: bool); //@description: Bookmarks an address or token
+    fn emit_player_social_link(ref self: TState, social_platform: SocialPlatform, user_name: ByteArray, user_id: ByteArray); //@description: Link to social platform
 
     // view calls
     fn get_duel_deck(self: @TState, duel_id: u128) -> Span<Span<u8>>;
@@ -84,7 +88,7 @@ pub mod game {
         leaderboard::{Leaderboard, LeaderboardTrait, LeaderboardPosition},
         pact::{PactTrait},
         season::{SeasonScoreboard, SeasonScoreboardTrait},
-        events::{Activity, ActivityTrait},
+        events::{Activity, ActivityTrait, SocialPlatform},
         // tournament::{TournamentRound, TournamentRoundTrait, TournamentDuelKeys},
     };
     use pistols::types::{
@@ -326,12 +330,6 @@ pub mod game {
             // store.set_round(@round); // _finish_challenge() does it
         }
 
-        fn clear_call_to_action(ref self: ContractState, duelist_id: u128) {
-            let mut store: Store = StoreTrait::new(self.world_default());
-            self._validate_ownership(@store.world, duelist_id);
-            store.emit_call_to_action(starknet::get_caller_address(), duelist_id, 0, false);
-        }
-
         fn collect_duel(ref self: ContractState, duel_id: u128) -> u8 {
             let mut store: Store = StoreTrait::new(self.world_default());
             let mut challenge: Challenge = store.get_challenge(duel_id);
@@ -375,6 +373,24 @@ pub mod game {
             }
             (challenge.winner)
         }
+
+        //------------------------------------
+        // event emitters
+        //
+        fn clear_call_to_action(ref self: ContractState, duelist_id: u128) {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            self._validate_ownership(@store.world, duelist_id);
+            store.emit_call_to_action(starknet::get_caller_address(), duelist_id, 0, false);
+        }
+        fn emit_player_bookmark(ref self: ContractState, target_address: ContractAddress, target_id: u128, enabled: bool) {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            store.emit_player_bookmark(starknet::get_caller_address(), target_address, target_id, enabled);
+        }
+        fn emit_player_social_link(ref self: ContractState, social_platform: SocialPlatform, user_name: ByteArray, user_id: ByteArray) {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            store.emit_player_social_link(starknet::get_caller_address(), social_platform, user_name, user_id);
+        }
+
 
 
         //------------------------------------

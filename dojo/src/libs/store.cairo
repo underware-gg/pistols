@@ -61,6 +61,8 @@ pub use pistols::models::{
         CallToActionEvent,
         ChallengeRewardsEvent,
         LordsReleaseEvent,
+        PlayerBookmarkEvent,
+        PlayerSocialLinkEvent, SocialPlatform,
     },
 };
 pub use pistols::systems::components::{
@@ -621,6 +623,25 @@ pub impl StoreImpl of StoreTrait {
             duel_id,
             bill: *bill,
             timestamp: starknet::get_block_timestamp(),
+        });
+    }
+
+    #[inline(always)]
+    fn emit_player_bookmark(ref self: Store, player_address: ContractAddress, target_address: ContractAddress, target_id: u128, enabled: bool) {
+        self.world.emit_event(@PlayerBookmarkEvent {
+            player_address,
+            target_address,
+            target_id,
+            enabled,
+        });
+    }
+    #[inline(always)]
+    fn emit_player_social_link(ref self: Store, player_address: ContractAddress, social_platform: SocialPlatform, user_name: ByteArray, user_id: ByteArray) {
+        self.world.emit_event(@PlayerSocialLinkEvent {
+            player_address,
+            social_platform,
+            user_name,
+            user_id,
         });
     }
 }

@@ -13,8 +13,8 @@ mod tests {
             TestSystems, FLAGS,
             IPackTokenDispatcherTrait,
             ILordsMockDispatcherTrait,
-            // IAdminDispatcherTrait,
-            OWNER, OTHER,
+            IAdminDispatcherTrait,
+            OWNER, OTHER, TREASURY,
         }
     };
     use pistols::libs::admin_fix::{AdminFixTrait};
@@ -124,5 +124,14 @@ mod tests {
         assert_eq!(balance_claimable_still, balance_claimable_OK, "balance_claimable STILL");
         assert_eq!(balance_purchases_still, balance_purchases_OK, "balance_purchases STILL");
         assert_eq!(balance_peg_still, balance_peg_OK, "balance_peg STILL");
+    }
+
+    #[test]
+    fn test_fix_player_bookmark() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN | FLAGS::OWNER);
+        tester::impersonate(OWNER());
+        tester::drop_dojo_events(@sys);
+        sys.admin.fix_player_bookmark(OTHER(), TREASURY(), 123, true);
+        tester::assert_event_bookmark(@sys, OTHER(), TREASURY(), 123, true);
     }
 }

@@ -53,10 +53,7 @@ pub mod SELECTORS {
     pub const LORDS_MOCK: felt252 = selector_from_tag!("pistols-lords_mock");
     pub const VRF_MOCK: felt252 = selector_from_tag!("pistols-vrf_mock");
     // models
-    pub const CONFIG: felt252 = selector_from_tag!("pistols-Config");
-    pub const SEASON_CONFIG: felt252 = selector_from_tag!("pistols-SeasonConfig");
-    pub const TOKEN_CONFIG: felt252 = selector_from_tag!("pistols-TokenConfig");
-    pub const COIN_CONFIG: felt252 = selector_from_tag!("pistols-CoinConfig");
+    // pub const CONFIG: felt252 = selector_from_tag!("pistols-Config");
 }
 
 #[generate_trait]

@@ -57,6 +57,7 @@ pub mod tester {
         },
         pool::{Pool, PoolType},
         player::{PlayerDuelistStack},
+        events::{SocialPlatform},
         // tournament::{TournamentRound},
     };
 
@@ -286,6 +287,8 @@ pub mod tester {
             TestResource::Event(pistols::models::events::e_CallToActionEvent::TEST_CLASS_HASH),
             TestResource::Event(pistols::models::events::e_ChallengeRewardsEvent::TEST_CLASS_HASH),
             TestResource::Event(pistols::models::events::e_LordsReleaseEvent::TEST_CLASS_HASH),
+            TestResource::Event(pistols::models::events::e_PlayerBookmarkEvent::TEST_CLASS_HASH),
+            TestResource::Event(pistols::models::events::e_PlayerSocialLinkEvent::TEST_CLASS_HASH),
             // cartridge arcade
             TestResource::Event(achievement::events::index::e_TrophyCreation::TEST_CLASS_HASH),
             TestResource::Event(achievement::events::index::e_TrophyProgression::TEST_CLASS_HASH),
@@ -592,10 +595,42 @@ pub mod tester {
         let contract_event = testing::pop_log::<dojo::world::world::Event>(*sys.world.dispatcher.contract_address).unwrap();
         match contract_event {
             dojo::world::world::Event::EventEmitted(event) => {
+                assert_eq!(event.selector, selector_from_tag!("pistols-TrophyProgression"), "Invalid selector");
                 assert_eq!(*event.keys.at(0), address.into(), "Invalid player id");
                 assert_eq!(*event.keys.at(1), trophy.identifier(), "Invalid task id");
                 // assert_eq!(*event.values.at(0), 1, "Invalid count");
                 // assert_eq!(*event.values.at(1), 0, "Invalid time");
+            },
+            _ => {},
+        }
+    }
+    pub fn assert_event_bookmark(sys: @TestSystems, player_address: ContractAddress, target_address: ContractAddress, target_id: u128, enabled: bool) {
+        let contract_event = testing::pop_log::<dojo::world::world::Event>(*sys.world.dispatcher.contract_address).unwrap();
+        match contract_event {
+            dojo::world::world::Event::EventEmitted(event) => {
+                assert_eq!(event.selector, selector_from_tag!("pistols-PlayerBookmarkEvent"), "Invalid selector");
+                assert_eq!(event.keys.len(), 3, "Invalid keys length");
+                assert_eq!(*event.keys.at(0), player_address.into(), "Invalid player_address");
+                assert_eq!(*event.keys.at(1), target_address.into(), "Invalid target_address");
+                assert_eq!(*event.keys.at(2), target_id.into(), "Invalid target_id");
+                assert_eq!(event.values.len(), 1, "Invalid values length");
+                assert_eq!(*event.values.at(0), enabled.into(), "Invalid enabled");
+            },
+            _ => {},
+        }
+    }
+    pub fn assert_event_social_link(sys: @TestSystems, player_address: ContractAddress, social_platform: SocialPlatform, user_name: ByteArray, user_id: ByteArray) {
+        let contract_event = testing::pop_log::<dojo::world::world::Event>(*sys.world.dispatcher.contract_address).unwrap();
+        match contract_event {
+            dojo::world::world::Event::EventEmitted(event) => {
+                assert_eq!(event.selector, selector_from_tag!("pistols-PlayerSocialLinkEvent"), "Invalid selector");
+                assert_eq!(event.keys.len(), 2, "Invalid values length");
+                assert_eq!(*event.keys.at(0), player_address.into(), "Invalid player_address");
+                // assert_eq!(*event.keys.at(1), social_platform.into(), "Invalid social_platform");
+                // values
+                assert_eq!(event.values.len(), 6, "Invalid values length");
+                // assert_eq!(*event.values.at(0), user_name.into(), "Invalid user_name");
+                // assert_eq!(*event.values.at(1), user_id.into(), "Invalid user_id");
             },
             _ => {},
         }

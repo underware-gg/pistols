@@ -15,7 +15,9 @@ pub trait IAdmin<TState> {
     fn set_is_blocked(ref self: TState, account_address: ContractAddress, is_blocked: bool);
     fn disqualify_duelist(ref self: TState, season_id: u32, duelist_id: u128, block_owner: bool) -> bool;
     fn qualify_duelist(ref self: TState, season_id: u32, duelist_id: u128) -> u8;
+    // maintenance functions
     fn urgent_update(ref self: TState);
+    fn fix_player_bookmark(ref self: TState, player_address: ContractAddress, target_address: ContractAddress, target_id: u128, enabled: bool);
 }
 
 #[dojo::contract]
@@ -151,11 +153,19 @@ pub mod admin {
             (position)
         }
 
+        //------------------------------------
+        // maintenance functions
+        //
         fn urgent_update(ref self: ContractState) {
             self._assert_caller_is_admin();
             let mut store: Store = StoreTrait::new(self.world_default());
             // post release fix: Introducing Claimable pool
             AdminFixTrait::fix_claimable_pool(ref store);
+        }
+        fn fix_player_bookmark(ref self: ContractState, player_address: ContractAddress, target_address: ContractAddress, target_id: u128, enabled: bool) {
+            self._assert_caller_is_admin();
+            let mut store: Store = StoreTrait::new(self.world_default());
+            store.emit_player_bookmark(player_address, target_address, target_id, enabled);
         }
     }
 

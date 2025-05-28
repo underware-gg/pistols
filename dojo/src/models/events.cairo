@@ -22,9 +22,17 @@ pub enum Activity {
     ClaimedGift,        // 15
 }
 
+#[derive(Serde, Copy, Drop, PartialEq, Introspect)]
+pub enum SocialPlatform {
+    Undefined,  // 0
+    Discord,    // 1
+    Telegram,   // 2
+    X,          // 3
+}
 
-//---------------------
-// ON-CHAIN events
+
+//----------------------------------
+// ON-CHAIN events (historical)
 //
 #[derive(Copy, Drop, Serde)]
 #[dojo::event(historical:true)]
@@ -37,7 +45,22 @@ pub struct PlayerActivityEvent {
     pub identifier: felt252,    // (optional) duel_id, duelist_id, ...
     pub is_public: bool,        // can be displayed in activity log
 }
+#[derive(Copy, Drop, Serde)]
+#[dojo::event(historical:true)]
+pub struct LordsReleaseEvent {
+    #[key]
+    pub season_id: u32,
+    //-----------------------
+    pub bill: LordsReleaseBill,
+    pub duel_id: u128,
+    pub timestamp: u64,
+}
 
+
+
+//----------------------------------
+// ON-CHAIN events (non-historical)
+//
 #[derive(Copy, Drop, Serde)]
 #[dojo::event(historical:false)]
 pub struct CallToActionEvent {
@@ -64,17 +87,31 @@ pub struct ChallengeRewardsEvent {
     // pub timestamp: u64,
 }
 
+
 #[derive(Copy, Drop, Serde)]
-#[dojo::event(historical:true)]
-pub struct LordsReleaseEvent {
+#[dojo::event(historical:false)]
+pub struct PlayerBookmarkEvent {
     #[key]
-    pub season_id: u32,
+    pub player_address: ContractAddress,
+    #[key]
+    pub target_address: ContractAddress,    // account or contract address
+    #[key]
+    pub target_id: u128,                    // (optional) token id
     //-----------------------
-    pub bill: LordsReleaseBill,
-    pub duel_id: u128,
-    pub timestamp: u64,
+    pub enabled: bool,
 }
 
+#[derive(Clone, Drop, Serde)]
+#[dojo::event(historical:false)]
+pub struct PlayerSocialLinkEvent {
+    #[key]
+    pub player_address: ContractAddress,
+    #[key]
+    pub social_platform: SocialPlatform,
+    //-----------------------
+    pub user_name: ByteArray,
+    pub user_id: ByteArray,
+}
 
 
 
