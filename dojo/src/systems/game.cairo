@@ -25,7 +25,8 @@ pub trait IGame<TState> {
     // event emitters
     fn clear_call_to_action(ref self: TState, duelist_id: u128); // @description: Clear call to action for a duelist
     fn emit_player_bookmark(ref self: TState, target_address: ContractAddress, target_id: u128, enabled: bool); //@description: Bookmarks an address or token
-    fn emit_player_social_link(ref self: TState, social_platform: SocialPlatform, user_name: ByteArray, user_id: ByteArray); //@description: Link to social platform
+    fn emit_player_social_link(ref self: TState, social_platform: SocialPlatform, player_address: ContractAddress, user_name: ByteArray, user_id: ByteArray); //@description: Link player to social platform
+    fn clear_player_social_link(ref self: TState, social_platform: SocialPlatform); //@description: Unlink player from social platform
 
     // view calls
     fn get_duel_deck(self: @TState, duel_id: u128) -> Span<Span<u8>>;
@@ -78,6 +79,7 @@ pub mod game {
         IDuelTokenDispatcherTrait,
         IDuelTokenProtectedDispatcherTrait,
         ITutorialDispatcherTrait,
+        IAdminDispatcherTrait,
         SELECTORS,
     };
     use pistols::systems::rng::{RngWrap, RngWrapTrait};
@@ -107,6 +109,7 @@ pub mod game {
 
     pub mod Errors {
         pub const CALLER_NOT_OWNER: felt252          = 'PISTOLS: Caller not owner';
+        pub const CALLER_NOT_ADMIN: felt252          = 'PISTOLS: Caller not admin';
         pub const CHALLENGE_EXISTS: felt252          = 'PISTOLS: Challenge exists';
         pub const CHALLENGE_NOT_IN_PROGRESS: felt252 = 'PISTOLS: Challenge not active';
         pub const CHALLENGE_IN_PROGRESS: felt252     = 'PISTOLS: Challenge is active';
@@ -386,9 +389,14 @@ pub mod game {
             let mut store: Store = StoreTrait::new(self.world_default());
             store.emit_player_bookmark(starknet::get_caller_address(), target_address, target_id, enabled);
         }
-        fn emit_player_social_link(ref self: ContractState, social_platform: SocialPlatform, user_name: ByteArray, user_id: ByteArray) {
+        fn emit_player_social_link(ref self: ContractState, social_platform: SocialPlatform, player_address: ContractAddress, user_name: ByteArray, user_id: ByteArray) {
+            self._assert_caller_is_admin();
             let mut store: Store = StoreTrait::new(self.world_default());
-            store.emit_player_social_link(starknet::get_caller_address(), social_platform, user_name, user_id);
+            store.emit_player_social_link(player_address, social_platform, user_name, user_id);
+        }
+        fn clear_player_social_link(ref self: ContractState, social_platform: SocialPlatform) {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            store.emit_player_social_link(starknet::get_caller_address(), social_platform, "", "");
         }
 
 
@@ -503,6 +511,10 @@ pub mod game {
         fn _assert_caller_is_owner(self: @ContractState) {
             let mut world = self.world_default();
             assert(world.dispatcher.is_owner(SELECTORS::GAME, starknet::get_caller_address()) == true, Errors::CALLER_NOT_OWNER);
+        }
+        fn _assert_caller_is_admin(self: @ContractState) {
+            let mut world = self.world_default();
+            assert(world.admin_dispatcher().am_i_admin(starknet::get_caller_address()) == true, Errors::CALLER_NOT_ADMIN);
         }
 
         fn _create_trophies(ref self: ContractState) {

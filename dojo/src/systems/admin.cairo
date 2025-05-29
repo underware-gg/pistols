@@ -1,10 +1,5 @@
 use starknet::{ContractAddress};
 
-// based on RYO
-// https://github.com/cartridge-gg/rollyourown/blob/market_packed/src/systems/ryo.cairo
-// https://github.com/cartridge-gg/rollyourown/blob/market_packed/src/config/ryo.cairo
-
-
 // Exposed to clients
 #[starknet::interface]
 pub trait IAdmin<TState> {
