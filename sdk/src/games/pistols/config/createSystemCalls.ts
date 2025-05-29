@@ -136,12 +136,10 @@ export function createSystemCalls(
         ]
         return await _executeTransaction(signer, calls)
       },
-      emit_player_social_link: async (signer: AccountInterface, social_platform: constants.SocialPlatform, user_name: string, user_id: string): Promise<boolean> => {
+      clear_player_social_link: async (signer: AccountInterface, social_platform: constants.SocialPlatform): Promise<boolean> => {
         const calls: DojoCalls = [
-          contractCalls.game.buildEmitPlayerSocialLinkCalldata(
+          contractCalls.game.buildClearPlayerSocialLinkCalldata(
             makeCustomEnum(social_platform),
-            user_name,
-            user_id,
           ),
         ]
         return await _executeTransaction(signer, calls)

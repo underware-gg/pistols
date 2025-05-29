@@ -10,6 +10,7 @@ import {
 } from 'src/games/pistols/config/config'
 import {
   make_typed_data_CommitMoveMessage,
+  make_typed_data_GeneralPurposeMessage,
   make_typed_data_PlayerOnline,
 } from './signed_messages'
 import { Connector } from '@starknet-react/core'
@@ -93,6 +94,12 @@ export const makePistolsPolicies = (networkId: NetworkId, mock: boolean, admin: 
       typedData: make_typed_data_CommitMoveMessage(makeStarknetDomain(networkId), {
         duelId: 0n,
         duelistId: 0n,
+      }),
+    },
+    {
+      description: 'General purpose authorization message',
+      typedData: make_typed_data_GeneralPurposeMessage(makeStarknetDomain(networkId), {
+        purpose: 'Purpose',
       }),
     },
     {

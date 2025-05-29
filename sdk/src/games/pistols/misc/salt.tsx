@@ -1,4 +1,4 @@
-import { AccountInterface, StarknetDomain } from 'starknet'
+import { AccountInterface, BigNumberish, StarknetDomain } from 'starknet'
 import { signMessages, Messages } from 'src/starknet/starknet_sign'
 import { bigintToHex, shortAddress } from 'src/utils/misc/types'
 import { make_moves_hash, _make_move_mask, _make_move_hash } from '../cairo/make_moves_hash'
@@ -12,54 +12,90 @@ export interface CommitMoveMessage extends Messages {
   duelistId: bigint,
 }
 
+// generates a salt for player authentication
+export interface GeneralPurposeMessage extends Messages {
+  purpose: string,
+}
+
+// passed to salt server to validate a GeneralPurposeMessage
+// https://discord.com/developers/docs/topics/oauth2#state-and-security
+export interface GeneralPurposeState {
+  player_address: string,
+  salt: string,
+}
+
+
+//------------------------------------------
+// salt generation from salt (assets) server
+//
+
 /** @returns a salt from account signature, or 0 if fails */
 const signAndGenerateSalt = async (
   serverUrl: string,
   account: AccountInterface, 
   starknetDomain: StarknetDomain, 
-  messageToSign: CommitMoveMessage,
+  messageToSign: Messages,
 ): Promise<bigint> => {
   let salt = 0n
   if (messageToSign) {
     try {
       //
-      // 1: try to restore from cookie...
-      //
-      const cookieKey = `salt[${bigintToHex(messageToSign.duelId)},${bigintToHex(messageToSign.duelistId)}]`;
-      salt = BigInt(cookies.get(cookieKey) || '0');
-      console.log(`SALT COOKIE [${cookieKey}]:`, shortAddress(salt))
-      //
       // 2: try hashed signature (non-controller wallets)...
       //
-      if (salt == 0n) {
-        const { signatureHash, signature, messageHash } = await signMessages(account, starknetDomain, messageToSign)
-        if (signatureHash > 0n) {
-          console.log(`SALT HASHED:`, shortAddress(salt))
-          salt = signatureHash
-        } else if (signature.length > 0 && serverUrl) {
-          //
-          // 3: generate controller signed salt...
-          //
-          salt = await apiGenerateControllerSalt(
-            serverUrl,
-            account.address,
-            starknetDomain,
-            messageHash,
-            signature,
-          )
-          console.log(`SALT GENERATED(${serverUrl}):`, shortAddress(salt))
-        }
-        // save cookie backup
-        if (salt > 0n) {
-          cookies.set(cookieKey, bigintToHex(salt));
-          console.log(`SALT backup to cookie[${cookieKey}]:`, shortAddress(salt))
-        }
+      const { signatureHash, signature, messageHash } = await signMessages(account, starknetDomain, messageToSign)
+      if (signatureHash > 0n) {
+        console.log(`SALT HASHED:`, shortAddress(salt))
+        salt = signatureHash
+      } else if (signature.length > 0 && serverUrl) {
+        //
+        // 3: generate controller signed salt...
+        //
+        salt = await apiGenerateControllerSalt(
+          serverUrl,
+          account.address,
+          starknetDomain,
+          messageHash,
+          signature,
+        )
+        console.log(`SALT GENERATED(${serverUrl}):`, shortAddress(salt))
       }
       if (salt == 0n) {
         throw new Error('unable to generate salt!')
       }
     } catch (e) {
-      console.warn(`signAndGenerateSalt() exception:`, e)
+      console.warn(`signAndGenerateSalt() exception:`, e, messageToSign)
+    }
+  }
+  return salt
+}
+
+
+//------------------------------------------
+// moves commit salt
+//
+
+/** @returns a salt from account signature, or 0 if fails */
+const signAndGenerateMovesSalt = async (
+  serverUrl: string,
+  account: AccountInterface,
+  starknetDomain: StarknetDomain,
+  messageToSign: CommitMoveMessage,
+): Promise<bigint> => {
+  let salt = 0n
+  if (messageToSign) {
+    //
+    // 1: try to restore from cookie...
+    //
+    const cookieKey = `salt[${bigintToHex(messageToSign.duelId)},${bigintToHex(messageToSign.duelistId)}]`;
+    salt = BigInt(cookies.get(cookieKey) || '0');
+    console.log(`SALT COOKIE [${cookieKey}]:`, shortAddress(salt))
+    if (salt == 0n) {
+      salt = await signAndGenerateSalt(serverUrl, account, starknetDomain, messageToSign)
+      // save cookie backup
+      if (salt > 0n) {
+        cookies.set(cookieKey, bigintToHex(salt));
+        console.log(`SALT backup to cookie[${cookieKey}]:`, shortAddress(salt))
+      }
     }
   }
   return salt
@@ -73,7 +109,7 @@ export const signAndGenerateMovesHash = async (
   messageToSign: CommitMoveMessage,
   moves: number[]
 ): Promise<{ hash: bigint, salt: bigint }> => {
-  const salt = await signAndGenerateSalt(serverUrl, account, starknetDomain, messageToSign)
+  const salt = await signAndGenerateMovesSalt(serverUrl, account, starknetDomain, messageToSign)
   const hash = make_moves_hash(salt, moves)
   console.log(`signAndGenerateMovesHash():`, messageToSign, moves, bigintToHex(salt), bigintToHex(hash))
   return { hash, salt }
@@ -88,7 +124,7 @@ export const signAndRestoreMovesFromHash = async (
   hash: bigint, 
   decks: number[][]
 ): Promise<{ salt: bigint, moves: number[] }> => {
-  const salt = await signAndGenerateSalt(serverUrl, account, starknetDomain, messageToSign)
+  const salt = await signAndGenerateMovesSalt(serverUrl, account, starknetDomain, messageToSign)
   let moves = []
   console.log(`___RESTORE decks:`, decks)
   console.log(`___RESTORE message:`, messageToSign, '\nsalt:', bigintToHex(salt), '\nhash:', bigintToHex(hash))
@@ -134,5 +170,24 @@ export const signAndRestoreMovesFromHash = async (
   return {
     salt,
     moves,
+  }
+}
+
+
+//------------------------------------------
+// general purpose salt
+//
+
+/** @returns the felt252 hash for an action, or 0 if fail */
+export const signAndGenerateGeneralPurposeSalt = async (
+  serverUrl: string,
+  account: AccountInterface,
+  starknetDomain: StarknetDomain,
+  messageToSign: GeneralPurposeMessage,
+): Promise<{ salt: bigint }> => {
+  const salt = await signAndGenerateSalt(serverUrl, account, starknetDomain, messageToSign)
+  console.log(`signAndGenerateGeneralPurposeSalt():`, messageToSign, bigintToHex(salt))
+  return {
+    salt,
   }
 }

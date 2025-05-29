@@ -37,7 +37,7 @@ export const DuelUIControls: React.FC<DuelUIControlsProps> = ({
 
       <DojoSetupErrorDetector />
 
-      {debugMode && <MenuDebugAnimations />}
+      {/* {debugMode && <MenuDebugAnimations />} */}
     </>
   );
 };

@@ -5,7 +5,7 @@ import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { createDojoStore } from '@dojoengine/sdk/react'
 import { PistolsEntity, PistolsSchemaType } from '@underware/pistols-sdk/pistols/sdk'
-import { arrayRemoveValue, bigintEquals, bigintToHex, bigintToNumber, sortObjectByValue } from '@underware/pistols-sdk/utils'
+import { arrayRemoveValue, bigintEquals, bigintToHex, bigintToNumber, isPositiveBigint, sortObjectByValue } from '@underware/pistols-sdk/utils'
 import { useAllStoreModels, useStoreModelsByKeys } from '@underware/pistols-sdk/dojo'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { useDuelistTokenStore } from '/src/stores/tokenStore'
@@ -39,9 +39,16 @@ interface State {
   updateMessages: (entities: PistolsEntity[]) => void;
 }
 
+const _playerKey = (address: BigNumberish | undefined): string | null => (
+  isPositiveBigint(address) ? bigintToHex(address) : null
+)
+
 const createStore = () => {
   return create<State>()(immer((set, get) => ({
-    players_names: {},
+    players_names: {
+      [_playerKey('0x04D92577856263bDe8E7601Ee189b6dbe52aCb879462489B92c0789f6c157E6c')]: '[Pistols Deployer]',
+      [_playerKey('0x0569d6f6080a3aB8678738De7Da68097796b11ECE78b21fD7FAe2Fd7505AB0Ba')]: '[Pistols Bot]',
+    },
     players_online: {},
     player_bookmarks: {},
     token_bookmarks: {},
@@ -49,7 +56,7 @@ const createStore = () => {
       // console.log("updateUsername()[Player] =>", usernames)
       set((state: State) => {
         usernames.forEach((value: string, key: string) => {
-          const _key = bigintToHex(key)
+          const _key = _playerKey(key)
           state.players_names[_key] = value
         })
         // console.log("updateUsername()[Player] =>", usernames, state.players)
@@ -57,7 +64,7 @@ const createStore = () => {
     },
     getPlayerName: (address: BigNumberish) => {
       const players_names = get().players_names
-      return players_names[bigintToHex(address)]
+      return players_names[_playerKey(address)]
     },
     updateMessages: (entities: PistolsEntity[]) => {
       // console.log("updateMessages()[Player] =>", entities)
@@ -66,13 +73,13 @@ const createStore = () => {
           // PlayerOnline flags
           const online = e.models.pistols.PlayerOnline
           if (online) {
-            const address = bigintToHex(online.identity)
+            const address = _playerKey(online.identity)
             state.players_online[address] = bigintToNumber(online.timestamp)
           }
           // Bookmarks
           const bookmark = e.models.pistols.PlayerBookmarkEvent
           if (bookmark) {
-            const address = bigintToHex(bookmark.player_address)
+            const address = _playerKey(bookmark.player_address)
             const target_address = BigInt(bookmark.target_address)
             const target_id = BigInt(bookmark.target_id)
             if (target_id == 0n) {
@@ -88,7 +95,7 @@ const createStore = () => {
               }
             } else {
               // Bookmarking token
-              const target_address = bigintToHex(bookmark.target_address)
+              const target_address = _playerKey(bookmark.target_address)
               const isBookmarked = state.token_bookmarks[address]?.[target_address]?.includes(target_id)
               if (bookmark.enabled && !isBookmarked) {
                 if (!state.token_bookmarks[address]) {
@@ -131,7 +138,7 @@ export const usePlayer = (address: BigNumberish) => {
   const totals = useTotals(player?.totals)
 
   // get from player name store...
-  const playerKey = useMemo(() => bigintToHex(address), [address])
+  const playerKey = useMemo(() => _playerKey(address), [address])
   const players_names = usePlayerDataStore((state) => state.players_names);
   const username = useMemo(() => (players_names[playerKey] ?? null), [players_names, playerKey])
   const name = useMemo(() => (username || 'Unknown'), [username])
@@ -224,7 +231,7 @@ export const useIsBookmarked = (target_address: BigNumberish, target_id: BigNumb
   const isBookmarked = useMemo(() => (
     target_id == 0n
       ? bookmarkedPlayers.includes(BigInt(target_address ?? 0))
-      : bookmarkedTokens[bigintToHex(target_address ?? 0)]?.includes(BigInt(target_id))
+      : bookmarkedTokens[_playerKey(target_address ?? 0)]?.includes(BigInt(target_id))
   ), [bookmarkedPlayers, bookmarkedTokens, target_address, target_id])
   return {
     isBookmarked,
@@ -277,7 +284,7 @@ export const useQueryPlayerIds = (
 
     // filter by active
     if (filterOnline) {
-      result = result.filter((e) => (players_online[bigintToHex(e.player_address)] ?? 0) >= minPlayerTimestamp)
+      result = result.filter((e) => (players_online[_playerKey(e.player_address)] ?? 0) >= minPlayerTimestamp)
     }
 
     // sort...
@@ -323,5 +330,5 @@ export const getPlayerName = (address: BigNumberish): string | undefined => {
 
 export const getPlayerOnlineStatus = (address: BigNumberish): boolean => {
   const players_online = usePlayerDataStore((state) => state.players_online);
-  return players_online[bigintToHex(address)] !== undefined
+  return players_online[_playerKey(address)] !== undefined
 }

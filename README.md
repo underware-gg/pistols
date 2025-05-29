@@ -238,6 +238,10 @@ VITE_ACADEMY_NETWORK_ID=ACADEMY
 # VITE_RPC_URL=https://api.cartridge.gg/x/starknet/mainnet
 # VITE_TORII_URL=https://api.cartridge.gg/x/pistols-mainnet-2/torii
 # VITE_TORII_RELAY_URL=/dns4/api.cartridge.gg/tcp/443/x-parity-wss/%2Fx%2Fpistols-mainnet-2%2Ftorii%2Fwss
+
+# Socials config
+VITE_SERVER_URL=https://play.underware.gg
+VITE_DISCORD_CLIENT_ID=<OAUTH2_CLIENT_ID>
 ```
 
 Start the client

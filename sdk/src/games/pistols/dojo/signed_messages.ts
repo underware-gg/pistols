@@ -5,7 +5,7 @@ import { generateTypedData } from 'src/dojo/setup/controller'
 import { makeStarknetDomain } from 'src/games/pistols/config/config'
 import { NetworkId } from 'src/games/pistols/config/networks'
 import { createTypedMessage } from 'src/starknet/starknet_sign'
-import { CommitMoveMessage } from 'src/games/pistols/misc/salt'
+import { CommitMoveMessage, GeneralPurposeMessage } from 'src/games/pistols/misc/salt'
 import * as models from 'src/games/pistols/generated/models.gen'
 
 //
@@ -24,6 +24,13 @@ import * as models from 'src/games/pistols/generated/models.gen'
 //
 
 export function make_typed_data_CommitMoveMessage(starknetDomain: StarknetDomain, messages: CommitMoveMessage) {
+  return createTypedMessage({
+    starknetDomain,
+    messages,
+  })
+}
+
+export function make_typed_data_GeneralPurposeMessage(starknetDomain: StarknetDomain, messages: GeneralPurposeMessage) {
   return createTypedMessage({
     starknetDomain,
     messages,

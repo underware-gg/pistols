@@ -23,15 +23,15 @@ export const useExecuteEmitPlayerBookmark = (targetAddress: BigNumberish, target
   }
 }
 
-export const useExecuteEmitPlayerSocialLink = (socialPlatform: constants.SocialPlatform, userName: string, userId: string) => {
+export const useExecuteClearPlayerSocialLink = (socialPlatform: constants.SocialPlatform) => {
   const { run, isRunning } = useAsyncRunner<boolean>()
   const { account, isConnected } = useAccount()
   const { game } = useDojoSystemCalls();
   const _execute = useCallback(() => {
-    run(() => game.emit_player_social_link(account, socialPlatform, userName, userId))
-  }, [run, game, account, socialPlatform, userName, userId])
+    run(() => game.clear_player_social_link(account, socialPlatform))
+  }, [run, game, account, socialPlatform])
   return {
-    emit_player_social_link: _execute,
+    clear_player_social_link: _execute,
     isDisabled: (!isConnected || isRunning),
   }
 }
