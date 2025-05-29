@@ -6617,8 +6617,8 @@
       ]
     },
     {
-      "address": "0x321111165b160965a177e0a499dda7d536605011f9e9570d9293f81ef61f0d7",
-      "class_hash": "0x3484b68d9f96e1ff925677d40d2a10c2d3f1b92d2133d56b1c8ca736565e0f5",
+      "address": "0x437b9f9c5601915b910c94396a12ab1fb8810793fcce9799b58b488afa2a277",
+      "class_hash": "0x7c696f46ac185bb23472a4173230b6f1d8fe1dd830730918199bc324d5d0a3d",
       "abi": [
         {
           "type": "impl",
@@ -7239,12 +7239,28 @@
                   "type": "pistols::models::events::SocialPlatform"
                 },
                 {
+                  "name": "player_address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
                   "name": "user_name",
                   "type": "core::byte_array::ByteArray"
                 },
                 {
                   "name": "user_id",
                   "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "clear_player_social_link",
+              "inputs": [
+                {
+                  "name": "social_platform",
+                  "type": "pistols::models::events::SocialPlatform"
                 }
               ],
               "outputs": [],
@@ -7526,6 +7542,7 @@
         "clear_call_to_action",
         "emit_player_bookmark",
         "emit_player_social_link",
+        "clear_player_social_link",
         "create_trophies",
         "do_that_thing",
         "upgrade"

@@ -2222,6 +2222,27 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
+	const build_game_clearPlayerSocialLink_calldata = (socialPlatform: CairoCustomEnum): DojoCall => {
+		return {
+			contractName: "game",
+			entrypoint: "clear_player_social_link",
+			calldata: [socialPlatform],
+		};
+	};
+
+	const game_clearPlayerSocialLink = async (snAccount: Account | AccountInterface, socialPlatform: CairoCustomEnum) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_game_clearPlayerSocialLink_calldata(socialPlatform),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 	const build_game_collectDuel_calldata = (duelId: BigNumberish): DojoCall => {
 		return {
 			contractName: "game",
@@ -2327,19 +2348,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-  const build_game_emitPlayerSocialLink_calldata = (socialPlatform: CairoCustomEnum, userName: string, userId: string): DojoCall => {
+  const build_game_emitPlayerSocialLink_calldata = (socialPlatform: CairoCustomEnum, playerAddress: string, userName: string, userId: string): DojoCall => {
 		return {
 			contractName: "game",
 			entrypoint: "emit_player_social_link",
-			calldata: [socialPlatform, userName, userId],
+			calldata: [socialPlatform, playerAddress, userName, userId],
 		};
 	};
 
-  const game_emitPlayerSocialLink = async (snAccount: Account | AccountInterface, socialPlatform: CairoCustomEnum, userName: string, userId: string) => {
+  const game_emitPlayerSocialLink = async (snAccount: Account | AccountInterface, socialPlatform: CairoCustomEnum, playerAddress: string, userName: string, userId: string) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_game_emitPlayerSocialLink_calldata(socialPlatform, userName, userId),
+				build_game_emitPlayerSocialLink_calldata(socialPlatform, playerAddress, userName, userId),
 				"pistols",
 			);
 		} catch (error) {
@@ -3776,6 +3797,8 @@ export function setupWorld(provider: DojoProvider) {
 			buildCanCollectDuelCalldata: build_game_canCollectDuel_calldata,
 			clearCallToAction: game_clearCallToAction,
 			buildClearCallToActionCalldata: build_game_clearCallToAction_calldata,
+			clearPlayerSocialLink: game_clearPlayerSocialLink,
+			buildClearPlayerSocialLinkCalldata: build_game_clearPlayerSocialLink_calldata,
 			collectDuel: game_collectDuel,
 			buildCollectDuelCalldata: build_game_collectDuel_calldata,
 			commitMoves: game_commitMoves,

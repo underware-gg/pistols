@@ -19,7 +19,8 @@ export const INTERFACE_DESCRIPTIONS: any = {
     collect_duel: 'Close expired duels',
     clear_call_to_action: 'Clear call to action for a duelist',
     emit_player_bookmark: 'Bookmarks an address or token',
-    emit_player_social_link: 'Link to social platform',
+    emit_player_social_link: 'Link player to social platform',
+    clear_player_social_link: 'Unlink player from social platform',
   },
   // from: ../dojo/src/systems/tokens/duel_token.cairo
   IDuelTokenPublic: {
