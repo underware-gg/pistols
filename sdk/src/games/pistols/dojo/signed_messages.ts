@@ -52,7 +52,7 @@ export function make_typed_data_PlayerOnline({
   timestamp: number,
 }) {
   return generateTypedData<PistolsSchemaType, OmitFieldOrder<models.PlayerOnline>>(
-    makeStarknetDomain(networkId),
+    makeStarknetDomain({ networkId }),
     'pistols-PlayerOnline',
     {
       identity: bigintToHex(identity),

@@ -1,6 +1,6 @@
 import { StarknetDomain } from 'starknet'
 import { Manifest, getContractByName } from '@dojoengine/core'
-import { NetworkId, NETWORKS } from './networks'
+import { ChainId, NetworkId, NETWORKS } from './networks'
 import pistols_manifest_dev from './manifests/manifest_dev.json'
 import pistols_manifest_academy from './manifests/manifest_academy.json'
 import pistols_manifest_staging from './manifests/manifest_staging.json'
@@ -26,10 +26,16 @@ const manifests: Record<NetworkId, DojoManifest> = {
 export const NAMESPACE = 'pistols'
 
 // starknet domain
-export const makeStarknetDomain = (networkId: NetworkId): StarknetDomain => ({
+export const makeStarknetDomain = ({
+  chainId,
+  networkId,
+}: {
+  chainId?: string,
+  networkId?: NetworkId
+}): StarknetDomain => ({
   name: 'Underware_gg',
   version: '1.0.0',
-  chainId: NETWORKS[networkId].chainId,
+  chainId: chainId ?? NETWORKS[networkId]?.chainId ?? ChainId.SN_MAIN,
   revision: '1',
 })
 

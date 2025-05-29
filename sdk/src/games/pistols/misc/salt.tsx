@@ -20,6 +20,7 @@ export interface GeneralPurposeMessage extends Messages {
 // passed to salt server to validate a GeneralPurposeMessage
 // https://discord.com/developers/docs/topics/oauth2#state-and-security
 export interface GeneralPurposeState {
+  chain_id: string,
   player_address: string,
   salt: string,
 }

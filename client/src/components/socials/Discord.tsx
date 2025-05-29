@@ -45,6 +45,7 @@ export function DiscordLinkButton({
   useEffect(() => {
     if (isLinking && salt) {
       const state: GeneralPurposeState = {
+        chain_id: starknetDomain.chainId as string,
         player_address: bigintToHex(address),
         salt: bigintToHex(salt),
       }

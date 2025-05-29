@@ -91,14 +91,14 @@ export const makePistolsPolicies = (networkId: NetworkId, mock: boolean, admin: 
   const signedMessagePolicyDescriptions: SignedMessagePolicyDescriptions = [
     {
       description: 'Verify the identity of a player in a Duel',
-      typedData: make_typed_data_CommitMoveMessage(makeStarknetDomain(networkId), {
+      typedData: make_typed_data_CommitMoveMessage(makeStarknetDomain({ networkId }), {
         duelId: 0n,
         duelistId: 0n,
       }),
     },
     {
       description: 'General purpose authorization message',
-      typedData: make_typed_data_GeneralPurposeMessage(makeStarknetDomain(networkId), {
+      typedData: make_typed_data_GeneralPurposeMessage(makeStarknetDomain({ networkId }), {
         purpose: 'Purpose',
       }),
     },
@@ -129,7 +129,7 @@ export const makeDojoAppConfig = (networkId: NetworkId, controllerConnector: Con
   return {
     selectedNetworkId: networkId,
     namespace: NAMESPACE,
-    starknetDomain: makeStarknetDomain(networkId),
+    starknetDomain: makeStarknetDomain({ networkId }),
     manifest: getManifest(networkId),
     mainContractName: Object.keys(contractPolicyDescriptions_pistols)[0],
     controllerConnector,
