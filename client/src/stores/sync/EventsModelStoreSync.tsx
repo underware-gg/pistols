@@ -13,25 +13,24 @@ import { debug } from '@underware/pistols-sdk/pistols'
 export function EventsModelStoreSync() {
   const eventsState = useEventsStore((state) => state)
   const playerDataState = usePlayerDataStore((state) => state)
-  const mounted = useMounted()
 
   const { address } = useAccount()
+  const mounted = useMounted()
 
   const query = useMemo<PistolsQueryBuilder>(() => (
     isPositiveBigint(address)
       ? new PistolsQueryBuilder()
         .withClause(
-          new PistolsClauseBuilder().compose().or([
-            new PistolsClauseBuilder().where(
-              "pistols-CallToActionEvent", "player_address", "Eq", address,
-            ),
-            new PistolsClauseBuilder().where(
-              "pistols-PlayerSocialLinkEvent", "player_address", "Eq", address,
-            ),
-            new PistolsClauseBuilder().where(
-              "pistols-PlayerBookmarkEvent", "player_address", "Eq", address,
-            ),
-          ]).build()
+          new PistolsClauseBuilder().keys(
+            [
+              'pistols-CallToActionEvent',
+              'pistols-PlayerBookmarkEvent',
+              'pistols-PlayerSocialLinkEvent',
+            ],
+            // VariableLen means: must have at least the address key...
+            [formatQueryValue(address)],
+            "VariableLen"
+          ).build()
         )
         .withEntityModels([
           'pistols-CallToActionEvent',
@@ -47,7 +46,7 @@ export function EventsModelStoreSync() {
     enabled: (mounted && Boolean(query)),
     setEntities: (entities: PistolsEntity[]) => {
       debug.log(`GET EventsModelStoreSync() ======>`, entities)
-      eventsState.setEntities(entities)
+      eventsState.setEntities(filterEntitiesByModels(entities, ['CallToActionEvent', 'PlayerSocialLinkEvent']))
       playerDataState.updateMessages(filterEntitiesByModels(entities, ['PlayerBookmarkEvent']))
     },
     updateEntity: (entity: PistolsEntity) => {
@@ -58,7 +57,9 @@ export function EventsModelStoreSync() {
         getEntityModel(entity, 'PlayerSocialLinkEvent');
       if (model && bigintEquals(model.player_address, address)) {
         debug.log(`SUB EventsModelStoreSync() ======> model:`, entity)
-        eventsState.updateEntity(entity)
+        if (entityContainsModels(entity, ['CallToActionEvent', 'PlayerSocialLinkEvent'])) {
+          eventsState.updateEntity(entity)
+        }
         if (entityContainsModels(entity, ['PlayerBookmarkEvent'])) {
           playerDataState.updateMessages([entity])
         }
@@ -66,7 +67,7 @@ export function EventsModelStoreSync() {
     },
   })
 
-  useEffect(() => debug.log("EventsModelStoreSync() =>", eventsState.entities), [eventsState.entities])
+  // useEffect(() => debug.log("EventsModelStoreSync() =>", eventsState.entities), [eventsState.entities])
 
   return (<></>)
 }

@@ -30,6 +30,7 @@ import TokensTestPage from '/src/pages/tests/TokensTestPage'
 import ProfilesTestPage from '/src/pages/tests/ProfilesTestPage'
 import TutorialTestPage from '/src/pages/tests/TutorialTestPage'
 import ChainSwitchPage from './pages/tests/ChainSwitchPage'
+import SocialsTestPage from './pages/tests/SocialsTestPage'
 
 //
 // REF:
@@ -78,6 +79,7 @@ const router = createBrowserRouter([
       { path: "icons", element: <IconsTestPage /> },
       { path: "sign", element: <SignTestPage /> },
       { path: "chainswitch", element: <ChainSwitchPage /> },
+      { path: "socials", element: <SocialsTestPage /> },
     ],
   },
   // internal pages

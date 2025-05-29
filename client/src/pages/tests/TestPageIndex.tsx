@@ -1,12 +1,13 @@
-import React, { useMemo, useState } from 'react'
+import React, { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
-import { Button, Container, Divider, Menu, MenuItem } from 'semantic-ui-react'
+import { Container, Menu, MenuItem } from 'semantic-ui-react'
 import App from '/src/components/App'
 
 const testPages = [
   { name: 'connect', connected: true },
   { name: 'sign', connected: true },
-  { name: 'chainswitch', connected: true},
+  { name: 'chainswitch', connected: true },
+  { name: 'socials', connected: true },
   { name: 'tokens', connected: true },
   { name: 'tutorial', connected: true },
   { name: 'timestamp', connected: true },
@@ -36,7 +37,7 @@ export function TestPageMainMenu() {
       <h3>Test pagess</h3>
       <Menu inverted vertical size='small'>
         {testPages.map(page => (
-          <MenuItem
+          <MenuItem className=''
             key={page.name}
             name={page.name}
             icon='arrow right'
@@ -63,7 +64,7 @@ export function TestPageMenu() {
           onClick={() => navigate('/tests')}
         />
         {testPages.map(page => (
-          <MenuItem
+          <MenuItem className=''
             key={page.name}
             name={page.name}
             icon={page.connected ? 'chain' : null}

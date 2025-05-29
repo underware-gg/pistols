@@ -14,8 +14,6 @@ import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
 import { DuelistTokenArt } from '/src/components/cards/DuelistTokenArt'
 import { DuelTokenArt } from '/src/components/cards/DuelTokenArt'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
-import CurrentChainHint from '/src/components/CurrentChainHint'
-import AppDojo from '/src/components/AppDojo'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { useAccount } from '@starknet-react/core'
 import { useCanClaimStarterPack } from '/src/hooks/usePistolsContractCalls'
@@ -23,6 +21,8 @@ import { LordsFaucet } from '/src/components/account/LordsFaucet'
 import { FameBalanceDuelist, FameLivesDuelist, LordsBalance } from '/src/components/account/LordsBalance'
 import { usePacksOfPlayer } from '/src/hooks/useTokenPacks'
 import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
+import CurrentChainHint from '/src/components/CurrentChainHint'
+import AppDojo from '/src/components/AppDojo'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -40,14 +40,14 @@ export default function TokensTestPage() {
         <CurrentChainHint />
         <Connect />
 
+        <TestImages />
+        <Purchases />
+        <Tokens />
+
         <EntityStoreSync />
         <TokenStoreSync />
         <SeasonChallengeStoreSync />
         <SeasonScoreboardStoreSync />
-
-        <TestImages />
-        <Purchases />
-        <Tokens />
       </Container>
     </AppDojo>
   );
@@ -60,11 +60,12 @@ const _style = {
 }
 
 function Purchases() {
-  const { account, address } = useAccount()
+  const { account, address, isConnected } = useAccount()
   const { pack_token } = useDojoSystemCalls()
   const { packIds } = usePacksOfPlayer()
   const { duelistIds } = useDuelistsOfPlayer()
   const { canClaimStarterPack } = useCanClaimStarterPack(Math.min(duelistIds.length, 1))
+  if (!isConnected) return <></>
   return (
     <>
       <LordsFaucet />
@@ -89,7 +90,8 @@ function Tokens() {
     duelistContractAddress,
     duelContractAddress,
   } = useTokenContracts()
-  // useSdkTokenBalancesTest();
+  const { isConnected } = useAccount()
+  if (!isConnected) return <></>
   return (
     <>
       <br />

@@ -3,6 +3,7 @@ import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { useAsyncRunner } from '@underware/pistols-sdk/utils/hooks'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 
 //------------------------------------------
@@ -22,3 +23,15 @@ export const useExecuteEmitPlayerBookmark = (targetAddress: BigNumberish, target
   }
 }
 
+export const useExecuteEmitPlayerSocialLink = (socialPlatform: constants.SocialPlatform, userName: string, userId: string) => {
+  const { run, isRunning } = useAsyncRunner<boolean>()
+  const { account, isConnected } = useAccount()
+  const { game } = useDojoSystemCalls();
+  const _execute = useCallback(() => {
+    run(() => game.emit_player_social_link(account, socialPlatform, userName, userId))
+  }, [run, game, account, socialPlatform, userName, userId])
+  return {
+    emit_player_social_link: _execute,
+    isDisabled: (!isConnected || isRunning),
+  }
+}

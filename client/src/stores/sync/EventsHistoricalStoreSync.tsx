@@ -2,10 +2,17 @@ import { useEffect } from 'react'
 import { useSdkEventsSub } from '@underware/pistols-sdk/dojo'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useHistoricalEventsStore } from '/src/stores/eventsHistoricalStore'
-import { PistolsHistoricalQueryBuilder } from '@underware/pistols-sdk/pistols/sdk'
+import { PistolsClauseBuilder, PistolsHistoricalQueryBuilder } from '@underware/pistols-sdk/pistols/sdk'
 import { debug } from '@underware/pistols-sdk/pistols'
 
 const query: PistolsHistoricalQueryBuilder = new PistolsHistoricalQueryBuilder()
+  .withClause(
+    new PistolsClauseBuilder().keys(
+      ['pistols-PlayerActivityEvent'],
+      [],
+      "VariableLen"
+    ).build()
+  )
   .withEntityModels([
     'pistols-PlayerActivityEvent',
   ])

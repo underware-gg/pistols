@@ -5,6 +5,7 @@ import { PistolsEntity } from '@underware/pistols-sdk/pistols/sdk'
 import { constants as C } from '@underware/pistols-sdk/pistols/gen'
 import { arrayClean, bigintToHex, bigintToNumber } from '@underware/pistols-sdk/utils'
 import { parseEnumVariant } from '@underware/pistols-sdk/starknet'
+import { debug } from '@underware/pistols-sdk/pistols'
 
 
 //-----------------------------------------
@@ -58,7 +59,7 @@ const createStore = () => {
   return create<State>()(immer((set) => ({
     playerActivity: [],
     setEvents: (events: PistolsEntity[]) => {
-      // console.log("historicalEventsStore() => SET:", events)
+      // debug.log("historicalEventsStore() => SET:", events)
       set((state: State) => {
         const activities = arrayClean(events.map((e, i) => _parseEvent(e, i)))
           // .sort((a, b) => (a.timestamp - b.timestamp))
@@ -69,7 +70,7 @@ const createStore = () => {
       })
     },
     updateEvent: (e: PistolsEntity) => {
-      // console.log("historicalEventsStore() => UPDATE:", e)
+      // debug.log("historicalEventsStore() => UPDATE:", e)
       set((state: State) => {
         _pushEvent(state, _parseEvent(e))
       });
