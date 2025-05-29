@@ -10,6 +10,10 @@ import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { bigintToHex } from '@underware/pistols-sdk/utils'
 import * as ENV from '/src/utils/env'
 
+const client_id = ENV.DISCORD_CLIENT_ID || ''
+const redirect_uri = ENV.DISCORD_REDIRECT_URL || ''
+const can_link = (client_id && redirect_uri)
+
 export function DiscordLinkButton({
   openNewTab = true,
 }: {
@@ -28,7 +32,7 @@ export function DiscordLinkButton({
   const [isLinking, setIsLinking] = useState<boolean>(false)
   const [salt, setSalt] = useState<bigint>()
   const _initiate = useCallback(async () => {
-    if (!isLinked && !isLinking) {
+    if (can_link && !isLinked && !isLinking) {
       setIsLinking(true)
       const { salt } = await signAndGenerateGeneralPurposeSalt(SALT_SERVER_URL, account, starknetDomain, messageToSign)
       if (salt > 0n) {
@@ -50,14 +54,14 @@ export function DiscordLinkButton({
         salt: bigintToHex(salt),
       }
       const options = {
-        client_id: ENV.DISCORD_CLIENT_ID,
-        redirect_uri: `${ENV.SERVER_URL}/profile`,
+        client_id,
+        redirect_uri,
         response_type: 'code',
         scope: 'identify email',
         state: JSON.stringify(state),
       }
       const url = 'https://discord.com/oauth2/authorize?' + new URLSearchParams(options)
-      console.log('DiscordLinkButton:', url.length, options.state.length, url)
+      console.log('DiscordLinkButton:', url.length, options.state.length, url, options)
       window.open(url, openNewTab ? '_blank' : '_self')
     }
   }, [isLinking, salt])
@@ -77,7 +81,13 @@ export function DiscordLinkButton({
   //
   const { clear_player_social_link, isDisabled } = useExecuteClearPlayerSocialLink(constants.SocialPlatform.Discord)
 
-  if (!isLinked) {
+  if (!can_link) {
+    return (
+      <Button disabled={true} onClick={() => {}}>
+        Disabled
+      </Button>
+    )
+  } else if (!isLinked) {
     return (
       <Button disabled={!isConnected || isLinking} onClick={() => _initiate()}>
         {isLinking ? 'Linking...' : 'Link to Discord'}

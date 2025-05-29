@@ -19,5 +19,6 @@ export const TORII_URL = _env('VITE_TORII_URL') || null;
 export const TORII_RELAY_URL = _env('VITE_TORII_RELAY_URL') || null;
 // social links
 export const DISCORD_CLIENT_ID = _env('VITE_DISCORD_CLIENT_ID') || null;
+export const DISCORD_REDIRECT_URL = _env('VITE_DISCORD_REDIRECT_URL') || null;
 // node
 export const NODE_ENV = _env('NODE_ENV');

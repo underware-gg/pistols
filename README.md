@@ -242,6 +242,7 @@ VITE_ACADEMY_NETWORK_ID=ACADEMY
 # Socials config
 VITE_SERVER_URL=https://play.underware.gg
 VITE_DISCORD_CLIENT_ID=<OAUTH2_CLIENT_ID>
+VITE_DISCORD_REDIRECT_URL=https://assets.pistols.gg/api/oauth/discord
 ```
 
 Start the client
