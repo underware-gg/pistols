@@ -15,6 +15,12 @@ export function EtherIcon({
   return <CustomIcon logo name='ethereum' size={size} className='EtherIcon' alt='$ETH' />
 }
 
+export function StrkIcon({
+  size = null,
+}: CoinIconProps) {
+  return <CustomIcon logo svg name='starknet' size={size} alt='$STRK' />
+}
+
 export function LordsBagIcon({
   size = null,
 }: CoinIconProps) {
@@ -38,6 +44,7 @@ export function FameIcon({
 export function Balance({
   ether = false,
   lords = false,
+  strk = false,
   fools = false,
   fame = false,
   clean = false,
@@ -53,6 +60,7 @@ export function Balance({
   placeholdder = '?',
 }: {
   ether?: boolean
+  strk?: boolean
   lords?: boolean
   fools?: boolean
   fame?: boolean
@@ -100,6 +108,7 @@ export function Balance({
   const _icon = useMemo(() => {
     if (clean) return <></>
     if (ether) return <><EtherIcon size={'small'} />{' '}</>
+    if (strk) return <><StrkIcon size={'small'} />{' '}</>
     if (lords) return <><LordsBagIcon size={null} />{' '}</>
     if (fools) return <><FoolsIcon size={null} />{' '}</>
     if (fame) return <><FameIcon size={'small'} />{' '}</>

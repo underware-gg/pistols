@@ -91,6 +91,7 @@ export type DojoNetworkConfig = {
   lordsFaucet: boolean | string
   lordsAddress: string,
   vrfAddress: string,
+  strkAddress: string
   predeployedAccounts: PredeployedAccount[]
   connectorIds: string[]
   // starknet Chain
@@ -121,6 +122,7 @@ const localKatanaConfig: DojoNetworkConfig = {
   lordsFaucet: true,
   lordsAddress: undefined,
   vrfAddress: undefined,
+  strkAddress: undefined,
   predeployedAccounts: [
     {
       name: 'Local Katana 1',
@@ -205,6 +207,7 @@ const academySlotConfig: DojoNetworkConfig = {
   lordsFaucet: true,
   lordsAddress: undefined,
   vrfAddress: undefined,
+  strkAddress: undefined,
   predeployedAccounts: [
     {
       name: 'Katana 1',
@@ -260,6 +263,7 @@ const pistolsStagingConfig: DojoNetworkConfig = {
   // lordsFaucet: 'https://sepolia.voyager.online/contract/0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210#writeContract',
   lordsAddress: '0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210',
   vrfAddress: '0x051fea4450da9d6aee758bdeba88b2f665bcbf549d2c61421aa724e9ac0ced8f',
+  strkAddress: '0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d',
   predeployedAccounts: [],
   connectorIds: [
     supportedConnetorIds.CONTROLLER,
@@ -282,6 +286,7 @@ const snSepoliaConfig: DojoNetworkConfig = {
   // lordsFaucet: 'https://sepolia.voyager.online/contract/0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210#writeContract',
   lordsAddress: '0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210',
   vrfAddress: '0x051fea4450da9d6aee758bdeba88b2f665bcbf549d2c61421aa724e9ac0ced8f',
+  strkAddress: '0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d',
   predeployedAccounts: [],
   connectorIds: [
     supportedConnetorIds.CONTROLLER,
@@ -304,6 +309,7 @@ const snMainnetConfig: DojoNetworkConfig = {
   lordsFaucet: 'https://app.ekubo.org/?inputCurrency=ETH&outputCurrency=LORDS',
   lordsAddress: '0x124aeb495b947201f5fac96fd1138e326ad86195b98df6dec9009158a533b49',
   vrfAddress: '0x051fea4450da9d6aee758bdeba88b2f665bcbf549d2c61421aa724e9ac0ced8f',
+  strkAddress: '0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d',
   predeployedAccounts: [],
   connectorIds: [
     supportedConnetorIds.CONTROLLER,

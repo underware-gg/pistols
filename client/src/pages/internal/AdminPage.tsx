@@ -1,12 +1,12 @@
 import React, { useMemo, useState } from 'react'
 import { BigNumberish } from 'starknet'
-import { Button, Checkbox, Container, FormInput, Input, Table } from 'semantic-ui-react'
+import { Button, Checkbox, Container, FormInput, Icon, Input, Table } from 'semantic-ui-react'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { STARKNET_ADDRESS_LENGTHS } from '@underware/pistols-sdk/starknet'
 import { ExplorerLink } from '@underware/pistols-sdk/starknet/components'
 import { useConfig } from '/src/stores/configStore'
 import { Address } from '/src/components/ui/Address'
-import { LordsBalance } from '/src/components/account/LordsBalance'
+import { LordsBalance, StrkBalance } from '/src/components/account/LordsBalance'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
 import { TokenStoreSync } from '/src/stores/sync/TokenStoreSync'
 import { InternalPageMenu, InternalPageWrapper } from '/src/pages/internal/InternalPageIndex'
@@ -62,6 +62,8 @@ export default function AdminPage() {
 function Config() {
   const { account } = useAccount()
   const { isPaused, currentSeasonId, treasuryAddress, vrfAddress, lordsAddress } = useConfig()
+  const deployerAddress = '0x04D92577856263bDe8E7601Ee189b6dbe52aCb879462489B92c0789f6c157E6c';
+  const botAddress = '0x0569d6f6080a3aB8678738De7Da68097796b11ECE78b21fD7FAe2Fd7505AB0Ba';
   const { admin } = useDojoSystemCalls()
   return (
     <Table celled striped size='small' color='orange'>
@@ -126,6 +128,30 @@ function Config() {
           </Cell>
           <Cell></Cell>
         </Row>
+        <Row className='H5'>
+          <Cell>[Pistols Deployer]</Cell>
+          <Cell>
+            <Address address={deployerAddress} full />
+          </Cell>
+          <Cell>
+            <ExplorerLink address={deployerAddress} voyager />
+          </Cell>
+          <Cell>
+            <StrkBalance address={deployerAddress} decimals={6} />
+          </Cell>
+        </Row>
+        <Row className='H5'>
+          <Cell>[Pistols Bot]</Cell>
+          <Cell>
+            <Address address={botAddress} full />
+          </Cell>
+          <Cell>
+            <ExplorerLink address={botAddress} voyager />
+          </Cell>
+          <Cell>
+            <StrkBalance address={botAddress} decimals={6} />
+          </Cell>
+        </Row>
       </Body>
     </Table>
   )
@@ -175,11 +201,11 @@ function TeamMemberRow({
       <Cell className='Code'>
         <ExplorerLink address={address} voyager />
       </Cell>
-      <Cell>
-        {isTeamMember && <span>Is Team Member</span>}
+      <Cell textAlign='center'>
+        {isTeamMember && <Icon name='users' size='large' />}
       </Cell>
-      <Cell>
-        {isAdmin && <span>Is Admin</span>}
+      <Cell textAlign='center'>
+        {isAdmin && <Icon name='id badge' size='large' />}
       </Cell>
     </Row>
   )

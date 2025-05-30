@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
-import { useLordsBalance, useEtherBalance, useFoolsBalance, useFameBalance, useDuelistFameBalance } from '/src/stores/coinStore'
+import { useLordsBalance, useEtherBalance, useFoolsBalance, useFameBalance, useDuelistFameBalance, useStrkBalance } from '/src/stores/coinStore'
 import { Balance } from '/src/components/account/Balance'
 import { weiToEth } from '@underware/pistols-sdk/starknet'
 import { IconSizeProp } from '/src/components/ui/Icons'
@@ -18,6 +18,23 @@ export const EtherBalance = ({
   const { balance } = useEtherBalance(address)
   return (
     <Balance ether wei={balance} />
+  )
+}
+
+
+//
+// Ether balance of an account
+//
+export const StrkBalance = ({
+  address,
+  decimals = 3,
+}: {
+  address: BigNumberish
+  decimals?: number
+}) => {
+  const { balance } = useStrkBalance(address)
+  return (
+    <Balance strk wei={balance} decimals={decimals} />
   )
 }
 

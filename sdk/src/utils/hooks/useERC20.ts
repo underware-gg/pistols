@@ -11,12 +11,13 @@ export const useERC20Balance = (
   fee: BigNumberish = 0n,
   watch: boolean = false,
 ) => {
+  const isValid = useMemo(() => (isPositiveBigint(contractAddress) && isPositiveBigint(ownerAddress)), [contractAddress, ownerAddress])
   const { data: balance, isLoading } = useBalance({
     token: bigintToHex(contractAddress),
     address: bigintToHex(ownerAddress),
     watch,
     refetchInterval: watch ? 1_000 : undefined,
-    enabled: (isPositiveBigint(contractAddress) && isPositiveBigint(ownerAddress)),
+    enabled: isValid,
   })
   const balance_eth = useMemo(() => weiToEth(balance?.value ?? 0n), [balance])
   // console.log(`BALANCE`, (bigintToHex(contractAddress)), (bigintToHex(ownerAddress)), balance)
@@ -34,6 +35,7 @@ export const useERC20Balance = (
     symbol: balance?.symbol ?? '?',       // eth
     canAffordFee,
     isLoading,
+    isValid,
   }
 }
 

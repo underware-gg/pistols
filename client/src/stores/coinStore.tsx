@@ -224,3 +224,7 @@ export const useEtherBalance = (address: BigNumberish, fee: BigNumberish = 0n, w
   const { selectedNetworkConfig } = useStarknetContext()
   return useERC20Balance(selectedNetworkConfig.etherAddress, address, fee, watch)
 }
+export const useStrkBalance = (address: BigNumberish, fee: BigNumberish = 0n, watch: boolean = false) => {
+  const { selectedNetworkConfig } = useStarknetContext()
+  return useERC20Balance(selectedNetworkConfig.strkAddress, address, fee, watch)
+}
