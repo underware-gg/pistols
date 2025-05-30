@@ -37,7 +37,7 @@ pub mod tests {
     use pistols::tests::prefabs::{prefabs,
         prefabs::{
             PlayerMoves, PlayerMovesTrait,
-            SALT_A, SALT_B, ENV_CARD_NEUTRAL
+            SALT_A, SALT_B, ENV_CARD_NEUTRAL, ENV_CARD_CRIT,
         },
     };
     use pistols::systems::rng_mock::{
@@ -1604,6 +1604,62 @@ pub mod tests {
         let score_b: SeasonScoreboard = sys.store.get_scoreboard(SEASON_ID_1, ID(OTHER()).into());
         // B dodged, scored more points
         assert_lt!(score_a.points, score_b.points, "score_a.points < score_b.points");
+    }
+
+    #[test]
+    fn test_dodge_win_a_TEMP() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        let moves_a: PlayerMoves = PlayerMovesTrait::new(SALT_A, [2, 1].span());
+        let moves_b: PlayerMoves = PlayerMovesTrait::new(SALT_B, [1, 10].span());
+        sys.rng.mock_values([
+                MockedValueTrait::new('shoot_a', 1),
+                MockedValueTrait::new('shoot_b', 99),
+                MockedValueTrait::shuffled('env', [ENV_CARD_CRIT, ENV_CARD_CRIT].span()),
+            ].span()
+        );
+        tester::fund_duelists_pool(@sys, 2);
+        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, OWNER())[0];
+        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, OTHER())[0];
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
+        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        let challenge: ChallengeValue = sys.store.get_challenge_value(duel_id);
+        assert_eq!(challenge.winner, 1, "challenge.winner");
+        // A dodged and won: ZERO POINTS
+        let score_a: SeasonScoreboard = sys.store.get_scoreboard(SEASON_ID_1, ID(OWNER()).into());
+        let score_b: SeasonScoreboard = sys.store.get_scoreboard(SEASON_ID_1, ID(OTHER()).into());
+        assert_eq!(score_a.points, 0, "score_a.points ZERO");
+        assert_gt!(score_b.points, 0, "score_b.points > 0");
+    }
+
+    #[test]
+    fn test_dodge_win_b_TEMP() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        let moves_a: PlayerMoves = PlayerMovesTrait::new(SALT_A, [1, 10].span());
+        let moves_b: PlayerMoves = PlayerMovesTrait::new(SALT_B, [2, 1].span());
+        sys.rng.mock_values([
+                MockedValueTrait::new('shoot_a', 99),
+                MockedValueTrait::new('shoot_b', 1),
+                MockedValueTrait::shuffled('env', [ENV_CARD_CRIT, ENV_CARD_CRIT].span()),
+            ].span()
+        );
+        tester::fund_duelists_pool(@sys, 2);
+        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, OWNER())[0];
+        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, OTHER())[0];
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
+        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        let challenge: ChallengeValue = sys.store.get_challenge_value(duel_id);
+        assert_eq!(challenge.winner, 2, "challenge.winner");
+        // B dodged and won: ZERO POINTS
+        let score_a: SeasonScoreboard = sys.store.get_scoreboard(SEASON_ID_1, ID(OWNER()).into());
+        let score_b: SeasonScoreboard = sys.store.get_scoreboard(SEASON_ID_1, ID(OTHER()).into());
+        assert_gt!(score_a.points, 0, "score_a.points > 0");
+        assert_eq!(score_b.points, 0, "score_b.points ZERO");
     }
 
 

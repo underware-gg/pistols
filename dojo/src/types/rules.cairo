@@ -113,9 +113,15 @@ pub impl RulesImpl of RulesTrait {
                     result.points_scored = 10;
                 }
                 // apply bonus
-                if (*bonus.dodge) { result.points_scored += 20 }
-                if (*bonus.kill_pace > 0) { result.points_scored += 10 }
-                else if (*bonus.hit) { result.points_scored += 5 }
+                if (*bonus.dodge) { result.points_scored += 20; }
+                if (*bonus.kill_pace > 0) { result.points_scored += 10; }
+                else if (*bonus.hit) { result.points_scored += 5; }
+                //--------------------------------
+                // TEMP: zero points when dodge
+                if (is_winner && *bonus.dodge) {
+                    result.points_scored = 0;
+                }
+                //--------------------------------
                 (result)
             },
             _ => Default::default()
