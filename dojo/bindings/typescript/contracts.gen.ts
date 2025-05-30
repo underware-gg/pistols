@@ -2348,19 +2348,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_game_emitPlayerSocialLink_calldata = (socialPlatform: CairoCustomEnum, playerAddress: string, userName: ByteArray, userId: ByteArray): DojoCall => {
+	const build_game_emitPlayerSocialLink_calldata = (socialPlatform: CairoCustomEnum, playerAddress: string, userName: ByteArray, userId: ByteArray, avatar: ByteArray): DojoCall => {
 		return {
 			contractName: "game",
 			entrypoint: "emit_player_social_link",
-			calldata: [socialPlatform, playerAddress, userName, userId],
+			calldata: [socialPlatform, playerAddress, userName, userId, avatar],
 		};
 	};
 
-	const game_emitPlayerSocialLink = async (snAccount: Account | AccountInterface, socialPlatform: CairoCustomEnum, playerAddress: string, userName: ByteArray, userId: ByteArray) => {
+	const game_emitPlayerSocialLink = async (snAccount: Account | AccountInterface, socialPlatform: CairoCustomEnum, playerAddress: string, userName: ByteArray, userId: ByteArray, avatar: ByteArray) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_game_emitPlayerSocialLink_calldata(socialPlatform, playerAddress, userName, userId),
+				build_game_emitPlayerSocialLink_calldata(socialPlatform, playerAddress, userName, userId, avatar),
 				"pistols",
 			);
 		} catch (error) {

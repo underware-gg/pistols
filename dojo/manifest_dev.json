@@ -3494,8 +3494,8 @@
       ]
     },
     {
-      "address": "0x301a7615430886d8515f5f1ba3396ff60b4f920accba1961f0e7f9da76bc91c",
-      "class_hash": "0x333f80c2cc9f0777701e5c8ba99507e3ac4d8b687e24e7ac78d7ef5559737e5",
+      "address": "0x5767ee9f9884a86f86943859d1abe7636f675b3ada50591aeea3f30603eb87b",
+      "class_hash": "0x25b850f4bbb022d1d8b0e76a7a873af86123ce5ddd65f217941c98dc8b98c0f",
       "abi": [
         {
           "type": "impl",
@@ -6617,8 +6617,8 @@
       ]
     },
     {
-      "address": "0x437b9f9c5601915b910c94396a12ab1fb8810793fcce9799b58b488afa2a277",
-      "class_hash": "0x7c696f46ac185bb23472a4173230b6f1d8fe1dd830730918199bc324d5d0a3d",
+      "address": "0x690d9e2d2373852e8571dc7f9c8ac2c9c3b7f44b4bd89f46b65befbe8fcf4c0",
+      "class_hash": "0x6eb913a393483f2c5bd5a807c5ce7c6dd232836ebb3c587b3b3bebedde4405b",
       "abi": [
         {
           "type": "impl",
@@ -7248,6 +7248,10 @@
                 },
                 {
                   "name": "user_id",
+                  "type": "core::byte_array::ByteArray"
+                },
+                {
+                  "name": "avatar",
                   "type": "core::byte_array::ByteArray"
                 }
               ],
@@ -11698,7 +11702,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x259e19c55838965c9c268f76a2eb00cf2555105bba57b1338963a91fd8efcf3",
+      "class_hash": "0x60986606db824831cacf73e1b8464c285a1bf3b298dce052af8f2a33e25bcac",
       "tag": "pistols-PlayerSocialLinkEvent",
       "selector": "0x480838a3c770e19dee008a3d8f3668402af487acf0d2ecacc584ec65a22f845"
     },

@@ -513,12 +513,14 @@ export interface PlayerSocialLinkEvent {
 	social_platform: SocialPlatformEnum;
 	user_name: string;
 	user_id: string;
+	avatar: string;
 }
 
 // Type definition for `pistols::models::events::PlayerSocialLinkEventValue` struct
 export interface PlayerSocialLinkEventValue {
 	user_name: string;
 	user_id: string;
+	avatar: string;
 }
 
 // Type definition for `pistols::models::pool::LordsReleaseBill` struct
@@ -898,6 +900,8 @@ export interface SchemaType extends ISchemaType {
 		MockedValue: MockedValue,
 		MockedValueValue: MockedValueValue,
 		Period: Period,
+	// },
+	// achievement: {
 		TrophyCreation: TrophyCreation,
 		TrophyCreationValue: TrophyCreationValue,
 		TrophyProgression: TrophyProgression,
@@ -1465,10 +1469,12 @@ export const schema: SchemaType = {
 				X: undefined, }),
 		user_name: "",
 		user_id: "",
+		avatar: "",
 		},
 		PlayerSocialLinkEventValue: {
 		user_name: "",
 		user_id: "",
+		avatar: "",
 		},
 		LordsReleaseBill: {
 		reason: new CairoCustomEnum({ 

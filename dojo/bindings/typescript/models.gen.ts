@@ -513,12 +513,14 @@ export interface PlayerSocialLinkEvent {
 	social_platform: SocialPlatformEnum;
 	user_name: string;
 	user_id: string;
+	avatar: string;
 }
 
 // Type definition for `pistols::models::events::PlayerSocialLinkEventValue` struct
 export interface PlayerSocialLinkEventValue {
 	user_name: string;
 	user_id: string;
+	avatar: string;
 }
 
 // Type definition for `pistols::models::pool::LordsReleaseBill` struct
@@ -1467,10 +1469,12 @@ export const schema: SchemaType = {
 				X: undefined, }),
 		user_name: "",
 		user_id: "",
+		avatar: "",
 		},
 		PlayerSocialLinkEventValue: {
 		user_name: "",
 		user_id: "",
+		avatar: "",
 		},
 		LordsReleaseBill: {
 		reason: new CairoCustomEnum({ 
