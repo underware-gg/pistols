@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState, useCallback } from 'react'
 import { Button } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSetup } from '@underware/pistols-sdk/dojo'
-import { usePlayerSocialLink } from '/src/stores/eventsModelStore'
+import { usePlayerDiscordSocialLink } from '/src/stores/eventsModelStore'
 import { useExecuteClearPlayerSocialLink } from '/src/hooks/usePistolsSystemCalls'
 import { signAndGenerateGeneralPurposeSalt } from '@underware/pistols-sdk/pistols'
 import { GeneralPurposeMessage, GeneralPurposeState } from '@underware/pistols-sdk/pistols/config'
@@ -11,6 +11,7 @@ import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { bigintToHex } from '@underware/pistols-sdk/utils'
 import * as ENV from '/src/utils/env'
 
+// Discord OAUTH params
 const client_id = ENV.DISCORD_CLIENT_ID || ''
 const redirect_uri = ENV.DISCORD_REDIRECT_URL || ''
 const can_link = (client_id && redirect_uri)
@@ -20,7 +21,7 @@ export function DiscordLinkButton({
 }: {
   openNewTab?: boolean
 }) {
-  const { isLinked } = usePlayerSocialLink(constants.SocialPlatform.Discord)
+  const { isLinked } = usePlayerDiscordSocialLink()
 
   //
   // Link step 1: generate salt to validate player request

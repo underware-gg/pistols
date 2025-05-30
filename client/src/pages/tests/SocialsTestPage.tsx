@@ -5,7 +5,7 @@ import { TestPageMenu } from './TestPageIndex'
 import { Connect } from '/src/pages/tests/ConnectTestPage'
 import { PlayerNameSync } from '/src/stores/sync/PlayerNameSync'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
-import { usePlayerSocialLink } from '/src/stores/eventsModelStore'
+import { usePlayerDiscordSocialLink, usePlayerSocialLink } from '/src/stores/eventsModelStore'
 import { DiscordLinkButton } from '/src/components/socials/Discord'
 import { EventsModelStoreSync } from '/src/stores/sync/EventsModelStoreSync'
 import CurrentChainHint from '/src/components/CurrentChainHint'
@@ -39,7 +39,7 @@ export default function SocialsTestPage() {
 }
 
 function Discord() {
-  const { isLinked } = usePlayerSocialLink(constants.SocialPlatform.Discord)
+  const { isLinked, avatarUrl } = usePlayerDiscordSocialLink()
   return (
     <Table celled striped size='small' color='green' className='ModalText'>
       <Header>
@@ -52,6 +52,7 @@ function Discord() {
         <SocialPlatform socialPlatform={constants.SocialPlatform.Discord} />
         <Row>
           <Cell>
+            {avatarUrl && <img src={avatarUrl} alt='avatar' />}
           </Cell>
           <Cell className='Code'>
             <DiscordLinkButton />
@@ -68,26 +69,34 @@ function SocialPlatform({
 }: {
   socialPlatform: constants.SocialPlatform,
 }) {
-  const { userName, userId } = usePlayerSocialLink(socialPlatform)
+  const { userName, userId, avatar } = usePlayerSocialLink(socialPlatform)
   return (
     <>
-        <Row>
-          <Cell>
-            user_name:
-          </Cell>
-          <Cell className='Code'>
-            {userName || '-'}
-          </Cell>
-        </Row>
-        <Row>
-          <Cell>
-            user_id:
-          </Cell>
-          <Cell className='Code'>
-            {userId || '-'}
-          </Cell>
-        </Row>
-      </>
+      <Row>
+        <Cell>
+          user_name:
+        </Cell>
+        <Cell className='Code'>
+          {userName || '-'}
+        </Cell>
+      </Row>
+      <Row>
+        <Cell>
+          user_id:
+        </Cell>
+        <Cell className='Code'>
+          {userId || '-'}
+        </Cell>
+      </Row>
+      <Row>
+        <Cell>
+          avatar:
+        </Cell>
+        <Cell className='Code'>
+          {avatar || '-'}
+        </Cell>
+      </Row>
+    </>
   )
 }
 

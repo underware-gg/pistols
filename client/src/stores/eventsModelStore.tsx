@@ -68,17 +68,43 @@ export function useDuelistCallToAction(duelist_id: BigNumberish) {
 
 export const usePlayerSocialLink = (socialPlatform: constants.SocialPlatform) => {
   const { address } = useAccount()
+  return useSocialLink(socialPlatform, address)
+}
+export const useSocialLink = (socialPlatform: constants.SocialPlatform, address: BigNumberish) => {
   const entities = useEventsStore((state) => state.entities);
   const link = useStoreModelsByKeys<models.PlayerSocialLinkEvent>(entities, 'PlayerSocialLinkEvent', [address, constants.getSocialPlatformValue(socialPlatform)])
 
   const userName = useMemo(() => link?.user_name ?? '', [link])
   const userId = useMemo(() => link?.user_id ?? '', [link])
-  const isLinked = useMemo(() => Boolean(userName), [userName])
+  const avatar = useMemo(() => link?.avatar ?? '', [link])
+  const isLinked = useMemo(() => Boolean(userName) || Boolean(userId), [userName, userId])
 
   return {
     isLinked,
     userName,
     userId,
+    avatar,
+  }
+}
+
+//
+// Discord
+//
+export const usePlayerDiscordSocialLink = () => {
+  const { address } = useAccount()
+  return useDiscordSocialLink(address)
+}
+export const useDiscordSocialLink = (address: BigNumberish) => {
+  const { userName, userId, avatar, isLinked } = useSocialLink(constants.SocialPlatform.Discord, address)
+  const avatarUrl = useMemo(() => (
+    (userId && avatar) ? `https://cdn.discordapp.com/avatars/${userId}/${avatar}.png` : ''
+  ), [userId, avatar])
+  return {
+    isLinked,
+    userName,
+    userId,
+    avatar,
+    avatarUrl,
   }
 }
 
