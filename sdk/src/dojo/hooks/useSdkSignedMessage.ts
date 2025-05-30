@@ -43,7 +43,7 @@ export const useSdkPublishTypedData = (
         }
 
         try {
-          debug.log(`SIGNED_MESSAGE: publish... (${signature.length})`)//, signature)
+          debug.log(`SIGNED_MESSAGE: publish... len:${signature.length}`)//, signature)
           await sdk.client.publishMessage(
             JSON.stringify(typedData),
             signature as string[],

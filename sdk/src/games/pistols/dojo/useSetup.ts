@@ -75,7 +75,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedNetworkConfig: Do
     if (!mounted) return undefined
     if (!dojoProvider) return undefined
     if (!sdkConfig) return null
-    console.log(`TORII CLIENT...`, toriiUrl)
+    console.log(`TORII CLIENT...`, sdkConfig)
     const sdk: SDK<PistolsSchemaType> = await init<PistolsSchemaType>(sdkConfig);
     console.log(`TORII CLIENT OK!`)
     return sdk

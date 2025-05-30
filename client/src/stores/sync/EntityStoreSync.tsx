@@ -161,7 +161,8 @@ export function EntityStoreSync() {
     enabled: (mounted),
     setEntities: (entities: PistolsEntity[]) => {
       debug.log("EntityStoreSync() SET PLAYERS =======> [entities]:", entities)
-      // debug.log("EntityStoreSync() SET PLAYERS =======> [Player]:", filterEntitiesByModels(entities, ['Player']))
+      debug.log("EntityStoreSync() SET PLAYERS =======> [Player]:", filterEntitiesByModels(entities, ['Player']))
+      debug.log("EntityStoreSync() SET PLAYERS =======> [PlayerOnline]:", filterEntitiesByModels(entities, ['PlayerOnline']))
       playerState.setEntities(filterEntitiesByModels(entities, ['Player', 'PlayerFlags', 'PlayerTeamFlags']))
       playerDataState.updateMessages(filterEntitiesByModels(entities, ['PlayerOnline']))
     },
