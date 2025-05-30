@@ -38,6 +38,21 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedNetworkConfig: Do
     return dojoAppConfig.starknetDomain ?? null
   }, [dojoAppConfig])
 
+  const sdkConfig = useMemo(() => {
+    if (!starknetDomain) return undefined
+    if (!manifest) return null
+    let config: SDKConfig = {
+      client: {
+        // rpcUrl,
+        toriiUrl,
+        relayUrl,
+        worldAddress: manifest.world.address ?? '',
+      },
+      domain: starknetDomain,
+    }
+    return config
+  }, [manifest, starknetDomain, toriiUrl, relayUrl])
+
   //
   // Provider setup
   const {
@@ -59,22 +74,12 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedNetworkConfig: Do
   } = useMemoAsync(async () => {
     if (!mounted) return undefined
     if (!dojoProvider) return undefined
-    if (!starknetDomain) return undefined
-    if (!manifest) return null
+    if (!sdkConfig) return null
     console.log(`TORII CLIENT...`, toriiUrl)
-    let config: SDKConfig = {
-      client: {
-        // rpcUrl,
-        toriiUrl,
-        relayUrl,
-        worldAddress: manifest.world.address ?? '',
-      },
-      domain: starknetDomain,
-    }
-    const sdk: SDK<PistolsSchemaType> = await init<PistolsSchemaType>(config);
+    const sdk: SDK<PistolsSchemaType> = await init<PistolsSchemaType>(sdkConfig);
     console.log(`TORII CLIENT OK!`)
     return sdk
-  }, [mounted, selectedNetworkConfig, manifest, starknetDomain, dojoProvider], undefined, null)
+  }, [mounted, selectedNetworkConfig, sdkConfig, dojoProvider], undefined, null)
 
   //
   // Check world deployment
@@ -129,6 +134,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedNetworkConfig: Do
     // resolved
     dojoProvider,
     sdk,
+    sdkConfig,
     contractCalls,
     systemCalls,
     // pass thru

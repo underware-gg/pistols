@@ -1,12 +1,13 @@
 import React, { useMemo } from 'react'
 import useSWR from 'swr'
 import { useStarknetContext } from 'src/dojo/contexts/StarknetProvider'
+import { useDojoSetup } from 'src/exports/dojo'
 
 const textFetcher = (url: string) => fetch(url).then((res) => res.text())
 
 export const useToriiStatus = () => {
-  const { selectedNetworkConfig } = useStarknetContext()
-  const { data, error, isLoading } = useSWR(selectedNetworkConfig.toriiUrl, textFetcher)
+  const { sdkConfig } = useDojoSetup()
+  const { data, error, isLoading } = useSWR(sdkConfig.client.toriiUrl, textFetcher)
   // data: string = {"service":"torii","success":true}
   // console.log(`torii:`, data, data, error, isLoading)
 

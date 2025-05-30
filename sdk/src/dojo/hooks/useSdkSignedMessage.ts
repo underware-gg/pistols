@@ -9,7 +9,7 @@ export const useSdkPublishTypedData = (
   account: Account,
   typedData: TypedData,
 ) => {
-  const { sdk } = useDojoSetup()
+  const { sdk, sdkConfig } = useDojoSetup()
   const { isControllerConnected } = useConnectedController()
   const { selectedNetworkConfig } = useStarknetContext()
   const [isPublishing, setIsPublishing] = useState<boolean>()
@@ -20,7 +20,7 @@ export const useSdkPublishTypedData = (
         console.warn('useSdkPublishSignedMessage() needs Cartridge Controller!')
         return
       }
-      if (!selectedNetworkConfig.relayUrl) {
+      if (!sdkConfig.client.relayUrl) {
         console.error('useSdkPublishSignedMessage() failed: relayUrl is not set')
         return
       }
