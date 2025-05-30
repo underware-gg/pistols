@@ -16,9 +16,9 @@ export default function ActivityFeed() {
     updateTimestamp()
   }, [allPlayersActivity])
 
-  const items = useMemo(() => ([...allPlayersActivity].reverse().map((a) =>
+  const items = useMemo(() => ([...allPlayersActivity].reverse().map((a, index) =>
     <ActivityItem
-      key={`${a.activity}-${a.identifier.toString()}-${a.timestamp}-${a.player_address}`}
+      key={`${a.activity}-${a.identifier.toString()}-${a.timestamp}-${index}`}
       clientSeconds={clientSeconds}
       activity={a}
       isRequired={requiredDuelIds.includes(a.identifier)}
