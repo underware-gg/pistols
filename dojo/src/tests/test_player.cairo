@@ -49,19 +49,19 @@ fn test_emit_player_social_link() {
     // set link (owner)
     tester::impersonate(OWNER());
     tester::drop_dojo_events(@sys);
-    sys.game.emit_player_social_link(SocialPlatform::Discord, BUMMER(), "username", "1234567890");
-    tester::assert_event_social_link(@sys, BUMMER(), SocialPlatform::Discord, "username", "1234567890");
+    sys.game.emit_player_social_link(SocialPlatform::Discord, BUMMER(), "username", "1234567890", "_avatar_1");
+    tester::assert_event_social_link(@sys, BUMMER(), SocialPlatform::Discord, "username", "1234567890", "_avatar_1");
     // unset link (player)
     tester::impersonate(BUMMER());
     tester::drop_dojo_events(@sys);
     sys.game.clear_player_social_link(SocialPlatform::Discord);
-    tester::assert_event_social_link(@sys, BUMMER(), SocialPlatform::Discord, "", "");
+    tester::assert_event_social_link(@sys, BUMMER(), SocialPlatform::Discord, "", "", "");
     // set link (admin)
     tester::execute_admin_set_is_team_member(@sys.admin, OWNER(), OTHER(), true, true);
     tester::impersonate(OTHER());
     tester::drop_dojo_events(@sys);
-    sys.game.emit_player_social_link(SocialPlatform::Telegram, BUMMER(), "USERNAME", "3333");
-    tester::assert_event_social_link(@sys, BUMMER(), SocialPlatform::Telegram, "USERNAME", "3333");
+    sys.game.emit_player_social_link(SocialPlatform::Telegram, BUMMER(), "USERNAME", "3333", "_avatar_2");
+    tester::assert_event_social_link(@sys, BUMMER(), SocialPlatform::Telegram, "USERNAME", "3333", "_avatar_2");
 }
 
 #[test]
@@ -70,5 +70,5 @@ fn test_emit_player_social_link_not_admin() {
     let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
     tester::drop_all_events(sys.game.contract_address);
     tester::impersonate(OTHER());
-    sys.game.emit_player_social_link(SocialPlatform::Discord, OTHER(), "username", "1234567890");
+    sys.game.emit_player_social_link(SocialPlatform::Discord, OTHER(), "username", "1234567890", "_avatar_3");
 }

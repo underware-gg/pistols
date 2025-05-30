@@ -25,7 +25,7 @@ pub trait IGame<TState> {
     // event emitters
     fn clear_call_to_action(ref self: TState, duelist_id: u128); // @description: Clear call to action for a duelist
     fn emit_player_bookmark(ref self: TState, target_address: ContractAddress, target_id: u128, enabled: bool); //@description: Bookmarks an address or token
-    fn emit_player_social_link(ref self: TState, social_platform: SocialPlatform, player_address: ContractAddress, user_name: ByteArray, user_id: ByteArray); //@description: Link player to social platform
+    fn emit_player_social_link(ref self: TState, social_platform: SocialPlatform, player_address: ContractAddress, user_name: ByteArray, user_id: ByteArray, avatar: ByteArray); //@description: Link player to social platform
     fn clear_player_social_link(ref self: TState, social_platform: SocialPlatform); //@description: Unlink player from social platform
 
     // view calls
@@ -389,14 +389,14 @@ pub mod game {
             let mut store: Store = StoreTrait::new(self.world_default());
             store.emit_player_bookmark(starknet::get_caller_address(), target_address, target_id, enabled);
         }
-        fn emit_player_social_link(ref self: ContractState, social_platform: SocialPlatform, player_address: ContractAddress, user_name: ByteArray, user_id: ByteArray) {
+        fn emit_player_social_link(ref self: ContractState, social_platform: SocialPlatform, player_address: ContractAddress, user_name: ByteArray, user_id: ByteArray, avatar: ByteArray) {
             self._assert_caller_is_admin();
             let mut store: Store = StoreTrait::new(self.world_default());
-            store.emit_player_social_link(player_address, social_platform, user_name, user_id);
+            store.emit_player_social_link(player_address, social_platform, user_name, user_id, avatar);
         }
         fn clear_player_social_link(ref self: ContractState, social_platform: SocialPlatform) {
             let mut store: Store = StoreTrait::new(self.world_default());
-            store.emit_player_social_link(starknet::get_caller_address(), social_platform, "", "");
+            store.emit_player_social_link(starknet::get_caller_address(), social_platform, "", "", "");
         }
 
 

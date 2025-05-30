@@ -636,12 +636,13 @@ pub impl StoreImpl of StoreTrait {
         });
     }
     #[inline(always)]
-    fn emit_player_social_link(ref self: Store, player_address: ContractAddress, social_platform: SocialPlatform, user_name: ByteArray, user_id: ByteArray) {
+    fn emit_player_social_link(ref self: Store, player_address: ContractAddress, social_platform: SocialPlatform, user_name: ByteArray, user_id: ByteArray, avatar: ByteArray) {
         self.world.emit_event(@PlayerSocialLinkEvent {
             player_address,
             social_platform,
             user_name,
             user_id,
+            avatar,
         });
     }
 }

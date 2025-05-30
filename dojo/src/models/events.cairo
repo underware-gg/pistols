@@ -111,6 +111,7 @@ pub struct PlayerSocialLinkEvent {
     //-----------------------
     pub user_name: ByteArray,
     pub user_id: ByteArray,
+    pub avatar: ByteArray,
 }
 
 

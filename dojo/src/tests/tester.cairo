@@ -75,6 +75,7 @@ pub mod tester {
     use pistols::utils::byte_arrays::{BoolToString};
     use pistols::utils::misc::{ContractAddressIntoU256};
     use pistols::utils::short_string::{ShortString};
+    use pistols::utils::serde::{SerializedAppend};
     pub use pistols::interfaces::dns::{DnsTrait};
     pub use pistols::libs::store::{Store, StoreTrait};
 
@@ -596,10 +597,11 @@ pub mod tester {
         match contract_event {
             dojo::world::world::Event::EventEmitted(event) => {
                 assert_eq!(event.selector, selector_from_tag!("pistols-TrophyProgression"), "Invalid selector");
-                assert_eq!(*event.keys.at(0), address.into(), "Invalid player id");
-                assert_eq!(*event.keys.at(1), trophy.identifier(), "Invalid task id");
-                // assert_eq!(*event.values.at(0), 1, "Invalid count");
-                // assert_eq!(*event.values.at(1), 0, "Invalid time");
+                // compare keys
+                let mut keys = array![];
+                keys.append_serde(trophy.identifier());
+                keys.append_serde(address);
+                _compare_values(event.keys, keys.span(), "keys");
             },
             _ => {},
         }
@@ -609,30 +611,47 @@ pub mod tester {
         match contract_event {
             dojo::world::world::Event::EventEmitted(event) => {
                 assert_eq!(event.selector, selector_from_tag!("pistols-PlayerBookmarkEvent"), "Invalid selector");
-                assert_eq!(event.keys.len(), 3, "Invalid keys length");
-                assert_eq!(*event.keys.at(0), player_address.into(), "Invalid player_address");
-                assert_eq!(*event.keys.at(1), target_address.into(), "Invalid target_address");
-                assert_eq!(*event.keys.at(2), target_id.into(), "Invalid target_id");
-                assert_eq!(event.values.len(), 1, "Invalid values length");
-                assert_eq!(*event.values.at(0), enabled.into(), "Invalid enabled");
+                // compare keys
+                let mut keys = array![];
+                keys.append_serde(player_address);
+                keys.append_serde(target_address);
+                keys.append_serde(target_id);
+                _compare_values(event.keys, keys.span(), "keys");
+                // compare values
+                let mut values = array![];
+                values.append_serde(enabled);
+                _compare_values(event.values, values.span(), "values");
             },
             _ => {},
         }
     }
-    pub fn assert_event_social_link(sys: @TestSystems, player_address: ContractAddress, social_platform: SocialPlatform, user_name: ByteArray, user_id: ByteArray) {
+    pub fn assert_event_social_link(sys: @TestSystems, player_address: ContractAddress, social_platform: SocialPlatform, user_name: ByteArray, user_id: ByteArray, avatar: ByteArray) {
         let contract_event = testing::pop_log::<dojo::world::world::Event>(*sys.world.dispatcher.contract_address).unwrap();
         match contract_event {
             dojo::world::world::Event::EventEmitted(event) => {
                 assert_eq!(event.selector, selector_from_tag!("pistols-PlayerSocialLinkEvent"), "Invalid selector");
-                assert_eq!(event.keys.len(), 2, "Invalid values length");
-                assert_eq!(*event.keys.at(0), player_address.into(), "Invalid player_address");
-                // assert_eq!(*event.keys.at(1), social_platform.into(), "Invalid social_platform");
-                // values
-                assert_eq!(event.values.len(), 6, "Invalid values length");
-                // assert_eq!(*event.values.at(0), user_name.into(), "Invalid user_name");
-                // assert_eq!(*event.values.at(1), user_id.into(), "Invalid user_id");
+                // compare keys
+                let mut keys = array![];
+                keys.append_serde(player_address);
+                keys.append_serde(social_platform);
+                _compare_values(event.keys, keys.span(), "keys");
+                // compare values
+                let mut values = array![];
+                values.append_serde(user_name);
+                values.append_serde(user_id);
+                values.append_serde(avatar);
+                _compare_values(event.values, values.span(), "values");
             },
             _ => {},
+        }
+    }
+    
+    pub fn _compare_values(v1: Span<felt252>, v2: Span<felt252>, prefix: ByteArray) {
+        assert_eq!(v1.len(), v2.len(), "[{}] Invalid values length", prefix);
+        let mut i = 0;
+        while (i < v1.len()) {
+            assert_eq!(v1.at(i), v2.at(i), "[{}] Invalid value {}", prefix, i);
+            i += 1;
         }
     }
 
