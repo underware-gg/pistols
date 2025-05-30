@@ -58,14 +58,11 @@ fi
 # sozo -P $PROFILE model get pistols-Config 1
 
 # admin::fix_player_bookmark
-# sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait admin fix_player_bookmark 0x550212d3f13a373dfe9e3ef6aa41fba4124bde63fd7955393f879de19f3f47f 0x7e268203c670265e8af497a201d568947db4087438c7fdac2be3b956de73811 0x0 1
-# sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait admin fix_player_bookmark 0x550212d3f13a373dfe9e3ef6aa41fba4124bde63fd7955393f879de19f3f47f 0x2e9c711b1a7e2784570b1bda5082a92606044e836ba392d2b977d280fb74b3c 0x2e 1
-# sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait admin fix_player_bookmark 0x550212d3f13a373dfe9e3ef6aa41fba4124bde63fd7955393f879de19f3f47f 0x2e9c711b1a7e2784570b1bda5082a92606044e836ba392d2b977d280fb74b3c 0x1e 1
-# sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait admin fix_player_bookmark 0x550212d3f13a373dfe9e3ef6aa41fba4124bde63fd7955393f879de19f3f47f 0x2e9c711b1a7e2784570b1bda5082a92606044e836ba392d2b977d280fb74b3c 0x2c 1
-# sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait admin fix_player_bookmark 0x550212d3f13a373dfe9e3ef6aa41fba4124bde63fd7955393f879de19f3f47f 0x6ed4b727bcb51e12553e40c981936916e897a027450adfa7750573637753f4a 0x0 1
-# sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait admin fix_player_bookmark 0x550212d3f13a373dfe9e3ef6aa41fba4124bde63fd7955393f879de19f3f47f 0x5409f66a48dd7b1b078e01f55155f89e5da57e2f31b592d3704b03e0ef03e4 0x0 1
-# sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait admin fix_player_bookmark 0x550212d3f13a373dfe9e3ef6aa41fba4124bde63fd7955393f879de19f3f47f 0x458f10bf89dfd916eaeabbf6866870bd5bb8b05c6df7de0ad36bb8ad66dce69 0x0 1
-# sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait admin fix_player_bookmark 0x550212d3f13a373dfe9e3ef6aa41fba4124bde63fd7955393f879de19f3f47f 0x0256d696f908f2748efcc6931c1bca88f269394ab80b91c691d7916f04af3d8c 0x0 1
+# sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait admin fix_player_bookmark 0x0550212d3f13a373dfe9e3ef6aa41fba4124bde63fd7955393f879de19f3f47f 0x02e9c711b1a7e2784570b1bda5082a92606044e836ba392d2b977d280fb74b3c 0x1 1
+# sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait admin fix_player_bookmark 0x0550212d3f13a373dfe9e3ef6aa41fba4124bde63fd7955393f879de19f3f47f 0x02e9c711b1a7e2784570b1bda5082a92606044e836ba392d2b977d280fb74b3c 0x5 1
+# sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait admin fix_player_bookmark 0x0550212d3f13a373dfe9e3ef6aa41fba4124bde63fd7955393f879de19f3f47f 0x0458f10bf89dfd916eaeabbf6866870bd5bb8b05c6df7de0ad36bb8ad66dce69 0x0 1
+# sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait admin fix_player_bookmark 0x0550212d3f13a373dfe9e3ef6aa41fba4124bde63fd7955393f879de19f3f47f 0x052eaece65e70b394f6907fbef609a143466ee0b861bc339306ab54dc8668a25 0x0 1
+# sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait admin fix_player_bookmark 0x0550212d3f13a373dfe9e3ef6aa41fba4124bde63fd7955393f879de19f3f47f 0x07e268203c670265e8af497a201d568947db4087438c7fdac2be3b956de73811 0x0 1
 
 
 #------------------------------------------------------------------------------
