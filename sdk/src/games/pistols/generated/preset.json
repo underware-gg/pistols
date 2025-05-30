@@ -281,6 +281,10 @@
               {
                 "entrypoint": "emit_player_social_link",
                 "description": "Link player to social platform"
+              },
+              {
+                "entrypoint": "clear_player_social_link",
+                "description": "Unlink player from social platform"
               }
             ]
           },
