@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Modal, Button, Icon, Image } from 'semantic-ui-react'
+import { Modal, Button, Icon, Image, Grid } from 'semantic-ui-react'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { usePistolsScene } from '/src/hooks/PistolsContext'
 import { ActionButton } from '/src/components/ui/Buttons'
@@ -9,6 +9,8 @@ import { SceneName } from '/src/data/assets'
 import { Opener } from '/src/hooks/useOpener'
 import Logo from '/src/components/Logo'
 import { PACKAGE_VERSION } from '/src/utils/constants'
+import { DiscordLinkButton } from '../socials/Discord'
+import { usePlayerDiscordSocialLink } from '/src/stores/eventsModelStore'
 
 interface SettingsModalProps {
   opener: Opener
@@ -19,6 +21,7 @@ export default function SettingsModal({ opener }: SettingsModalProps) {
   const { atGate, atDoor, atTutorial, dispatchSetScene } = usePistolsScene()
   const [view, setView] = useState<'settings' | 'about'>('settings')
   const { aspectWidth, aspectHeight } = useGameAspect()
+  const { isLinked: isDiscordLinked, userName: discordUserName, avatarUrl: discordAvatarUrl } = usePlayerDiscordSocialLink()
 
   const handleQualityChange = (value: string) => {
     dispatchSetting(SettingsActions.QUALITY, value)
@@ -96,11 +99,11 @@ export default function SettingsModal({ opener }: SettingsModalProps) {
           <>
             <div className="SettingsSection">
               <h3>Quality Settings</h3>
-              
+
               {/* The tentacles of quality shall wrap around your game experience, squeezing out the best performance! */}
               <div className="QualitySelector">
                 {['low', 'medium', 'high'].map((quality) => (
-                  <Button 
+                  <Button
                     key={quality}
                     className={`QualityButton ${settings.quality === quality ? 'active' : ''}`}
                     onClick={() => handleQualityChange(quality)}
@@ -109,10 +112,45 @@ export default function SettingsModal({ opener }: SettingsModalProps) {
                   </Button>
                 ))}
               </div>
-              
+
               {/* Description of selected quality level */}
               <div className="QualityDescription">
                 {getQualityDescription(settings.quality)}
+              </div>
+            </div>
+
+            <div className="SettingsSection">
+              <h3>Socials</h3>
+
+              {/* The tentacles of quality shall wrap around your game experience, squeezing out the best performance! */}
+              <Grid className="SettingsControl">
+                <Grid.Row className="ControlHeader">
+                  <Grid.Column width={1}>
+                    <Icon name="discord" />
+                  </Grid.Column>
+                  {!isDiscordLinked &&
+                    <Grid.Column width={10}>
+                      <span>Discord</span>
+                    </Grid.Column>
+                  }
+                  {isDiscordLinked &&
+                    <>
+                      <Grid.Column width={1}>
+                        <Image className="Avatar" src={discordAvatarUrl} />
+                      </Grid.Column>
+                      <Grid.Column width={9}>
+                      &nbsp;&nbsp;&nbsp;<b>{discordUserName}</b>
+                      </Grid.Column>
+                    </>
+                  }
+                  <Grid.Column width={5}>
+                    <DiscordLinkButton className="QualityButton" />
+                  </Grid.Column>
+                </Grid.Row>
+              </Grid>
+
+              <div className="QualityDescription">
+                Link to Social platforms to receive duel notifications.
               </div>
             </div>
 

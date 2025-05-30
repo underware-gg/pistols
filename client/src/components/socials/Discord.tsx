@@ -18,8 +18,10 @@ const can_link = (client_id && redirect_uri)
 
 export function DiscordLinkButton({
   openNewTab = true,
+  className = '',
 }: {
   openNewTab?: boolean
+  className?: string
 }) {
   const { isLinked } = usePlayerDiscordSocialLink()
 
@@ -86,20 +88,20 @@ export function DiscordLinkButton({
 
   if (isLinked) {
     return (
-      <Button disabled={isDisabled} onClick={() => clear_player_social_link()}>
-        Unlink
+      <Button className={className} disabled={isDisabled} onClick={() => clear_player_social_link()}>
+        Unlink Discord
       </Button>
     )
   }
   if (!can_link) {
     return (
-      <Button disabled={true} onClick={() => { }}>
-        Disabled
+      <Button className={className} disabled={true} onClick={() => { }}>
+        Discord Disabled
       </Button>
     )
   }
   return (
-    <Button disabled={!isConnected || isLinking} onClick={() => _initiate()}>
+    <Button className={className} disabled={!isConnected || isLinking} onClick={() => _initiate()}>
       {isLinking ? 'Linking...' : 'Link to Discord'}
     </Button>
   )

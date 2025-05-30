@@ -824,6 +824,11 @@ $ui-container-gap: 1em;
   margin: aspect-width(0.23);
 }
 
+.Avatar {
+  width: aspect-width(2);
+  height: aspect-width(2);
+}
+
 .ProfileStats {
   top: 0.3em;
   font-size: 1.3em;
