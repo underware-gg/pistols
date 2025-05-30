@@ -234,15 +234,15 @@ VITE_NETWORK_ID=KATANA_LOCAL
 VITE_ACADEMY_NETWORK_ID=ACADEMY
 
 # optional/alternative service urls
+# VITE_SERVER_URL=https://play.pistols.gg
 # VITE_SALT_SERVER_URL=https://assets.underware.gg
 # VITE_RPC_URL=https://api.cartridge.gg/x/starknet/mainnet
 # VITE_TORII_URL=https://api.cartridge.gg/x/pistols-mainnet-2/torii
 # VITE_TORII_RELAY_URL=/dns4/api.cartridge.gg/tcp/443/x-parity-wss/%2Fx%2Fpistols-mainnet-2%2Ftorii%2Fwss
 
 # Socials config
-VITE_SERVER_URL=https://play.underware.gg
 VITE_DISCORD_CLIENT_ID=<OAUTH2_CLIENT_ID>
-VITE_DISCORD_REDIRECT_URL=https://assets.pistols.gg/api/oauth/discord
+VITE_DISCORD_REDIRECT_URL=https://assets.underware.gg/api/oauth/discord
 ```
 
 Start the client

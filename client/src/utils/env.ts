@@ -8,7 +8,7 @@ const _env = (name: string) => (
 );
 
 // required
-export const SERVER_URL = _env('VITE_SERVER_URL') || 'https://play.underware.gg';
+export const SERVER_URL = _env('VITE_SERVER_URL') || 'https://play.pistols.gg';
 export const DEFAULT_NETWORK_ID = _env('VITE_NETWORK_ID') || _env('VITE_DEFAULT_NETWORK_ID') ||  'MAINNET';
 export const ACADEMY_NETWORK_ID = _env('VITE_ACADEMY_NETWORK_ID') || _env('ACADEMY_NETWORK_ID') || 'ACADEMY';
 export const ASSETS_SERVER_URL = _env('VITE_ASSETS_SERVER_URL') || 'https://assets.underware.gg';

@@ -50,9 +50,10 @@ export function DiscordLinkButton({
   useEffect(() => {
     if (isLinking && salt) {
       const state: GeneralPurposeState = {
-        chain_id: starknetDomain.chainId as string,
-        player_address: bigintToHex(address),
+        chainId: starknetDomain.chainId as string,
+        playerAddress: bigintToHex(address),
         salt: bigintToHex(salt),
+        redirectUrl: `${ENV.SERVER_URL}/profile`,
       }
       const options = {
         client_id,
@@ -82,23 +83,23 @@ export function DiscordLinkButton({
   //
   const { clear_player_social_link, isDisabled } = useExecuteClearPlayerSocialLink(constants.SocialPlatform.Discord)
 
-  if (!can_link) {
-    return (
-      <Button disabled={true} onClick={() => {}}>
-        Disabled
-      </Button>
-    )
-  } else if (!isLinked) {
-    return (
-      <Button disabled={!isConnected || isLinking} onClick={() => _initiate()}>
-        {isLinking ? 'Linking...' : 'Link to Discord'}
-      </Button>
-    )
-  } else {
+  if (isLinked) {
     return (
       <Button disabled={isDisabled} onClick={() => clear_player_social_link()}>
         Unlink
       </Button>
     )
   }
+  if (!can_link) {
+    return (
+      <Button disabled={true} onClick={() => { }}>
+        Disabled
+      </Button>
+    )
+  }
+  return (
+    <Button disabled={!isConnected || isLinking} onClick={() => _initiate()}>
+      {isLinking ? 'Linking...' : 'Link to Discord'}
+    </Button>
+  )
 }
