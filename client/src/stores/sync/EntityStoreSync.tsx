@@ -84,18 +84,6 @@ const query_sub: PistolsQueryBuilder = new PistolsQueryBuilder()
   .withLimit(10)
   .includeHashedKeys()
 
-// // TEMP: force load Claimable pool
-// const query_claimable_pool: PistolsQueryBuilder = new PistolsQueryBuilder()
-//   .withClause(
-//     new PistolsClauseBuilder().keys(
-//       ["pistols-Pool"],
-//       [formatQueryValue(6)] // PoolType::Claimable
-//     ).build()
-//   )
-//   .withEntityModels(['pistols-Pool'])
-//   .withLimit(1)
-//   .includeHashedKeys()
-
   
 //------------------------------------------------------
 // Sync entities: Add only once to a top level component
@@ -119,16 +107,6 @@ export function EntityStoreSync() {
   const scoreboardState = useScoreboardStore((state) => state)
 
   const mounted = useMounted()
-
-  // // TEMP: force load Claimable pool
-  // useSdkEntitiesGet({
-  //   query: query_claimable_pool,
-  //   enabled: mounted,
-  //   setEntities: (entities: PistolsEntity[]) => {
-  //     debug.log("EntityStoreSync() SET CLAIMABLE POOL =======> [entities]:", entities)
-  //     bankState.setEntities(entities)
-  //   },
-  // })
 
   const { isFinished: isFinishedMisc } = useSdkEntitiesGet({
     query: query_get_misc,

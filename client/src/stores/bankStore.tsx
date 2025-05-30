@@ -62,7 +62,7 @@ export const useFundedStarterPackCount = () => {
   const { priceLords } = usePackType(constants.PackType.StarterPack)
   const fundedCount = useMemo(() => Number(balanceLords / priceLords), [balanceLords, priceLords])
   return {
-    fundedCount: 101, // TEMP: force load Claimable pool
+    fundedCount,
     priceLords,
     balanceLords,
   }
