@@ -22,12 +22,12 @@
 | `starknetid.js`          | ✅       |           |         |                |                   |            |
 | `get-starknet-core`      | ✅       |           | ✅      |                |                   |            |
 | `react`                  | ✅       |           | ✅      | ✅             |                   |            |
+| `@starknet-react/chains` |          |           | ✅      |                | ✅                |            |
 | `@starknet-react/core`   | ✅       |           | ✅      | ✅             |                   |            |
-| `@starknet-react/chains` |          |           | ✅      |                |                   |            |
 | `@cartridge/controller`  |          |           | ✅      |                |                   | ✅         |
 | `@cartridge/connector`   |          |           | ✅      |                |                   |            |
 | `@dojoengine/core`       |          |           | ✅      |                | ✅                | ✅         |
-| `@dojoengine/sdk`        |          |           | ✅      |                | ✅                | ✅         |
+| `@dojoengine/sdk`        |          |           | ✅      |                |                   | ✅         |
 | `@dojoengine/utils`      | ✅       |           |         |                |                   |            |
 | `@apollo/client`         |          |           |         | ✅             |                   |            |
 | `universal-cookie`       |          |           |         |                |                   | ✅         |

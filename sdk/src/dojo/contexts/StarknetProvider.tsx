@@ -1,7 +1,7 @@
 import React, { ReactNode, createContext, useContext, useEffect, useMemo } from 'react'
 import { Chain } from '@starknet-react/chains'
 import { StarknetConfig, jsonRpcProvider } from '@starknet-react/core'
-import { useChainConnectors } from 'src/dojo/setup/connectors'
+import { useChainConnectors } from 'src/games/pistols/dojo/connectors'
 import { NetworkId, DojoNetworkConfig, NETWORKS } from 'src/games/pistols/config/networks'
 import { DojoAppConfig } from 'src/dojo/contexts/Dojo'
 

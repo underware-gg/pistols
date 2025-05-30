@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
-import { PredeployedConnector, PredeployedAccount } from 'src/starknet/predeployed'
+import { PredeployedAccount } from 'src/games/pistols/config/networks'
+import { PredeployedConnector } from 'src/games/pistols/dojo/predeployed'
 
 export const usePredeployedConnector = (nodeUrl: string, chainId: string, predeployedAccounts: PredeployedAccount[]) => {
   const predeployed = useCallback(() => {

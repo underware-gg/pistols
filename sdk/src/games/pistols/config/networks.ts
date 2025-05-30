@@ -11,8 +11,6 @@ import {
   KATANA_PREFUNDED_PRIVATE_KEY,
   KATANA_ETH_CONTRACT_ADDRESS,
 } from '@dojoengine/core'
-import { supportedConnetorIds } from 'src/dojo/setup/connectors'
-import { PredeployedAccount } from 'src/starknet/predeployed'
 import { stringToFelt } from 'src/starknet/starknet'
 
 //
@@ -56,6 +54,24 @@ type ChainExplorers = {
 const WORLD_EXPLORER: ChainExplorers = {
   worlds: ['https://worlds.dev'],
 }
+
+//
+// predeployed accounts
+//
+export type PredeployedAccount = {
+  name?: string;
+  address: string;
+  privateKey: string;
+  active?: boolean;
+};
+
+export const supportedConnetorIds = {
+  CONTROLLER: 'controller',   // same as ControllerConnector.id
+  PREDEPLOYED: 'predeployed', // same as PREDEPLOYED_ID
+  // ARGENT: argent().id,
+  // BRAAVOS: braavos().id,
+}
+
 
 //
 // chain config

@@ -6,7 +6,7 @@ import { ProfileContextTypeVariant } from '@cartridge/controller'
 import { useContractClassHash } from 'src/utils/hooks/useContractClassHash'
 import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
 import { KATANA_CLASS_HASH } from '@dojoengine/core'
-import { supportedConnetorIds } from 'src/dojo/setup/connectors'
+import { supportedConnetorIds } from 'src/games/pistols/config/networks'
 import { bigintEquals, bigintToHex, isPositiveBigint } from 'src/utils/misc/types'
 
 // sync from here:

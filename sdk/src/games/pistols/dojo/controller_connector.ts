@@ -1,12 +1,11 @@
-import { InterfaceAbi, StarknetDomain, StarknetType, TypedData } from 'starknet'
+import { InterfaceAbi } from 'starknet'
 import { Connector } from '@starknet-react/core'
 import { ControllerConnector } from '@cartridge/connector'
 import type { ControllerOptions, Tokens } from '@cartridge/controller'
 import type { SessionPolicies, ContractPolicies, SignMessagePolicy, Method } from '@cartridge/presets'
-import { SchemaType, UnionOfModelData } from '@dojoengine/sdk'
 import { ContractPolicyDescriptions, SignedMessagePolicyDescriptions } from 'src/dojo/contexts/Dojo'
+import { supportedConnetorIds } from 'src/games/pistols/config/networks'
 import { DojoManifest } from 'src/games/pistols/config/config'
-import { supportedConnetorIds } from 'src/dojo/setup/connectors'
 import { formatQueryValue } from 'src/dojo/hooks/useSdkEntities'
 import { stringToFelt } from 'src/starknet/starknet'
 import { bigintToHex } from 'src/utils/misc/types'
@@ -141,40 +140,6 @@ const _makeControllerContractPolicies = (
 //--------------------------------------
 // sined message policies
 //
-
-// same as sdk.generateTypedData()
-export const generateTypedData = <T extends SchemaType, M extends UnionOfModelData<T>>(
-  domain: StarknetDomain,
-  primaryType: string,
-  message: M,
-  messageFieldTypes: { [name: string]: string },
-  enumTypes?: Record<string, StarknetType[]>,
-): TypedData => ({
-  types: {
-    StarknetDomain: [
-      { name: "name", type: "shortstring" },
-      { name: "version", type: "shortstring" },
-      { name: "chainId", type: "shortstring" },
-      { name: "revision", type: "shortstring" },
-    ],
-    [primaryType]: Object.keys(message).map((key) => {
-      let result: any = {
-        name: key,
-        type: messageFieldTypes[key],
-      }
-      if (enumTypes?.[result.type]) {
-        result.contains = result.type
-        result.type = "enum"
-      }
-      return result
-    }),
-    ...enumTypes,
-  },
-  primaryType,
-  domain,
-  message,
-})
-
 
 const _makeControllerSignMessagePolicies = (
   messageDescriptions: SignedMessagePolicyDescriptions,

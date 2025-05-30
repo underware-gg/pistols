@@ -1,10 +1,10 @@
 import type { SessionPolicies } from '@cartridge/presets'
 import type { DojoAppConfig, ContractPolicyDescriptions, SignedMessagePolicyDescriptions } from 'src/dojo/contexts/Dojo'
+import { makeControllerPolicies } from 'src/games/pistols/dojo/controller_connector'
+import { makeStarknetDomain } from 'src/games/pistols/config/typed_data'
 import { NetworkId } from 'src/games/pistols/config/networks'
-import { makeControllerPolicies } from 'src/dojo/setup/controller'
 import {
   NAMESPACE,
-  makeStarknetDomain,
   getManifest,
   getVrfAddress,
 } from 'src/games/pistols/config/config'
@@ -113,7 +113,7 @@ export const makePistolsPolicies = (networkId: NetworkId, mock: boolean, admin: 
   ]
   return makeControllerPolicies(
     NAMESPACE,
-    getManifest(networkId),
+    getManifest({ networkId }),
     {
       ...contractPolicyDescriptions_pistols,
       ...(mock ? contractPolicyDescriptions_mock : {}),
@@ -130,7 +130,7 @@ export const makeDojoAppConfig = (networkId: NetworkId, controllerConnector: Con
     selectedNetworkId: networkId,
     namespace: NAMESPACE,
     starknetDomain: makeStarknetDomain({ networkId }),
-    manifest: getManifest(networkId),
+    manifest: getManifest({ networkId }),
     mainContractName: Object.keys(contractPolicyDescriptions_pistols)[0],
     controllerConnector,
   }

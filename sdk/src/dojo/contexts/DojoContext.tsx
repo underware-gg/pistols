@@ -1,5 +1,5 @@
 import React, { ReactNode, createContext, useContext } from 'react'
-import { SetupResult } from 'src/dojo/setup/useSetup'
+import { SetupResult } from 'src/games/pistols/dojo/useSetup'
 
 interface DojoContextType {
   isInitialized: boolean;

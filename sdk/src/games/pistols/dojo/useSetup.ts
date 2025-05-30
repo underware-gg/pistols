@@ -6,7 +6,7 @@ import { useMounted } from 'src/utils/hooks/useMounted'
 import { DojoAppConfig } from 'src/dojo/contexts/Dojo'
 import { DojoNetworkConfig } from 'src/games/pistols/config/networks'
 import { useDeployedSystem } from 'src/dojo/hooks/useDojoSystem'
-import { createSystemCalls } from 'src/games/pistols/config/createSystemCalls'
+import { createSystemCalls } from 'src/games/pistols/dojo/createSystemCalls'
 import { setupWorld } from 'src/games/pistols/generated/contracts.gen'
 import { PistolsSchemaType } from 'src/games/pistols/sdk/types_web'
 

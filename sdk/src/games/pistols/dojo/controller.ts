@@ -1,7 +1,7 @@
 import { Connector } from '@starknet-react/core'
 import type { Tokens } from '@cartridge/controller'
 import { NetworkId, NETWORKS } from 'src/games/pistols/config/networks'
-import { makeControllerConnector } from 'src/dojo/setup/controller'
+import { makeControllerConnector } from 'src/games/pistols/dojo/controller_connector'
 import { makePistolsPolicies } from 'src/games/pistols/dojo/policies'
 import {
   getLordsAddress,

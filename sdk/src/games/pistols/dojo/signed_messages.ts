@@ -1,11 +1,10 @@
-import { BigNumberish, StarknetDomain, StarknetType } from 'starknet'
-import { bigintToDecimal, bigintToHex } from 'src/utils/misc/types'
+import { BigNumberish, StarknetDomain, StarknetType, TypedData } from 'starknet'
+import { makeStarknetDomain, CommitMoveMessage, GeneralPurposeMessage } from 'src/games/pistols/config/typed_data'
+import { UnionOfModelData } from '@dojoengine/sdk'
+import { bigintToHex } from 'src/utils/misc/types'
 import { PistolsSchemaType } from 'src/games/pistols/sdk/types_web'
-import { generateTypedData } from 'src/dojo/setup/controller'
-import { makeStarknetDomain } from 'src/games/pistols/config/config'
 import { NetworkId } from 'src/games/pistols/config/networks'
 import { createTypedMessage } from 'src/starknet/starknet_sign'
-import { CommitMoveMessage, GeneralPurposeMessage } from 'src/games/pistols/misc/salt'
 import * as models from 'src/games/pistols/generated/models.gen'
 
 //
@@ -64,3 +63,37 @@ export function make_typed_data_PlayerOnline({
     },
   )
 }
+
+// same as sdk.generateTypedData()
+const generateTypedData = <T extends models.SchemaType, M extends UnionOfModelData<T>>(
+  domain: StarknetDomain,
+  primaryType: string,
+  message: M,
+  messageFieldTypes: { [name: string]: string },
+  enumTypes?: Record<string, StarknetType[]>,
+): TypedData => ({
+  types: {
+    StarknetDomain: [
+      { name: "name", type: "shortstring" },
+      { name: "version", type: "shortstring" },
+      { name: "chainId", type: "shortstring" },
+      { name: "revision", type: "shortstring" },
+    ],
+    [primaryType]: Object.keys(message).map((key) => {
+      let result: any = {
+        name: key,
+        type: messageFieldTypes[key],
+      }
+      if (enumTypes?.[result.type]) {
+        result.contains = result.type
+        result.type = "enum"
+      }
+      return result
+    }),
+    ...enumTypes,
+  },
+  primaryType,
+  domain,
+  message,
+})
+

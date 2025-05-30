@@ -5,18 +5,6 @@ import { useStarknetContext } from 'src/dojo/contexts/StarknetProvider'
 import { useConnectedController } from 'src/dojo/hooks/useController'
 import { debug } from 'src/games/pistols/misc/debug'
 
-// export const useSdkPublishSignedMessage = <M extends PistolsModelType>(
-//   account: Account,
-//   modelName: string,
-//   message: M,
-// ) => {
-//   const { sdk } = useDojoSetup()
-//   const typedData = useMemo<TypedData>(() => (
-//     sdk?.generateTypedData<M>(modelName, message)
-//   ), [sdk, modelName, message])
-//   return useSdkPublishTypedData(account, typedData)
-// }
-
 export const useSdkPublishTypedData = (
   account: Account,
   typedData: TypedData,

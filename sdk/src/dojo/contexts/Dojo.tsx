@@ -7,7 +7,7 @@ import { StarknetProvider, useStarknetContext } from 'src/dojo/contexts/Starknet
 import { DojoManifest } from 'src/games/pistols/config/config'
 import { DojoProvider } from 'src/dojo/contexts/DojoContext'
 import { DojoStatus } from 'src/dojo/contexts/DojoStatus'
-import { useSetup } from 'src/dojo/setup/useSetup'
+import { useSetup } from 'src/games/pistols/dojo/useSetup'
 
 export type ContractPolicyDescriptions = {
   [contract_name: string]: {

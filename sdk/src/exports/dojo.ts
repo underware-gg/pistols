@@ -15,7 +15,3 @@ export * from '../dojo/hooks/useSdkEntities'
 export * from '../dojo/hooks/useSdkSignedMessage'
 export * from '../dojo/hooks/useSdkState'
 export * from '../dojo/hooks/useSdkTokenBalances'
-
-export * from '../dojo/setup/connectors'
-export * from '../dojo/setup/controller'
-export * from '../dojo/setup/useSetup'

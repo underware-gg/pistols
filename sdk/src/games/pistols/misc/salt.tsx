@@ -1,29 +1,12 @@
-import { AccountInterface, BigNumberish, StarknetDomain } from 'starknet'
+import Cookies from 'universal-cookie';
+import { AccountInterface, StarknetDomain } from 'starknet'
+import { make_moves_hash, _make_move_mask, _make_move_hash } from 'src/games/pistols/cairo/make_moves_hash'
+import { CommitMoveMessage, GeneralPurposeMessage } from 'src/games/pistols/config/typed_data'
 import { signMessages, Messages } from 'src/starknet/starknet_sign'
 import { bigintToHex, shortAddress } from 'src/utils/misc/types'
-import { make_moves_hash, _make_move_mask, _make_move_hash } from '../cairo/make_moves_hash'
 import { apiGenerateControllerSalt } from 'src/api/salt'
-import Cookies from 'universal-cookie';
 
 const cookies = new Cookies(null, { path: '/' });
-
-export interface CommitMoveMessage extends Messages {
-  duelId: bigint,
-  duelistId: bigint,
-}
-
-// generates a salt for player authentication
-export interface GeneralPurposeMessage extends Messages {
-  purpose: string,
-}
-
-// passed to salt server to validate a GeneralPurposeMessage
-// https://discord.com/developers/docs/topics/oauth2#state-and-security
-export interface GeneralPurposeState {
-  chain_id: string,
-  player_address: string,
-  salt: string,
-}
 
 
 //------------------------------------------

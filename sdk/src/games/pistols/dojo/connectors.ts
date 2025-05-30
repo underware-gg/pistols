@@ -6,15 +6,7 @@ import {
 } from '@starknet-react/core'
 import { usePredeployedConnector } from 'src/utils/hooks/usePredeployedConnector'
 import { DojoAppConfig } from 'src/dojo/contexts/Dojo'
-import { DojoNetworkConfig } from 'src/games/pistols/config/networks'
-import { PREDEPLOYED_ID } from 'src/starknet/predeployed'
-
-export const supportedConnetorIds = {
-  CONTROLLER: 'controller', // same as ControllerConnector.id
-  // ARGENT: argent().id,
-  // BRAAVOS: braavos().id,
-  PREDEPLOYED: PREDEPLOYED_ID,
-}
+import { DojoNetworkConfig, supportedConnetorIds } from 'src/games/pistols/config/networks'
 
 export const getConnectorIcon = (connector: Connector): string  => {
   if (!connector) return null
