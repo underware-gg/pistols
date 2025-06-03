@@ -15,6 +15,7 @@ enum AudioName {
   STRIKE_BLOCK = 'STRIKE_BLOCK',
 
   // UI
+  NOTIFICATION = 'NOTIFICATION',
   // UI_BUTTON_CLICK = 'UI_BUTTON_CLICK',
 
   // environment
@@ -175,11 +176,11 @@ let AUDIO_ASSETS: AudioAssets = {
     delaySeconds: 0,
     type: AudioType.SFX,
   },
-  
-  
-  
-  
-  
+  NOTIFICATION: {
+    path: '/audio/sfx/env/notification.mp3',
+    volume: 0.7,
+    type: AudioType.SFX,
+  },
 }
 
 

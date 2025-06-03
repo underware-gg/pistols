@@ -327,15 +327,17 @@ export const Header = memo(function Header() {
   )
 })
 
-const BannerButton = memo(function BannerButton({
+export const BannerButton = memo(function BannerButton({
   button,
   right = false,
   short = false,
+  long = false,
   visible = false,
 }: {
   button: any
   right?: boolean
   short?: boolean
+  long?: boolean
   visible?: boolean
 }) {
 
@@ -345,8 +347,12 @@ const BannerButton = memo(function BannerButton({
   
   useEffect(() => {
     if (visible) {
+      let targetOffset = 0
+      if (short) targetOffset = -4.5
+      else if (long) targetOffset = 3
+      
       new TWEEN.Tween({ offset })
-        .to({ offset: short ? -4.5 : 0 }, SCENE_CHANGE_ANIMATION_DURATION * 2)
+        .to({ offset: targetOffset }, SCENE_CHANGE_ANIMATION_DURATION * 2)
         .easing(TWEEN.Easing.Quadratic.Out)
         .delay(100)
         .onUpdate(({offset}) => setOffset(offset))
@@ -358,7 +364,7 @@ const BannerButton = memo(function BannerButton({
         .onUpdate(({offset}) => setOffset(offset))
         .start()
     }
-  }, [visible, short])
+  }, [visible, short, long])
 
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'absolute', width: aspectWidth(10), height: 'auto', top: aspectWidth(offset), [right ? 'right' : 'left']: aspectWidth(2) }}>
@@ -374,8 +380,7 @@ const BannerButton = memo(function BannerButton({
         borderColor: '#f1d242', 
         borderWidth: `${aspectWidth(0.2)}px`,
         borderRadius: '500px', 
-        backgroundColor: '#5f1011',
-        paddingLeft: aspectWidth(0.24),
+        backgroundColor: '#5f1011'
       }}>
         {button}
       </div>

@@ -39,6 +39,8 @@ export class InteractibleScene extends THREE.Scene {
   pickedColor: THREE.Color
   pickedItem: SceneObject
   timeOffset: number
+  isSceneClickable: boolean = true
+  isModalOpen: boolean = false
   isClickable: boolean = true
 
   opacityTweens: any[] = []
@@ -71,7 +73,8 @@ export class InteractibleScene extends THREE.Scene {
     this.setSceneData(sceneName)
 
     emitter.on('hasModalOpen', (data) => {
-      this.setClickable(!data)
+      this.isModalOpen = data
+      this.updateClickable()
     })
   }
 
@@ -662,9 +665,14 @@ export class InteractibleScene extends THREE.Scene {
   }
 
   public setClickable(isClickable: boolean) {
-    this.isClickable = isClickable
-    this.maskShader.setUniformValue('uClickable', isClickable)
-    if (!isClickable) {
+    this.isSceneClickable = isClickable
+    this.updateClickable()
+  }
+
+  public updateClickable() {
+    this.isClickable = this.isSceneClickable && !this.isModalOpen
+    this.maskShader.setUniformValue('uClickable', this.isClickable)
+    if (!this.isClickable) {
       this.pickColor(0, 0, 0)
     }
   }

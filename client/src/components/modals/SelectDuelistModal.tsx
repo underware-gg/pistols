@@ -149,6 +149,12 @@ function _SelectDuelistModal({
     }
   }, [selectedDuelistId])
 
+  useEffect(() => {
+    if (availableDuelists.length !== 0) {
+      emitter.emit('hover_description', '')
+    }
+  }, [availableDuelists, selectedDuelistId])
+
   const _close = useCallback(() => {
     setIsAnimating(true)
     isAnimatingRef.current = true
