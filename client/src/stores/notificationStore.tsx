@@ -72,7 +72,6 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const activeDuels = useMyActiveDuels(notificationDuelIds)
   
   useEffect(() => {
-    console.log('notifications', notifications)
     saveNotificationsToStorage(notifications)
   }, [notifications])
 
