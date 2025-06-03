@@ -34,6 +34,8 @@ import Gate from '/src/components/scenes/ScGate'
 import Door from '/src/components/scenes/ScDoor'
 import Duel from '/src/components/scenes/Duel'
 import { Header } from '/src/components/Header'
+import NotificationSystem from '/src/components/notifications/NotificationSystem'
+import { NotificationProvider } from '/src/stores/notificationStore'
 
 // test sdk
 import { helloPistols } from '@underware/pistols-sdk'
@@ -89,17 +91,20 @@ export default function MainPage({
 
   return (
     <AppGame backgroundImage={null} networkId={showTutorial ? ENV.ACADEMY_NETWORK_ID : undefined} autoConnect={showTutorial}>
-      <Background className={null}>
-        <GameContainer isVisible={true} />
-        <MainUI />
-        <Modals />
-        {overlay}
-        <Header />
-        <CurrentChainHint />
-        <MouseToolTip />
-        <TavernAudios />
-      </Background>
-    </AppGame>
+        <Background className={null}>
+          <NotificationProvider>
+            <GameContainer isVisible={true} />
+            <MainUI />
+            <Modals />
+            {overlay}
+            <Header />
+            <CurrentChainHint />
+            <MouseToolTip />
+            <TavernAudios />
+            <NotificationSystem />
+          </NotificationProvider>
+        </Background>
+      </AppGame>
   );
 }
 
