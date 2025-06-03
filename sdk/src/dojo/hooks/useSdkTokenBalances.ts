@@ -27,6 +27,7 @@ export type UseSdkTokenBalancesGetProps = {
   enabled?: boolean
   // initBalances?: (accounts: BigNumberish[]) => void
   setBalances: (balances: torii.TokenBalance[]) => void
+  updateProgress?: (currentPage: number, finished?: boolean) => void  // called page by page to report progress
 }
 export type UseSdkTokenBalancesSubProps = {
   contracts: BigNumberish[]
@@ -43,6 +44,7 @@ export const useSdkTokenBalancesGet = ({
   tokenIds,
   // initBalances,
   setBalances,
+  updateProgress,
   enabled = true,
 }: UseSdkTokenBalancesGetProps): UseSdkTokenGetResult => {
   const { sdk } = useDojoSetup()
@@ -55,6 +57,7 @@ export const useSdkTokenBalancesGet = ({
       const _accounts = accounts?.map(a => bigintToHex(a)) ?? []
       // debug.log("useSdkTokenBalancesGet() GET........", enabled, _contract, _accounts, tokenIds)
       setIsLoading(true)
+      updateProgress?.(0);
       // initBalances?.(_accounts);
       await sdk.getTokenBalances({
         contractAddresses: [_contract],
@@ -84,6 +87,7 @@ export const useSdkTokenBalancesGet = ({
         console.error("useSdkTokenBalancesGet().sdk.get() error:", error, contract, _accounts, tokenIds)
       }).finally(() => {
         setIsLoading(false)
+        updateProgress?.(1, true);
       })
       // debug.log("useSdkTokenBalancesGet() done!", account)
     }

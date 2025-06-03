@@ -5,6 +5,7 @@ import { entityContainsModels, filterEntitiesByModels, formatQueryValue, getEnti
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useEventsStore } from '/src/stores/eventsModelStore'
 import { usePlayerDataStore } from '/src/stores/playerStore'
+import { useProgressStore } from '/src/stores/progressStore'
 import { bigintEquals, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { debug } from '@underware/pistols-sdk/pistols'
 
@@ -13,6 +14,7 @@ import { debug } from '@underware/pistols-sdk/pistols'
 export function EventsModelStoreSync() {
   const eventsState = useEventsStore((state) => state)
   const playerDataState = usePlayerDataStore((state) => state)
+  const updateProgress = useProgressStore((state) => state.updateProgress)
 
   const { address } = useAccount()
   const mounted = useMounted()
@@ -44,6 +46,9 @@ export function EventsModelStoreSync() {
   useSdkEventsSub({
     query,
     enabled: (mounted && Boolean(query)),
+    updateProgress: (currentPage: number, finished?: boolean) => {
+      updateProgress('get_events', currentPage, finished)
+    },
     setEntities: (entities: PistolsEntity[]) => {
       debug.log(`GET EventsModelStoreSync() ======>`, entities)
       eventsState.setEntities(filterEntitiesByModels(entities, ['CallToActionEvent', 'PlayerSocialLinkEvent']))

@@ -3,6 +3,7 @@ import { useSdkEventsSub } from '@underware/pistols-sdk/dojo'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useHistoricalEventsStore } from '/src/stores/eventsHistoricalStore'
 import { PistolsClauseBuilder, PistolsHistoricalQueryBuilder } from '@underware/pistols-sdk/pistols/sdk'
+import { useProgressStore } from '/src/stores/progressStore'
 import { debug } from '@underware/pistols-sdk/pistols'
 
 const query: PistolsHistoricalQueryBuilder = new PistolsHistoricalQueryBuilder()
@@ -22,12 +23,15 @@ const query: PistolsHistoricalQueryBuilder = new PistolsHistoricalQueryBuilder()
 // Sync entities: Add only once to a top level component
 export function EventsHistoricalStoreSync() {
   const historicalEventsState = useHistoricalEventsStore((state) => state)
-
+  const updateProgress = useProgressStore((state) => state.updateProgress)
   const mounted = useMounted()
 
   useSdkEventsSub({
     query,
     enabled: mounted,
+    updateProgress: (currentPage: number, finished?: boolean) => {
+      updateProgress('get_historical_events', currentPage, finished)
+    },
     setEntities: historicalEventsState.setEvents,
     updateEntity: historicalEventsState.updateEvent,
   })

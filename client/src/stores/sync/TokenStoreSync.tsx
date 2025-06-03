@@ -6,11 +6,14 @@ import { useSdkTokenBalancesGet, useSdkTokenBalancesSub } from '@underware/pisto
 import { useDuelistTokenStore, useDuelTokenStore, usePackTokenStore, useTournamentTokenStore } from '/src/stores/tokenStore'
 import { bigintToHex, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { useFameCoinStore, useLordsCoinStore, useFoolsCoinStore, useFetchAccountsBalances } from '/src/stores/coinStore'
+import { useProgressStore } from '/src/stores/progressStore'
 import { debug } from '@underware/pistols-sdk/pistols'
 import * as torii from '@dojoengine/torii-client'
 
 
 export function TokenStoreSync() {
+  const updateProgress = useProgressStore((state) => state.updateProgress)
+
   // token stores
   const duelist_state = useDuelistTokenStore((state) => state)
   const duel_state = useDuelTokenStore((state) => state)
@@ -30,7 +33,7 @@ export function TokenStoreSync() {
     packContractAddress,
     tournamentContractAddress,
   } = useTokenContracts()
-
+  
   const contracts = useMemo(() => [
     bigintToHex(lordsContractAddress),
     bigintToHex(fameContractAddress),
@@ -71,6 +74,9 @@ export function TokenStoreSync() {
     accounts,
     setBalances: pack_state.setBalances,
     enabled: (mounted && isPositiveBigint(packContractAddress)),
+    updateProgress: (currentPage: number, finished?: boolean) => {
+      updateProgress('token_packs', currentPage, finished)
+    },
   })
 
   // cache all duelists
@@ -78,6 +84,9 @@ export function TokenStoreSync() {
     contract: duelistContractAddress,
     setBalances: duelist_state.setBalances,
     enabled: (mounted && isPositiveBigint(duelistContractAddress)),
+    updateProgress: (currentPage: number, finished?: boolean) => {
+      updateProgress('token_duelists', currentPage, finished)
+    },
   })
 
   // cache all FAME
@@ -85,6 +94,9 @@ export function TokenStoreSync() {
     contract: fameContractAddress,
     setBalances: fame_state.setBalances,
     enabled: (mounted && isPositiveBigint(fameContractAddress)),
+    updateProgress: (currentPage: number, finished?: boolean) => {
+      updateProgress('token_fame', currentPage, finished)
+    },
   })
 
 

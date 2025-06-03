@@ -11,6 +11,7 @@ import { useChallengeQueryStore } from '/src/stores/challengeQueryStore'
 import { useBankStore } from '/src/stores/bankStore'
 import { usePackStore } from '/src/stores/packStore'
 import { useScoreboardStore } from '/src/stores/scoreboardStore'
+import { useProgressStore } from '/src/stores/progressStore'
 import { debug } from '@underware/pistols-sdk/pistols'
 
 const _modelsMisc = [
@@ -107,10 +108,14 @@ export function EntityStoreSync() {
   const scoreboardState = useScoreboardStore((state) => state)
 
   const mounted = useMounted()
+  const updateProgress = useProgressStore((state) => state.updateProgress)
 
   const { isFinished: isFinishedMisc } = useSdkEntitiesGet({
     query: query_get_misc,
     enabled: mounted,
+    updateProgress: (currentPage: number, finished?: boolean) => {
+      updateProgress('query_get_misc', currentPage, finished)
+    },
     resetStore: () => {
       debug.log("EntityStoreSync() RESET MISC =======>")
       configState.resetStore()
@@ -137,6 +142,9 @@ export function EntityStoreSync() {
   const { isFinished: isFinishedPlayers } = useSdkEntitiesGet({
     query: query_get_players,
     enabled: (mounted),
+    updateProgress: (currentPage: number, finished?: boolean) => {
+      updateProgress('query_get_players', currentPage, finished)
+    },
     setEntities: (entities: PistolsEntity[]) => {
       debug.log("EntityStoreSync() SET PLAYERS =======> [entities]:", entities)
       debug.log("EntityStoreSync() SET PLAYERS =======> [Player]:", filterEntitiesByModels(entities, ['Player']))
@@ -149,6 +157,9 @@ export function EntityStoreSync() {
   const { isFinished: isFinishedDuelists } = useSdkEntitiesGet({
     query: query_get_duelists,
     enabled: (mounted),
+    updateProgress: (currentPage: number, finished?: boolean) => {
+      updateProgress('query_get_duelists', currentPage, finished)
+    },
     resetStore: () => {
       debug.log("EntityStoreSync() RESET DUELISTS =======>")
       duelistState.resetStore()
@@ -163,6 +174,9 @@ export function EntityStoreSync() {
   const { isFinished: isFinishedStacks } = useSdkEntitiesGet({
     query: query_get_duelist_stacks,
     enabled: (mounted),
+    updateProgress: (currentPage: number, finished?: boolean) => {
+      updateProgress('query_get_duelist_stacks', currentPage, finished)
+    },
     resetStore: () => {
       debug.log("EntityStoreSync() RESET STACKS =======>")
       duelistStackState.resetStore()

@@ -7,6 +7,7 @@ import { PlayerNameSync } from '/src/stores/sync/PlayerNameSync'
 import { PlayerOnlineSync } from '/src/stores/sync/PlayerOnlineSync'
 import { TokenStoreSync } from '/src/stores/sync/TokenStoreSync'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
+import { StoreProgressBar } from './StoreProgressBar'
 
 //
 // Manages all store subscriptions
@@ -34,6 +35,7 @@ export default function StoreSync() {
       {/* Other */}
       <PlayerOnlineSync />
 
+      <StoreProgressBar />
     </>
   )
 }

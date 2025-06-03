@@ -33,8 +33,9 @@ export type UseSdkGetProps = {
   query: PistolsQueryBuilder
   enabled?: boolean
   retryInterval?: number
-  resetStore?: () => void // called on the 1st page to reset store, is present
-  setEntities: (entities: PistolsEntity[]) => void // stores set callback (erases previous state)
+  resetStore?: () => void     // called on the 1st page to reset store, if present
+  setEntities: (entities: PistolsEntity[]) => void
+  updateProgress?: (currentPage: number, finished?: boolean) => void  // called page by page to report progress
 }
 export type UseSdkSubProps = UseSdkGetProps & {
   updateEntity: (entities: PistolsEntity) => void // store update callback
@@ -65,6 +66,7 @@ const _useSdkGet = (prefix: string, {
   enabled,
   setEntities,
   resetStore,
+  updateProgress,
   retryInterval = 0,
 }: UseSdkGetProps & {
   fn: (query: PistolsGetParams) => Promise<PistolsToriiResponse>
@@ -79,6 +81,7 @@ const _useSdkGet = (prefix: string, {
         let pageIndex = 0;
         let lastCursor = undefined;
         while (query) {
+          updateProgress?.(pageIndex);
           const response: PistolsToriiResponse = await fn({ query });
           if (!_mounted) return
           debug.log(`${prefix} GOT[page:${pageIndex}]:`, response)
@@ -104,6 +107,7 @@ const _useSdkGet = (prefix: string, {
           }
           pageIndex++;
         }
+        updateProgress?.(pageIndex, true);
         setIsLoading(false)
       } catch (error) {
         console.error(`${prefix} exception:`, error)
@@ -127,6 +131,7 @@ export const useSdkEntitiesGet = ({
   query,
   resetStore,
   setEntities,
+  updateProgress,
   enabled = true,
   retryInterval = 0,
 }: UseSdkGetProps): UseSdkGetResult => {
@@ -138,6 +143,7 @@ export const useSdkEntitiesGet = ({
     query,
     resetStore,
     setEntities,
+    updateProgress,
     enabled,
     retryInterval,
   })
@@ -152,6 +158,7 @@ export const useSdkEventsGet = ({
   query,
   resetStore,
   setEntities,
+  updateProgress,
   enabled = true,
   retryInterval = 0,
 }: UseSdkGetProps): UseSdkGetResult => {
@@ -164,6 +171,7 @@ export const useSdkEventsGet = ({
     query,
     resetStore,
     setEntities,
+    updateProgress,
     enabled,
     retryInterval,
   })

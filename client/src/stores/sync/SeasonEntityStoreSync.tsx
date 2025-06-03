@@ -5,6 +5,7 @@ import { useChallengeQueryStore } from '/src/stores/challengeQueryStore'
 import { useChallengeStore } from '/src/stores/challengeStore'
 import { useConfig } from '/src/stores/configStore'
 import { useScoreboardStore } from '/src/stores/scoreboardStore'
+import { useProgressStore } from '/src/stores/progressStore'
 import { debug } from '@underware/pistols-sdk/pistols'
 
 const _limit = 1000
@@ -44,12 +45,16 @@ export function SeasonChallengeStoreSync() {
 
   const challengeState = useChallengeStore((state) => state)
   const queryState = useChallengeQueryStore((state) => state)
+  const updateProgress = useProgressStore((state) => state.updateProgress)
 
   const mounted = useMounted()
 
   useSdkEntitiesGet({
     query,
     enabled: mounted,
+    updateProgress: (currentPage: number, finished?: boolean) => {
+      updateProgress('season_challenges', currentPage, finished)
+    },
     resetStore: () => {
       debug.log("SeasonEntityStoreSync() RESET =======>")
       challengeState.resetStore()
