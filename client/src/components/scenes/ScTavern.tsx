@@ -23,6 +23,7 @@ export default function ScTavern() {
   const { x: notificationShiftX, y: notificationShiftY } = useTextureShift(1)
 
   const [open, setOpen] = useState(false)
+  const [initialStage, setInitialStage] = useState<'intro' | 'menu' | 'notifications'>('intro')
   const [exclamationOpacity, setExclamationOpacity] = useState(0)
   const [isHovered, setIsHovered] = useState(false)
   const [pulseIntensity, setPulseIntensity] = useState(8)
@@ -46,6 +47,12 @@ export default function ScTavern() {
       })
       .start()
   }, [hasUnreadNotifications, open])
+
+  useEffect(() => {
+    if (!open) {
+      setInitialStage('intro')
+    }
+  }, [open])
 
   useEffect(() => {
     if (pulseTweenRef.current) {
@@ -140,15 +147,19 @@ export default function ScTavern() {
           cursor: 'pointer',
           opacity: exclamationOpacity,
           filter: `drop-shadow(0 0 ${pulseIntensity}px rgba(255, 255, 255, ${isHovered ? 1 : 0.8}))`,
-          transition: 'transform 0.2s ease-out'
+          transition: 'transform 0.2s ease-out',
+          pointerEvents: 'auto'
         }}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          setInitialStage('notifications')
+          setOpen(true)
+        }}
       />
 
       <ActivityPanel />
-      <BarkeepModal open={open} setOpen={setOpen} />
+      <BarkeepModal open={open} setOpen={setOpen} initialStage={initialStage} />
 
       <DojoSetupErrorDetector />
     </div>

@@ -546,7 +546,6 @@ export class InteractibleScene extends THREE.Scene {
   }
 
   public updateSettings(sceneShiftEnabled: boolean, blurEnabled: boolean) {
-    console.log('updateSettings', sceneShiftEnabled, blurEnabled)
     this.sceneShiftEnabled = sceneShiftEnabled
     this.blurEnabled = blurEnabled
 
