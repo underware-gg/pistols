@@ -11,7 +11,7 @@ export function SeasonSelectDropdown({
   setSeasonId: (seasonId: number) => void
 }) {
   const { currentSeasonId } = useConfig()
-  const { seasonIds } = useAllSeasonIds()
+  const { seasonIdsDescending: seasonIds } = useAllSeasonIds()
 
   const options = useMemo(() => [
     {

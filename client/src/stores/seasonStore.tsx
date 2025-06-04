@@ -12,13 +12,18 @@ export const useSeasonStore = createDojoStore<PistolsSchemaType>();
 
 export const useAllSeasonIds = () => {
   const entities = useSeasonStore((state) => state.entities)
-  const seasonIds = useMemo(() => (
+  const seasonIdsAscending = useMemo(() => (
     Object.values(entities)
       .filter(e => Boolean(e.models?.pistols?.SeasonConfig))
       .map(e => Number(e.models?.pistols?.SeasonConfig?.season_id))
+      .sort((a, b) => (a - b))
   ), [entities])
+  const seasonIdsDescending = useMemo(() => (
+    seasonIdsAscending.sort((a, b) => (b - a))
+  ), [seasonIdsAscending])
   return {
-    seasonIds,
+    seasonIdsAscending,
+    seasonIdsDescending,
   }
 }
 

@@ -508,7 +508,7 @@ export default function ScLeaderboards() {
   const { aspectWidth, aspectHeight } = useGameAspect();
   const [activePage, setActivePage] = useState(1);
   
-  const { seasonIds } = useAllSeasonIds();
+  const { seasonIdsDescending: seasonIds } = useAllSeasonIds();
   const [selectedSeasonId, setSelectedSeasonId] = useState<number | null>(null);
 
   const handleSeasonSelect = useCallback((seasonId: number) => {

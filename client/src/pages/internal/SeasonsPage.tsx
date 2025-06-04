@@ -53,7 +53,7 @@ export default function SeasonsPage() {
 
 function Seasons() {
   const { currentSeasonId } = useConfig()
-  const { seasonIds } = useAllSeasonIds()
+  const { seasonIdsDescending: seasonIds } = useAllSeasonIds()
   const [reportSeasonId, setReportSeasonId] = useState<number>()
   const header = (
     <Header fullWidth>
