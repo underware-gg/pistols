@@ -249,11 +249,13 @@ export function PlayGameButton({
 export function ConnectButton({
   setLoading,
   large = true,
+  label = 'Enter Tavern',
   onButtonHover,
   onDoorCreak
 }: {
   setLoading?: (loading: boolean) => void,
   large?: boolean,
+  label?: string,
   onButtonHover?: () => void,
   onDoorCreak?: () => void
 }) {
@@ -324,7 +326,7 @@ export function ConnectButton({
         important 
         disabled={!canConnect} 
         onClick={() => _connect()} 
-        label={'Enter Tavern'} 
+        label={label} 
         onMouseEnter={handleMouseEnter}
       />
       

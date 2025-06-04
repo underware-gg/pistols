@@ -98,7 +98,7 @@ export default function WalletHeader({
             </Col>
           }
           <Col verticalAlign='middle'>
-            <ConnectButton large={false} />
+            <ConnectButton large={false} label='Connect' />
           </Col>
         </Row>
       }
