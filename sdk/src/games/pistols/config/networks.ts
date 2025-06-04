@@ -81,7 +81,7 @@ export type DojoNetworkConfig = {
   chainId: ChainId
   chain: Chain
   name: string
-  slot: string,
+  slotName: string,
   rpcUrl: string
   toriiUrl: string
   graphqlUrl: string
@@ -105,12 +105,12 @@ export type DojoNetworkConfig = {
 // Local Katana
 //
 const localKatanaConfig: DojoNetworkConfig = {
-  networkId: undefined, // derive from this
-  chain: undefined, // derive from this
+  networkId: undefined, // derive from NETWORKS
+  chain: undefined,     // derive from this
   chainId: ChainId.KATANA_LOCAL,
   name: 'Katana Local',
   rpcUrl: LOCAL_KATANA,
-  slot: undefined,
+  slotName: undefined,
   // toriiUrl: LOCAL_TORII,
   // toriiUrl: 'http://127.0.0.1:8080',
   toriiUrl: 'http://0.0.0.0:8080',
@@ -193,15 +193,15 @@ const localKatanaConfig: DojoNetworkConfig = {
 // Slot Katana
 //
 const academySlotConfig: DojoNetworkConfig = {
-  networkId: undefined, // derive from this
-  chain: undefined, // derive from this
+  networkId: undefined, // derive from NETWORKS
+  chain: undefined,     // derive from this
   chainId: ChainId.PISTOLS_ACADEMY,
   name: 'Katana Academy',
-  slot: 'pistols-academy',
+  slotName: 'pistols-academy',
   rpcUrl: 'https://api.cartridge.gg/x/pistols-academy/katana',
-  toriiUrl: 'https://api.cartridge.gg/x/pistols-academy/torii',
-  graphqlUrl: 'https://api.cartridge.gg/x/pistols-academy/torii/graphql',
-  relayUrl: '/dns4/api.cartridge.gg/tcp/443/x-parity-wss/%2Fx%2Fpistols-academy%2Ftorii%2Fwss',
+  toriiUrl: undefined,    // derive from slotName
+  graphqlUrl: undefined,  // derive from slotName
+  relayUrl: undefined,    // derive from slotName
   accountClassHash: KATANA_CLASS_HASH,
   etherAddress: KATANA_ETH_CONTRACT_ADDRESS,
   lordsFaucet: true,
@@ -248,15 +248,15 @@ const academySlotConfig: DojoNetworkConfig = {
 //
 
 const pistolsStagingConfig: DojoNetworkConfig = {
-  networkId: undefined, // derive from this
+  networkId: undefined, // derive from NETWORKS
   chain: { ...sepolia },
   chainId: ChainId.SN_SEPOLIA,
   name: 'Sepolia Staging',
-  slot: 'pistols-staging',
+  slotName: 'pistols-staging',
   rpcUrl: 'https://api.cartridge.gg/x/starknet/sepolia',
-  toriiUrl: 'https://api.cartridge.gg/x/pistols-staging/torii',
-  graphqlUrl: 'https://api.cartridge.gg/x/pistols-staging/torii/graphql',
-  relayUrl: '/dns4/api.cartridge.gg/tcp/443/x-parity-wss/%2Fx%2Fpistols-staging%2Ftorii%2Fwss',
+  toriiUrl: undefined,    // derive from slotName
+  graphqlUrl: undefined,  // derive from slotName
+  relayUrl: undefined,    // derive from slotName
   accountClassHash: KATANA_CLASS_HASH,
   etherAddress: sepolia.nativeCurrency.address,
   lordsFaucet: true,
@@ -271,15 +271,15 @@ const pistolsStagingConfig: DojoNetworkConfig = {
 } as const
 
 const snSepoliaConfig: DojoNetworkConfig = {
-  networkId: undefined, // derive from this
+  networkId: undefined, // derive from NETWORKS
   chain: { ...sepolia },
   chainId: ChainId.SN_SEPOLIA,
   name: 'Sepolia Testnet',
-  slot: 'pistols-sepolia',
+  slotName: 'pistols-sepolia',
   rpcUrl: 'https://api.cartridge.gg/x/starknet/sepolia',
-  toriiUrl: 'https://api.cartridge.gg/x/pistols-sepolia/torii',
-  graphqlUrl: 'https://api.cartridge.gg/x/pistols-sepolia/torii/graphql',
-  relayUrl: '/dns4/api.cartridge.gg/tcp/443/x-parity-wss/%2Fx%2Fpistols-sepolia%2Ftorii%2Fwss',
+  toriiUrl: undefined,    // derive from slotName
+  graphqlUrl: undefined,  // derive from slotName
+  relayUrl: undefined,    // derive from slotName
   accountClassHash: KATANA_CLASS_HASH,
   etherAddress: sepolia.nativeCurrency.address,
   lordsFaucet: true,
@@ -294,16 +294,15 @@ const snSepoliaConfig: DojoNetworkConfig = {
 } as const
 
 const snMainnetConfig: DojoNetworkConfig = {
-  networkId: undefined, // derive from this
+  networkId: undefined, // derive from NETWORKS
   chain: { ...mainnet },
   chainId: ChainId.SN_MAIN,
   name: 'Mainnet',
-  slot: 'pistols-mainnet',
-  // rpcUrl: 'https://api.cartridge.gg/rpc/starknet',
+  slotName: 'pistols-mainnet',
   rpcUrl: 'https://api.cartridge.gg/x/starknet/mainnet',
-  toriiUrl: 'https://api.cartridge.gg/x/pistols-mainnet/torii',
-  graphqlUrl: 'https://api.cartridge.gg/x/pistols-mainnet/torii/graphql',
-  relayUrl: '/dns4/api.cartridge.gg/tcp/443/x-parity-wss/%2Fx%2Fpistols-mainnet%2Ftorii%2Fwss',
+  toriiUrl: undefined,    // derive from slotName
+  graphqlUrl: undefined,  // derive from slotName
+  relayUrl: undefined,    // derive from slotName
   accountClassHash: undefined,
   etherAddress: mainnet.nativeCurrency.address,
   lordsFaucet: 'https://app.ekubo.org/?inputCurrency=ETH&outputCurrency=LORDS',
@@ -321,42 +320,65 @@ const snMainnetConfig: DojoNetworkConfig = {
 // Available chains
 //
 
-const makeDojoNetworkConfig = (networkId: NetworkId, config: DojoNetworkConfig): DojoNetworkConfig => {
-  let network = { ...config }
-  //
+const NETWORKS: Record<NetworkId, DojoNetworkConfig> = {
+  [NetworkId.MAINNET]: snMainnetConfig,
+  [NetworkId.SEPOLIA]: snSepoliaConfig,
+  [NetworkId.ACADEMY]: academySlotConfig,
+  [NetworkId.STAGING]: pistolsStagingConfig,
+  [NetworkId.KATANA_LOCAL]: localKatanaConfig,
+}
+
+export interface DojoNetworkEnv {
+  SLOT_NAME?: string,
+  RPC_URL?: string,
+  TORII_URL?: string,
+  TORII_GRAPHQL_URL?: string,
+  TORII_RELAY_URL?: string,
+}
+export const getNetworkConfig = (networkId: NetworkId, env?: DojoNetworkEnv): DojoNetworkConfig => {
+  if (!NETWORKS[networkId]) return undefined
+  // get base config
+  let result: DojoNetworkConfig = {
+    ...NETWORKS[networkId],
+  }
   // set networkId
-  network.networkId = networkId
-  //
+  result.networkId = networkId
+
+  // resolve urls with ENV
+  result.slotName = (env?.SLOT_NAME || result.slotName);
+  result.rpcUrl = (env?.RPC_URL || result.rpcUrl);
+  result.toriiUrl = (env?.TORII_URL || result.toriiUrl || `https://api.cartridge.gg/x/${result.slotName}/torii`);
+  result.graphqlUrl = (env?.TORII_GRAPHQL_URL || result.graphqlUrl || `https://api.cartridge.gg/x/${result.slotName}/torii/graphql`);
+  result.relayUrl = (env?.TORII_RELAY_URL || result.relayUrl || `/dns4/api.cartridge.gg/tcp/443/x-parity-wss/%2Fx%2F${result.slotName}%2Ftorii%2Fwss`);
+
   // derive starknet Chain
-  if (!network.chain) {
-    network.chain = {
-      id: BigInt(stringToFelt(network.chainId)),
-      name: network.name,
-      network: network.network ?? 'katana',
-      testnet: network.testnet ?? true,
-      nativeCurrency: network.nativeCurrency,
+  if (!result.chain) {
+    result.chain = {
+      id: BigInt(stringToFelt(result.chainId)),
+      name: result.name,
+      network: result.network ?? 'katana',
+      testnet: result.testnet ?? true,
+      nativeCurrency: result.nativeCurrency,
       rpcUrls: {
         default: { http: [] },
         public: { http: [] },
       },
-      explorers: network.explorers,
+      explorers: result.explorers,
     } as Chain
   }
-  //
-  // use Cartridge RPCs
-  if (network.rpcUrl) {
-    network.chain.rpcUrls.default.http = [network.rpcUrl]
-    network.chain.rpcUrls.public.http = [network.rpcUrl]
-  }
-  // console.log(networkConfig)
 
-  return network
+  // use Cartridge RPCs
+  if (result.rpcUrl) {
+    result.chain.rpcUrls.default.http = [result.rpcUrl]
+    result.chain.rpcUrls.public.http = [result.rpcUrl]
+  }
+
+  return result
 }
 
-export const NETWORKS: Record<NetworkId, DojoNetworkConfig> = {
-  [NetworkId.MAINNET]: makeDojoNetworkConfig(NetworkId.MAINNET, snMainnetConfig),
-  [NetworkId.SEPOLIA]: makeDojoNetworkConfig(NetworkId.SEPOLIA, snSepoliaConfig),
-  [NetworkId.ACADEMY]: makeDojoNetworkConfig(NetworkId.ACADEMY, academySlotConfig),
-  [NetworkId.STAGING]: makeDojoNetworkConfig(NetworkId.STAGING, pistolsStagingConfig),
-  [NetworkId.KATANA_LOCAL]: makeDojoNetworkConfig(NetworkId.KATANA_LOCAL, localKatanaConfig),
+export const getChains = (): Chain[] => {
+  return Object.keys(NETWORKS)
+    .map((networkId) => getNetworkConfig(networkId as NetworkId).chain)
+    // remove duplicates
+    .filter((value, index, array) => (array.findIndex(v => v.id === value.id) === index))
 }

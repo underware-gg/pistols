@@ -12,11 +12,7 @@ import { PistolsSchemaType } from 'src/games/pistols/sdk/types_web'
 
 export type SetupResult = ReturnType<typeof useSetup> | null
 
-export function useSetup(dojoAppConfig: DojoAppConfig, selectedNetworkConfig: DojoNetworkConfig, env?: any) {
-
-  const rpcUrl = (env?.RPC_URL || selectedNetworkConfig.rpcUrl);
-  const toriiUrl = (env?.TORII_URL || selectedNetworkConfig.toriiUrl);
-  const relayUrl = (env?.TORII_RELAY_URL || selectedNetworkConfig.relayUrl);
+export function useSetup(dojoAppConfig: DojoAppConfig, selectedNetworkConfig: DojoNetworkConfig) {
 
   // avoid double effects
   const mounted = useMounted()
@@ -44,14 +40,14 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedNetworkConfig: Do
     let config: SDKConfig = {
       client: {
         // rpcUrl,
-        toriiUrl,
-        relayUrl,
+        toriiUrl: selectedNetworkConfig.toriiUrl,
+        relayUrl: selectedNetworkConfig.relayUrl,
         worldAddress: manifest.world.address ?? '',
       },
       domain: starknetDomain,
     }
     return config
-  }, [manifest, starknetDomain, toriiUrl, relayUrl])
+  }, [manifest, starknetDomain, selectedNetworkConfig])
 
   //
   // Provider setup
@@ -61,7 +57,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedNetworkConfig: Do
   } = useMemoAsync<DojoProvider>(async () => {
     if (!mounted) return undefined
     if (!manifest) return null
-    const dojoProvider = new DojoProvider(manifest, rpcUrl)
+    const dojoProvider = new DojoProvider(manifest, selectedNetworkConfig.rpcUrl)
     console.log(`DojoProvider:`, dojoProvider)
     return dojoProvider
   }, [mounted, selectedNetworkConfig, manifest], undefined, null)
@@ -143,6 +139,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedNetworkConfig: Do
     namespace: dojoAppConfig.namespace,
     manifest,
     starknetDomain,
+    rpcUrl: selectedNetworkConfig.rpcUrl,
     // status
     status: {
       isReady: (!isLoading && !isError),

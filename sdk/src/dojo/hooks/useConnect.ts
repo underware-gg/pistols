@@ -4,6 +4,7 @@ import { SwitchStarknetChainParameters, AddStarknetChainParameters } from 'get-s
 import { useAddStarknetChain, useSwitchStarknetChain } from 'src/utils/hooks/useWalletRequest'
 import { useStarknetContext } from 'src/dojo/contexts/StarknetProvider'
 import { feltToString } from 'src/starknet/starknet'
+import { useDojoSetup } from 'src/exports/dojo'
 
 
 export const useConnectToSelectedNetwork = (onConnect?: () => void) => {
@@ -78,6 +79,7 @@ interface AddStarknetChainParametersImpl extends AddStarknetChainParameters {
 }
 export const useChainSwitchCallbacks = () => {
   const { selectedNetworkConfig } = useStarknetContext()
+  const { rpcUrl } = useDojoSetup()
 
   const switch_params = useMemo(() => {
     const params: SwitchStarknetChainParameters = {
@@ -92,8 +94,8 @@ export const useChainSwitchCallbacks = () => {
       id: selectedNetworkConfig.chainId,
       chain_id: selectedNetworkConfig.chainId,
       chain_name: selectedNetworkConfig.name,
-      rpcUrl: selectedNetworkConfig.rpcUrl,
-      rpc_urls: [selectedNetworkConfig.rpcUrl],
+      rpcUrl,
+      rpc_urls: [rpcUrl],
       native_currency: { type: 'ERC20', options: selectedNetworkConfig.chain.nativeCurrency },
       accountClassHash: selectedNetworkConfig.accountClassHash,
       classHash: selectedNetworkConfig.accountClassHash,

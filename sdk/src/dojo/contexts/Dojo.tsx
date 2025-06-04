@@ -46,8 +46,8 @@ export function Dojo({
   env?: any
 }) {
   return (
-    <StarknetProvider dojoAppConfig={dojoAppConfig}>
-      <SetupDojoProvider dojoAppConfig={dojoAppConfig} env={env}>
+    <StarknetProvider dojoAppConfig={dojoAppConfig} env={env}>
+      <SetupDojoProvider dojoAppConfig={dojoAppConfig}>
         {children}
       </SetupDojoProvider>
     </StarknetProvider>
@@ -57,15 +57,13 @@ export function Dojo({
 function SetupDojoProvider({
   dojoAppConfig,
   children,
-  env,
 }: {
   dojoAppConfig: DojoAppConfig,
   children: ReactNode
-  env?: any
 }) {
   // Connected wallet or Dojo Predeployed (master)
   const { selectedNetworkConfig } = useStarknetContext()
-  const setupResult = useSetup(dojoAppConfig, selectedNetworkConfig, env)
+  const setupResult = useSetup(dojoAppConfig, selectedNetworkConfig)
   const isInitialized = useMemo(() => Boolean(setupResult), [setupResult])
   useEffect(() => console.log(!isInitialized ? '---> DOJO setup...' : '---> DOJO initialized!'), [isInitialized])
   return (

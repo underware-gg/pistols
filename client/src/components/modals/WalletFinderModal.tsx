@@ -1,7 +1,6 @@
-import React, { ReactNode, useEffect, useMemo, useState } from 'react'
+import React, { ReactNode, useEffect, useState } from 'react'
 import { Grid, Modal, Breadcrumb, Icon } from 'semantic-ui-react'
-import { NetworkId, NETWORKS } from '@underware/pistols-sdk/pistols/config'
-import { useControllerAccount } from '@underware/pistols-sdk/dojo'
+import { useControllerAccount, useDojoSetup } from '@underware/pistols-sdk/dojo'
 import { useMounted, useStarkName, useStarkProfile, useValidateWalletAddressOrName } from '@underware/pistols-sdk/utils/hooks'
 import { STARKNET_ADDRESS_LENGTHS } from '@underware/pistols-sdk/starknet'
 import { useIsMyAccount } from '/src/hooks/useIsYou'
@@ -41,15 +40,15 @@ function _WalletFinderModal({
     if (opener.isOpen) setInputAddres('')
   }, [opener.isOpen])
 
-  const networkConfig = useMemo(() => NETWORKS[NetworkId.MAINNET], [])
+  const { rpcUrl } = useDojoSetup()
   
-  const { validatedAddress, isStarknetAddress, isEthereumAddress } = useValidateWalletAddressOrName(inputAddress, networkConfig.rpcUrl)
+  const { validatedAddress, isStarknetAddress, isEthereumAddress } = useValidateWalletAddressOrName(inputAddress, rpcUrl)
   const { isDeployed, isControllerAccount, isKatanaAccount } = useControllerAccount(validatedAddress)
   const { isMyAccount, myAcountAddress } = useIsMyAccount(validatedAddress)
   const canSubmit = (isStarknetAddress && !isMyAccount && (isControllerAccount || isKatanaAccount))
 
-  const { starkName } = useStarkName(isStarknetAddress ? validatedAddress : null, networkConfig.rpcUrl)
-  const { name: profileName, profilePicture: starkProfilePic } = useStarkProfile(isStarknetAddress ? validatedAddress : null, networkConfig.rpcUrl)
+  const { starkName } = useStarkName(isStarknetAddress ? validatedAddress : null, rpcUrl)
+  const { name: profileName, profilePicture: starkProfilePic } = useStarkProfile(isStarknetAddress ? validatedAddress : null, rpcUrl)
 
   return (
     <Modal

@@ -1,5 +1,5 @@
 import { StarknetDomain } from 'starknet'
-import { ChainId, NetworkId, NETWORKS } from './networks'
+import { ChainId, getNetworkConfig, NetworkId } from './networks'
 import { Messages } from 'src/starknet/starknet_sign'
 
 //----------------------------------------
@@ -16,7 +16,7 @@ export const makeStarknetDomain = ({
 }): StarknetDomain => ({
   name: 'Underware_gg',
   version: '1.0.0',
-  chainId: chainId ?? NETWORKS[networkId]?.chainId ?? ChainId.SN_MAIN,
+  chainId: chainId ?? getNetworkConfig(networkId)?.chainId ?? ChainId.SN_MAIN,
   revision: '1',
 })
 

@@ -1,5 +1,5 @@
 import { Manifest, getContractByName } from '@dojoengine/core'
-import { ChainId, NetworkId, NETWORKS } from './networks'
+import { ChainId, getNetworkConfig, NetworkId } from './networks'
 import pistols_manifest_dev from './manifests/manifest_dev.json'
 import pistols_manifest_academy from './manifests/manifest_academy.json'
 import pistols_manifest_staging from './manifests/manifest_staging.json'
@@ -49,7 +49,7 @@ export const getManifest = ({
 // contract addresses
 //
 // erc-20
-export const getLordsAddress = (networkId: NetworkId): string => (NETWORKS[networkId].lordsAddress || (getContractByName(manifests_per_network[networkId], NAMESPACE, 'lords_mock')?.address ?? '0x0'))
+export const getLordsAddress = (networkId: NetworkId): string => (getNetworkConfig(networkId).lordsAddress || (getContractByName(manifests_per_network[networkId], NAMESPACE, 'lords_mock')?.address ?? '0x0'))
 export const getFameAddress = (networkId: NetworkId): string => (getContractByName(manifests_per_network[networkId], NAMESPACE, 'fame_coin')?.address ?? '0x0')
 export const getFoolsAddress = (networkId: NetworkId): string => (getContractByName(manifests_per_network[networkId], NAMESPACE, 'fools_coin')?.address ?? '0x0')
 // erc-721
@@ -62,5 +62,5 @@ export const getWorldAddress = (networkId: NetworkId): string => (manifests_per_
 export const getGameAddress = (networkId: NetworkId): string => (getContractByName(manifests_per_network[networkId], NAMESPACE, 'game')?.address ?? '0x0')
 export const getBankAddress = (networkId: NetworkId): string => (getContractByName(manifests_per_network[networkId], NAMESPACE, 'bank')?.address ?? '0x0')
 export const getAdminAddress = (networkId: NetworkId): string => (getContractByName(manifests_per_network[networkId], NAMESPACE, 'admin')?.address ?? '0x0')
-export const getVrfAddress = (networkId: NetworkId): string => (NETWORKS[networkId].vrfAddress || (getContractByName(manifests_per_network[networkId], NAMESPACE, 'vrf_mock')?.address ?? '0x0'))
+export const getVrfAddress = (networkId: NetworkId): string => (getNetworkConfig(networkId).vrfAddress || (getContractByName(manifests_per_network[networkId], NAMESPACE, 'vrf_mock')?.address ?? '0x0'))
 

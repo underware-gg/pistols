@@ -1,6 +1,6 @@
 import { Connector } from '@starknet-react/core'
 import type { Tokens } from '@cartridge/controller'
-import { NetworkId, NETWORKS } from 'src/games/pistols/config/networks'
+import { getNetworkConfig, NetworkId } from 'src/games/pistols/config/networks'
 import { makeControllerConnector } from 'src/games/pistols/dojo/controller_connector'
 import { makePistolsPolicies } from 'src/games/pistols/dojo/policies'
 import {
@@ -13,7 +13,7 @@ import {
   NAMESPACE,
 } from 'src/games/pistols/config/config'
 
-export const makePistolsControllerConnector = (networkId: NetworkId): Connector => {
+export const makePistolsControllerConnector = (networkId: NetworkId, env?: any): Connector => {
   const tokens: Tokens = {
     erc20: [
       getLordsAddress(networkId),
@@ -29,9 +29,10 @@ export const makePistolsControllerConnector = (networkId: NetworkId): Connector 
   }
 
   // do not generate policies for Mainnet, as it uses the preset
+  const networkConfig = getNetworkConfig(networkId, env)
   const policies = (
     networkId === NetworkId.MAINNET ? undefined
-      : makePistolsPolicies(networkId, !Boolean(NETWORKS[networkId].lordsAddress), false)
+      : makePistolsPolicies(networkId, !Boolean(networkConfig.lordsAddress), false)
   )
 
   //
@@ -39,9 +40,9 @@ export const makePistolsControllerConnector = (networkId: NetworkId): Connector 
   return makeControllerConnector(
     'pistols', // preset name
     NAMESPACE,
-    NETWORKS[networkId].chainId,
-    NETWORKS[networkId].rpcUrl,
-    NETWORKS[networkId].slot,
+    networkConfig.chainId,
+    networkConfig.rpcUrl,
+    networkConfig.slotName,
     policies,
     tokens,
   );

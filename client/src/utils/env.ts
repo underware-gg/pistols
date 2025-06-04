@@ -14,6 +14,7 @@ export const ACADEMY_NETWORK_ID = _env('VITE_ACADEMY_NETWORK_ID') || _env('ACADE
 export const ASSETS_SERVER_URL = _env('VITE_ASSETS_SERVER_URL') || 'https://assets.underware.gg';
 export const SALT_SERVER_URL = _env('VITE_SALT_SERVER_URL') || 'https://assets.underware.gg';
 // dojo config overrides
+export const SLOT_NAME = _env('VITE_SLOT_NAME') || null;
 export const RPC_URL = _env('VITE_RPC_URL') || null;
 export const TORII_URL = _env('VITE_TORII_URL') || null;
 export const TORII_RELAY_URL = _env('VITE_TORII_RELAY_URL') || null;

@@ -20,10 +20,6 @@ export const useSdkPublishTypedData = (
         console.warn('useSdkPublishSignedMessage() needs Cartridge Controller!')
         return
       }
-      if (!sdkConfig.client.relayUrl) {
-        console.error('useSdkPublishSignedMessage() failed: relayUrl is not set')
-        return
-      }
       if (isPublishing) {
         console.warn('useSdkPublishSignedMessage() still publishing...')
         return

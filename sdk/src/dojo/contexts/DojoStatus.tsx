@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react'
 import useSWR from 'swr'
-import { useStarknetContext } from 'src/dojo/contexts/StarknetProvider'
 import { useDojoSetup } from 'src/exports/dojo'
 
 const textFetcher = (url: string) => fetch(url).then((res) => res.text())
@@ -29,8 +28,8 @@ export const useToriiStatus = () => {
 }
 
 export const useKatanaStatus = () => {
-  const { selectedNetworkConfig } = useStarknetContext()
-  const { data, error, isLoading } = useSWR(selectedNetworkConfig.rpcUrl, textFetcher)
+  const { rpcUrl } = useDojoSetup()
+  const { data, error, isLoading } = useSWR(rpcUrl, textFetcher)
   // data: string = {"health":true}
   // console.log(`torii:`, data, data, error, isLoading)
 

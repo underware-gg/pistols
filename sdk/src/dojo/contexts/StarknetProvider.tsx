@@ -2,7 +2,7 @@ import React, { ReactNode, createContext, useContext, useEffect, useMemo } from 
 import { Chain } from '@starknet-react/chains'
 import { StarknetConfig, jsonRpcProvider } from '@starknet-react/core'
 import { useChainConnectors } from 'src/games/pistols/dojo/connectors'
-import { NetworkId, DojoNetworkConfig, NETWORKS } from 'src/games/pistols/config/networks'
+import { NetworkId, DojoNetworkConfig, getChains, getNetworkConfig, DojoNetworkEnv } from 'src/games/pistols/config/networks'
 import { DojoAppConfig } from 'src/dojo/contexts/Dojo'
 
 
@@ -17,23 +17,20 @@ export const StarknetContext = createContext<StarknetContextType>(null)
 export const StarknetProvider = ({
   dojoAppConfig,
   children,
+  env,
 }: {
   dojoAppConfig: DojoAppConfig
   children: ReactNode
+  env?: DojoNetworkEnv
 }) => {
   const currentValue = useContext(StarknetContext)
   if (currentValue) throw new Error('StarknetProvider can only be used once')
 
-  const chains: Chain[] = useMemo(() => (
-    Object.values(NETWORKS)
-      .map(networkConfig => networkConfig.chain)
-      // remove duplicates
-      .filter((value, index, array) => (array.findIndex(v => v.id === value.id) === index))
-  ), [])
+  const chains: Chain[] = useMemo(() => getChains(), [])
 
   // Current chain
   const selectedNetworkId = useMemo(() => (dojoAppConfig.selectedNetworkId), [dojoAppConfig])
-  const selectedNetworkConfig = useMemo(() => NETWORKS[selectedNetworkId], [selectedNetworkId])
+  const selectedNetworkConfig = useMemo(() => getNetworkConfig(selectedNetworkId, env), [selectedNetworkId, env])
   useEffect(() => console.log(`Selected network:`, selectedNetworkId, selectedNetworkConfig), [selectedNetworkId])
 
   // Build chain connectors from selectedNetworkConfig
