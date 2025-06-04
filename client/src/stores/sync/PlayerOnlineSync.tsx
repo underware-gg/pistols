@@ -17,7 +17,7 @@ export function PlayerOnlineSync() {
   }, [])
 
   // wait for page to load
-  const waited = useDelay(true, 3000)
+  const waited = useDelay(true, 10000)
 
   // publisher
   const { publish, isPublishing } = usePlayerOnlineSignedMessage(waited ? clientSeconds : 0)
