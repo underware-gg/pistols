@@ -101,7 +101,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         if (!newNotif) return existing
 
         if (newNotif.timestamp !== existing.timestamp || 
-            newNotif.requiresAction !== existing.requiresAction) {
+          (newNotif.requiresAction !== existing.requiresAction && (newNotif.state === constants.ChallengeState.Resolved || newNotif.state === constants.ChallengeState.Draw))
+        ) {
           return {
             ...existing,
             timestamp: newNotif.timestamp,

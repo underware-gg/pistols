@@ -298,7 +298,7 @@ export const Header = memo(function Header() {
             <CurtainUI visible={!atTavern && !atTutorial && !atCardPacks} short={true} />
             <BannerButton button={<SettingsGearButton size='big'/>} visible={atTavern || atProfile} right={true} />
           </div>
-          <Image className='NoMouse NoDrag NoSelection ' src='/images/ui/tavern/wooden_corners.png' style={{ position: 'absolute' }} />
+          <Image className='NoMouse NoDrag NoSelection' src='/images/ui/tavern/wooden_corners.png' style={{ position: 'absolute' }} />
           <div className='UIHeaderCorner' style={{ padding: `${aspectWidth(1)}px ${aspectWidth(2)}px` }}>
             {!atTavern && 
               <>
@@ -331,13 +331,13 @@ export const BannerButton = memo(function BannerButton({
   button,
   right = false,
   short = false,
-  long = false,
+  customOffset = 0,
   visible = false,
 }: {
   button: any
   right?: boolean
   short?: boolean
-  long?: boolean
+  customOffset?: number
   visible?: boolean
 }) {
 
@@ -349,7 +349,7 @@ export const BannerButton = memo(function BannerButton({
     if (visible) {
       let targetOffset = 0
       if (short) targetOffset = -4.5
-      else if (long) targetOffset = 3
+      else if (customOffset) targetOffset = customOffset
       
       new TWEEN.Tween({ offset })
         .to({ offset: targetOffset }, SCENE_CHANGE_ANIMATION_DURATION * 2)
@@ -364,7 +364,7 @@ export const BannerButton = memo(function BannerButton({
         .onUpdate(({offset}) => setOffset(offset))
         .start()
     }
-  }, [visible, short, long])
+  }, [visible, short, customOffset])
 
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'absolute', width: aspectWidth(10), height: 'auto', top: aspectWidth(offset), [right ? 'right' : 'left']: aspectWidth(2) }}>
