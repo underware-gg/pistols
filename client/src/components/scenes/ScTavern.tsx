@@ -144,6 +144,7 @@ export default function ScTavern() {
         }}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
+        onClick={() => setOpen(true)}
       />
 
       <ActivityPanel />

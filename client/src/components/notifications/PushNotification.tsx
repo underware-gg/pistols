@@ -121,6 +121,10 @@ export const PushNotification: React.FC<{
     return { title: rawTitle, message: rawMessage }
   }, [notification, myName, isMeA, isMeB, challengedName, challengerName, challenge, turnA, turnB, completedStagesA, completedStagesB])
 
+  //TODO notifications show up behind curtain
+  //TODO check notifications working throughout a duel and if they display correct text
+  //TODO check all texts states and pushnotifications might not have latest information?
+
   useEffect(() => {
     if (notification && notificationData.title && notificationData.message) {
       if (!notification.isDisplayed) {
