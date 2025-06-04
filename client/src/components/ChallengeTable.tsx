@@ -151,7 +151,7 @@ function DuelItem({
   const { selectedDuelistId } = usePistolsContext()
 
   const {
-    challenge: { duelistIdA, duelistIdB, state, isLive, isCanceled, isExpired, isDraw, winner, duelistAddressA, duelistAddressB },
+    challenge: { duelistIdA, duelistIdB, state, isLive, isCanceled, isExpired, isDraw, winner, duelistAddressA, duelistAddressB, seasonId },
     turnA, turnB,
   } = useDuel(duelId)
   const { name: playerNameA } = usePlayer(duelistAddressA)
@@ -250,6 +250,9 @@ function DuelItem({
 
       <Cell textAlign='center' style={{ width: '20%' }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          {seasonId > 0 &&
+            <span className='Important'>Season {seasonId}</span>
+          }
           <span style={{ fontSize: aspectWidth(1.4), fontWeight: 'bold' }}>VS</span>
           {state == constants.ChallengeState.Resolved ?
             <>
