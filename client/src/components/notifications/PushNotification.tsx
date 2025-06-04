@@ -5,12 +5,14 @@ import { usePlayer } from '/src/stores/playerStore'
 import { useDuel } from '/src/hooks/useDuel'
 import { useIsMyAccount } from '/src/hooks/useIsYou'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
+import { usePistolsContext } from '/src/hooks/PistolsContext'
 
 export const PushNotification: React.FC<{ 
   notification: Notification, 
   shouldShow: boolean,
   showNotification: () => void
 }> = ({ notification, shouldShow, showNotification }) => {
+  const { currentDuel, selectedDuelId } = usePistolsContext()
   const { challenge, turnA, turnB, completedStagesA, completedStagesB } = useDuel(notification?.duelId)
   const { isMyAccount: isMeA } = useIsMyAccount(challenge?.duelistAddressA)
   const { isMyAccount: isMeB } = useIsMyAccount(challenge?.duelistAddressB)
@@ -126,8 +128,10 @@ export const PushNotification: React.FC<{
 
   useEffect(() => {
     if (notification && notificationData.title && notificationData.message) {
-      if (!notification.isDisplayed) {
+      if (!notification.isDisplayed && selectedDuelId !== notification.duelId && currentDuel !== notification.duelId) {
         sendBrowserNotification()
+      } else if (selectedDuelId === notification.duelId || currentDuel === notification.duelId) {
+        showNotification()
       }
     }
   }, [notification, notificationData])
