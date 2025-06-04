@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
 import { formatQueryValue, useStoreModelsByKeys, useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
@@ -8,6 +8,7 @@ import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { movesToHand } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
+import { useChallengeQueryStore } from './challengeQueryStore'
 
 export const useChallengeStore = createDojoStore<PistolsSchemaType>();
 
@@ -197,6 +198,61 @@ export const useRoundTimeout = (duelId: BigNumberish, autoUpdate = false) => {
 // (for non default challenges, like tutorials)
 //
 
+const _challengeModels: `${string}-${string}`[] = [
+  "pistols-Challenge",
+  "pistols-ChallengeMessage",
+  'pistols-Round',
+]
+
+export const useGetChallengeIdsByDuelist = (duelistId: BigNumberish) => {
+  const duelistIds = useMemo(() => [duelistId], [duelistId])
+  return useGetChallengeIdsByDuelistIds(duelistIds)
+}
+
+export const useGetChallengeIdsByDuelistIds = (duelistIds: BigNumberish[]) => {
+  const updateEntity = useChallengeStore((state) => state.updateEntity);
+  const queryState = useChallengeQueryStore((state) => state);
+
+  const newDuelistIds = useMemo(() => (
+    duelistIds
+      .filter(isPositiveBigint)
+      .filter(id => !queryState.duelistIds.includes(BigInt(id)))
+  ), [duelistIds])
+
+  const query = useMemo<PistolsQueryBuilder>(() => (
+    newDuelistIds.length > 0
+      ? new PistolsQueryBuilder()
+        .withClause(
+          new PistolsClauseBuilder().compose().or([
+            new PistolsClauseBuilder().where("pistols-Challenge", "duelist_id_a", "In", newDuelistIds.map(formatQueryValue)),
+            new PistolsClauseBuilder().where("pistols-Challenge", "duelist_id_b", "In", newDuelistIds.map(formatQueryValue)),
+          ]).build()
+        )
+        .withEntityModels(_challengeModels)
+        .includeHashedKeys()
+      : null
+  ), [newDuelistIds])
+
+  useSdkEntitiesGet({
+    query,
+    // enabled: !result.challengeExists,
+    setEntities: (entities: PistolsEntity[]) => {
+      console.log(`useGetChallengeIdsByDuelist() GOT`, newDuelistIds, entities);
+      queryState.fetchedDuelistIds(newDuelistIds.map(BigInt));
+      entities.forEach(e => {
+        queryState.updateEntity(e);
+        updateEntity(e);
+      });
+    },
+  })
+
+  useEffect(() => {
+    console.log(`::challengeIdsByDuelist`, newDuelistIds, query)
+  }, [newDuelistIds, query])
+
+  return {}
+}
+
 export const useGetChallenge = (duel_id: BigNumberish) => {
   const result = useChallenge(duel_id)
 
@@ -204,20 +260,9 @@ export const useGetChallenge = (duel_id: BigNumberish) => {
     isPositiveBigint(duel_id)
       ? new PistolsQueryBuilder()
         .withClause(
-          new PistolsClauseBuilder().keys(
-            [
-              "pistols-Challenge",
-              "pistols-ChallengeMessage",
-              'pistols-Round',
-            ],
-            [formatQueryValue(duel_id)]
-          ).build()
+          new PistolsClauseBuilder().keys(_challengeModels, [formatQueryValue(duel_id)]).build()
         )
-        .withEntityModels([
-          "pistols-Challenge",
-          "pistols-ChallengeMessage",
-          'pistols-Round',
-        ])
+        .withEntityModels(_challengeModels)
         .includeHashedKeys()
       : null
   ), [duel_id])

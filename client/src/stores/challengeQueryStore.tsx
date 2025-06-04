@@ -26,17 +26,17 @@ interface StateEntity {
   address_b: bigint
   duelist_id_a: bigint
   duelist_id_b: bigint
-  duelist_entity_id_a: string
-  duelist_entity_id_b: string
 }
 interface StateEntities {
   [entityId: string]: StateEntity,
 }
 interface State {
   entities: StateEntities,
+  duelistIds: bigint[],
   resetStore: () => void;
   setEntities: (entities: PistolsEntity[]) => void;
   updateEntity: (entity: PistolsEntity) => void;
+  fetchedDuelistIds: (duelistIds: bigint[]) => void;
 }
 
 const createStore = () => {
@@ -55,12 +55,11 @@ const createStore = () => {
       address_b: BigInt(challenge.address_b),
       duelist_id_a: BigInt(challenge.duelist_id_a),
       duelist_id_b: BigInt(challenge.duelist_id_b),
-      duelist_entity_id_a: keysToEntityId([challenge.duelist_id_a]),
-      duelist_entity_id_b: keysToEntityId([challenge.duelist_id_b]),
     }
   }
   return create<State>()(immer((set) => ({
     entities: {},
+    duelistIds: [],
     resetStore: () => {
       // console.warn("QUERY_STORE: resetStore()")
       set((state: State) => {
@@ -85,6 +84,14 @@ const createStore = () => {
           state.entities[e.entityId] = value
         }
       });
+    },
+    fetchedDuelistIds: (duelistIds: bigint[]) => {
+      set((state: State) => {
+        state.duelistIds = [...new Set([
+          ...state.duelistIds,
+          ...duelistIds])
+        ]
+      })
     },
   })))
 }

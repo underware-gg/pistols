@@ -9,6 +9,7 @@ import { useDuelCallToAction } from '/src/stores/eventsModelStore'
 import { usePlayer } from '/src/stores/playerStore'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { useIsMyAccount } from '/src/hooks/useIsYou'
+import { useGetChallengeIdsByDuelist } from '/src/stores/challengeStore'
 import { AllChallengeStates, ChallengeStateClasses, ChallengeStateNames } from '/src/utils/pistols'
 import { ProfilePic } from '/src/components/account/ProfilePic'
 import { DuelIconsAsRow } from '/src/components/DuelIcons'
@@ -33,6 +34,7 @@ export function ChallengeTableSelectedDuelist({
   const { selectedDuelistId } = usePistolsContext()
   const { filterChallengeSortColumn, filterChallengeSortDirection } = useQueryParams()
   const { challengeIds, states } = useQueryChallengeIds(statesFilter, null, false, selectedDuelistId, filterChallengeSortColumn, filterChallengeSortDirection)
+  const challengeIdsByDuelist = useGetChallengeIdsByDuelist(selectedDuelistId)
 
   useEffect(() => {
     console.log('ChallengeTableSelectedDuelist', selectedDuelistId)
