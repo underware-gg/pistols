@@ -15,6 +15,7 @@ export const useAllSeasonIds = () => {
   const seasonIds = useMemo(() => (
     Object.values(entities)
       .filter(e => Boolean(e.models?.pistols?.SeasonConfig))
+      .sort((a, b) => Number(b.models?.pistols?.SeasonConfig?.period?.start) - Number(a.models?.pistols?.SeasonConfig?.period?.start))
       .map(e => Number(e.models?.pistols?.SeasonConfig?.season_id))
   ), [entities])
   return {
