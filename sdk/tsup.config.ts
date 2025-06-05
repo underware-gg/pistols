@@ -7,6 +7,7 @@ export default defineConfig({
     "src/exports/api.ts",
     "src/exports/dojo.ts",
     "src/exports/dojo_graphql.ts",
+    "src/exports/dojo_sql.ts",
     "src/exports/fix.ts",
     "src/exports/hooks.ts",
     "src/exports/pistols.ts",

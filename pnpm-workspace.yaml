@@ -23,6 +23,7 @@ catalog:
   #
   "@starknet-react/core": ^3.6.2
   "@starknet-react/chains": ^3.1.0
+  "@tanstack/react-query": ^5.62.16
   get-starknet-core: ^4.0.0
   starknet: 6.23.1
   immer: ^10.1.1

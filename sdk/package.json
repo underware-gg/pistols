@@ -47,6 +47,10 @@
       "import": "./dist/dojo_graphql.js",
       "types": "./dist/dojo_graphql.d.ts"
     },
+    "./dojo/sql": {
+      "import": "./dist/dojo_sql.js",
+      "types": "./dist/dojo_sql.d.ts"
+    },
     "./fix": {
       "import": "./dist/fix.js",
       "types": "./dist/fix.d.ts"
@@ -134,6 +138,7 @@
     "@dojoengine/utils": "catalog:",
     "@starknet-react/chains": "catalog:",
     "@starknet-react/core": "catalog:",
+    "@tanstack/react-query": "catalog:",
     "get-starknet-core": "catalog:",
     "immer": "catalog:",
     "react": "catalog:",
