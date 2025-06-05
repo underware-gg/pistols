@@ -1,8 +1,8 @@
 import { formatQueryValue, useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
 import { useMemoGate, useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols/sdk'
-import { useChallengeQueryStore } from '/src/stores/challengeQueryStore'
 import { useChallengeStore } from '/src/stores/challengeStore'
+import { useChallengeFetchStore } from '/src/stores/fetchStore'
 import { useConfig } from '/src/stores/configStore'
 import { useScoreboardStore } from '/src/stores/scoreboardStore'
 import { useProgressStore } from '/src/stores/progressStore'
@@ -44,7 +44,7 @@ export function SeasonChallengeStoreSync() {
   ), [currentSeasonId])
 
   const challengeState = useChallengeStore((state) => state)
-  const queryState = useChallengeQueryStore((state) => state)
+  const fetchState = useChallengeFetchStore((state) => state)
   const updateProgress = useProgressStore((state) => state.updateProgress)
 
   const mounted = useMounted()
@@ -58,7 +58,7 @@ export function SeasonChallengeStoreSync() {
     resetStore: () => {
       debug.log("SeasonEntityStoreSync() RESET =======>")
       challengeState.resetStore()
-      queryState.resetStore()
+      fetchState.resetStore()
     },
     setEntities: (entities: PistolsEntity[]) => {
       debug.log("SeasonEntityStoreSync() SET =======> [entity]:", entities)

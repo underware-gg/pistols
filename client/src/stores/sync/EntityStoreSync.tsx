@@ -1,5 +1,5 @@
-import { useSdkEntitiesSub, filterEntitiesByModels, entityContainsModels, useSdkEntitiesGet, formatQueryValue } from '@underware/pistols-sdk/dojo'
-import { PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols/sdk'
+import { useSdkEntitiesSub, filterEntitiesByModels, entityContainsModels, useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
+import { PistolsQueryBuilder, PistolsEntity } from '@underware/pistols-sdk/pistols/sdk'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useConfigStore } from '/src/stores/configStore'
 import { useSeasonStore } from '/src/stores/seasonStore'
@@ -126,7 +126,7 @@ export function EntityStoreSync() {
       debug.log("EntityStoreSync() SET MISC =======> [entities]:", entities)
       // debug.log("EntityStoreSync() SET =======> [Config]:", filterEntitiesByModels(entities, ['Config']))
       // debug.log("EntityStoreSync() SET =======> [TokenConfig]:", filterEntitiesByModels(entities, ['TokenConfig']))
-      debug.log("EntityStoreSync() SET =======> [Pool]:", filterEntitiesByModels(entities, ['Pool']))
+      // debug.log("EntityStoreSync() SET =======> [Pool]:", filterEntitiesByModels(entities, ['Pool']))
       // debug.log("EntityStoreSync() SET =======> [SeasonConfig]:", filterEntitiesByModels(entities, ['SeasonConfig', 'Leaderboard']))
       // debug.log("EntityStoreSync() SET =======> [Leaderboard]:", filterEntitiesByModels(entities, ['Leaderboard']))
       configState.setEntities(filterEntitiesByModels(entities, ['Config']))
@@ -145,8 +145,8 @@ export function EntityStoreSync() {
     },
     setEntities: (entities: PistolsEntity[]) => {
       debug.log("EntityStoreSync() SET PLAYERS =======> [entities]:", entities)
-      debug.log("EntityStoreSync() SET PLAYERS =======> [Player]:", filterEntitiesByModels(entities, ['Player']))
-      debug.log("EntityStoreSync() SET PLAYERS =======> [PlayerOnline]:", filterEntitiesByModels(entities, ['PlayerOnline']))
+      // debug.log("EntityStoreSync() SET PLAYERS =======> [Player]:", filterEntitiesByModels(entities, ['Player']))
+      // debug.log("EntityStoreSync() SET PLAYERS =======> [PlayerOnline]:", filterEntitiesByModels(entities, ['PlayerOnline']))
       playerState.setEntities(filterEntitiesByModels(entities, ['Player', 'PlayerFlags', 'PlayerTeamFlags']))
       playerDataState.updateMessages(filterEntitiesByModels(entities, ['PlayerOnline']))
     },

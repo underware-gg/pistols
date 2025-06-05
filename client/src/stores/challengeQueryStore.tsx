@@ -1,6 +1,4 @@
 import { useMemo } from 'react'
-import { create } from 'zustand'
-import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useCallToActions } from './eventsModelStore'
@@ -13,56 +11,11 @@ import { parseEnumVariant } from '@underware/pistols-sdk/starknet'
 import { keysToEntityId, getEntityModel, useAllStoreModels } from '@underware/pistols-sdk/dojo'
 import { useChallengeStore } from '/src/stores/challengeStore'
 
-//------------------------------------------
-// query helper
-//
-
-// interface StateEntity {
-//   duel_id: bigint
-//   timestamp: number
-//   state: constants.ChallengeState
-//   state_value: number
-//   address_a: bigint
-//   address_b: bigint
-//   duelist_id_a: bigint
-//   duelist_id_b: bigint
-// }
-interface State {
-  duelistIds: bigint[],
-  resetStore: () => void;
-  fetchedDuelistIds: (duelistIds: bigint[]) => void;
-}
-
-const createStore = () => {
-  return create<State>()(immer((set) => ({
-    duelistIds: [],
-    resetStore: () => {
-      // console.warn("QUERY_STORE: resetStore()")
-      set((state: State) => {
-        state.duelistIds = []
-      })
-    },
-    fetchedDuelistIds: (duelistIds: bigint[]) => {
-      set((state: State) => {
-        state.duelistIds = [...new Set([
-          ...state.duelistIds,
-          ...duelistIds])
-        ]
-      })
-    },
-  })))
-}
-
-export const useChallengeQueryStore = createStore();
-
 
 //--------------------------------
-// query hooks
+// SQL query hooks
 // use SQL to find Duel IDs and add to challengeStore
 //
-
-
-
 
 
 
@@ -79,7 +32,7 @@ export function useMyActiveDuels(notificationDuelIds: bigint[] = []) {
   // const { requiredDuelIds } = useCallToActions()
   // const { duelPerDuelist } = useCallToActions()
 
-  // const entities = useChallengeQueryStore((state) => state.entities)
+  // const entities = useChallengeFetchStore((state) => state.entities)
 
   // const result = useMemo(() => {
   //   if (!address) return []

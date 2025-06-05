@@ -8,24 +8,31 @@ import { useGameAspect } from '/src/hooks/useGameAspect'
 import { DojoSetupErrorDetector } from '/src/components/account/DojoSetupErrorDetector'
 import { POSTER_HEIGHT_SMALL, POSTER_WIDTH_SMALL, ProfilePoster, ProfilePosterHandle } from '/src/components/ui/ProfilePoster'
 import { SceneName } from '/src/data/assets'
-import { useQueryChallengeIds } from '/src/stores/challengeStore'
+import { useFetchChallengeIdsByPlayer, useQueryChallengesByPlayer } from '/src/stores/challengeStore'
 import { useAccount } from '@starknet-react/core'
 import { LiveChallengeStates } from '/src/utils/pistols'
 import DuelTutorialOverlay from '/src/components/ui/duel/DuelTutorialOverlay'
+import { bigintEquals } from '@underware/pistols-sdk/utils'
 
 export default function ScDuelists() {
-  const { address } = useAccount()
   const { filterPlayerName, filterPlayerOnline, filterPlayerBookmarked, filterPlayerSortColumn, filterPlayerSortDirection } = useQueryParams()
   const { playerIds } = useQueryPlayerIds(filterPlayerName, filterPlayerOnline, filterPlayerBookmarked, filterPlayerSortColumn, filterPlayerSortDirection)
-  const { playerIds: matchmakingPlayerIds } = useQueryPlayerIds("", true, false, PlayerColumn.Timestamp, SortDirection.Descending)
-  const { challengePlayerMap } = useQueryChallengeIds(LiveChallengeStates, "", false, address, ChallengeColumn.Time, SortDirection.Descending)
+  const { playerIds: matchmakingPlayerAddresses } = useQueryPlayerIds("", true, false, PlayerColumn.Timestamp, SortDirection.Descending)
+  
+  // get the players current challenges
+  const { address } = useAccount()
+  useFetchChallengeIdsByPlayer(address)
+  const { challenges: currentChallenges } = useQueryChallengesByPlayer(address, LiveChallengeStates)
+
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSelectPlayerAddress, tutorialOpener } = usePistolsContext()
   const { dispatchSetScene} = usePistolsScene()
 
   const availableMatchmakingPlayers = useMemo(() => {
-    return matchmakingPlayerIds.filter(id => !Array.from(challengePlayerMap.values()).some(player => player.addressA === id || player.addressB === id))
-  }, [matchmakingPlayerIds, challengePlayerMap])
+    return matchmakingPlayerAddresses.filter(address => (
+      !currentChallenges.some(ch => bigintEquals(ch.address_a, address) || bigintEquals(ch.address_b, address))
+    ))
+  }, [matchmakingPlayerAddresses, currentChallenges])
 
   // useEffect(() => {
   //   console.log(`matchmaking:`, matchmakingPlayerIds, challengePlayerMap, availableMatchmakingPlayers)

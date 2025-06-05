@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
 import { formatQueryValue, useStoreModelsByKeys, useSdkEntitiesGet, useAllStoreModels } from '@underware/pistols-sdk/dojo'
@@ -8,11 +8,11 @@ import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
 import { bigintEquals, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { movesToHand } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
-import { useChallengeQueryStore } from './challengeQueryStore'
 import { ChallengeColumn, SortDirection } from './queryParamsStore'
 import { useAccount } from '@starknet-react/core'
 import { getPlayerName, usePlayer } from './playerStore'
 import { useCallToActions } from './eventsModelStore'
+import { useChallengeFetchStore } from '/src/stores/fetchStore'
 
 export const useChallengeStore = createDojoStore<PistolsSchemaType>();
 
@@ -261,65 +261,10 @@ export function useDuelistSeasonStats(duelistId: BigNumberish, seasonId?: BigNum
 
 
 
-//--------------------------------
+//------------------------------------------
 // Fetch new challenge and add to the store
-// (for non default challenges, like tutorials)
+// (if not already in the store)
 //
-
-export const useFetchChallengeIdsByDuelist = (duelistId: BigNumberish) => {
-  const duelistIds = useMemo(() => [duelistId], [duelistId])
-  return useFetchChallengeIdsByDuelistIds(duelistIds)
-}
-
-export const useFetchChallengeIdsByDuelistIds = (duelistIds: BigNumberish[]) => {
-  const setEntities = useChallengeStore((state) => state.setEntities);
-  const queryState = useChallengeQueryStore((state) => state);
-
-  const newDuelistIds = useMemo(() => (
-    duelistIds
-      .filter(isPositiveBigint)
-      .filter(id => !queryState.duelistIds.includes(BigInt(id)))
-  ), [duelistIds])
-
-  const query = useMemo<PistolsQueryBuilder>(() => (
-    newDuelistIds.length > 0
-      ? new PistolsQueryBuilder()
-        .withClause(
-          new PistolsClauseBuilder().compose().or([
-            new PistolsClauseBuilder().where("pistols-Challenge", "duelist_id_a", "In", newDuelistIds.map(formatQueryValue)),
-            new PistolsClauseBuilder().where("pistols-Challenge", "duelist_id_b", "In", newDuelistIds.map(formatQueryValue)),
-          ]).build()
-        )
-        .withEntityModels([
-          "pistols-Challenge",
-          "pistols-ChallengeMessage",
-          'pistols-Round',
-        ])
-        .includeHashedKeys()
-      : null
-  ), [newDuelistIds])
-
-  useSdkEntitiesGet({
-    query,
-    // enabled: !result.challengeExists,
-    setEntities: (entities: PistolsEntity[]) => {
-      console.log(`useFetchChallengeIdsByDuelist() GOT`, newDuelistIds, entities);
-      queryState.fetchedDuelistIds(newDuelistIds.map(BigInt));
-      setEntities(entities);
-    },
-  })
-
-  useEffect(() => {
-    console.log(`::useFetchChallengeIdsByDuelist...`, newDuelistIds, query)
-  }, [newDuelistIds, query])
-
-  // const entities = useChallengeStore((state) => state.entities);
-  // useEffect(() => {
-  //   console.log(`::useFetchChallengeIdsByDuelist... entities:`, entities)
-  // }, [entities])
-
-  return {}
-}
 
 export const useGetChallenge = (duel_id: BigNumberish) => {
   const result = useChallenge(duel_id)
@@ -363,6 +308,119 @@ export const useGetChallenge = (duel_id: BigNumberish) => {
 
 
 
+//------------------------------------------------
+// Fetch multiple challenges per player or duelist
+// after fetching once, it won't fetch again the same duelists/players
+// new and fetched challenges will be updated automatically with the entity subscription
+//
+
+export const useFetchChallengeIdsByDuelist = (duelistId: BigNumberish) => {
+  const duelistIds = useMemo(() => [duelistId], [duelistId])
+  return useFetchChallengeIdsByDuelistIds(duelistIds)
+}
+
+export const useFetchChallengeIdsByDuelistIds = (duelistIds: BigNumberish[]) => {
+  const setEntities = useChallengeStore((state) => state.setEntities);
+  const fetchState = useChallengeFetchStore((state) => state);
+
+  const newDuelistIds = useMemo(() => (
+    fetchState.getNewDuelistIds(duelistIds)
+  ), [duelistIds, fetchState.duelistIds])
+
+  const query = useMemo<PistolsQueryBuilder>(() => (
+    newDuelistIds.length > 0
+      ? new PistolsQueryBuilder()
+        .withClause(
+          new PistolsClauseBuilder().compose().or([
+            new PistolsClauseBuilder().where("pistols-Challenge", "duelist_id_a", "In", newDuelistIds.map(formatQueryValue)),
+            new PistolsClauseBuilder().where("pistols-Challenge", "duelist_id_b", "In", newDuelistIds.map(formatQueryValue)),
+          ]).build()
+        )
+        .withEntityModels([
+          "pistols-Challenge",
+          "pistols-ChallengeMessage",
+          'pistols-Round',
+        ])
+        .includeHashedKeys()
+      : null
+  ), [newDuelistIds])
+
+  useSdkEntitiesGet({
+    query,
+    // enabled: !result.challengeExists,
+    setEntities: (entities: PistolsEntity[]) => {
+      console.log(`useFetchChallengeIdsByDuelist() GOT`, newDuelistIds, entities);
+      fetchState.setFetchedDuelistIds(newDuelistIds.map(BigInt));
+      setEntities(entities);
+    },
+  })
+
+  useEffect(() => {
+    console.log(`::useFetchChallengeIdsByDuelist...`, newDuelistIds, query)
+  }, [newDuelistIds, query])
+
+  // const entities = useChallengeStore((state) => state.entities);
+  // useEffect(() => {
+  //   console.log(`::useFetchChallengeIdsByDuelist... entities:`, entities)
+  // }, [entities])
+
+  return {}
+}
+
+
+export const useFetchChallengeIdsByPlayer = (address: BigNumberish) => {
+  const addresses = useMemo(() => [address], [address])
+  return useFetchChallengeIdsByPlayerAddresses(addresses)
+}
+
+export const useFetchChallengeIdsByPlayerAddresses = (addresses: BigNumberish[]) => {
+  const setEntities = useChallengeStore((state) => state.setEntities);
+  const fetchState = useChallengeFetchStore((state) => state);
+
+  const newAddresses = useMemo(() => (
+    addresses
+      .filter(isPositiveBigint)
+      .filter(id => !fetchState.playerAddresses.includes(BigInt(id)))
+  ), [addresses, fetchState.playerAddresses])
+
+  const query = useMemo<PistolsQueryBuilder>(() => (
+    newAddresses.length > 0
+      ? new PistolsQueryBuilder()
+        .withClause(
+          new PistolsClauseBuilder().compose().or([
+            new PistolsClauseBuilder().where("pistols-Challenge", "address_a", "In", newAddresses.map(formatQueryValue)),
+            new PistolsClauseBuilder().where("pistols-Challenge", "address_b", "In", newAddresses.map(formatQueryValue)),
+          ]).build()
+        )
+        .withEntityModels([
+          "pistols-Challenge",
+          "pistols-ChallengeMessage",
+          'pistols-Round',
+        ])
+        .includeHashedKeys()
+      : null
+  ), [newAddresses])
+
+  useSdkEntitiesGet({
+    query,
+    // enabled: !result.challengeExists,
+    setEntities: (entities: PistolsEntity[]) => {
+      console.log(`useFetchChallengeIdsByPlayerAddresses() GOT`, newAddresses, entities);
+      fetchState.setFetchedPlayerAddresses(newAddresses.map(BigInt));
+      setEntities(entities);
+    },
+  })
+
+  useEffect(() => {
+    console.log(`::useFetchChallengeIdsByPlayerAddresses...`, newAddresses, query)
+  }, [newAddresses, query])
+
+  return {}
+}
+
+
+
+
 
 
 
@@ -392,6 +450,43 @@ const _sortChallenges = (challenges: models.Challenge[], sortColumn: ChallengeCo
         return (sortDirection === SortDirection.Ascending ? state_a - state_b : state_b - state_a);
       }) : challenges
 );
+
+export const useQueryChallengesByPlayer = (
+  playerAddress: BigNumberish,
+  filterStates?: constants.ChallengeState[],
+) => {
+  const entities = useChallengeStore((state) => state.entities);
+  const challenges = useAllStoreModels<models.Challenge>(entities, 'Challenge')
+
+  const { result, challengeIds } = useMemo(() => {
+    let _playerAddress = BigInt(playerAddress ?? 0)
+    let result = _playerAddress > 0n ? challenges.filter((ch) => (
+      bigintEquals(ch.address_a, _playerAddress) ||
+      bigintEquals(ch.address_b, _playerAddress)
+    )) : []
+
+    // filter by states, with special handling for required action duels
+    if (filterStates) {
+      result = _filterChallengesByState(result, filterStates)
+    }
+
+    // sort...
+    result = _sortChallenges(result, ChallengeColumn.Time, SortDirection.Descending)
+
+    // return ids only
+    const challengeIds = result.map((ch) => BigInt(ch.duel_id))
+
+    return {
+      result,
+      challengeIds,
+    }
+  }, [challenges, filterStates, playerAddress])
+
+  return {
+    challenges: result,
+    challengeIds,
+  }
+}
 
 export const useQueryChallengeIdsByDuelist = (
   duelistId: BigNumberish,
@@ -448,14 +543,13 @@ export const useQueryChallengeIds = (
   const entities = useChallengeStore((state) => state.entities);
   const challenges = useAllStoreModels<models.Challenge>(entities, 'Challenge')
 
-  useEffect(() => console.log(`::useQueryChallengeIds... entities:`, entities), [entities])
-  useEffect(() => console.log(`::useQueryChallengeIds... challenges:`, challenges), [challenges])
+  // useEffect(() => console.log(`::useQueryChallengeIds... entities:`, entities), [entities])
+  // useEffect(() => console.log(`::useQueryChallengeIds... challenges:`, challenges), [challenges])
 
   const targetId = useMemo(() => BigInt(playerAddressOrDuelistId ?? 0), [playerAddressOrDuelistId])
 
-  const { challengeIds, states, challengePlayerMap } = useMemo(() => {
+  const { result, challengeIds, states } = useMemo(() => {
     let result = [...challenges]
-    console.log(`::useQueryChallengeIds... 0:`, result)
 
     // filter challenges by duelist or player address
     if (targetId > 0n) {
@@ -466,13 +560,11 @@ export const useQueryChallengeIds = (
         bigintEquals(ch.address_b, targetId)
       ))
     }
-    console.log(`::useQueryChallengeIds... result_1 (${targetId}):`, result)
 
     // filter by bookmarked duels
     if (filterBookmarked) {
       result = result.filter((ch) => (bookmarkedDuels.find(p => bigintEquals(p, ch.duel_id)) !== undefined))
     }
-    console.log(`::useQueryChallengeIds... result_2:`, result)
 
     // filter by name
     if (filterName) {
@@ -482,63 +574,29 @@ export const useQueryChallengeIds = (
         getPlayerName(ch.address_b)?.toLowerCase().includes(filterNameLower)
       ))
     }
-    console.log(`::useQueryChallengeIds... result_3:`, result)
 
     // get all current states for fitlering
-    const states: constants.ChallengeState[] = [
-      ...new Set(result.map((ch) => (parseEnumVariant<constants.ChallengeState>(ch.state)))),
-    ]
-    // add awaiting state if there are required duels
-    if (result.some((ch) => requiredDuelIds.includes(BigInt(ch.duel_id))) && !states.includes(constants.ChallengeState.Awaiting)) {
-      states.push(constants.ChallengeState.Awaiting)
-    }
-    console.log(`::useQueryChallengeIds... result_4 (states):`, states)
+    const states = _getChallengeStateSet(result)
 
     // filter by states, with special handling for required action duels
-    result = result.filter((ch) => {
-      if (requiredDuelIds.includes(BigInt(ch.duel_id))) {
-        return filterStates.includes(constants.ChallengeState.Awaiting)
-      }
-      return filterStates.includes(parseEnumVariant<constants.ChallengeState>(ch.state))
-    })
+    result = _filterChallengesByState(result, filterStates)
 
     // sort...
-    if (sortColumn === ChallengeColumn.Time) {
-      result.sort((a, b) => {
-        const timestamp_a = Math.max(Number(a.timestamps.start), Number(a.timestamps.end))
-        const timestamp_b = Math.max(Number(b.timestamps.start), Number(b.timestamps.end))
-        return (sortDirection === SortDirection.Ascending ? timestamp_a - timestamp_b : timestamp_b - timestamp_a);
-      })
-    } else if (sortColumn === ChallengeColumn.Status) {
-      result.sort((a, b) => {
-        const state_a = constants.getChallengeStateValue(parseEnumVariant<constants.ChallengeState>(a.state))
-        const state_b = constants.getChallengeStateValue(parseEnumVariant<constants.ChallengeState>(b.state))
-        return (sortDirection === SortDirection.Ascending ? state_a - state_b : state_b - state_a);
-      })
-    }
+    result = _sortChallenges(result, sortColumn, sortDirection)
 
     // return ids only
     const challengeIds = result.map((ch) => BigInt(ch.duel_id))
 
-    // create map of challenge ids to player addresses
-    const challengePlayerMap = result.reduce((map, ch) => {
-      map.set(BigInt(ch.duel_id), {
-        addressA: BigInt(ch.address_a),
-        addressB: BigInt(ch.address_b)
-      })
-      return map
-    }, new Map())
-
     return {
+      result,
       challengeIds,
       states,
-      challengePlayerMap,
     }
   }, [challenges, filterStates, filterName, filterBookmarked, targetId, sortColumn, sortDirection, bookmarkedDuels, requiredDuelIds])
 
   return {
+    challenges: result,
     challengeIds,
     states,
-    challengePlayerMap,
   }
 }

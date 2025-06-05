@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { EventsHistoricalStoreSync } from '/src/stores/sync/EventsHistoricalStoreSync'
 import { EventsModelStoreSync } from './EventsModelStoreSync'
 import { SeasonChallengeStoreSync, SeasonScoreboardStoreSync } from '/src/stores/sync/SeasonEntityStoreSync'
@@ -6,8 +7,8 @@ import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
 import { PlayerNameSync } from '/src/stores/sync/PlayerNameSync'
 import { PlayerOnlineSync } from '/src/stores/sync/PlayerOnlineSync'
 import { TokenStoreSync } from '/src/stores/sync/TokenStoreSync'
-import { useMounted } from '@underware/pistols-sdk/utils/hooks'
-import { StoreProgressBar } from './StoreProgressBar'
+import { PlayerSync } from '/src/stores/sync/PlayerSync'
+import { StoreProgressBar } from '/src/stores/sync/StoreProgressBar'
 
 //
 // Manages all store subscriptions
@@ -22,6 +23,7 @@ export default function StoreSync() {
   return (
     <>
       {/* Torii */}
+      <PlayerSync />
       <EntityStoreSync />
       {/* <SeasonChallengeStoreSync /> */}
       <SeasonScoreboardStoreSync />
