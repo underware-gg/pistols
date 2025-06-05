@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { Grid } from 'semantic-ui-react'
 import { useAccount, useDisconnect } from '@starknet-react/core'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
-import { useStarknetContext, useConnectedController } from '@underware/pistols-sdk/dojo'
+import { useDojoSetup, useConnectedController } from '@underware/pistols-sdk/dojo'
 import { getConnectorIcon } from '@underware/pistols-sdk/pistols/dojo'
 import { makeProfilePicUrl } from '@underware/pistols-sdk/pistols'
 import { useSettings } from '/src/hooks/SettingsContext'
@@ -22,7 +22,7 @@ export default function WalletHeader({
 }) {
   const { disconnect } = useDisconnect()
   const { account, address, isConnected, connector } = useAccount()
-  const { selectedNetworkConfig } = useStarknetContext()
+  const { selectedNetworkConfig } = useDojoSetup()
   const { lordsContractAddress } = useTokenContracts()
   const { dispatchSetScene } = usePistolsScene()
   const { dispatchSelectPlayerAddress } = usePistolsContext()

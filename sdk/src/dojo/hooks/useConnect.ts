@@ -2,15 +2,14 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Connector, useAccount, useConnect, useNetwork } from '@starknet-react/core'
 import { SwitchStarknetChainParameters, AddStarknetChainParameters } from 'get-starknet-core'
 import { useAddStarknetChain, useSwitchStarknetChain } from 'src/utils/hooks/useWalletRequest'
-import { useStarknetContext } from 'src/dojo/contexts/StarknetProvider'
+import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
 import { feltToString } from 'src/starknet/starknet'
-import { useDojoSetup } from 'src/exports/dojo'
 
 
 export const useConnectToSelectedNetwork = (onConnect?: () => void) => {
   const { isConnected, isConnecting } = useAccount()
   const { connect, connectors } = useConnect()
-  const { selectedNetworkConfig } = useStarknetContext()
+  const { selectedNetworkConfig } = useDojoSetup()
 
   const [requestedConnect, setRequestedConnect] = useState(false)
   useEffect(() => {
@@ -48,7 +47,7 @@ export const useConnectToSelectedNetwork = (onConnect?: () => void) => {
 export const useIsConnectedToSelectedNetwork = () => {
   const { isConnected, isConnecting } = useAccount()
   const { chain } = useNetwork()
-  const { selectedNetworkConfig } = useStarknetContext()
+  const { selectedNetworkConfig } = useDojoSetup()
 
   const isCorrectNetwork = useMemo(() => {
     if (!isConnected || !chain) return undefined
@@ -78,7 +77,7 @@ interface AddStarknetChainParametersImpl extends AddStarknetChainParameters {
   rpcUrl: string,
 }
 export const useChainSwitchCallbacks = () => {
-  const { selectedNetworkConfig } = useStarknetContext()
+  const { selectedNetworkConfig } = useDojoSetup()
   const { rpcUrl } = useDojoSetup()
 
   const switch_params = useMemo(() => {

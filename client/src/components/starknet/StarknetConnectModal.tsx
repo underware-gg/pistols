@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Modal, Button, Image } from 'semantic-ui-react'
 import { useConnect, Connector, useAccount } from '@starknet-react/core'
-import { useChainSwitchCallbacks, useStarknetContext, useIsConnectedToSelectedNetwork } from '@underware/pistols-sdk/dojo'
+import { useChainSwitchCallbacks, useDojoSetup, useIsConnectedToSelectedNetwork } from '@underware/pistols-sdk/dojo'
 import { getConnectorIcon } from '@underware/pistols-sdk/pistols/dojo'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { Opener } from '/src/hooks/useOpener'
@@ -50,7 +50,7 @@ function ConnectButtons({
 }: {
   walletHelp: boolean
 }) {
-  const { selectedNetworkConfig } = useStarknetContext()
+  const { selectedNetworkConfig } = useDojoSetup()
   const { connect, connectors } = useConnect()
   const { isConnecting } = useAccount()
 
@@ -97,7 +97,7 @@ function ConnectButtons({
 }
 
 function SwitchChainButtons() {
-  const { selectedNetworkId, selectedNetworkConfig } = useStarknetContext()
+  const { selectedNetworkId, selectedNetworkConfig } = useDojoSetup()
   const { switch_starknet_chain, add_starknet_chain } = useChainSwitchCallbacks()
   const [chainExists, setChainExists] = useState(true)
   const [isBusy, setIsBusy] = useState(false)

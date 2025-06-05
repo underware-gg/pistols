@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { gql } from '@apollo/client'
-import { useStarknetContext } from 'src/dojo/contexts/StarknetProvider'
+import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
 import { useGraphQLQuery } from 'src/dojo/hooks/graphql/useGraphQL'
 import { bigintToHex, isPositiveBigint } from 'src/utils/misc/types'
 
@@ -102,7 +102,7 @@ export type ERC_Tokens = {
 }
 
 function useToriiTokenBalancesQL(variables: any, enabled: boolean, watch: boolean) {
-  const { selectedNetworkConfig } = useStarknetContext()
+  const { selectedNetworkConfig } = useDojoSetup()
   const { data, isLoading, refetch } = useGraphQLQuery({
     graphqlUrl: selectedNetworkConfig.graphqlUrl,
     query: tokenBalances,

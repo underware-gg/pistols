@@ -136,6 +136,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedNetworkConfig: Do
     // pass thru
     dojoAppConfig,
     selectedNetworkConfig,
+    selectedNetworkId: dojoAppConfig.selectedNetworkId,
     namespace: dojoAppConfig.namespace,
     manifest,
     starknetDomain,

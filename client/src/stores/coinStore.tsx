@@ -3,7 +3,7 @@ import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
 import { useERC20Balance } from '@underware/pistols-sdk/utils/hooks'
-import { useSdkTokenBalancesGet, useStarknetContext } from '@underware/pistols-sdk/dojo'
+import { useSdkTokenBalancesGet, useDojoSetup } from '@underware/pistols-sdk/dojo'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { useDuelistTokenBoundAddress } from '/src/hooks/useTokenBound'
 import { makeTokenBoundAddress } from '@underware/pistols-sdk/pistols'
@@ -221,10 +221,10 @@ export const useFetchAccountsBalances = (coinAddress: BigNumberish, accounts: Bi
 // RPC balances
 //
 export const useEtherBalance = (address: BigNumberish, fee: BigNumberish = 0n, watch: boolean = false) => {
-  const { selectedNetworkConfig } = useStarknetContext()
+  const { selectedNetworkConfig } = useDojoSetup()
   return useERC20Balance(selectedNetworkConfig.etherAddress, address, fee, watch)
 }
 export const useStrkBalance = (address: BigNumberish, fee: BigNumberish = 0n, watch: boolean = false) => {
-  const { selectedNetworkConfig } = useStarknetContext()
+  const { selectedNetworkConfig } = useDojoSetup()
   return useERC20Balance(selectedNetworkConfig.strkAddress, address, fee, watch)
 }

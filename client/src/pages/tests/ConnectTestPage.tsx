@@ -3,7 +3,7 @@ import { EthSigner, Signature } from 'starknet'
 import { Container, Table, Button, Grid } from 'semantic-ui-react'
 import { useAccount, useConnect, useDisconnect, useNetwork } from '@starknet-react/core'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
-import { useDojoSetup, useStarknetContext, useConnectedController } from '@underware/pistols-sdk/dojo'
+import { useDojoSetup, useConnectedController } from '@underware/pistols-sdk/dojo'
 import { getConnectorIcon } from '@underware/pistols-sdk/pistols/dojo'
 import { useTypedMessage, useMemoAsync } from '@underware/pistols-sdk/utils/hooks'
 import { Messages, splitSignature, feltToString } from '@underware/pistols-sdk/starknet'
@@ -47,8 +47,6 @@ export default function ConnectTestPage() {
 
 export function DojoAccount() {
   const { address } = useAccount()
-  const { selectedNetworkConfig } = useStarknetContext()
-
   return (
     <Table celled striped color='orange' size='small'>
       <Body>
@@ -73,7 +71,7 @@ export function DojoAccount() {
 export function Connect() {
   const { connectOpener } = usePistolsContext()
   const { address, isConnecting, isConnected, connector } = useAccount()
-  const { selectedNetworkConfig } = useStarknetContext()
+  const { selectedNetworkConfig } = useDojoSetup()
   const { disconnect } = useDisconnect()
   const { connectors } = useConnect()
   const { chain } = useNetwork()

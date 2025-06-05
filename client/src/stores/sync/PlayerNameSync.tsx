@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { lookupAddresses } from '@cartridge/controller'
 import { usePlayersAccounts, usePlayerDataStore } from '/src/stores/playerStore'
-import { useStarknetContext, useConnectedController } from '@underware/pistols-sdk/dojo'
+import { useDojoSetup, useConnectedController } from '@underware/pistols-sdk/dojo'
 import { supportedConnetorIds } from '@underware/pistols-sdk/pistols/config'
 import { debug } from '@underware/pistols-sdk/pistols'
 
@@ -19,7 +19,7 @@ export function PlayerNameSync() {
   ), [playersAccounts, players_names])
 
   const { connectorId, isControllerConnected } = useConnectedController()
-  const { selectedNetworkConfig } = useStarknetContext()
+  const { selectedNetworkConfig } = useDojoSetup()
 
   useEffect(() => {
     if (newPlayerAddresses.length == 0) return

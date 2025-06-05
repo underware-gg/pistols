@@ -3,7 +3,7 @@ import { BigNumberish } from 'starknet'
 import { Container, Table } from 'semantic-ui-react'
 import { getWorldAddress } from '@underware/pistols-sdk/pistols/config'
 import { contractPolicyDescriptions_pistols } from '@underware/pistols-sdk/pistols/dojo'
-import { useDojoSystem, useStarknetContext } from '@underware/pistols-sdk/dojo'
+import { useDojoSystem, useDojoSetup } from '@underware/pistols-sdk/dojo'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { ExplorerLink } from '@underware/pistols-sdk/starknet/components'
 import { Address } from '/src/components/ui/Address'
@@ -39,7 +39,7 @@ export default function ContractsPage() {
 
 
 function Contracts() {
-  const { selectedNetworkId } = useStarknetContext()
+  const { selectedNetworkId } = useDojoSetup()
   const worldContractAddress = useMemo(() => getWorldAddress(selectedNetworkId), [selectedNetworkId])
 
   return (

@@ -1,7 +1,6 @@
 import { useCallback, useState } from 'react'
 import { Account, TypedData, stark } from 'starknet'
 import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
-import { useStarknetContext } from 'src/dojo/contexts/StarknetProvider'
 import { useConnectedController } from 'src/dojo/hooks/useController'
 import { debug } from 'src/games/pistols/misc/debug'
 
@@ -9,9 +8,8 @@ export const useSdkPublishTypedData = (
   account: Account,
   typedData: TypedData,
 ) => {
-  const { sdk, sdkConfig } = useDojoSetup()
+  const { sdk } = useDojoSetup()
   const { isControllerConnected } = useConnectedController()
-  const { selectedNetworkConfig } = useStarknetContext()
   const [isPublishing, setIsPublishing] = useState<boolean>()
 
   const publish = useCallback(async () => {

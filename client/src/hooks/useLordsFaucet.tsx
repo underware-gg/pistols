@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Account, AccountInterface } from 'starknet'
 import { useAccount } from '@starknet-react/core'
-import { useStarknetContext } from '@underware/pistols-sdk/dojo'
+import { useDojoSetup } from '@underware/pistols-sdk/dojo'
 import { bigintToU256, ethToWei, execute } from '@underware/pistols-sdk/starknet'
 import { bigintToHex } from '@underware/pistols-sdk/utils'
 import { useLordsContract } from './useTokenContracts'
@@ -21,7 +21,7 @@ export interface FaucetInterface {
 
 export const useLordsFaucet = (): FaucetInterface => {
   const { account } = useAccount()
-  const { selectedNetworkConfig } = useStarknetContext()
+  const { selectedNetworkConfig } = useDojoSetup()
   const { lordsContractAddress, abi } = useLordsContract()
   const faucetUrl = useMemo(() => (typeof selectedNetworkConfig.lordsFaucet === 'string' ? selectedNetworkConfig.lordsFaucet : null), [selectedNetworkConfig])
   const hasFaucet = useMemo(() => (selectedNetworkConfig.lordsFaucet === true), [selectedNetworkConfig])

@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useDojoSystem, useStarknetContext } from '@underware/pistols-sdk/dojo'
+import { useDojoSystem, useDojoSetup } from '@underware/pistols-sdk/dojo'
 import { bigintEquals, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import {
   getFoolsAddress,
@@ -12,7 +12,7 @@ import {
 } from '@underware/pistols-sdk/pistols/config'
 
 export const useTokenContracts = () => {
-  const { selectedNetworkId } = useStarknetContext()
+  const { selectedNetworkId } = useDojoSetup()
   // erc-20
   const lordsContractAddress = getLordsAddress(selectedNetworkId)
   const fameContractAddress = getFameAddress(selectedNetworkId)
@@ -34,7 +34,7 @@ export const useTokenContracts = () => {
 }
 
 export const useLordsContract = () => {
-  const { selectedNetworkId } = useStarknetContext()
+  const { selectedNetworkId } = useDojoSetup()
   const lordsAddress = getLordsAddress(selectedNetworkId)
 
   const { contractAddress: mockAddress, abi } = useDojoSystem('lords_mock')
