@@ -94,8 +94,14 @@ const useDuelPosterData = (duelId?: bigint) => {
     return duelistId !== Number(winnerDuelistId) && isFinished && !isCallToAction
   }
 
-  const { fameBefore: fameBeforeA, fameAfter: fameAfterA } = useDuelistFameOnDuel(duelId, duelistIdA)
-  const { fameBefore: fameBeforeB, fameAfter: fameAfterB } = useDuelistFameOnDuel(duelId, duelistIdB)
+  //-------------------
+  // DISABLED by Roger
+  // use these hooks ONLY when presenting a single duel
+  // this was being called for all posters in the Past/Current duels screens
+  // adding 16 unnecessary queries to Torii, slowing it down
+  //-------------------
+  // const { fameBefore: fameBeforeA, fameAfter: fameAfterA } = useDuelistFameOnDuel(duelId, duelistIdA)
+  // const { fameBefore: fameBeforeB, fameAfter: fameAfterB } = useDuelistFameOnDuel(duelId, duelistIdB)listId)
   
   return {
     leftDuelistId,
@@ -109,10 +115,10 @@ const useDuelPosterData = (duelId?: bigint) => {
     isDead,
     isYouA,
     isYouB,
-    fameBeforeA,
-    fameAfterA,
-    fameBeforeB,
-    fameAfterB,
+    // fameBeforeA,
+    // fameAfterA,
+    // fameBeforeB,
+    // fameAfterB,
     isCallToAction,
   }
 }
