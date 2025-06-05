@@ -65,7 +65,7 @@ export const useCalcSeasonReward = (season_id: number, duelist_id: BigNumberish,
   const { game: { calcSeasonReward } } = useDojoContractCalls()
   const options = useMemo(() => ({
     call: calcSeasonReward,
-    args: [BigInt(season_id), BigInt(duelist_id ?? 0), BigInt(lives_staked ?? 1)],
+    args: [BigInt(season_id ?? 0), BigInt(duelist_id ?? 0), BigInt(lives_staked ?? 1)],
     enabled: isPositiveBigint(season_id) && isPositiveBigint(duelist_id) && isPositiveBigint(lives_staked),
     defaultValue: null,
   }), [season_id, duelist_id, lives_staked])
