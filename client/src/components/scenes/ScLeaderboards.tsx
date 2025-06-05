@@ -16,7 +16,7 @@ import { useOwnerOfDuelist } from '/src/hooks/useTokenDuelists';
 import { useSeasonPool } from '/src/stores/bankStore';
 import { Balance } from '/src/components/account/Balance';
 import { useIsMyAccount } from '/src/hooks/useIsYou';
-import { useDuelistSeasonStats } from '/src/stores/challengeQueryStore';
+import { useDuelistSeasonStats } from '/src/stores/challengeStore';
 import { useSeason, useAllSeasonIds, useFullLeaderboard, useLeaderboard } from '/src/stores/seasonStore';
 import { useSeasonTotals } from '/src/queries/useSeason';
 

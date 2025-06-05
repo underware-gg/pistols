@@ -7,7 +7,6 @@ import { useTokenConfigStore } from '/src/stores/tokenConfigStore'
 import { usePlayerStore, usePlayerDataStore } from '/src/stores/playerStore'
 import { useDuelistStore, useDuelistStackStore } from '/src/stores/duelistStore'
 import { useChallengeStore } from '/src/stores/challengeStore'
-import { useChallengeQueryStore } from '/src/stores/challengeQueryStore'
 import { useBankStore } from '/src/stores/bankStore'
 import { usePackStore } from '/src/stores/packStore'
 import { useScoreboardStore } from '/src/stores/scoreboardStore'
@@ -104,7 +103,6 @@ export function EntityStoreSync() {
   const duelistStackState = useDuelistStackStore((state) => state)
   // per season (update only)
   const challengeState = useChallengeStore((state) => state)
-  const challengeQueryState = useChallengeQueryStore((state) => state)
   const scoreboardState = useScoreboardStore((state) => state)
 
   const mounted = useMounted()
@@ -226,7 +224,6 @@ export function EntityStoreSync() {
       // per season models (update only)
       if (entityContainsModels(entity, ['Challenge', 'ChallengeMessage', 'Round'])) {
         challengeState.updateEntity(entity)
-        challengeQueryState.updateEntity(entity)
       }
       if (entityContainsModels(entity, ['SeasonScoreboard'])) {
         scoreboardState.updateEntity(entity)

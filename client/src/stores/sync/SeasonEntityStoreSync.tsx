@@ -63,7 +63,6 @@ export function SeasonChallengeStoreSync() {
     setEntities: (entities: PistolsEntity[]) => {
       debug.log("SeasonEntityStoreSync() SET =======> [entity]:", entities)
       challengeState.setEntities(entities)
-      queryState.setEntities(entities)
     },
   })
 

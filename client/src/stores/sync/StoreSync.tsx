@@ -23,7 +23,7 @@ export default function StoreSync() {
     <>
       {/* Torii */}
       <EntityStoreSync />
-      <SeasonChallengeStoreSync />
+      {/* <SeasonChallengeStoreSync /> */}
       <SeasonScoreboardStoreSync />
       <TokenStoreSync />
       <EventsModelStoreSync />

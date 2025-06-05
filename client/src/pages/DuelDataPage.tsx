@@ -29,7 +29,7 @@ export default function DuelDataPage() {
   return (
     <AppDojo backgroundImage={null}>
       <EntityStoreSync />
-      <SeasonChallengeStoreSync />
+      {/* <SeasonChallengeStoreSync /> */}
       <SeasonScoreboardStoreSync />
       <PlayerNameSync />
       <StatsLoader />

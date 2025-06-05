@@ -11,7 +11,6 @@ import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
 import { useDuelistStackStore, useDuelistStore } from '/src/stores/duelistStore'
 import { useChallengeStore } from '/src/stores/challengeStore'
 import { usePlayerStore } from '/src/stores/playerStore'
-import { useChallengeQueryStore } from '/src/stores/challengeQueryStore'
 import { useScoreboardStore } from '/src/stores/scoreboardStore'
 import { usePlayerDataStore } from '/src/stores/playerStore'
 import { usePackStore } from '/src/stores/packStore'
@@ -82,7 +81,6 @@ function StoreStats() {
   const duelistStackState = useDuelistStackStore((state) => state)
   // per season (update only)
   const challengeState = useChallengeStore((state) => state)
-  const challengeQueryState = useChallengeQueryStore((state) => state)
   const scoreboardState = useScoreboardStore((state) => state)
 
 
@@ -99,7 +97,6 @@ function StoreStats() {
         <StoreCountRow name='Duelists' entities={duelistState.entities} important />
         <StoreCountRow name='Stacks' entities={duelistStackState.entities} />
         <StoreCountRow name='Challenges' entities={challengeState.entities} important />
-        <StoreCountRow name='Challenges' entities={challengeQueryState.entities} important />
         {/* <StoreCountRow name='Scoreboard' entities={scoreboardState.entities} /> */}
       </Body>
     </Table>

@@ -3,13 +3,12 @@ import { ButtonGroup, Grid, SemanticCOLORS, Table } from 'semantic-ui-react'
 import { useQueryParams } from '/src/stores/queryParamsStore'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { useDuel } from '/src/hooks/useDuel'
-import { useQueryChallengeIds } from '/src/stores/challengeQueryStore'
+import { useFetchChallengeIdsByDuelist, useQueryChallengeIds, useQueryChallengeIdsByDuelist } from '/src/stores/challengeStore'
 import { useDuelistFameBalance } from '/src/stores/coinStore'
 import { useDuelCallToAction } from '/src/stores/eventsModelStore'
 import { usePlayer } from '/src/stores/playerStore'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { useIsMyAccount } from '/src/hooks/useIsYou'
-import { useGetChallengeIdsByDuelist } from '/src/stores/challengeStore'
 import { AllChallengeStates, ChallengeStateClasses, ChallengeStateNames } from '/src/utils/pistols'
 import { ProfilePic } from '/src/components/account/ProfilePic'
 import { DuelIconsAsRow } from '/src/components/DuelIcons'
@@ -31,10 +30,13 @@ export function ChallengeTableSelectedDuelist({
 }) {
   const [statesFilter, setStatesFilter] = useState(AllChallengeStates)
 
+  // fetch duelist challenges onto the store
   const { selectedDuelistId } = usePistolsContext()
+  useFetchChallengeIdsByDuelist(selectedDuelistId)
+
+  // filter challenges
   const { filterChallengeSortColumn, filterChallengeSortDirection } = useQueryParams()
-  const { challengeIds, states } = useQueryChallengeIds(statesFilter, null, false, selectedDuelistId, filterChallengeSortColumn, filterChallengeSortDirection)
-  const challengeIdsByDuelist = useGetChallengeIdsByDuelist(selectedDuelistId)
+  const { challengeIds, states } = useQueryChallengeIdsByDuelist(selectedDuelistId, statesFilter, filterChallengeSortColumn, filterChallengeSortDirection)
 
   useEffect(() => {
     console.log('ChallengeTableSelectedDuelist', selectedDuelistId)
