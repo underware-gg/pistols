@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useRef, useCallback, ReactNode } from 'react'
-import { useMyActiveDuels } from './challengeQueryStore'
+import { useMyActiveDuels } from '/src/stores/challengeStore'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 const STORAGE_KEY = 'pistols_notifications'

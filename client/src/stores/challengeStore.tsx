@@ -259,6 +259,49 @@ export function useDuelistSeasonStats(duelistId: BigNumberish, seasonId?: BigNum
 }
 
 
+/**
+ * Returns all active duels for the current user's address, including both required duels
+ * and duels that have notifications
+ * @param notificationDuelIds Array of duel IDs from notifications to track
+ * @returns Array of duel IDs with their states
+ */
+export function useMyActiveDuels(notificationDuelIds: bigint[] = []) {
+  const { address } = useAccount()
+  const { requiredDuelIds } = useCallToActions()
+  const { duelPerDuelist } = useCallToActions()
+
+  const entities = useChallengeStore((state) => state.entities)
+  const challenges = useAllStoreModels<models.Challenge>(entities, 'Challenge')
+
+  const result = useMemo(() => {
+    if (!address) return []
+
+    // Get all duel IDs we need to track (both required and from notifications)
+    const allRelevantDuelIds = new Set([...requiredDuelIds, ...notificationDuelIds])
+
+    return challenges
+      .filter((ch) => (
+        bigintEquals(ch.address_a, address) ||
+        bigintEquals(ch.address_b, address)
+      ))
+      .filter(ch => allRelevantDuelIds.has(BigInt(ch.duel_id)))
+      .map(ch => {
+        const callToAction = Object.values(duelPerDuelist).find(duel => bigintEquals(duel.duelId, ch.duel_id))?.callToAction ?? false
+        return {
+          duel_id: BigInt(ch.duel_id),
+          timestamp: Number(ch.timestamps.start),
+          state: parseEnumVariant<constants.ChallengeState>(ch.state),
+          callToAction
+        }
+      })
+
+  }, [challenges, address, duelPerDuelist, requiredDuelIds, notificationDuelIds])
+
+  return result
+}
+
+
+
 
 
 //------------------------------------------
