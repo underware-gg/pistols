@@ -1,6 +1,8 @@
+import { useMemo } from "react";
 import type { NoInfer, UseQueryOptions } from "@tanstack/react-query";
-import { useDojoSetup } from "src/exports/dojo";
 import { useToriiSQLQuery } from "@dojoengine/sdk/sql";
+import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
+import { poseidonString } from "src/starknet/starknet";
 
 
 export type UseSdkSqlQueryProps<Input, Output> = {
@@ -16,6 +18,7 @@ export type UseSdkSqlQueryResult<Output> = {
   error: Error,
   isLoading: boolean,
   isRefetching: boolean,
+  queryHash: bigint,
 }
 
 //---------------------------------------
@@ -41,10 +44,12 @@ export const useSdkSqlQuery = <Input, Output>({
     defaultValue,
     selectedNetworkConfig.sqlUrl,
   );
+  const queryHash = useMemo(() => poseidonString(query), [query])
   return {
     data,
     error,
     isLoading: isPending,
     isRefetching,
+    queryHash,
   }
 }

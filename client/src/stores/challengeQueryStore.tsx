@@ -91,9 +91,9 @@ export const useQueryChallengeIds = (
     return {
       query,
     }
-  }, [filterStates, playerAddress, filterName, filterBookmarked, sortColumn, sortDirection, bookmarkedDuels])
+  }, [filterStates, playerAddress, filterName, filterBookmarked, bookmarkedDuels, sortColumn, sortDirection, pageSize, pageIndex])
 
-  const { data, isLoading } = useSdkSqlQuery({
+  const { data, isLoading, queryHash } = useSdkSqlQuery({
     query,
     formatFn,
   });
@@ -101,17 +101,17 @@ export const useQueryChallengeIds = (
   // fetch only NEW duels (not already in the store)
   useFetchChallengeIds(data?.duelIds ?? []);
 
-  useEffect(() => {
-    console.log('SQL QUERY:', query)
-  }, [query])
-  useEffect(() => {
-    console.log('SQL CHALLENGE IDs:', isLoading, data)
-  }, [isLoading, data])
+  // useEffect(() => console.log('SQL QUERY:', query), [query])
+  // useEffect(() => console.log('SQL CHALLENGE IDs:', isLoading, data), [isLoading, data])
+
+  const totalCount = useMemo(() => (data?.totalCount ?? 0), [data?.totalCount])
+  const pageCount = useMemo(() => (pageSize > 0 ? Math.ceil(totalCount / pageSize) : 0), [totalCount, pageSize])
 
   return {
     challengeIds: data?.duelIds ?? [],
-    totalCount: data?.totalCount ?? 0,
-    totalPages: pageSize ? Math.ceil(data?.totalCount ?? 0 / pageSize) : 0,
+    totalCount,
+    pageCount,
     isLoading,
+    queryHash,
   }
 }

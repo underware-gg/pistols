@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import useSWR from 'swr'
-import { useDojoSetup } from 'src/exports/dojo'
+import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
 
 const textFetcher = (url: string) => fetch(url).then((res) => res.text())
 

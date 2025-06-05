@@ -85,27 +85,20 @@ export function decodeBase64Buffer(data: string) {
   return Buffer.from(data, 'base64');
 }
 
-// const encodeBase64Options = {
-//   svg: false,
-// }
-// export function encodeBase64(data, options = null) {
-//   let result = null;
-//   if (data) {
-//     result = '';
-//     if (options) {
-//       options = {
-//         ...encodeBase64Options,
-//         ...options,
-//       }
-//       if (options.svg) {
-//         result += 'data:image/svg+xml;base64,';
-//       } else if (options.html) {
-//         result += 'data:text/html;base64,';
-//       }
-//     }
-//     result += Buffer.from(data).toString('base64');
-//   }
-//   return result;
-// }
+export type MimeTypes = 'svg' | 'html' | 'json';
+export function encodeBase64(data: string | undefined, mimeType?: MimeTypes): string | undefined {
+  if (data == undefined) {
+    return undefined;
+  }
+  const result = Buffer.from(data).toString('base64');
+  if (mimeType == 'svg') {
+    return `data:image/svg+xml;base64,${result}`;
+  } else if (mimeType == 'html') {
+    return `data:text/html;base64,${result}`;
+  } else if (mimeType == 'json') {
+    return `data:application/json;base64,${result}`;
+  }
+  return result;
+}
 
 

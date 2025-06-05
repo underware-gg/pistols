@@ -10,8 +10,10 @@ import {
   encode,
   Abi,
   ec,
+  byteArray,
 } from 'starknet'
 import { bigintToHex, isBigint, isPositiveBigint } from 'src/utils/misc/types'
+import { encodeBase64 } from 'src/utils/misc/decoder'
 
 //
 // Lenghts of a Starknet address
@@ -21,6 +23,7 @@ export const ETHEREUM_ADDRESS_LENGTH = 42
 //
 // Cairo functions
 export const poseidon = (values: BigNumberish[]): bigint => (BigInt(ec.starkCurve.poseidonHashMany(values.map(v => BigInt(v)))))
+export const poseidonString = (v: string): bigint => poseidon(byteArray.byteArrayFromString(encodeBase64(v)).data)
 
 //
 // Cairo type conversions

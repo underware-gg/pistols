@@ -15,9 +15,25 @@ import { SceneName } from '/src/data/assets'
 
 
 export default function ScGraveyard() {
+  const [pageNumber, setPageNumber] = useState(0)
+  const duelsPerPage = 8
+
   const { address } = useAccount()
   const { filterStatesPastDuels, filterPlayerName, filterShowAllDuels, filterShowBookmarkedDuels, filterChallengeSortColumn, filterChallengeSortDirection } = useQueryParams()
-  const { challengeIds } = useQueryChallengeIds(filterStatesPastDuels, filterPlayerName, filterShowBookmarkedDuels, filterShowAllDuels ? 0n : address, filterChallengeSortColumn, filterChallengeSortDirection)
+  const { challengeIds, pageCount, totalCount, queryHash } = useQueryChallengeIds(
+    filterStatesPastDuels,
+    filterPlayerName,
+    filterShowBookmarkedDuels,
+    filterShowAllDuels ? 0n : address,
+    filterChallengeSortColumn,
+    filterChallengeSortDirection,
+    duelsPerPage,
+    pageNumber,
+  )
+
+  useEffect(() => {
+    setPageNumber(0)
+  }, [queryHash])
 
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSetScene } = usePistolsScene()
@@ -37,10 +53,7 @@ export default function ScGraveyard() {
   const mainTween = useRef<TWEEN.Tween<{ x: number }> | null>(null)
   const secondTween = useRef<TWEEN.Tween<{ x: number }> | null>(null)
 
-  const [pageNumber, setPageNumber] = useState(0)
   const [isAnimating, setIsAnimating] = useState(false)
-  const duelsPerPage = 8
-  const pageCount = useMemo(() => Math.ceil(challengeIds.length / duelsPerPage), [challengeIds])
   const posterRefs = useRef<{[key: number]: DuelPosterHandle}>({})
 
   const getDuelsForPage = (page: number) => {
@@ -128,8 +141,6 @@ export default function ScGraveyard() {
 
 
   useEffect(() => {
-    setPageNumber(0)
-    
     gridRefs.current.forEach(({ref}, index) => {
       if (ref.current) {
         const renderOrder = gridRefs.current[index].renderOrder

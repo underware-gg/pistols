@@ -13,9 +13,25 @@ import { SceneName } from '/src/data/assets'
 import { ActionButton } from '/src/components/ui/Buttons'
 
 export default function ScDuelsBoard() {
+  const [pageNumber, setPageNumber] = useState(0)
+  const duelsPerPage = 5
+
   const { address } = useAccount()
   const { filterStatesLiveDuels, filterPlayerName, filterShowAllDuels, filterShowBookmarkedDuels, filterChallengeSortColumn, filterChallengeSortDirection } = useQueryParams()
-  const { challengeIds } = useQueryChallengeIds(filterStatesLiveDuels, filterPlayerName, filterShowBookmarkedDuels, filterShowAllDuels ? 0n : address, filterChallengeSortColumn, filterChallengeSortDirection)
+  const { challengeIds, pageCount, totalCount, queryHash } = useQueryChallengeIds(
+    filterStatesLiveDuels,
+    filterPlayerName,
+    filterShowBookmarkedDuels,
+    filterShowAllDuels ? 0n : address,
+    filterChallengeSortColumn,
+    filterChallengeSortDirection,
+    duelsPerPage,
+    pageNumber,
+  )
+
+  useEffect(() => {
+    setPageNumber(0)
+  }, [queryHash])
 
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSetScene } = usePistolsScene()
@@ -35,10 +51,7 @@ export default function ScDuelsBoard() {
   const mainTween = useRef<TWEEN.Tween<{ x: number }> | null>(null)
   const secondTween = useRef<TWEEN.Tween<{ x: number }> | null>(null)
 
-  const [pageNumber, setPageNumber] = useState(0)
   const [isAnimating, setIsAnimating] = useState(false)
-  const duelsPerPage = 5
-  const pageCount = useMemo(() => Math.ceil(challengeIds.length / duelsPerPage), [challengeIds])
   const posterRefs = useRef<{[key: number]: DuelPosterHandle}>({})
 
   const getDuelsForPage = (page: number) => {

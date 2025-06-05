@@ -372,9 +372,9 @@ export const useFetchChallengeIds = (duelIds: BigNumberish[], retryInterval?: nu
     },
   })
 
-  useEffect(() => {
-    console.log(`::useFetchChallengeIds...`, newDuelIds, query)
-  }, [newDuelIds, query])
+  // useEffect(() => {
+  //   console.log(`::useFetchChallengeIds...`, newDuelIds, query)
+  // }, [newDuelIds, query])
 
   // const entities = useChallengeStore((state) => state.entities);
   // useEffect(() => {
@@ -436,9 +436,9 @@ export const useFetchChallengeIdsByDuelistIds = (duelistIds: BigNumberish[]) => 
     },
   })
 
-  useEffect(() => {
-    console.log(`::useFetchChallengeIdsByDuelist...`, newDuelistIds, query)
-  }, [newDuelistIds, query])
+  // useEffect(() => {
+  //   console.log(`::useFetchChallengeIdsByDuelist...`, newDuelistIds, query)
+  // }, [newDuelistIds, query])
 
   // const entities = useChallengeStore((state) => state.entities);
   // useEffect(() => {
@@ -494,9 +494,9 @@ export const useFetchChallengeIdsByPlayerAddresses = (addresses: BigNumberish[])
     },
   })
 
-  useEffect(() => {
-    console.log(`::useFetchChallengeIdsByPlayerAddresses...`, newAddresses, query)
-  }, [newAddresses, query])
+  // useEffect(() => {
+  //   console.log(`::useFetchChallengeIdsByPlayerAddresses...`, newAddresses, query)
+  // }, [newAddresses, query])
 
   return {}
 }
