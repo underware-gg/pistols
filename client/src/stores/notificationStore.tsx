@@ -88,12 +88,6 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         state: duel.state,
         requiresAction: duel.callToAction,
       }))
-      .sort((a, b) => {
-        if (a.requiresAction !== b.requiresAction) {
-          return a.requiresAction ? -1 : 1
-        }
-        return b.timestamp - a.timestamp
-      })
 
     setNotifications(prev => {
       const updatedNotifications = prev.map(existing => {
@@ -113,6 +107,12 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
           }
         }
         return existing
+      })
+      .sort((a, b) => {
+        if (a.requiresAction !== b.requiresAction) {
+          return a.requiresAction ? -1 : 1
+        }
+        return b.timestamp - a.timestamp
       })
 
       const existingIds = updatedNotifications.map(n => n.duelId)
