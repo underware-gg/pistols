@@ -97,15 +97,15 @@ export const DuelNotificationItem: React.FC<DuelNotificationItemProps> = ({
         return {
           title: 'Duel In Progress',
           message: isMeA
-            ? <><PlayerLink address={duelistAddressB} /> has accepted your challenge in <ChallengeLink duelId={duelId} /></>
-            : <>You've accepted <PlayerLink address={duelistAddressA} />'s challenge in <ChallengeLink duelId={duelId} /></>
+            ? <><PlayerLink address={duelistAddressB} /> has accepted your <ChallengeLink duelId={duelId} /></>
+            : <>You've accepted <PlayerLink address={duelistAddressA} />'s <ChallengeLink duelId={duelId} /></>
         }
       case constants.ChallengeState.Refused:
         return {
           title: 'Duel Refused',
           message: isMeA
-            ? <><PlayerLink address={duelistAddressB} /> has refused your challenge in <ChallengeLink duelId={duelId} /></>
-            : <>You've refused <PlayerLink address={duelistAddressA} />'s challenge in <ChallengeLink duelId={duelId} /></>
+            ? <><PlayerLink address={duelistAddressB} /> has refused your <ChallengeLink duelId={duelId} /></>
+            : <>You've refused <PlayerLink address={duelistAddressA} />'s <ChallengeLink duelId={duelId} /></>
         }
       case constants.ChallengeState.Withdrawn:
         return {
@@ -118,8 +118,8 @@ export const DuelNotificationItem: React.FC<DuelNotificationItemProps> = ({
         return {
           title: 'Duel Expired',
           message: isMeA
-            ? <>Your challenge to <PlayerLink address={duelistAddressB} /> in <ChallengeLink duelId={duelId} /> has expired</>
-            : <>The challenge from <PlayerLink address={duelistAddressA} /> in <ChallengeLink duelId={duelId} /> has expired</>
+            ? <>Your <ChallengeLink duelId={duelId} /> with <PlayerLink address={duelistAddressB} /> has expired</>
+            : <>The <ChallengeLink duelId={duelId} /> from <PlayerLink address={duelistAddressA} /> has expired</>
         }
       case constants.ChallengeState.Resolved:
         if (requiresAction) {
@@ -130,7 +130,7 @@ export const DuelNotificationItem: React.FC<DuelNotificationItemProps> = ({
         }
         return {
           title: 'Duel Resolved',
-          message: <>Your duel with <PlayerLink address={isMeA ? duelistAddressB : duelistAddressA} /> in <ChallengeLink duelId={duelId} /> has been resolved</>
+          message: <>Your <ChallengeLink duelId={duelId} /> with <PlayerLink address={isMeA ? duelistAddressB : duelistAddressA} />  has been resolved</>
         }
       case constants.ChallengeState.Draw:
         if (requiresAction) {
@@ -141,12 +141,12 @@ export const DuelNotificationItem: React.FC<DuelNotificationItemProps> = ({
         }
         return {
           title: 'Duel Draw',
-          message: <>Your duel with <PlayerLink address={isMeA ? duelistAddressB : duelistAddressA} /> in <ChallengeLink duelId={duelId} /> ended in a draw</>
+          message: <>Your <ChallengeLink duelId={duelId} /> with <PlayerLink address={isMeA ? duelistAddressB : duelistAddressA} /> ended in a draw</>
         }
       default:
         return {
           title: 'Duel Update',
-          message: <>Duel <ChallengeLink duelId={duelId} /> state updated to {state}</>
+          message: <><ChallengeLink duelId={duelId} /> state updated to {state}</>
         }
     }
   }, [challenge, state, isMeA, isMeB, duelId, turnA, turnB, completedStagesA, completedStagesB, requiresAction])

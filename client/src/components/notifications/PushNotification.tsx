@@ -74,44 +74,44 @@ export const PushNotification: React.FC<{
         else {
           rawTitle = `Duel In Progress - ${myName}`
           rawMessage = isMeA
-            ? `${duelistNameB} has accepted your challenge in duel #${duelId.toString()}`
-            : `You've accepted ${duelistNameA}'s challenge in duel #${duelId.toString()}`
+            ? `${duelistNameB} has accepted your duel #${duelId.toString()}`
+            : `You've accepted ${duelistNameA}'s duel #${duelId.toString()}`
         }
         break
       case constants.ChallengeState.Refused:
         rawTitle = `Duel Refused - ${myName}`
         rawMessage = isMeA
-          ? `${duelistNameB} has refused your challenge in duel #${duelId.toString()}`
-          : `You've refused ${duelistNameA}'s challenge in duel #${duelId.toString()}`
+          ? `${duelistNameB} has refused your duel #${duelId.toString()}`
+          : `You've refused ${duelistNameA}'s duel #${duelId.toString()}`
         break
       case constants.ChallengeState.Withdrawn:
         rawTitle = `Duel Withdrawn - ${myName}`
         rawMessage = isMeA
-          ? `Your challenge with ${duelistNameB} in duel #${duelId.toString()} has been withdrawn`
-          : `The challenge from ${duelistNameA} in duel #${duelId.toString()} has been withdrawn`
+          ? `Your duel #${duelId.toString()} with ${duelistNameB} has been withdrawn`
+          : `The duel #${duelId.toString()} from ${duelistNameA} has been withdrawn`
         break
       case constants.ChallengeState.Expired:
         rawTitle = `Duel Expired - ${myName}`
         rawMessage = isMeA
-          ? `Your challenge to ${duelistNameB} in duel #${duelId.toString()} has expired`
-          : `The challenge from ${duelistNameA} in duel #${duelId.toString()} has expired`
+          ? `Your duel #${duelId.toString()} with ${duelistNameB} has expired`
+          : `The duel #${duelId.toString()} from ${duelistNameA} has expired`
         break
       case constants.ChallengeState.Resolved:
         if (requiresAction) {
           rawTitle = `Duel Ended - ${myName}`
-          rawMessage = `Your duel with ${isMeA ? duelistNameB : duelistNameA} in duel #${duelId.toString()} has been resolved. Click to see the result!`
+          rawMessage = `Your duel #${duelId.toString()} with ${isMeA ? duelistNameB : duelistNameA} has been resolved. Click to see the result!`
         } else {
           rawTitle = `Duel Resolved - ${myName}`
-          rawMessage = `Your duel with ${isMeA ? duelistNameB : duelistNameA} in duel #${duelId.toString()} has been resolved`
+          rawMessage = `Your duel #${duelId.toString()} with ${isMeA ? duelistNameB : duelistNameA} has been resolved`
         }
         break
       case constants.ChallengeState.Draw:
         if (requiresAction) {
           rawTitle = `Duel Ended - ${myName}`
-          rawMessage = `Your duel with ${isMeA ? duelistNameB : duelistNameA} in duel #${duelId.toString()} has been resolved. Click to see the result!`
+          rawMessage = `Your duel #${duelId.toString()} with ${isMeA ? duelistNameB : duelistNameA} has been resolved. Click to see the result!`
         } else {
           rawTitle = `Duel Draw - ${myName}`
-          rawMessage = `Your duel with ${isMeA ? duelistNameB : duelistNameA} in duel #${duelId.toString()} ended in a draw`
+          rawMessage = `Your duel #${duelId.toString()} with ${isMeA ? duelistNameB : duelistNameA} ended in a draw`
         }
         break
       default:
