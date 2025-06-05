@@ -108,10 +108,10 @@ export const PushNotification: React.FC<{
       case constants.ChallengeState.Draw:
         if (requiresAction) {
           rawTitle = `Duel Ended - ${myName}`
-          rawMessage = `Your duel with ${isMeA ? duelistNameA : duelistNameB} in duel #${duelId.toString()} has been resolved. Click to see the result!`
+          rawMessage = `Your duel with ${isMeA ? duelistNameB : duelistNameA} in duel #${duelId.toString()} has been resolved. Click to see the result!`
         } else {
           rawTitle = `Duel Draw - ${myName}`
-          rawMessage = `Your duel with ${isMeA ? duelistNameA : duelistNameB} in duel #${duelId.toString()} ended in a draw`
+          rawMessage = `Your duel with ${isMeA ? duelistNameB : duelistNameA} in duel #${duelId.toString()} ended in a draw`
         }
         break
       default:
