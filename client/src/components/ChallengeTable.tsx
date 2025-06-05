@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState, useRef } from 'react'
 import { ButtonGroup, Grid, SemanticCOLORS, Table } from 'semantic-ui-react'
 import { useQueryParams } from '/src/stores/queryParamsStore'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
@@ -15,12 +15,13 @@ import { DuelIconsAsRow } from '/src/components/DuelIcons'
 import { FilterButton } from '/src/components/ui/Buttons'
 import { arrayRemoveValue } from '@underware/pistols-sdk/utils'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
+import { emitter } from '../three/game'
+import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
 
 const Row = Grid.Row
 const Col = Grid.Column
 const Cell = Table.Cell
 const HeaderCell = Table.HeaderCell
-
 
 export function ChallengeTableSelectedDuelist({
   compact = false,
@@ -110,12 +111,12 @@ function ChallengeTableByIds({
         </div>
       }
 
-      <Table sortable selectable className='Faded' color={color as SemanticCOLORS}>
+      <Table sortable selectable className='Faded' color={color as SemanticCOLORS} style={{ tableLayout: 'fixed' }}>
         <Table.Header className='TableHeader'>
           <Table.Row textAlign='left' verticalAlign='middle'>
-            <HeaderCell width={3} textAlign='center'>Challenger</HeaderCell>
-            <HeaderCell width={3} textAlign='center'></HeaderCell>
-            <HeaderCell width={3} textAlign='center'>Challenged</HeaderCell>
+            <HeaderCell style={{ width: '38%', maxWidth: '38%' }} textAlign='center'>Challenger</HeaderCell>
+            <HeaderCell style={{ width: '24%', maxWidth: '24%' }} textAlign='center'></HeaderCell>
+            <HeaderCell style={{ width: '38%', maxWidth: '38%' }} textAlign='center'>Challenged</HeaderCell>
           </Table.Row>
         </Table.Header>
 
@@ -137,6 +138,55 @@ function ChallengeTableByIds({
   )
 }
 
+function Player({ name, className }: { name: string, className?: string }) {
+  const textRef = useRef<HTMLDivElement>(null)
+  const [isTruncated, setIsTruncated] = useState(false)
+
+  useEffect(() => {
+    const checkTruncation = () => {
+      if (textRef.current) {
+        const isOverflowing = textRef.current.scrollWidth > textRef.current.clientWidth
+        setIsTruncated(isOverflowing)
+      }
+    }
+
+    checkTruncation()
+    window.addEventListener('resize', checkTruncation)
+    return () => window.removeEventListener('resize', checkTruncation)
+  }, [name])
+
+  return (
+    <div
+      className={className}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        width: '100%',
+        maxWidth: '100%',
+        overflow: 'hidden',
+      }}
+      onMouseEnter={() => isTruncated && emitter.emit('hover_description', name)}
+      onMouseLeave={() => isTruncated && emitter.emit('hover_description', null)}
+    >
+      <ProfilePic profilePic={0} small />
+      <div
+        ref={textRef}
+        style={{
+          maxWidth: '100%',
+          width: '100%',
+          textAlign: 'center',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {name}
+      </div>
+    </div>
+  )
+}
+
 
 function DuelItem({
   duelId,
@@ -149,9 +199,10 @@ function DuelItem({
 }) {
   const { aspectWidth } = useGameAspect()
   const { selectedDuelistId } = usePistolsContext()
+  const { clientSeconds } = useClientTimestamp(true)
 
   const {
-    challenge: { duelistIdA, duelistIdB, state, isLive, isCanceled, isExpired, isDraw, winner, duelistAddressA, duelistAddressB },
+    challenge: { duelistIdA, duelistIdB, state, isLive, isCanceled, isExpired, isDraw, winner, duelistAddressA, duelistAddressB, timestampStart },
     turnA, turnB,
   } = useDuel(duelId)
   const { name: playerNameA } = usePlayer(duelistAddressA)
@@ -160,6 +211,16 @@ function DuelItem({
   const { isAlive: isAliveB } = useDuelistFameBalance(duelistIdB)
   const { isMyAccount: isYouA } = useIsMyAccount(duelistAddressA)
   const { isMyAccount: isYouB } = useIsMyAccount(duelistAddressB)
+
+  const timeAgo = useMemo(() => {
+    const secondsAgo = clientSeconds - timestampStart
+    if (secondsAgo < 60) return 'just now'
+    if (secondsAgo < 3600) return `${Math.floor(secondsAgo / 60)}m ago`
+    if (secondsAgo < 86400) return `${Math.floor(secondsAgo / 3600)}h ago`
+    if (secondsAgo < 2592000) return `${Math.floor(secondsAgo / 86400)}d ago`
+    if (secondsAgo < 31536000) return `${Math.floor(secondsAgo / 2592000)}mo ago`
+    return `${Math.floor(secondsAgo / 31536000)}y ago`
+  }, [clientSeconds, timestampStart])
 
   const [leftDuelistId, leftDuelistAddress, leftPlayerName] = useMemo(() => {
     if (selectedDuelistId === duelistIdA) {
@@ -214,8 +275,6 @@ function DuelItem({
     dispatchSelectDuel(duelId)
   }
 
-  const fameBalance = null;
-
   if (nameFilter) {
     const isA = playerNameA ? playerNameA.toLowerCase().includes(nameFilter) : false
     const isB = playerNameB ? playerNameB.toLowerCase().includes(nameFilter) : false
@@ -231,53 +290,58 @@ function DuelItem({
       onClick={() => _gotoChallenge()} 
       style={{ 
         maxWidth: '100%',
+        width: '100%',
         backgroundColor: isOpponentOnRight ? 'rgba(245, 180, 50, 0.15)' : undefined,
+        minHeight: aspectWidth(6)
       }}
     >
-      <Cell style={{ width: '40%' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: aspectWidth(0.8) }}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-            <ProfilePic profilePic={0} small />
-            <PositiveResult positive={winnerIsLeft} negative={winnerIsRight} warning={isDraw} canceled={isCanceled || isExpired}>
-              <span className='BreakWord'>{leftPlayerName}</span>
-            </PositiveResult>
-          </div>
-          <div style={{ alignItems: 'center' }}>
-            <DuelIconsAsRow duelId={duelId} duelistId={leftDuelistId} size={null} />
-          </div>
+      <Cell style={{ width: '38%', maxWidth: '38%', overflow: 'hidden', minHeight: aspectWidth(6) }}>
+        <PositiveResult positive={winnerIsLeft} negative={winnerIsRight} warning={isDraw} canceled={isCanceled || isExpired}>
+          <Player name={leftPlayerName} className='BreakWord' />
+        </PositiveResult>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          width: '100%',
+          maxWidth: '100%',
+          marginTop: aspectWidth(0.4)
+        }}>
+          <DuelIconsAsRow duelId={duelId} duelistId={leftDuelistId} size={null} />
         </div>
       </Cell>
 
-      <Cell textAlign='center' style={{ width: '20%' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <span style={{ fontSize: aspectWidth(1.4), fontWeight: 'bold' }}>VS</span>
-          {state == constants.ChallengeState.Resolved ?
-            <>
-              <PositiveResult positive={true}>
-                <span className='BreakWord'>{winnerIsLeft ? leftPlayerName : rightPlayerName}</span>
-              </PositiveResult>
-            </>
-            :
-            <>
+      <Cell textAlign='center' style={{ width: '24%', maxWidth: '24%', overflow: 'hidden', minHeight: aspectWidth(6) }}>
+        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', marginTop: aspectWidth(0.4) }}>
+          <span style={{ height: aspectWidth(2), fontSize: aspectWidth(1.4), fontWeight: 'bold' }}>VS</span>
+          {state == constants.ChallengeState.Resolved ? (
+            <PositiveResult positive={winnerIsLeft && !isCallToAction} negative={winnerIsRight && !isCallToAction} warning={isDraw && !isCallToAction} canceled={isCanceled || isExpired}>
               <span className={ChallengeStateClasses[state]}>
                 {isCallToAction ? constants.ChallengeState.Awaiting : ChallengeStateNames[state]}
               </span>
-            </>
-          }
+            </PositiveResult>
+          ) : (
+            <span className={ChallengeStateClasses[state]} >
+              {isCallToAction ? constants.ChallengeState.Awaiting : ChallengeStateNames[state]}
+            </span>
+          )}
+        </div>
+        <div className={ChallengeStateClasses[state]} style={{ marginTop: aspectWidth(0), height: aspectWidth(2) }}>
+          {timeAgo}
         </div>
       </Cell>
 
-      <Cell style={{ width: '40%' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: aspectWidth(0.8), flexDirection: 'row-reverse' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-            <ProfilePic profilePic={0} small />
-            <PositiveResult positive={winnerIsRight} negative={winnerIsLeft} warning={isDraw} canceled={isCanceled || isExpired}>
-              <span className='BreakWord'>{rightPlayerName}</span>
-            </PositiveResult>
-          </div>
-          <div style={{ alignItems: 'center' }}>
-            <DuelIconsAsRow duelId={duelId} duelistId={rightDuelistId} size={null} />
-          </div>
+      <Cell style={{ width: '38%', maxWidth: '38%', overflow: 'hidden', minHeight: aspectWidth(6) }}>
+        <PositiveResult positive={winnerIsLeft} negative={winnerIsRight} warning={isDraw} canceled={isCanceled || isExpired}>
+          <Player name={rightPlayerName} className='BreakWord' />
+        </PositiveResult>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          width: '100%',
+          maxWidth: '100%',
+          marginTop: aspectWidth(0.4)
+        }}>
+          <DuelIconsAsRow duelId={duelId} duelistId={rightDuelistId} size={null} />
         </div>
       </Cell>
     </Table.Row>
@@ -298,6 +362,6 @@ function PositiveResult({
           : canceled ? 'Canceled'
             : ''
   return (
-    <span className={_className}>{children}</span>
+    <div className={_className} style={{ width: '100%', maxWidth: '100%' }}>{children}</div>
   )
 }

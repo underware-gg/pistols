@@ -250,7 +250,7 @@ function ModalNavigator() {
         zIndex: 1001,
         paddingTop: aspectWidth(1),
         paddingLeft: aspectWidth(2),
-        paddingBottom: aspectWidth(2)
+        paddingRight: aspectWidth(2)
       }}
     >
       <CustomIcon icon png raw 
