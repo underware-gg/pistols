@@ -310,41 +310,10 @@ export function useMyActiveDuels(notificationDuelIds: bigint[] = []) {
 //
 
 export const useGetChallenge = (duel_id: BigNumberish) => {
+  // fetch if not already in the store
+  useFetchChallenge(duel_id, 500)
+  // return challenge from the store
   const result = useChallenge(duel_id)
-
-  const query = useMemo<PistolsQueryBuilder>(() => (
-    isPositiveBigint(duel_id)
-      ? new PistolsQueryBuilder()
-        .withClause(
-          new PistolsClauseBuilder().keys([
-            "pistols-Challenge",
-            "pistols-ChallengeMessage",
-            'pistols-Round',
-          ], [formatQueryValue(duel_id)]).build()
-        )
-        .withEntityModels([
-          "pistols-Challenge",
-          "pistols-ChallengeMessage",
-          'pistols-Round',
-        ])
-        .includeHashedKeys()
-      : null
-  ), [duel_id])
-
-  const updateEntity = useChallengeStore((state) => state.updateEntity)
-
-  useSdkEntitiesGet({
-    query,
-    retryInterval: 500,
-    enabled: !result.challengeExists,
-    setEntities: (entities: PistolsEntity[]) => {
-      entities.forEach(e => {
-        console.log(`useGetChallenge() SET =======> [entity]:`, e)
-        updateEntity(e)
-      })
-    },
-  })
-
   return result
 }
 
@@ -357,6 +326,75 @@ export const useGetChallenge = (duel_id: BigNumberish) => {
 // new and fetched challenges will be updated automatically with the entity subscription
 //
 
+//
+// Fetch NEW Challenges by duelist ID
+//
+export const useFetchChallenge = (duelId: BigNumberish, retryInterval?: number) => {
+  const duelIds = useMemo(() => [duelId], [duelId])
+  return useFetchChallengeIds(duelIds, retryInterval)
+}
+
+export const useFetchChallengeIds = (duelIds: BigNumberish[], retryInterval?: number) => {
+  const setEntities = useChallengeStore((state) => state.setEntities);
+
+  const entities = useChallengeStore((state) => state.entities);
+  const challenges = useAllStoreModels<models.Challenge>(entities, 'Challenge')
+  const existingDuelIds = useMemo(() => challenges.map((e) => BigInt(e.duel_id)), [challenges])
+  
+  const newDuelIds = useMemo(() => (
+    duelIds
+      .map(BigInt)
+      .filter(isPositiveBigint)
+      .filter((id) => !existingDuelIds.includes(id))
+  ), [duelIds, existingDuelIds])
+
+  const query = useMemo<PistolsQueryBuilder>(() => (
+    newDuelIds.length > 0
+      ? new PistolsQueryBuilder()
+        .withClause(
+          new PistolsClauseBuilder().where("pistols-Challenge", "duel_id", "In", newDuelIds.map(formatQueryValue)).build()
+        )
+        .withEntityModels([
+          "pistols-Challenge",
+          "pistols-ChallengeMessage",
+          'pistols-Round',
+        ])
+        .includeHashedKeys()
+      : null
+  ), [newDuelIds])
+
+  useSdkEntitiesGet({
+    query,
+    retryInterval,
+    setEntities: (entities: PistolsEntity[]) => {
+      console.log(`useFetchChallengeIds() GOT`, newDuelIds, entities);
+      setEntities(entities);
+    },
+  })
+
+  useEffect(() => {
+    console.log(`::useFetchChallengeIds...`, newDuelIds, query)
+  }, [newDuelIds, query])
+
+  // const entities = useChallengeStore((state) => state.entities);
+  // useEffect(() => {
+  //   console.log(`::useFetchChallengeIds... entities:`, entities)
+  // }, [entities])
+
+  return {}
+}
+
+
+
+//------------------------------------------------
+// Fetch multiple challenges per player or duelist
+// after fetching once, it won't fetch again the same duelists/players
+// new and fetched challenges will be updated automatically with the entity subscription
+//
+
+//
+// Fetch NEW Challenges by duelist ID
+//
 export const useFetchChallengeIdsByDuelist = (duelistId: BigNumberish) => {
   const duelistIds = useMemo(() => [duelistId], [duelistId])
   return useFetchChallengeIdsByDuelistIds(duelistIds)
@@ -410,7 +448,9 @@ export const useFetchChallengeIdsByDuelistIds = (duelistIds: BigNumberish[]) => 
   return {}
 }
 
-
+//
+// Fetch NEW Challenges by player address
+//
 export const useFetchChallengeIdsByPlayer = (address: BigNumberish) => {
   const addresses = useMemo(() => [address], [address])
   return useFetchChallengeIdsByPlayerAddresses(addresses)
@@ -571,75 +611,75 @@ export const useQueryChallengeIdsByDuelist = (
   }
 }
 
-export const useQueryChallengeIds = (
-  filterStates: constants.ChallengeState[],
-  filterName: string,
-  filterBookmarked: boolean,
-  playerAddressOrDuelistId: BigNumberish,
-  sortColumn: ChallengeColumn,
-  sortDirection: SortDirection,
-) => {
-  const { address } = useAccount()
-  const { bookmarkedDuels } = usePlayer(address)
-  const { requiredDuelIds } = useCallToActions()
+// export const useQueryChallengeIds = (
+//   filterStates: constants.ChallengeState[],
+//   filterName: string,
+//   filterBookmarked: boolean,
+//   playerAddressOrDuelistId: BigNumberish,
+//   sortColumn: ChallengeColumn,
+//   sortDirection: SortDirection,
+// ) => {
+//   const { address } = useAccount()
+//   const { bookmarkedDuels } = usePlayer(address)
+//   const { requiredDuelIds } = useCallToActions()
 
-  const entities = useChallengeStore((state) => state.entities);
-  const challenges = useAllStoreModels<models.Challenge>(entities, 'Challenge')
+//   const entities = useChallengeStore((state) => state.entities);
+//   const challenges = useAllStoreModels<models.Challenge>(entities, 'Challenge')
 
-  // useEffect(() => console.log(`::useQueryChallengeIds... entities:`, entities), [entities])
-  // useEffect(() => console.log(`::useQueryChallengeIds... challenges:`, challenges), [challenges])
+//   // useEffect(() => console.log(`::useQueryChallengeIds... entities:`, entities), [entities])
+//   // useEffect(() => console.log(`::useQueryChallengeIds... challenges:`, challenges), [challenges])
 
-  const targetId = useMemo(() => BigInt(playerAddressOrDuelistId ?? 0), [playerAddressOrDuelistId])
+//   const targetId = useMemo(() => BigInt(playerAddressOrDuelistId ?? 0), [playerAddressOrDuelistId])
 
-  const { result, challengeIds, states } = useMemo(() => {
-    let result = [...challenges]
+//   const { result, challengeIds, states } = useMemo(() => {
+//     let result = [...challenges]
 
-    // filter challenges by duelist or player address
-    if (targetId > 0n) {
-      result = result.filter((ch) => (
-        bigintEquals(ch.duelist_id_a, targetId) ||
-        bigintEquals(ch.duelist_id_b, targetId) ||
-        bigintEquals(ch.address_a, targetId) ||
-        bigintEquals(ch.address_b, targetId)
-      ))
-    }
+//     // filter challenges by duelist or player address
+//     if (targetId > 0n) {
+//       result = result.filter((ch) => (
+//         bigintEquals(ch.duelist_id_a, targetId) ||
+//         bigintEquals(ch.duelist_id_b, targetId) ||
+//         bigintEquals(ch.address_a, targetId) ||
+//         bigintEquals(ch.address_b, targetId)
+//       ))
+//     }
 
-    // filter by bookmarked duels
-    if (filterBookmarked) {
-      result = result.filter((ch) => (bookmarkedDuels.find(p => bigintEquals(p, ch.duel_id)) !== undefined))
-    }
+//     // filter by bookmarked duels
+//     if (filterBookmarked) {
+//       result = result.filter((ch) => (bookmarkedDuels.find(p => bigintEquals(p, ch.duel_id)) !== undefined))
+//     }
 
-    // filter by name
-    if (filterName) {
-      const filterNameLower = filterName.toLowerCase();
-      result = result.filter((ch) => (
-        getPlayerName(ch.address_a)?.toLowerCase().includes(filterNameLower) ||
-        getPlayerName(ch.address_b)?.toLowerCase().includes(filterNameLower)
-      ))
-    }
+//     // filter by name
+//     if (filterName) {
+//       const filterNameLower = filterName.toLowerCase();
+//       result = result.filter((ch) => (
+//         getPlayerName(ch.address_a)?.toLowerCase().includes(filterNameLower) ||
+//         getPlayerName(ch.address_b)?.toLowerCase().includes(filterNameLower)
+//       ))
+//     }
 
-    // get all current states for fitlering
-    const states = _getChallengeStateSet(result)
+//     // get all current states for fitlering
+//     const states = _getChallengeStateSet(result)
 
-    // filter by states, with special handling for required action duels
-    result = _filterChallengesByState(result, filterStates)
+//     // filter by states, with special handling for required action duels
+//     result = _filterChallengesByState(result, filterStates)
 
-    // sort...
-    result = _sortChallenges(result, sortColumn, sortDirection)
+//     // sort...
+//     result = _sortChallenges(result, sortColumn, sortDirection)
 
-    // return ids only
-    const challengeIds = result.map((ch) => BigInt(ch.duel_id))
+//     // return ids only
+//     const challengeIds = result.map((ch) => BigInt(ch.duel_id))
 
-    return {
-      result,
-      challengeIds,
-      states,
-    }
-  }, [challenges, filterStates, filterName, filterBookmarked, targetId, sortColumn, sortDirection, bookmarkedDuels, requiredDuelIds])
+//     return {
+//       result,
+//       challengeIds,
+//       states,
+//     }
+//   }, [challenges, filterStates, filterName, filterBookmarked, targetId, sortColumn, sortDirection, bookmarkedDuels, requiredDuelIds])
 
-  return {
-    challenges: result,
-    challengeIds,
-    states,
-  }
-}
+//   return {
+//     challenges: result,
+//     challengeIds,
+//     states,
+//   }
+// }

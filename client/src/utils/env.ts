@@ -17,6 +17,8 @@ export const SALT_SERVER_URL = _env('VITE_SALT_SERVER_URL') || 'https://assets.u
 export const SLOT_NAME = _env('VITE_SLOT_NAME') || null;
 export const RPC_URL = _env('VITE_RPC_URL') || null;
 export const TORII_URL = _env('VITE_TORII_URL') || null;
+export const TORII_GRAPHQL_URL = _env('VITE_TORII_GRAPHQL_URL') || null;
+export const TORII_SQL_URL = _env('VITE_TORII_SQL_URL') || null;
 export const TORII_RELAY_URL = _env('VITE_TORII_RELAY_URL') || null;
 // social links
 export const DISCORD_CLIENT_ID = _env('VITE_DISCORD_CLIENT_ID') || null;

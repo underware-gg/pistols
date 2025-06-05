@@ -39,6 +39,7 @@
     "@mui/material": "^7.0.2",
     "@starknet-react/chains": "catalog:",
     "@starknet-react/core": "catalog:",
+    "@tanstack/react-query": "catalog:",
     "@tweenjs/tween.js": "^21.0.0",
     "@underware/pistols-sdk": "workspace:*",
     "event-emitter": "^0.3.5",
