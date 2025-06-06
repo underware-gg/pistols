@@ -302,7 +302,7 @@ function DuelItem({
       }}
     >
       <Cell style={{ width: '38%', maxWidth: '38%', overflow: 'hidden', minHeight: aspectWidth(6) }}>
-        <PositiveResult positive={winnerIsLeft} negative={winnerIsRight} warning={isDraw} canceled={isCanceled || isExpired}>
+        <PositiveResult positive={winnerIsLeft && !isCallToAction} negative={winnerIsRight && !isCallToAction} warning={isDraw && !isCallToAction} canceled={isCanceled || isExpired}>
           <Player name={leftPlayerName} className='BreakWord' />
         </PositiveResult>
         <div style={{ 
@@ -337,7 +337,7 @@ function DuelItem({
       </Cell>
 
       <Cell style={{ width: '38%', maxWidth: '38%', overflow: 'hidden', minHeight: aspectWidth(6) }}>
-        <PositiveResult positive={winnerIsLeft} negative={winnerIsRight} warning={isDraw} canceled={isCanceled || isExpired}>
+        <PositiveResult positive={winnerIsRight && !isCallToAction} negative={winnerIsLeft && !isCallToAction} warning={isDraw && !isCallToAction} canceled={isCanceled || isExpired}>
           <Player name={rightPlayerName} className='BreakWord' />
         </PositiveResult>
         <div style={{ 
