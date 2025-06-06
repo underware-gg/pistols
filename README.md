@@ -73,6 +73,7 @@ Pistols at Dawn is an onchain game, in which you face off against another Lord i
 * `/dreams`: [Daydreams](https://www.dreams.fun/) AI agents (typescript)
 * `/gamejam`: Original [Dojo Game Jam #3](https://twitter.com/ohayo_dojo/status/1747626446720258059) contents 
 * `/assets`: Assorted test assets
+* `/verifier`: Contracts verifier
 
 ### Assets
 
