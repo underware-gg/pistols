@@ -19,6 +19,7 @@ import { useIsMyAccount } from '/src/hooks/useIsYou';
 import { useDuelistSeasonStats } from '/src/stores/challengeStore';
 import { useSeason, useAllSeasonIds, useFullLeaderboard, useLeaderboard } from '/src/stores/seasonStore';
 import { useSeasonTotals } from '/src/queries/useSeason';
+import { useDiscordSocialLink } from '/src/stores/eventsModelStore';
 
 const calculateReward = (rank: number, totalPrizePool: bigint): bigint => {
   if (rank > 10) return 0n;
@@ -140,6 +141,7 @@ const PlayerRow = memo(({
   const seasonStats = useDuelistSeasonStats(duelistId, selectedSeasonId);
   const poolSeason = useSeasonPool(selectedSeasonId || 0);
   const { isActive } = useSeason(selectedSeasonId || 0);
+  const { isLinked, avatarUrl } = useDiscordSocialLink(owner);
 
   const totalPrizePool = useMemo(() => {
     if (!poolSeason) return 0n;
@@ -175,7 +177,7 @@ const PlayerRow = memo(({
         </Grid.Column>
         
         <Grid.Column width={4} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => dispatchSelectPlayerAddress(owner)}>
-          <ProfilePic profilePic={0} width={2.5} removeBorder circle />
+          <ProfilePic profilePic={isLinked ? undefined : 0} profilePicUrl={isLinked ? avatarUrl : undefined} width={2.5} removeBorder circle />
           <div style={{ marginLeft: aspectWidth(1), fontSize: aspectWidth(1.2), color: isMe ? '#00ff00' : 'lightskyblue', overflow: 'hidden', textOverflow: 'ellipsis' }}>{playerName}</div>
         </Grid.Column>
 
