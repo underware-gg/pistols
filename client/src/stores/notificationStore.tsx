@@ -94,9 +94,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         const newNotif = newNotifications.find(n => n.duelId === existing.duelId)
         if (!newNotif) return existing
 
-        if (newNotif.timestamp !== existing.timestamp ||
-          ((newNotif.state !== existing.state || newNotif.requiresAction !== existing.requiresAction) && 
-          (newNotif.state === constants.ChallengeState.Resolved || newNotif.state === constants.ChallengeState.Draw))
+        if (newNotif.timestamp !== existing.timestamp || newNotif.state !== existing.state ||
+          (newNotif.requiresAction !== existing.requiresAction && (newNotif.state === constants.ChallengeState.Resolved || newNotif.state === constants.ChallengeState.Draw))
         ) {
           return {
             ...existing,
