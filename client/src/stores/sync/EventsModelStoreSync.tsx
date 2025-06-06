@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { useAccount } from '@starknet-react/core'
 import { PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols/sdk'
 import { entityContainsModels, filterEntitiesByModels, formatQueryValue, getEntityModel, useSdkEventsGet, useSdkEventsSub } from '@underware/pistols-sdk/dojo'
@@ -62,8 +62,8 @@ export function EventsModelStoreSync() {
       updateProgress('events_get', currentPage, finished)
     },
     setEntities: (entities: PistolsEntity[]) => {
-      debug.log(`GET EventsModelStoreSync() ======> [PlayerBookmarkEvent]`, entities)
-      playerDataState.updateMessages(filterEntitiesByModels(entities, ['PlayerBookmarkEvent']))
+      debug.log(`GET EventsModelStoreSync() ======> [PlayerSocialLinkEvent]`, entities)
+      eventsState.setEntities(filterEntitiesByModels(entities, ['PlayerSocialLinkEvent']))
     },
   })
 

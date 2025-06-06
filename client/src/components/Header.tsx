@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState, useMemo, useRef, memo } from '
 import { Image, Input, ButtonGroup, Divider, Dropdown } from 'semantic-ui-react'
 import { useQueryParams, SortDirection, ChallengeColumn, PlayerColumn } from '/src/stores/queryParamsStore'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
+import { useCurrentSeason } from '/src/stores/seasonStore'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { ChallengeStateNames, LiveChallengeStates, PastChallengeStates } from '/src/utils/pistols'
 import { BackButton, FilterButton, SettingsGearButton, HomeButton } from '/src/components/ui/Buttons'
@@ -12,7 +13,6 @@ import AccountHeader from '/src/components/account/AccountHeader'
 import * as TWEEN from '@tweenjs/tween.js'
 import { usePlayerDuelistsOrganized } from '/src/stores/duelistStore'
 import DuelistData, { DuelistDataValues } from '/src/components/ui/DuelistData'
-import { useCurrentSeason } from '../stores/seasonStore'
 
 const VisibilityWrapper = memo(function VisibilityWrapper({ 
   visible, 
@@ -714,8 +714,6 @@ const FilterSeason = memo(function FilterSeason() {
     value: `${id}`,
     text: `${id == 0 ? 'All Seasons' : `Season ${id}${id == seasonId ? ' (Current)' : ''}`}`,
   })), [seasonId])
-
-  console.log('seasonId', seasonId, filterSeason, typeof filterSeason)
 
   return (
     <div style={{

@@ -1,11 +1,11 @@
 import { useMemo } from 'react'
+import { BigNumberish } from 'starknet';
+import { useAccount } from '@starknet-react/core';
 import { createDojoStore } from '@dojoengine/sdk/react'
 import { PistolsSchemaType } from '@underware/pistols-sdk/pistols/sdk'
 import { bigintToHex } from '@underware/pistols-sdk/utils';
-import { BigNumberish } from 'starknet';
 import { useStoreModelsByKeys } from '@underware/pistols-sdk/dojo';
 import { models, constants } from '@underware/pistols-sdk/pistols/gen';
-import { useAccount } from '@starknet-react/core';
 
 export const useEventsStore = createDojoStore<PistolsSchemaType>();
 
