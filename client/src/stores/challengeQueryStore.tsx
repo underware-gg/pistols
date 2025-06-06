@@ -84,7 +84,7 @@ export const useQueryChallengeIds = (
     }
 
     // sort...
-    const sort_column = (sortColumn == ChallengeColumn.Status ? `state` : `MAX("A.timestamps.start", "A.timestamps.end")`);
+    const sort_column = (sortColumn == ChallengeColumn.Status ? `state` : `MAX(A."timestamps.start", A."timestamps.end")`);
     const sort_direction = (sortDirection == SortDirection.Ascending ? `ASC` : `DESC`);
     query += `\norder by ${sort_column} ${sort_direction}`
 
