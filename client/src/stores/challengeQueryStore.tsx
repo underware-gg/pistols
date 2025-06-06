@@ -67,8 +67,12 @@ export const useQueryChallengeIds = (
     // filter by name
     if (filterName) {
       const filterNameLower = filterName.toLowerCase();
-      columns.push(`(select username from controllers where address=A.address_a) as name_a`);
-      columns.push(`(select username from controllers where address=A.address_b) as name_b`);
+      // columns.push(`(select username from controllers where address=A.address_a) as name_a`);
+      // columns.push(`(select username from controllers where address=A.address_b) as name_b`);
+      // TORII 1.5.7 BUG:
+      // controller address is not 0x0000 padded, so we remove '0x' and look the rest
+      columns.push(`(select username from controllers where INSTR(A.address_a, SUBSTRING(address, 3, 64)) > 0) as name_a`);
+      columns.push(`(select username from controllers where INSTR(A.address_b, SUBSTRING(address, 3, 64)) > 0) as name_b`);
       conditions.push(`(name_a like '%${filterNameLower}%' or name_b like '%${filterNameLower}%')`)
     }
 
