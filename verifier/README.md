@@ -15,7 +15,7 @@
 Install dependencies:
 
 ```sh
-pnpm prepare
+pnpm sync
 ```
 
 Verify all contracts:
