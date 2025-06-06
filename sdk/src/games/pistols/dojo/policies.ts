@@ -19,22 +19,31 @@ import { Connector } from '@starknet-react/core'
 //----------------------------------------
 // policies
 //
-const contractPolicyDescriptions_pistols: ContractPolicyDescriptions = {
+export const contractPolicyDescriptions_pistols: ContractPolicyDescriptions = {
   game: {
     name: 'Game',
-    description: 'Game loop contract',
+    description: 'Game entry point',
     interfaces: ['IGame'],
   },
-  // tutorial: {
-  //   name: 'Tutorial',
-  //   description: 'Tutorial game contract',
-  //   interfaces: ['ITutorial'],
-  // },
+  game_loop: {
+    name: 'Game loop',
+    description: 'Game loop contract',
+  },
+  tutorial: {
+    name: 'Tutorial',
+    description: 'Tutorial game contract',
+  },
   bank: {
     name: 'Bank',
     description: 'Bank contract',
     interfaces: ['IBankPublic'],
   },
+  admin: {
+    name: 'Admin',
+    description: 'Admin contract',
+  },
+  //
+  // ERC-721
   pack_token: {
     name: 'Pack token',
     description: 'Packs ERC721 contract',
@@ -54,6 +63,16 @@ const contractPolicyDescriptions_pistols: ContractPolicyDescriptions = {
     name: 'Tournament token',
     description: 'Tournament ERC721 contract',
     interfaces: ['ITournamentTokenPublic'],
+  },
+  //
+  // ERC-20
+  fame_coin: {
+    name: 'Fame coin',
+    description: '$FAME ERC20 contract (Tokenbound to Duelists)',
+  },
+  fools_coin: {
+    name: 'Fools coin',
+    description: '$FOOLS ERC20 contract (Players rewards)',
   },
 }
 const contractPolicyDescriptions_mock: ContractPolicyDescriptions = {

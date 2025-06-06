@@ -1,9 +1,10 @@
 import React, { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { Container, Table } from 'semantic-ui-react'
-import { getAdminAddress, getBankAddress, getGameAddress, getWorldAddress } from '@underware/pistols-sdk/pistols/config'
-import { useStarknetContext } from '@underware/pistols-sdk/dojo'
-import { useTokenContracts } from '/src/hooks/useTokenContracts'
+import { getWorldAddress } from '@underware/pistols-sdk/pistols/config'
+import { contractPolicyDescriptions_pistols } from '@underware/pistols-sdk/pistols/dojo'
+import { useDojoSystem, useStarknetContext } from '@underware/pistols-sdk/dojo'
+import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { ExplorerLink } from '@underware/pistols-sdk/starknet/components'
 import { Address } from '/src/components/ui/Address'
 import { Connect } from '/src/pages/tests/ConnectTestPage'
@@ -40,19 +41,6 @@ export default function ContractsPage() {
 function Contracts() {
   const { selectedNetworkId } = useStarknetContext()
   const worldContractAddress = useMemo(() => getWorldAddress(selectedNetworkId), [selectedNetworkId])
-  const gameContractAddress = useMemo(() => getGameAddress(selectedNetworkId), [selectedNetworkId])
-  const adminContractAddress = useMemo(() => getAdminAddress(selectedNetworkId), [selectedNetworkId])
-  const bankContractAddress = useMemo(() => getBankAddress(selectedNetworkId), [selectedNetworkId])
-  
-  const {
-    // lordsContractAddress,
-    fameContractAddress,
-    foolsContractAddress,
-    duelistContractAddress,
-    duelContractAddress,
-    packContractAddress,
-    tournamentContractAddress,
-  } = useTokenContracts()
 
   return (
     <Table celled striped size='small' color='orange'>
@@ -64,13 +52,17 @@ function Contracts() {
           <HeaderCell></HeaderCell>
           <HeaderCell></HeaderCell>
           <HeaderCell></HeaderCell>
+          <HeaderCell></HeaderCell>
+          <HeaderCell></HeaderCell>
         </Row>
       </Header>
       <Body className='H5 Code'>
-        <ContractRow name='World' address={worldContractAddress} />
-        <ContractRow name='Game' address={gameContractAddress} />
-        <ContractRow name='Admin' address={adminContractAddress} />
-        <ContractRow name='Bank' address={bankContractAddress} />
+        <ContractRow name='world' address={worldContractAddress} description='Dojo world contract' />
+        <ContractRow name='game' />
+        <ContractRow name='game_loop' />
+        <ContractRow name='tutorial' />
+        <ContractRow name='admin' />
+        <ContractRow name='bank' />
       </Body>
       <Header>
         <Row className='H5'>
@@ -80,11 +72,13 @@ function Contracts() {
           <HeaderCell></HeaderCell>
           <HeaderCell></HeaderCell>
           <HeaderCell></HeaderCell>
+          <HeaderCell></HeaderCell>
+          <HeaderCell></HeaderCell>
         </Row>
       </Header>
       <Body className='H5 Code'>
-        <ContractRow name='Fame' address={fameContractAddress} />
-        <ContractRow name='Fools' address={foolsContractAddress} />
+        <ContractRow name='fame_coin' />
+        <ContractRow name='fools_coin' />
       </Body>
       <Header>
         <Row className='H5'>
@@ -94,13 +88,15 @@ function Contracts() {
           <HeaderCell></HeaderCell>
           <HeaderCell></HeaderCell>
           <HeaderCell></HeaderCell>
+          <HeaderCell></HeaderCell>
+          <HeaderCell></HeaderCell>
         </Row>
       </Header>
       <Body className='H5 Code'>
-        <ContractRow name='Duels' address={duelContractAddress} />
-        <ContractRow name='Duelists' address={duelistContractAddress} />
-        <ContractRow name='Packs' address={packContractAddress} />
-        <ContractRow name='Tournaments' address={tournamentContractAddress} />
+        <ContractRow name='duel_token' />
+        <ContractRow name='duelist_token' />
+        <ContractRow name='pack_token' />
+        <ContractRow name='tournament_token' />
       </Body>
     </Table>
   )
@@ -109,31 +105,40 @@ function Contracts() {
 function ContractRow({
   name,
   address,
-  full = true,
+  description,
 }: {
   name: string,
-  address: BigNumberish,
-  full?: boolean,
+  address?: BigNumberish,
+  description?: string,
 }) {
+  const { contractAddress } = useDojoSystem(name)
+  const _address = address ?? contractAddress
+  const _description = description ?? contractPolicyDescriptions_pistols[name]?.description
   return (
     <Row className='H5'>
       <Cell>
         {name}
       </Cell>
       <Cell className='Smaller'>
-        <Address address={address} full={full} />
+        {isPositiveBigint(_address)
+          ? <Address address={_address} full={false} />
+          : <>Not deployed yet</>
+        }
+      </Cell>
+      <Cell className='Smaller'>
+        {`Pistols at Dawn ${_description}`}
       </Cell>
       <Cell>
-        <ExplorerLink address={address} cartridge />
+        <ExplorerLink address={_address} cartridge />
       </Cell>
       <Cell>
-        <ExplorerLink address={address} voyager />
+        <ExplorerLink address={_address} voyager />
       </Cell>
       <Cell>
-        <ExplorerLink address={address} starkscan />
+        <ExplorerLink address={_address} starkscan />
       </Cell>
       <Cell>
-        <ExplorerLink address={address} viewblock />
+        <ExplorerLink address={_address} viewblock />
       </Cell>
     </Row>
   )
