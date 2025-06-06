@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState, useMemo, useRef, memo } from 'react'
-import { Image, Input, ButtonGroup, Divider } from 'semantic-ui-react'
+import { Image, Input, ButtonGroup, Divider, Dropdown } from 'semantic-ui-react'
 import { useQueryParams, SortDirection, ChallengeColumn, PlayerColumn } from '/src/stores/queryParamsStore'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { useGameAspect } from '/src/hooks/useGameAspect'
@@ -12,6 +12,7 @@ import AccountHeader from '/src/components/account/AccountHeader'
 import * as TWEEN from '@tweenjs/tween.js'
 import { usePlayerDuelistsOrganized } from '/src/stores/duelistStore'
 import DuelistData, { DuelistDataValues } from '/src/components/ui/DuelistData'
+import { useCurrentSeason } from '../stores/seasonStore'
 
 const VisibilityWrapper = memo(function VisibilityWrapper({ 
   visible, 
@@ -476,7 +477,8 @@ const CurtainUI = memo(function CurtainUI({
         <VisibilityWrapper visible={atDuelists}>
           <div style={{width: '90%' }}>
             <div style={{display: 'flex', justifyContent: 'space-evenly', alignItems: 'center'}}>
-              <FilterPlayerName  />
+              <FilterPlayerName />
+              <FilterSeason />
               <div>
                 <label style={{marginRight: '10px'}}>Filters:</label>
                 <FilterButton label='Active Only' state={filterPlayerOnline} onClick={() => setFilterPlayerOnline(!filterPlayerOnline)} />
@@ -514,6 +516,7 @@ const CurtainUI = memo(function CurtainUI({
           <div style={{width: '90%'}}>
             <div style={{display: 'flex', justifyContent: 'space-evenly', alignItems: 'center'}}>
               <FilterPlayerName  />
+              <FilterSeason />
               <FilterButton label='Show All Live Duels' state={filterShowAllDuels} onClick={() => setFilterShowAllDuels(!filterShowAllDuels)} />
               <FilterButton label='Bookmarked' state={filterShowBookmarkedDuels} onClick={() => setFilterShowBookmarkedDuels(!filterShowBookmarkedDuels)} />
             </div>
@@ -557,6 +560,7 @@ const CurtainUI = memo(function CurtainUI({
           <div style={{width: '90%'}}>
             <div style={{display: 'flex', justifyContent: 'space-evenly', alignItems: 'center'}}>
               <FilterPlayerName  />
+              <FilterSeason />
               <FilterButton label='Show All Past Duels' state={filterShowAllDuels} onClick={() => setFilterShowAllDuels(!filterShowAllDuels)} />
               <FilterButton label='Bookmarked' state={filterShowBookmarkedDuels} onClick={() => setFilterShowBookmarkedDuels(!filterShowBookmarkedDuels)} />
             </div>
@@ -695,4 +699,38 @@ const FilterPlayerName = memo(function FilterPlayerName() {
   )
 })
 
+
+// Memoize FilterSeason component
+const FilterSeason = memo(function FilterSeason() {
+  const {
+    filterSeason,
+    setFilterSeason,
+  } = useQueryParams()
+  const { aspectWidth } = useGameAspect()
+
+  const { seasonId } = useCurrentSeason()
+  const seasonOptions = useMemo(() => Array.from(Array((seasonId ?? 0) + 1).keys()).reverse().map((id) => ({
+    key: `${id}`,
+    value: `${id}`,
+    text: `${id == 0 ? 'All Seasons' : `Season ${id}${id == seasonId ? ' (Current)' : ''}`}`,
+  })), [seasonId])
+
+  console.log('seasonId', seasonId, filterSeason, typeof filterSeason)
+
+  return (
+    <div style={{
+      position: 'relative',
+      minWidth: aspectWidth(12)
+    }}>
+      <Dropdown
+        options={seasonOptions}
+        placeholder={null}
+        selection
+        fluid
+        value={`${filterSeason}`}
+        onChange={(e, { value }) => setFilterSeason(parseInt(value as string))}
+      />
+    </div>
+  )
+})
 //TODO remove content on the curtain ui only when the curtain is raised (when switching screen, best example is ScProfile)

@@ -19,14 +19,28 @@ export default function ScGraveyard() {
   const duelsPerPage = 8
 
   const { address } = useAccount()
-  const { filterStatesPastDuels, filterPlayerName, filterShowAllDuels, filterShowBookmarkedDuels, filterChallengeSortColumn, filterChallengeSortDirection } = useQueryParams()
-  const { challengeIds, pageCount, totalCount, queryHash } = useQueryChallengeIds(
+  const {
+    filterStatesPastDuels,
+    filterPlayerName,
+    filterShowAllDuels,
+    filterShowBookmarkedDuels,
+    filterChallengeSortColumn,
+    filterChallengeSortDirection,
+    filterSeason,
+  } = useQueryParams()
+  const {
+    challengeIds,
+    pageCount,
+    totalCount,
+    queryHash,
+  } = useQueryChallengeIds(
     filterStatesPastDuels,
     filterPlayerName,
     filterShowBookmarkedDuels,
     filterShowAllDuels ? 0n : address,
     filterChallengeSortColumn,
     filterChallengeSortDirection,
+    filterSeason,
     duelsPerPage,
     pageNumber,
   )

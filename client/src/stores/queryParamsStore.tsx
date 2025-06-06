@@ -50,6 +50,7 @@ type State = {
   filterStatesDuelistDuels: constants.ChallengeState[]
   filterShowAllDuels: boolean
   filterShowBookmarkedDuels: boolean
+  filterSeason: number
   // duelist setters
   setFilterDuelistName: (value: string) => void
   setFilterDuelistActive: (value: boolean) => void
@@ -73,6 +74,7 @@ type State = {
   setFilterStatesDuelistDuels: (value: constants.ChallengeState[]) => void
   setFilterShowAllDuels: (value: boolean) => void
   setFilterShowBookmarkedDuels: (value: boolean) => void
+  setFilterSeason: (value: number) => void
 }
 
 export const useQueryParams = create<State>((set) => ({
@@ -96,6 +98,7 @@ export const useQueryParams = create<State>((set) => ({
   filterStatesDuelistDuels: AllChallengeStates,
   filterShowAllDuels: false,
   filterShowBookmarkedDuels: false,
+  filterSeason: 0,
   // duelist setters
   setFilterDuelistName: (value: string) => set({ filterDuelistName: value.toLowerCase() }),
   setFilterDuelistActive: (value: boolean) => set({ filterDuelistActive: value }),
@@ -119,4 +122,5 @@ export const useQueryParams = create<State>((set) => ({
   setFilterStatesDuelistDuels: (value: constants.ChallengeState[]) => set({ filterStatesDuelistDuels: value.filter(state => AllChallengeStates.includes(state)) }),
   setFilterShowAllDuels: (value: boolean) => set({ filterShowAllDuels: value }),
   setFilterShowBookmarkedDuels: (value: boolean) => set({ filterShowBookmarkedDuels: value }),
+  setFilterSeason: (value: number) => set({ filterSeason: value }),
 }))

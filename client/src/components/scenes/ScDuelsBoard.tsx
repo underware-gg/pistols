@@ -17,14 +17,28 @@ export default function ScDuelsBoard() {
   const duelsPerPage = 5
 
   const { address } = useAccount()
-  const { filterStatesLiveDuels, filterPlayerName, filterShowAllDuels, filterShowBookmarkedDuels, filterChallengeSortColumn, filterChallengeSortDirection } = useQueryParams()
-  const { challengeIds, pageCount, totalCount, queryHash } = useQueryChallengeIds(
+  const {
+    filterStatesLiveDuels,
+    filterPlayerName,
+    filterShowAllDuels,
+    filterShowBookmarkedDuels,
+    filterChallengeSortColumn,
+    filterChallengeSortDirection,
+    filterSeason,
+  } = useQueryParams()
+  const {
+    challengeIds,
+    pageCount,
+    totalCount,
+    queryHash,
+  } = useQueryChallengeIds(
     filterStatesLiveDuels,
     filterPlayerName,
     filterShowBookmarkedDuels,
     filterShowAllDuels ? 0n : address,
     filterChallengeSortColumn,
     filterChallengeSortDirection,
+    filterSeason,
     duelsPerPage,
     pageNumber,
   )

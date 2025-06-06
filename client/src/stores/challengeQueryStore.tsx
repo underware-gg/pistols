@@ -5,6 +5,7 @@ import { useSdkSqlQuery } from '@underware/pistols-sdk/dojo/sql';
 import { useTokenContracts } from '../hooks/useTokenContracts';
 import { useFetchChallengeIds } from './challengeStore';
 import { usePlayer } from '/src/stores/playerStore';
+import { useCurrentSeason } from '/src/stores/seasonStore';
 import { bigintToAddress, isPositiveBigint } from '@underware/pistols-sdk/utils';
 import { ChallengeColumn, SortDirection } from '/src/stores/queryParamsStore';
 import { constants } from '@underware/pistols-sdk/pistols/gen';
@@ -39,12 +40,14 @@ export const useQueryChallengeIds = (
   playerAddress: BigNumberish,
   sortColumn: ChallengeColumn,
   sortDirection: SortDirection,
+  filterSeason: number,
   pageSize = 8,
   pageIndex = 0,
 ) => {
   const { address } = useAccount()
   const { duelContractAddress } = useTokenContracts()
   const { bookmarkedDuels } = usePlayer(address)
+  const { seasonId: currentSeasonId } = useCurrentSeason()
 
   const { query } = useMemo(() => {
     const columns = ['A.duel_id', 'COUNT(*) OVER() AS count']
@@ -57,6 +60,15 @@ export const useQueryChallengeIds = (
     // filter by player address
     if (isPositiveBigint(playerAddress)) {
       conditions.push(`(A.address_a="${bigintToAddress(playerAddress)}" or A.address_b="${bigintToAddress(playerAddress)}")`)
+    }
+
+    // filter by season
+    if (filterSeason > 0) {
+      if (filterSeason == currentSeasonId) {
+        conditions.push(`(A.season_id=0 or A.season_id=${filterSeason})`)
+      } else {
+        conditions.push(`A.season_id=${filterSeason}`)
+      }
     }
 
     // filter by bookmarked duels
@@ -95,7 +107,7 @@ export const useQueryChallengeIds = (
     return {
       query,
     }
-  }, [filterStates, playerAddress, filterName, filterBookmarked, bookmarkedDuels, sortColumn, sortDirection, pageSize, pageIndex])
+  }, [filterStates, playerAddress, filterName, filterBookmarked, bookmarkedDuels, filterSeason, sortColumn, sortDirection, pageSize, pageIndex])
 
   const { data, isLoading, queryHash } = useSdkSqlQuery({
     query,
@@ -105,7 +117,7 @@ export const useQueryChallengeIds = (
   // fetch only NEW duels (not already in the store)
   useFetchChallengeIds(data?.duelIds ?? []);
 
-  // useEffect(() => console.log('SQL QUERY:', query), [query])
+  useEffect(() => console.log('SQL QUERY:', query), [query])
   // useEffect(() => console.log('SQL CHALLENGE IDs:', isLoading, data), [isLoading, data])
 
   const totalCount = useMemo(() => (data?.totalCount ?? 0), [data?.totalCount])
