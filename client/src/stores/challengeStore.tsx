@@ -592,7 +592,7 @@ export const useQueryChallengeIdsByDuelist = (
   const entities = useChallengeStore((state) => state.entities);
   const challenges = useAllStoreModels<models.Challenge>(entities, 'Challenge')
 
-  const { challengeIds, states } = useMemo(() => {
+  const { challengeIds, states, challengesPerSeason } = useMemo(() => {
     let _duelistId = BigInt(duelistId ?? 0)
     let result = _duelistId > 0n ? challenges.filter((ch) => (
       bigintEquals(ch.duelist_id_a, _duelistId) ||
@@ -611,15 +611,24 @@ export const useQueryChallengeIdsByDuelist = (
     // return ids only
     const challengeIds = result.map((ch) => BigInt(ch.duel_id))
 
+    //get results per season...
+    const challengesPerSeason = result.reduce((acc, ch) => {
+      acc[Number(ch.season_id)] = acc[Number(ch.season_id)] || []
+      acc[Number(ch.season_id)].push(BigInt(ch.duel_id))
+      return acc
+    }, {})
+
     return {
       challengeIds,
       states,
+      challengesPerSeason,
     }
   }, [challenges, filterStates, duelistId, sortColumn, sortDirection])
 
   return {
     challengeIds,
     states,
+    challengesPerSeason,
   }
 }
 

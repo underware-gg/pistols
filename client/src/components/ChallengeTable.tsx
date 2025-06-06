@@ -36,7 +36,7 @@ export function ChallengeTableSelectedDuelist({
 
   // filter challenges
   const { filterChallengeSortColumn, filterChallengeSortDirection } = useQueryParams()
-  const { challengeIds, states } = useQueryChallengeIdsByDuelist(selectedDuelistId, statesFilter, filterChallengeSortColumn, filterChallengeSortDirection)
+  const { challengeIds, states, challengesPerSeason } = useQueryChallengeIdsByDuelist(selectedDuelistId, statesFilter, filterChallengeSortColumn, filterChallengeSortDirection)
 
   useEffect(() => {
     console.log('ChallengeTableSelectedDuelist', selectedDuelistId)
@@ -44,7 +44,7 @@ export function ChallengeTableSelectedDuelist({
 
   return (
     <div style={{width: '100%', height: '100%',}}>
-      <ChallengeTableByIds challengeIds={challengeIds} compact={compact} existingStates={states} states={statesFilter} setStates={setStatesFilter} />
+      <ChallengeTableByIds challengeIds={challengesPerSeason} compact={compact} existingStates={states} states={statesFilter} setStates={setStatesFilter} />
     </div>
   )
 }
@@ -58,7 +58,7 @@ function ChallengeTableByIds({
   states,
   setStates,
 }: {
-  challengeIds: bigint[]
+  challengeIds: { [seasonId: number]: bigint[] }
   color?: SemanticCOLORS
   compact?: boolean
   existingStates: constants.ChallengeState[]
@@ -66,14 +66,116 @@ function ChallengeTableByIds({
   setStates: (states: constants.ChallengeState[]) => void
 }) {
   const { aspectWidth } = useGameAspect()
+  const [collapsedSeasons, setCollapsedSeasons] = useState<Set<string>>(new Set())
+
+  const toggleSeason = (seasonId: string) => {
+    const newCollapsed = new Set(collapsedSeasons)
+    if (newCollapsed.has(seasonId)) {
+      newCollapsed.delete(seasonId)
+    } else {
+      newCollapsed.add(seasonId)
+    }
+    setCollapsedSeasons(newCollapsed)
+  }
 
   const rows = useMemo(() => {
     let result = []
-    challengeIds.forEach((duelId) => {
-      result.push(<DuelItem key={duelId} duelId={duelId} compact={compact} />)
-    })
+    Object.keys(challengeIds)
+          .sort((a, b) => Number(b) - Number(a))
+          .forEach((seasonId) => {
+            const isCollapsed = collapsedSeasons.has(seasonId)
+            
+            result.push(
+              <Table.Row 
+                key={`season-${seasonId}`} 
+                className="" 
+                onClick={() => {
+                  toggleSeason(seasonId)
+                  emitter.emit('hover_description', null)
+                }} 
+                onMouseEnter={() => {
+                  emitter.emit('hover_description', collapsedSeasons.has(seasonId) ? "Click to expand season duels" : "Click to collapse season duels")
+                }}
+                onMouseLeave={() => {
+                  emitter.emit('hover_description', null)
+                }}
+                style={{ cursor: 'pointer' }}
+              >
+                <Cell colSpan="3" textAlign="center" style={{ 
+                  fontSize: aspectWidth(1.4), 
+                  fontWeight: 'bold',
+                  backgroundColor: 'rgba(0,0,0,0.05)',
+                  padding: aspectWidth(0.8),
+                  position: 'relative',
+                  borderTop: '1px solid rgba(0,0,0,0.1)',
+                  borderBottom: '1px solid rgba(0,0,0,0.1)'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: aspectWidth(1)
+                  }}>
+                    <div style={{
+                      flex: 1,
+                      height: aspectWidth(0.05),
+                      backgroundColor: 'white',
+                      maxWidth: aspectWidth(8)
+                    }}></div>
+                    
+                    {/* Left arrow */}
+                    <div style={{
+                      fontSize: aspectWidth(0.8),
+                      color: 'orange',
+                      fontWeight: 'bold',
+                      transform: isCollapsed ? 'rotate(180deg)' : 'rotate(0deg)',
+                      transition: 'transform 0.2s ease'
+                    }}>
+                      ▼
+                    </div>
+                    
+                    <span style={{ 
+                      whiteSpace: 'nowrap', 
+                      fontSize: aspectWidth(1.6), 
+                      fontWeight: 'bold',
+                      margin: `0 ${aspectWidth(0.5)}px`
+                    }}>
+                      Season {seasonId}
+                    </span>
+                    
+                    {/* Right arrow */}
+                    <div style={{
+                      fontSize: aspectWidth(0.8),
+                      color: 'orange',
+                      fontWeight: 'bold',
+                      transform: isCollapsed ? 'rotate(-180deg)' : 'rotate(0deg)',
+                      transition: 'transform 0.2s ease'
+                    }}>
+                      ▼
+                    </div>
+                    
+                    <div style={{
+                      flex: 1,
+                      height: aspectWidth(0.05),
+                      backgroundColor: 'white',
+                      maxWidth: aspectWidth(8)
+                    }}></div>
+                  </div>
+                </Cell>
+              </Table.Row>
+            )
+            
+            // Add collapsible container for duel items
+            if (challengeIds[Number(seasonId)].length > 0) {
+              if (!isCollapsed) {
+                challengeIds[Number(seasonId)].map((duelId) => {
+                  result.push(<DuelItem key={duelId} duelId={duelId} compact={compact} />)
+                })
+              }
+            }
+          })
     return result
-  }, [challengeIds, compact])
+  }, [challengeIds, compact, collapsedSeasons])
 
   const { filters, canAdd, canClear } = useMemo(() => {
     let canAdd = false
@@ -206,7 +308,7 @@ function DuelItem({
   const { clientSeconds } = useClientTimestamp(true)
 
   const {
-    challenge: { duelistIdA, duelistIdB, state, isLive, isCanceled, isExpired, isDraw, winner, duelistAddressA, duelistAddressB, seasonId, timestampStart, timestampEnd },
+    challenge: { duelistIdA, duelistIdB, state, isLive, isCanceled, isExpired, isDraw, winner, duelistAddressA, duelistAddressB, timestampStart, timestampEnd },
     turnA, turnB,
   } = useDuel(duelId)
   const { name: playerNameA } = usePlayer(duelistAddressA)
@@ -322,9 +424,6 @@ function DuelItem({
 
       <Cell textAlign='center' style={{ width: '24%', maxWidth: '24%', overflow: 'hidden', minHeight: aspectWidth(6) }}>
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', marginTop: aspectWidth(0.4) }}>
-          {seasonId > 0 &&
-            <span className='Important'>Season {seasonId}</span>
-          }
           <span style={{ height: aspectWidth(2), fontSize: aspectWidth(1.4), fontWeight: 'bold' }}>VS</span>
           {state == constants.ChallengeState.Resolved ? (
             <PositiveResult positive={winnerIsLeft && !isCallToAction} negative={winnerIsRight && !isCallToAction} warning={isDraw && !isCallToAction} canceled={isCanceled || isExpired}>
