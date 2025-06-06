@@ -284,6 +284,7 @@ interface CustomIconProps {
   color?: string,       // css color
   tooltip?: string,
   onClick?: Function,
+  alt?: string,
   // <Icon> fallback
   disabled?: boolean,   // if <Icon>
   flipped?: boolean,    // if <Icon>
@@ -302,6 +303,7 @@ export function CustomIcon({
   tooltip = null,
   onClick = null,
   raw = false,
+  alt = null,
 }: CustomIconProps) {
 
   const [isHovered, setIsHovered] = useState(false)
