@@ -9,7 +9,9 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "verify-starkscan": "./scripts/verifyStarkscan.sh"
+    "prepare": "git clone https://github.com/NethermindEth/starknet-contract-verifier.git",
+    "verify-starkscan": "./scripts/verifyStarkscan.sh",
+    "verify-voyager": "./scripts/verifyVoyager.sh"
   },
   "packageManager": "pnpm@10.10.0",
   "dependencies": {

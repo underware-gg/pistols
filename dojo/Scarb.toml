@@ -3,6 +3,7 @@ name = "pistols"
 version = "1.0.18"
 cairo-version = "2.10.1"
 edition = "2024_07"
+license = "CC0-1.0"
 
 [cairo]
 sierra-replace-ids = true
@@ -61,3 +62,20 @@ build-external-contracts = [
 [profile.staging]
 [profile.sepolia]
 [profile.mainnet]
+
+
+#--------------------------
+# Voyager verification
+# https://github.com/NethermindEth/starknet-contract-verifier
+[tool.voyager]
+game = { path = "src/systems/game.cairo" }
+game_loop = { path = "src/systems/game_loop.cairo" }
+tutorial = { path = "src/systems/tutorial.cairo" }
+admin = { path = "src/systems/admin.cairo" }
+bank = { path = "src/systems/bank.cairo" }
+fame_coin = { path = "src/tokens/fame_coin.cairo" }
+fools_coin = { path = "src/tokens/fools_coin.cairo" }
+duel_token = { path = "src/tokens/duel_token.cairo" }
+duelist_token = { path = "src/tokens/duelist_token.cairo" }
+pack_token = { path = "src/tokens/pack_token.cairo" }
+# tournament_token = { path = "src/tokens/tournament_token.cairo" }
