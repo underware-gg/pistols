@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { useAccount } from '@starknet-react/core'
 import { PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols/sdk'
-import { entityContainsModels, filterEntitiesByModels, formatQueryValue, getEntityModel, useSdkEventsSub } from '@underware/pistols-sdk/dojo'
+import { entityContainsModels, filterEntitiesByModels, formatQueryValue, getEntityModel, useSdkEventsGet, useSdkEventsSub } from '@underware/pistols-sdk/dojo'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useEventsStore } from '/src/stores/eventsModelStore'
 import { usePlayerDataStore } from '/src/stores/playerStore'
@@ -19,7 +19,15 @@ export function EventsModelStoreSync() {
   const { address } = useAccount()
   const mounted = useMounted()
 
-  const query = useMemo<PistolsQueryBuilder>(() => (
+  const query_get = useMemo<PistolsQueryBuilder>(() => (
+    new PistolsQueryBuilder()
+      .withEntityModels([
+        'pistols-PlayerSocialLinkEvent',
+      ])
+      .includeHashedKeys()
+  ), [])
+
+  const query_sub = useMemo<PistolsQueryBuilder>(() => (
     isPositiveBigint(address)
       ? new PistolsQueryBuilder()
         .withClause(
@@ -43,19 +51,38 @@ export function EventsModelStoreSync() {
       : undefined
   ), [address])
 
-  useSdkEventsSub({
-    query,
-    enabled: (mounted && Boolean(query)),
+
+  //
+  // Initial fetch
+  //
+  useSdkEventsGet({
+    query: query_get,
+    enabled: (mounted && Boolean(query_get)),
     updateProgress: (currentPage: number, finished?: boolean) => {
-      updateProgress('get_events', currentPage, finished)
+      updateProgress('events_get', currentPage, finished)
     },
     setEntities: (entities: PistolsEntity[]) => {
-      debug.log(`GET EventsModelStoreSync() ======>`, entities)
+      debug.log(`GET EventsModelStoreSync() ======> [PlayerBookmarkEvent]`, entities)
+      playerDataState.updateMessages(filterEntitiesByModels(entities, ['PlayerBookmarkEvent']))
+    },
+  })
+
+  //
+  // Subscription
+  //
+  useSdkEventsSub({
+    query: query_sub,
+    enabled: (mounted && Boolean(query_sub)),
+    updateProgress: (currentPage: number, finished?: boolean) => {
+      updateProgress('events_sub', currentPage, finished)
+    },
+    setEntities: (entities: PistolsEntity[]) => {
+      debug.log(`GET EventsModelStoreSync() ======> [player]`, entities)
       eventsState.setEntities(filterEntitiesByModels(entities, ['CallToActionEvent', 'PlayerSocialLinkEvent']))
       playerDataState.updateMessages(filterEntitiesByModels(entities, ['PlayerBookmarkEvent']))
     },
     updateEntity: (entity: PistolsEntity) => {
-      debug.log(`SUB EventsModelStoreSync() ======>`, entity)
+      debug.log(`SUB EventsModelStoreSync() ======> [player]`, entity)
       const model =
         getEntityModel(entity, 'CallToActionEvent') ??
         getEntityModel(entity, 'PlayerBookmarkEvent') ??

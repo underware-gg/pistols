@@ -30,7 +30,7 @@ export function EventsHistoricalStoreSync() {
     query,
     enabled: mounted,
     updateProgress: (currentPage: number, finished?: boolean) => {
-      updateProgress('get_historical_events', currentPage, finished)
+      updateProgress('historical_events_sub', currentPage, finished)
     },
     setEntities: historicalEventsState.setEvents,
     updateEntity: historicalEventsState.updateEvent,
