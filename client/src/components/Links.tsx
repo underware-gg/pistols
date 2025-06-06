@@ -13,7 +13,13 @@ export const PlayerLink = ({
   const { name } = usePlayer(address)
   const { dispatchSelectPlayerAddress } = usePistolsContext()
   return (
-    <span className='AnchorLink' onClick={() => dispatchSelectPlayerAddress(address)}>
+    <span 
+      className='AnchorLink' 
+      onClick={(e) => {
+        e.stopPropagation()
+        dispatchSelectPlayerAddress(address)
+      }}
+    >
       {name}
     </span>
   )
@@ -29,7 +35,13 @@ export const DuelistLink = ({
   const { nameAndId } = useDuelist(useName ? duelistId : 0)
   const { dispatchSelectDuelistId } = usePistolsContext()
   return (
-    <span className='AnchorLink' onClick={() => dispatchSelectDuelistId(duelistId)}>
+    <span 
+      className='AnchorLink' 
+      onClick={(e) => {
+        e.stopPropagation()
+        dispatchSelectDuelistId(duelistId)
+      }}
+    >
       {useName ? nameAndId : `Duelist #${bigintToDecimal(duelistId)}`}
     </span>
   )
@@ -42,7 +54,13 @@ export const ChallengeLink = ({
 }) => {
   const { dispatchSelectDuel } = usePistolsContext()
   return (
-    <span className='AnchorLink' onClick={() => dispatchSelectDuel(duelId)}>
+    <span 
+      className='AnchorLink' 
+      onClick={(e) => {
+        e.stopPropagation()
+        dispatchSelectDuel(duelId)
+      }}
+    >
       Duel #{bigintToDecimal(duelId)}
     </span>
   )

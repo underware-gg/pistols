@@ -51,7 +51,7 @@ type NotificationContextType = {
   notifications: Notification[]
   markAsRead: (duelId: bigint) => void
   markAsDisplayed: (duelId: bigint) => void
-  clearNotifications: () => void
+  markAllAsRead: () => void
   hasUnreadNotifications: boolean
   getNotification: (duelId: bigint) => Notification | null
 }
@@ -86,7 +86,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         isRead: false,
         isDisplayed: !duel.callToAction && (duel.state === constants.ChallengeState.Awaiting || duel.state === constants.ChallengeState.InProgress),
         state: duel.state,
-        requiresAction: duel.callToAction,
+        requiresAction: duel.callToAction && (duel.state !== constants.ChallengeState.Withdrawn && duel.state !== constants.ChallengeState.Expired && duel.state !== constants.ChallengeState.Refused),
       }))
 
     setNotifications(prev => {
@@ -94,7 +94,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         const newNotif = newNotifications.find(n => n.duelId === existing.duelId)
         if (!newNotif) return existing
 
-        if (newNotif.timestamp !== existing.timestamp || 
+        if (newNotif.timestamp !== existing.timestamp || newNotif.state !== existing.state ||
           (newNotif.requiresAction !== existing.requiresAction && (newNotif.state === constants.ChallengeState.Resolved || newNotif.state === constants.ChallengeState.Draw))
         ) {
           return {
@@ -154,9 +154,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     )
   }, [])
 
-  const clearNotifications = useCallback(() => {
-    setNotifications([])
-    localStorage.removeItem(STORAGE_KEY)
+  const markAllAsRead = useCallback(() => {
+    setNotifications(prev => prev.map(n => ({ ...n, isRead: true })))
   }, [])
 
   const hasUnreadNotifications = useMemo(() => {
@@ -175,10 +174,10 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     notifications,
     markAsRead,
     markAsDisplayed,
-    clearNotifications,
+    markAllAsRead,
     hasUnreadNotifications,
     getNotification
-  }), [notifications, markAsRead, markAsDisplayed, clearNotifications, hasUnreadNotifications, getNotification])
+  }), [notifications, markAsRead, markAsDisplayed, markAllAsRead, hasUnreadNotifications, getNotification])
 
   return (
     <NotificationContext.Provider value={value}>

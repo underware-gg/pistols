@@ -18,6 +18,7 @@ import { useDuelistsOfOwner } from '/src/hooks/useTokenDuelists'
 import { useExecuteEmitPlayerBookmark } from '/src/hooks/usePistolsSystemCalls'
 import { Address } from './Address'
 import { ChallengeButton } from '/src/components/ui/Buttons'
+import { useDiscordSocialLink } from '/src/stores/eventsModelStore'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -53,19 +54,22 @@ const useProfilePosterData = (playerAddress?: BigNumberish) => {
   const { name, isBlocked } = usePlayer(playerAddress)
   const { isMyAccount } = useIsMyAccount(playerAddress)
   const isOnline = getPlayerOnlineStatus(playerAddress)
+  const { isLinked, avatarUrl } = useDiscordSocialLink(playerAddress)
 
   return {
     name,
     isMyAccount,
     isOnline,
-    isBlocked
+    isBlocked,
+    isLinked,
+    avatarUrl
   }
 }
 
 // Small version of the ProfilePoster
 const ProfilePosterSmall = forwardRef<ProfilePosterHandle, ProfilePosterProps>((props, ref) => {
   const { aspectWidth, aspectHeight } = useGameAspect()
-  const { name, isOnline, isBlocked } = useProfilePosterData(props.playerAddress)
+  const { name, isOnline, isBlocked, isLinked, avatarUrl } = useProfilePosterData(props.playerAddress)
 
   const baseRef = useRef<InteractibleComponentHandle>(null)
 
@@ -118,7 +122,14 @@ const ProfilePosterSmall = forwardRef<ProfilePosterHandle, ProfilePosterProps>((
           <div className='WantedText Small'>WANTED</div>
           
           <div className='ProfileSection Small'>
-            <ProfilePic profilePic={0} width={9} removeCorners borderColor='#201a18' borderWidth={0.3} />
+            <ProfilePic 
+              profilePic={isLinked ? undefined : 0} 
+              profilePicUrl={isLinked ? avatarUrl : undefined} 
+              width={9} 
+              removeCorners 
+              borderColor='#201a18' 
+              borderWidth={0.3} 
+            />
             <div className='PlayerName Small'>{name}</div>
           </div>
 
@@ -138,7 +149,7 @@ const ProfilePosterFull = forwardRef<ProfilePosterHandle, ProfilePosterProps>((p
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSetScene } = usePistolsScene()
   const { dispatchSelectDuelistId } = usePistolsContext()
-  const { name, isMyAccount, isOnline, isBlocked } = useProfilePosterData(props.playerAddress)
+  const { name, isMyAccount, isOnline, isBlocked, isLinked, avatarUrl } = useProfilePosterData(props.playerAddress)
   
   // Full-specific data
   const { duelistIds, isLoading } = useDuelistsOfOwner(props.playerAddress)
@@ -256,7 +267,15 @@ const ProfilePosterFull = forwardRef<ProfilePosterHandle, ProfilePosterProps>((p
           <div className='WantedText'>WANTED</div>
           
           <div className='ProfileSection'>
-            <ProfilePic profilePic={0} width={22} height={22} removeCorners borderColor='#201a18' borderWidth={0.4} />
+            <ProfilePic 
+              profilePic={isLinked ? undefined : 0} 
+              profilePicUrl={isLinked ? avatarUrl : undefined} 
+              width={22} 
+              height={22} 
+              removeCorners 
+              borderColor='#201a18' 
+              borderWidth={0.4} 
+            />
             <div className='PlayerName'>{name}</div>
             <div className='PlayerAddress'><Address address={props.playerAddress} /></div>
           </div>

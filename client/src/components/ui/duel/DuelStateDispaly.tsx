@@ -50,17 +50,19 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
   const rewardsB = useGetChallengeRewards(isFinished ? duelId : 0n, duelistIdB)
 
   // Determine if we need to swap the display (if player B is the current user)
-  const shouldSwap = isYouB
+  const shouldSwap = useMemo(() => isYouB, [isYouB])
   
   // Define the actual display order based on whether we should swap
-  const leftPlayerName = shouldSwap ? playerNameB : playerNameA
-  const rightPlayerName = shouldSwap ? playerNameA : playerNameB
-  const leftDuelistId = shouldSwap ? duelistIdB : duelistIdA
-  const rightDuelistId = shouldSwap ? duelistIdA : duelistIdB
-  const leftRewards = shouldSwap ? rewardsB : rewardsA
-  const rightRewards = shouldSwap ? rewardsA : rewardsB
-  const isLeftMe = shouldSwap ? isYouB : isYouA
-  const isRightMe = shouldSwap ? isYouA : isYouB
+  const { leftPlayerName, rightPlayerName, leftDuelistId, rightDuelistId, leftRewards, rightRewards, isLeftMe, isRightMe } = useMemo(() => ({
+    leftPlayerName: shouldSwap ? playerNameB : playerNameA,
+    rightPlayerName: shouldSwap ? playerNameA : playerNameB,
+    leftDuelistId: shouldSwap ? duelistIdB : duelistIdA,
+    rightDuelistId: shouldSwap ? duelistIdA : duelistIdB,
+    leftRewards: shouldSwap ? rewardsB : rewardsA,
+    rightRewards: shouldSwap ? rewardsA : rewardsB,
+    isLeftMe: shouldSwap ? isYouB : isYouA,
+    isRightMe: shouldSwap ? isYouA : isYouB
+  }), [shouldSwap, playerNameA, playerNameB, duelistIdA, duelistIdB, rewardsA, rewardsB, isYouA, isYouB])
 
   const winnerIsLeft = useMemo(() => (winnerDuelistId == leftDuelistId), [winnerDuelistId, leftDuelistId])
   const winnerIsRight = useMemo(() => (winnerDuelistId == rightDuelistId), [winnerDuelistId, rightDuelistId])

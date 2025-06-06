@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from 'react'
 import { type Notification } from '/src/stores/notificationStore'
 import { useAccount } from '@starknet-react/core'
 import { usePlayer } from '/src/stores/playerStore'
-import { useDuel } from '/src/hooks/useDuel'
+import { DuelStage, useDuel } from '/src/hooks/useDuel'
 import { useIsMyAccount } from '/src/hooks/useIsYou'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
@@ -26,10 +26,10 @@ export const PushNotification: React.FC<{
 
     const { duelId, state, requiresAction } = notification
     const isOpponentTurn = (!isMeA && turnA) || (!isMeB && turnB)
-    const hasCommittedA = completedStagesA?.[0]
-    const hasCommittedB = completedStagesB?.[0]
-    const hasRevealedA = completedStagesA?.[1]
-    const hasRevealedB = completedStagesB?.[1]
+    const hasCommittedA = completedStagesA?.[DuelStage.Round1Commit]
+    const hasCommittedB = completedStagesB?.[DuelStage.Round1Commit]
+    const hasRevealedA = completedStagesA?.[DuelStage.Round1Reveal]
+    const hasRevealedB = completedStagesB?.[DuelStage.Round1Reveal]
 
     let rawTitle: string
     let rawMessage: string

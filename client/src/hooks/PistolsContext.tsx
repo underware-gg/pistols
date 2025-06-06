@@ -285,9 +285,16 @@ const PistolsProvider = ({
         break
       }
       case PistolsActions.POP_SELECTION: {
+        const isOnDuel = state.selectedDuelId > 0n
         newState = clearSelections(newState)
         if (state.selectionHistory.length > 0) {
           newState = restoreFromHistory(newState)
+        }
+        if (isOnDuel) {
+          clearSelections(newState)
+          if (state.selectionHistory.length > 0) {
+            newState = restoreFromHistory(newState)
+          }
         }
         break
       }

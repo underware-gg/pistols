@@ -4,7 +4,7 @@ import { PlayerLink, ChallengeLink } from '/src/components/Links'
 import { Image } from 'semantic-ui-react'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
-import { useDuel } from '/src/hooks/useDuel'
+import { DuelStage, useDuel } from '/src/hooks/useDuel'
 import { useIsMyAccount } from '/src/hooks/useIsYou'
 import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
 
@@ -45,10 +45,10 @@ export const DuelNotificationItem: React.FC<DuelNotificationItemProps> = ({
     const duelistAddressA = challenge.duelistAddressA
     const duelistAddressB = challenge.duelistAddressB
     const isOpponentTurn = (!isMeA && turnA) || (!isMeB && turnB)
-    const hasCommittedA = completedStagesA?.[0]
-    const hasCommittedB = completedStagesB?.[0]
-    const hasRevealedA = completedStagesA?.[1]
-    const hasRevealedB = completedStagesB?.[1]
+    const hasCommittedA = completedStagesA?.[DuelStage.Round1Commit]
+    const hasCommittedB = completedStagesB?.[DuelStage.Round1Commit]
+    const hasRevealedA = completedStagesA?.[DuelStage.Round1Reveal]
+    const hasRevealedB = completedStagesB?.[DuelStage.Round1Reveal]
 
     switch (state) {
       case constants.ChallengeState.Awaiting:
