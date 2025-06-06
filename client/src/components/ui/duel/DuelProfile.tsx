@@ -8,6 +8,7 @@ import { ProfilePic } from '/src/components/account/ProfilePic'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { usePlayer } from '/src/stores/playerStore'
 import { DuelTutorialLevel } from '/src/data/tutorialConstants'
+import { useDiscordSocialLink } from '/src/stores/eventsModelStore'
 
 export default function DuelProfile({
   playerAddress,
@@ -23,6 +24,7 @@ export default function DuelProfile({
   const { name } = usePlayer(playerAddress)
   const { aspectWidth } = useGameAspect()
   const { dispatchSelectPlayerAddress } = usePistolsContext()
+  const { avatarUrl, isLinked } = useDiscordSocialLink(playerAddress)
 
   const { profilePic, profileType, nameAndId: duelistName } = useDuelist(duelistId)
 
@@ -34,7 +36,13 @@ export default function DuelProfile({
       {floated == 'left' &&
         <>
           <div className='YesMouse NoDrag' onClick={() => dispatchSelectPlayerAddress(playerAddress)} >
-          <ProfilePic circle profilePic={isTutorial ? profilePic : 0} profileType={isTutorial ? profileType : constants.DuelistProfile.Character} className='NoMouse NoDrag' />
+          <ProfilePic 
+            circle 
+            profilePic={isTutorial ? profilePic : (isLinked ? undefined : 0)} 
+            profilePicUrl={isTutorial ? undefined : (isLinked ? avatarUrl : undefined)} 
+            profileType={isTutorial ? profileType : constants.DuelistProfile.Character} 
+            className='NoMouse NoDrag' 
+          />
           </div>
           <Image className='NoMouse NoDrag' src='/images/ui/duel/player_profile.png' style={{ position: 'absolute' }} />
           <div className='NoMouse NoDrag' style={{ zIndex: 10, position: 'absolute', top: aspectWidth(0.2), left: aspectWidth(8.3) }}>

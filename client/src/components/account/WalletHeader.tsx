@@ -14,6 +14,7 @@ import { ActionButton } from '/src/components/ui/Buttons'
 import { Address } from '/src/components/ui/Address'
 import { ConnectButton, PlayGameButton } from '/src/components/scenes/ScDoor'
 import { SceneName } from '/src/data/assets'
+import { useDiscordSocialLink } from '/src/stores/eventsModelStore'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -27,6 +28,7 @@ export default function WalletHeader({
   const { dispatchSetScene } = usePistolsScene()
   const { dispatchSelectPlayerAddress } = usePistolsContext()
   const { hasFinishedTutorial } = useSettings()
+  const { avatarUrl, isLinked } = useDiscordSocialLink(address)
 
   // BUG: https://github.com/apibara/starknet-react/issues/419
   // const { data, error, isLoading } = useStarkProfile({ address, enabled: false })
@@ -34,7 +36,8 @@ export default function WalletHeader({
   const data = { name: null, profilePicture: null }
 
   const connectionName = useMemo(() => (data?.name ?? `Connected to ${selectedNetworkConfig.name}`), [data])
-  const imageUrl = useMemo(() => (data?.profilePicture ?? getConnectorIcon(connector) ?? makeProfilePicUrl(0)), [data, connector])
+  // const imageUrl = useMemo(() => (data?.profilePicture ?? getConnectorIcon(connector) ?? makeProfilePicUrl(0)), [data, connector])
+  const imageUrl = useMemo(() => (isLinked ? avatarUrl : getConnectorIcon(connector) ?? makeProfilePicUrl(0)), [data, connector, avatarUrl, isLinked])
 
   const { username, openProfile } = useConnectedController()
 
