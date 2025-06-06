@@ -86,7 +86,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         isRead: false,
         isDisplayed: !duel.callToAction && (duel.state === constants.ChallengeState.Awaiting || duel.state === constants.ChallengeState.InProgress),
         state: duel.state,
-        requiresAction: duel.callToAction,
+        requiresAction: duel.callToAction && (duel.state !== constants.ChallengeState.Withdrawn && duel.state !== constants.ChallengeState.Expired && duel.state !== constants.ChallengeState.Refused),
       }))
 
     setNotifications(prev => {
@@ -94,8 +94,9 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         const newNotif = newNotifications.find(n => n.duelId === existing.duelId)
         if (!newNotif) return existing
 
-        if (newNotif.timestamp !== existing.timestamp || 
-          (newNotif.requiresAction !== existing.requiresAction && (newNotif.state === constants.ChallengeState.Resolved || newNotif.state === constants.ChallengeState.Draw))
+        if (newNotif.timestamp !== existing.timestamp ||
+          ((newNotif.state !== existing.state || newNotif.requiresAction !== existing.requiresAction) && 
+          (newNotif.state === constants.ChallengeState.Resolved || newNotif.state === constants.ChallengeState.Draw))
         ) {
           return {
             ...existing,
