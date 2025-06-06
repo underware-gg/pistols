@@ -179,6 +179,14 @@
   }
 }
 
+.BarkeepButtonContainer {
+  display: flex;
+  justify-content: flex-end;
+  gap: aspect-width(1);
+  width: 100%;
+  margin-top: aspect-width(1);
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

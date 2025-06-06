@@ -51,7 +51,7 @@ type NotificationContextType = {
   notifications: Notification[]
   markAsRead: (duelId: bigint) => void
   markAsDisplayed: (duelId: bigint) => void
-  clearNotifications: () => void
+  markAllAsRead: () => void
   hasUnreadNotifications: boolean
   getNotification: (duelId: bigint) => Notification | null
 }
@@ -154,9 +154,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     )
   }, [])
 
-  const clearNotifications = useCallback(() => {
-    setNotifications([])
-    localStorage.removeItem(STORAGE_KEY)
+  const markAllAsRead = useCallback(() => {
+    setNotifications(prev => prev.map(n => ({ ...n, isRead: true })))
   }, [])
 
   const hasUnreadNotifications = useMemo(() => {
@@ -175,10 +174,10 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     notifications,
     markAsRead,
     markAsDisplayed,
-    clearNotifications,
+    markAllAsRead,
     hasUnreadNotifications,
     getNotification
-  }), [notifications, markAsRead, markAsDisplayed, clearNotifications, hasUnreadNotifications, getNotification])
+  }), [notifications, markAsRead, markAsDisplayed, markAllAsRead, hasUnreadNotifications, getNotification])
 
   return (
     <NotificationContext.Provider value={value}>

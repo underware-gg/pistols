@@ -21,7 +21,7 @@ export default function BarkeepModal({ open, setOpen, initialStage = 'intro' }: 
   const { dispatchSetScene } = usePistolsScene()
   const { tutorialOpener, dispatchSelectDuel } = usePistolsContext()
   
-  const { notifications, hasUnreadNotifications } = useNotifications()
+  const { notifications, hasUnreadNotifications, markAllAsRead } = useNotifications()
   
   const [stage, setStage] = useState<ModalStage>(initialStage)
   const [displayText, setDisplayText] = useState('')
@@ -112,20 +112,33 @@ export default function BarkeepModal({ open, setOpen, initialStage = 'intro' }: 
               ))}
             </div>
           )}
-          
-          <button
-            onClick={() => {
-              if (stage === 'notifications') {
-                setStage('menu')
-                setDisplayText('What else do you want?')
-              } else {
-                setOpen(false)
-              }
-            }}
-            className="BarkeepDialogButton"
-          >
-            {stage === 'notifications' ? 'Back' : 'Exit'}
-          </button>
+
+          <div className="BarkeepButtonContainer">
+            {hasUnreadNotifications && stage === 'notifications' && (
+              <button
+                onClick={() => {
+                  markAllAsRead()
+                }}
+                className="BarkeepDialogButton"
+              >
+                Mark all as read
+              </button>
+            )}
+            
+            <button
+              onClick={() => {
+                if (stage === 'notifications') {
+                  setStage('menu')
+                  setDisplayText('What else do you want?')
+                } else {
+                  setOpen(false)
+                }
+              }}
+              className="BarkeepDialogButton"
+            >
+              {stage === 'notifications' ? 'Back' : 'Exit'}
+            </button>
+          </div>
         </div>
       </div>
 
