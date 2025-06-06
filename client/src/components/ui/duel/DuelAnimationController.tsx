@@ -63,6 +63,7 @@ export const DuelAnimationController = forwardRef<DuelAnimationControllerRef, Du
   const hasSpawnedCardsLeftRef = useRef(false);
   const hasSpawnedCardsRightRef = useRef(false);
   const isAnimatingStepRef = useRef(false);
+  const duelHasReachedStepsRef = useRef(false);
   const queuedStepsRef = useRef(0);
 
   const speedFactorRef = useRef(duelSpeedFactor);
@@ -216,6 +217,7 @@ export const DuelAnimationController = forwardRef<DuelAnimationControllerRef, Du
           }
 
           // Start animation if set to play
+          duelHasReachedStepsRef.current = true;
           if (isPlayingRef.current) {
             nextStepCallbackRef.current = setTimeout(() => {
               gameImpl.hideDialogs();
@@ -236,15 +238,9 @@ export const DuelAnimationController = forwardRef<DuelAnimationControllerRef, Du
   }, [duelProgress, duelInProgress, gameImpl, leftDuelist?.id, rightDuelist?.id, tutorialLevel, areDuelistsLoaded]);
 
   // Main function for playing animation steps
-  const playStep = () => {
+  const playStep = () => {    
     if (isPlayingRef.current) {
       queuedStepsRef.current = 0;
-      return;
-    }
-
-    if (!isPlayingRef.current && isAnimatingStepRef.current) {
-      queuedStepsRef.current += 1;
-      return;
     }
 
     // Safety check - don't try to play steps if we don't have progress data
@@ -426,13 +422,13 @@ export const DuelAnimationController = forwardRef<DuelAnimationControllerRef, Du
       } else {
         // If this is the last step or not playing, mark as finished and handle queue
         setTimeout(() => {
-          isAnimatingStepRef.current = false;
-          
           if (!isPlayingRef.current && queuedStepsRef.current > 0) {
             queuedStepsRef.current -= 1;
             setTimeout(() => {
               playStep();
             }, 0);
+          } else {
+            isAnimatingStepRef.current = false;
           }
         }, timeDelayNextStep / speedFactorRef.current);
       }
@@ -497,6 +493,7 @@ export const DuelAnimationController = forwardRef<DuelAnimationControllerRef, Du
     hasSpawnedCardsLeftRef.current = false;
     hasSpawnedCardsRightRef.current = false;
     isAnimatingStepRef.current = false;
+    duelHasReachedStepsRef.current = false;
     queuedStepsRef.current = 0; // Clear queued steps
     
     // Clear all timeout references
@@ -505,12 +502,22 @@ export const DuelAnimationController = forwardRef<DuelAnimationControllerRef, Du
     gameBladeAnimationTimeoutRef.current = null;
     gameAnimationTimeoutRef.current = null;
   };
+
+  const stepForward = () => {
+    if (!duelHasReachedStepsRef.current) return;
+    
+    if (!isAnimatingStepRef.current) {
+      playStep();
+    } else if (!isPlayingRef.current) {
+      queuedStepsRef.current += 1;
+    }
+  }
   
   // Expose resetDuel function to parent component through ref
   useImperativeHandle(ref, () => ({
     resetDuel,
     stepForward: () => {
-      playStep();
+      stepForward();
     },
     setCardsSpawnedLeft: (left: boolean) => {
       hasSpawnedCardsLeftRef.current = left;
@@ -524,7 +531,7 @@ export const DuelAnimationController = forwardRef<DuelAnimationControllerRef, Du
     const handleKeyPress = (event: KeyboardEvent) => {
       if (event.code === 'Space') {
         event.preventDefault();
-        playStep();
+        stepForward();
       }
     };
 
