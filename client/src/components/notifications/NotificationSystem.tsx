@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useNotifications, type Notification } from '/src/stores/notificationStore'
-import { usePistolsContext } from '/src/hooks/PistolsContext'
+import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import * as TWEEN from '@tweenjs/tween.js'
 import { BannerButton } from '../Header'
 import { Image } from 'semantic-ui-react'
@@ -16,6 +16,7 @@ const NOTIFICATION_SOUND_COOLDOWN = 15000
 export default function NotificationSystem() {
   const { notifications, markAsRead, markAsDisplayed } = useNotifications()
   const { dispatchSelectDuel, currentDuel, selectedDuelId } = usePistolsContext()
+  const { atDuel } = usePistolsScene()
   
   const [currentNotification, setCurrentNotification] = useState<Notification | null>(null)
   const [isVisible, setIsVisible] = useState(false)
@@ -25,7 +26,11 @@ export default function NotificationSystem() {
   
   const bubbleRef = useRef<HTMLDivElement>(null)
   const timeoutRef = useRef<NodeJS.Timeout>()
+  
   const notificationRef = useRef<Notification | null>(null)
+  const selectedDuelIdRef = useRef<bigint | null>(null)
+  const currentDuelRef = useRef<bigint | null>(null)
+
   const hasDisplayedNotificationRef = useRef(false)
   const swRegistrationRef = useRef<ServiceWorkerRegistration | null>(null)
   const lastSoundTimeRef = useRef<number>(0)
@@ -111,6 +116,8 @@ export default function NotificationSystem() {
     if (currentDuel) {
       markAsRead(currentDuel)
     }
+    selectedDuelIdRef.current = selectedDuelId
+    currentDuelRef.current = currentDuel
   }, [selectedDuelId, currentDuel])
 
   // Helper function to play notification sound with cooldown
@@ -156,7 +163,7 @@ export default function NotificationSystem() {
   }, [])
 
   const showNotification = () => {
-    if (selectedDuelId === notificationRef.current?.duelId || currentDuel === notificationRef.current?.duelId) {
+    if (selectedDuelIdRef.current === notificationRef.current?.duelId || currentDuelRef.current === notificationRef.current?.duelId) {
       onNotificationShown()
       onNotificationDismissed(true, notificationRef.current?.duelId)
       return
@@ -192,7 +199,7 @@ export default function NotificationSystem() {
   }
 
   const showPushNotification = () => {
-    if (selectedDuelId === notificationRef.current?.duelId || currentDuel === notificationRef.current?.duelId) {
+    if (selectedDuelIdRef.current === notificationRef.current?.duelId || currentDuelRef.current === notificationRef.current?.duelId) {
       onNotificationShown()
       onNotificationDismissed(true, notificationRef.current?.duelId)
       return
@@ -286,7 +293,7 @@ export default function NotificationSystem() {
     <>
       <BannerButton 
         visible={isVisible} 
-        long 
+        customOffset={!atDuel ? 4 : 2.5} 
         button={
           <Image 
             onClick={handleClick} 
@@ -307,7 +314,8 @@ export default function NotificationSystem() {
         ref={bubbleRef}
         className='NotificationTalkBaloon YesMouse'
         style={{
-          display: isVisible ? 'block' : 'none'
+          display: isVisible ? 'block' : 'none',
+          top: atDuel ? '15%' : '18%'
         }}
         data-tail="left"
         onClick={handleClick}

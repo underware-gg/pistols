@@ -18,6 +18,14 @@ import { emitter } from '/src/three/game'
 // State
 //
 
+type SelectionState = {
+  duelId: bigint,
+  duelistId: bigint,
+  playerAddress: bigint,
+  challengingAddress: bigint,
+  challengingDuelistId: bigint,
+}
+
 export const initialState = {
   walletSig: { address: 0n, sig: 0n },
   // opening modals
@@ -28,6 +36,9 @@ export const initialState = {
   // new challenge modal
   challengingAddress: 0n,
   challengingDuelistId: 0n,
+
+  // selection history stack
+  selectionHistory: [] as Array<SelectionState>,
 
   currentDuel: 0n,
   currentScene: undefined as SceneName,
@@ -55,6 +66,8 @@ const PistolsActions = {
   SELECT_CHALLENGING_DUELIST_ID: 'SELECT_CHALLENGING_DUELIST_ID',
   SET_TUTORIAL_LEVEL: 'SET_TUTORIAL_LEVEL',
   RESET_VALUES: 'RESET_VALUES',
+  POP_SELECTION: 'POP_SELECTION',
+  CLEAR_SELECTION_HISTORY: 'CLEAR_SELECTION_HISTORY',
 }
 
 
@@ -75,6 +88,8 @@ type ActionType =
   | { type: 'SELECT_CHALLENGING_DUELIST_ID', payload: bigint }
   | { type: 'RESET_VALUES', payload: null }
   | { type: 'SET_TUTORIAL_LEVEL', payload: DuelTutorialLevel }
+  | { type: 'POP_SELECTION', payload: null }
+  | { type: 'CLEAR_SELECTION_HISTORY', payload: null }
 
 //--------------------------------
 // Context
@@ -86,6 +101,61 @@ const PistolsContext = createContext<{
   state: initialState,
   dispatch: () => null,
 })
+
+//--------------------------------
+// Helper Functions
+//
+
+const shouldAddToHistory = (state: PistolsContextStateType): boolean => {
+  return isPositiveBigint(state.selectedDuelId) || 
+         isPositiveBigint(state.selectedDuelistId) || 
+         isPositiveBigint(state.selectedPlayerAddress) || 
+         isPositiveBigint(state.challengingAddress) ||
+         isPositiveBigint(state.challengingDuelistId)
+}
+
+const addToHistory = (state: PistolsContextStateType, oldState: PistolsContextStateType): PistolsContextStateType => {
+  state.selectionHistory = [...oldState.selectionHistory, {
+    duelId: oldState.selectedDuelId,
+    duelistId: oldState.selectedDuelistId,
+    playerAddress: oldState.selectedPlayerAddress,
+    challengingAddress: oldState.challengingAddress,
+    challengingDuelistId: oldState.challengingDuelistId,
+  }]
+
+  return state
+} 
+
+const clearSelections = (state: PistolsContextStateType): PistolsContextStateType => {
+  return {
+    ...state,
+    selectedDuelId: 0n,
+    selectedDuelistId: 0n,
+    selectedPlayerAddress: 0n,
+    challengingAddress: 0n,
+    challengingDuelistId: 0n,
+  }
+}
+
+const restoreFromHistory = (state: PistolsContextStateType): PistolsContextStateType => {
+  const lastSelection = state.selectionHistory[state.selectionHistory.length - 1]
+  state.selectionHistory = state.selectionHistory.slice(0, -1)
+
+  if (lastSelection.duelId) {
+    state.selectedDuelId = lastSelection.duelId
+  } else if (lastSelection.duelistId) {
+    state.selectedDuelistId = lastSelection.duelistId
+  } else if (lastSelection.playerAddress) {
+    state.selectedPlayerAddress = lastSelection.playerAddress
+  } else if (lastSelection.challengingAddress) {
+    state.challengingAddress = lastSelection.challengingAddress
+    if (lastSelection.challengingDuelistId) {
+      state.challengingDuelistId = lastSelection.challengingDuelistId
+    }
+  }
+  
+  return state
+}
 
 //--------------------------------
 // Provider
@@ -155,34 +225,55 @@ const PistolsProvider = ({
         break
       }
       case PistolsActions.SELECT_DUEL: {
-        newState.selectedDuelId = action.payload as bigint
-        newState.selectedDuelistId = 0n
-        newState.selectedPlayerAddress = 0n
-        newState.challengingAddress = 0n
-        newState.challengingDuelistId = 0n
+        const newDuelId = action.payload as bigint
+        if (newDuelId !== 0n && newDuelId !== state.selectedDuelId && shouldAddToHistory(state)) {
+          newState = addToHistory(newState, state)
+        }
+        newState = clearSelections(newState)
+        newState.selectedDuelId = newDuelId
+
+        if (newDuelId == 0n && state.selectionHistory.length > 0) {
+          newState = restoreFromHistory(newState)
+        }
         break
       }
-      case PistolsActions.SELECT_DUELIST_ID: {
-        newState.selectedDuelId = 0n
-        newState.selectedDuelistId = action.payload as bigint
-        newState.selectedPlayerAddress = 0n
-        newState.challengingAddress = 0n
-        newState.challengingDuelistId = 0n
+      case PistolsActions.SELECT_DUELIST_ID: {        
+        const newDuelistId = action.payload as bigint
+        if (newDuelistId !== 0n && newDuelistId !== state.selectedDuelistId && shouldAddToHistory(state)) {
+          newState = addToHistory(newState, state)
+        }
+        newState = clearSelections(newState)
+        newState.selectedDuelistId = newDuelistId
+
+        if (newDuelistId == 0n && state.selectionHistory.length > 0) {
+          newState = restoreFromHistory(newState)
+        }
         break
       }
       case PistolsActions.SELECT_PLAYER_ADDRESS: {
-        newState.selectedDuelId = 0n
-        newState.selectedDuelistId = 0n
-        newState.selectedPlayerAddress = action.payload as bigint
-        newState.challengingAddress = 0n
-        newState.challengingDuelistId = 0n
+        const newPlayerAddress = action.payload as bigint
+        if (newPlayerAddress !== 0n && newPlayerAddress !== state.selectedPlayerAddress && shouldAddToHistory(state)) {
+          newState = addToHistory(newState, state)
+        }
+        newState = clearSelections(newState)
+        newState.selectedPlayerAddress = newPlayerAddress
+
+        if (newPlayerAddress == 0n && state.selectionHistory.length > 0) {
+          newState = restoreFromHistory(newState)
+        }
         break
       }
       case PistolsActions.SELECT_CHALLENGING_ADDRESS: {
-        newState.selectedDuelId = 0n
-        newState.selectedDuelistId = 0n
-        newState.selectedPlayerAddress = 0n
-        newState.challengingAddress = action.payload as bigint
+        const newChallengingAddress = action.payload as bigint
+        if (newChallengingAddress !== 0n && newChallengingAddress !== state.challengingAddress && shouldAddToHistory(state)) {
+          newState = addToHistory(newState, state)
+        }
+        newState = clearSelections(newState)
+        newState.challengingAddress = newChallengingAddress
+        
+        if (newChallengingAddress == 0n && state.selectionHistory.length > 0) {
+          newState = restoreFromHistory(newState)
+        }
         break
       }
       case PistolsActions.SELECT_CHALLENGING_DUELIST_ID: {
@@ -191,6 +282,18 @@ const PistolsProvider = ({
       }
       case PistolsActions.SET_TUTORIAL_LEVEL: {
         newState.tutorialLevel = action.payload as DuelTutorialLevel
+        break
+      }
+      case PistolsActions.POP_SELECTION: {
+        newState = clearSelections(newState)
+        if (state.selectionHistory.length > 0) {
+          newState = restoreFromHistory(newState)
+        }
+        break
+      }
+      case PistolsActions.CLEAR_SELECTION_HISTORY: {
+        newState.selectionHistory = []
+        newState = clearSelections(newState)
         break
       }
       default:
@@ -328,6 +431,20 @@ export const usePistolsContext = () => {
     })
   }, [dispatch])
 
+  const dispatchPopSelection = useCallback(() => {
+    dispatch({
+      type: PistolsActions.POP_SELECTION,
+      payload: null,
+    })
+  }, [dispatch])
+
+  const dispatchClearSelectionHistory = useCallback(() => {
+    dispatch({
+      type: PistolsActions.CLEAR_SELECTION_HISTORY,
+      payload: null,
+    })
+  }, [dispatch])
+
   const __dispatchSetScene = useCallback((newScene: SceneName) => {
     dispatch({
       type: PistolsActions.SET_SCENE,
@@ -353,6 +470,7 @@ export const usePistolsContext = () => {
     ...state,
     hasSigned: (state.walletSig.sig > 0n),
     lastScene: state.sceneStack[state.sceneStack.length - 2],
+    hasSelectionHistory: state.selectionHistory.length > 0,
     // PistolsActions,
     dispatch,
     dispatchSetSig,
@@ -362,10 +480,12 @@ export const usePistolsContext = () => {
     dispatchSelectPlayerAddress,
     dispatchChallengingPlayerAddress,
     dispatchChallengingDuelistId,
+    dispatchSetTutorialLevel,
+    dispatchPopSelection,
+    dispatchClearSelectionHistory,
     __dispatchSetScene, // used internally only
     __dispatchSceneBack, // used internally only
     __dispatchResetValues,  // used internally only
-    dispatchSetTutorialLevel,
   }
 }
 
@@ -567,7 +687,14 @@ export const useSyncRouterParams = () => {
   //--------------------------------------------
   // URL Params > Game Context
   // cases: A, D
-  const { dispatchSelectDuel, dispatchSelectDuelistId, dispatchSelectPlayerAddress } = usePistolsContext()
+  const { 
+    dispatchSelectDuel, 
+    dispatchSelectDuelistId, 
+    dispatchSelectPlayerAddress,
+    dispatchChallengingPlayerAddress,
+    dispatchChallengingDuelistId 
+  } = usePistolsContext()
+  
   useEffect(() => {
     if (searchParams.get('duel')) {
       dispatchSelectDuel(searchParams.get('duel'))
@@ -575,6 +702,11 @@ export const useSyncRouterParams = () => {
       dispatchSelectDuelistId(searchParams.get('duelist'))
     } else if (searchParams.get('player')) {
       dispatchSelectPlayerAddress(searchParams.get('player'))
+    } else if (searchParams.get('challenging_address')) {
+      dispatchChallengingPlayerAddress(searchParams.get('challenging_address'))
+      if (searchParams.get('challenging_duelist')) {
+        dispatchChallengingDuelistId(searchParams.get('challenging_duelist'))
+      }
     }
   }, [searchParams])
 
@@ -583,10 +715,17 @@ export const useSyncRouterParams = () => {
   // (for shareable urls, back button support)
   // cases: C
   //
-  const { currentScene, selectedDuelId, selectedDuelistId, selectedPlayerAddress } = usePistolsContext()
+  const { 
+    currentScene, 
+    selectedDuelId, 
+    selectedDuelistId, 
+    selectedPlayerAddress,
+    challengingAddress,
+    challengingDuelistId 
+  } = usePistolsContext()
+  
   useEffect(() => {
     setSearchParams((prev) => {
-      // const params = new URLSearchParams(prev)
       const params = new URLSearchParams()
       if (selectedDuelId) {
         params.set('duel', bigintToDecimal(selectedDuelId))
@@ -594,11 +733,22 @@ export const useSyncRouterParams = () => {
         params.set('duelist', bigintToDecimal(selectedDuelistId))
       } else if (selectedPlayerAddress) {
         params.set('player', bigintToHex(selectedPlayerAddress))
+      } else if (challengingAddress) {
+        params.set('challenging_address', bigintToHex(challengingAddress))
+        if (challengingDuelistId) {
+          params.set('challenging_duelist', bigintToDecimal(challengingDuelistId))
+        }
       }
       // console.log(`params >>>>>`, params)
       return params
     })
-  }, [selectedDuelId, selectedDuelistId, selectedPlayerAddress])
+  }, [
+    selectedDuelId, 
+    selectedDuelistId, 
+    selectedPlayerAddress,
+    challengingAddress,
+    challengingDuelistId
+  ])
 
   return {}
 }

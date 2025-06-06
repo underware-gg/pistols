@@ -194,8 +194,7 @@ export const useQueryChallengeIds = (
  */
 export function useMyActiveDuels(notificationDuelIds: bigint[] = []) {
   const { address } = useAccount()
-  const { requiredDuelIds } = useCallToActions()
-  const { duelPerDuelist } = useCallToActions()
+  const { requiredDuelIds, duelPerDuelist } = useCallToActions()
 
   const entities = useChallengeQueryStore((state) => state.entities)
 

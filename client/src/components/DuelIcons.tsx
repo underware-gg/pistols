@@ -168,9 +168,23 @@ export function DuelIconsAsRow({
   const { icons } = useDuelIcons({ duelId, duelistId, size })
 
   return (
-    <>
-      {icons}
-    </>
+    <div style={{ 
+      display: 'flex', 
+      flexDirection: 'row', 
+      alignItems: 'center',
+      gap: '0.25em'
+    }}>
+      {icons.map((icon, index) => (
+        <div key={index} style={{ 
+          display: 'flex', 
+          alignItems: 'center',
+          justifyContent: 'center',
+          lineHeight: 1
+        }}>
+          {icon}
+        </div>
+      ))}
+    </div>
   )
 }
 

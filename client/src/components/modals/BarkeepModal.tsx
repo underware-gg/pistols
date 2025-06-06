@@ -11,13 +11,19 @@ import DuelTutorialOverlay from '../ui/duel/DuelTutorialOverlay'
 
 type ModalStage = 'intro' | 'menu' | 'notifications'
 
-export default function BarkeepModal({ open, setOpen }) {  
+interface BarkeepModalProps {
+  open: boolean
+  setOpen: (open: boolean) => void
+  initialStage?: ModalStage
+}
+
+export default function BarkeepModal({ open, setOpen, initialStage = 'intro' }: BarkeepModalProps) {  
   const { dispatchSetScene } = usePistolsScene()
   const { tutorialOpener, dispatchSelectDuel } = usePistolsContext()
   
   const { notifications, hasUnreadNotifications } = useNotifications()
   
-  const [stage, setStage] = useState<ModalStage>('intro')
+  const [stage, setStage] = useState<ModalStage>(initialStage)
   const [displayText, setDisplayText] = useState('')
 
   // const { username, name } = useConnectedController()
@@ -25,22 +31,27 @@ export default function BarkeepModal({ open, setOpen }) {
 
   useEffect(() => {
     if (open) {
-      const introTexts = [
-        'What do you want, you filthy mortal?',
-        'Are ye here for a drink or something else?',
-        'Another weakling looking for trouble...',
-        'Make it quick, I\'ve got better things to do than serve the likes of you.'
-      ]
-      const randomText = introTexts[Math.floor(Math.random() * introTexts.length)]
-      setTimeout(() => {
-        setDisplayText(randomText)
-        setStage('menu')
-      }, 100)
+      if (initialStage === 'notifications') {
+        setStage('notifications')
+        setDisplayText('Here ya go, ya filthy animal. Don\'t make me regret this...')
+      } else {
+        const introTexts = [
+          'What do you want, you filthy mortal?',
+          'Are ye here for a drink or something else?',
+          'Another weakling looking for trouble...',
+          'Make it quick, I\'ve got better things to do than serve the likes of you.'
+        ]
+        const randomText = introTexts[Math.floor(Math.random() * introTexts.length)]
+        setTimeout(() => {
+          setDisplayText(randomText)
+          setStage('menu')
+        }, 100)
+      }
     } else {
       setDisplayText('')
       setStage('intro')
     }
-  }, [open])
+  }, [open, initialStage])
 
   if (!open) return null
 

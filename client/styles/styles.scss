@@ -1506,7 +1506,6 @@ $logo-url: '/logos/logo_avante.svg';
 
 .NotificationTalkBaloon {
   @extend .DialogBalloon;
-  top: 16%;
   left: 11%;
   color: $color-darkest;
   z-index: 800;

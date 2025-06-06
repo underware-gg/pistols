@@ -1,6 +1,7 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import { Icon, IconGroup, Popup, PopupContent, PopupHeader, SemanticICONS } from 'semantic-ui-react'
 import { IconProps, IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon'
+import { emitter } from '/src/three/game'
 
 export type { IconSizeProp, SemanticICONS }
 
@@ -275,7 +276,6 @@ interface CustomIconProps {
   logo?: boolean,			  // if the svg is on /logos/
   png?: boolean,        // use pure png file
   svg?: boolean,        // use pure svg file
-  alt?: string,
   raw?: boolean,        // used for removing the top margin when loading svg or pngs
   // <Icon> fallback
   // optionals
@@ -293,7 +293,6 @@ export function CustomIcon({
   logo = false,
   png = false,
   svg = false,
-  alt = undefined,    // TODO: add tooltip
   name = 'avante',
   className = null,
   size = null,
@@ -304,13 +303,45 @@ export function CustomIcon({
   onClick = null,
   raw = false,
 }: CustomIconProps) {
+
+  const [isHovered, setIsHovered] = useState(false)
+
+  const onMouseEnter = () => {
+    console.log(`onMouseEnter >>>>>`, tooltip)
+    if (tooltip) {
+      emitter.emit('hover_description', tooltip)
+      setIsHovered(true)
+    }
+  }
+  const onMouseLeave = () => {
+    console.log(`onMouseLeave >>>>>`, tooltip)
+    emitter.emit('hover_description', null)
+    setIsHovered(false)
+  }
+
+  // Cleanup tooltip on unmount if it's being shown
+  useEffect(() => {
+    return () => {
+      if (tooltip && isHovered) {
+        emitter.emit('hover_description', null)
+      }
+    }
+  }, [tooltip, isHovered])
+
   const component = useMemo(() => {
     const _extension = png ? 'png' : 'svg'
     const _url = (logo ? `/logos/logo_${name}.${_extension}` : icon ? `/icons/icon_${name}.${_extension}` : null)
 
     // not svg, logo, icon or png
     if (!_url) {
-      return <Icon name={name as SemanticICONS} className={className} size={size} disabled={disabled} />
+      return <Icon 
+        name={name as SemanticICONS} 
+        className={className} 
+        size={size} 
+        disabled={disabled}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+      />
     }
 
     // png
@@ -319,7 +350,12 @@ export function CustomIcon({
         backgroundImage: `url(${_url})`,
       }
       return (
-        <i className={`${className} ${onClick ? 'IconClick' : ''} icon ${size} NoMargin Relative`} onClick={() => onClick?.() ?? {}}>
+        <i 
+          className={`${className} ${onClick ? 'IconClick' : ''} icon ${size} NoMargin Relative`} 
+          onClick={() => onClick?.() ?? {}}
+          onMouseEnter={onMouseEnter}
+          onMouseLeave={onMouseLeave}
+        >
           {' '}
           <div className={raw ? 'CustomIconRaw' : png ? 'CustomIconPng' : 'CustomIconSvg'} style={_style} />
         </i>
@@ -342,20 +378,16 @@ export function CustomIcon({
     }
 
     return (
-      <i className={classNames.join(' ')}
+      <i 
+        className={classNames.join(' ')}
         style={_style}
         onClick={() => (onClick?.() ?? {})}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
       >
         {' '}
       </i>
     )
-
-    // result = _linkfy(result, props.linkUrl)
-
-    // TODO: breaks something, need to debug!
-    // if(props.tooltip) {
-    // 	content = <Tooltip content={props.tooltip}>{content}</Tooltip>	
-    // }
   }, [icon, logo, png, name, className, size, color, tooltip, onClick])
   return component
 }

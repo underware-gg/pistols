@@ -30,8 +30,8 @@ export const DuelNotificationItem: React.FC<DuelNotificationItemProps> = ({
   const { aspectWidth } = useGameAspect()
   const { duelId, requiresAction, state, type, timestamp } = notification
   const { challenge, turnA, turnB, completedStagesA, completedStagesB } = useDuel(duelId)
-  const { isMyAccount: isChallenger } = useIsMyAccount(challenge?.duelistAddressA)
-  const { isMyAccount: isChallenged } = useIsMyAccount(challenge?.duelistAddressB)
+  const { isMyAccount: isMeA } = useIsMyAccount(challenge?.duelistAddressA)
+  const { isMyAccount: isMeB } = useIsMyAccount(challenge?.duelistAddressB)
   const { markAsRead } = useNotifications()
   const [isHovered, setIsHovered] = useState(false)
   const { clientSeconds } = useClientTimestamp(true)
@@ -42,10 +42,9 @@ export const DuelNotificationItem: React.FC<DuelNotificationItemProps> = ({
       message: null
     }
 
-    const challengerAddress = challenge.duelistAddressA
-    const challengedAddress = challenge.duelistAddressB
-    const isOpponentTurnA = isChallenged && turnA
-    const isOpponentTurnB = isChallenger && turnB
+    const duelistAddressA = challenge.duelistAddressA
+    const duelistAddressB = challenge.duelistAddressB
+    const isOpponentTurn = (!isMeA && turnA) || (!isMeB && turnB)
     const hasCommittedA = completedStagesA?.[0]
     const hasCommittedB = completedStagesB?.[0]
     const hasRevealedA = completedStagesA?.[1]
@@ -53,17 +52,17 @@ export const DuelNotificationItem: React.FC<DuelNotificationItemProps> = ({
 
     switch (state) {
       case constants.ChallengeState.Awaiting:
-        if (requiresAction && isChallenger) {
+        if (requiresAction && isMeA) {
           return {
             title: 'Your Move - Commit Cards',
-            message: <>It's your turn to commit your moves in <ChallengeLink duelId={duelId} /> against <PlayerLink address={isChallenger ? challengedAddress : challengerAddress} /></>
+            message: <>It's your turn to commit your moves in <ChallengeLink duelId={duelId} /> against <PlayerLink address={duelistAddressB} /></>
           }
         }
         return {
           title: 'Waiting for Duel Acceptance',
-          message: isChallenger 
-            ? <>Waiting for <PlayerLink address={challengedAddress} /> to accept your <ChallengeLink duelId={duelId} /></>
-            : <><PlayerLink address={challengerAddress} /> has challenged you to a <ChallengeLink duelId={duelId} /></>
+          message: isMeA 
+            ? <>Waiting for <PlayerLink address={duelistAddressB} /> to accept your <ChallengeLink duelId={duelId} /></>
+            : <><PlayerLink address={duelistAddressA} /> has challenged you to a <ChallengeLink duelId={duelId} /></>
         }
       case constants.ChallengeState.InProgress:
         // Handle commit phase
@@ -71,12 +70,12 @@ export const DuelNotificationItem: React.FC<DuelNotificationItemProps> = ({
           if (requiresAction) {
             return {
               title: 'Your Move - Commit Cards',
-              message: <>It's your turn to commit your moves in <ChallengeLink duelId={duelId} /> against <PlayerLink address={isChallenger ? challengedAddress : challengerAddress} /></>
+              message: <>It's your turn to commit your moves in <ChallengeLink duelId={duelId} /> against <PlayerLink address={isMeA ? duelistAddressB : duelistAddressA} /></>
             }
-          } else if (isOpponentTurnA || isOpponentTurnB) {
+          } else if (isOpponentTurn) {
             return {
               title: 'Waiting for Opponent',
-              message: <>Waiting for <PlayerLink address={isChallenger ? challengedAddress : challengerAddress} /> to commit their moves in <ChallengeLink duelId={duelId} /></>
+              message: <>Waiting for <PlayerLink address={isMeA ? duelistAddressB : duelistAddressA} /> to commit their moves in <ChallengeLink duelId={duelId} /></>
             }
           }
         }
@@ -85,72 +84,72 @@ export const DuelNotificationItem: React.FC<DuelNotificationItemProps> = ({
           if (requiresAction) {
             return {
               title: 'Your Move - Reveal Cards',
-              message: <>It's your turn to reveal your moves in <ChallengeLink duelId={duelId} /> against <PlayerLink address={isChallenger ? challengedAddress : challengerAddress} /></>
+              message: <>It's your turn to reveal your moves in <ChallengeLink duelId={duelId} /> against <PlayerLink address={isMeA ? duelistAddressB : duelistAddressA} /></>
             }
-          } else if (isOpponentTurnA || isOpponentTurnB) {
+          } else if (isOpponentTurn) {
             return {
               title: 'Waiting for Opponent',
-              message: <>Waiting for <PlayerLink address={isChallenger ? challengedAddress : challengerAddress} /> to reveal their moves in <ChallengeLink duelId={duelId} /></>
+              message: <>Waiting for <PlayerLink address={isMeA ? duelistAddressB : duelistAddressA} /> to reveal their moves in <ChallengeLink duelId={duelId} /></>
             }
           }
         }
         // Fallback for other in-progress states
         return {
           title: 'Duel In Progress',
-          message: isChallenger
-            ? <><PlayerLink address={challengedAddress} /> has accepted your challenge in <ChallengeLink duelId={duelId} /></>
-            : <>You've accepted <PlayerLink address={challengerAddress} />'s challenge in <ChallengeLink duelId={duelId} /></>
+          message: isMeA
+            ? <><PlayerLink address={duelistAddressB} /> has accepted your <ChallengeLink duelId={duelId} /></>
+            : <>You've accepted <PlayerLink address={duelistAddressA} />'s <ChallengeLink duelId={duelId} /></>
         }
       case constants.ChallengeState.Refused:
         return {
           title: 'Duel Refused',
-          message: isChallenger
-            ? <><PlayerLink address={challengedAddress} /> has refused your challenge in <ChallengeLink duelId={duelId} /></>
-            : <>You've refused <PlayerLink address={challengerAddress} />'s challenge in <ChallengeLink duelId={duelId} /></>
+          message: isMeA
+            ? <><PlayerLink address={duelistAddressB} /> has refused your <ChallengeLink duelId={duelId} /></>
+            : <>You've refused <PlayerLink address={duelistAddressA} />'s <ChallengeLink duelId={duelId} /></>
         }
       case constants.ChallengeState.Withdrawn:
         return {
           title: 'Duel Withdrawn',
-          message: isChallenger
-            ? <>Your <ChallengeLink duelId={duelId} /> with <PlayerLink address={challengedAddress} /> has been withdrawn</>
-            : <> The <ChallengeLink duelId={duelId} /> from <PlayerLink address={challengerAddress} /> has been withdrawn</>
+          message: isMeA
+            ? <>Your <ChallengeLink duelId={duelId} /> with <PlayerLink address={duelistAddressB} /> has been withdrawn</>
+            : <> The <ChallengeLink duelId={duelId} /> from <PlayerLink address={duelistAddressA} /> has been withdrawn</>
         }
       case constants.ChallengeState.Expired:
         return {
           title: 'Duel Expired',
-          message: isChallenger
-            ? <>Your challenge to <PlayerLink address={challengedAddress} /> in <ChallengeLink duelId={duelId} /> has expired</>
-            : <>The challenge from <PlayerLink address={challengerAddress} /> in <ChallengeLink duelId={duelId} /> has expired</>
+          message: isMeA
+            ? <>Your <ChallengeLink duelId={duelId} /> with <PlayerLink address={duelistAddressB} /> has expired</>
+            : <>The <ChallengeLink duelId={duelId} /> from <PlayerLink address={duelistAddressA} /> has expired</>
         }
       case constants.ChallengeState.Resolved:
         if (requiresAction) {
           return {
             title: 'Duel Ended - Action Required',
-            message: <>Your <ChallengeLink duelId={duelId} /> with <PlayerLink address={isChallenger ? challengedAddress : challengerAddress} /> has been resolved. Click to see the result!</>
+            message: <>Your <ChallengeLink duelId={duelId} /> with <PlayerLink address={isMeA ? duelistAddressB : duelistAddressA} /> has been resolved. Click to see the result!</>
           }
         }
         return {
           title: 'Duel Resolved',
-          message: <>Your duel with <PlayerLink address={challengerAddress} /> in <ChallengeLink duelId={duelId} /> has been resolved</>
+          message: <>Your <ChallengeLink duelId={duelId} /> with <PlayerLink address={isMeA ? duelistAddressB : duelistAddressA} />  has been resolved</>
         }
       case constants.ChallengeState.Draw:
         if (requiresAction) {
           return {
             title: 'Duel Ended - Action Required',
-            message: <>Your <ChallengeLink duelId={duelId} /> with <PlayerLink address={isChallenger ? challengedAddress : challengerAddress} /> has been resolved. Click to see the result!</>
+            message: <>Your <ChallengeLink duelId={duelId} /> with <PlayerLink address={isMeA ? duelistAddressB : duelistAddressA} /> has been resolved. Click to see the result!</>
           }
         }
         return {
           title: 'Duel Draw',
-          message: <>Your duel with <PlayerLink address={challengerAddress} /> in <ChallengeLink duelId={duelId} /> ended in a draw</>
+          message: <>Your <ChallengeLink duelId={duelId} /> with <PlayerLink address={isMeA ? duelistAddressB : duelistAddressA} /> ended in a draw</>
         }
       default:
         return {
           title: 'Duel Update',
-          message: <>Duel <ChallengeLink duelId={duelId} /> state updated to {state}</>
+          message: <><ChallengeLink duelId={duelId} /> state updated to {state}</>
         }
     }
-  }, [challenge, state, isChallenger, isChallenged, duelId, turnA, turnB, completedStagesA, completedStagesB, requiresAction])
+  }, [challenge, state, isMeA, isMeB, duelId, turnA, turnB, completedStagesA, completedStagesB, requiresAction])
 
   const timeAgo = useMemo(() => {
     const secondsAgo = clientSeconds - timestamp

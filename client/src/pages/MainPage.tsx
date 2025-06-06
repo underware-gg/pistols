@@ -4,7 +4,7 @@ import { usePistolsContext, usePistolsScene, usePistolsSceneFromRoute, useSyncRo
 import { useSetPageTitle } from '/src/hooks/useSetPageTitle'
 import { useEffectOnce } from '@underware/pistols-sdk/utils/hooks'
 import { useQuality } from '/src/hooks/useQuality'
-import { DojoStatus } from '@underware/pistols-sdk/dojo'
+import { DojoStatus, emitter } from '@underware/pistols-sdk/dojo'
 import { MouseToolTip } from '/src/components/ui/MouseToolTip'
 import { SCENE_CHANGE_ANIMATION_DURATION } from '/src/three/game'
 import * as ENV from '/src/utils/env'
@@ -39,6 +39,9 @@ import { NotificationProvider } from '/src/stores/notificationStore'
 
 // test sdk
 import { helloPistols } from '@underware/pistols-sdk'
+import { BackButton } from '../components/ui/Buttons'
+import { CustomIcon } from '../components/ui/Icons'
+import { useGameAspect } from '../hooks/useGameAspect'
 
 helloPistols();
 export default function MainPage({
@@ -217,6 +220,53 @@ function Modals() {
       <SelectDuelistModal opener={duelistSelectOpener} />
       <WalletFinderModal opener={walletFinderOpener} />
       <SettingsModal opener={settingsOpener} />
+      <ModalNavigator />
     </>
+  )
+}
+
+function ModalNavigator() {
+  const { aspectWidth, aspectHeight } = useGameAspect()
+  const { hasSelectionHistory, dispatchPopSelection, dispatchClearSelectionHistory } = usePistolsContext()
+
+  useEffect(() => {
+    emitter.emit('hover_description', null)
+  }, [hasSelectionHistory])
+
+  if (!hasSelectionHistory) return <></>
+
+  return (
+    <div 
+      className='NoMouse NoDrag' 
+      style={{ 
+        position: 'absolute', 
+        top: 0, 
+        left: 0, 
+        width: aspectWidth(100), 
+        height: aspectHeight(10), 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'top', 
+        zIndex: 1001,
+        paddingTop: aspectWidth(1),
+        paddingLeft: aspectWidth(2),
+        paddingRight: aspectWidth(2)
+      }}
+    >
+      <CustomIcon icon png raw 
+        name={'back_arrow'} 
+        onClick={() => dispatchPopSelection()} 
+        tooltip='Navigate Back'
+        size={'huge'} 
+        disabled={false} 
+      />
+      <CustomIcon icon png raw 
+        name={'close'} 
+        onClick={() => dispatchClearSelectionHistory()} 
+        tooltip='Clear All'
+        size={'huge'} 
+        disabled={false} 
+      />
+    </div>
   )
 }
