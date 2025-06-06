@@ -202,7 +202,7 @@ function DuelItem({
   const { clientSeconds } = useClientTimestamp(true)
 
   const {
-    challenge: { duelistIdA, duelistIdB, state, isLive, isCanceled, isExpired, isDraw, winner, duelistAddressA, duelistAddressB, seasonId, timestampStart },
+    challenge: { duelistIdA, duelistIdB, state, isLive, isCanceled, isExpired, isDraw, winner, duelistAddressA, duelistAddressB, seasonId, timestampStart, timestampEnd },
     turnA, turnB,
   } = useDuel(duelId)
   const { name: playerNameA } = usePlayer(duelistAddressA)
@@ -212,15 +212,21 @@ function DuelItem({
   const { isMyAccount: isYouA } = useIsMyAccount(duelistAddressA)
   const { isMyAccount: isYouB } = useIsMyAccount(duelistAddressB)
 
+  const timeStamp = useMemo(() => {
+    if (isLive) return clientSeconds
+    if (isCanceled || isExpired ||isDraw || winner) return timestampEnd
+    return timestampStart
+  }, [isLive, isCanceled, isExpired, isDraw, winner, timestampStart, timestampEnd, clientSeconds])
+
   const timeAgo = useMemo(() => {
-    const secondsAgo = clientSeconds - timestampStart
+    const secondsAgo = clientSeconds - timeStamp
     if (secondsAgo < 60) return 'just now'
     if (secondsAgo < 3600) return `${Math.floor(secondsAgo / 60)}m ago`
     if (secondsAgo < 86400) return `${Math.floor(secondsAgo / 3600)}h ago`
     if (secondsAgo < 2592000) return `${Math.floor(secondsAgo / 86400)}d ago`
     if (secondsAgo < 31536000) return `${Math.floor(secondsAgo / 2592000)}mo ago`
     return `${Math.floor(secondsAgo / 31536000)}y ago`
-  }, [clientSeconds, timestampStart])
+  }, [clientSeconds, timeStamp])
 
   const [leftDuelistId, leftDuelistAddress, leftPlayerName] = useMemo(() => {
     if (selectedDuelistId === duelistIdA) {
@@ -296,7 +302,7 @@ function DuelItem({
       }}
     >
       <Cell style={{ width: '38%', maxWidth: '38%', overflow: 'hidden', minHeight: aspectWidth(6) }}>
-        <PositiveResult positive={winnerIsLeft} negative={winnerIsRight} warning={isDraw} canceled={isCanceled || isExpired}>
+        <PositiveResult positive={winnerIsLeft && !isCallToAction} negative={winnerIsRight && !isCallToAction} warning={isDraw && !isCallToAction} canceled={isCanceled || isExpired}>
           <Player name={leftPlayerName} className='BreakWord' />
         </PositiveResult>
         <div style={{ 
@@ -334,7 +340,7 @@ function DuelItem({
       </Cell>
 
       <Cell style={{ width: '38%', maxWidth: '38%', overflow: 'hidden', minHeight: aspectWidth(6) }}>
-        <PositiveResult positive={winnerIsLeft} negative={winnerIsRight} warning={isDraw} canceled={isCanceled || isExpired}>
+        <PositiveResult positive={winnerIsRight && !isCallToAction} negative={winnerIsLeft && !isCallToAction} warning={isDraw && !isCallToAction} canceled={isCanceled || isExpired}>
           <Player name={rightPlayerName} className='BreakWord' />
         </PositiveResult>
         <div style={{ 
