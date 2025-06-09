@@ -84,8 +84,8 @@ export const useFetchPacksOfPlayer = () => {
   useSdkEntitiesGet({
     query,
     setEntities: (entities: PistolsEntity[]) => {
+      debug.log(`useFetchPacksOfPlayer() SET =======> [entities]:`, entities)
       entities.forEach(e => {
-        debug.log(`usePack() SET =======> [entity]:`, e)
         packState.updateEntity(e)
       })
     },
