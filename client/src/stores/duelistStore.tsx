@@ -5,7 +5,7 @@ import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
 import { useEntityIds, getEntityModel, useDojoSystem, keysToEntityId, getCustomEnumCalldata, useStoreModelsByKeys, useStoreModelsById, useEntitiesModel, useAllStoreModels, formatQueryValue, useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
 import { useClientTimestamp, useMemoGate } from '@underware/pistols-sdk/utils/hooks'
-import { isPositiveBigint, bigintToDecimal, bigintToHex } from '@underware/pistols-sdk/utils'
+import { isPositiveBigint, bigintToDecimal, bigintToHex, bigintEquals } from '@underware/pistols-sdk/utils'
 import { makeAbiCustomEnum, parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/starknet'
 import { getCollectionDescription, getProfileDescription, getProfileGender, getProfileId, DuelistProfileKey, DuelistGender, getProfileQuote } from '@underware/pistols-sdk/pistols'
 import { PistolsEntity, PistolsSchemaType } from '@underware/pistols-sdk/pistols/sdk'
@@ -15,7 +15,6 @@ import { ArchetypeNames } from '/src/utils/pistols'
 import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
 import { useAccount } from '@starknet-react/core'
 import { useDuelistIdsOfOwners, useDuelistsOfPlayer, useOwnerOfDuelist } from '/src/hooks/useTokenDuelists'
-import { useSdkEntitiesGetState } from '@underware/pistols-sdk/dojo'
 import { PistolsQueryBuilder, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols/sdk'
 import { useDuelistFetchStore } from '/src/stores/fetchStore'
 import { debug } from '@underware/pistols-sdk/pistols'
@@ -303,30 +302,11 @@ export const useDuelistStack = (duelist_id: BigNumberish) => {
 }
 
 export function useDuelistStacks(player_address: BigNumberish) {
-  const query = useMemo(() => {
-    if (!player_address) return null;
-    const builder = new PistolsQueryBuilder();
-    builder
-      .withEntityModels(['pistols-PlayerDuelistStack'])
-      .withClause(
-        new PistolsClauseBuilder()
-          .where('pistols-PlayerDuelistStack', 'player_address', 'Eq', player_address)
-          .build()
-      )
-      .withLimit(2000)
-      .includeHashedKeys();
-    return builder;
-  }, [player_address]);
-
-  const { entities, isLoading } = useSdkEntitiesGetState({
-    query,
-    enabled: Boolean(query),
-  });
-
-  const playerStacks = useEntitiesModel<models.PlayerDuelistStack>(entities, 'PlayerDuelistStack')
+  const entities = useDuelistStackStore((state) => state.entities)
+  const models = useAllStoreModels<models.PlayerDuelistStack>(entities, 'PlayerDuelistStack')
+  const playerStacks = useMemo(() => models.filter(s => bigintEquals(s.player_address, player_address)), [models, player_address])
 
   const stacks = useMemo(() => {
-    if (!playerStacks || !player_address) return [];
     return playerStacks.map(stack => {
       if (!stack.active_duelist_id) return null;
       return {
@@ -339,13 +319,12 @@ export function useDuelistStacks(player_address: BigNumberish) {
 
   return {
     stacks,
-    isLoading,
   };
 }
 
 export const usePlayerDuelistsOrganized = () => {
   const { address } = useAccount();
-  const { stacks, isLoading } = useDuelistStacks(address)
+  const { stacks } = useDuelistStacks(address)
   const { duelistIds } = useDuelistsOfPlayer()
   const entities = useDuelistStore((state) => state.entities)
 
@@ -398,7 +377,6 @@ export const usePlayerDuelistsOrganized = () => {
 
   return {
     ...organizedDuelists,
-    isLoading
   }
 }
 
@@ -440,7 +418,7 @@ export const useGetDuelist = (duelist_id: BigNumberish) => {
 //
 
 //
-// Fetch NEW Challenges by duelist ID
+// Fetch NEW duelists by IDs
 //
 export const useFetchDuelist = (duelist_id: BigNumberish, retryInterval?: number) => {
   const duelistIds = useMemo(() => [duelist_id], [duelist_id])
@@ -521,6 +499,8 @@ export const useFetchDuelistIdsByPlayerAddresses = (addresses: BigNumberish[]) =
   // fetch duelists...
   const { duelistIds } = useDuelistIdsOfOwners(newAddresses)
   const { isLoading, isFinished } = useFetchDuelistIds(duelistIds)
+  // fetch player stacks...
+  useFetchPlayerDuelistStacks(newAddresses)
   
   // mark players as fetched...
   useEffect(() => {
@@ -529,6 +509,38 @@ export const useFetchDuelistIdsByPlayerAddresses = (addresses: BigNumberish[]) =
       fetchState.setFetchedAddresses(newAddresses.map(BigInt));
     }
   }, [isFinished])
+
+  return {
+    isLoading,
+    isFinished,
+  }
+}
+
+
+const useFetchPlayerDuelistStacks = (addresses: BigNumberish[]) => {
+  const setEntities = useDuelistStackStore((state) => state.setEntities);
+
+  const query = useMemo<PistolsQueryBuilder>(() => (
+    addresses.length > 0
+      ? new PistolsQueryBuilder()
+        .withClause(
+          new PistolsClauseBuilder()
+            .where('pistols-PlayerDuelistStack', 'player_address', 'In', addresses.map(formatQueryValue))
+            .build()
+        )
+        .withEntityModels(['pistols-PlayerDuelistStack'])
+        .withLimit(2000)
+        .includeHashedKeys()
+      : null
+  ), [addresses])
+
+  const { isLoading, isFinished } = useSdkEntitiesGet({
+    query,
+    setEntities: (entities: PistolsEntity[]) => {
+      debug.log(`useFetchDuelistStacks() GOT`, addresses, entities);
+      setEntities(entities);
+    },
+  })
 
   return {
     isLoading,

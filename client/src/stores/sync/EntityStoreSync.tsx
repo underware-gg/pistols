@@ -35,9 +35,6 @@ const _modelsPlayers = [
   // off-chain signed messages
   "pistols-PlayerOnline",
 ];
-const _modelsStacks = [
-  "pistols-PlayerDuelistStack",
-];
 
 //-------------------------
 // Models to subscribe only
@@ -47,6 +44,8 @@ const _modelsSubscribed = [
   "pistols-Duelist",
   "pistols-DuelistAssignment",
   "pistols-DuelistMemorial",
+  // Players
+  "pistols-PlayerDuelistStack",
   // Challenges
   "pistols-Challenge",
   "pistols-ChallengeMessage",
@@ -67,15 +66,10 @@ const query_get_players: PistolsQueryBuilder = new PistolsQueryBuilder()
   .withEntityModels(_modelsPlayers)
   .withLimit(_limit)
   .includeHashedKeys()
-const query_get_duelist_stacks: PistolsQueryBuilder = new PistolsQueryBuilder()
-  .withEntityModels(_modelsStacks)
-  .withLimit(_limit)
-  .includeHashedKeys()
 const query_sub: PistolsQueryBuilder = new PistolsQueryBuilder()
   .withEntityModels([
     ..._modelsMisc,
     ..._modelsPlayers,
-    ..._modelsStacks,
     ..._modelsSubscribed,
   ])
   .withLimit(10)
@@ -147,26 +141,9 @@ export function EntityStoreSync() {
     },
   })
 
-  const { isFinished: isFinishedStacks } = useSdkEntitiesGet({
-    query: query_get_duelist_stacks,
-    enabled: (mounted),
-    updateProgress: (currentPage: number, finished?: boolean) => {
-      updateProgress('query_get_duelist_stacks', currentPage, finished)
-    },
-    resetStore: () => {
-      debug.log("EntityStoreSync() RESET STACKS =======>")
-      duelistStackState.resetStore()
-    },
-    setEntities: (entities: PistolsEntity[]) => {
-      debug.log("EntityStoreSync() SET STACKS =======> [entities]:", entities)
-      // debug.log("EntityStoreSync() SET STACKS =======> [PlayerDuelistStack]:", filterEntitiesByModels(entities, ['PlayerDuelistStack']))
-      duelistStackState.setEntities(entities)
-    },
-  })
-
   useSdkEntitiesSub({
     query: query_sub,
-    enabled: (mounted && isFinishedMisc && isFinishedPlayers && isFinishedStacks),
+    enabled: (mounted && isFinishedMisc && isFinishedPlayers),
     setEntities: (entities: PistolsEntity[]) => {
       debug.log("EntityStoreSync() SET =======> [entities]: DISCARD!", entities.length)
     },
@@ -218,7 +195,7 @@ export function EntityStoreSync() {
   // useEffect(() => debug.log("EntityStoreSync() [configStore.entities] =>", Object.values(configState.entities).length), [configState.entities])
   // useEffect(() => debug.log("EntityStoreSync() [seasonState.entities] =>", Object.values(seasonState.entities).length), [seasonState.entities])
   // useEffect(() => debug.log("EntityStoreSync() [tokenStore.entities] =>", Object.values(tokenState.entities).length), [tokenState.entities])
-  useEffect(() => debug.log("EntityStoreSync() [duelistStore.entities] =>", Object.values(duelistState.entities).length), [duelistState.entities])
+  // useEffect(() => debug.log("EntityStoreSync() [duelistStore.entities] =>", Object.values(duelistState.entities).length), [duelistState.entities])
   // useEffect(() => debug.log("EntityStoreSync() [duelistStackStore.entities] =>", Object.values(duelistStackState.entities).length), [duelistStackState.entities])
   // useEffect(() => debug.log("EntityStoreSync() [playerDataState.players] =>", Object.values(playerDataState.players_names).length), [playerDataState.players_names])
   // useEffect(() => debug.log("EntityStoreSync() [playerDataState.players_online] =>", Object.values(playerDataState.players_online).length), [playerDataState.players_online])
