@@ -14,10 +14,10 @@ import { CharacterType } from '/src/data/assets'
 import { ArchetypeNames } from '/src/utils/pistols'
 import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
 import { useAccount } from '@starknet-react/core'
-import { useDuelistIdsOfOwner, useDuelistIdsOfOwners, useDuelistsOfPlayer, useOwnerOfDuelist } from '../hooks/useTokenDuelists'
-import { useSdkEntitiesGetState, filterEntitiesByModels } from '@underware/pistols-sdk/dojo'
+import { useDuelistIdsOfOwners, useDuelistsOfPlayer, useOwnerOfDuelist } from '../hooks/useTokenDuelists'
+import { useSdkEntitiesGetState } from '@underware/pistols-sdk/dojo'
 import { PistolsQueryBuilder, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols/sdk'
-import { useDuelistFetchStore } from './fetchStore'
+import { useDuelistFetchStore } from '/src/stores/fetchStore'
 
 export const useDuelistStore = createDojoStore<PistolsSchemaType>();
 export const useDuelistStackStore = createDojoStore<PistolsSchemaType>();
@@ -312,7 +312,7 @@ export function useDuelistStacks(player_address: BigNumberish) {
           .where('pistols-PlayerDuelistStack', 'player_address', 'Eq', player_address)
           .build()
       )
-      .withLimit(100) //TODO adjust later or remove?
+      .withLimit(2000)
       .includeHashedKeys();
     return builder;
   }, [player_address]);
@@ -457,6 +457,10 @@ export const useFetchDuelistIds = (duelistIds: BigNumberish[], retryInterval?: n
       .filter((id) => !existingDuelistIds.includes(id))
   ), [duelistIds, existingDuelistIds])
 
+  useEffect(() => {
+    console.log(`FETCH::::: newDuelistIds:`, existingDuelistIds.length, '>', newDuelistIds.length)
+  }, [newDuelistIds])
+
   const query = useMemo<PistolsQueryBuilder>(() => (
     newDuelistIds.length > 0
       ? new PistolsQueryBuilder()
@@ -468,6 +472,7 @@ export const useFetchDuelistIds = (duelistIds: BigNumberish[], retryInterval?: n
           "pistols-DuelistAssignment",
           "pistols-DuelistMemorial",
         ])
+        .withLimit(newDuelistIds.length)
         .includeHashedKeys()
       : null
   ), [newDuelistIds])
@@ -513,8 +518,8 @@ export const useFetchDuelistIdsByPlayerAddresses = (addresses: BigNumberish[]) =
   // dont even try for players already fetched...
   const fetchState = useDuelistFetchStore((state) => state);
   const newAddresses = useMemo(() => (
-    fetchState.getNewPlayerAddresses(addresses)
-  ), [addresses, fetchState.playerAddresses])
+    fetchState.getNewAddresses(addresses)
+  ), [addresses, fetchState.addresses])
 
   // fetch duelists...
   const { duelistIds } = useDuelistIdsOfOwners(newAddresses)
@@ -524,7 +529,7 @@ export const useFetchDuelistIdsByPlayerAddresses = (addresses: BigNumberish[]) =
   useEffect(() => {
     if (isFinished) {
       console.log(`useFetchDuelistIdsByPlayerAddresses() GOT`, newAddresses.map(bigintToHex));
-      fetchState.setFetchedPlayerAddresses(newAddresses.map(BigInt));
+      fetchState.setFetchedAddresses(newAddresses.map(BigInt));
     }
   }, [isFinished])
 

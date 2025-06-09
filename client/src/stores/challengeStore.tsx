@@ -2,16 +2,16 @@ import { useMemo } from 'react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
+import { useAccount } from '@starknet-react/core'
 import { createDojoStore } from '@dojoengine/sdk/react'
 import { formatQueryValue, useStoreModelsByKeys, useSdkEntitiesGet, useAllStoreModels } from '@underware/pistols-sdk/dojo'
 import { PistolsSchemaType, PistolsQueryBuilder, PistolsClauseBuilder, PistolsEntity } from '@underware/pistols-sdk/pistols/sdk'
 import { parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/starknet'
-import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
 import { bigintEquals, isPositiveBigint } from '@underware/pistols-sdk/utils'
+import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
 import { movesToHand } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
-import { ChallengeColumn, SortDirection } from './queryParamsStore'
-import { useAccount } from '@starknet-react/core'
+import { ChallengeColumn, SortDirection } from '/src/stores/queryParamsStore'
 import { useCallToActions } from '/src/stores/eventsModelStore'
 import { useChallengeFetchStore } from '/src/stores/fetchStore'
 
@@ -366,6 +366,7 @@ export const useFetchChallengeIds = (duelIds: BigNumberish[], retryInterval?: nu
           "pistols-ChallengeMessage",
           'pistols-Round',
         ])
+        .withLimit(newDuelIds.length)
         .includeHashedKeys()
       : null
   ), [newDuelIds])
@@ -412,8 +413,8 @@ export const useFetchChallengeIdsByDuelistIds = (duelistIds: BigNumberish[]) => 
   const fetchState = useChallengeFetchStore((state) => state);
 
   const newDuelistIds = useMemo(() => (
-    fetchState.getNewDuelistIds(duelistIds)
-  ), [duelistIds, fetchState.duelistIds])
+    fetchState.getNewIds(duelistIds)
+  ), [duelistIds, fetchState.ids])
 
   const query = useMemo<PistolsQueryBuilder>(() => (
     newDuelistIds.length > 0
@@ -429,6 +430,7 @@ export const useFetchChallengeIdsByDuelistIds = (duelistIds: BigNumberish[]) => 
           "pistols-ChallengeMessage",
           'pistols-Round',
         ])
+        .withLimit(newDuelistIds.length)
         .includeHashedKeys()
       : null
   ), [newDuelistIds])
@@ -438,7 +440,7 @@ export const useFetchChallengeIdsByDuelistIds = (duelistIds: BigNumberish[]) => 
     // enabled: !result.challengeExists,
     setEntities: (entities: PistolsEntity[]) => {
       console.log(`useFetchChallengeIdsByDuelist() GOT`, newDuelistIds, entities);
-      fetchState.setFetchedDuelistIds(newDuelistIds.map(BigInt));
+      fetchState.setFetchedIds(newDuelistIds.map(BigInt));
       setEntities(entities);
     },
   })
@@ -468,8 +470,8 @@ export const useFetchChallengeIdsByPlayerAddresses = (addresses: BigNumberish[])
   const fetchState = useChallengeFetchStore((state) => state);
 
   const newAddresses = useMemo(() => (
-    fetchState.getNewPlayerAddresses(addresses)
-  ), [addresses, fetchState.playerAddresses])
+    fetchState.getNewAddresses(addresses)
+  ), [addresses, fetchState.addresses])
 
   const query = useMemo<PistolsQueryBuilder>(() => (
     newAddresses.length > 0
@@ -485,6 +487,7 @@ export const useFetchChallengeIdsByPlayerAddresses = (addresses: BigNumberish[])
           "pistols-ChallengeMessage",
           'pistols-Round',
         ])
+        .withLimit(newAddresses.length)
         .includeHashedKeys()
       : null
   ), [newAddresses])
@@ -494,7 +497,7 @@ export const useFetchChallengeIdsByPlayerAddresses = (addresses: BigNumberish[])
     // enabled: !result.challengeExists,
     setEntities: (entities: PistolsEntity[]) => {
       console.log(`useFetchChallengeIdsByPlayerAddresses() GOT`, newAddresses, entities);
-      fetchState.setFetchedPlayerAddresses(newAddresses.map(BigInt));
+      fetchState.setFetchedAddresses(newAddresses.map(BigInt));
       setEntities(entities);
     },
   })

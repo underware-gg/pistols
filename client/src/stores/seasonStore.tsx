@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { createDojoStore } from '@dojoengine/sdk/react'
 import { useConfig } from '/src/stores/configStore'
-import { useSeasonScoreboard } from '/src/stores/scoreboardStore'
+import { useGetSeasonScoreboard } from '/src/stores/scoreboardStore'
 import { useStoreModelsByKeys } from '@underware/pistols-sdk/dojo'
 import { PistolsSchemaType } from '@underware/pistols-sdk/pistols/sdk'
 import { parseEnumVariant } from '@underware/pistols-sdk/starknet'
@@ -69,6 +69,7 @@ export const useSeason = (season_id: number) => {
 export type DuelistScore = {
   duelistId: bigint
   points: number
+  seasonId: number
 }
 
 export const useLeaderboard = (season_id: number) => {
@@ -89,6 +90,7 @@ export const useLeaderboard = (season_id: number) => {
         result.push({
           duelistId,
           points: Number(score),
+          seasonId: season_id,
         })
       }
     }
@@ -104,7 +106,7 @@ export const useLeaderboard = (season_id: number) => {
 
 export const useFullLeaderboard = (season_id: number) => {
   const { scores: leaderboardScores } = useLeaderboard(season_id || 0);
-  const { seasonScoreboard } = useSeasonScoreboard(season_id || 0);
+  const { seasonScoreboard } = useGetSeasonScoreboard(season_id || 0);
   const { blockedPlayersDuelistIds } = useBlockedPlayersDuelistIds()
 
   const scores = useMemo(() => (

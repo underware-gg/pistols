@@ -8,7 +8,6 @@ import { useRouteSlugs } from '/src/hooks/useRoute'
 import { useDuelProgress } from '/src/hooks/usePistolsContractCalls'
 import { usePlayer } from '/src/stores/playerStore'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
-import { SeasonChallengeStoreSync, SeasonScoreboardStoreSync } from '/src/stores/sync/SeasonEntityStoreSync'
 import { PlayerNameSync } from '/src/stores/sync/PlayerNameSync'
 import { ChallengeStateNames, RoundStateNames } from '/src/utils/pistols'
 import { bigintToDecimal, bigintToHex, formatTimestampLocal } from '@underware/pistols-sdk/utils'
@@ -29,8 +28,6 @@ export default function DuelDataPage() {
   return (
     <AppDojo backgroundImage={null}>
       <EntityStoreSync />
-      {/* <SeasonChallengeStoreSync /> */}
-      <SeasonScoreboardStoreSync />
       <PlayerNameSync />
       <StatsLoader />
     </AppDojo>

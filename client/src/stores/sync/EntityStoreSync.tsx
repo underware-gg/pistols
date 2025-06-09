@@ -213,13 +213,13 @@ export function EntityStoreSync() {
   useEffect(() => updateChallengeIdsEntities(Object.values(challengeState.entities)), [challengeState.entities])
   useEffect(() => updateDuelistIdsEntities(Object.values(duelistState.entities)), [duelistState.entities])
 
-  // useEffect(() => debug.log("EntityStoreSync() [configStore.entities] =>", configState.entities), [configState.entities])
-  // useEffect(() => debug.log("EntityStoreSync() [seasonState.entities] =>", seasonState.entities), [seasonState.entities])
-  // useEffect(() => debug.log("EntityStoreSync() [tokenStore.entities] =>", tokenState.entities), [tokenState.entities])
-  // useEffect(() => debug.log("EntityStoreSync() [duelistStore.entities] =>", duelistState.entities), [duelistState.entities])
-  // useEffect(() => debug.log("EntityStoreSync() [duelistStackStore.entities] =>", duelistStackState.entities), [duelistStackState.entities])
-  // useEffect(() => debug.log("EntityStoreSync() [playerDataState.players] =>", playerDataState.players), [playerDataState.players])
-  // useEffect(() => debug.log("EntityStoreSync() [playerDataState.players_online] =>", playerDataState.players_online), [playerDataState.players_online])
+  // useEffect(() => debug.log("EntityStoreSync() [configStore.entities] =>", Object.values(configState.entities).length), [configState.entities])
+  // useEffect(() => debug.log("EntityStoreSync() [seasonState.entities] =>", Object.values(seasonState.entities).length), [seasonState.entities])
+  // useEffect(() => debug.log("EntityStoreSync() [tokenStore.entities] =>", Object.values(tokenState.entities).length), [tokenState.entities])
+  useEffect(() => debug.log("EntityStoreSync() [duelistStore.entities] =>", Object.values(duelistState.entities).length), [duelistState.entities])
+  // useEffect(() => debug.log("EntityStoreSync() [duelistStackStore.entities] =>", Object.values(duelistStackState.entities).length), [duelistStackState.entities])
+  // useEffect(() => debug.log("EntityStoreSync() [playerDataState.players] =>", Object.values(playerDataState.players_names).length), [playerDataState.players_names])
+  // useEffect(() => debug.log("EntityStoreSync() [playerDataState.players_online] =>", Object.values(playerDataState.players_online).length), [playerDataState.players_online])
 
   return (<></>)
 }

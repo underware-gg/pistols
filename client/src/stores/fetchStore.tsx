@@ -4,62 +4,62 @@ import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 
 
-//--------------------------------
-// keep track of data fetched per duelist/players
+//------------------------------------------
+// keep track of data fetched per id/address
 // (avoid fetching twice)
 //
 
 interface ChallengeFetchState {
-  duelistIds: bigint[],
-  playerAddresses: bigint[],
+  ids: bigint[],
+  addresses: bigint[],
   resetStore: () => void;
-  setFetchedDuelistIds: (duelistIds: bigint[]) => void;
-  setFetchedPlayerAddresses: (playerAddresses: bigint[]) => void;
-  getNewDuelistIds: (candidateDuelistIds: BigNumberish[]) => bigint[];
-  getNewPlayerAddresses: (candidatePlayerAddresses: BigNumberish[]) => bigint[];
+  setFetchedIds: (ids: bigint[]) => void;
+  setFetchedAddresses: (addresses: bigint[]) => void;
+  getNewIds: (candidateIds: BigNumberish[]) => bigint[];
+  getNewAddresses: (candidateAddresses: BigNumberish[]) => bigint[];
 }
 const createStore = () => {
   return create<ChallengeFetchState>()(immer((set, get) => ({
-    duelistIds: [],
-    playerAddresses: [],
+    ids: [],
+    addresses: [],
     resetStore: () => {
       // console.warn("QUERY_STORE: resetStore()")
       set((state: ChallengeFetchState) => {
-        state.duelistIds = []
-        state.playerAddresses = []
+        state.ids = []
+        state.addresses = []
       })
     },
-    setFetchedDuelistIds: (duelistIds: bigint[]) => {
+    setFetchedIds: (ids: bigint[]) => {
       set((state: ChallengeFetchState) => {
-        state.duelistIds = [
+        state.ids = [
           ...new Set([
-            ...state.duelistIds,
-            ...duelistIds
+            ...state.ids,
+            ...ids
           ])
         ]
       })
     },
-    setFetchedPlayerAddresses: (playerAddresses: bigint[]) => {
+    setFetchedAddresses: (addresses: bigint[]) => {
       set((state: ChallengeFetchState) => {
-        state.playerAddresses = [
+        state.addresses = [
           ...new Set([
-            ...state.playerAddresses,
-            ...playerAddresses
+            ...state.addresses,
+            ...addresses
           ])
         ]
       })
     },
-    getNewDuelistIds: (candidateDuelistIds: BigNumberish[]) => {
-      return candidateDuelistIds
+    getNewIds: (candidateIds: BigNumberish[]) => {
+      return candidateIds
         .filter(isPositiveBigint)
         .map(BigInt)
-        .filter(id => !get().duelistIds.includes(id))
+        .filter(id => !get().ids.includes(id))
     },
-    getNewPlayerAddresses: (candidatePlayerAddresses: BigNumberish[]) => {
-      return candidatePlayerAddresses
+    getNewAddresses: (candidateAddresses: BigNumberish[]) => {
+      return candidateAddresses
         .filter(isPositiveBigint)
         .map(BigInt)
-        .filter(id => !get().playerAddresses.includes(id))
+        .filter(id => !get().addresses.includes(id))
     },
   })))
 }
@@ -67,3 +67,4 @@ const createStore = () => {
 
 export const useChallengeFetchStore = createStore();
 export const useDuelistFetchStore = createStore();
+export const useScoreboardFetchStore = createStore();

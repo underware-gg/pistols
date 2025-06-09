@@ -6,7 +6,7 @@ import { bigintToDecimal, bigintToHex } from '@underware/pistols-sdk/utils'
 import { useAllChallengesIds, useChallenge } from '/src/stores/challengeStore'
 import { useDuelist, useAllDuelistsIds } from '/src/stores/duelistStore'
 import { useSeasonTotals } from '/src/queries/useSeason'
-import { useSeasonScoreboard, DuelistScore } from '/src/stores/scoreboardStore'
+import { useGetSeasonScoreboard, DuelistScore } from '/src/stores/scoreboardStore'
 import { useDuelistFameBalance } from '/src/stores/coinStore'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { SeasonChallengeStoreSync, SeasonScoreboardStoreSync } from '/src/stores/sync/SeasonEntityStoreSync'
@@ -83,7 +83,7 @@ export function Snapshots() {
   const { duelIds: seasonDuelIds, duelistIds: seasonDuelistIds } = useSeasonTotals(seasonId)
   const { duelIds: allDuelIds } = useAllChallengesIds()
   const { duelistIds: allDuelistIds } = useAllDuelistsIds()
-  const { seasonScoreboard } = useSeasonScoreboard(seasonId)
+  const { seasonScoreboard } = useGetSeasonScoreboard(seasonId)
   // console.log("______________Snapshots:", seasonId, leaderboardScores)
 
   useEffect(() => {

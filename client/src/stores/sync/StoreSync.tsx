@@ -2,7 +2,6 @@ import React, { useEffect } from 'react'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { EventsHistoricalStoreSync } from '/src/stores/sync/EventsHistoricalStoreSync'
 import { EventsModelStoreSync } from './EventsModelStoreSync'
-import { SeasonScoreboardStoreSync } from '/src/stores/sync/SeasonEntityStoreSync'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
 import { PlayerNameSync } from '/src/stores/sync/PlayerNameSync'
 import { PlayerOnlineSync } from '/src/stores/sync/PlayerOnlineSync'
@@ -28,7 +27,6 @@ export default function StoreSync() {
       <TokenStoreSync />
       <PlayerSync />
       <EntityStoreSync />
-      <SeasonScoreboardStoreSync />
       <EventsModelStoreSync />
       <EventsHistoricalStoreSync />
 

@@ -1,13 +1,13 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
-import { formatQueryValue, useEntitiesModel, useSdkEntitiesGetState } from '@underware/pistols-sdk/dojo'
-import { PistolsClauseBuilder, PistolsEntity, PistolsQueryBuilder } from '@underware/pistols-sdk/pistols/sdk'
 import { bigintEquals } from '@underware/pistols-sdk/utils'
-import { models } from '@underware/pistols-sdk/pistols/gen'
-import { useLeaderboard, DuelistScore } from './seasonStore'
-import { useConfig } from './configStore'
+import { formatQueryValue, useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
+import { PistolsClauseBuilder, PistolsEntity, PistolsQueryBuilder } from '@underware/pistols-sdk/pistols/sdk'
+import { useLeaderboard, DuelistScore } from '/src/stores/seasonStore'
+import { useScoreboardFetchStore } from '/src/stores/fetchStore'
+import { useConfig } from '/src/stores/configStore'
 
 // re-export
 export type { DuelistScore }
@@ -29,6 +29,7 @@ const createStore = () => {
     return scoreboard ? {
       duelistId: BigInt(scoreboard.holder),
       points: Number(scoreboard.points),
+      seasonId: Number(scoreboard.season_id),
     } : null
   }
   const _pushScoreboards = (state: State, entities: PistolsEntity[]) => {
@@ -117,9 +118,13 @@ export const useDuelistCurrentSeasonScore = (duelist_id: BigNumberish) => {
 // use with caution (like once per page)
 //
 
-export const useSeasonScoreboard = (season_id: number) => {
+export const useGetSeasonScoreboard = (season_id: number) => {
+  const scoreboardState = useScoreboardStore((state) => state);
+  const fetchState = useScoreboardFetchStore((state) => state);
+
+  // fetch only once per season
   const query = useMemo<PistolsQueryBuilder>(() => (
-    (season_id > 0)
+    (season_id > 0 && fetchState.getNewIds([season_id]).length > 0)
       ? new PistolsQueryBuilder()
         .withClause(
           new PistolsClauseBuilder().keys(
@@ -130,27 +135,32 @@ export const useSeasonScoreboard = (season_id: number) => {
         .withEntityModels(
           ["pistols-SeasonScoreboard"]
         )
-        .withLimit(1000)
+        .withLimit(2000)
         .includeHashedKeys()
       : null
-  ), [season_id])
+  ), [season_id, fetchState.ids])
 
-  const { entities, isLoading } = useSdkEntitiesGetState({ query })
-  const scoreboards = useEntitiesModel<models.SeasonScoreboard>(entities, 'SeasonScoreboard')
+  // add season scores to the store
+  const { isLoading, isFinished } = useSdkEntitiesGet({
+    query,
+    setEntities: (entities: PistolsEntity[]) => {
+      console.log(`useGetSeasonScoreboard() GOT`, season_id, entities);
+      scoreboardState.setEntities(entities);
+      fetchState.setFetchedIds([BigInt(season_id)]);
+    },
+  })
 
   const scoreboard = useMemo<DuelistScore[]>(() => (
-    scoreboards.map(scoreboard => ({
-      duelistId: BigInt(scoreboard.holder),
-      points: Number(scoreboard.points),
-    })).sort((a, b) => b.points - a.points)
-  ), [scoreboards])
-  // useEffect(() => console.log(`SCOREBOARDS...`, season_id, seasonScores), [seasonScores])
+    scoreboardState.scoreboard.filter(s => s.seasonId === season_id)
+  ), [scoreboardState.scoreboard, season_id])
+  useEffect(() => console.log(`::::::SCOREBOARDS...`, season_id, fetchState.ids, '>', scoreboard.length), [season_id, fetchState.ids, scoreboard])
 
   const seasonScoreboard = _useMergeScoreboardWithLeaderboard(scoreboard, season_id)
 
   return {
     seasonScoreboard,
     isLoading,
+    isFinished,
   }
 }
 

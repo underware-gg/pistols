@@ -4,7 +4,7 @@ import { PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder } from '@under
 import { useChallengeStore } from '/src/stores/challengeStore'
 import { useChallengeFetchStore } from '/src/stores/fetchStore'
 import { useConfig } from '/src/stores/configStore'
-import { useScoreboardStore } from '/src/stores/scoreboardStore'
+import { useGetSeasonScoreboard, useScoreboardStore } from '/src/stores/scoreboardStore'
 import { useProgressStore } from '/src/stores/progressStore'
 import { debug } from '@underware/pistols-sdk/pistols'
 
@@ -74,41 +74,7 @@ export function SeasonChallengeStoreSync() {
 
 export function SeasonScoreboardStoreSync() {
   const { currentSeasonId } = useConfig()
-  const query = useMemoGate<PistolsQueryBuilder>(() => (
-    new PistolsQueryBuilder()
-      .withClause(
-        new PistolsClauseBuilder().keys(
-          ["pistols-SeasonScoreboard"],
-          [formatQueryValue(currentSeasonId), undefined]
-        ).build()
-      )
-      .withEntityModels([
-        'pistols-SeasonScoreboard',
-      ])
-      .withLimit(_limit)
-      .includeHashedKeys()
-  ), [currentSeasonId])
-
-  const scoreboardState = useScoreboardStore((state) => state)
-
-  const mounted = useMounted()
-
-  useSdkEntitiesGet({
-    query,
-    enabled: mounted,
-    resetStore: () => {
-      debug.log("SeasonScoreboardStoreSync() RESET =======>")
-      scoreboardState.resetStore()
-      scoreboardState.resetStore()
-    },
-    setEntities: (entities: PistolsEntity[]) => {
-      debug.log("SeasonScoreboardStoreSync() SET =======> [entity]:", entities)
-      scoreboardState.setEntities(entities)
-      scoreboardState.setEntities(entities)
-    },
-  })
-
+  useGetSeasonScoreboard(currentSeasonId)
   // useEffect(() => debug.log(`SeasonScoreboardStoreSync() [${Object.keys(challengeState.entities).length}] =>`, challengeState.entities), [challengeState.entities])
-
   return (<></>)
 }
