@@ -16,6 +16,22 @@ const client_id = ENV.DISCORD_CLIENT_ID || ''
 const redirect_uri = ENV.DISCORD_REDIRECT_URL || ''
 const can_link = (client_id && redirect_uri)
 
+//
+// How linking works...
+//
+// -	PISTOLS: generate salt with GeneralPurposeMessage hash
+// -	PISTOLS: click Discord login, send state containing: (chain id + address + salt + message hash)
+// -	DISCORD: authorize, redrects to SALT_SERVER
+// -	SALT_SERVER: validates salt (re-generate and compare it)
+// -	SALT_SERVER: does the OAUTH ping-pong with Discord
+// -	SALT_SERVER: call emit_player_social_link()
+// -	SALT_SERVER: redirects to game client
+// -	Linked!
+// 
+// Discord OAuth Guide
+// https://discord.com/developers/docs/topics/oauth2
+//
+
 export function DiscordLinkButton({
   openNewTab = true,
   className = '',
