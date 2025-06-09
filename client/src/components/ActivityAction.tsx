@@ -6,7 +6,7 @@ import { usePlayer } from '/src/stores/playerStore'
 import { useDuelistFameBalance } from '/src/stores/coinStore'
 import { useCallToActions } from '/src/stores/eventsModelStore'
 import { Icon, EmojiIcon } from '/src/components/ui/Icons'
-import { ChallengeLink, DuelistLink } from '/src/components/Links'
+import { DuelOpponentNameLink, ChallengeLink, DuelistLink, DuelistOwnerLink } from '/src/components/Links'
 import { bigintToDecimal, bigintToHex } from '@underware/pistols-sdk/utils'
 import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
 import { usePlayerDuelistsOrganized } from '/src/stores/duelistStore'
@@ -146,7 +146,7 @@ const ActionItem = ({
       <>
         {/* <Icon name='circle' className='Invisible' /> */}
         <Icon name='circle' className='Warning' />
-        {'Reply to  '}
+        {'Reply to '}
         <ChallengeLink duelId={duelId} />
         <br />
       </>
@@ -158,8 +158,9 @@ const ActionItem = ({
     return (
       <>
         <Icon name='circle' className='Positive' />
-        <DuelistLink duelistId={duelistId} useName />
-        {' required in '}
+        {'Shoot at '}
+        <DuelOpponentNameLink duelId={duelId} />
+        {' in '}
         <ChallengeLink duelId={duelId} />
         <br />
       </>
@@ -170,8 +171,9 @@ const ActionItem = ({
     return (
       <>
         <Icon name='circle' />
-        <DuelistLink duelistId={duelistId} useName />
-        {' waiting in '}
+        {'Standing by '}
+        <DuelOpponentNameLink duelId={duelId} />
+        {' in '}
         <ChallengeLink duelId={duelId} />
         <br />
       </>
