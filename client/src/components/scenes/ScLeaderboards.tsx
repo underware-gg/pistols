@@ -3,7 +3,7 @@ import { Grid, Header, Pagination } from 'semantic-ui-react';
 import { POSTER_HEIGHT_SMALL, POSTER_WIDTH_SMALL, ProfilePoster, ProfilePosterHandle } from '/src/components/ui/ProfilePoster';
 import { useGameAspect } from '/src/hooks/useGameAspect';
 import { usePlayer } from '/src/stores/playerStore';
-import { useDuelist } from '/src/stores/duelistStore';
+import { useDuelist, useFetchDuelistIds } from '/src/stores/duelistStore';
 import { ProfilePic } from '/src/components/account/ProfilePic';
 import { constants } from '@underware/pistols-sdk/pistols/gen';
 import { BigNumberish } from 'starknet';
@@ -526,6 +526,7 @@ export default function ScLeaderboards() {
   }, [seasonIds, selectedSeasonId]);
 
   const { scores } = useFullLeaderboard(selectedSeasonId || 0);
+  useFetchDuelistIds(scores.map(s => s.duelistId))
 
   const { itemsPerPage, startIndex, totalPages } = useMemo(() => {
     const itemsPerPage = activePage === 1 ? 3 : 7;

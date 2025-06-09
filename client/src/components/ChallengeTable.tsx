@@ -108,7 +108,7 @@ function ChallengeTableByIds({
             gap: `${aspectWidth(0.6)}px 0`,
             width: '100%'
           }}>
-            <FilterButton grouped icon='add' state={false} disabled={!canAdd} onClick={() => setStates(AllChallengeStates)} />
+            <FilterButton grouped icon='asterisk' state={false} disabled={!canAdd} onClick={() => setStates(AllChallengeStates)} />
             {filters}
             <FilterButton grouped icon='close' state={false} disabled={!canClear} onClick={() => setStates([])} />
           </ButtonGroup>

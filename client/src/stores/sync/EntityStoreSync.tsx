@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useSdkEntitiesSub, filterEntitiesByModels, entityContainsModels, useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
 import { PistolsQueryBuilder, PistolsEntity } from '@underware/pistols-sdk/pistols/sdk'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
@@ -5,8 +6,8 @@ import { useConfigStore } from '/src/stores/configStore'
 import { useSeasonStore } from '/src/stores/seasonStore'
 import { useTokenConfigStore } from '/src/stores/tokenConfigStore'
 import { usePlayerStore, usePlayerDataStore } from '/src/stores/playerStore'
-import { useDuelistStore, useDuelistStackStore } from '/src/stores/duelistStore'
-import { useChallengeStore } from '/src/stores/challengeStore'
+import { useDuelistStore, useDuelistStackStore, useDuelistIdsStore } from '/src/stores/duelistStore'
+import { useChallengeIdsStore, useChallengeStore } from '/src/stores/challengeStore'
 import { useBankStore } from '/src/stores/bankStore'
 import { usePackStore } from '/src/stores/packStore'
 import { useScoreboardStore } from '/src/stores/scoreboardStore'
@@ -61,18 +62,10 @@ const query_get_players: PistolsQueryBuilder = new PistolsQueryBuilder()
   .withEntityModels(_modelsPlayers)
   .withLimit(_limit)
   .includeHashedKeys()
-const query_get_duelists: PistolsQueryBuilder = new PistolsQueryBuilder()
-  .withEntityModels(_modelsDuelists)
-  .withLimit(_limit)
-  .includeHashedKeys()
 const query_get_duelist_stacks: PistolsQueryBuilder = new PistolsQueryBuilder()
   .withEntityModels(_modelsStacks)
   .withLimit(_limit)
   .includeHashedKeys()
-// const query_get_challenges: PistolsQueryBuilder = new PistolsQueryBuilder()
-//   .withEntityModels(_modelsPerSeason)
-//   .withLimit(_limit)
-//   .includeHashedKeys()
 const query_sub: PistolsQueryBuilder = new PistolsQueryBuilder()
   .withEntityModels([
     ..._modelsMisc,
@@ -152,23 +145,6 @@ export function EntityStoreSync() {
     },
   })
 
-  const { isFinished: isFinishedDuelists } = useSdkEntitiesGet({
-    query: query_get_duelists,
-    enabled: (mounted),
-    updateProgress: (currentPage: number, finished?: boolean) => {
-      updateProgress('query_get_duelists', currentPage, finished)
-    },
-    resetStore: () => {
-      debug.log("EntityStoreSync() RESET DUELISTS =======>")
-      duelistState.resetStore()
-    },
-    setEntities: (entities: PistolsEntity[]) => {
-      debug.log("EntityStoreSync() SET DUELISTS =======> [entities]:", entities)
-      // debug.log("EntityStoreSync() SET DUELISTS =======> [Duelist]:", filterEntitiesByModels(entities, ['Duelist']))
-      duelistState.setEntities(entities)
-    },
-  })
-
   const { isFinished: isFinishedStacks } = useSdkEntitiesGet({
     query: query_get_duelist_stacks,
     enabled: (mounted),
@@ -188,7 +164,7 @@ export function EntityStoreSync() {
 
   useSdkEntitiesSub({
     query: query_sub,
-    enabled: (mounted && isFinishedMisc && isFinishedPlayers && isFinishedDuelists && isFinishedStacks),
+    enabled: (mounted && isFinishedMisc && isFinishedPlayers && isFinishedStacks),
     setEntities: (entities: PistolsEntity[]) => {
       debug.log("EntityStoreSync() SET =======> [entities]: DISCARD!", entities.length)
     },
@@ -230,6 +206,12 @@ export function EntityStoreSync() {
       }
     },
   })
+
+  // Keep Id stores updated
+  const updateChallengeIdsEntities = useChallengeIdsStore((state) => state.updateEntities)
+  const updateDuelistIdsEntities = useDuelistIdsStore((state) => state.updateEntities)
+  useEffect(() => updateChallengeIdsEntities(Object.values(challengeState.entities)), [challengeState.entities])
+  useEffect(() => updateDuelistIdsEntities(Object.values(duelistState.entities)), [duelistState.entities])
 
   // useEffect(() => debug.log("EntityStoreSync() [configStore.entities] =>", configState.entities), [configState.entities])
   // useEffect(() => debug.log("EntityStoreSync() [seasonState.entities] =>", seasonState.entities), [seasonState.entities])

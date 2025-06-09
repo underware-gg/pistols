@@ -24,6 +24,7 @@ interface State {
   setBalances: (balances: torii.TokenBalance[]) => void;
   updateBalance: (balance: torii.TokenBalance) => void;
   getTokenIdsOfOwner: (accountAddress: BigNumberish) => bigint[] | undefined | null;
+  getTokenIdsOfOwners: (accountAddresses: BigNumberish[]) => bigint[] | undefined | null;
   getOwnerOfTokenId: (tokenId: BigNumberish) => bigint | undefined | null;
 }
 
@@ -72,6 +73,11 @@ const createStore = (tokenName: string) => {
         : Object.entries(get().tokens)
           .filter(([key, value]) => value?.owner === _owner)
           .map(([key, value]) => BigInt(key))
+    },
+    getTokenIdsOfOwners: (accountAddresses: BigNumberish[]): bigint[] => {
+      return accountAddresses.reduce((acc, address) => (
+        acc.concat(get().getTokenIdsOfOwner(address))
+      ), [] as bigint[])
     },
     getOwnerOfTokenId: (tokenId: BigNumberish | undefined): bigint | undefined => {
       return get().tokens[_tokenKey(tokenId ?? 0n)]?.owner ?? undefined

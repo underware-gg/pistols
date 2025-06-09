@@ -249,7 +249,7 @@ const FilterStateButtonGroup = memo(function FilterStateButtonGroup({ states, cu
   return (
     <ButtonGroup>
       <FilterButton
-        icon='add'
+        icon='asterisk'
         grouped
         state={false}
         disabled={!canAdd}

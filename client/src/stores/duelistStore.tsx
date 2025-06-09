@@ -1,31 +1,49 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
+import { create } from 'zustand'
+import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
-import { useEntityIds, getEntityModel, useDojoSystem, keysToEntityId, getCustomEnumCalldata, useStoreModelsByKeys, useStoreModelsById, useEntitiesModel } from '@underware/pistols-sdk/dojo'
+import { useEntityIds, getEntityModel, useDojoSystem, keysToEntityId, getCustomEnumCalldata, useStoreModelsByKeys, useStoreModelsById, useEntitiesModel, useAllStoreModels, formatQueryValue, useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
 import { useClientTimestamp, useMemoGate } from '@underware/pistols-sdk/utils/hooks'
 import { isPositiveBigint, bigintToDecimal, bigintToHex } from '@underware/pistols-sdk/utils'
 import { makeAbiCustomEnum, parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/starknet'
 import { getCollectionDescription, getProfileDescription, getProfileGender, getProfileId, DuelistProfileKey, DuelistGender, getProfileQuote } from '@underware/pistols-sdk/pistols'
-import { PistolsSchemaType } from '@underware/pistols-sdk/pistols/sdk'
+import { PistolsEntity, PistolsSchemaType } from '@underware/pistols-sdk/pistols/sdk'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { CharacterType } from '/src/data/assets'
 import { ArchetypeNames } from '/src/utils/pistols'
 import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
 import { useAccount } from '@starknet-react/core'
-import { useDuelistsOfPlayer, useOwnerOfDuelist } from '../hooks/useTokenDuelists'
+import { useDuelistIdsOfOwner, useDuelistIdsOfOwners, useDuelistsOfPlayer, useOwnerOfDuelist } from '../hooks/useTokenDuelists'
 import { useSdkEntitiesGetState, filterEntitiesByModels } from '@underware/pistols-sdk/dojo'
 import { PistolsQueryBuilder, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols/sdk'
+import { useDuelistFetchStore } from './fetchStore'
 
 export const useDuelistStore = createDojoStore<PistolsSchemaType>();
 export const useDuelistStackStore = createDojoStore<PistolsSchemaType>();
 
-// export const useAllDuelistsEntityIds = () => {
-//   const entities = useStore((state) => state.entities)
-//   const entityIds = useMemo(() => Object.keys(entities), [entities])
-//   return {
-//     entityIds,
-//   }
-// }
+// keep track of all challenge ids in the store
+interface DuelistIdsState {
+  duelistIds: bigint[],
+  updateEntities: (entities: PistolsEntity[]) => void;
+}
+const createStore = () => {
+  return create<DuelistIdsState>()(immer((set, get) => ({
+    duelistIds: [],
+    updateEntities: (entities: PistolsEntity[]) => {
+      set((state: DuelistIdsState) => {
+        state.duelistIds = entities.map(e => BigInt(e.models.pistols.Duelist?.duelist_id ?? 0)).filter(Boolean)
+      })
+    },
+  })))
+}
+export const useDuelistIdsStore = createStore();
+
+
+
+//--------------------------------
+// consumer hooks
+//
 
 export const useAllDuelistsIds = () => {
   const entities = useDuelistStore((state) => state.entities)
@@ -380,5 +398,138 @@ export const usePlayerDuelistsOrganized = () => {
   return {
     ...organizedDuelists,
     isLoading
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//------------------------------------------
+// Fetch new challenge and add to the store
+// (if not already in the store)
+//
+
+export const useGetDuelist = (duelist_id: BigNumberish) => {
+  // fetch if not already in the store
+  useFetchDuelist(duelist_id, 500)
+  // return duelist from the store
+  const result = useDuelist(duelist_id)
+  return result
+}
+
+
+
+
+//------------------------------------------------
+// Fetch multiple duelists per player or challenge
+// after fetching once, it won't fetch again the same duelists/players
+// new and fetched duelists will be updated automatically with the entity subscription
+//
+
+//
+// Fetch NEW Challenges by duelist ID
+//
+export const useFetchDuelist = (duelist_id: BigNumberish, retryInterval?: number) => {
+  const duelistIds = useMemo(() => [duelist_id], [duelist_id])
+  return useFetchDuelistIds(duelistIds, retryInterval)
+}
+
+export const useFetchDuelistIds = (duelistIds: BigNumberish[], retryInterval?: number) => {
+  const setEntities = useDuelistStore((state) => state.setEntities);
+
+  const existingDuelistIds = useDuelistIdsStore((state) => state.duelistIds)
+  const newDuelistIds = useMemo(() => (
+    duelistIds
+      .filter(isPositiveBigint)
+      .map(BigInt)
+      .filter((id) => !existingDuelistIds.includes(id))
+  ), [duelistIds, existingDuelistIds])
+
+  const query = useMemo<PistolsQueryBuilder>(() => (
+    newDuelistIds.length > 0
+      ? new PistolsQueryBuilder()
+        .withClause(
+          new PistolsClauseBuilder().where("pistols-Duelist", "duelist_id", "In", newDuelistIds.map(formatQueryValue)).build()
+        )
+        .withEntityModels([
+          "pistols-Duelist",
+          "pistols-DuelistAssignment",
+          "pistols-DuelistMemorial",
+        ])
+        .includeHashedKeys()
+      : null
+  ), [newDuelistIds])
+
+  const { isLoading, isFinished } = useSdkEntitiesGet({
+    query,
+    retryInterval,
+    setEntities: (entities: PistolsEntity[]) => {
+      console.log(`useFetchDuelistIds() GOT`, newDuelistIds, entities);
+      setEntities(entities);
+    },
+  })
+
+  // useEffect(() => {
+  //   console.log(`::useFetchDuelistIds...`, newDuelIds, query)
+  // }, [newDuelIds, query])
+
+  // const entities = useChallengeStore((state) => state.entities);
+  // useEffect(() => {
+  //   console.log(`::useFetchDuelistIds... entities:`, entities)
+  // }, [entities])
+
+  return {
+    isLoading,
+    isFinished,
+  }
+}
+
+
+
+//------------------------------------------------
+// Fetch multiple duelists per player
+// after fetching once, it won't fetch again the same duelists/players
+// new and fetched duelists will be updated automatically with the entity subscription
+//
+
+export const useFetchDuelistIdsByPlayer = (address: BigNumberish) => {
+  const addresses = useMemo(() => [address], [address])
+  return useFetchDuelistIdsByPlayerAddresses(addresses)
+}
+
+export const useFetchDuelistIdsByPlayerAddresses = (addresses: BigNumberish[]) => {
+  // dont even try for players already fetched...
+  const fetchState = useDuelistFetchStore((state) => state);
+  const newAddresses = useMemo(() => (
+    fetchState.getNewPlayerAddresses(addresses)
+  ), [addresses, fetchState.playerAddresses])
+
+  // fetch duelists...
+  const { duelistIds } = useDuelistIdsOfOwners(newAddresses)
+  const { isLoading, isFinished } = useFetchDuelistIds(duelistIds)
+  
+  // mark players as fetched...
+  useEffect(() => {
+    if (isFinished) {
+      console.log(`useFetchDuelistIdsByPlayerAddresses() GOT`, newAddresses.map(bigintToHex));
+      fetchState.setFetchedPlayerAddresses(newAddresses.map(BigInt));
+    }
+  }, [isFinished])
+
+  return {
+    isLoading,
+    isFinished,
   }
 }

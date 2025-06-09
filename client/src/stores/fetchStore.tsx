@@ -51,14 +51,14 @@ const createStore = () => {
     },
     getNewDuelistIds: (candidateDuelistIds: BigNumberish[]) => {
       return candidateDuelistIds
-        .map(BigInt)
         .filter(isPositiveBigint)
+        .map(BigInt)
         .filter(id => !get().duelistIds.includes(id))
     },
     getNewPlayerAddresses: (candidatePlayerAddresses: BigNumberish[]) => {
       return candidatePlayerAddresses
-        .map(BigInt)
         .filter(isPositiveBigint)
+        .map(BigInt)
         .filter(id => !get().playerAddresses.includes(id))
     },
   })))

@@ -14,11 +14,12 @@ import { ActionButton } from '/src/components/ui/Buttons'
 import { usePistolsScene } from '/src/hooks/PistolsContext'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { SceneName } from '/src/data/assets'
-import { useDuelistsOfOwner } from '/src/hooks/useTokenDuelists'
+import { useDuelistIdsOfOwner } from '/src/hooks/useTokenDuelists'
 import { useExecuteEmitPlayerBookmark } from '/src/hooks/usePistolsSystemCalls'
 import { Address } from './Address'
 import { ChallengeButton } from '/src/components/ui/Buttons'
 import { useDiscordSocialLink } from '/src/stores/eventsModelStore'
+import { useFetchDuelistIdsByPlayer } from '/src/stores/duelistStore'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -152,7 +153,8 @@ const ProfilePosterFull = forwardRef<ProfilePosterHandle, ProfilePosterProps>((p
   const { name, isMyAccount, isOnline, isBlocked, isLinked, avatarUrl } = useProfilePosterData(props.playerAddress)
   
   // Full-specific data
-  const { duelistIds, isLoading } = useDuelistsOfOwner(props.playerAddress)
+  useFetchDuelistIdsByPlayer(props.playerAddress) // fetch duelists in the store, if not already fetched
+  const { duelistIds, isLoading } = useDuelistIdsOfOwner(props.playerAddress)
   const { isBookmarked } = useIsBookmarked(props.playerAddress)
   const { emit_player_bookmark, isDisabled: emitIsDisabled } = useExecuteEmitPlayerBookmark(props.playerAddress, 0, !isBookmarked)
 

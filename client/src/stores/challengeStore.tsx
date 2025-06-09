@@ -1,4 +1,6 @@
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
+import { create } from 'zustand'
+import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
 import { formatQueryValue, useStoreModelsByKeys, useSdkEntitiesGet, useAllStoreModels } from '@underware/pistols-sdk/dojo'
@@ -10,28 +12,35 @@ import { movesToHand } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { ChallengeColumn, SortDirection } from './queryParamsStore'
 import { useAccount } from '@starknet-react/core'
-import { getPlayerName, usePlayer } from './playerStore'
-import { useCallToActions } from './eventsModelStore'
+import { useCallToActions } from '/src/stores/eventsModelStore'
 import { useChallengeFetchStore } from '/src/stores/fetchStore'
 
 export const useChallengeStore = createDojoStore<PistolsSchemaType>();
+
+// keep track of all challenge ids in the store
+interface ChallengeIdsState {
+  duelIds: bigint[],
+  updateEntities: (entities: PistolsEntity[]) => void;
+}
+const createStore = () => {
+  return create<ChallengeIdsState>()(immer((set, get) => ({
+    duelIds: [],
+    updateEntities: (entities: PistolsEntity[]) => {
+      set((state: ChallengeIdsState) => {
+        state.duelIds = entities.map(e => BigInt(e.models.pistols.Challenge?.duel_id ?? 0)).filter(Boolean)
+      })
+    },
+  })))
+}
+export const useChallengeIdsStore = createStore();
 
 
 //--------------------------------
 // consumer hooks
 //
 
-export const useAllChallengesEntityIds = () => {
-  const entities = useChallengeStore((state) => state.entities)
-  const entityIds = useMemo(() => Object.keys(entities), [entities])
-  return {
-    entityIds,
-  }
-}
-
 export const useAllChallengesIds = () => {
-  const entities = useChallengeStore((state) => state.entities)
-  const duelIds = useMemo(() => Object.values(entities).map(e => BigInt(e.models.pistols.Challenge.duel_id)), [entities])
+  const duelIds = useChallengeIdsStore((state) => state.duelIds)
   // useEffect(() => console.log(`useAllChallengesIds() =>`, duelIds.length), [duelIds])
   return {
     duelIds,
@@ -337,14 +346,12 @@ export const useFetchChallenge = (duelId: BigNumberish, retryInterval?: number) 
 export const useFetchChallengeIds = (duelIds: BigNumberish[], retryInterval?: number) => {
   const setEntities = useChallengeStore((state) => state.setEntities);
 
-  const entities = useChallengeStore((state) => state.entities);
-  const challenges = useAllStoreModels<models.Challenge>(entities, 'Challenge')
-  const existingDuelIds = useMemo(() => challenges.map((e) => BigInt(e.duel_id)), [challenges])
-  
+  // use only duels not in the store
+  const existingDuelIds = useChallengeIdsStore((state) => state.duelIds)  
   const newDuelIds = useMemo(() => (
     duelIds
-      .map(BigInt)
       .filter(isPositiveBigint)
+      .map(BigInt)
       .filter((id) => !existingDuelIds.includes(id))
   ), [duelIds, existingDuelIds])
 
@@ -461,9 +468,7 @@ export const useFetchChallengeIdsByPlayerAddresses = (addresses: BigNumberish[])
   const fetchState = useChallengeFetchStore((state) => state);
 
   const newAddresses = useMemo(() => (
-    addresses
-      .filter(isPositiveBigint)
-      .filter(id => !fetchState.playerAddresses.includes(BigInt(id)))
+    fetchState.getNewPlayerAddresses(addresses)
   ), [addresses, fetchState.playerAddresses])
 
   const query = useMemo<PistolsQueryBuilder>(() => (

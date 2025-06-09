@@ -3,7 +3,7 @@ import { useAccount } from '@starknet-react/core'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { useGetChallenge } from '/src/stores/challengeStore'
-import { useDuelist } from '/src/stores/duelistStore'
+import { useDuelist, useFetchDuelistIds } from '/src/stores/duelistStore'
 import { checkIsDuelistCharacter, useIsMyAccount } from '/src/hooks/useIsYou'
 import { useDuelProgress } from '/src/hooks/usePistolsContractCalls'
 import { useDuelCallToAction } from '/src/stores/eventsModelStore'
@@ -212,6 +212,7 @@ export const DuelContextProvider: React.FC<{
     isExpired, isCanceled])
 
   // Get duelist data
+  useFetchDuelistIds([duelistIdA, duelistIdB])
   const duelistA = useDuelist(duelistIdA);
   const duelistB = useDuelist(duelistIdB);
   
