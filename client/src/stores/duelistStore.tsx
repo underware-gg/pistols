@@ -14,10 +14,11 @@ import { CharacterType } from '/src/data/assets'
 import { ArchetypeNames } from '/src/utils/pistols'
 import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
 import { useAccount } from '@starknet-react/core'
-import { useDuelistIdsOfOwners, useDuelistsOfPlayer, useOwnerOfDuelist } from '../hooks/useTokenDuelists'
+import { useDuelistIdsOfOwners, useDuelistsOfPlayer, useOwnerOfDuelist } from '/src/hooks/useTokenDuelists'
 import { useSdkEntitiesGetState } from '@underware/pistols-sdk/dojo'
 import { PistolsQueryBuilder, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols/sdk'
 import { useDuelistFetchStore } from '/src/stores/fetchStore'
+import { debug } from '@underware/pistols-sdk/pistols'
 
 export const useDuelistStore = createDojoStore<PistolsSchemaType>();
 export const useDuelistStackStore = createDojoStore<PistolsSchemaType>();
@@ -457,10 +458,6 @@ export const useFetchDuelistIds = (duelistIds: BigNumberish[], retryInterval?: n
       .filter((id) => !existingDuelistIds.includes(id))
   ), [duelistIds, existingDuelistIds])
 
-  useEffect(() => {
-    console.log(`FETCH::::: newDuelistIds:`, existingDuelistIds.length, '>', newDuelistIds.length)
-  }, [newDuelistIds])
-
   const query = useMemo<PistolsQueryBuilder>(() => (
     newDuelistIds.length > 0
       ? new PistolsQueryBuilder()
@@ -481,7 +478,7 @@ export const useFetchDuelistIds = (duelistIds: BigNumberish[], retryInterval?: n
     query,
     retryInterval,
     setEntities: (entities: PistolsEntity[]) => {
-      console.log(`useFetchDuelistIds() GOT`, newDuelistIds, entities);
+      debug.log(`useFetchDuelistIds() GOT`, newDuelistIds, entities);
       setEntities(entities);
     },
   })
@@ -528,7 +525,7 @@ export const useFetchDuelistIdsByPlayerAddresses = (addresses: BigNumberish[]) =
   // mark players as fetched...
   useEffect(() => {
     if (isFinished) {
-      console.log(`useFetchDuelistIdsByPlayerAddresses() GOT`, newAddresses.map(bigintToHex));
+      debug.log(`useFetchDuelistIdsByPlayerAddresses() GOT`, newAddresses.map(bigintToHex));
       fetchState.setFetchedAddresses(newAddresses.map(BigInt));
     }
   }, [isFinished])

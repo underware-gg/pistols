@@ -8,6 +8,7 @@ import { PistolsClauseBuilder, PistolsEntity, PistolsQueryBuilder } from '@under
 import { useLeaderboard, DuelistScore } from '/src/stores/seasonStore'
 import { useScoreboardFetchStore } from '/src/stores/fetchStore'
 import { useConfig } from '/src/stores/configStore'
+import { debug } from '@underware/pistols-sdk/pistols'
 
 // re-export
 export type { DuelistScore }
@@ -144,7 +145,7 @@ export const useGetSeasonScoreboard = (season_id: number) => {
   const { isLoading, isFinished } = useSdkEntitiesGet({
     query,
     setEntities: (entities: PistolsEntity[]) => {
-      console.log(`useGetSeasonScoreboard() GOT`, season_id, entities);
+      debug.log(`useGetSeasonScoreboard() GOT`, season_id, entities);
       scoreboardState.setEntities(entities);
       fetchState.setFetchedIds([BigInt(season_id)]);
     },
@@ -153,7 +154,6 @@ export const useGetSeasonScoreboard = (season_id: number) => {
   const scoreboard = useMemo<DuelistScore[]>(() => (
     scoreboardState.scoreboard.filter(s => s.seasonId === season_id)
   ), [scoreboardState.scoreboard, season_id])
-  useEffect(() => console.log(`::::::SCOREBOARDS...`, season_id, fetchState.ids, '>', scoreboard.length), [season_id, fetchState.ids, scoreboard])
 
   const seasonScoreboard = _useMergeScoreboardWithLeaderboard(scoreboard, season_id)
 

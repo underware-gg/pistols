@@ -14,6 +14,10 @@ import { useScoreboardStore } from '/src/stores/scoreboardStore'
 import { useProgressStore } from '/src/stores/progressStore'
 import { debug } from '@underware/pistols-sdk/pistols'
 
+
+//---------------------------
+// Models to fetch at startup
+//
 const _modelsMisc = [
   // admin
   "pistols-Config",
@@ -22,8 +26,6 @@ const _modelsMisc = [
   // season
   "pistols-SeasonConfig",
   "pistols-Leaderboard",
-  // Other
-  "pistols-Pack",
 ];
 const _modelsPlayers = [
   // players
@@ -33,23 +35,26 @@ const _modelsPlayers = [
   // off-chain signed messages
   "pistols-PlayerOnline",
 ];
-const _modelsDuelists = [
+const _modelsStacks = [
+  "pistols-PlayerDuelistStack",
+];
+
+//-------------------------
+// Models to subscribe only
+//
+const _modelsSubscribed = [
   // Duelists
   "pistols-Duelist",
   "pistols-DuelistAssignment",
   "pistols-DuelistMemorial",
-];
-const _modelsStacks = [
-  // Stacks
-  "pistols-PlayerDuelistStack",
-];
-const _modelsPerSeason = [
   // Challenges
   "pistols-Challenge",
   "pistols-ChallengeMessage",
   'pistols-Round',
   // Scoreboards
   "pistols-SeasonScoreboard",
+  // Other
+  "pistols-Pack",
 ];
 
 
@@ -70,9 +75,8 @@ const query_sub: PistolsQueryBuilder = new PistolsQueryBuilder()
   .withEntityModels([
     ..._modelsMisc,
     ..._modelsPlayers,
-    ..._modelsDuelists,
     ..._modelsStacks,
-    ..._modelsPerSeason,
+    ..._modelsSubscribed,
   ])
   .withLimit(10)
   .includeHashedKeys()
@@ -113,7 +117,6 @@ export function EntityStoreSync() {
       tokenState.resetStore()
       seasonState.resetStore()
       bankState.resetStore()
-      packState.resetStore()
     },
     setEntities: (entities: PistolsEntity[]) => {
       debug.log("EntityStoreSync() SET MISC =======> [entities]:", entities)
@@ -126,7 +129,6 @@ export function EntityStoreSync() {
       tokenState.setEntities(filterEntitiesByModels(entities, ['TokenConfig']))
       bankState.setEntities(filterEntitiesByModels(entities, ['Pool']))
       seasonState.setEntities(filterEntitiesByModels(entities, ['SeasonConfig', 'Leaderboard']))
-      packState.setEntities(filterEntitiesByModels(entities, ['Pack']))
     },
   })
 
@@ -207,7 +209,7 @@ export function EntityStoreSync() {
     },
   })
 
-  // Keep Id stores updated
+  // Keep ID stores updated
   const updateChallengeIdsEntities = useChallengeIdsStore((state) => state.updateEntities)
   const updateDuelistIdsEntities = useDuelistIdsStore((state) => state.updateEntities)
   useEffect(() => updateChallengeIdsEntities(Object.values(challengeState.entities)), [challengeState.entities])

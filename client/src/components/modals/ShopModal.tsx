@@ -9,7 +9,7 @@ import { FeesToPay } from '/src/components/account/LordsBalance'
 import { Opener } from '/src/hooks/useOpener'
 import { Divider } from '/src/components/ui/Divider'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
-import { useGetPack, usePackType } from '/src/stores/packStore'
+import { usePack, usePackType } from '/src/stores/packStore'
 import { bigintToDecimal } from '@underware/pistols-sdk/utils'
 import { CardPack } from '/src/components/ui/CardPack'
 
@@ -153,7 +153,7 @@ function PacksListItem({
   active: boolean
   setSelectedPackId: (packId: number) => void
 }) {
-  const { packExists, packType, name, isOpen } = useGetPack(packId)
+  const { packExists, packType, name, isOpen } = usePack(packId)
   return (
     <Button size='big'
       active={active}

@@ -1,11 +1,12 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
-import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { parseEnumVariant } from '@underware/pistols-sdk/starknet'
-import { formatQueryValue, useSdkEntitiesGet, useStoreModelsByKeys } from '@underware/pistols-sdk/dojo'
+import { formatQueryValue, useEntitiesModel, useSdkEntitiesGet, useStoreModelsByKeys } from '@underware/pistols-sdk/dojo'
 import { PistolsSchemaType, PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols/sdk'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
+import { usePacksOfPlayer } from '/src/hooks/useTokenPacks'
+import { debug } from '@underware/pistols-sdk/pistols'
 
 export const usePackStore = createDojoStore<PistolsSchemaType>();
 
@@ -55,38 +56,41 @@ export const usePack = (pack_id: BigNumberish) => {
 // (for non default challenges, like tutorials)
 //
 
-export const useGetPack = (pack_id: number) => {
-  const result = usePack(pack_id)
+export const useFetchPacksOfPlayer = () => {
+  const packState = usePackStore((state) => state)
+  const { packIds } = usePacksOfPlayer()
+
+  const entities = useMemo(() => Object.values(packState.entities), [packState.entities])
+  const packs = useEntitiesModel<models.Pack>(entities, 'Pack')
+  const existingPackIds = useMemo(() => packs.map((p) => BigInt(p.pack_id)), [packs])
+
+  const newPackIds = useMemo(() => (
+    packIds.filter((id) => !existingPackIds.includes(BigInt(id)))
+  ), [packIds, existingPackIds])
 
   const query = useMemo<PistolsQueryBuilder>(() => (
-    isPositiveBigint(pack_id)
+    newPackIds.length > 0
       ? new PistolsQueryBuilder()
         .withClause(
-          new PistolsClauseBuilder().keys(
-            ["pistols-Pack"],
-            [formatQueryValue(pack_id)]
-          ).build()
+          new PistolsClauseBuilder().where("pistols-Pack", "pack_id", "In", newPackIds.map(formatQueryValue)).build()
         )
         .withEntityModels(
           ["pistols-Pack"]
         )
         .includeHashedKeys()
       : null
-  ), [pack_id])
-
-  const updateEntity = usePackStore((state) => state.updateEntity)
+  ), [newPackIds])
 
   useSdkEntitiesGet({
     query,
-    enabled: !result.packExists,
     setEntities: (entities: PistolsEntity[]) => {
       entities.forEach(e => {
-        console.log(`useGetPack() SET =======> [entity]:`, e)
-        updateEntity(e)
+        debug.log(`usePack() SET =======> [entity]:`, e)
+        packState.updateEntity(e)
       })
     },
   })
 
-  return result
-}
 
+  return {}
+}

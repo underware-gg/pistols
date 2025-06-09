@@ -14,6 +14,7 @@ import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { ChallengeColumn, SortDirection } from '/src/stores/queryParamsStore'
 import { useCallToActions } from '/src/stores/eventsModelStore'
 import { useChallengeFetchStore } from '/src/stores/fetchStore'
+import { debug } from '@underware/pistols-sdk/pistols'
 
 export const useChallengeStore = createDojoStore<PistolsSchemaType>();
 
@@ -375,7 +376,7 @@ export const useFetchChallengeIds = (duelIds: BigNumberish[], retryInterval?: nu
     query,
     retryInterval,
     setEntities: (entities: PistolsEntity[]) => {
-      console.log(`useFetchChallengeIds() GOT`, newDuelIds, entities);
+      debug.log(`useFetchChallengeIds() GOT`, newDuelIds, entities);
       setEntities(entities);
     },
   })
@@ -439,7 +440,7 @@ export const useFetchChallengeIdsByDuelistIds = (duelistIds: BigNumberish[]) => 
     query,
     // enabled: !result.challengeExists,
     setEntities: (entities: PistolsEntity[]) => {
-      console.log(`useFetchChallengeIdsByDuelist() GOT`, newDuelistIds, entities);
+      debug.log(`useFetchChallengeIdsByDuelist() GOT`, newDuelistIds, entities);
       fetchState.setFetchedIds(newDuelistIds.map(BigInt));
       setEntities(entities);
     },
@@ -496,7 +497,7 @@ export const useFetchChallengeIdsByPlayerAddresses = (addresses: BigNumberish[])
     query,
     // enabled: !result.challengeExists,
     setEntities: (entities: PistolsEntity[]) => {
-      console.log(`useFetchChallengeIdsByPlayerAddresses() GOT`, newAddresses, entities);
+      debug.log(`useFetchChallengeIdsByPlayerAddresses() GOT`, newAddresses, entities);
       fetchState.setFetchedAddresses(newAddresses.map(BigInt));
       setEntities(entities);
     },
