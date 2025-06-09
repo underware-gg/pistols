@@ -9,6 +9,7 @@ import { PlayerOnlineSync } from '/src/stores/sync/PlayerOnlineSync'
 import { TokenStoreSync } from '/src/stores/sync/TokenStoreSync'
 import { PlayerSync } from '/src/stores/sync/PlayerSync'
 import { StoreProgressBar } from '/src/stores/sync/StoreProgressBar'
+import { DuelSync } from '/src/stores/sync/DuelSync'
 
 //
 // Manages all store subscriptions
@@ -23,6 +24,7 @@ export default function StoreSync() {
   return (
     <>
       {/* Torii */}
+      <DuelSync />
       <TokenStoreSync />
       <PlayerSync />
       <EntityStoreSync />
