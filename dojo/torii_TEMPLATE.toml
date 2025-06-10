@@ -15,6 +15,7 @@ historical = [
 ]
 
 [indexing]
+blocks_chunk_size = 1024
 pending = true
 transactions = true
 controllers = true
