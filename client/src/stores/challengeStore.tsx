@@ -618,6 +618,13 @@ export const useQueryChallengeIdsByDuelist = (
       return acc
     }, {})
 
+    // Combine season 0 with max season
+    const maxSeasonId = Math.max(...Object.keys(challengesPerSeason).map(Number))
+    if (challengesPerSeason[0] && maxSeasonId > 0) {
+      challengesPerSeason[maxSeasonId] = [ ...challengesPerSeason[0], ...(challengesPerSeason[maxSeasonId] || [])]
+      delete challengesPerSeason[0]
+    }
+
     return {
       challengeIds,
       states,

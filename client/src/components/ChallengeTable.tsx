@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState, useRef } from 'react'
 import { ButtonGroup, Grid, SemanticCOLORS, Table } from 'semantic-ui-react'
-import { useQueryParams } from '/src/stores/queryParamsStore'
+import { ChallengeColumn, useQueryParams } from '/src/stores/queryParamsStore'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { useDuel } from '/src/hooks/useDuel'
 import { useFetchChallengeIdsByDuelist, useQueryChallengeIdsByDuelist } from '/src/stores/challengeStore'
@@ -35,8 +35,8 @@ export function ChallengeTableSelectedDuelist({
   useFetchChallengeIdsByDuelist(selectedDuelistId)
 
   // filter challenges
-  const { filterChallengeSortColumn, filterChallengeSortDirection } = useQueryParams()
-  const { challengeIds, states, challengesPerSeason } = useQueryChallengeIdsByDuelist(selectedDuelistId, statesFilter, filterChallengeSortColumn, filterChallengeSortDirection)
+  const { filterChallengeSortDirection } = useQueryParams()
+  const { challengeIds, states, challengesPerSeason } = useQueryChallengeIdsByDuelist(selectedDuelistId, statesFilter, ChallengeColumn.Time, filterChallengeSortDirection)
 
   useEffect(() => {
     console.log('ChallengeTableSelectedDuelist', selectedDuelistId)
