@@ -16,7 +16,7 @@ import { useOwnerOfDuelist } from '/src/hooks/useTokenDuelists';
 import { useSeasonPool } from '/src/stores/bankStore';
 import { Balance } from '/src/components/account/Balance';
 import { useIsMyAccount } from '/src/hooks/useIsYou';
-import { useDuelistSeasonStats } from '/src/stores/challengeStore';
+import { useDuelistSeasonStats, useFetchChallengeIdsByDuelistIds } from '/src/stores/challengeStore';
 import { useSeason, useAllSeasonIds, useFullLeaderboard, useLeaderboard } from '/src/stores/seasonStore';
 import { useSeasonTotals } from '/src/queries/useSeason';
 import { useDiscordSocialLink } from '/src/stores/eventsModelStore';
@@ -539,6 +539,7 @@ export default function ScLeaderboards() {
     if (!scores) return [];
     return scores.slice(startIndex, startIndex + itemsPerPage);
   }, [scores, startIndex, itemsPerPage]);
+  useFetchChallengeIdsByDuelistIds(paginatedScores.map(s => s.duelistId))
 
   const handlePageChange = useCallback((_, data) => {
     setActivePage(Number(data.activePage));
