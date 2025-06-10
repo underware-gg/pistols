@@ -7,7 +7,7 @@ import { createDojoStore } from '@dojoengine/sdk/react'
 import { formatQueryValue, useStoreModelsByKeys, useSdkEntitiesGet, useAllStoreModels } from '@underware/pistols-sdk/dojo'
 import { PistolsSchemaType, PistolsQueryBuilder, PistolsClauseBuilder, PistolsEntity } from '@underware/pistols-sdk/pistols/sdk'
 import { parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/starknet'
-import { bigintEquals, isPositiveBigint } from '@underware/pistols-sdk/utils'
+import { bigintEquals, bigintToHex, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
 import { movesToHand } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
@@ -431,7 +431,7 @@ export const useFetchChallengeIdsByDuelistIds = (duelistIds: BigNumberish[]) => 
           "pistols-ChallengeMessage",
           'pistols-Round',
         ])
-        .withLimit(newDuelistIds.length)
+        .withLimit(1000)
         .includeHashedKeys()
       : null
   ), [newDuelistIds])
@@ -488,16 +488,16 @@ export const useFetchChallengeIdsByPlayerAddresses = (addresses: BigNumberish[])
           "pistols-ChallengeMessage",
           'pistols-Round',
         ])
-        .withLimit(newAddresses.length)
+        .withLimit(1000)
         .includeHashedKeys()
       : null
   ), [newAddresses])
 
-  useSdkEntitiesGet({
+  const { isLoading, isFinished } = useSdkEntitiesGet({
     query,
     // enabled: !result.challengeExists,
     setEntities: (entities: PistolsEntity[]) => {
-      debug.log(`useFetchChallengeIdsByPlayerAddresses() GOT`, newAddresses, entities);
+      debug.log(`useFetchChallengeIdsByPlayerAddresses() GOT`, newAddresses.map(bigintToHex), entities);
       fetchState.setFetchedAddresses(newAddresses.map(BigInt));
       setEntities(entities);
     },
@@ -507,7 +507,10 @@ export const useFetchChallengeIdsByPlayerAddresses = (addresses: BigNumberish[])
   //   console.log(`::useFetchChallengeIdsByPlayerAddresses...`, newAddresses, query)
   // }, [newAddresses, query])
 
-  return {}
+  return {
+    isLoading,
+    isFinished,
+  }
 }
 
 

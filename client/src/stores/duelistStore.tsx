@@ -315,7 +315,9 @@ export function useDuelistStacks(player_address: BigNumberish) {
         level: Number(stack.level ?? 0),
       };
     }).filter(Boolean);
-  }, [playerStacks, player_address]);
+  }, [playerStacks]);
+
+  // console.log('>>>>>>duelist stacks...', entities, models, playerStacks, stacks);
 
   return {
     stacks,
@@ -379,19 +381,6 @@ export const usePlayerDuelistsOrganized = () => {
     ...organizedDuelists,
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -195,6 +195,7 @@ export function EntityStoreSync() {
   // useEffect(() => debug.log("EntityStoreSync() [configStore.entities] =>", Object.values(configState.entities).length), [configState.entities])
   // useEffect(() => debug.log("EntityStoreSync() [seasonState.entities] =>", Object.values(seasonState.entities).length), [seasonState.entities])
   // useEffect(() => debug.log("EntityStoreSync() [tokenStore.entities] =>", Object.values(tokenState.entities).length), [tokenState.entities])
+  useEffect(() => debug.log("EntityStoreSync() [challengeState.entities] =>", Object.values(challengeState.entities).length), [challengeState.entities])
   // useEffect(() => debug.log("EntityStoreSync() [duelistStore.entities] =>", Object.values(duelistState.entities).length), [duelistState.entities])
   // useEffect(() => debug.log("EntityStoreSync() [duelistStackStore.entities] =>", Object.values(duelistStackState.entities).length), [duelistStackState.entities])
   // useEffect(() => debug.log("EntityStoreSync() [playerDataState.players] =>", Object.values(playerDataState.players_names).length), [playerDataState.players_names])

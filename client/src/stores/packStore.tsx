@@ -81,7 +81,7 @@ export const useFetchPacksOfPlayer = () => {
       : null
   ), [newPackIds])
 
-  useSdkEntitiesGet({
+  const { isLoading, isFinished } = useSdkEntitiesGet({
     query,
     setEntities: (entities: PistolsEntity[]) => {
       debug.log(`useFetchPacksOfPlayer() SET =======> [entities]:`, entities)
@@ -91,6 +91,8 @@ export const useFetchPacksOfPlayer = () => {
     },
   })
 
-
-  return {}
+  return {
+    isLoading,
+    isFinished,
+  }
 }
