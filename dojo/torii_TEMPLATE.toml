@@ -15,11 +15,12 @@ historical = [
 ]
 
 [indexing]
+world_block = $world_block
 blocks_chunk_size = 1024
-pending = true
+max_concurrent_tasks = 40
 transactions = true
 controllers = true
-world_block = $world_block
+pending = true
 contracts = [
   "erc721:$duel_token", # duel_token
   "erc721:$duelist_token", # duelist_token

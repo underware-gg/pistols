@@ -15,11 +15,12 @@ historical = [
 ]
 
 [indexing]
+world_block = 23920
 blocks_chunk_size = 1024
-pending = true
+max_concurrent_tasks = 40
 transactions = true
 controllers = true
-world_block = 23920
+pending = true
 contracts = [
   "erc721:0x2244bd444ba8dc1796487235d3c3aabd019344438da411959e6ab259068ea0d", # duel_token
   "erc721:0x1ce3aee914c0c3dd2ffc2327d30697f0a2a2ae8e65923e3bb161b63b0813a30", # duelist_token
