@@ -16,7 +16,7 @@ import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
 import { useAccount } from '@starknet-react/core'
 import { useDuelistIdsOfOwners, useDuelistsOfPlayer, useOwnerOfDuelist } from '/src/hooks/useTokenDuelists'
 import { PistolsQueryBuilder, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols/sdk'
-import { useDuelistFetchStore } from '/src/stores/fetchStore'
+import { useDuelistFetchStore, useDuelistStackFetchStore } from '/src/stores/fetchStore'
 import { debug } from '@underware/pistols-sdk/pistols'
 
 export const useDuelistStore = createDojoStore<PistolsSchemaType>();
@@ -489,7 +489,7 @@ export const useFetchDuelistIdsByPlayerAddresses = (addresses: BigNumberish[]) =
   const { duelistIds } = useDuelistIdsOfOwners(newAddresses)
   const { isLoading, isFinished } = useFetchDuelistIds(duelistIds)
   // fetch player stacks...
-  useFetchPlayerDuelistStacks(newAddresses)
+  useFetchPlayerDuelistStacks(addresses)
   
   // mark players as fetched...
   useEffect(() => {
@@ -509,25 +509,32 @@ export const useFetchDuelistIdsByPlayerAddresses = (addresses: BigNumberish[]) =
 const useFetchPlayerDuelistStacks = (addresses: BigNumberish[]) => {
   const setEntities = useDuelistStackStore((state) => state.setEntities);
 
+  // dont even try for players already fetched...
+  const fetchState = useDuelistStackFetchStore((state) => state);
+  const newAddresses = useMemo(() => (
+    fetchState.getNewAddresses(addresses)
+  ), [addresses, fetchState.addresses])
+
   const query = useMemo<PistolsQueryBuilder>(() => (
-    addresses.length > 0
+    newAddresses.length > 0
       ? new PistolsQueryBuilder()
         .withClause(
           new PistolsClauseBuilder()
-            .where('pistols-PlayerDuelistStack', 'player_address', 'In', addresses.map(formatQueryValue))
+            .where('pistols-PlayerDuelistStack', 'player_address', 'In', newAddresses.map(formatQueryValue))
             .build()
         )
         .withEntityModels(['pistols-PlayerDuelistStack'])
         .withLimit(2000)
         .includeHashedKeys()
       : null
-  ), [addresses])
+  ), [newAddresses])
 
   const { isLoading, isFinished } = useSdkEntitiesGet({
     query,
     setEntities: (entities: PistolsEntity[]) => {
-      debug.log(`useFetchDuelistStacks() GOT`, addresses, entities);
+      debug.log(`useFetchPlayerDuelistStacks() GOT`, newAddresses, entities);
       setEntities(entities);
+      fetchState.setFetchedAddresses(newAddresses.map(BigInt));
     },
   })
 
