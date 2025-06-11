@@ -153,6 +153,9 @@ export default function ScTavern() {
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         onClick={() => {
+          (_currentScene as InteractibleScene)?.excludeItem(TextureName.bg_tavern_bartender_mask);
+          (_currentScene as InteractibleScene)?.toggleBlur(true);
+          (_currentScene as InteractibleScene)?.setClickable(false);
           setInitialStage('notifications')
           setOpen(true)
         }}

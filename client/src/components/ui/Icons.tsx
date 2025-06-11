@@ -309,14 +309,12 @@ export function CustomIcon({
   const [isHovered, setIsHovered] = useState(false)
 
   const onMouseEnter = () => {
-    console.log(`onMouseEnter >>>>>`, tooltip)
     if (tooltip) {
       emitter.emit('hover_description', tooltip)
       setIsHovered(true)
     }
   }
   const onMouseLeave = () => {
-    console.log(`onMouseLeave >>>>>`, tooltip)
     emitter.emit('hover_description', null)
     setIsHovered(false)
   }

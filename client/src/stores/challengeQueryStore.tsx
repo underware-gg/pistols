@@ -42,7 +42,8 @@ export const useQueryChallengeIds = (
   sortDirection: SortDirection,
   filterSeason: number,
   pageSize = 8,
-  pageIndex = 0,
+  pageStartIndex = 0,
+  pageFetchCount = 2,
 ) => {
   const { address } = useAccount()
   const { duelContractAddress } = useTokenContracts()
@@ -101,13 +102,13 @@ export const useQueryChallengeIds = (
     query += `\norder by ${sort_column} ${sort_direction}`
 
     if (pageSize > 0) {
-      query += `\nlimit ${pageSize} offset ${(pageIndex ?? 0) * pageSize}`
+      query += `\nlimit ${pageSize * pageFetchCount} offset ${(pageStartIndex ?? 0) * pageSize}`
     }
 
     return {
       query,
     }
-  }, [filterStates, playerAddress, filterName, filterBookmarked, bookmarkedDuels, filterSeason, sortColumn, sortDirection, pageSize, pageIndex])
+  }, [filterStates, playerAddress, filterName, filterBookmarked, bookmarkedDuels, filterSeason, sortColumn, sortDirection, pageSize, pageStartIndex, pageFetchCount])
 
   const { data, isLoading, queryHash } = useSdkSqlQuery({
     query,
