@@ -6,6 +6,7 @@ import { ControllerVerifyParams } from './verify'
 export type SaltGeneratorResponse = {
   salt?: BigNumberish,
   error?: string,
+  message?: string,
 }
 
 export const apiGenerateControllerSalt = async (
@@ -25,22 +26,21 @@ export const apiGenerateControllerSalt = async (
   }
 
   try {
-    const response = await fetch(`${serverUrl}/api/controller/salt`,
+    const resp = await fetch(`${serverUrl}/api/controller/salt`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(params),
       }
     );
-    const data = await response.json();
-    if (data.salt) {
-      result = BigInt(data.salt)
-    } else if (data.error) {
-      console.warn("apiGenerateControllerSalt() ERROR:", data.error,
-        // data.message,
+    const response: SaltGeneratorResponse = await resp.json();
+    if (response.salt) {
+      result = BigInt(response.salt)
+    } else if (response.error) {
+      console.warn("apiGenerateControllerSalt() ERROR:", response.error, response.message,
       );
     } else {
-      console.error("apiGenerateControllerSalt() Invalid response:", data);
+      console.error("apiGenerateControllerSalt() Invalid response:", response);
     }
   } catch (error) {
     console.error("apiGenerateControllerSalt() EXCEPTION:", error);

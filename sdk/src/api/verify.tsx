@@ -8,6 +8,11 @@ export type ControllerVerifyParams = {
   signature: BigNumberish[],
 }
 
+export type VerifyResponse = {
+  verified?: boolean,
+  error?: string,
+}
+
 export const apiVerifyControllerSignature = async (
   serverUrl: string,
   address: BigNumberish,
@@ -25,24 +30,24 @@ export const apiVerifyControllerSignature = async (
   }
 
   try {
-    const response = await fetch(`${serverUrl}/api/controller/verify`,
+    const resp = await fetch(`${serverUrl}/api/controller/verify`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(params),
       }
     );
-    const data = await response.json();
-    // console.log(`apiVerifyControllerSignature() data:`, data)
-    if (data.verified === true || data.verified === false) {
-      result = data.verified;
-      if (data.error) {
-        console.warn("apiVerifyControllerSignature() INVALID:", data.error);
+    const response: VerifyResponse = await resp.json();
+    // console.log(`apiVerifyControllerSignature() data:`, response)
+    if (response.verified === true || response.verified === false) {
+      result = response.verified;
+      if (response.error) {
+        console.warn("apiVerifyControllerSignature() INVALID:", response.error);
       }
-    } else if (data.error) {
-      console.error("apiVerifyControllerSignature() ERROR:", data.error);
+    } else if (response.error) {
+      console.error("apiVerifyControllerSignature() ERROR:", response.error);
     } else {
-      console.error("apiVerifyControllerSignature() Invalid response:", data);
+      console.error("apiVerifyControllerSignature() Invalid response:", response);
     }
   } catch (error) {
     console.error("apiVerifyControllerSignature() EXCEPTION:", error);
