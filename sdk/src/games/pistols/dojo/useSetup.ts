@@ -41,7 +41,6 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedNetworkConfig: Do
       client: {
         // rpcUrl,
         toriiUrl: selectedNetworkConfig.toriiUrl,
-        relayUrl: selectedNetworkConfig.relayUrl,
         worldAddress: manifest.world.address ?? '',
       },
       domain: starknetDomain,

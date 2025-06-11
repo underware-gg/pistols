@@ -5,7 +5,6 @@ import {
 import {
   LOCAL_KATANA,
   LOCAL_TORII,
-  LOCAL_RELAY,
   KATANA_CLASS_HASH,
   KATANA_PREFUNDED_ADDRESS,
   KATANA_PREFUNDED_PRIVATE_KEY,
@@ -86,7 +85,6 @@ export type DojoNetworkConfig = {
   toriiUrl: string
   graphqlUrl: string
   sqlUrl: string
-  relayUrl: string
   accountClassHash: string
   etherAddress: string
   lordsFaucet: boolean | string
@@ -117,8 +115,6 @@ const localKatanaConfig: DojoNetworkConfig = {
   toriiUrl: 'http://0.0.0.0:8080',
   graphqlUrl: 'http://0.0.0.0:8080/graphql',
   sqlUrl: 'http://0.0.0.0:8080/sql',
-  relayUrl: '/ip4/127.0.0.1/tcp/9090',
-  // relayUrl: '/ip4/127.0.0.1/tcp/9090/tcp/80',
   accountClassHash: KATANA_CLASS_HASH,
   etherAddress: KATANA_ETH_CONTRACT_ADDRESS,
   lordsFaucet: true,
@@ -204,7 +200,6 @@ const academySlotConfig: DojoNetworkConfig = {
   toriiUrl: undefined,    // derive from slotName
   graphqlUrl: undefined,  // derive from slotName
   sqlUrl: undefined,      // derive from slotName
-  relayUrl: undefined,    // derive from slotName
   accountClassHash: KATANA_CLASS_HASH,
   etherAddress: KATANA_ETH_CONTRACT_ADDRESS,
   lordsFaucet: true,
@@ -260,7 +255,6 @@ const pistolsStagingConfig: DojoNetworkConfig = {
   toriiUrl: undefined,    // derive from slotName
   graphqlUrl: undefined,  // derive from slotName
   sqlUrl: undefined,      // derive from slotName
-  relayUrl: undefined,    // derive from slotName
   accountClassHash: KATANA_CLASS_HASH,
   etherAddress: sepolia.nativeCurrency.address,
   lordsFaucet: true,
@@ -284,7 +278,6 @@ const snSepoliaConfig: DojoNetworkConfig = {
   toriiUrl: undefined,    // derive from slotName
   graphqlUrl: undefined,  // derive from slotName
   sqlUrl: undefined,      // derive from slotName
-  relayUrl: undefined,    // derive from slotName
   accountClassHash: KATANA_CLASS_HASH,
   etherAddress: sepolia.nativeCurrency.address,
   lordsFaucet: true,
@@ -308,7 +301,6 @@ const snMainnetConfig: DojoNetworkConfig = {
   toriiUrl: undefined,    // derive from slotName
   graphqlUrl: undefined,  // derive from slotName
   sqlUrl: undefined,      // derive from slotName
-  relayUrl: undefined,    // derive from slotName
   accountClassHash: undefined,
   etherAddress: mainnet.nativeCurrency.address,
   lordsFaucet: 'https://app.ekubo.org/?inputCurrency=ETH&outputCurrency=LORDS',
@@ -340,7 +332,6 @@ export interface DojoNetworkEnv {
   TORII_URL?: string,
   TORII_GRAPHQL_URL?: string,
   TORII_SQL_URL?: string,
-  TORII_RELAY_URL?: string,
 }
 export const getNetworkConfig = (networkId: NetworkId, env?: DojoNetworkEnv): DojoNetworkConfig => {
   if (!NETWORKS[networkId]) return undefined
@@ -357,7 +348,6 @@ export const getNetworkConfig = (networkId: NetworkId, env?: DojoNetworkEnv): Do
   result.toriiUrl = (env?.TORII_URL || result.toriiUrl || `https://api.cartridge.gg/x/${result.slotName}/torii`);
   result.graphqlUrl = (env?.TORII_GRAPHQL_URL || result.graphqlUrl || `https://api.cartridge.gg/x/${result.slotName}/torii/graphql`);
   result.sqlUrl = (env?.TORII_SQL_URL || result.sqlUrl || `https://api.cartridge.gg/x/${result.slotName}/torii/sql`);
-  result.relayUrl = (env?.TORII_RELAY_URL || result.relayUrl || `/dns4/api.cartridge.gg/tcp/443/x-parity-wss/%2Fx%2F${result.slotName}%2Ftorii%2Fwss`);
 
   // derive starknet Chain
   if (!result.chain) {
