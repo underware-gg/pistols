@@ -24,7 +24,7 @@ import { debug } from 'src/games/pistols/misc/debug'
 // updates calls: updateEntity() (optional)
 //
 
-type UseSdkGetResult = {
+export type UseSdkGetResult = {
   isLoading: boolean | undefined
   isFinished: boolean | undefined
 }
@@ -46,7 +46,7 @@ export type SdkSubscribeResponse = [
   torii.Subscription
 ];
 
-type SdkSubscriptionCallbackResponse = {
+export type SdkSubscriptionCallbackResponse = {
   data?: PistolsEntity[]
   error?: Error
 };

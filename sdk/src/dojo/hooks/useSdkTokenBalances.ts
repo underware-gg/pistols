@@ -16,7 +16,7 @@ import { debug } from 'src/games/pistols/misc/debug'
 // updates calls: updateEntity() (optional)
 //
 
-type UseSdkTokenGetResult = {
+export type UseSdkTokenGetResult = {
   isLoading: boolean | undefined
 }
 
