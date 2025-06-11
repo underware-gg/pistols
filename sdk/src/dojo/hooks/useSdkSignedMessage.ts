@@ -25,30 +25,34 @@ export const useSdkPublishTypedData = (
 
       setIsPublishing(true)
 
-      // debug.log('ONLINE: publish...', typedData)
-      // await sdk.sendMessage(typedData, account)
-
       try {
-        // debug.log('SIGNED_MESSAGE: sign...', serialize(typedData), typedData)
-        let signature = await account.signMessage(typedData);
-        // debug.log('SIGNED_MESSAGE: signature:', signature)
-        if (!Array.isArray(signature)) {
-          signature = stark.formatSignature(signature)
-        }
-
-        try {
-          debug.log(`SIGNED_MESSAGE: publish... len:${signature.length}`)//, signature)
-          await sdk.client.publishMessage(
-            JSON.stringify(typedData),
-            signature as string[],
-          );
-          debug.log('SIGNED_MESSAGE: published!')
-        } catch (error) {
-          console.error("useSdkPublishSignedMessage() failed to publish message:", error, typedData, signature);
-        }
+        debug.log(`SIGNED_MESSAGE: publish..`, typedData);
+        sdk.sendMessage(typedData, account);
       } catch (error) {
-        console.error("useSdkPublishSignedMessage() failed to sign message:", error, typedData);
+        console.error("useSdkPublishSignedMessage() failed to publish message:", error, typedData);
       }
+
+      // try {
+      //   // debug.log('SIGNED_MESSAGE: sign...', serialize(typedData), typedData)
+      //   let signature = await account.signMessage(typedData);
+      //   // debug.log('SIGNED_MESSAGE: signature:', signature)
+      //   if (!Array.isArray(signature)) {
+      //     signature = stark.formatSignature(signature)
+      //   }
+
+      //   try {
+      //     debug.log(`SIGNED_MESSAGE: publish... len:${signature.length}`)//, signature)
+      //     await sdk.client.publishMessage(
+      //       JSON.stringify(typedData),
+      //       signature as string[],
+      //     );
+      //     debug.log('SIGNED_MESSAGE: published!')
+      //   } catch (error) {
+      //     console.error("useSdkPublishSignedMessage() failed to publish message:", error, typedData, signature);
+      //   }
+      // } catch (error) {
+      //   console.error("useSdkPublishSignedMessage() failed to sign message:", error, typedData);
+      // }
 
       // debug.log('SIGNED: done!')
       setIsPublishing(false)
