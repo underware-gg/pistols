@@ -18,10 +18,12 @@ export function PlayerSync() {
   // update progress
   const updateProgress = useProgressStore((state) => state.updateProgress)
   useEffect(() => {
-    updateProgress('player_challenges', 0, false)
-    updateProgress('player_duelists', 0, false)
-    updateProgress('player_packs', 0, false)
-  }, [])
+    if (address) {
+      updateProgress('player_challenges', 0, false)
+      updateProgress('player_duelists', 0, false)
+      updateProgress('player_packs', 0, false)
+    }
+  }, [address])
   useEffect(() => {
     if (isFinishedChallenges) updateProgress('player_challenges', 1, true)
   }, [isFinishedChallenges])
