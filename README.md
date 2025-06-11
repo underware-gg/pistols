@@ -235,8 +235,8 @@ VITE_NETWORK_ID=KATANA_LOCAL
 VITE_ACADEMY_NETWORK_ID=ACADEMY
 
 # optional/alternative service urls
-# VITE_SERVER_URL=https://play.pistols.gg
-# VITE_SALT_SERVER_URL=https://assets.underware.gg
+# VITE_CLIENT_URL=https://play.pistols.gg
+# VITE_ASSETS_SERVER_URL=https://assets.underware.gg
 
 # optional/alternative dojo urls
 # VITE_SLOT_NAME=pistols-mainnet-2

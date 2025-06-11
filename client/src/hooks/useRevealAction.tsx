@@ -6,11 +6,10 @@ import { CommitMoveMessage } from '@underware/pistols-sdk/pistols/config'
 import { useGetDuelDeck } from '/src/hooks/usePistolsContractCalls'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { PLAYER_CHARACTER_ID } from '/src/utils/pistols'
-import { SALT_SERVER_URL } from '/src/utils/env'
 
 export function useSignAndRestoreMovesFromHash(duelId: bigint, duelistId: bigint, hash: bigint) {
   const { account } = useAccount()
-  const { starknetDomain } = useDojoSetup()
+  const { starknetDomain, selectedNetworkConfig } = useDojoSetup()
   const { decks } = useGetDuelDeck(duelId)
 
   const messageToSign = useMemo<CommitMoveMessage>(() => ((duelId && duelistId) ? {
@@ -29,7 +28,7 @@ export function useSignAndRestoreMovesFromHash(duelId: bigint, duelistId: bigint
 
   const sign_and_restore = useCallback(async () => {
     if (canSign) {
-      const { salt, moves } = await signAndRestoreMovesFromHash(SALT_SERVER_URL, account, starknetDomain, messageToSign, hash, decks)
+      const { salt, moves } = await signAndRestoreMovesFromHash(selectedNetworkConfig.assetsServerUrl, account, starknetDomain, messageToSign, hash, decks)
       if (salt > 0n && moves) {
         setSalt(salt)
         setMoves(moves)

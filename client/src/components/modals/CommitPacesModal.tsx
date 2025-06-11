@@ -12,7 +12,6 @@ import { BladesCardsTextures, CardData, DodgeCardsTextures, FireCardsTextures, T
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { emitter } from '/src/three/game'
 import { DuelTutorialLevel } from '/src/data/tutorialConstants'
-import { SALT_SERVER_URL } from '/src/utils/env'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -69,7 +68,7 @@ function _CommitPacesModal({
   const { account } = useAccount()
   const { game } = useDojoSystemCalls()
   const { tutorialLevel } = usePistolsContext()
-  const { starknetDomain } = useDojoSetup()
+  const { starknetDomain, selectedNetworkConfig } = useDojoSetup()
 
   const [firePaces, setFirePaces] = useState(0)
   const [dodgePaces, setDodgePaces] = useState(0)
@@ -116,7 +115,7 @@ function _CommitPacesModal({
     if (canSubmit) {
       setIsSubmitting(true)
       const moves = isSimpleTutorial ? [firePaces, dodgePaces, 0, 0] : [firePaces, dodgePaces, tactics, blades]
-      const { hash, salt } = await signAndGenerateMovesHash(SALT_SERVER_URL, account, starknetDomain, messageToSign, moves)
+      const { hash, salt } = await signAndGenerateMovesHash(selectedNetworkConfig.assetsServerUrl, account, starknetDomain, messageToSign, moves)
       if (hash && salt) {
         await game.commit_moves(account, duelistId, duelId, hash)
         _closeModal()

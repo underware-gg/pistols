@@ -8,7 +8,6 @@ import { Messages } from '@underware/pistols-sdk/starknet'
 import { bigintToHex, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { CommitMoveMessage } from '@underware/pistols-sdk/pistols/config'
 import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
-import { SALT_SERVER_URL } from '/src/utils/env'
 import { Connect } from './ConnectTestPage'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppDojo from '/src/components/AppDojo'
@@ -75,7 +74,7 @@ function Sign({
   fromAccount?: string,
 }) {
   const { account, isConnected } = useAccount()
-  const { starknetDomain } = useDojoSetup()
+  const { starknetDomain, selectedNetworkConfig } = useDojoSetup()
 
   const { typedMessage, messageHash, typeHash } = useTypedMessage({
     account,
@@ -101,8 +100,8 @@ function Sign({
     setIsSigning(false)
   }
   const { isLoading, isValid } = useVerifyControllerSignature(messageHash, signature)
-  const { isLoading: isLoadingApi, isValid: isValidApi } = useVerifyControllerSignatureApi(SALT_SERVER_URL, messageHash, signature, fromAccount)
-  const { isLoading: isLoadingSalt, isError: isErrorSalt, salt } = useGenerateControllerSaltApi(SALT_SERVER_URL, starknetDomain, messageHash, signature, fromAccount)
+  const { isLoading: isLoadingApi, isValid: isValidApi } = useVerifyControllerSignatureApi(selectedNetworkConfig.assetsServerUrl, messageHash, signature, fromAccount)
+  const { isLoading: isLoadingSalt, isError: isErrorSalt, salt } = useGenerateControllerSaltApi(selectedNetworkConfig.assetsServerUrl, starknetDomain, messageHash, signature, fromAccount)
 
   return (
     <>
@@ -171,7 +170,7 @@ function Sign({
               Salt Server:
             </Cell>
             <Cell className='Code'>
-              {SALT_SERVER_URL}
+              {selectedNetworkConfig.assetsServerUrl}
             </Cell>
           </Row>
 

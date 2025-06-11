@@ -70,15 +70,8 @@ export const useIsConnectedToSelectedNetwork = () => {
 //-----------------------------
 // Chain switch callbacks
 //
-interface AddStarknetChainParametersImpl extends AddStarknetChainParameters {
-  // accountImplementation: string, // ArgentX class hash (BUGGED)
-  accountClassHash: string, // ???
-  classHash: string, // ???
-  rpcUrl: string,
-}
 export const useChainSwitchCallbacks = () => {
   const { selectedNetworkConfig } = useDojoSetup()
-  const { rpcUrl } = useDojoSetup()
 
   const switch_params = useMemo(() => {
     const params: SwitchStarknetChainParameters = {
@@ -88,24 +81,8 @@ export const useChainSwitchCallbacks = () => {
   }, [selectedNetworkConfig])
   const { switch_starknet_chain } = useSwitchStarknetChain(switch_params)
 
-  const add_params = useMemo(() => {
-    const params: AddStarknetChainParametersImpl = {
-      id: selectedNetworkConfig.chainId,
-      chain_id: selectedNetworkConfig.chainId,
-      chain_name: selectedNetworkConfig.name,
-      rpcUrl,
-      rpc_urls: [rpcUrl],
-      native_currency: { type: 'ERC20', options: selectedNetworkConfig.chain.nativeCurrency },
-      accountClassHash: selectedNetworkConfig.accountClassHash,
-      classHash: selectedNetworkConfig.accountClassHash,
-    }
-    return params
-  }, [selectedNetworkConfig])
-  const { add_starknet_chain } = useAddStarknetChain(add_params)
-
   return {
     switch_starknet_chain,
-    add_starknet_chain,
   }
 }
 

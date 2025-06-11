@@ -98,8 +98,7 @@ function ConnectButtons({
 
 function SwitchChainButtons() {
   const { selectedNetworkId, selectedNetworkConfig } = useDojoSetup()
-  const { switch_starknet_chain, add_starknet_chain } = useChainSwitchCallbacks()
-  const [chainExists, setChainExists] = useState(true)
+  const { switch_starknet_chain } = useChainSwitchCallbacks()
   const [isBusy, setIsBusy] = useState(false)
 
   const _switchNetwork = () => {
@@ -107,36 +106,11 @@ function SwitchChainButtons() {
     switch_starknet_chain().then((response) => {
       console.log(`wallet_switchStarknetChain RESPONSE:`, response)
       setIsBusy(false)
-      if (!response) {
-        setChainExists(false)
-      }
     }).catch((error) => {
       console.error(`wallet_switchStarknetChain ERROR:`, error)
       setIsBusy(false)
     })
   }
-
-  const _addNetwork = () => {
-    setIsBusy(true)
-    add_starknet_chain().then((response) => {
-      console.log(`wallet_addStarknetChain RESPONSE:`, response)
-      if (response) {
-        setChainExists(true)
-        _switchNetwork()
-      } else {
-        setIsBusy(false)
-      }
-    }).catch((error) => {
-      console.error(`wallet_addStarknetChain ERROR:`, error)
-      setIsBusy(false)
-    })
-  }
-
-  useEffect(() => {
-    if (!chainExists) {
-      _addNetwork()
-    }
-  }, [chainExists])
 
   return (
     <VStack>
@@ -149,8 +123,8 @@ function SwitchChainButtons() {
         </p>
       </div>
       <Divider />
-      <Button fluid size='huge' disabled={isBusy} onClick={() => { (chainExists ? _switchNetwork : _addNetwork)() }}>
-        {chainExists ? 'Switch Network' : 'Add Network'}
+      <Button fluid size='huge' disabled={isBusy} onClick={() => { _switchNetwork() }}>
+        Switch Network
       </Button>
     </VStack>
   )

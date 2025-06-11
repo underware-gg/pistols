@@ -5,7 +5,6 @@ import {
 import {
   LOCAL_KATANA,
   LOCAL_TORII,
-  KATANA_CLASS_HASH,
   KATANA_PREFUNDED_ADDRESS,
   KATANA_PREFUNDED_PRIVATE_KEY,
   KATANA_ETH_CONTRACT_ADDRESS,
@@ -80,12 +79,13 @@ export type DojoNetworkConfig = {
   chainId: ChainId
   chain: Chain
   name: string
+  clientUrl: string
+  assetsServerUrl: string
   slotName: string,
   rpcUrl: string
   toriiUrl: string
   graphqlUrl: string
   sqlUrl: string
-  accountClassHash: string
   etherAddress: string
   lordsFaucet: boolean | string
   lordsAddress: string,
@@ -108,6 +108,8 @@ const localKatanaConfig: DojoNetworkConfig = {
   chain: undefined,     // derive from this
   chainId: ChainId.KATANA_LOCAL,
   name: 'Katana Local',
+  clientUrl: 'https://localhost:5173',
+  assetsServerUrl: 'https://assets.underware.gg',
   rpcUrl: LOCAL_KATANA,
   slotName: undefined,
   // toriiUrl: LOCAL_TORII,
@@ -115,7 +117,6 @@ const localKatanaConfig: DojoNetworkConfig = {
   toriiUrl: 'http://0.0.0.0:8080',
   graphqlUrl: 'http://0.0.0.0:8080/graphql',
   sqlUrl: 'http://0.0.0.0:8080/sql',
-  accountClassHash: KATANA_CLASS_HASH,
   etherAddress: KATANA_ETH_CONTRACT_ADDRESS,
   lordsFaucet: true,
   lordsAddress: undefined,
@@ -195,12 +196,13 @@ const academySlotConfig: DojoNetworkConfig = {
   chain: undefined,     // derive from this
   chainId: ChainId.PISTOLS_ACADEMY,
   name: 'Katana Academy',
+  clientUrl: undefined,
+  assetsServerUrl: 'https://assets.underware.gg',
   slotName: 'pistols-academy',
   rpcUrl: 'https://api.cartridge.gg/x/pistols-academy/katana',
   toriiUrl: undefined,    // derive from slotName
   graphqlUrl: undefined,  // derive from slotName
   sqlUrl: undefined,      // derive from slotName
-  accountClassHash: KATANA_CLASS_HASH,
   etherAddress: KATANA_ETH_CONTRACT_ADDRESS,
   lordsFaucet: true,
   lordsAddress: undefined,
@@ -250,12 +252,13 @@ const pistolsStagingConfig: DojoNetworkConfig = {
   chain: { ...sepolia },
   chainId: ChainId.SN_SEPOLIA,
   name: 'Sepolia Staging',
+  clientUrl: 'https://stage.pistols.gg',
+  assetsServerUrl: 'https://assets.underware.gg',
   slotName: 'pistols-staging',
   rpcUrl: 'https://api.cartridge.gg/x/starknet/sepolia',
   toriiUrl: undefined,    // derive from slotName
   graphqlUrl: undefined,  // derive from slotName
   sqlUrl: undefined,      // derive from slotName
-  accountClassHash: KATANA_CLASS_HASH,
   etherAddress: sepolia.nativeCurrency.address,
   lordsFaucet: true,
   // lordsFaucet: 'https://sepolia.voyager.online/contract/0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210#writeContract',
@@ -273,12 +276,13 @@ const snSepoliaConfig: DojoNetworkConfig = {
   chain: { ...sepolia },
   chainId: ChainId.SN_SEPOLIA,
   name: 'Sepolia Testnet',
+  clientUrl: 'https://testnet.pistols.gg',
+  assetsServerUrl: 'https://assets.underware.gg',
   slotName: 'pistols-sepolia',
   rpcUrl: 'https://api.cartridge.gg/x/starknet/sepolia',
   toriiUrl: undefined,    // derive from slotName
   graphqlUrl: undefined,  // derive from slotName
   sqlUrl: undefined,      // derive from slotName
-  accountClassHash: KATANA_CLASS_HASH,
   etherAddress: sepolia.nativeCurrency.address,
   lordsFaucet: true,
   // lordsFaucet: 'https://sepolia.voyager.online/contract/0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210#writeContract',
@@ -296,12 +300,13 @@ const snMainnetConfig: DojoNetworkConfig = {
   chain: { ...mainnet },
   chainId: ChainId.SN_MAIN,
   name: 'Mainnet',
+  clientUrl: 'https://play.pistols.gg',
+  assetsServerUrl: 'https://assets.underware.gg',
   slotName: 'pistols-mainnet',
   rpcUrl: 'https://api.cartridge.gg/x/starknet/mainnet',
   toriiUrl: undefined,    // derive from slotName
   graphqlUrl: undefined,  // derive from slotName
   sqlUrl: undefined,      // derive from slotName
-  accountClassHash: undefined,
   etherAddress: mainnet.nativeCurrency.address,
   lordsFaucet: 'https://app.ekubo.org/?inputCurrency=ETH&outputCurrency=LORDS',
   lordsAddress: '0x124aeb495b947201f5fac96fd1138e326ad86195b98df6dec9009158a533b49',
@@ -327,6 +332,8 @@ const NETWORKS: Record<NetworkId, DojoNetworkConfig> = {
 }
 
 export interface DojoNetworkEnv {
+  CLIENT_URL?: string,
+  ASSETS_SERVER_URL?: string,
   SLOT_NAME?: string,
   RPC_URL?: string,
   TORII_URL?: string,
@@ -343,11 +350,26 @@ export const getNetworkConfig = (networkId: NetworkId, env?: DojoNetworkEnv): Do
   result.networkId = networkId
 
   // resolve urls with ENV
+  result.clientUrl = (env?.CLIENT_URL || result.clientUrl || '/');
+  result.assetsServerUrl = (env?.ASSETS_SERVER_URL || result.assetsServerUrl || 'https://assets.underware.gg');
   result.slotName = (env?.SLOT_NAME || result.slotName);
   result.rpcUrl = (env?.RPC_URL || result.rpcUrl);
   result.toriiUrl = (env?.TORII_URL || result.toriiUrl || `https://api.cartridge.gg/x/${result.slotName}/torii`);
   result.graphqlUrl = (env?.TORII_GRAPHQL_URL || result.graphqlUrl || `https://api.cartridge.gg/x/${result.slotName}/torii/graphql`);
   result.sqlUrl = (env?.TORII_SQL_URL || result.sqlUrl || `https://api.cartridge.gg/x/${result.slotName}/torii/sql`);
+
+  if (!result.rpcUrl) {
+    throw new Error(`Network [${networkId}] and .env missing: RPC_URL`);
+  }
+  if (!result.slotName && !result.toriiUrl) {
+    throw new Error(`Network [${networkId}] and .env missing: SLOT_NAME or TORII_URL`);
+  }
+  if (!result.slotName && !result.graphqlUrl) {
+    throw new Error(`Network [${networkId}] and .env missing: SLOT_NAME or TORII_GRAPHQL_URL`);
+  }
+  if (!result.slotName && !result.sqlUrl) {
+    throw new Error(`Network [${networkId}] and .env missing: SLOT_NAME or TORII_SQL_URL`);
+  }
 
   // derive starknet Chain
   if (!result.chain) {

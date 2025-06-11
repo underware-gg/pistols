@@ -6,7 +6,6 @@ import { usePlayerDiscordSocialLink } from '/src/stores/eventsModelStore'
 import { useExecuteClearPlayerSocialLink } from '/src/hooks/usePistolsSystemCalls'
 import { signAndGenerateGeneralPurposeSalt } from '@underware/pistols-sdk/pistols'
 import { GeneralPurposeMessage, GeneralPurposeState } from '@underware/pistols-sdk/pistols/config'
-import { SALT_SERVER_URL } from '/src/utils/env'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { bigintToHex } from '@underware/pistols-sdk/utils'
 import * as ENV from '/src/utils/env'
@@ -40,6 +39,7 @@ export function DiscordLinkButton({
   className?: string
 }) {
   const { isLinked } = usePlayerDiscordSocialLink()
+  const { selectedNetworkConfig } = useDojoSetup()
 
   //
   // Link step 1: generate salt to validate player request
@@ -54,7 +54,7 @@ export function DiscordLinkButton({
   const _initiate = useCallback(async () => {
     if (can_link && !isLinked && !isLinking) {
       setIsLinking(true)
-      const { salt } = await signAndGenerateGeneralPurposeSalt(SALT_SERVER_URL, account, starknetDomain, messageToSign)
+      const { salt } = await signAndGenerateGeneralPurposeSalt(selectedNetworkConfig.assetsServerUrl, account, starknetDomain, messageToSign)
       if (salt > 0n) {
         setSalt(salt)
       } else {
@@ -72,7 +72,7 @@ export function DiscordLinkButton({
         chainId: starknetDomain.chainId as string,
         playerAddress: bigintToHex(address),
         salt: bigintToHex(salt),
-        redirectUrl: `${ENV.SERVER_URL}/profile`,
+        redirectUrl: `${selectedNetworkConfig.clientUrl}/profile`,
       }
       const options = {
         client_id,
