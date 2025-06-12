@@ -108,10 +108,29 @@ export const signAndRestoreMovesFromHash = async (
   hash: bigint, 
   decks: number[][]
 ): Promise<{ salt: bigint, moves: number[] }> => {
-  const salt = await signAndGenerateMovesSalt(serverUrl, account, starknetDomain, messageToSign)
-  let moves = []
+  const salt: bigint = await signAndGenerateMovesSalt(serverUrl, account, starknetDomain, messageToSign)
   console.log(`___RESTORE decks:`, decks)
   console.log(`___RESTORE message:`, messageToSign, '\nsalt:', bigintToHex(salt), '\nhash:', bigintToHex(hash))
+  let moves: number[] = restoreMovesFromHash(salt, hash, decks)
+  if (moves.length == decks.length) {
+    console.log(`___RESTORED ALL MOVES:`, moves)
+  } else {
+    console.log(`___RESTORED: moves.length != decks.length`, moves, decks)
+    moves = []
+  }
+  return {
+    salt,
+    moves,
+  }
+}
+
+/** @returns the original action from an action hash, or 0 if fail */
+export const restoreMovesFromHash = (
+  salt: bigint,
+  hash: bigint,
+  decks: number[][]
+): number[] => {
+  let moves: number[] = []
   if (salt > 0n) {
     // there are 2 to 4 decks...
     for (let di = 0; di < decks.length; ++di) {
@@ -119,7 +138,7 @@ export const signAndRestoreMovesFromHash = async (
       const mask = _make_move_mask(di)
       // is deck is empty, no move
       if (deck.length == 0) {
-        console.log(`___RESTORE D${di}: SKIP`)
+        // console.log(`___RESTORE D${di}: SKIP`)
         moves.push(0) // did not move here
         continue
       }
@@ -135,7 +154,7 @@ export const signAndRestoreMovesFromHash = async (
           // console.log(`___RESTORE D${di}/M${mi}:`, bigintToHex(stored_hash), '>', bigintToHex(move_hash), '?', move)
           if (stored_hash == move_hash) {
             moves.push(Number(move))
-            console.log(`___RESTORE D${di}/M${mi}: FOUND!`, move)
+            // console.log(`___RESTORE D${di}/M${mi}: FOUND!`, move)
             break
           }
         }
@@ -146,17 +165,8 @@ export const signAndRestoreMovesFromHash = async (
       }
     }
   }
-  if (moves.length != decks.length) {
-    moves = []
-  } else {
-    console.log(`___RESTORED ALL MOVES:`, moves)
-  }
-  return {
-    salt,
-    moves,
-  }
+  return moves;
 }
-
 
 //------------------------------------------
 // general purpose salt
