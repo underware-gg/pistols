@@ -34,7 +34,7 @@ export default function StoreSync() {
       <PlayerNameSync />
 
       {/* Other */}
-      {/* <PlayerOnlineSync /> */}
+      <PlayerOnlineSync />
 
       <StoreProgressBar />
     </>

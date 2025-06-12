@@ -1,7 +1,4 @@
-import { useEffect } from 'react'
-import { Button, Progress } from 'semantic-ui-react'
-import { usePlayerOnlineSignedMessage } from '/src/hooks/useSignedMessages'
-import { useClientTimestamp, useDelay, useUserHasInteracted } from '@underware/pistols-sdk/utils/hooks'
+import { Progress } from 'semantic-ui-react'
 import { useStoreLoadingProgress } from '../progressStore'
 
 
