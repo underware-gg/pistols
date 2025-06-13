@@ -38,8 +38,8 @@ export function useCallToChallenges() {
     Object.values(entities)
       .reduce((acc, e) => {
         const callToAction = e.models.pistols.CallToChallengeEvent
-        const duelId = BigInt(callToAction?.duel_id ?? 0);
-        if (duelId > 0n && bigintEquals(callToAction.player_address, address)) {
+        if (callToAction) {
+          const duelId = BigInt(callToAction?.duel_id ?? 0);
           const action = parseEnumVariant<constants.ChallengeAction>(callToAction.action);
           if (!_ignoredActions.includes(action)) {
             acc.push({
@@ -55,7 +55,7 @@ export function useCallToChallenges() {
   ), [entities])
   const requiredDuelIds = useMemo(() => activeChallenges.filter((ch) => ch.requiresAction).map((ch) => ch.duelId), [activeChallenges])
   const requiresAction = useMemo(() => (requiredDuelIds.length > 0), [requiredDuelIds])
-  // console.warn(`useCallToChallenge() =================>`, entities, activeChallenges, requiredDuelIds)
+  // console.log(`useCallToChallenge() =================>`, entities, activeChallenges, requiredDuelIds)
   return {
     activeChallenges,   // all current active challenges
     requiredDuelIds,    // IDs of challenges that require action

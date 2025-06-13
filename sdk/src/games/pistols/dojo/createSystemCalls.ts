@@ -28,7 +28,7 @@ export function createSystemCalls(
   const _executeTransaction = async (signer: AccountInterface, calls: DojoCalls): Promise<boolean> => {
     let success = false
     try {
-      console.log(`_executeTransaction(): execute...`, calls)
+      console.log(`_executeTransaction(): execute...`, calls, provider)
       if (!signer) {
         throw new Error(`_executeTransaction(): not connected!`)
       }

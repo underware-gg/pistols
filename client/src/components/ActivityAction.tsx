@@ -18,6 +18,7 @@ export function usePlayersActions() {
   const waitingCount = useMemo(() => activeChallenges.filter((ch) => ch.action === constants.ChallengeAction.Waiting).length, [activeChallenges])
   const actionCount = useMemo(() => activeChallenges.filter((ch) => ch.requiresAction).length, [activeChallenges])
   const idleCount = useMemo(() => (duelistIds.length - activeChallenges.length), [duelistIds, activeChallenges])
+  // console.log(`usePlayersActions() =================> activeChallenges:`, replyCount, actionCount, waitingCount, idleCount, duelistIds.length)
 
   return {
     activeChallenges,
@@ -40,8 +41,8 @@ export const ActionIcon = ({
   const name = useMemo(() => (pulsing ? 'dot circle outline' : isActive ? 'circle' : 'circle outline'), [isActive, pulsing])
   const className = useMemo(() => {
     let classNames = []
-    if (actionCount > 0) classNames.push('Positive')
-    else if (replyCount > 0) classNames.push('Warning')
+    if (replyCount > 0 && replyCount == actionCount) classNames.push('Warning')
+    else if (actionCount > 0) classNames.push('Positive')
     if (pulsing) classNames.push('IconPulse')
     return classNames.join(' ')
   }, [replyCount, actionCount, pulsing])
@@ -90,7 +91,10 @@ const ActionItem = ({
   // const { isInactive } = useDuelist(duelistId)
   // const { lives } = useDuelistFameBalance(duelistId)
 
+  console.log(`ActionItem() =================> duelId:`, duelId, action)
+
   if (action === constants.ChallengeAction.Reply) {
+    console.log(`ActionItem() =================> reply....`, duelId, action)
     return (
       <>
         {/* <Icon name='circle' className='Invisible' /> */}
