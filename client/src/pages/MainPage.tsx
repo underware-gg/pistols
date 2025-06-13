@@ -20,6 +20,7 @@ import NewChallengeModal from '/src/components/modals/NewChallengeModal'
 import SelectDuelistModal from '/src/components/modals/SelectDuelistModal'
 import WalletFinderModal from '/src/components/modals/WalletFinderModal'
 import SettingsModal from '/src/components/modals/SettingsModal'
+import BugReportModal from '/src/components/modals/BugReportModal'
 import ScProfile from '/src/components/scenes/ScProfile'
 import ScTavern from '/src/components/scenes/ScTavern'
 import ScDuelsBoard from '/src/components/scenes/ScDuelsBoard'
@@ -39,9 +40,8 @@ import { NotificationProvider } from '/src/stores/notificationStore'
 
 // test sdk
 import { helloPistols } from '@underware/pistols-sdk'
-import { BackButton } from '../components/ui/Buttons'
-import { CustomIcon } from '../components/ui/Icons'
-import { useGameAspect } from '../hooks/useGameAspect'
+import { CustomIcon } from '/src/components/ui/Icons'
+import { useGameAspect } from '/src/hooks/useGameAspect'
 
 helloPistols();
 export default function MainPage({
@@ -209,7 +209,20 @@ function TutorialUI({
 }
 
 function Modals() {
-  const { walletFinderOpener, duelistSelectOpener, settingsOpener } = usePistolsContext()
+  const { walletFinderOpener, duelistSelectOpener, settingsOpener, bugReportOpener } = usePistolsContext()
+
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      // Ctrl+B or Cmd+B to open bug report
+      if ((event.ctrlKey || event.metaKey) && event.key === 'b') {
+        event.preventDefault()
+        bugReportOpener.open()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyPress)
+    return () => window.removeEventListener('keydown', handleKeyPress)
+  }, [])
 
   return (
     <>
@@ -217,6 +230,7 @@ function Modals() {
       <DuelistModal />
       <PlayerModal />
       <NewChallengeModal />
+      <BugReportModal opener={bugReportOpener} />
       <SelectDuelistModal opener={duelistSelectOpener} />
       <WalletFinderModal opener={walletFinderOpener} />
       <SettingsModal opener={settingsOpener} />

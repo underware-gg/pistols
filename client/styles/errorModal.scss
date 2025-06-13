@@ -1,0 +1,402 @@
+// Error Modal and Bug Report Modal Styles
+
+// Copy Notification Component Styles
+.CopyNotification {
+  position: fixed;
+  background: #3b2a23;
+  color: #C0C0C0;
+  padding: aspect-width(0.5) aspect-width(1);
+  border-radius: aspect-width(0.4);
+  border: 1px solid rgba(200, 182, 168, 0.3);
+  font-size: aspect-width(0.8);
+  font-weight: 500;
+  z-index: 10000;
+  box-shadow: 0 aspect-width(0.3) aspect-width(0.8) rgba(0, 0, 0, 0.6);
+  animation: CopyNotificationFadeInUp 0.3s ease-out;
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+@keyframes CopyNotificationFadeInUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(aspect-width(0.5));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+// Error Modal Accordion Styles
+.ErrorAccordion {
+  border: 1px solid transparent;
+  border-radius: aspect-width(0.5);
+  overflow: hidden;
+  background: transparent;
+  box-shadow: none;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &.Expanded {
+    border: 1px solid #C0C0C0;
+    background: #3b2a23;
+    box-shadow: 0 aspect-width(0.5) aspect-width(1) rgba(0, 0, 0, 0.6);
+    transform: translateY(aspect-width(-0.2));
+  }
+}
+
+.ErrorHeader {
+  background: transparent;
+  border-bottom: none;
+  padding: aspect-width(1.5) aspect-width(2);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+
+  &.Expanded {
+    background: transparent;
+    border-bottom: 1px solid rgba(200, 182, 168, 0.3);
+  }
+
+  &:hover {
+    background: rgba(200, 182, 168, 0.1);
+  }
+}
+
+.ErrorArrow {
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  margin-left: aspect-width(1);
+
+  &.Expanded {
+    transform: rotate(180deg) scale(1.1);
+  }
+}
+
+.ErrorContent {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #3b2a23;
+
+  &.Expanded {
+    max-height: aspect-height(40);
+    opacity: 1;
+  }
+}
+
+.ErrorDetails {
+  padding: aspect-width(2);
+  position: relative;
+}
+
+.CopyButtonWrapper {
+  position: absolute;
+  top: 50%;
+  right: aspect-width(1);
+  transform: translateY(-50%);
+  z-index: 10;
+}
+
+.CopyButton {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: aspect-width(0.4);
+  padding: aspect-width(0.5) aspect-width(0.8);
+  color: #C0C0C0;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(aspect-width(-0.1));
+    box-shadow: 0 aspect-width(0.3) aspect-width(0.5) rgba(0, 0, 0, 0.3);
+  }
+}
+
+.TechnicalLabel {
+  color: #C0C0C0;
+  font-size: aspect-width(0.7);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: aspect-width(0.8);
+  display: block;
+}
+
+.ErrorText {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: aspect-width(0.4);
+  padding: aspect-width(1);
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: aspect-width(0.8);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin-right: aspect-width(6);
+  max-height: aspect-height(50);
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: aspect-width(0.4);
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: aspect-width(0.2);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: aspect-width(0.2);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+  }
+}
+
+// Bug Report Modal Styles
+.BugReportModalContent {
+  &::-webkit-scrollbar {
+    width: aspect-width(0.5);
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: aspect-width(0.3);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(192, 192, 192, 0.5);
+    border-radius: aspect-width(0.3);
+
+    &:hover {
+      background: rgba(192, 192, 192, 0.7);
+    }
+  }
+}
+
+.BugReportTextArea {
+  font-size: aspect-width(1) !important;
+  padding: 0.5em 1em !important;
+  margin: 0.15em 0 !important;
+  line-height: 1em !important;
+  
+  background-color: #57493e !important;
+  color: #c8b6a8 !important;
+  border: 1px solid #efe1d7 !important;
+  min-height: aspect-height(4) !important;
+  font-family: 'EB Garamond', serif !important;
+  display: flex !important;
+  align-items: center !important;
+  
+  border-radius: 0.25em !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+  -webkit-appearance: none !important;
+  transition: border-color 0.25s !important;
+  resize: vertical !important;
+  overflow: hidden !important;
+
+  &:focus {
+    border: 1px solid #efe1d7 !important;
+    background-color: #57493e !important;
+    color: #efe1d7 !important;
+  }
+
+  &::placeholder {
+    color: rgba(239, 225, 215, 0.35) !important;
+    font-family: 'EB Garamond', serif !important;
+    font-variant-caps: small-caps !important;
+    font-style: normal !important;
+  }
+}
+
+.BugReportValidationWarning {
+  padding: aspect-width(1);
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px solid rgba(255, 107, 107, 0.3);
+  border-radius: aspect-width(0.5);
+  margin-bottom: aspect-width(1);
+
+  p {
+    color: #ff6b6b;
+    margin: 0;
+    font-size: aspect-width(1);
+  }
+
+  ul {
+    margin: aspect-width(0.5) 0 0 aspect-width(1);
+    color: #ff6b6b;
+    font-size: aspect-width(1);
+  }
+}
+
+.BugReportSection {
+  margin-bottom: aspect-width(2);
+
+  h4 {
+    color: #C0C0C0;
+    margin-bottom: aspect-width(0.5);
+    font-size: aspect-width(1.2);
+  }
+
+  p {
+    font-size: aspect-width(1);
+    color: #888;
+    margin: 0;
+
+    &.Description {
+      margin-bottom: aspect-width(1);
+    }
+
+    &.PrefilledNote {
+      color: #C0C0C0;
+    }
+  }
+}
+
+.BugReportStepContainer {
+  display: flex;
+  align-items: center;
+  margin-bottom: aspect-width(0.5);
+
+  .StepNumber {
+    margin-right: aspect-width(0.5);
+    color: #C0C0C0;
+    font-weight: bold;
+    min-width: aspect-width(1.5);
+  }
+
+  .StepInput {
+    margin-right: aspect-width(0.5);
+    flex: 1;
+    min-height: aspect-height(4);
+    height: aspect-height(7);
+    resize: none;
+    overflow: hidden;
+  }
+
+  .StepRemoveIcon {
+    color: #ff6b6b;
+    cursor: pointer;
+  }
+}
+
+// File Upload Styles
+.FileDropZone {
+  border: 2px dashed rgba(200, 182, 168, 0.5);
+  border-radius: aspect-width(0.5);
+  padding: aspect-width(2) aspect-width(1.5);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(87, 73, 62, 0.3);
+  margin-bottom: aspect-width(1);
+  user-select: none;
+
+  &:hover {
+    border-color: rgba(200, 182, 168, 0.8);
+    background: rgba(87, 73, 62, 0.5);
+    transform: translateY(aspect-width(-0.2));
+    box-shadow: 0 aspect-width(0.3) aspect-width(0.8) rgba(0, 0, 0, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0px);
+    border-color: #C0C0C0;
+    background: rgba(200, 182, 168, 0.2);
+  }
+
+  &.DragOver {
+    border-color: #C0C0C0;
+    background: rgba(200, 182, 168, 0.1);
+    border-style: solid;
+    transform: scale(1.02);
+  }
+
+  p {
+    margin: 0;
+    font-size: aspect-width(1);
+
+    &:first-of-type {
+      margin-bottom: aspect-width(0.5);
+      color: #C0C0C0;
+    }
+
+    &:last-of-type {
+      color: #888;
+      font-size: aspect-width(0.85);
+    }
+  }
+}
+
+.AttachedFilesList {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(200, 182, 168, 0.3);
+  border-radius: aspect-width(0.4);
+  padding: aspect-width(0.8);
+  max-height: aspect-height(15);
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: aspect-width(0.4);
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: aspect-width(0.2);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: aspect-width(0.2);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+  }
+}
+
+.AttachedFileItem {
+  display: flex;
+  align-items: center;
+  padding: aspect-width(0.5) aspect-width(0.8);
+  margin-bottom: aspect-width(0.3);
+  background: rgba(87, 73, 62, 0.4);
+  border-radius: aspect-width(0.3);
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: rgba(87, 73, 62, 0.6);
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  span {
+    color: #C0C0C0;
+    font-size: aspect-width(0.85);
+    word-break: break-all;
+  }
+
+  .ui.icon {
+    margin-right: aspect-width(0.5) !important;
+    color: #C0C0C0 !important;
+
+    &.trash {
+      color: #ff6b6b !important;
+      cursor: pointer;
+      margin-left: aspect-width(0.5) !important;
+      margin-right: 0 !important;
+
+      &:hover {
+        color: #ff5252 !important;
+        transform: scale(1.1);
+      }
+    }
+  }
+} 

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { Grid } from 'semantic-ui-react'
 import { useAccount, useDisconnect } from '@starknet-react/core'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
@@ -15,6 +15,7 @@ import { Address } from '/src/components/ui/Address'
 import { ConnectButton, PlayGameButton } from '/src/components/scenes/ScDoor'
 import { SceneName } from '/src/data/assets'
 import { useDiscordSocialLink } from '/src/stores/eventsModelStore'
+import { emitter } from '/src/three/game'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -40,6 +41,10 @@ export default function WalletHeader({
   const imageUrl = useMemo(() => (isLinked ? avatarUrl : getConnectorIcon(connector) ?? makeProfilePicUrl(0)), [data, connector, avatarUrl, isLinked])
 
   const { username, openProfile } = useConnectedController()
+
+  useEffect(() => {
+    emitter.emit('player_username', username)
+  }, [username])
 
   return (
     <Grid className='WalletHeader'>

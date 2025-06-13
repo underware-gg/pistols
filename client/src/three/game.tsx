@@ -337,8 +337,7 @@ function setRender(canvas) {
   _renderer = new THREE.WebGLRenderer({
     antialias: true,
     alpha: true,
-    canvas,
-    powerPreference: 'low-power' //TODO requires more testing
+    canvas
   })
   _renderer.setSize(WIDTH, HEIGHT)
   _renderer.setPixelRatio(window.devicePixelRatio * _currentQualitySettings.resolutionScale);
