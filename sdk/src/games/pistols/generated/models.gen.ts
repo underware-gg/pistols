@@ -434,19 +434,17 @@ export interface Task {
 	description: string;
 }
 
-// Type definition for `pistols::models::events::CallToActionEvent` struct
-export interface CallToActionEvent {
+// Type definition for `pistols::models::events::CallToChallengeEvent` struct
+export interface CallToChallengeEvent {
 	player_address: string;
-	duelist_id: BigNumberish;
 	duel_id: BigNumberish;
-	call_to_action: boolean;
+	action: ChallengeActionEnum;
 	timestamp: BigNumberish;
 }
 
-// Type definition for `pistols::models::events::CallToActionEventValue` struct
-export interface CallToActionEventValue {
-	duel_id: BigNumberish;
-	call_to_action: boolean;
+// Type definition for `pistols::models::events::CallToChallengeEventValue` struct
+export interface CallToChallengeEventValue {
+	action: ChallengeActionEnum;
 	timestamp: BigNumberish;
 }
 
@@ -505,6 +503,18 @@ export interface PlayerBookmarkEvent {
 // Type definition for `pistols::models::events::PlayerBookmarkEventValue` struct
 export interface PlayerBookmarkEventValue {
 	enabled: boolean;
+}
+
+// Type definition for `pistols::models::events::PlayerSettingEvent` struct
+export interface PlayerSettingEvent {
+	player_address: string;
+	setting: PlayerSettingEnum;
+	value: PlayerSettingValueEnum;
+}
+
+// Type definition for `pistols::models::events::PlayerSettingEventValue` struct
+export interface PlayerSettingEventValue {
+	value: PlayerSettingValueEnum;
 }
 
 // Type definition for `pistols::models::events::PlayerSocialLinkEvent` struct
@@ -827,6 +837,38 @@ export const activity = [
 export type Activity = { [key in typeof activity[number]]: string };
 export type ActivityEnum = CairoCustomEnum;
 
+// Type definition for `pistols::models::events::ChallengeAction` enum
+export const challengeAction = [
+	'Undefined',
+	'Reply',
+	'Commit',
+	'Reveal',
+	'Waiting',
+	'Results',
+	'Finished',
+] as const;
+export type ChallengeAction = { [key in typeof challengeAction[number]]: string };
+export type ChallengeActionEnum = CairoCustomEnum;
+
+// Type definition for `pistols::models::events::PlayerSetting` enum
+export const playerSetting = [
+	'Undefined',
+	'OptOutNotifications',
+] as const;
+export type PlayerSetting = { 
+	Undefined: string,
+	OptOutNotifications: SocialPlatformEnum,
+};
+export type PlayerSettingEnum = CairoCustomEnum;
+
+// Type definition for `pistols::models::events::PlayerSettingValue` enum
+export const playerSettingValue = [
+	'Undefined',
+	'Boolean',
+] as const;
+export type PlayerSettingValue = { [key in typeof playerSettingValue[number]]: string };
+export type PlayerSettingValueEnum = CairoCustomEnum;
+
 // Type definition for `pistols::models::events::SocialPlatform` enum
 export const socialPlatform = [
 	'Undefined',
@@ -900,15 +942,15 @@ export interface SchemaType extends ISchemaType {
 		MockedValue: MockedValue,
 		MockedValueValue: MockedValueValue,
 		Period: Period,
-	// },
-	// achievement: {
+	},
+	achievement: {
 		TrophyCreation: TrophyCreation,
 		TrophyCreationValue: TrophyCreationValue,
 		TrophyProgression: TrophyProgression,
 		TrophyProgressionValue: TrophyProgressionValue,
 		Task: Task,
-		CallToActionEvent: CallToActionEvent,
-		CallToActionEventValue: CallToActionEventValue,
+		CallToChallengeEvent: CallToChallengeEvent,
+		CallToChallengeEventValue: CallToChallengeEventValue,
 		ChallengeRewardsEvent: ChallengeRewardsEvent,
 		ChallengeRewardsEventValue: ChallengeRewardsEventValue,
 		LordsReleaseEvent: LordsReleaseEvent,
@@ -917,6 +959,8 @@ export interface SchemaType extends ISchemaType {
 		PlayerActivityEventValue: PlayerActivityEventValue,
 		PlayerBookmarkEvent: PlayerBookmarkEvent,
 		PlayerBookmarkEventValue: PlayerBookmarkEventValue,
+		PlayerSettingEvent: PlayerSettingEvent,
+		PlayerSettingEventValue: PlayerSettingEventValue,
 		PlayerSocialLinkEvent: PlayerSocialLinkEvent,
 		PlayerSocialLinkEventValue: PlayerSocialLinkEventValue,
 		LordsReleaseBill: LordsReleaseBill,
@@ -1365,16 +1409,28 @@ export const schema: SchemaType = {
 			total: 0,
 		description: "",
 		},
-		CallToActionEvent: {
+		CallToChallengeEvent: {
 			player_address: "",
-			duelist_id: 0,
 			duel_id: 0,
-			call_to_action: false,
+		action: new CairoCustomEnum({ 
+					Undefined: "",
+				Reply: undefined,
+				Commit: undefined,
+				Reveal: undefined,
+				Waiting: undefined,
+				Results: undefined,
+				Finished: undefined, }),
 			timestamp: 0,
 		},
-		CallToActionEventValue: {
-			duel_id: 0,
-			call_to_action: false,
+		CallToChallengeEventValue: {
+		action: new CairoCustomEnum({ 
+					Undefined: "",
+				Reply: undefined,
+				Commit: undefined,
+				Reveal: undefined,
+				Waiting: undefined,
+				Results: undefined,
+				Finished: undefined, }),
 			timestamp: 0,
 		},
 		ChallengeRewardsEvent: {
@@ -1459,6 +1515,20 @@ export const schema: SchemaType = {
 		},
 		PlayerBookmarkEventValue: {
 			enabled: false,
+		},
+		PlayerSettingEvent: {
+			player_address: "",
+		setting: new CairoCustomEnum({ 
+					Undefined: "",
+				OptOutNotifications: undefined, }),
+		value: new CairoCustomEnum({ 
+					Undefined: "",
+				Boolean: undefined, }),
+		},
+		PlayerSettingEventValue: {
+		value: new CairoCustomEnum({ 
+					Undefined: "",
+				Boolean: undefined, }),
 		},
 		PlayerSocialLinkEvent: {
 			player_address: "",
@@ -1574,8 +1644,9 @@ export enum ModelsMapping {
 	TrophyProgressionValue = 'achievement-TrophyProgressionValue',
 	Task = 'achievement-Task',
 	Activity = 'pistols-Activity',
-	CallToActionEvent = 'pistols-CallToActionEvent',
-	CallToActionEventValue = 'pistols-CallToActionEventValue',
+	CallToChallengeEvent = 'pistols-CallToChallengeEvent',
+	CallToChallengeEventValue = 'pistols-CallToChallengeEventValue',
+	ChallengeAction = 'pistols-ChallengeAction',
 	ChallengeRewardsEvent = 'pistols-ChallengeRewardsEvent',
 	ChallengeRewardsEventValue = 'pistols-ChallengeRewardsEventValue',
 	LordsReleaseEvent = 'pistols-LordsReleaseEvent',
@@ -1584,6 +1655,10 @@ export enum ModelsMapping {
 	PlayerActivityEventValue = 'pistols-PlayerActivityEventValue',
 	PlayerBookmarkEvent = 'pistols-PlayerBookmarkEvent',
 	PlayerBookmarkEventValue = 'pistols-PlayerBookmarkEventValue',
+	PlayerSetting = 'pistols-PlayerSetting',
+	PlayerSettingEvent = 'pistols-PlayerSettingEvent',
+	PlayerSettingEventValue = 'pistols-PlayerSettingEventValue',
+	PlayerSettingValue = 'pistols-PlayerSettingValue',
 	PlayerSocialLinkEvent = 'pistols-PlayerSocialLinkEvent',
 	PlayerSocialLinkEventValue = 'pistols-PlayerSocialLinkEventValue',
 	SocialPlatform = 'pistols-SocialPlatform',

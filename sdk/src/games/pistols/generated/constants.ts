@@ -17,10 +17,11 @@ export const INTERFACE_DESCRIPTIONS: any = {
     commit_moves: 'Commit moves of a Duelist in a Duel',
     reveal_moves: 'Reveal moves of a Duelist in a Duel',
     collect_duel: 'Close expired duels',
-    clear_call_to_action: 'Clear call to action for a duelist',
+    clear_call_to_challenge: 'Clear call to action for a player',
     emit_player_bookmark: 'Bookmarks an address or token',
     emit_player_social_link: 'Link player to social platform',
     clear_player_social_link: 'Unlink player from social platform',
+    emit_player_setting: 'Store player settings',
   },
   // from: ../dojo/src/systems/tokens/duel_token.cairo
   IDuelTokenPublic: {
@@ -135,6 +136,20 @@ export const getActivityFromValue = (value: number): Activity | undefined => Obj
 export const getActivityMap = (): Record<Activity, number> => Object.keys(Activity).reduce((acc, v, index) => { acc[v as Activity] = index; return acc; }, {} as Record<Activity, number>);
 
 // from: ../dojo/src/models/events.cairo
+export enum ChallengeAction {
+  Undefined = 'Undefined', // 0
+  Reply = 'Reply', // 1
+  Commit = 'Commit', // 2
+  Reveal = 'Reveal', // 3
+  Waiting = 'Waiting', // 4
+  Results = 'Results', // 5
+  Finished = 'Finished', // 6
+};
+export const getChallengeActionValue = (name: ChallengeAction): number | undefined => _indexOrUndefined(Object.keys(ChallengeAction).indexOf(name));
+export const getChallengeActionFromValue = (value: number): ChallengeAction | undefined => Object.keys(ChallengeAction)[value] as ChallengeAction;
+export const getChallengeActionMap = (): Record<ChallengeAction, number> => Object.keys(ChallengeAction).reduce((acc, v, index) => { acc[v as ChallengeAction] = index; return acc; }, {} as Record<ChallengeAction, number>);
+
+// from: ../dojo/src/models/events.cairo
 export enum SocialPlatform {
   Undefined = 'Undefined', // 0
   Discord = 'Discord', // 1
@@ -144,6 +159,24 @@ export enum SocialPlatform {
 export const getSocialPlatformValue = (name: SocialPlatform): number | undefined => _indexOrUndefined(Object.keys(SocialPlatform).indexOf(name));
 export const getSocialPlatformFromValue = (value: number): SocialPlatform | undefined => Object.keys(SocialPlatform)[value] as SocialPlatform;
 export const getSocialPlatformMap = (): Record<SocialPlatform, number> => Object.keys(SocialPlatform).reduce((acc, v, index) => { acc[v as SocialPlatform] = index; return acc; }, {} as Record<SocialPlatform, number>);
+
+// from: ../dojo/src/models/events.cairo
+export enum PlayerSetting {
+  Undefined = 'Undefined', // 0
+  OptOutNotifications = 'OptOutNotifications', // 1
+};
+export const getPlayerSettingValue = (name: PlayerSetting): number | undefined => _indexOrUndefined(Object.keys(PlayerSetting).indexOf(name));
+export const getPlayerSettingFromValue = (value: number): PlayerSetting | undefined => Object.keys(PlayerSetting)[value] as PlayerSetting;
+export const getPlayerSettingMap = (): Record<PlayerSetting, number> => Object.keys(PlayerSetting).reduce((acc, v, index) => { acc[v as PlayerSetting] = index; return acc; }, {} as Record<PlayerSetting, number>);
+
+// from: ../dojo/src/models/events.cairo
+export enum PlayerSettingValue {
+  Undefined = 'Undefined', // 0
+  Boolean = 'Boolean', // 1
+};
+export const getPlayerSettingValueValue = (name: PlayerSettingValue): number | undefined => _indexOrUndefined(Object.keys(PlayerSettingValue).indexOf(name));
+export const getPlayerSettingValueFromValue = (value: number): PlayerSettingValue | undefined => Object.keys(PlayerSettingValue)[value] as PlayerSettingValue;
+export const getPlayerSettingValueMap = (): Record<PlayerSettingValue, number> => Object.keys(PlayerSettingValue).reduce((acc, v, index) => { acc[v as PlayerSettingValue] = index; return acc; }, {} as Record<PlayerSettingValue, number>);
 
 // from: ../dojo/src/models/pack.cairo
 export enum PackType {

@@ -2184,8 +2184,8 @@
       ]
     },
     {
-      "address": "0x51982f210763490d2bd45109e5fc51de445b0f6e28141c3ea3fea6f4f7c672c",
-      "class_hash": "0x3836dce3421e0c18c6a737e3cc6b13f63dad93ea1c21d92831d972fcfb5e081",
+      "address": "0x6f162b5457e47a59ab4577991d1bb880b8327ab2a59139fa30cf3d57aec309a",
+      "class_hash": "0xb24245fae76b813bf26d9277237877dfe60d182b646b92924f9ff506b7ff55",
       "abi": [
         {
           "type": "impl",
@@ -6617,8 +6617,8 @@
       ]
     },
     {
-      "address": "0x690d9e2d2373852e8571dc7f9c8ac2c9c3b7f44b4bd89f46b65befbe8fcf4c0",
-      "class_hash": "0x6eb913a393483f2c5bd5a807c5ce7c6dd232836ebb3c587b3b3bebedde4405b",
+      "address": "0x780ec4aa2ccd487f17a9e95d54a882c1868e8101489f76b24af80bbde07274a",
+      "class_hash": "0x64d4bb2a1ac5cac1b9bbf785d4923e4b5984b281de731040bd2e2a3da75fb6b",
       "abi": [
         {
           "type": "impl",
@@ -6725,6 +6725,34 @@
             {
               "name": "X",
               "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "pistols::models::events::PlayerSetting",
+          "variants": [
+            {
+              "name": "Undefined",
+              "type": "()"
+            },
+            {
+              "name": "OptOutNotifications",
+              "type": "pistols::models::events::SocialPlatform"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "pistols::models::events::PlayerSettingValue",
+          "variants": [
+            {
+              "name": "Undefined",
+              "type": "()"
+            },
+            {
+              "name": "Boolean",
+              "type": "core::bool"
             }
           ]
         },
@@ -7200,10 +7228,10 @@
             },
             {
               "type": "function",
-              "name": "clear_call_to_action",
+              "name": "clear_call_to_challenge",
               "inputs": [
                 {
-                  "name": "duelist_id",
+                  "name": "duel_id",
                   "type": "core::integer::u128"
                 }
               ],
@@ -7265,6 +7293,22 @@
                 {
                   "name": "social_platform",
                   "type": "pistols::models::events::SocialPlatform"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "emit_player_setting",
+              "inputs": [
+                {
+                  "name": "setting",
+                  "type": "pistols::models::events::PlayerSetting"
+                },
+                {
+                  "name": "value",
+                  "type": "pistols::models::events::PlayerSettingValue"
                 }
               ],
               "outputs": [],
@@ -7543,18 +7587,19 @@
         "commit_moves",
         "reveal_moves",
         "collect_duel",
-        "clear_call_to_action",
+        "clear_call_to_challenge",
         "emit_player_bookmark",
         "emit_player_social_link",
         "clear_player_social_link",
+        "emit_player_setting",
         "create_trophies",
         "do_that_thing",
         "upgrade"
       ]
     },
     {
-      "address": "0x1d162cdd2f8d0ad4b0e6b37ee7e949d19bb6595f49d3302317e45537b7784fd",
-      "class_hash": "0x4832270fad4cf7a0b4cbf3adbcbfa81d8f373a1495c60d785e50ce821b258d2",
+      "address": "0x6914a7b76b931d4d7ee2414224152ef9e446e986edcf522a1882591bb6a545d",
+      "class_hash": "0x35b3a7047b92ddb5d2deaf1b3db751bf36c879b6251713c9418c822c9a08e1c",
       "abi": [
         {
           "type": "impl",
@@ -11672,9 +11717,9 @@
   "events": [
     {
       "members": [],
-      "class_hash": "0x40ec689a3117ed5bcfd9f5e3bc289ec1a034e41e539ac0c0e7d73edc40fd4e4",
-      "tag": "pistols-CallToActionEvent",
-      "selector": "0x2626522e055d4243cc4565f162bea1b170c6a5fd29721e7bc59607f9b737849"
+      "class_hash": "0x1e184235ea5f0c9d811c574f51ba8603d4c608e7604b85371040e14556563f6",
+      "tag": "pistols-CallToChallengeEvent",
+      "selector": "0x1ba7f84f0de5fbe4d2d56640e9c17b2f0ec42dbdaaba69eb31fa4b6ad4fe63f"
     },
     {
       "members": [],
@@ -11699,6 +11744,12 @@
       "class_hash": "0x617a32d2569068cebd7e633e7e7b26ba207233494d324d0705b6aa695f340bc",
       "tag": "pistols-PlayerBookmarkEvent",
       "selector": "0x3075e796a774ce4fe1a6f34d9cf7915d5d76f0bcdec07acb8af65fbb3b23b4"
+    },
+    {
+      "members": [],
+      "class_hash": "0x161013bbdf7383c8b4a038785fac31550cfec40ab291318b79f713b5ddfc582",
+      "tag": "pistols-PlayerSettingEvent",
+      "selector": "0x11eaf687b501164991ef978d89c94bd94698f102deafddda9b777e5cefd9a58"
     },
     {
       "members": [],

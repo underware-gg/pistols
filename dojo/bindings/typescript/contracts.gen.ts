@@ -2201,19 +2201,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_game_clearCallToAction_calldata = (duelistId: BigNumberish): DojoCall => {
+	const build_game_clearCallToChallenge_calldata = (duelId: BigNumberish): DojoCall => {
 		return {
 			contractName: "game",
-			entrypoint: "clear_call_to_action",
-			calldata: [duelistId],
+			entrypoint: "clear_call_to_challenge",
+			calldata: [duelId],
 		};
 	};
 
-	const game_clearCallToAction = async (snAccount: Account | AccountInterface, duelistId: BigNumberish) => {
+	const game_clearCallToChallenge = async (snAccount: Account | AccountInterface, duelId: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_game_clearCallToAction_calldata(duelistId),
+				build_game_clearCallToChallenge_calldata(duelId),
 				"pistols",
 			);
 		} catch (error) {
@@ -2340,6 +2340,27 @@ export function setupWorld(provider: DojoProvider) {
 			return await provider.execute(
 				snAccount,
 				build_game_emitPlayerBookmark_calldata(targetAddress, targetId, enabled),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_game_emitPlayerSetting_calldata = (setting: CairoCustomEnum, value: CairoCustomEnum): DojoCall => {
+		return {
+			contractName: "game",
+			entrypoint: "emit_player_setting",
+			calldata: [setting, value],
+		};
+	};
+
+	const game_emitPlayerSetting = async (snAccount: Account | AccountInterface, setting: CairoCustomEnum, value: CairoCustomEnum) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_game_emitPlayerSetting_calldata(setting, value),
 				"pistols",
 			);
 		} catch (error) {
@@ -3795,8 +3816,8 @@ export function setupWorld(provider: DojoProvider) {
 			buildCalcSeasonRewardCalldata: build_game_calcSeasonReward_calldata,
 			canCollectDuel: game_canCollectDuel,
 			buildCanCollectDuelCalldata: build_game_canCollectDuel_calldata,
-			clearCallToAction: game_clearCallToAction,
-			buildClearCallToActionCalldata: build_game_clearCallToAction_calldata,
+			clearCallToChallenge: game_clearCallToChallenge,
+			buildClearCallToChallengeCalldata: build_game_clearCallToChallenge_calldata,
 			clearPlayerSocialLink: game_clearPlayerSocialLink,
 			buildClearPlayerSocialLinkCalldata: build_game_clearPlayerSocialLink_calldata,
 			collectDuel: game_collectDuel,
@@ -3809,6 +3830,8 @@ export function setupWorld(provider: DojoProvider) {
 			buildDoThatThingCalldata: build_game_doThatThing_calldata,
 			emitPlayerBookmark: game_emitPlayerBookmark,
 			buildEmitPlayerBookmarkCalldata: build_game_emitPlayerBookmark_calldata,
+			emitPlayerSetting: game_emitPlayerSetting,
+			buildEmitPlayerSettingCalldata: build_game_emitPlayerSetting_calldata,
 			emitPlayerSocialLink: game_emitPlayerSocialLink,
 			buildEmitPlayerSocialLinkCalldata: build_game_emitPlayerSocialLink_calldata,
 			getDuelDeck: game_getDuelDeck,
