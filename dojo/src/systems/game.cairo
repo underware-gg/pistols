@@ -1,7 +1,7 @@
 use starknet::{ContractAddress};
 use pistols::types::duel_progress::{DuelProgress};
 use pistols::models::leaderboard::{LeaderboardPosition};
-use pistols::models::events::{SocialPlatform};
+use pistols::models::events::{SocialPlatform, PlayerSetting, PlayerSettingValue};
 use pistols::types::rules::{RewardValues};
 
 // Exposed to clients
@@ -27,6 +27,7 @@ pub trait IGame<TState> {
     fn emit_player_bookmark(ref self: TState, target_address: ContractAddress, target_id: u128, enabled: bool); //@description: Bookmarks an address or token
     fn emit_player_social_link(ref self: TState, social_platform: SocialPlatform, player_address: ContractAddress, user_name: ByteArray, user_id: ByteArray, avatar: ByteArray); //@description: Link player to social platform
     fn clear_player_social_link(ref self: TState, social_platform: SocialPlatform); //@description: Unlink player from social platform
+    fn emit_player_setting(ref self: TState, setting: PlayerSetting, value: PlayerSettingValue); //@description: Store player settings
 
     // view calls
     fn get_duel_deck(self: @TState, duel_id: u128) -> Span<Span<u8>>;
@@ -90,7 +91,7 @@ pub mod game {
         leaderboard::{Leaderboard, LeaderboardTrait, LeaderboardPosition},
         pact::{PactTrait},
         season::{SeasonScoreboard, SeasonScoreboardTrait},
-        events::{Activity, ActivityTrait, SocialPlatform},
+        events::{Activity, ActivityTrait, SocialPlatform, PlayerSetting, PlayerSettingValue},
         // tournament::{TournamentRound, TournamentRoundTrait, TournamentDuelKeys},
     };
     use pistols::types::{
@@ -397,6 +398,10 @@ pub mod game {
         fn clear_player_social_link(ref self: ContractState, social_platform: SocialPlatform) {
             let mut store: Store = StoreTrait::new(self.world_default());
             store.emit_player_social_link(starknet::get_caller_address(), social_platform, "", "", "");
+        }
+        fn emit_player_setting(ref self: ContractState, setting: PlayerSetting, value: PlayerSettingValue) {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            store.emit_player_setting(starknet::get_caller_address(), setting, value);
         }
 
 

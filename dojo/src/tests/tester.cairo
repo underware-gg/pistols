@@ -57,7 +57,7 @@ pub mod tester {
         },
         pool::{Pool, PoolType},
         player::{PlayerDuelistStack},
-        events::{SocialPlatform},
+        events::{SocialPlatform, PlayerSetting, PlayerSettingValue},
         // tournament::{TournamentRound},
     };
 
@@ -290,6 +290,7 @@ pub mod tester {
             TestResource::Event(pistols::models::events::e_LordsReleaseEvent::TEST_CLASS_HASH),
             TestResource::Event(pistols::models::events::e_PlayerBookmarkEvent::TEST_CLASS_HASH),
             TestResource::Event(pistols::models::events::e_PlayerSocialLinkEvent::TEST_CLASS_HASH),
+            TestResource::Event(pistols::models::events::e_PlayerSettingEvent::TEST_CLASS_HASH),
             // cartridge arcade
             TestResource::Event(achievement::events::index::e_TrophyCreation::TEST_CLASS_HASH),
             TestResource::Event(achievement::events::index::e_TrophyProgression::TEST_CLASS_HASH),
@@ -592,6 +593,9 @@ pub mod tester {
     pub fn drop_dojo_events(sys: @TestSystems) {
         drop_all_events(*sys.world.dispatcher.contract_address);
     }
+    pub fn assert_no_dojo_events_left(sys: @TestSystems) {
+        assert_no_events_left(*sys.world.dispatcher.contract_address);
+    }
     pub fn assert_event_trophy(sys: @TestSystems, trophy: Trophy, address: ContractAddress) {
         let contract_event = testing::pop_log::<dojo::world::world::Event>(*sys.world.dispatcher.contract_address).unwrap();
         match contract_event {
@@ -640,6 +644,24 @@ pub mod tester {
                 values.append_serde(user_name);
                 values.append_serde(user_id);
                 values.append_serde(avatar);
+                _compare_values(event.values, values.span(), "values");
+            },
+            _ => {},
+        }
+    }
+    pub fn assert_event_player_setting(sys: @TestSystems, player_address: ContractAddress, setting: PlayerSetting, value: PlayerSettingValue) {
+        let contract_event = testing::pop_log::<dojo::world::world::Event>(*sys.world.dispatcher.contract_address).unwrap();
+        match contract_event {
+            dojo::world::world::Event::EventEmitted(event) => {
+                assert_eq!(event.selector, selector_from_tag!("pistols-PlayerSettingEvent"), "Invalid selector");
+                // compare keys
+                let mut keys = array![];
+                keys.append_serde(player_address);
+                keys.append_serde(setting);
+                _compare_values(event.keys, keys.span(), "keys");
+                // compare values
+                let mut values = array![];
+                values.append_serde(value);
                 _compare_values(event.values, values.span(), "values");
             },
             _ => {},

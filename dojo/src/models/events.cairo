@@ -12,7 +12,7 @@ pub enum Activity {
     DuelistSpawned,     // 5
     DuelistDied,        // 6
     ChallengeCreated,   // 7
-    ChallengeCanceled,   // 8
+    ChallengeCanceled,  // 8
     ChallengeReplied,   // 9
     MovesCommitted,     // 10
     MovesRevealed,      // 11
@@ -28,6 +28,17 @@ pub enum SocialPlatform {
     Discord,    // 1
     Telegram,   // 2
     X,          // 3
+}
+
+#[derive(Serde, Copy, Drop, PartialEq, Introspect)]
+pub enum PlayerSetting {
+    Undefined,                              // 0
+    OptOutNotifications: SocialPlatform,    // 1
+}
+#[derive(Serde, Copy, Drop, PartialEq, Introspect)]
+pub enum PlayerSettingValue {
+    Undefined,      // 0
+    Boolean: bool,  // 1
 }
 
 
@@ -112,6 +123,17 @@ pub struct PlayerSocialLinkEvent {
     pub user_name: ByteArray,
     pub user_id: ByteArray,
     pub avatar: ByteArray,
+}
+
+#[derive(Clone, Drop, Serde)]
+#[dojo::event(historical:false)]
+pub struct PlayerSettingEvent {
+    #[key]
+    pub player_address: ContractAddress,
+    #[key]
+    pub setting: PlayerSetting,
+    //-----------------------
+    pub value: PlayerSettingValue,
 }
 
 

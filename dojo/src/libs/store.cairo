@@ -63,6 +63,7 @@ pub use pistols::models::{
         LordsReleaseEvent,
         PlayerBookmarkEvent,
         PlayerSocialLinkEvent, SocialPlatform,
+        PlayerSettingEvent, PlayerSetting, PlayerSettingValue,
     },
 };
 pub use pistols::systems::components::{
@@ -644,5 +645,15 @@ pub impl StoreImpl of StoreTrait {
             user_id,
             avatar,
         });
+    }
+    #[inline(always)]
+    fn emit_player_setting(ref self: Store, player_address: ContractAddress, setting: PlayerSetting, value: PlayerSettingValue) {
+        if (setting != PlayerSetting::Undefined) {
+            self.world.emit_event(@PlayerSettingEvent {
+                player_address,
+                setting,
+                value,
+            });
+        }
     }
 }
