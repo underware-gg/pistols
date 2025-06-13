@@ -52,6 +52,8 @@ export const initialState = {
   duelistSelectOpener: null as Opener,
   walletFinderOpener: null as Opener,
   settingsOpener: null as Opener,
+  errorModalOpener: null as Opener,
+  bugReportOpener: null as Opener,
 }
 
 const PistolsActions = {
@@ -173,6 +175,8 @@ const PistolsProvider = ({
   const duelistSelectOpener = useOpener()
   const walletFinderOpener = useOpener()
   const settingsOpener = useOpener()
+  const errorModalOpener = useOpener()
+  const bugReportOpener = useOpener()
 
   const [hasSearchParams, setHasSearchParams] = useState(false)
 
@@ -317,6 +321,8 @@ const PistolsProvider = ({
     duelistSelectOpener,
     walletFinderOpener,
     settingsOpener,
+    errorModalOpener,
+    bugReportOpener,
   })
 
   emitter.on('searchParams', (data) => {
@@ -331,6 +337,8 @@ const PistolsProvider = ({
                         duelistSelectOpener.isOpen || 
                         walletFinderOpener.isOpen ||
                         settingsOpener.isOpen ||
+                        errorModalOpener.isOpen ||
+                        bugReportOpener.isOpen ||
                         hasSearchParams ||
                         (state.challengingAddress && state.challengingDuelistId)
 
@@ -343,6 +351,8 @@ const PistolsProvider = ({
     duelistSelectOpener.isOpen,
     walletFinderOpener.isOpen,
     settingsOpener.isOpen,
+    errorModalOpener.isOpen,
+    bugReportOpener.isOpen,
     hasSearchParams,
     state.challengingAddress,
     state.challengingDuelistId
@@ -359,6 +369,8 @@ const PistolsProvider = ({
       duelistSelectOpener,
       walletFinderOpener,
       settingsOpener,
+      errorModalOpener,
+      bugReportOpener,
     } }}>
       {children}
     </PistolsContext.Provider>

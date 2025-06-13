@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Modal, Button, Icon, Image, Grid } from 'semantic-ui-react'
 import { useSettings } from '/src/hooks/SettingsContext'
-import { usePistolsScene } from '/src/hooks/PistolsContext'
+import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { ActionButton } from '/src/components/ui/Buttons'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import Slider from '@mui/material/Slider'
@@ -18,7 +18,8 @@ interface SettingsModalProps {
 
 export default function SettingsModal({ opener }: SettingsModalProps) {
   const { settings, dispatchSetting, SettingsActions } = useSettings()
-  const { atGate, atDoor, atTutorial, dispatchSetScene } = usePistolsScene()
+  const { atGate, atDoor, atTutorial, dispatchSetScene} = usePistolsScene()
+  const { bugReportOpener } = usePistolsContext()
   const [view, setView] = useState<'settings' | 'about'>('settings')
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { isLinked: isDiscordLinked, userName: discordUserName, avatarUrl: discordAvatarUrl } = usePlayerDiscordSocialLink()
@@ -226,8 +227,8 @@ export default function SettingsModal({ opener }: SettingsModalProps) {
                     />
                 )}
                 <ActionButton label="About Us" className='spaced' onClick={() => setView('about')}/>
-                <ActionButton label="Contact Us" className='spaced' onClick={() => {
-                  window.open('https://x.com/underware_gg', '_blank')
+                <ActionButton label="Report a Bug" className='spaced' onClick={() => {
+                  bugReportOpener.open()
                 }}/>
               </div>
             </div>
