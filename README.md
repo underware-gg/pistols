@@ -63,7 +63,7 @@ Pistols at Dawn is an onchain game, in which you face off against another Lord i
 
 ### Other Contributors
 
-* Voltrevo — Engineering, Hidden information mechanism
+* [@voltrevo](https://x.com/voltrevo) — Engineering, Hidden information mechanism
 
 ## Contents
 
