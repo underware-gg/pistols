@@ -171,7 +171,7 @@ pub mod duel_token {
         challenge::{Challenge, ChallengeTrait, ChallengeValue, ChallengeMessage, ChallengeMessageValue, DuelType, Round, RoundTrait},
         duelist::{DuelistTrait, DuelistProfile, DuelistProfileTrait},
         pact::{PactTrait},
-        events::{Activity, ActivityTrait},
+        events::{Activity, ActivityTrait, ChallengeAction},
         // tournament::{
         //     TournamentDuelKeys, TournamentDuelKeysTrait,
         //     TournamentRules,
@@ -358,9 +358,9 @@ pub mod duel_token {
             }
 
             // Duelist 1 is ready to commit
-            store.emit_challenge_action(@challenge, 1, true);
+            store.emit_challenge_action(@challenge, 1, ChallengeAction::Commit);
             // Duelist 2 has to reply
-            store.emit_challenge_reply_action(@challenge, true);
+            store.emit_challenge_action(@challenge, 2, ChallengeAction::Reply);
 
             // events
             PlayerTrait::check_in(ref store, Activity::ChallengeCreated, address_a, duel_id.into());
@@ -414,7 +414,7 @@ pub mod duel_token {
                     store.enter_challenge(challenge.duelist_id_b, duel_id);
 
                     // Duelist 2 can commit
-                    store.emit_challenge_action(@challenge, 2, true);
+                    store.emit_challenge_action(@challenge, 2, ChallengeAction::Commit);
 
                     // update timestamps
                     challenge.state = ChallengeState::InProgress;
@@ -434,17 +434,14 @@ pub mod duel_token {
                 }
             }
 
-            // replied
-            store.emit_challenge_reply_action(@challenge, false);
-
             // duel canceled!
             if (challenge.state.is_canceled()) {
                 challenge.season_id = store.get_current_season_id();
                 challenge.timestamps.end = timestamp;
                 challenge.unset_pact(ref store);
                 store.exit_challenge(challenge.duelist_id_a);
-                store.emit_clear_challenge_action(@challenge, 1);
-                store.emit_clear_challenge_action(@challenge, 2);
+                store.emit_challenge_action(@challenge, 1, ChallengeAction::Finished);
+                store.emit_challenge_action(@challenge, 2, ChallengeAction::Finished);
                 Activity::ChallengeCanceled.emit(ref store.world, starknet::get_caller_address(), challenge.duel_id.into());
             } else {
                 PlayerTrait::check_in(ref store, Activity::ChallengeReplied, address_b, duel_id.into());

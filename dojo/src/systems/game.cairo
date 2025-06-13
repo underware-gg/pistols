@@ -23,7 +23,7 @@ pub trait IGame<TState> {
     );
     fn collect_duel(ref self: TState, duel_id: u128) -> u8; //@description: Close expired duels
     // event emitters
-    fn clear_call_to_action(ref self: TState, duelist_id: u128); // @description: Clear call to action for a duelist
+    fn clear_call_to_challenge(ref self: TState, duel_id: u128); // @description: Clear call to action for a player
     fn emit_player_bookmark(ref self: TState, target_address: ContractAddress, target_id: u128, enabled: bool); //@description: Bookmarks an address or token
     fn emit_player_social_link(ref self: TState, social_platform: SocialPlatform, player_address: ContractAddress, user_name: ByteArray, user_id: ByteArray, avatar: ByteArray); //@description: Link player to social platform
     fn clear_player_social_link(ref self: TState, social_platform: SocialPlatform); //@description: Unlink player from social platform
@@ -91,7 +91,7 @@ pub mod game {
         leaderboard::{Leaderboard, LeaderboardTrait, LeaderboardPosition},
         pact::{PactTrait},
         season::{SeasonScoreboard, SeasonScoreboardTrait},
-        events::{Activity, ActivityTrait, SocialPlatform, PlayerSetting, PlayerSettingValue},
+        events::{Activity, ActivityTrait, ChallengeAction, SocialPlatform, PlayerSetting, PlayerSettingValue},
         // tournament::{TournamentRound, TournamentRoundTrait, TournamentDuelKeys},
     };
     use pistols::types::{
@@ -185,50 +185,47 @@ pub mod game {
 
             if (duelist_number == 1) {
                 // validate and store hash
-                assert(round.moves_a.hashed == 0, Errors::ALREADY_COMMITTED);
+                assert(!round.moves_a.has_comitted(), Errors::ALREADY_COMMITTED);
                 assert(hashed > 0, Errors::INVALID_MOVES_HASH);
-                round.moves_a.hashed = hashed;
+                round.moves_a.commit(hashed);
                 // was duelist transferred?
                 if (challenge.address_a != owner) {
                     challenge.address_a = owner;
                     store.set_challenge(@challenge);
                 }
-                if (round.moves_b.hashed == 0) {
-                    // other duelist did not commit: clear self action flag
-                    store.emit_challenge_action(@challenge, 1, false);
-                } else {
-                    // other duelist committed: call for action (keep self flag for reveal)
-                    store.emit_challenge_action(@challenge, 2, true);
-                }
             } else if (duelist_number == 2) {
                 // validate and store hash
-                assert(round.moves_b.hashed == 0, Errors::ALREADY_COMMITTED);
+                assert(!round.moves_b.has_comitted(), Errors::ALREADY_COMMITTED);
                 assert(hashed > 0, Errors::INVALID_MOVES_HASH);
-                round.moves_b.hashed = hashed;
+                round.moves_b.commit(hashed);
                 // was duelist transferred?
                 if (challenge.address_b != owner) {
                     challenge.address_b = owner;
                     store.set_challenge(@challenge);
                 }
-                if (round.moves_a.hashed == 0) {
-                    // other duelist did not commit: clear self action flag
-                    store.emit_challenge_action(@challenge, 2, false);
-                } else {
-                    // other duelist committed: call for action (keep self flag for reveal)
-                    store.emit_challenge_action(@challenge, 1, true);
-                }
             }
+
 
             // move to reveal phase?
             let timestamp: u64 = starknet::get_block_timestamp();
             let rules: Rules = store.get_current_season_rules();
-            if (round.moves_a.hashed != 0 && round.moves_b.hashed != 0) {
+            if (round.moves_a.has_comitted() && round.moves_b.has_comitted()) {
                 round.state = RoundState::Reveal;
                 round.set_reveal_timeout(rules, timestamp);
-            } else if (challenge.state == ChallengeState::InProgress) {
-                // reset timeout for other player
-                // (not if Awaiting, under Challenge timeouts)
-                round.set_commit_timeout(rules, timestamp);
+                // call for reveal
+                store.emit_challenge_action(@challenge, 1, ChallengeAction::Reveal);
+                store.emit_challenge_action(@challenge, 2, ChallengeAction::Reveal);
+            } else {
+                // reset timeout for other player (not if Awaiting, under Challenge timeouts)
+                if (challenge.state == ChallengeState::InProgress) {
+                    round.set_commit_timeout(rules, timestamp);
+                }
+                // One duelist comitted, wait for the other...
+                if (round.moves_a.has_comitted()) {
+                    store.emit_challenge_action(@challenge, 1, ChallengeAction::Waiting);
+                } else if (round.moves_b.has_comitted()) {
+                    store.emit_challenge_action(@challenge, 2, ChallengeAction::Waiting);
+                }
             }
 
             // // update tournanemnt (if applicable)
@@ -282,11 +279,11 @@ pub mod game {
             // validate hash
             let hashed: u128 = MovesTrait::make_moves_hash(salt, moves);
             if (duelist_number == 1) {
-                assert(round.moves_a.salt == 0, Errors::ALREADY_REVEALED);
+                assert(!round.moves_a.has_revealed(), Errors::ALREADY_REVEALED);
                 assert(round.moves_a.hashed == hashed, Errors::MOVES_HASH_MISMATCH);
                 round.moves_a.reveal_salt_and_moves(salt, moves);
             } else {
-                assert(round.moves_b.salt == 0, Errors::ALREADY_REVEALED);
+                assert(!round.moves_b.has_revealed(), Errors::ALREADY_REVEALED);
                 assert(round.moves_b.hashed == hashed, Errors::MOVES_HASH_MISMATCH);
                 round.moves_b.reveal_salt_and_moves(salt, moves);
             }
@@ -302,11 +299,11 @@ pub mod game {
             // events
             Activity::MovesRevealed.emit(ref store.world, starknet::get_caller_address(), duel_id.into());
 
-            // missing reveal, update only and wait for final reveal
-            if (round.moves_a.salt == 0 || round.moves_b.salt == 0) {
+            // missing reveal, just update and wait for final reveal
+            if (!round.moves_a.has_revealed() || !round.moves_b.has_revealed()) {
                 store.set_round(@round);
-                // clear self flag
-                store.emit_challenge_action(@challenge, duelist_number, false);
+                // wait for other player...
+                store.emit_challenge_action(@challenge, duelist_number, ChallengeAction::Waiting);
                 // // update tournanemnt (if applicable)
                 // self._update_tournament(ref store, duel_id, @round);
                 return;
@@ -317,12 +314,9 @@ pub mod game {
             //
 
             // clear self duel
-            store.emit_clear_challenge_action(@challenge, duelist_number);
+            store.emit_challenge_action(@challenge, duelist_number, ChallengeAction::Finished);
             // call other duelist to see the results
-            store.emit_challenge_action(@challenge,
-                if (duelist_number == 1) {2} else {1},
-                true,
-            );
+            store.emit_challenge_action(@challenge, if(duelist_number==1){2}else{1}, ChallengeAction::Results);
 
             // execute game loop...
             let wrapped: @RngWrap = RngWrapTrait::new(store.world.rng_address());
@@ -381,10 +375,9 @@ pub mod game {
         //------------------------------------
         // event emitters
         //
-        fn clear_call_to_action(ref self: ContractState, duelist_id: u128) {
+        fn clear_call_to_challenge(ref self: ContractState, duel_id: u128) {
             let mut store: Store = StoreTrait::new(self.world_default());
-            self._validate_ownership(@store.world, duelist_id);
-            store.emit_call_to_action(starknet::get_caller_address(), duelist_id, 0, false);
+            store.emit_call_to_challenge(starknet::get_caller_address(), duel_id, ChallengeAction::Finished);
         }
         fn emit_player_bookmark(ref self: ContractState, target_address: ContractAddress, target_id: u128, enabled: bool) {
             let mut store: Store = StoreTrait::new(self.world_default());
@@ -606,8 +599,8 @@ pub mod game {
                     Activity::PlayerTimedOut.emit(ref store.world, challenge.address_b, challenge.duel_id.into());
                 }
                 // clear both duelists actions
-                store.emit_clear_challenge_action(@challenge, 1);
-                store.emit_clear_challenge_action(@challenge, 2);
+                store.emit_challenge_action(@challenge, 1, ChallengeAction::Finished);
+                store.emit_challenge_action(@challenge, 2, ChallengeAction::Finished);
                 (true)
             } else {
                 (false)

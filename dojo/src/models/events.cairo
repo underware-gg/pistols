@@ -23,6 +23,17 @@ pub enum Activity {
 }
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
+pub enum ChallengeAction {
+    Undefined,  // 0
+    Reply,      // 1
+    Commit,     // 2
+    Reveal,     // 3
+    Waiting,    // 4
+    Results,    // 5
+    Finished,   // 6
+}
+
+#[derive(Serde, Copy, Drop, PartialEq, Introspect)]
 pub enum SocialPlatform {
     Undefined,  // 0
     Discord,    // 1
@@ -72,32 +83,32 @@ pub struct LordsReleaseEvent {
 //----------------------------------
 // ON-CHAIN events (non-historical)
 //
+// #[derive(Copy, Drop, Serde)]
+// #[dojo::event(historical:false)]
+// pub struct CallToActionEvent {
+//     //
+//     // deprecated for CallToChallengeEvent
+//     //
+//     #[key]
+//     pub player_address: ContractAddress,
+//     #[key]
+//     pub duelist_id: u128,
+//     //-----------------------
+//     pub duel_id: u128,
+//     pub call_to_action: bool,
+//     pub timestamp: u64,
+// }
 #[derive(Copy, Drop, Serde)]
 #[dojo::event(historical:false)]
-pub struct CallToActionEvent {
+pub struct CallToChallengeEvent {
     #[key]
     pub player_address: ContractAddress,
     #[key]
-    pub duelist_id: u128,
-    //-----------------------
     pub duel_id: u128,
-    pub call_to_action: bool,
+    //-----------------------
+    pub action: ChallengeAction,
     pub timestamp: u64,
 }
-
-#[derive(Copy, Drop, Serde)]
-#[dojo::event(historical:false)]
-pub struct ChallengeRewardsEvent {
-    #[key]
-    pub duel_id: u128,
-    #[key]
-    pub duelist_id: u128,
-    //-----------------------
-    pub rewards: RewardValues,
-    // TODO: enable this??
-    // pub timestamp: u64,
-}
-
 
 #[derive(Copy, Drop, Serde)]
 #[dojo::event(historical:false)]
@@ -136,6 +147,18 @@ pub struct PlayerSettingEvent {
     pub value: PlayerSettingValue,
 }
 
+#[derive(Copy, Drop, Serde)]
+#[dojo::event(historical:false)]
+pub struct ChallengeRewardsEvent {
+    #[key]
+    pub duel_id: u128,
+    #[key]
+    pub duelist_id: u128,
+    //-----------------------
+    pub rewards: RewardValues,
+    // TODO: enable this??
+    // pub timestamp: u64,
+}
 
 
 //----------------------------------

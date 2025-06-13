@@ -285,7 +285,7 @@ pub mod tester {
             TestResource::Model(pistols::tests::token::mock_duelist::m_MockDuelistOwners::TEST_CLASS_HASH),
             // pistols events
             TestResource::Event(pistols::models::events::e_PlayerActivityEvent::TEST_CLASS_HASH),
-            TestResource::Event(pistols::models::events::e_CallToActionEvent::TEST_CLASS_HASH),
+            TestResource::Event(pistols::models::events::e_CallToChallengeEvent::TEST_CLASS_HASH),
             TestResource::Event(pistols::models::events::e_ChallengeRewardsEvent::TEST_CLASS_HASH),
             TestResource::Event(pistols::models::events::e_LordsReleaseEvent::TEST_CLASS_HASH),
             TestResource::Event(pistols::models::events::e_PlayerBookmarkEvent::TEST_CLASS_HASH),

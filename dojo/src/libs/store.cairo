@@ -58,7 +58,7 @@ pub use pistols::models::{
     //     TournamentDuelKeys,
     // },
     events::{
-        CallToActionEvent,
+        CallToChallengeEvent, ChallengeAction,
         ChallengeRewardsEvent,
         LordsReleaseEvent,
         PlayerBookmarkEvent,
@@ -570,39 +570,20 @@ pub impl StoreImpl of StoreTrait {
     // Emitters
     //
 
-    #[inline(always)]
-    fn emit_challenge_reply_action(ref self: Store, challenge: @Challenge, reply_required: bool) {
-        if ((*challenge.address_b).is_non_zero()) {
-            // duelist is challenger (just to be unique)
-            self.emit_call_to_action(*challenge.address_b, *challenge.duelist_id_a,
-                if (reply_required) {*challenge.duel_id} else {0},
-                reply_required);
-        }
-    }
-    #[inline(always)]
-    fn emit_challenge_action(ref self: Store, challenge: @Challenge, duelist_number: u8, call_to_action: bool) {
+    fn emit_challenge_action(ref self: Store, challenge: @Challenge, duelist_number: u8, action: ChallengeAction) {
         if (duelist_number == 1) {
-            self.emit_call_to_action(*challenge.address_a, *challenge.duelist_id_a, *challenge.duel_id, call_to_action);
+            self.emit_call_to_challenge(*challenge.address_a, *challenge.duel_id, action);
         } else if (duelist_number == 2) {
-            self.emit_call_to_action(*challenge.address_b, *challenge.duelist_id_b, *challenge.duel_id, call_to_action);
+            self.emit_call_to_challenge(*challenge.address_b, *challenge.duel_id, action);
         }
     }
     #[inline(always)]
-    fn emit_clear_challenge_action(ref self: Store, challenge: @Challenge, duelist_number: u8) {
-        if (duelist_number == 1) {
-            self.emit_call_to_action(*challenge.address_a, *challenge.duelist_id_a, 0, false);
-        } else if (duelist_number == 2) {
-            self.emit_call_to_action(*challenge.address_b, *challenge.duelist_id_b, 0, false);
-        }
-    }
-    #[inline(always)]
-    fn emit_call_to_action(ref self: Store, player_address: ContractAddress, duelist_id: u128, duel_id: u128, call_to_action: bool) {
-        self.world.emit_event(@CallToActionEvent{
+    fn emit_call_to_challenge(ref self: Store, player_address: ContractAddress, duel_id: u128, action: ChallengeAction) {
+        self.world.emit_event(@CallToChallengeEvent{
             player_address,
-            duelist_id,
             duel_id,
-            call_to_action,
-            timestamp: if (duel_id.is_non_zero()) {starknet::get_block_timestamp()} else {0},
+            action,
+            timestamp: starknet::get_block_timestamp(),
         });
     }
 
