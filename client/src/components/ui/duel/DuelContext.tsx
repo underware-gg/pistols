@@ -300,10 +300,9 @@ export const DuelContextProvider: React.FC<{
   // Create a stable function to clear action flags
   const clearActionFlag = useCallback(() => {
     if ((isYouA || isYouB) && account && isRequired && isFinished) {
-      if (isYouA) game.clear_call_to_action(account, duelistIdA);
-      if (isYouB) game.clear_call_to_action(account, duelistIdB);
+      game.clear_call_to_challenge(account, duelId);
     }
-  }, [isYouA, isYouB, account, isRequired, isFinished, game, duelistIdA, duelistIdB]);
+  }, [isYouA, isYouB, account, isRequired, isFinished, game]);
 
   // Create a stable function to reset stats
   const resetStats = useCallback(() => {

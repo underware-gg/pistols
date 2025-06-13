@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react'
 import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
 import { useAllPlayersActivityFeed, ActivityState } from '/src/stores/eventsHistoricalStore'
-import { useCallToActions } from '/src/stores/eventsModelStore'
+import { useCallToChallenges } from '/src/stores/eventsModelStore'
 import { useChallenge } from '/src/stores/challengeStore'
 import { ChallengeLink, DuelistLink, PlayerLink, TimestampDeltaElapsed } from '/src/components/Links'
 import { ChallengeStateReplyVerbs } from '/src/utils/pistols'
@@ -9,8 +9,7 @@ import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 export default function ActivityFeed() {
   const { allPlayersActivity } = useAllPlayersActivityFeed()
-  const { requiredDuelIds } = useCallToActions()
-
+  const { requiredDuelIds } = useCallToChallenges()
   const { clientSeconds, updateTimestamp } = useClientTimestamp(true, 60)
   useEffect(() => {
     updateTimestamp()

@@ -19,6 +19,7 @@ export function EventsModelStoreSync() {
   const { address } = useAccount()
   const mounted = useMounted()
 
+  // get for all players
   const query_get = useMemo<PistolsQueryBuilder>(() => (
     new PistolsQueryBuilder()
       .withEntityModels([
@@ -27,15 +28,17 @@ export function EventsModelStoreSync() {
       .includeHashedKeys()
   ), [])
 
+  // get for current player only
   const query_sub = useMemo<PistolsQueryBuilder>(() => (
     isPositiveBigint(address)
       ? new PistolsQueryBuilder()
         .withClause(
           new PistolsClauseBuilder().keys(
             [
-              'pistols-CallToActionEvent',
+              'pistols-CallToChallengeEvent',
               'pistols-PlayerBookmarkEvent',
               'pistols-PlayerSocialLinkEvent',
+              'pistols-PlayerSettingEvent',
             ],
             // VariableLen means: must have at least the address key...
             [formatQueryValue(address)],
@@ -43,9 +46,10 @@ export function EventsModelStoreSync() {
           ).build()
         )
         .withEntityModels([
-          'pistols-CallToActionEvent',
+          'pistols-CallToChallengeEvent',
           'pistols-PlayerBookmarkEvent',
           'pistols-PlayerSocialLinkEvent',
+          'pistols-PlayerSettingEvent',
         ])
         .includeHashedKeys()
       : undefined
@@ -78,18 +82,19 @@ export function EventsModelStoreSync() {
     },
     setEntities: (entities: PistolsEntity[]) => {
       debug.log(`GET EventsModelStoreSync() ======> [player]`, entities)
-      eventsState.setEntities(filterEntitiesByModels(entities, ['CallToActionEvent', 'PlayerSocialLinkEvent']))
+      eventsState.setEntities(filterEntitiesByModels(entities, ['CallToChallengeEvent', 'PlayerSocialLinkEvent', 'PlayerSettingEvent']))
       playerDataState.updateMessages(filterEntitiesByModels(entities, ['PlayerBookmarkEvent']))
     },
     updateEntity: (entity: PistolsEntity) => {
       debug.log(`SUB EventsModelStoreSync() ======> [player]`, entity)
       const model =
-        getEntityModel(entity, 'CallToActionEvent') ??
+        getEntityModel(entity, 'CallToChallengeEvent') ??
         getEntityModel(entity, 'PlayerBookmarkEvent') ??
-        getEntityModel(entity, 'PlayerSocialLinkEvent');
+        getEntityModel(entity, 'PlayerSocialLinkEvent') ??
+        getEntityModel(entity, 'PlayerSettingEvent');
       if (model && bigintEquals(model.player_address, address)) {
         debug.log(`SUB EventsModelStoreSync() ======> model:`, entity)
-        if (entityContainsModels(entity, ['CallToActionEvent', 'PlayerSocialLinkEvent'])) {
+        if (entityContainsModels(entity, ['CallToChallengeEvent', 'PlayerSocialLinkEvent', 'PlayerSettingEvent'])) {
           eventsState.updateEntity(entity)
         }
         if (entityContainsModels(entity, ['PlayerBookmarkEvent'])) {

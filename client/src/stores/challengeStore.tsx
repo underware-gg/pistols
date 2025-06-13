@@ -12,7 +12,7 @@ import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
 import { movesToHand } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { ChallengeColumn, SortDirection } from '/src/stores/queryParamsStore'
-import { useCallToActions } from '/src/stores/eventsModelStore'
+import { useCallToChallenges } from '/src/stores/eventsModelStore'
 import { useChallengeFetchStore } from '/src/stores/fetchStore'
 import { debug } from '@underware/pistols-sdk/pistols'
 
@@ -277,8 +277,7 @@ export function useDuelistSeasonStats(duelistId: BigNumberish, seasonId?: BigNum
  */
 export function useMyActiveDuels(notificationDuelIds: bigint[] = []) {
   const { address } = useAccount()
-  const { requiredDuelIds } = useCallToActions()
-  const { duelPerDuelist } = useCallToActions()
+  const { requiredDuelIds } = useCallToChallenges()
 
   const entities = useChallengeStore((state) => state.entities)
   const challenges = useAllStoreModels<models.Challenge>(entities, 'Challenge')
@@ -290,22 +289,15 @@ export function useMyActiveDuels(notificationDuelIds: bigint[] = []) {
     const allRelevantDuelIds = new Set([...requiredDuelIds, ...notificationDuelIds])
 
     return challenges
-      .filter((ch) => (
-        bigintEquals(ch.address_a, address) ||
-        bigintEquals(ch.address_b, address)
-      ))
       .filter(ch => allRelevantDuelIds.has(BigInt(ch.duel_id)))
-      .map(ch => {
-        const callToAction = Object.values(duelPerDuelist).find(duel => bigintEquals(duel.duelId, ch.duel_id))?.callToAction ?? false
-        return {
-          duel_id: BigInt(ch.duel_id),
-          timestamp: Number(ch.timestamps.start),
-          state: parseEnumVariant<constants.ChallengeState>(ch.state),
-          callToAction
-        }
+      .map(ch => ({
+        duel_id: BigInt(ch.duel_id),
+        timestamp: Number(ch.timestamps.start),
+        state: parseEnumVariant<constants.ChallengeState>(ch.state),
+        callToAction: requiredDuelIds.includes(BigInt(ch.duel_id))
       })
-
-  }, [challenges, address, duelPerDuelist, requiredDuelIds, notificationDuelIds])
+      )
+  }, [challenges, address, requiredDuelIds, notificationDuelIds])
 
   return result
 }
@@ -649,7 +641,7 @@ export const useQueryChallengeIdsByDuelist = (
 // ) => {
 //   const { address } = useAccount()
 //   const { bookmarkedDuels } = usePlayer(address)
-//   const { requiredDuelIds } = useCallToActions()
+//   const { requiredDuelIds } = useCallToChallenges()
 
 //   const entities = useChallengeStore((state) => state.entities);
 //   const challenges = useAllStoreModels<models.Challenge>(entities, 'Challenge')

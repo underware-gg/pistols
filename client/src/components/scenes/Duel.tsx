@@ -361,10 +361,9 @@ const DuelContent: React.FC<{
 //   useEffect(() => {
 //     if ((isYouA || isYouB) && mounted && account && isRequired && isFinished) {
 //       console.log('clearing required action flag...')
-//       if (isYouA) game.clear_call_to_action(account, duelistIdA)
-//       if (isYouB) game.clear_call_to_action(account, duelistIdB)
+//       if (isYouA || isYouB) game.clear_call_to_challenge(account, duelId)
 //     }
-//   }, [isYouA, isYouB, mounted, account, isRequired, isFinished])
+//   }, [isYouA, isYouB, mounted, account, isRequired, isFinished, duelId])
 
 //   // Animated duel is useDuel added with intermediate animation stages
 //   const {

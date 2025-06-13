@@ -118,9 +118,9 @@ export function createSystemCalls(
         ]
         return await _executeTransaction(signer, calls)
       },
-      clear_call_to_action: async (signer: AccountInterface, duel_id: BigNumberish): Promise<boolean> => {
+      clear_call_to_challenge: async (signer: AccountInterface, duel_id: BigNumberish): Promise<boolean> => {
         const calls: DojoCalls = [
-          contractCalls.game.buildClearCallToActionCalldata(
+          contractCalls.game.buildClearCallToChallengeCalldata(
             duel_id,
           ),
         ]

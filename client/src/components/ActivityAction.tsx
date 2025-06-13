@@ -1,78 +1,26 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { useAccount } from '@starknet-react/core'
 import { BigNumberish } from 'starknet'
-import { useDuelist } from '/src/stores/duelistStore'
-import { usePlayer } from '/src/stores/playerStore'
-import { useDuelistFameBalance } from '/src/stores/coinStore'
-import { useCallToActions } from '/src/stores/eventsModelStore'
-import { Icon, EmojiIcon } from '/src/components/ui/Icons'
-import { DuelOpponentNameLink, ChallengeLink, DuelistLink, DuelistOwnerLink } from '/src/components/Links'
-import { bigintToDecimal, bigintToHex } from '@underware/pistols-sdk/utils'
-import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
+import { useCallToChallenges } from '/src/stores/eventsModelStore'
+import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
 import { usePlayerDuelistsOrganized } from '/src/stores/duelistStore'
+import { DuelOpponentNameLink, ChallengeLink } from '/src/components/Links'
+import { bigintToDecimal } from '@underware/pistols-sdk/utils'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
+import { Icon } from '/src/components/ui/Icons'
 
-
-type ActionType = 'Waiting' | 'ReplyChallenge' | 'ActionRequired' | 'Idle';
-type Action = {
-  actionType: ActionType
-  duelId?: bigint
-  duelistId?: BigNumberish
-}
 
 export function usePlayersActions() {
-  const { duelPerDuelist } = useCallToActions()
-  const { activeDuelists: duelistIds } = usePlayerDuelistsOrganized();
+  const { activeChallenges } = useCallToChallenges()
+  const { duelistIds } = useDuelistsOfPlayer()
 
-  const sortedDuelistIds = useMemo(() => (
-    Array.from(new Set([
-      // join with duelists in actions (other player when replying)
-      ...duelistIds,
-      ...Object.keys(duelPerDuelist).map((duelistId) => BigInt(duelistId))
-    ])).sort((a, b) => {
-      const duelA = duelPerDuelist[bigintToHex(a)] ?? null
-      const duelB = duelPerDuelist[bigintToHex(b)] ?? null
-      if (!duelA && !duelB) {
-        // Convert BigNumberish to bigint before subtraction
-        const bigA = typeof a === 'bigint' ? a : BigInt(a.toString())
-        const bigB = typeof b === 'bigint' ? b : BigInt(b.toString())
-        return Number(bigB - bigA)
-      }
-      if (!duelA) return 1
-      if (!duelB) return -1
-      return Number(duelB.duelId - duelA.duelId)
-      // return (duelB.timestamp - duelA.timestamp)
-    })
-  ), [duelistIds, duelPerDuelist])
-
-  const actions = useMemo(() => (
-    sortedDuelistIds.map(d => BigInt(d)).map((duelistId) => {
-      const duel = duelPerDuelist[bigintToHex(duelistId)]
-      const duelId = BigInt(duel?.duelId ?? 0)
-      const isReply = (duelId > 0n && !duelistIds.some(id =>
-        (typeof id === 'bigint' && typeof duelistId === 'bigint')
-          ? id === duelistId
-          : BigInt(id.toString()) === BigInt(duelistId.toString())
-      ))
-      const actionType =
-        isReply ? 'ReplyChallenge'
-          : duelId > 0n ? (duel?.callToAction ? 'ActionRequired' : 'Waiting')
-            : 'Idle'
-      const action: Action = {
-        actionType,
-        duelId,
-        duelistId,
-      }
-      return action
-    })//.sort((a, b) => Number(b.duelId - a.duelId))
-  ), [sortedDuelistIds, duelPerDuelist])
-
-  const replyCount = useMemo(() => actions.filter((a) => a.actionType === 'ReplyChallenge').length, [actions])
-  const actionCount = useMemo(() => actions.filter((a) => a.actionType === 'ActionRequired').length, [actions])
-  const waitingCount = useMemo(() => actions.filter((a) => a.actionType === 'Waiting').length, [actions])
-  const idleCount = useMemo(() => actions.filter((a) => a.actionType === 'Idle').length, [actions])
+  const replyCount = useMemo(() => activeChallenges.filter((ch) => ch.action === constants.ChallengeAction.Reply).length, [activeChallenges])
+  const waitingCount = useMemo(() => activeChallenges.filter((ch) => ch.action === constants.ChallengeAction.Waiting).length, [activeChallenges])
+  const actionCount = useMemo(() => activeChallenges.filter((ch) => ch.requiresAction).length, [activeChallenges])
+  const idleCount = useMemo(() => (duelistIds.length - activeChallenges.length), [duelistIds, activeChallenges])
 
   return {
-    actions,
+    activeChallenges,
     replyCount,
     actionCount,
     waitingCount,
@@ -82,7 +30,11 @@ export function usePlayersActions() {
 }
 
 
-export const ActionIcon = (isActive: boolean) => {
+export const ActionIcon = ({
+  isActive
+} : {
+  isActive: boolean
+}) => {
   const { actionCount, replyCount } = usePlayersActions()
   const pulsing = useMemo(() => (!isActive && (actionCount > 0 || replyCount > 0)), [isActive, actionCount, replyCount])
   const name = useMemo(() => (pulsing ? 'dot circle outline' : isActive ? 'circle' : 'circle outline'), [isActive, pulsing])
@@ -103,17 +55,16 @@ export const ActionIcon = (isActive: boolean) => {
 
 export default function ActivityAction() {
   const { isConnected } = useAccount()
-  const { actions, idleCount, duelistCount } = usePlayersActions()
-  const items = useMemo(() => (actions.map((a) => {
+  const { activeChallenges, idleCount, duelistCount } = usePlayersActions()
+  const items = useMemo(() => (activeChallenges.map((a) => {
     return (
       <ActionItem
-        key={`${a.actionType}-${bigintToDecimal(a.duelId ?? 0) }-${bigintToDecimal(a.duelistId ?? 0) }`}
-        duelistId={a.duelistId}
+        key={bigintToDecimal(a.duelId)}
         duelId={a.duelId}
-        actionType={a.actionType}
+        action={a.action}
       />
     )
-  })), [actions])
+  })), [activeChallenges])
   return (
     <div className='FillParent'>
       {items}
@@ -130,18 +81,16 @@ export default function ActivityAction() {
 
 
 const ActionItem = ({
-  duelistId,
   duelId,
-  actionType,
+  action,
 }: {
-  duelistId: BigNumberish
   duelId: BigNumberish
-  actionType: ActionType
+  action: constants.ChallengeAction
 }) => {
   // const { isInactive } = useDuelist(duelistId)
   // const { lives } = useDuelistFameBalance(duelistId)
 
-  if (actionType === 'ReplyChallenge') {
+  if (action === constants.ChallengeAction.Reply) {
     return (
       <>
         {/* <Icon name='circle' className='Invisible' /> */}
@@ -154,7 +103,7 @@ const ActionItem = ({
   }
 
   // in a duel, required to play
-  if (actionType === 'ActionRequired') {
+  if (action === constants.ChallengeAction.Commit || action === constants.ChallengeAction.Reveal) {
     return (
       <>
         <Icon name='circle' className='Positive' />
@@ -167,7 +116,21 @@ const ActionItem = ({
     )
   }
 
-  if (actionType === 'Waiting') {
+  if (action === constants.ChallengeAction.Results) {
+    return (
+      <>
+        <Icon name='circle' />
+        {'Did you kill '}
+        <DuelOpponentNameLink duelId={duelId} />
+        {' in '}
+        <ChallengeLink duelId={duelId} />
+        {'?'}
+        <br />
+      </>
+    )
+  }
+
+  if (action === constants.ChallengeAction.Waiting) {
     return (
       <>
         <Icon name='circle' />
@@ -192,18 +155,6 @@ const ActionItem = ({
   //   )
   // }
 
-  // if (isLoading) {
-  //   return (
-  //     <>
-  //       <Icon name='circle outline' />
-  //       <DuelistLink duelistId={duelistId} useName />
-  //       {'...'}
-  //       <br />
-  //     </>
-  //   )
-  // }
-
-
   // // dripping fame!
   // if (lives == 0) {
   //   return (
@@ -215,16 +166,6 @@ const ActionItem = ({
   //     </>
   //   )
   // }
-
-  // // idle
-  // return (
-  //   <>
-  //     <Icon name='circle outline' />
-  //     <DuelistLink duelistId={duelistId} useName />
-  //     {' is ready to duel!'}
-  //     <br />
-  //   </>
-  // )
 
   return <></>
 }

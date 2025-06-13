@@ -33,7 +33,7 @@ export function PlayerSync() {
   useEffect(() => {
     if (isFinishedPacks) updateProgress('player_packs', 1, true)
   }, [isFinishedPacks])
-  // console.log('>>>>>>PROGRESSS', isFinishedChallenges, isFinishedDuelists, isFinishedPacks)
+  // console.log('>>>>>> PLAYER PROGRESSS', isFinishedChallenges, isFinishedDuelists, isFinishedPacks)
 
   return (<></>)
 }
