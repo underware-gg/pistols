@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef, useCallback } from 'react'
 import { usePistolsScene } from '/src/hooks/PistolsContext'
 import { SceneName, TextureName } from '/src/data/assets'
 import { useGameEvent } from '/src/hooks/useGameEvent'
@@ -15,23 +15,58 @@ import * as TWEEN from '@tweenjs/tween.js'
 import { emitter } from '/src/three/game'
 
 export default function ScTavern() {
+
+  useEffect(() => {
+    if (!open && _currentScene && _currentScene instanceof InteractibleScene) {
+      (_currentScene as InteractibleScene)?.toggleBlur?.(false);
+      (_currentScene as InteractibleScene)?.setClickable?.(true);
+      setTimeout(() => {
+        (_currentScene as InteractibleScene)?.excludeItem?.(null);
+      }, 400)
+    }
+  }, [open])
+
+  return (
+    <div>
+      <NotificationExclamation />
+
+      <ActivityPanel />
+
+      <DojoSetupErrorDetector />
+    </div>
+  )
+}
+
+//
+// TEMP:::Removed from main scene
+// should be somewhere else???
+// 
+// 
+function NotificationExclamation({ }) {
   const { dispatchSetScene } = usePistolsScene()
   const { aspectWidth } = useGameAspect()
   const { hasUnreadNotifications } = useNotifications()
 
+  const [open, setOpen] = useState(false)
+  const [initialStage, setInitialStage] = useState<'intro' | 'menu' | 'notifications'>('intro')
+
   const { value: itemClicked, timestamp } = useGameEvent('scene_click', null)
   const { x: notificationShiftX, y: notificationShiftY } = useTextureShift(1)
 
-  const [open, setOpen] = useState(false)
-  const [initialStage, setInitialStage] = useState<'intro' | 'menu' | 'notifications'>('intro')
   const [exclamationOpacity, setExclamationOpacity] = useState(0)
   const [isHovered, setIsHovered] = useState(false)
   const [pulseIntensity, setPulseIntensity] = useState(8)
   const [verticalShift, setVerticalShift] = useState(0)
-  
+
   const opacityTweenRef = useRef<TWEEN.Tween<any> | null>(null)
   const pulseTweenRef = useRef<TWEEN.Tween<any> | null>(null)
   const floatTweenRef = useRef<TWEEN.Tween<any> | null>(null)
+
+  useEffect(() => {
+    if (!open) {
+      setInitialStage('intro')
+    }
+  }, [open])
 
   useEffect(() => {
     if (opacityTweenRef.current) {
@@ -47,12 +82,6 @@ export default function ScTavern() {
       })
       .start()
   }, [hasUnreadNotifications, open])
-
-  useEffect(() => {
-    if (!open) {
-      setInitialStage('intro')
-    }
-  }, [open])
 
   useEffect(() => {
     if (pulseTweenRef.current) {
@@ -87,7 +116,7 @@ export default function ScTavern() {
       setVerticalShift(0)
     }
   }, [exclamationOpacity, isHovered, open])
-  
+
   useEffect(() => {
     if (itemClicked) {
       switch (itemClicked) {
@@ -120,19 +149,20 @@ export default function ScTavern() {
     }
   }, [open])
 
-  const handleMouseEnter = () => {
+  const handleMouseEnter = useCallback(() => {
     setIsHovered(true)
     emitter.emit('hover_description', 'You have unread notifications')
-  }
+  }, [emitter])
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = useCallback(() => {
     setIsHovered(false)
     emitter.emit('hover_description', '')
-  }
+  }, [emitter])
+
 
   return (
-    <div>
-      <Image 
+    <>
+      <Image
         src="/images/ui/notification_exclamation.png"
         className="YeMouse NoDrag"
         style={{
@@ -143,7 +173,7 @@ export default function ScTavern() {
           rotate: '-20deg',
           width: aspectWidth(10),
           height: 'auto',
-          transform: `translate(${notificationShiftX}px, ${notificationShiftY + verticalShift}px) scale(${isHovered ? 1.2 : 1})`, 
+          transform: `translate(${notificationShiftX}px, ${notificationShiftY + verticalShift}px) scale(${isHovered ? 1.2 : 1})`,
           cursor: 'pointer',
           opacity: exclamationOpacity,
           filter: `drop-shadow(0 0 ${pulseIntensity}px rgba(255, 255, 255, ${isHovered ? 1 : 0.8}))`,
@@ -160,11 +190,7 @@ export default function ScTavern() {
           setOpen(true)
         }}
       />
-
-      <ActivityPanel />
       <BarkeepModal open={open} setOpen={setOpen} initialStage={initialStage} />
-
-      <DojoSetupErrorDetector />
-    </div>
+    </>
   )
 }
