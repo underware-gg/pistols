@@ -113,8 +113,12 @@ pub impl GameLoopImpl of GameLoopTrait {
             // println!("Env card/dice {}:{}", card_env, dice_env);
 
             // apply env card points to both duelists
-            card_env.apply_points(ref specials_a, ref state_a, ref state_b);
-            card_env.apply_points(ref specials_b, ref state_b, ref state_a);
+            if (dice_fire_a == 0) {
+                card_env.apply_points(ref specials_a, ref state_a, ref state_b);
+            }
+            if (dice_fire_b == 0) {
+                card_env.apply_points(ref specials_b, ref state_b, ref state_a);
+            }
 
             // Fire!
             if (hand_a.card_fire == pace) {
