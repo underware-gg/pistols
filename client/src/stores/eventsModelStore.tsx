@@ -1,12 +1,12 @@
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { BigNumberish } from 'starknet';
 import { useAccount } from '@starknet-react/core';
 import { createDojoStore } from '@dojoengine/sdk/react'
 import { PistolsSchemaType } from '@underware/pistols-sdk/pistols/sdk'
-import { bigintEquals, bigintToHex } from '@underware/pistols-sdk/utils';
-import { useStoreModelsByKeys } from '@underware/pistols-sdk/dojo';
+import { getCustomEnumCalldata, useDojoSystem, useStoreModelsByKeys } from '@underware/pistols-sdk/dojo';
 import { models, constants } from '@underware/pistols-sdk/pistols/gen';
-import { parseEnumVariant } from '@underware/pistols-sdk/starknet';
+import { makeAbiCustomEnum, makeCustomEnum, parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/starknet';
+import { bigintToHex } from '@underware/pistols-sdk/utils';
 
 export const useEventsStore = createDojoStore<PistolsSchemaType>();
 
@@ -32,7 +32,6 @@ export type CallToChallengeDuel = {
   timestamp: number;
 }
 export function useCallToChallenges() {
-  const { address } = useAccount()
   const entities = useEventsStore((state) => state.entities)
   const activeChallenges = useMemo(() => (
     Object.values(entities)
@@ -74,6 +73,13 @@ export function useDuelCallToAction(duel_id: BigNumberish) {
 // 'consumer' hooks
 // [PlayerSocialLinkEvent]
 //
+const _makePlayerSettingKeys = (address: BigNumberish, setting: constants.PlayerSetting, socialPlatform: constants.SocialPlatform): BigNumberish[] => {
+  return [
+    bigintToHex(address),
+    constants.getPlayerSettingValue(setting),
+    constants.getSocialPlatformValue(socialPlatform),
+  ]
+}
 
 export const usePlayerSocialLink = (socialPlatform: constants.SocialPlatform) => {
   const { address } = useAccount()
@@ -81,18 +87,32 @@ export const usePlayerSocialLink = (socialPlatform: constants.SocialPlatform) =>
 }
 export const useSocialLink = (socialPlatform: constants.SocialPlatform, address: BigNumberish) => {
   const entities = useEventsStore((state) => state.entities);
-  const link = useStoreModelsByKeys<models.PlayerSocialLinkEvent>(entities, 'PlayerSocialLinkEvent', [address, constants.getSocialPlatformValue(socialPlatform)])
-
+  const link = useStoreModelsByKeys<models.PlayerSocialLinkEvent>(entities, 'PlayerSocialLinkEvent', [address, constants.getSocialPlatformValue(socialPlatform)]);
+  
   const userName = useMemo(() => link?.user_name ?? '', [link])
   const userId = useMemo(() => link?.user_id ?? '', [link])
   const avatar = useMemo(() => link?.avatar ?? '', [link])
   const isLinked = useMemo(() => Boolean(userName) || Boolean(userId), [userName, userId])
+
+  // PlayerSetting.OptOutNotifications
+  const optOutKeys = useMemo(() => _makePlayerSettingKeys(address, constants.PlayerSetting.OptOutNotifications, socialPlatform), [address, socialPlatform]);
+  const optOutSetting = useStoreModelsByKeys<models.PlayerSettingEvent>(entities, 'PlayerSettingEvent', optOutKeys);
+  const {
+    variant: _optedOutVariant,
+    value: optedOutValue,
+  } = useMemo(() => parseCustomEnum<constants.PlayerSettingValue, boolean>(optOutSetting?.value), [optOutSetting])
+
+  // console.log(`useSocialLink() ::: entities=`, entities)
+  // console.log(`useSocialLink() ::: link=`, link)
+  // console.log(`useSocialLink() ::: optOut=`, optOutSetting)
+  // console.log(`useSocialLink() ::: optedOut/optedOutValue=`, _optedOutVariant, optedOutValue)
 
   return {
     isLinked,
     userName,
     userId,
     avatar,
+    optedOut: optedOutValue,
   }
 }
 
@@ -104,7 +124,7 @@ export const usePlayerDiscordSocialLink = () => {
   return useDiscordSocialLink(address)
 }
 export const useDiscordSocialLink = (address: BigNumberish) => {
-  const { userName, userId, avatar, isLinked } = useSocialLink(constants.SocialPlatform.Discord, address)
+  const { userName, userId, avatar, isLinked, optedOut } = useSocialLink(constants.SocialPlatform.Discord, address)
   const avatarUrl = useMemo(() => (
     (userId && avatar) ? `https://cdn.discordapp.com/avatars/${userId}/${avatar}.png` : ''
   ), [userId, avatar])
@@ -114,6 +134,7 @@ export const useDiscordSocialLink = (address: BigNumberish) => {
     userId,
     avatar,
     avatarUrl,
+    optedOut,
   }
 }
 

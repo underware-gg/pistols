@@ -1,5 +1,5 @@
 import { DojoCall, DojoProvider, getContractByName } from '@dojoengine/core'
-import { AccountInterface, BigNumberish, Call, CallData, UniversalDetails } from 'starknet'
+import { AccountInterface, BigNumberish, CairoCustomEnum, Call, CallData, UniversalDetails } from 'starknet'
 import { arrayClean, shortAddress, isPositiveBigint, bigintToHex } from 'src/utils/misc/types'
 import { NAMESPACE, getLordsAddress, getBankAddress, getVrfAddress, DojoManifest } from 'src/games/pistols/config/config'
 import { bigintToU256 } from 'src/starknet/starknet'
@@ -140,6 +140,19 @@ export function createSystemCalls(
         const calls: DojoCalls = [
           contractCalls.game.buildClearPlayerSocialLinkCalldata(
             makeCustomEnum(social_platform),
+          ),
+        ]
+        return await _executeTransaction(signer, calls)
+      },
+      emit_player_setting: async (signer: AccountInterface, social_platform: constants.SocialPlatform, setting: constants.PlayerSetting, value: boolean): Promise<boolean> => {
+        const settingValue = (
+          setting == constants.PlayerSetting.OptOutNotifications ? makeCustomEnum(constants.PlayerSettingValue.Boolean, value)
+            : undefined
+        );
+        const calls: DojoCalls = [
+          contractCalls.game.buildEmitPlayerSettingCalldata(
+            makeCustomEnum(setting, makeCustomEnum(social_platform)),
+            settingValue,
           ),
         ]
         return await _executeTransaction(signer, calls)

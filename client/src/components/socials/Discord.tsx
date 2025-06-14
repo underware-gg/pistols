@@ -3,7 +3,7 @@ import { Button } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSetup } from '@underware/pistols-sdk/dojo'
 import { usePlayerDiscordSocialLink } from '/src/stores/eventsModelStore'
-import { useExecuteClearPlayerSocialLink } from '/src/hooks/usePistolsSystemCalls'
+import { useExecuteClearPlayerSocialLink, useExecuteEmitPlayerSetting } from '/src/hooks/usePistolsSystemCalls'
 import { signAndGenerateGeneralPurposeSalt } from '@underware/pistols-sdk/pistols'
 import { GeneralPurposeMessage, GeneralPurposeState } from '@underware/pistols-sdk/pistols/config'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
@@ -104,21 +104,44 @@ export function DiscordLinkButton({
 
   if (isLinked) {
     return (
-      <Button className={className} disabled={isDisabled} onClick={() => clear_player_social_link()}>
+      <Button fluid className={className} disabled={isDisabled} onClick={() => clear_player_social_link()}>
         Unlink Discord
       </Button>
     )
   }
   if (!can_link) {
     return (
-      <Button className={className} disabled={true} onClick={() => { }}>
+      <Button fluid className={className} disabled={true} onClick={() => { }}>
         Discord Disabled
       </Button>
     )
   }
   return (
-    <Button className={className} disabled={!isConnected || isLinking} onClick={() => _initiate()}>
+    <Button fluid className={className} disabled={!isConnected || isLinking} onClick={() => _initiate()}>
       {isLinking ? 'Linking...' : 'Link to Discord'}
+    </Button>
+  )
+}
+
+export function DiscordOptOutButton({
+  className = '',
+}: {
+  className?: string
+}) {
+  const { isConnected } = useAccount()
+  const { isLinked, optedOut } = usePlayerDiscordSocialLink()
+
+  //
+  // Unlink: call contract directly (only player can unlink)
+  //
+  const { emit_player_setting, isDisabled } = useExecuteEmitPlayerSetting(constants.SocialPlatform.Discord, constants.PlayerSetting.OptOutNotifications, !optedOut)
+  const _emit = useCallback(() => {
+    emit_player_setting()
+  }, [emit_player_setting, optedOut])
+
+  return (
+    <Button fluid toggle active={!optedOut} className={className} disabled={!isConnected || !isLinked || isDisabled} onClick={() => _emit()}>
+      {isDisabled ? '...' : optedOut ? 'No DMs' : 'DM Notify'}
     </Button>
   )
 }

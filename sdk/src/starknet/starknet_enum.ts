@@ -1,7 +1,7 @@
 import { CairoCustomEnum, BigNumberish, Abi, CallData } from 'starknet'
 import { bigintToHex } from 'src/utils/misc/types'
 
-export type CustomEnumValue = number | BigNumberish | BigNumberish[] | string
+export type CustomEnumValue = boolean | number | BigNumberish | BigNumberish[] | string | CairoCustomEnum
 
 //
 // parse cairo custom enum

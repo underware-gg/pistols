@@ -35,3 +35,16 @@ export const useExecuteClearPlayerSocialLink = (socialPlatform: constants.Social
     isDisabled: (!isConnected || isRunning),
   }
 }
+
+export const useExecuteEmitPlayerSetting = (socialPlatform: constants.SocialPlatform, setting: constants.PlayerSetting, value: boolean) => {
+  const { run, isRunning } = useAsyncRunner<boolean>()
+  const { account, isConnected } = useAccount()
+  const { game } = useDojoSystemCalls();
+  const _execute = useCallback(() => {
+    run(() => game.emit_player_setting(account, socialPlatform, setting, value))
+  }, [run, game, account, socialPlatform, setting, value])
+  return {
+    emit_player_setting: _execute,
+    isDisabled: (!isConnected || isRunning),
+  }
+}

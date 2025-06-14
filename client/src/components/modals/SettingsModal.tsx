@@ -9,7 +9,7 @@ import { SceneName } from '/src/data/assets'
 import { Opener } from '/src/hooks/useOpener'
 import Logo from '/src/components/Logo'
 import { PACKAGE_VERSION } from '/src/utils/constants'
-import { DiscordLinkButton } from '../socials/Discord'
+import { DiscordLinkButton, DiscordOptOutButton } from '../socials/Discord'
 import { usePlayerDiscordSocialLink } from '/src/stores/eventsModelStore'
 
 interface SettingsModalProps {
@@ -139,8 +139,11 @@ export default function SettingsModal({ opener }: SettingsModalProps) {
                       <Grid.Column width={1}>
                         <Image className="Avatar" src={discordAvatarUrl} />
                       </Grid.Column>
-                      <Grid.Column width={9}>
-                      &nbsp;&nbsp;&nbsp;<b>{discordUserName}</b>
+                      <Grid.Column width={5}>
+                        &nbsp;&nbsp;&nbsp;<b>{discordUserName}</b>
+                      </Grid.Column>
+                      <Grid.Column width={4}>
+                        <DiscordOptOutButton className="QualityButton" />
                       </Grid.Column>
                     </>
                   }
