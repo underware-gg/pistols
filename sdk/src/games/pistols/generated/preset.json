@@ -16,7 +16,7 @@
       "policies": {
         "contracts": {
           "0x02c6a7c98a9dea8322b51018eef7be99ebedd209cebdaacb9f4c5bbf661c1cc9": {
-            "description": "Game loop contract",
+            "description": "Game entry point",
             "methods": [
               {
                 "entrypoint": "commit_moves",
@@ -31,8 +31,7 @@
                 "description": "Close expired duels"
               },
               {
-                "entrypoint": "clear_call_to_action",
-                "description": "Clear call to action for a duelist"
+                "entrypoint": "clear_call_to_action"
               },
               {
                 "entrypoint": "emit_player_bookmark",
