@@ -108,12 +108,12 @@ const PistolsContext = createContext<{
 // Helper Functions
 //
 
-const shouldAddToHistory = (state: PistolsContextStateType): boolean => {
+const shouldAddToHistory = (state: PistolsContextStateType, navigatingToDuel: boolean = false): boolean => {
   return isPositiveBigint(state.selectedDuelId) || 
          isPositiveBigint(state.selectedDuelistId) || 
          isPositiveBigint(state.selectedPlayerAddress) || 
-         isPositiveBigint(state.challengingAddress) ||
-         isPositiveBigint(state.challengingDuelistId)
+         (!navigatingToDuel && isPositiveBigint(state.challengingAddress) ||
+         isPositiveBigint(state.challengingDuelistId))
 }
 
 const addToHistory = (state: PistolsContextStateType, oldState: PistolsContextStateType): PistolsContextStateType => {
@@ -223,12 +223,14 @@ const PistolsProvider = ({
         break
       }
       case PistolsActions.SET_DUEL: {
+        newState = clearSelections(newState)
+        newState.selectionHistory = []
         newState.currentDuel = action.payload as bigint
         break
       }
       case PistolsActions.SELECT_DUEL: {
         const newDuelId = action.payload as bigint
-        if (newDuelId !== 0n && newDuelId !== state.selectedDuelId && shouldAddToHistory(state)) {
+        if (newDuelId !== 0n && newDuelId !== state.selectedDuelId && shouldAddToHistory(state, true)) {
           newState = addToHistory(newState, state)
         }
         newState = clearSelections(newState)
