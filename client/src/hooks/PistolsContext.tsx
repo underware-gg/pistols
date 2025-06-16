@@ -184,10 +184,8 @@ const PistolsProvider = ({
     let newState = { ...state }
     switch (action.type) {
       case PistolsActions.RESET_VALUES: {
-        newState.selectedDuelId = 0n
-        newState.selectedDuelistId = 0n
-        newState.selectedPlayerAddress = 0n
-        newState.challengingAddress = 0n
+        newState = clearSelections(newState)
+        newState.selectionHistory = []
         break
       }
       case PistolsActions.SET_SIG: {
