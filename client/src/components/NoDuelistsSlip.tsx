@@ -80,14 +80,14 @@ export const NoDuelistsSlip = forwardRef<NoDuelistsSlipHandle, NoDuelistsSlipPro
             {!canClaimStarterPack ? (
               <>
                 <p style={{ fontSize: aspectWidth(1.4), marginTop: 0, marginBottom: aspectWidth(1) }}>Note to self:</p>
-                <p style={{ fontSize: aspectWidth(1.2) }}>Should probably get a duelist first.. or two.</p>
-                <p style={{ fontSize: aspectWidth(1), marginTop: aspectWidth(0.3) }}>Just a thought...</p>
+                <p style={{ fontSize: aspectWidth(1.2) }}>Should probably get a new duelist... or two.</p>
+                <p style={{ fontSize: aspectWidth(1) }}>...preferably one who can aim this time.</p>
               </>
             ) : (
               <>
                 <p style={{ fontSize: aspectWidth(1.4), marginTop: 0, marginBottom: aspectWidth(1) }}>Urgent reminder:</p>
-                <p style={{ fontSize: aspectWidth(1.2) }}>No duelists available. I should acquire some more...</p>
-                <p style={{ fontSize: aspectWidth(1) }}>...preferably some with good aim.</p>
+                <p style={{ fontSize: aspectWidth(1.2) }}>Still need to get myself a duelist... or two.</p>
+                <p style={{ fontSize: aspectWidth(1) }}>...can't really duel without one.</p>
               </>
             )}
           </div>

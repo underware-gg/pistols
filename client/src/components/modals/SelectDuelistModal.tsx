@@ -262,7 +262,7 @@ function _SelectDuelistModal({
     )
     
     if (isHovered) {
-      emitter.emit('hover_description', 'Go to profile screen')
+      emitter.emit('hover_description', 'Click to go to your card packs to recruit more of your own duelists')
     } else {
       emitter.emit('hover_description', '')
     }
