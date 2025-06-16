@@ -91,8 +91,6 @@ const ActionItem = ({
   // const { isInactive } = useDuelist(duelistId)
   // const { lives } = useDuelistFameBalance(duelistId)
 
-  console.log(`ActionItem() =================> duelId:`, duelId, action)
-
   if (action === constants.ChallengeAction.Reply) {
     console.log(`ActionItem() =================> reply....`, duelId, action)
     return (

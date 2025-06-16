@@ -5,15 +5,17 @@ import { useConfig } from '/src/stores/configStore'
 import { PACKAGE_VERSION } from '/src/utils/constants'
 
 export default function CurrentChainHint() {
-  const { selectedNetworkId } = useDojoSetup()
   const { connector } = useAccount()
   const { currentSeasonId } = useConfig()
+  const { selectedNetworkConfig } = useDojoSetup()
   return (
     <>
       <div className='Code Disabled AbsoluteBottom Padded AlignLeft'>
-        v{PACKAGE_VERSION} s{currentSeasonId}
+        v{PACKAGE_VERSION}/S{currentSeasonId}
         <br />
-        {selectedNetworkId}
+        {selectedNetworkConfig.networkId}
+        {'/'}
+        {selectedNetworkConfig.slotName}
         {'/'}
         {connector?.id ?? 'off'}
       </div>
