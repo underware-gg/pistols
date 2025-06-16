@@ -42,6 +42,11 @@ export const DuelNotificationItem: React.FC<DuelNotificationItemProps> = ({
       message: null
     }
 
+    if (!isMeA && !isMeB) return {
+      title: null,
+      message: null
+    }
+
     const duelistAddressA = challenge.duelistAddressA
     const duelistAddressB = challenge.duelistAddressB
     const isOpponentTurn = (!isMeA && turnA) || (!isMeB && turnB)

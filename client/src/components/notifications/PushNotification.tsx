@@ -20,7 +20,7 @@ export const PushNotification: React.FC<{
   const { name: duelistNameB } = usePlayer(challenge?.duelistAddressB)
 
   const notificationData = useMemo(() => {
-    if (!notification || !challenge || !shouldShow) return { title: null, message: null }
+    if (!notification || !challenge || !shouldShow || (!isMeA && !isMeB)) return { title: null, message: null }
 
     const myName = isMeA ? duelistNameA : duelistNameB
 
