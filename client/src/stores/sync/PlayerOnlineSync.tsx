@@ -23,7 +23,7 @@ export function PlayerOnlineSync() {
 
   useEffect(() => {
     if (publish && clientSeconds > 0 && userHasInteracted && finished && !isPublishing) {
-      publish()
+      // publish()
     }
   }, [publish, clientSeconds, userHasInteracted, finished])
 
