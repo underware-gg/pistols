@@ -1,4 +1,4 @@
-import React, { ReactNode, createContext, useReducer, useContext, useMemo, useEffect, useCallback, useState } from 'react'
+import React, { ReactNode, createContext, useReducer, useContext, useMemo, useEffect, useCallback, useState, useRef } from 'react'
 import { useNavigate, useSearchParams, useLocation, useParams } from 'react-router'
 import { BigNumberish } from 'starknet'
 import { Opener, useOpener } from '/src/hooks/useOpener'
@@ -713,8 +713,16 @@ export const useSyncRouterParams = () => {
     dispatchChallengingPlayerAddress,
     dispatchChallengingDuelistId 
   } = usePistolsContext()
-  
+
+  const isUpdatingFromState = useRef(false)
+
   useEffect(() => {
+    // Only dispatch if the update didn't come from our internal state change
+    if (isUpdatingFromState.current) {
+      isUpdatingFromState.current = false
+      return
+    }
+    
     if (searchParams.get('duel')) {
       dispatchSelectDuel(searchParams.get('duel'))
     } else if (searchParams.get('duelist')) {
@@ -744,6 +752,9 @@ export const useSyncRouterParams = () => {
   } = usePistolsContext()
   
   useEffect(() => {
+    // Mark that we're updating from internal state
+    isUpdatingFromState.current = true
+    
     setSearchParams((prev) => {
       const params = new URLSearchParams()
       if (selectedDuelId) {

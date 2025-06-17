@@ -27,6 +27,14 @@ export default function SelectDuelistModal({
 }: {
   opener: Opener
 }) {
+  const { challengingAddress } = usePistolsContext()
+  const isOpen = useMemo(() => (challengingAddress > 0n), [challengingAddress])
+
+  useEffect(() => {
+    if (!isOpen) {
+      opener.close()
+    }
+  }, [isOpen])
   return <>{opener.isOpen && <_SelectDuelistModal opener={opener} />}</>
 }
 
@@ -36,7 +44,7 @@ function _SelectDuelistModal({
   opener: Opener
 }) {
   const { aspectWidth } = useGameAspect()
-  const { dispatchChallengingPlayerAddress, dispatchChallengingDuelistId } = usePistolsContext()
+  const { dispatchChallengingPlayerAddress, dispatchChallengingDuelistId, challengingAddress, challengingDuelistId } = usePistolsContext()
   const { dispatchSetScene } = usePistolsScene()
   
   // const { duelistIds } = useDuelistsOfPlayer()
@@ -161,6 +169,10 @@ function _SelectDuelistModal({
     animate(0, 1000, 1, 0.5, TWEEN.Easing.Cubic.In, () => {
       if (isPositiveBigint(selectedDuelistId)) {
         dispatchChallengingDuelistId(selectedDuelistId)
+      } else {
+        if (challengingDuelistId == 0n) {
+          dispatchChallengingPlayerAddress(0n)
+        }
       }
       setSelectedDuelistId(0n)
       opener?.close()
@@ -190,7 +202,7 @@ function _SelectDuelistModal({
   }, [currentDuelists, getCardPositioning])
 
   const handleNoDuelistsClick = useCallback(() => {    
-    dispatchSetScene(SceneName.Profile)
+    dispatchSetScene(SceneName.CardPacks)
     opener?.close()
     emitter.emit('hover_description', '')
   }, [dispatchSetScene, opener])
