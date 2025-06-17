@@ -20,7 +20,7 @@ github = "https://github.com/underware-gg/pistols"
 
 [env]
 chain_id = "SN_SEPOLIA"
-# rpc_url = "https://api.cartridge.gg/x/starknet/sepolia" # or env: STARKNET_RPC_URL
+rpc_url = "https://api.cartridge.gg/x/starknet/sepolia" # or env: STARKNET_RPC_URL
 # account_address = ""  # env: DOJO_ACCOUNT_ADDRESS
 # private_key = ""      # env: DOJO_PRIVATE_KEY
 world_address = "0x5898736105a52dad26771eb4d9d166ae9df6f43010f2c16d4878c9d3a834a71"
