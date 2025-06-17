@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
-import { useSdkEntitiesSub, filterEntitiesByModels, entityContainsModels, useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
-import { PistolsQueryBuilder, PistolsEntity } from '@underware/pistols-sdk/pistols/sdk'
+import { useSdkEntitiesSub, filterEntitiesByModels, useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
+import { PistolsQueryBuilder, PistolsEntity, entityContainsModels } from '@underware/pistols-sdk/pistols/sdk'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useConfigStore } from '/src/stores/configStore'
 import { useSeasonStore } from '/src/stores/seasonStore'

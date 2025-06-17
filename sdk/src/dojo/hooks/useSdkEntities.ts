@@ -1,17 +1,21 @@
 import { useEffect, useMemo, useState } from 'react'
 import { BigNumberish } from 'starknet'
-import { bigintToAddress, arrayClean } from 'src/utils/misc/types'
+import { bigintToAddress } from 'src/utils/misc/types'
 import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
 import {
   PistolsToriiResponse,
   PistolsEntity,
   PistolsQueryBuilder,
-  PistolsHistoricalQueryBuilder,
   PistolsModelType,
   PistolsSchemaModelNames,
   PistolsGetParams,
+  SdkSubscribeResponse,
+  SdkSubscriptionCallbackResponse,
 } from 'src/games/pistols/sdk/types_web'
-import * as torii from '@dojoengine/torii-client'
+import {
+  getEntityModel,
+  entityContainsModels,
+} from 'src/games/pistols/sdk/utils_web'
 import { useEntityId } from 'src/dojo/hooks/useEntityId'
 import { debug } from 'src/games/pistols/misc/debug'
 
@@ -40,16 +44,6 @@ export type UseSdkGetProps = {
 export type UseSdkSubProps = UseSdkGetProps & {
   updateEntity: (entities: PistolsEntity) => void // store update callback
 }
-
-export type SdkSubscribeResponse = [
-  PistolsToriiResponse,
-  torii.Subscription
-];
-
-export type SdkSubscriptionCallbackResponse = {
-  data?: PistolsEntity[]
-  error?: Error
-};
 
 
 //---------------------------------------
@@ -325,12 +319,6 @@ export const formatQueryValue = (value: BigNumberish): string => {
 //
 // Extract models from a stored entity
 //
-export const getEntityModel = <M extends PistolsModelType>(entity: PistolsEntity, modelName: PistolsSchemaModelNames): M | undefined => (
-  entity?.models.pistols?.[modelName] as M
-)
-export const entityContainsModels = (entity: PistolsEntity, modelNames: PistolsSchemaModelNames[]): boolean => (
-  modelNames.some(modelName => Boolean(entity?.models.pistols?.[modelName]))
-)
 
 // hooks on DojoStore entities
 export const useAllStoreModels = <M extends PistolsModelType>(entitiesMap: Record<string, PistolsEntity>, modelName: PistolsSchemaModelNames): M[] => {

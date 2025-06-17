@@ -8,6 +8,7 @@ import {
   HistoricalToriiQueryBuilder,
   UnionOfModelData,
 } from '@dojoengine/sdk'
+import * as torii from '@dojoengine/torii-client'
 import * as models from 'src/games/pistols/generated/models.gen'
 
 type PistolsSchemaType = models.SchemaType;
@@ -20,6 +21,16 @@ type PistolsToriiResponse = ToriiResponse<PistolsSchemaType>;
 type PistolsModelType = UnionOfModelData<PistolsSchemaType>;
 type PistolsEntity = ParsedEntity<PistolsSchemaType>;
 
+type SdkSubscribeResponse = [
+  PistolsToriiResponse,
+  torii.Subscription
+];
+
+type SdkSubscriptionCallbackResponse = {
+  data?: PistolsEntity[]
+  error?: Error
+};
+
 export type {
   PistolsSchemaType,
   PistolsSchemaModels,
@@ -28,6 +39,8 @@ export type {
   PistolsToriiResponse,
   PistolsModelType,
   PistolsEntity,
+  SdkSubscribeResponse,
+  SdkSubscriptionCallbackResponse,
 }
 
 class PistolsQueryBuilder extends ToriiQueryBuilder<PistolsSchemaType> { }
