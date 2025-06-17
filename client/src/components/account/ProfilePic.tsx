@@ -3,6 +3,7 @@ import { Image, SemanticFLOATS } from 'semantic-ui-react'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { makeProfilePicUrl } from '@underware/pistols-sdk/pistols'
 import { useGameAspect } from '/src/hooks/useGameAspect'
+import { COLORS } from '@underware/pistols-sdk/pistols/constants'
 
 export function ProfilePic({
   profilePic = null,
@@ -92,7 +93,7 @@ export function ProfilePic({
     
     imageRef.current.style.setProperty('--profile-pic-border', 
       (borderWidth && borderColor) ? `${aspectWidth(borderWidth)}px solid ${borderColor}` :
-      borderWidth ? `${aspectWidth(borderWidth)}px solid #c8b6a8` :
+      borderWidth ? `${aspectWidth(borderWidth)}px solid ${COLORS.BRIGHT}` :
       borderColor ?? `1px solid ${borderColor}`
     );
     imageRef.current.style.setProperty('--profile-pic-border-radius', removeCorners ? '0px' : borderRadius ? `${aspectWidth(borderRadius)}px` : `${aspectWidth(0.2)}px`);

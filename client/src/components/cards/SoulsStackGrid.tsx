@@ -5,6 +5,7 @@ import { CARD_ASPECT_RATIO } from '/src/data/cardConstants'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { emitter } from '/src/three/game'
 import TWEEN from '@tweenjs/tween.js'
+import { COLORS } from '@underware/pistols-sdk/pistols/constants'
 
 const CARDS_PER_ROW = 5
 const CARDS_PER_PAGE = CARDS_PER_ROW * 2
@@ -114,7 +115,7 @@ const SoulsStackGrid: React.FC<SoulsStackGridProps> = ({
                 width: `${aspectWidth(cardWidth)}px`,
                 height: `${aspectWidth(cardHeight)}px`,
                 opacity: 0.2,
-                border: '2px dashed #c8b6a8',
+                border: `2px dashed ${COLORS.BRIGHT}`,
                 borderRadius: '10px'
               }}
             />

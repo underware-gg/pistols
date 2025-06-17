@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react'
 import { Icon, IconGroup, Popup, PopupContent, PopupHeader, SemanticICONS } from 'semantic-ui-react'
 import { IconProps, IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon'
 import { emitter } from '/src/three/game'
+import { COLORS } from '@underware/pistols-sdk/pistols/constants'
 
 export type { IconSizeProp, SemanticICONS }
 
@@ -299,7 +300,7 @@ export function CustomIcon({
   size = null,
   disabled = false,
   flipped = false,
-  color = '#c8b6a8', // $color-text
+  color = COLORS.BRIGHT, // $color-text
   tooltip = null,
   onClick = null,
   raw = false,

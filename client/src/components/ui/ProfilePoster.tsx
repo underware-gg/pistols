@@ -20,6 +20,7 @@ import { Address } from './Address'
 import { ChallengeButton } from '/src/components/ui/Buttons'
 import { useDiscordSocialLink } from '/src/stores/eventsModelStore'
 import { useFetchDuelistIdsByPlayer } from '/src/stores/duelistStore'
+import { COLORS } from '@underware/pistols-sdk/pistols/constants'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -128,7 +129,7 @@ const ProfilePosterSmall = forwardRef<ProfilePosterHandle, ProfilePosterProps>((
               profilePicUrl={isLinked ? avatarUrl : undefined} 
               width={9} 
               removeCorners 
-              borderColor='#201a18' 
+              borderColor={COLORS.DARK}
               borderWidth={0.3} 
             />
             <div className='PlayerName Small'>{name}</div>
@@ -275,7 +276,7 @@ const ProfilePosterFull = forwardRef<ProfilePosterHandle, ProfilePosterProps>((p
               width={22} 
               height={22} 
               removeCorners 
-              borderColor='#201a18' 
+              borderColor={COLORS.DARK}
               borderWidth={0.4} 
             />
             <div className='PlayerName'>{name}</div>

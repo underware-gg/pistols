@@ -19,6 +19,7 @@ import { DUELIST_CARD_WIDTH } from '/src/data/cardConstants'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { useCurrentSeason } from '/src/stores/seasonStore'
 import { useConfig } from '/src/stores/configStore'
+import { COLORS } from '@underware/pistols-sdk/pistols/constants'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -414,7 +415,7 @@ function NewChallengeForm({
           style={{
             width: aspectWidth(2),
             height: aspectWidth(2),
-            border: `2px solid ${highStakes ? '#ef9758' : '#efe1d7'}`,
+            border: `2px solid ${highStakes ? COLORS.MEDIUM : COLORS.BRIGHTEST}`,
             borderRadius: aspectWidth(0.4),
             marginRight: aspectWidth(1.2),
             display: 'flex',
@@ -428,7 +429,7 @@ function NewChallengeForm({
           {highStakes && <div style={{
             width: '60%',
             height: '60%',
-            backgroundColor: '#ef9758',
+            backgroundColor: COLORS.MEDIUM,
             borderRadius: aspectWidth(0.2)
           }} />}
         </div>
