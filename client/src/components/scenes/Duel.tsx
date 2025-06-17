@@ -16,6 +16,7 @@ import DuelHeader from '/src/components/ui/duel/DuelHeader'
 import DuelStateDisplay from '/src/components/ui/duel/DuelStateDispaly'
 import DuelTutorialOverlay from '/src/components/ui/duel/DuelTutorialOverlay'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
+import { useTransactionObserver } from '/src/hooks/useTransaction'
 
 /**
  * Main Duel component that orchestrates the duel scene and UI.
@@ -75,6 +76,9 @@ const DuelContent: React.FC<{
   const isPlayingRef = useRef(true)
   const [isPlaying, setIsPlaying] = useState(true)
   const [triggerReset, setTriggerReset] = useState(false)
+
+  //make sure to clear the create_duel transaction
+  const { isLoading: isLoadingCreateDuel } = useTransactionObserver({ key: `create_duel${leftDuelist?.isYou ? rightDuelist?.address : rightDuelist?.isYou ? leftDuelist?.address : 0n}` })
 
   // Force a reset of current step and animation state when duelId changes
   useEffect(() => {

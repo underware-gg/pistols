@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import Dexie, { Table } from 'dexie'
@@ -211,10 +211,12 @@ export const useCheckPendingTransactions = () => {
   const { account, isConnected } = useAccount()
   const { checkTransactionStatus } = useDojoSystemCalls()
   const checkPendingTransactions = useTransactionStore((state) => state.checkPendingTransactions)
+  const [hasChecked, setHasChecked] = useState(false)
 
-  useMemo(() => {
-    if (isConnected && account && checkTransactionStatus) {
+  useEffect(() => {
+    if (isConnected && account && checkTransactionStatus && !hasChecked) {
       checkPendingTransactions(checkTransactionStatus, account)
+      setHasChecked(true)
     }
   }, [isConnected, account, checkTransactionStatus, checkPendingTransactions])
 } 

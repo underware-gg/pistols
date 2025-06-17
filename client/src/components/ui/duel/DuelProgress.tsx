@@ -36,6 +36,7 @@ export default function DuelProgress({
   }, [isA, round1, swapSides])
 
   const duelProgressRef = useRef(null)
+  const isRevealingRef = useRef(false)
 
   // Duelist interaction
   const { isConnected } = useAccount()
@@ -58,7 +59,8 @@ export default function DuelProgress({
       if (duelStage == DuelStage.Round1Commit) {
         setCommitModalIsOpen(true)
       } else if (duelStage == DuelStage.Round1Reveal) {
-        if (canReveal && !isLoadingReveal && !isLoadingCommit) {
+        if (canReveal && !isLoadingReveal && !isLoadingCommit && !isRevealingRef.current) {
+          isRevealingRef.current = true
           revealMoves()
         }
       }
