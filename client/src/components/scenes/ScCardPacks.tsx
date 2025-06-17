@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useMemo, createRef } from 'react'
 import { usePistolsScene } from '/src/hooks/PistolsContext'
 import { useGameAspect } from '/src/hooks/useGameAspect'
-import { useCalcFeePack } from '/src/hooks/usePistolsContractCalls'
+import { useCalcFeePack, useCanClaimStarterPack } from '/src/hooks/usePistolsContractCalls'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { usePacksOfPlayer } from '/src/hooks/useTokenPacks'
@@ -34,6 +34,7 @@ export default function ScCardPacks() {
   const { account, isConnected } = useAccount()
   const { pack_token } = useDojoSystemCalls()
   const { packIds } = usePacksOfPlayer()
+  const { canClaimStarterPack } = useCanClaimStarterPack()
   
   const [visiblePacks, setVisiblePacks] = useState<number[]>([])
   const [currentPage, setCurrentPage] = useState(0)
@@ -69,20 +70,24 @@ export default function ScCardPacks() {
   }
   
   useEffect(() => {
-    const calculatedTotalPages = Math.ceil(packIds.length / MAX_VISIBLE_PACKS)
+    const calculatedTotalPages = Math.ceil((packIds.length + (canClaimStarterPack ? 1 : 0)) / MAX_VISIBLE_PACKS)
     setTotalPages(calculatedTotalPages)
     
     if (currentPage >= calculatedTotalPages) {
       setCurrentPage(Math.max(0, calculatedTotalPages - 1))
     }
-  }, [packIds])
+  }, [packIds, canClaimStarterPack])
   
   const [allRenderedPacks, setAllRenderedPacks] = useState<number[]>([])
   
   useEffect(() => {
-    const newStartIndex = currentPage * MAX_VISIBLE_PACKS
-    const endIndex = Math.min(newStartIndex + MAX_VISIBLE_PACKS, packIds.length)
-    const visible = packIds.slice(newStartIndex, endIndex)
+    const newStartIndex = currentPage * MAX_VISIBLE_PACKS - (canClaimStarterPack && currentPage !== 0 ? 1 : 0)
+    const endIndex = Math.min(newStartIndex + (canClaimStarterPack && currentPage === 0 ? MAX_VISIBLE_PACKS - 1 : MAX_VISIBLE_PACKS), packIds.length)
+    
+    let visible = packIds.slice(newStartIndex, endIndex)
+    if (canClaimStarterPack && currentPage === 0) {
+      visible = [-1, ...visible]
+    }
     
     if (visible.every(id => allRenderedPacks.includes(id)) && visible.length === allRenderedPacks.length) return
     setVisiblePacks(visible)
@@ -93,7 +98,7 @@ export default function ScCardPacks() {
       newRenderedPacks.push(selectedCardPack)
     }
     setAllRenderedPacks(newRenderedPacks)
-  }, [packIds, currentPage, selectedCardPack])
+  }, [packIds, currentPage, selectedCardPack, canClaimStarterPack])
   
   const navigateStack = (direction: 'up' | 'down') => {
     if (direction === 'up' && currentPage > 0) {
@@ -198,6 +203,30 @@ export default function ScCardPacks() {
     const index = visiblePacks.indexOf(packId);
     const isVisible = index !== -1;
     const position = isVisible ? getPackPosition(index) : { x: 0, y: 0 };
+    
+    // Special handling for welcome pack
+    if (packId === -1) {
+      return (
+        <CardPackAnimationWrapper
+          key="welcome-pack"
+          packType={constants.PackType.StarterPack}
+          ref={packRefsMap.get(packId)}
+          startPosition={position}
+          startRotation={0}
+          startScale={1}
+          startZIndex={PACK_BASE_Z_INDEX + index}
+          onHover={(hovered) => handleHover(packId, hovered)}
+          onClick={(e, fromPack) => handlePackClick(packId, fromPack)}
+          onComplete={() => handlePackComplete(packId)}
+          packId={undefined}
+          isOpen={true}
+          cardPackSize={PACK_SIZE}
+          maxTilt={20}
+          atTutorialEnding={false}
+          optionalTitle="Welcome Pack"
+        />
+      );
+    }
     
     return (
       <CardPackAnimationWrapper

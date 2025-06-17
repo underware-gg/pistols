@@ -170,7 +170,7 @@ function _SelectDuelistModal({
       if (isPositiveBigint(selectedDuelistId)) {
         dispatchChallengingDuelistId(selectedDuelistId)
       } else {
-        if (challengingDuelistId == 0n) {
+        if (challengingDuelistId == 0n && challengingAddress > 0n) {
           dispatchChallengingPlayerAddress(0n)
         }
       }
