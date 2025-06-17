@@ -190,11 +190,11 @@ export const useDuellingDuelists = (duelistIds: BigNumberish[]) => {
     const duellingIds: BigNumberish[] = []
     const duelPerDuelists: Record<string, BigNumberish> = {}
     alive_entities.forEach(entityId => {
-      const challenge = getEntityModel(entities[entityId], 'DuelistAssignment')
-      const duelist_id = bigintToHex(challenge?.duelist_id ?? getEntityModel(entities[entityId], 'Duelist').duelist_id)
-      if (isPositiveBigint(challenge?.duel_id)) {
+      const assignment = getEntityModel(entities[entityId], 'DuelistAssignment')
+      const duelist_id = bigintToHex(assignment?.duelist_id ?? getEntityModel(entities[entityId], 'Duelist').duelist_id)
+      if (isPositiveBigint(assignment?.duel_id)) {
         duellingIds.push(duelist_id)
-        duelPerDuelists[duelist_id] = bigintToHex(challenge.duel_id)
+        duelPerDuelists[duelist_id] = bigintToHex(assignment.duel_id)
       } else {
         notDuelingIds.push(duelist_id)
       }
@@ -429,7 +429,11 @@ export const useFetchDuelistIds = (duelistIds: BigNumberish[], retryInterval?: n
     newDuelistIds.length > 0
       ? new PistolsQueryBuilder()
         .withClause(
-          new PistolsClauseBuilder().where("pistols-Duelist", "duelist_id", "In", newDuelistIds.map(formatQueryValue)).build()
+          new PistolsClauseBuilder().compose().or([
+            new PistolsClauseBuilder().where("pistols-Duelist", "duelist_id", "In", newDuelistIds.map(formatQueryValue)),
+            new PistolsClauseBuilder().where("pistols-DuelistAssignment", "duelist_id", "In", newDuelistIds.map(formatQueryValue)),
+            new PistolsClauseBuilder().where("pistols-DuelistMemorial", "duelist_id", "In", newDuelistIds.map(formatQueryValue)),
+          ]).build()
         )
         .withEntityModels([
           "pistols-Duelist",
