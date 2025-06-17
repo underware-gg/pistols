@@ -307,6 +307,10 @@ export class DuelistsManager {
     this.duelProgressDialogManger.updateDialogState(isA, duelistState, onClick)
   }
 
+  public setIsLoading(isA: boolean, isLoading: boolean) {
+    this.duelProgressDialogManger.setIsLoading(isA, isLoading)
+  }
+
   public setDuelistElement(isA: boolean, duelistElement: any) {
     this.duelProgressDialogManger.setElementData(isA, duelistElement)
   }

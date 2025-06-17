@@ -13,6 +13,7 @@ import { LordsBagIcon } from '/src/components/account/Balance'
 import { SceneName } from '/src/data/assets'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
+import { useTransactionObserver } from '/src/hooks/useTransaction'
 
 //-----------------
 // Generic Action button
@@ -32,6 +33,7 @@ type ActionButtonProps = {
   confirm?: boolean
   confirmMessage?: string
   className?: string
+  loading?: boolean
   onClick: () => void
   onMouseEnter?: () => void
   onMouseLeave?: () => void
@@ -51,6 +53,7 @@ export const ActionButton = ({
   confirm = false,
   confirmMessage = null,
   className = null,
+  loading = false,
   onClick,
   onMouseEnter,
   onMouseLeave,
@@ -87,12 +90,19 @@ export const ActionButton = ({
         fluid={fill}
         toggle={toggle}
         active={active}
-        disabled={disabled}
+        disabled={disabled || loading}
         onClick={() => _click()}
         onMouseEnter={() => onMouseEnter?.()}
         onMouseLeave={() => onMouseLeave?.()}
       >
         {label}
+        {loading && (
+          <div className='button-loading-overlay'>
+            <div className='button-dialog-spinner-container CenteredContainer'>
+              <div className='dialog-spinner'></div>
+            </div>
+          </div>
+        )}
       </Button>
       <Confirm
         open={isConfirming}
@@ -113,6 +123,7 @@ export const BalanceRequiredButton = ({
   fee,
   onClick,
   disabled = false,
+  loading = false,
   fill = true,
   fillParent = false,
 }: {
@@ -120,6 +131,7 @@ export const BalanceRequiredButton = ({
   fee: BigNumberish
   onClick: Function
   disabled?: boolean
+  loading?: boolean
   fill?: boolean
   fillParent?: boolean
 }) => {
@@ -129,6 +141,7 @@ export const BalanceRequiredButton = ({
   return (
     <ActionButton large fill={fill} fillParent={fillParent}
       disabled={disabled}
+      loading={loading}
       important={canSubmit}
       negative={!canSubmit}
       label={!canSubmit ? 'No Funds!' : isPositiveBigint(fee) ? <>{label} <LordsBagIcon /></> : label}
@@ -353,8 +366,14 @@ export function ChallengeButton({
   const { hasPact, pactDuelId } = usePact(constants.DuelType.Seasonal, address, challengedPlayerAddress, true)
   const canChallenge = (!hasPact && !isMyAccount)
 
+  const { isLoading } = useTransactionObserver({ key: `create_duel${challengedPlayerAddress}`, indexerCheck: hasPact })
+
+  useEffect(() => {
+    console.log(`[useTransaction] isLoading: ${isLoading}`);
+  }, [isLoading])
+
   if (!hasPact) {
-    return <ActionButton large fill fillParent={fillParent} important disabled={!canChallenge} label={customLabel ?? 'Challenge for a Duel!'} onClick={() => {
+    return <ActionButton large fill fillParent={fillParent} important disabled={!canChallenge} loading={isLoading} label={customLabel ?? 'Challenge for a Duel!'} onClick={() => {
       dispatchChallengingPlayerAddress(challengedPlayerAddress)
       duelistSelectOpener.open()
     }} />

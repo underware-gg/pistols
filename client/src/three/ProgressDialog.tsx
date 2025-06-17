@@ -434,6 +434,14 @@ export class ProgressDialogManager {
     }
   }
 
+  public setIsLoading(isA: boolean, isLoading: boolean) {
+    if (isA) {
+      this.dialogA.setIsLoading(isLoading)
+    } else {
+      this.dialogB.setIsLoading(isLoading)
+    }
+  }
+
   public showDialogs() {
     this.dialogA.showElement()
     this.dialogB.showElement()
@@ -591,6 +599,7 @@ export class ProgressDialogMesh {
   private isThinkingBubble: boolean
   public message: string
   private onButtonClick: () => void
+  private isLoading: boolean = false
 
   constructor(camera: THREE.PerspectiveCamera, position: THREE.Vector3, isLeft: boolean) {
     this.camera = camera
@@ -626,6 +635,12 @@ export class ProgressDialogMesh {
     this.duelistName = duelistName
     this.isYou = isYou
     this.shouldBeVisible = true
+
+    this.updateElement()
+  }
+
+  public setIsLoading(isLoading: boolean) {
+    this.isLoading = isLoading
 
     this.updateElement()
   }
@@ -694,10 +709,16 @@ export class ProgressDialogMesh {
     const button = this.element.querySelector('.dialog-button') as HTMLElement
     button.textContent = this.message
     button.dataset.contentlength = Math.floor(this.message?.length / 10).toString()
+    button.classList.toggle('NoMouse', this.isLoading)
+    const buttonLoading = this.element.querySelector('.button-loading-overlay') as HTMLElement
+    buttonLoading.style.display = this.isLoading ? 'flex' : 'none'
+
+    const buttonContainer = this.element.querySelector('.moves-button-container') as HTMLElement
+
     const message = this.element.querySelector('.dialog-quote') as HTMLElement
     message.textContent = this.message
     message.dataset.contentlength = Math.floor(this.message?.length / 10).toString()
-    const spinner = this.element.querySelector('.dialog-spinner') as HTMLElement
+    const spinner = this.element.querySelector('#dialog-spinner') as HTMLElement
 
     button.offsetWidth;
     message.offsetWidth;
@@ -705,21 +726,21 @@ export class ProgressDialogMesh {
 
     if (this.isYou) {
       if (this.isThinkingBubble) {
-        button.style.display = 'block'
+        buttonContainer.style.display = 'block'
         message.style.display = 'none'
         spinner.style.display = 'none'
       } else {
-        button.style.display = 'none'
+        buttonContainer.style.display = 'none'
         message.style.display = 'block'
         spinner.style.display = 'none'
       }
     } else {
       if (this.isThinkingBubble) {
-        button.style.display = 'none'
+        buttonContainer.style.display = 'none'
         message.style.display = 'block'
         spinner.style.display = 'grid'
       } else {
-        button.style.display = 'none'
+        buttonContainer.style.display = 'none'
         message.style.display = 'block'
         spinner.style.display = 'none'
       }

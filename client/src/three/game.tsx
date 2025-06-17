@@ -1286,6 +1286,10 @@ export function updatePlayerProgress(isA, duelistState, onClick) {
   _duelistManager.updatePlayerProgress(isA, duelistState, onClick)
 }
 
+export function setIsLoading(isA, isLoading) {
+  _duelistManager.setIsLoading(isA, isLoading)
+}
+
 export function setDuelistElement(isA, duelistElement) {
   _duelistManager.setDuelistElement(isA, duelistElement)
 }

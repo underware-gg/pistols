@@ -67,6 +67,11 @@ export function useDuelCallToAction(duel_id: BigNumberish) {
   return requiredDuelIds.includes(BigInt(duel_id))
 }
 
+export function useDuelCallToActionWithState(duel_id: BigNumberish) {
+  const { activeChallenges } = useCallToChallenges()
+  return activeChallenges.find((ch) => ch.duelId === BigInt(duel_id))
+}
+
 
 
 //--------------------------------

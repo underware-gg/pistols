@@ -7,6 +7,8 @@ import { useRevealAction, useSignAndRestoreMovesFromHash } from '/src/hooks/useR
 import { useIsMyDuelist } from '/src/hooks/useIsYou'
 import { DuelStage, useDuel } from '/src/hooks/useDuel'
 import CommitPacesModal from '/src/components/modals/CommitPacesModal'
+import { useTransactionHandler, useTransactionObserver } from '/src/hooks/useTransaction'
+import { useDuelContext } from './DuelContext'
 
 export default function DuelProgress({
   isA = false,
@@ -22,7 +24,9 @@ export default function DuelProgress({
   canAutoReveal
 }) {
   const { gameImpl } = useThreeJsContext()
+  const { completedStagesLeft } = useDuelContext()
   const { round1 } = useDuel(duelId)
+
   const round1Moves = useMemo(() => {
     if (swapSides) {
       return isA ? round1?.moves_b : round1?.moves_a;
@@ -38,22 +42,32 @@ export default function DuelProgress({
   const isMyDuelist = useIsMyDuelist(duelistId)
 
   // Commit modal control
-  const [didReveal, setDidReveal] = useState(false)
   const [commitModalIsOpen, setCommitModalIsOpen] = useState(false)
-  const { reveal, canReveal } = useRevealAction(duelId, isYou ? duelistId : 0n, round1Moves?.hashed, duelStage == DuelStage.Round1Reveal)
+  const { reveal, canReveal } = useRevealAction(duelId, isYou ? duelistId : 0n, round1Moves?.hashed, duelStage == DuelStage.Round1Reveal, `reveal_moves${duelId}`)
+
+  const { call: revealMoves, isLoading: isLoadingReveal } = useTransactionHandler<boolean, []>({
+    transactionCall: () => reveal(),
+    indexerCheck: completedStagesLeft[DuelStage.Round1Reveal] && !canReveal,
+    key: `reveal_moves${duelId}`,
+  })
+
+  const { isLoading: isLoadingCommit } = useTransactionObserver({ key: `commit_paces${duelId}`, indexerCheck: completedStagesLeft[DuelStage.Round1Commit] })
 
   const onClick = useCallback(() => {
     if (isMyDuelist && isConnected && completedStages[duelStage] === false) {
       if (duelStage == DuelStage.Round1Commit) {
         setCommitModalIsOpen(true)
       } else if (duelStage == DuelStage.Round1Reveal) {
-        if (canReveal && !didReveal) {
-          setDidReveal(true)
-          reveal()
+        if (canReveal && !isLoadingReveal && !isLoadingCommit) {
+          revealMoves()
         }
       }
     }
-  }, [isMyDuelist, isConnected, duelStage, completedStages, canReveal])
+  }, [isMyDuelist, isConnected, duelStage, completedStages, canReveal, isLoadingReveal, isLoadingCommit])
+
+  useEffect(() => {
+    gameImpl.setIsLoading(isA, isLoadingReveal || isLoadingCommit)
+  }, [isLoadingReveal, isLoadingCommit, isA])
 
   // Auto-reveal when conditions are met
   useEffect(() => {
@@ -108,9 +122,18 @@ export default function DuelProgress({
           <div className='dialog-title'></div>
           <div className='dialog-duelist'></div>
           <div className='dialog-content'>
-            <button className='dialog-button'></button>
+            <div className='moves-button-container'>
+              <button className='dialog-button'></button>
+              <div className='button-loading-overlay'>
+                <div className='duel-button-spinner-container'>
+                  <div id='dialog-spinner-button' className='dialog-spinner'></div>
+                </div>
+              </div>
+            </div>
             <div className='dialog-quote'></div>
-            <div className='dialog-spinner'></div>
+            <div className='duel-dialog-spinner-container'>
+              <div id='dialog-spinner' className='dialog-spinner'></div>
+            </div>
           </div>
         </div>
       </div>

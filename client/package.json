@@ -42,6 +42,8 @@
     "@tanstack/react-query": "catalog:",
     "@tweenjs/tween.js": "^21.0.0",
     "@underware/pistols-sdk": "workspace:*",
+    "dexie": "^4.0.11",
+    "dexie-react-hooks": "^1.1.7",
     "event-emitter": "^0.3.5",
     "get-starknet-core": "catalog:",
     "immer": "catalog:",
