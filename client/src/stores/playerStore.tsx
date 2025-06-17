@@ -47,7 +47,7 @@ const createStore = () => {
   return create<State>()(immer((set, get) => ({
     players_names: {
       [_playerKey('0x04D92577856263bDe8E7601Ee189b6dbe52aCb879462489B92c0789f6c157E6c')]: '[Pistols Deployer]',
-      [_playerKey('0x0569d6f6080a3aB8678738De7Da68097796b11ECE78b21fD7FAe2Fd7505AB0Ba')]: '[Pistols Bot]',
+      [_playerKey('0x0569d6f6080a3aB8678738De7Da68097796b11ECE78b21fD7FAe2Fd7505AB0Ba')]: 'The Bartender',
     },
     players_online: {},
     player_bookmarks: {},
