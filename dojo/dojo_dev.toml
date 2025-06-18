@@ -26,6 +26,11 @@ private_key = "0xc5b2fcab997346f3ea1c00b002ecf6f382c5f9c9659a3894eb783c5320f912"
 world_address = "0x51c0fbe7d5a06863d7c30dc9e5935a3343b1f7084eeb11ddd5b950bd7799bb"
 world_block = 1
 
+# development options
+[cartridge]
+controllers = true
+# paymaster = true
+
 #--------------------------
 # namespaces
 #
