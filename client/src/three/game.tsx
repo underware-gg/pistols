@@ -255,7 +255,7 @@ export async function init(canvas, framerate = 60, statsEnabled = false) {
 }
 
 async function loadAssets() {
-  await shaders.loadShaders();
+  shaders.loadShaders();
 
   const loadingManager = new THREE.LoadingManager();
   const textureLoader = new THREE.TextureLoader(loadingManager);
