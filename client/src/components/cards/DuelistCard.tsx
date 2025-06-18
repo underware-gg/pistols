@@ -25,6 +25,8 @@ interface DuelistCardProps extends InteractibleComponentProps {
   duelistId: number
   address?: BigNumberish
   isSmall?: boolean
+  overrideFame?: boolean
+  fame?: bigint
   isAnimating?: boolean
   showQuote?: boolean
   hideSouls?: boolean
@@ -463,9 +465,9 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
               ) : (
                 <>
                 <div className="duelist-fame">
-                  <FameLivesDuelist duelistId={props.duelistId} />
+                  <FameLivesDuelist duelistId={props.duelistId} overrideFame={props.overrideFame} fame={props.fame} />
                 </div>
-                <FameProgressBar duelistId={props.duelistId} width={props.width * 0.8} height={props.height * 0.1} hideValue />
+                <FameProgressBar duelistId={props.duelistId} width={props.width * 0.8} height={props.height * 0.1} hideValue overrideFame={props.overrideFame} fame={props.fame} />
                 <div className="duelist-name small" data-contentlength={_nameLength(playerName)}>{playerName}</div>
                 </>
               )

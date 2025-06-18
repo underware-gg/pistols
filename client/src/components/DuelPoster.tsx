@@ -32,6 +32,7 @@ import { useExecuteEmitPlayerBookmark } from '/src/hooks/usePistolsSystemCalls'
 import { SceneName } from '/src/data/assets'
 import { useTransactionHandler } from '../hooks/useTransaction'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
+import { useDuelistFameOnDuel } from '../queries/useDuelistFameOnDuel'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -97,15 +98,6 @@ const useDuelPosterData = (duelId?: bigint) => {
     return duelistId !== Number(winnerDuelistId) && isFinished && !isCallToAction
   }
 
-  //-------------------
-  // DISABLED by Roger
-  // use these hooks ONLY when presenting a single duel
-  // this was being called for all posters in the Past/Current duels screens
-  // adding 16 unnecessary queries to Torii, slowing it down
-  //-------------------
-  // const { fameBefore: fameBeforeA, fameAfter: fameAfterA } = useDuelistFameOnDuel(duelId, duelistIdA)
-  // const { fameBefore: fameBeforeB, fameAfter: fameAfterB } = useDuelistFameOnDuel(duelId, duelistIdB)listId)
-  
   return {
     leftDuelistId,
     leftDuelistAddress,
@@ -122,10 +114,6 @@ const useDuelPosterData = (duelId?: bigint) => {
     isDead,
     isYouA,
     isYouB,
-    // fameBeforeA,
-    // fameAfterA,
-    // fameBeforeB,
-    // fameAfterB,
     isCallToAction,
   }
 }
@@ -256,6 +244,9 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
   const { account } = useAccount()
   const { duelistSelectOpener } = usePistolsContext()
   const { leftDuelistId, rightDuelistId, leftDuelistAddress, rightDuelistAddress, leftPlayerName, rightPlayerName, isDead, isYouA, isYouB, leftIsBlocked, rightIsBlocked, isCallToAction, leftIsLinked, rightIsLinked, leftAvatarUrl, rightAvatarUrl } = useDuelPosterData(props.duelId)
+  const { fameBefore: fameBeforeA, fameAfter: fameAfterA } = useDuelistFameOnDuel(props.duelId, leftDuelistId)
+  const { fameBefore: fameBeforeB, fameAfter: fameAfterB } = useDuelistFameOnDuel(props.duelId, rightDuelistId)
+
   useFetchDuelistIdsByPlayerAddresses([leftDuelistAddress, rightDuelistAddress]) // fetch duelists in the store, if not already fetched
 
   const {
@@ -307,12 +298,12 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
   const isSubmitting = useMemo(() => isLoadingSubmit || isLoadingCollect, [isLoadingSubmit, isLoadingCollect])
 
   useEffect(() => {
-    if (isLoadingSubmit) {
+    if (isSubmitting) {
       if (meta[2] && isPositiveBigint(meta[1]) && challengingDuelistId != meta[1]) {
         dispatchChallengingDuelistId(meta[1])
       }
     }
-  }, [meta, isLoadingSubmit, challengingDuelistId])
+  }, [meta, isSubmitting, challengingDuelistId])
 
   const _collectDuel = () => {
     collectDuel(props.duelId)
@@ -433,6 +424,8 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
                 <DuelistCard
                   duelistId={Number(leftDuelistId || challengingDuelistId)}
                   isSmall={true}
+                  overrideFame={true}
+                  fame={isFinished && !isCallToAction ? fameAfterA : fameBeforeA}
                   isLeft={true}
                   isVisible={true}
                   isFlipped={true}
@@ -502,7 +495,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
               </Row>
               <Row columns='equal' textAlign='center'>
                 <Col>
-                  <h5 className='Darkest'>{challengeDescription}</h5>
+                  <h5 className='Darkest'>{isFinished && isCallToAction ? 'Waiting for result reveal.' : challengeDescription}</h5>
                   <span className='Code Darkest'><ChallengeTime duelId={props.duelId} prefixed /></span>
                 </Col>
               </Row>
@@ -512,6 +505,8 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
                 <DuelistCard
                   duelistId={Number(rightDuelistId)}
                   isSmall={true}
+                  overrideFame={true}
+                  fame={isFinished && !isCallToAction ? fameAfterB : fameBeforeB}
                   isLeft={false}
                   isVisible={true}
                   isFlipped={true}
@@ -534,7 +529,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
               </Col>
               {(state == constants.ChallengeState.InProgress && canCollectDuel) &&
                 <Col>
-                  <ActionButton large fill important label='Timed Out, Collect Duel' onClick={() => _collectDuel()} />
+                  <ActionButton large fillParent important label='Timed Out, Collect Duel' onClick={() => _collectDuel()} />
                 </Col>
               }
               {(state == constants.ChallengeState.Awaiting && isChallenger) &&
