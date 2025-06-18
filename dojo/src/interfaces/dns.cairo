@@ -18,6 +18,7 @@ pub use pistols::systems::{
         duel_token::{IDuelTokenDispatcher, IDuelTokenDispatcherTrait, IDuelTokenProtectedDispatcher, IDuelTokenProtectedDispatcherTrait},
         duelist_token::{IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait, IDuelistTokenProtectedDispatcher, IDuelistTokenProtectedDispatcherTrait},
         pack_token::{IPackTokenDispatcher, IPackTokenDispatcherTrait},
+        ring_token::{IRingTokenDispatcher, IRingTokenDispatcherTrait},
         // tournament_token::{ITournamentTokenDispatcher, ITournamentTokenDispatcherTrait},
         fame_coin::{IFameCoinDispatcher, IFameCoinDispatcherTrait, IFameCoinProtectedDispatcher, IFameCoinProtectedDispatcherTrait},
         fools_coin::{IFoolsCoinDispatcher, IFoolsCoinDispatcherTrait, IFoolsCoinProtectedDispatcher, IFoolsCoinProtectedDispatcherTrait},
@@ -46,6 +47,7 @@ pub mod SELECTORS {
     pub const DUEL_TOKEN: felt252 = selector_from_tag!("pistols-duel_token");
     pub const DUELIST_TOKEN: felt252 = selector_from_tag!("pistols-duelist_token");
     pub const PACK_TOKEN: felt252 = selector_from_tag!("pistols-pack_token");
+    pub const ring_token: felt252 = selector_from_tag!("pistols-ring_token");
     pub const TOURNAMENT_TOKEN: felt252 = selector_from_tag!("pistols-tournament_token");
     pub const FAME_COIN: felt252 = selector_from_tag!("pistols-fame_coin");
     pub const FOOLS_COIN: felt252 = selector_from_tag!("pistols-fools_coin");
@@ -126,6 +128,10 @@ pub impl DnsImpl of DnsTrait {
     #[inline(always)]
     fn pack_token_address(self: @WorldStorage) -> ContractAddress {
         (self.find_contract_address(@"pack_token"))
+    }
+    #[inline(always)]
+    fn ring_token_address(self: @WorldStorage) -> ContractAddress {
+        (self.find_contract_address(@"ring_token"))
     }
     // #[inline(always)]
     // fn tournament_token_address(self: @WorldStorage) -> ContractAddress {
@@ -235,6 +241,10 @@ pub impl DnsImpl of DnsTrait {
     #[inline(always)]
     fn pack_token_dispatcher(self: @WorldStorage) -> IPackTokenDispatcher {
         (IPackTokenDispatcher{ contract_address: self.pack_token_address() })
+    }
+    #[inline(always)]
+    fn ring_token_dispatcher(self: @WorldStorage) -> IRingTokenDispatcher {
+        (IRingTokenDispatcher{ contract_address: self.ring_token_address() })
     }
     // #[inline(always)]
     // fn tournament_token_dispatcher(self: @WorldStorage) -> ITournamentTokenDispatcher {
