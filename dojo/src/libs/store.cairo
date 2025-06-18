@@ -24,6 +24,9 @@ pub use pistols::models::{
     pack::{
         Pack, PackValue,
     },
+    ring::{
+        Ring, RingValue,
+    },
     challenge::{
         Challenge, ChallengeValue,
         ChallengeMessage, ChallengeMessageValue,
@@ -123,6 +126,15 @@ pub impl StoreImpl of StoreTrait {
     #[inline(always)]
     fn get_pack_value(self: @Store, pack_id: u128) -> PackValue {
         (self.world.read_value(pack_id))
+    }
+
+    #[inline(always)]
+    fn get_ring(self: @Store, ring_id: u128) -> Ring {
+        (self.world.read_model(ring_id))
+    }
+    #[inline(always)]
+    fn get_ring_value(self: @Store, ring_id: u128) -> RingValue {
+        (self.world.read_value(ring_id))
     }
 
     #[inline(always)]
@@ -321,6 +333,10 @@ pub impl StoreImpl of StoreTrait {
     }
 
     fn set_pack(ref self: Store, model: @Pack) {
+        self.world.write_model(model);
+    }
+
+    fn set_ring(ref self: Store, model: @Ring) {
         self.world.write_model(model);
     }
 

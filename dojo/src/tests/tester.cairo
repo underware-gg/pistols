@@ -24,6 +24,7 @@ pub mod tester {
             duel_token::{duel_token, IDuelTokenDispatcher, IDuelTokenDispatcherTrait},
             duelist_token::{duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
             pack_token::{pack_token, IPackTokenDispatcher, IPackTokenDispatcherTrait},
+            ring_token::{ring_token, IRingTokenDispatcher, IRingTokenDispatcherTrait},
             // tournament_token::{tournament_token, ITournamentTokenDispatcher, ITournamentTokenDispatcherTrait},
             fame_coin::{fame_coin, IFameCoinDispatcher, IFameCoinDispatcherTrait},
             fools_coin::{fools_coin, IFoolsCoinDispatcher, IFoolsCoinDispatcherTrait},
@@ -37,6 +38,7 @@ pub mod tester {
     pub use pistols::models::{
         player::{Player},
         pack::{Pack, PackType, PackTypeTrait},
+        ring::{Ring, RingType, RingTypeTrait},
         challenge::{
             Challenge, ChallengeValue,
             RoundValue,
@@ -170,6 +172,7 @@ pub mod tester {
         pub const ACCOUNT: u16    = 0b1000000000;
         pub const TOURNAMENT: u16 = 0b10000000000;
         pub const OWNER: u16      = 0b100000000000;
+        pub const RINGS: u16      = 0b1000000000000;
     }
 
     #[derive(Copy, Drop)]
@@ -187,6 +190,7 @@ pub mod tester {
         pub duels: IDuelTokenDispatcher,
         pub duelists: IDuelistTokenDispatcher,
         pub pack: IPackTokenDispatcher,
+        pub rings: IRingTokenDispatcher,
         // pub tournaments: ITournamentTokenDispatcher,
         pub rng: IRngMockDispatcher,
         // pub budokan: IBudokanMockDispatcher,
@@ -211,6 +215,7 @@ pub mod tester {
                 duels: world.duel_token_dispatcher(),
                 duelists: world.duelist_token_dispatcher(),
                 pack: world.pack_token_dispatcher(),
+                rings: world.ring_token_dispatcher(),
                 // tournaments: world.tournament_token_dispatcher(),
                 rng: IRngMockDispatcher{ contract_address: world.rng_address() },
                 // budokan: world.budokan_mock_dispatcher(),
@@ -232,6 +237,7 @@ pub mod tester {
         let mut deploy_account: bool = (flags & FLAGS::ACCOUNT) != 0;
         let mut deploy_tournament: bool = (flags & FLAGS::TOURNAMENT) != 0;
         let mut deploy_owner: bool = (flags & FLAGS::OWNER) != 0;
+        let mut deploy_rings: bool = (flags & FLAGS::RINGS) != 0;
         let mut deploy_game_loop: bool = false;
         let mut deploy_duelist_mock: bool = false;
         let mut deploy_bank: bool = false;
@@ -265,6 +271,7 @@ pub mod tester {
             TestResource::Model(pistols::models::duelist::m_DuelistMemorial::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::leaderboard::m_Leaderboard::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::pack::m_Pack::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::ring::m_Ring::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::pact::m_Pact::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::pool::m_Pool::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::player::m_Player::TEST_CLASS_HASH),
@@ -383,6 +390,17 @@ pub mod tester {
             resources.append(TestResource::Contract(pack_token::TEST_CLASS_HASH));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"pack_token")
+                    .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
+                    .with_init_calldata([
+                        'http://localhost:3000',
+                    ].span()),
+            );
+        }
+
+        if (deploy_rings) {
+            resources.append(TestResource::Contract(ring_token::TEST_CLASS_HASH));
+            contract_defs.append(
+                ContractDefTrait::new(@"pistols", @"ring_token")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
                     .with_init_calldata([
                         'http://localhost:3000',
