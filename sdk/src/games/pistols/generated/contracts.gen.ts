@@ -1,5 +1,5 @@
 import { DojoProvider, DojoCall } from "@dojoengine/core";
-import { Account, AccountInterface, BigNumberish, CairoOption, CairoCustomEnum } from "starknet";
+import { Account, AccountInterface, BigNumberish, CairoOption, CairoCustomEnum, ByteArray } from "starknet";
 import * as models from "./models.gen";
 
 export function setupWorld(provider: DojoProvider) {
@@ -290,26 +290,26 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	// const build_bank_releaseLordsFromFameToBeBurned_calldata = (seasonId: BigNumberish, duelId: BigNumberish, bills: Array<LordsReleaseBill>): DojoCall => {
-	// 	return {
-	// 		contractName: "bank",
-	// 		entrypoint: "release_lords_from_fame_to_be_burned",
-	// 		calldata: [seasonId, duelId, bills],
-	// 	};
-	// };
+	const build_bank_releaseLordsFromFameToBeBurned_calldata = (seasonId: BigNumberish, duelId: BigNumberish, bills: Array<LordsReleaseBill>): DojoCall => {
+		return {
+			contractName: "bank",
+			entrypoint: "release_lords_from_fame_to_be_burned",
+			calldata: [seasonId, duelId, bills],
+		};
+	};
 
-	// const bank_releaseLordsFromFameToBeBurned = async (snAccount: Account | AccountInterface, seasonId: BigNumberish, duelId: BigNumberish, bills: Array<LordsReleaseBill>) => {
-	// 	try {
-	// 		return await provider.execute(
-	// 			snAccount,
-	// 			build_bank_releaseLordsFromFameToBeBurned_calldata(seasonId, duelId, bills),
-	// 			"pistols",
-	// 		);
-	// 	} catch (error) {
-	// 		console.error(error);
-	// 		throw error;
-	// 	}
-	// };
+	const bank_releaseLordsFromFameToBeBurned = async (snAccount: Account | AccountInterface, seasonId: BigNumberish, duelId: BigNumberish, bills: Array<LordsReleaseBill>) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_bank_releaseLordsFromFameToBeBurned_calldata(seasonId, duelId, bills),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
 
 	const build_bank_sponsorDuelists_calldata = (payer: string, lordsAmount: BigNumberish): DojoCall => {
 		return {
@@ -446,7 +446,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_duel_token_createDuel_calldata = (duelType: CairoCustomEnum, duelistId: BigNumberish, challengedAddress: string, livesStaked: BigNumberish, expireHours: BigNumberish, premise: CairoCustomEnum, message: string): DojoCall => {
+	const build_duel_token_createDuel_calldata = (duelType: CairoCustomEnum, duelistId: BigNumberish, challengedAddress: string, livesStaked: BigNumberish, expireHours: BigNumberish, premise: CairoCustomEnum, message: ByteArray): DojoCall => {
 		return {
 			contractName: "duel_token",
 			entrypoint: "create_duel",
@@ -454,7 +454,7 @@ export function setupWorld(provider: DojoProvider) {
 		};
 	};
 
-  const duel_token_createDuel = async (snAccount: Account | AccountInterface, duelType: CairoCustomEnum, duelistId: BigNumberish, challengedAddress: string, livesStaked: BigNumberish, expireHours: BigNumberish, premise: CairoCustomEnum, message: string) => {
+	const duel_token_createDuel = async (snAccount: Account | AccountInterface, duelType: CairoCustomEnum, duelistId: BigNumberish, challengedAddress: string, livesStaked: BigNumberish, expireHours: BigNumberish, premise: CairoCustomEnum, message: ByteArray) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -1555,26 +1555,26 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	// const build_duelist_token_transferRewards_calldata = (challenge: models.Challenge, tournamentId: BigNumberish, bonus: models.DuelBonus): DojoCall => {
-	// 	return {
-	// 		contractName: "duelist_token",
-	// 		entrypoint: "transfer_rewards",
-	// 		calldata: [challenge, tournamentId, bonus],
-	// 	};
-	// };
+	const build_duelist_token_transferRewards_calldata = (challenge: models.Challenge, tournamentId: BigNumberish, bonus: models.DuelBonus): DojoCall => {
+		return {
+			contractName: "duelist_token",
+			entrypoint: "transfer_rewards",
+			calldata: [challenge, tournamentId, bonus],
+		};
+	};
 
-	// const duelist_token_transferRewards = async (snAccount: Account | AccountInterface, challenge: models.Challenge, tournamentId: BigNumberish, bonus: models.DuelBonus) => {
-	// 	try {
-	// 		return await provider.execute(
-	// 			snAccount,
-	// 			build_duelist_token_transferRewards_calldata(challenge, tournamentId, bonus),
-	// 			"pistols",
-	// 		);
-	// 	} catch (error) {
-	// 		console.error(error);
-	// 		throw error;
-	// 	}
-	// };
+	const duelist_token_transferRewards = async (snAccount: Account | AccountInterface, challenge: models.Challenge, tournamentId: BigNumberish, bonus: models.DuelBonus) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_duelist_token_transferRewards_calldata(challenge, tournamentId, bonus),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
 
 	const build_duelist_token_updateContractMetadata_calldata = (): DojoCall => {
 		return {
@@ -2369,7 +2369,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-  const build_game_emitPlayerSocialLink_calldata = (socialPlatform: CairoCustomEnum, playerAddress: string, userName: string, userId: string, avatar: string): DojoCall => {
+	const build_game_emitPlayerSocialLink_calldata = (socialPlatform: CairoCustomEnum, playerAddress: string, userName: ByteArray, userId: ByteArray, avatar: ByteArray): DojoCall => {
 		return {
 			contractName: "game",
 			entrypoint: "emit_player_social_link",
@@ -2377,7 +2377,7 @@ export function setupWorld(provider: DojoProvider) {
 		};
 	};
 
-  const game_emitPlayerSocialLink = async (snAccount: Account | AccountInterface, socialPlatform: CairoCustomEnum, playerAddress: string, userName: string, userId: string, avatar: string) => {
+	const game_emitPlayerSocialLink = async (snAccount: Account | AccountInterface, socialPlatform: CairoCustomEnum, playerAddress: string, userName: ByteArray, userId: ByteArray, avatar: ByteArray) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -2475,22 +2475,22 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	// const build_game_loop_executeGameLoop_calldata = (wrapped: models.RngWrap, deck: models.Deck, round: models.Round): DojoCall => {
-	// 	return {
-	// 		contractName: "game_loop",
-	// 		entrypoint: "execute_game_loop",
-	// 		calldata: [wrapped, deck, round],
-	// 	};
-	// };
+	const build_game_loop_executeGameLoop_calldata = (wrapped: models.RngWrap, deck: models.Deck, round: models.Round): DojoCall => {
+		return {
+			contractName: "game_loop",
+			entrypoint: "execute_game_loop",
+			calldata: [wrapped, deck, round],
+		};
+	};
 
-	// const game_loop_executeGameLoop = async (wrapped: models.RngWrap, deck: models.Deck, round: models.Round) => {
-	// 	try {
-	// 		return await provider.call("pistols", build_game_loop_executeGameLoop_calldata(wrapped, deck, round));
-	// 	} catch (error) {
-	// 		console.error(error);
-	// 		throw error;
-	// 	}
-	// };
+	const game_loop_executeGameLoop = async (wrapped: models.RngWrap, deck: models.Deck, round: models.Round) => {
+		try {
+			return await provider.call("pistols", build_game_loop_executeGameLoop_calldata(wrapped, deck, round));
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
 
 	const build_game_revealMoves_calldata = (duelistId: BigNumberish, duelId: BigNumberish, salt: BigNumberish, moves: Array<BigNumberish>): DojoCall => {
 		return {
@@ -3342,94 +3342,657 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	// const build_rng_isMocked_calldata = (salt: BigNumberish): DojoCall => {
-	// 	return {
-	// 		contractName: "rng",
-	// 		entrypoint: "is_mocked",
-	// 		calldata: [salt],
-	// 	};
-	// };
+	const build_ring_token_airdropRing_calldata = (recipient: string, ringType: CairoCustomEnum): DojoCall => {
+		return {
+			contractName: "ring_token",
+			entrypoint: "airdrop_ring",
+			calldata: [recipient, ringType],
+		};
+	};
 
-	// const rng_isMocked = async (salt: BigNumberish) => {
-	// 	try {
-	// 		return await provider.call("pistols", build_rng_isMocked_calldata(salt));
-	// 	} catch (error) {
-	// 		console.error(error);
-	// 		throw error;
-	// 	}
-	// };
+	const ring_token_airdropRing = async (snAccount: Account | AccountInterface, recipient: string, ringType: CairoCustomEnum) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_ring_token_airdropRing_calldata(recipient, ringType),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
 
-	// const build_rng_mock_isMocked_calldata = (salt: BigNumberish): DojoCall => {
-	// 	return {
-	// 		contractName: "rng_mock",
-	// 		entrypoint: "is_mocked",
-	// 		calldata: [salt],
-	// 	};
-	// };
+	const build_ring_token_approve_calldata = (to: string, tokenId: BigNumberish): DojoCall => {
+		return {
+			contractName: "ring_token",
+			entrypoint: "approve",
+			calldata: [to, tokenId],
+		};
+	};
 
-	// const rng_mock_isMocked = async (salt: BigNumberish) => {
-	// 	try {
-	// 		return await provider.call("pistols", build_rng_mock_isMocked_calldata(salt));
-	// 	} catch (error) {
-	// 		console.error(error);
-	// 		throw error;
-	// 	}
-	// };
+	const ring_token_approve = async (snAccount: Account | AccountInterface, to: string, tokenId: BigNumberish) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_ring_token_approve_calldata(to, tokenId),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
 
-	// const build_rng_mock_mockValues_calldata = (mocked: Array<MockedValue>): DojoCall => {
-	// 	return {
-	// 		contractName: "rng_mock",
-	// 		entrypoint: "mock_values",
-	// 		calldata: [mocked],
-	// 	};
-	// };
+	const build_ring_token_balanceOf_calldata = (account: string): DojoCall => {
+		return {
+			contractName: "ring_token",
+			entrypoint: "balanceOf",
+			calldata: [account],
+		};
+	};
 
-	// const rng_mock_mockValues = async (snAccount: Account | AccountInterface, mocked: Array<MockedValue>) => {
-	// 	try {
-	// 		return await provider.execute(
-	// 			snAccount,
-	// 			build_rng_mock_mockValues_calldata(mocked),
-	// 			"pistols",
-	// 		);
-	// 	} catch (error) {
-	// 		console.error(error);
-	// 		throw error;
-	// 	}
-	// };
+	const ring_token_balanceOf = async (account: string) => {
+		try {
+			return await provider.call("pistols", build_ring_token_balanceOf_calldata(account));
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
 
-	// const build_rng_mock_reseed_calldata = (seed: BigNumberish, salt: BigNumberish, mocked: Array<MockedValue>): DojoCall => {
-	// 	return {
-	// 		contractName: "rng_mock",
-	// 		entrypoint: "reseed",
-	// 		calldata: [seed, salt, mocked],
-	// 	};
-	// };
+	const build_ring_token_balanceOfRing_calldata = (account: string, ringType: CairoCustomEnum): DojoCall => {
+		return {
+			contractName: "ring_token",
+			entrypoint: "balance_of_ring",
+			calldata: [account, ringType],
+		};
+	};
 
-	// const rng_mock_reseed = async (seed: BigNumberish, salt: BigNumberish, mocked: Array<MockedValue>) => {
-	// 	try {
-	// 		return await provider.call("pistols", build_rng_mock_reseed_calldata(seed, salt, mocked));
-	// 	} catch (error) {
-	// 		console.error(error);
-	// 		throw error;
-	// 	}
-	// };
+	const ring_token_balanceOfRing = async (account: string, ringType: CairoCustomEnum) => {
+		try {
+			return await provider.call("pistols", build_ring_token_balanceOfRing_calldata(account, ringType));
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
 
-	// const build_rng_reseed_calldata = (seed: BigNumberish, salt: BigNumberish, mocked: Array<MockedValue>): DojoCall => {
-	// 	return {
-	// 		contractName: "rng",
-	// 		entrypoint: "reseed",
-	// 		calldata: [seed, salt, mocked],
-	// 	};
-	// };
+	const build_ring_token_canMint_calldata = (recipient: string): DojoCall => {
+		return {
+			contractName: "ring_token",
+			entrypoint: "can_mint",
+			calldata: [recipient],
+		};
+	};
 
-	// const rng_reseed = async (seed: BigNumberish, salt: BigNumberish, mocked: Array<MockedValue>) => {
-	// 	try {
-	// 		return await provider.call("pistols", build_rng_reseed_calldata(seed, salt, mocked));
-	// 	} catch (error) {
-	// 		console.error(error);
-	// 		throw error;
-	// 	}
-	// };
+	const ring_token_canMint = async (recipient: string) => {
+		try {
+			return await provider.call("pistols", build_ring_token_canMint_calldata(recipient));
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_ring_token_claimSeasonRing_calldata = (duelId: BigNumberish, ringType: CairoCustomEnum): DojoCall => {
+		return {
+			contractName: "ring_token",
+			entrypoint: "claim_season_ring",
+			calldata: [duelId, ringType],
+		};
+	};
+
+	const ring_token_claimSeasonRing = async (snAccount: Account | AccountInterface, duelId: BigNumberish, ringType: CairoCustomEnum) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_ring_token_claimSeasonRing_calldata(duelId, ringType),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_ring_token_contractUri_calldata = (): DojoCall => {
+		return {
+			contractName: "ring_token",
+			entrypoint: "contractURI",
+			calldata: [],
+		};
+	};
+
+	const ring_token_contractUri = async () => {
+		try {
+			return await provider.call("pistols", build_ring_token_contractUri_calldata());
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_ring_token_defaultRoyalty_calldata = (): DojoCall => {
+		return {
+			contractName: "ring_token",
+			entrypoint: "defaultRoyalty",
+			calldata: [],
+		};
+	};
+
+	const ring_token_defaultRoyalty = async () => {
+		try {
+			return await provider.call("pistols", build_ring_token_defaultRoyalty_calldata());
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_ring_token_getApproved_calldata = (tokenId: BigNumberish): DojoCall => {
+		return {
+			contractName: "ring_token",
+			entrypoint: "getApproved",
+			calldata: [tokenId],
+		};
+	};
+
+	const ring_token_getApproved = async (tokenId: BigNumberish) => {
+		try {
+			return await provider.call("pistols", build_ring_token_getApproved_calldata(tokenId));
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_ring_token_getClaimableSeasonRingType_calldata = (recipient: string, duelId: BigNumberish): DojoCall => {
+		return {
+			contractName: "ring_token",
+			entrypoint: "get_claimable_season_ring_type",
+			calldata: [recipient, duelId],
+		};
+	};
+
+	const ring_token_getClaimableSeasonRingType = async (recipient: string, duelId: BigNumberish) => {
+		try {
+			return await provider.call("pistols", build_ring_token_getClaimableSeasonRingType_calldata(recipient, duelId));
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_ring_token_hasClaimed_calldata = (recipient: string, ringType: CairoCustomEnum): DojoCall => {
+		return {
+			contractName: "ring_token",
+			entrypoint: "has_claimed",
+			calldata: [recipient, ringType],
+		};
+	};
+
+	const ring_token_hasClaimed = async (recipient: string, ringType: CairoCustomEnum) => {
+		try {
+			return await provider.call("pistols", build_ring_token_hasClaimed_calldata(recipient, ringType));
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_ring_token_isApprovedForAll_calldata = (owner: string, operator: string): DojoCall => {
+		return {
+			contractName: "ring_token",
+			entrypoint: "isApprovedForAll",
+			calldata: [owner, operator],
+		};
+	};
+
+	const ring_token_isApprovedForAll = async (owner: string, operator: string) => {
+		try {
+			return await provider.call("pistols", build_ring_token_isApprovedForAll_calldata(owner, operator));
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_ring_token_isMintingPaused_calldata = (): DojoCall => {
+		return {
+			contractName: "ring_token",
+			entrypoint: "is_minting_paused",
+			calldata: [],
+		};
+	};
+
+	const ring_token_isMintingPaused = async () => {
+		try {
+			return await provider.call("pistols", build_ring_token_isMintingPaused_calldata());
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_ring_token_isOwnerOf_calldata = (address: string, tokenId: BigNumberish): DojoCall => {
+		return {
+			contractName: "ring_token",
+			entrypoint: "is_owner_of",
+			calldata: [address, tokenId],
+		};
+	};
+
+	const ring_token_isOwnerOf = async (address: string, tokenId: BigNumberish) => {
+		try {
+			return await provider.call("pistols", build_ring_token_isOwnerOf_calldata(address, tokenId));
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_ring_token_lastTokenId_calldata = (): DojoCall => {
+		return {
+			contractName: "ring_token",
+			entrypoint: "last_token_id",
+			calldata: [],
+		};
+	};
+
+	const ring_token_lastTokenId = async () => {
+		try {
+			return await provider.call("pistols", build_ring_token_lastTokenId_calldata());
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_ring_token_maxSupply_calldata = (): DojoCall => {
+		return {
+			contractName: "ring_token",
+			entrypoint: "maxSupply",
+			calldata: [],
+		};
+	};
+
+	const ring_token_maxSupply = async () => {
+		try {
+			return await provider.call("pistols", build_ring_token_maxSupply_calldata());
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_ring_token_name_calldata = (): DojoCall => {
+		return {
+			contractName: "ring_token",
+			entrypoint: "name",
+			calldata: [],
+		};
+	};
+
+	const ring_token_name = async () => {
+		try {
+			return await provider.call("pistols", build_ring_token_name_calldata());
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_ring_token_ownerOf_calldata = (tokenId: BigNumberish): DojoCall => {
+		return {
+			contractName: "ring_token",
+			entrypoint: "ownerOf",
+			calldata: [tokenId],
+		};
+	};
+
+	const ring_token_ownerOf = async (tokenId: BigNumberish) => {
+		try {
+			return await provider.call("pistols", build_ring_token_ownerOf_calldata(tokenId));
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_ring_token_royaltyInfo_calldata = (tokenId: BigNumberish, salePrice: BigNumberish): DojoCall => {
+		return {
+			contractName: "ring_token",
+			entrypoint: "royaltyInfo",
+			calldata: [tokenId, salePrice],
+		};
+	};
+
+	const ring_token_royaltyInfo = async (tokenId: BigNumberish, salePrice: BigNumberish) => {
+		try {
+			return await provider.call("pistols", build_ring_token_royaltyInfo_calldata(tokenId, salePrice));
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_ring_token_safeTransferFrom_calldata = (from: string, to: string, tokenId: BigNumberish, data: Array<BigNumberish>): DojoCall => {
+		return {
+			contractName: "ring_token",
+			entrypoint: "safeTransferFrom",
+			calldata: [from, to, tokenId, data],
+		};
+	};
+
+	const ring_token_safeTransferFrom = async (snAccount: Account | AccountInterface, from: string, to: string, tokenId: BigNumberish, data: Array<BigNumberish>) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_ring_token_safeTransferFrom_calldata(from, to, tokenId, data),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_ring_token_setApprovalForAll_calldata = (operator: string, approved: boolean): DojoCall => {
+		return {
+			contractName: "ring_token",
+			entrypoint: "setApprovalForAll",
+			calldata: [operator, approved],
+		};
+	};
+
+	const ring_token_setApprovalForAll = async (snAccount: Account | AccountInterface, operator: string, approved: boolean) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_ring_token_setApprovalForAll_calldata(operator, approved),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_ring_token_supportsInterface_calldata = (interfaceId: BigNumberish): DojoCall => {
+		return {
+			contractName: "ring_token",
+			entrypoint: "supports_interface",
+			calldata: [interfaceId],
+		};
+	};
+
+	const ring_token_supportsInterface = async (interfaceId: BigNumberish) => {
+		try {
+			return await provider.call("pistols", build_ring_token_supportsInterface_calldata(interfaceId));
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_ring_token_symbol_calldata = (): DojoCall => {
+		return {
+			contractName: "ring_token",
+			entrypoint: "symbol",
+			calldata: [],
+		};
+	};
+
+	const ring_token_symbol = async () => {
+		try {
+			return await provider.call("pistols", build_ring_token_symbol_calldata());
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_ring_token_tokenRoyalty_calldata = (tokenId: BigNumberish): DojoCall => {
+		return {
+			contractName: "ring_token",
+			entrypoint: "tokenRoyalty",
+			calldata: [tokenId],
+		};
+	};
+
+	const ring_token_tokenRoyalty = async (tokenId: BigNumberish) => {
+		try {
+			return await provider.call("pistols", build_ring_token_tokenRoyalty_calldata(tokenId));
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_ring_token_tokenUri_calldata = (tokenId: BigNumberish): DojoCall => {
+		return {
+			contractName: "ring_token",
+			entrypoint: "tokenURI",
+			calldata: [tokenId],
+		};
+	};
+
+	const ring_token_tokenUri = async (tokenId: BigNumberish) => {
+		try {
+			return await provider.call("pistols", build_ring_token_tokenUri_calldata(tokenId));
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_ring_token_tokenExists_calldata = (tokenId: BigNumberish): DojoCall => {
+		return {
+			contractName: "ring_token",
+			entrypoint: "token_exists",
+			calldata: [tokenId],
+		};
+	};
+
+	const ring_token_tokenExists = async (tokenId: BigNumberish) => {
+		try {
+			return await provider.call("pistols", build_ring_token_tokenExists_calldata(tokenId));
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_ring_token_totalSupply_calldata = (): DojoCall => {
+		return {
+			contractName: "ring_token",
+			entrypoint: "totalSupply",
+			calldata: [],
+		};
+	};
+
+	const ring_token_totalSupply = async () => {
+		try {
+			return await provider.call("pistols", build_ring_token_totalSupply_calldata());
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_ring_token_transferFrom_calldata = (from: string, to: string, tokenId: BigNumberish): DojoCall => {
+		return {
+			contractName: "ring_token",
+			entrypoint: "transferFrom",
+			calldata: [from, to, tokenId],
+		};
+	};
+
+	const ring_token_transferFrom = async (snAccount: Account | AccountInterface, from: string, to: string, tokenId: BigNumberish) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_ring_token_transferFrom_calldata(from, to, tokenId),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_ring_token_updateContractMetadata_calldata = (): DojoCall => {
+		return {
+			contractName: "ring_token",
+			entrypoint: "update_contract_metadata",
+			calldata: [],
+		};
+	};
+
+	const ring_token_updateContractMetadata = async (snAccount: Account | AccountInterface) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_ring_token_updateContractMetadata_calldata(),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_ring_token_updateTokenMetadata_calldata = (tokenId: BigNumberish): DojoCall => {
+		return {
+			contractName: "ring_token",
+			entrypoint: "update_token_metadata",
+			calldata: [tokenId],
+		};
+	};
+
+	const ring_token_updateTokenMetadata = async (snAccount: Account | AccountInterface, tokenId: BigNumberish) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_ring_token_updateTokenMetadata_calldata(tokenId),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_ring_token_updateTokensMetadata_calldata = (fromTokenId: BigNumberish, toTokenId: BigNumberish): DojoCall => {
+		return {
+			contractName: "ring_token",
+			entrypoint: "update_tokens_metadata",
+			calldata: [fromTokenId, toTokenId],
+		};
+	};
+
+	const ring_token_updateTokensMetadata = async (snAccount: Account | AccountInterface, fromTokenId: BigNumberish, toTokenId: BigNumberish) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_ring_token_updateTokensMetadata_calldata(fromTokenId, toTokenId),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_rng_isMocked_calldata = (salt: BigNumberish): DojoCall => {
+		return {
+			contractName: "rng",
+			entrypoint: "is_mocked",
+			calldata: [salt],
+		};
+	};
+
+	const rng_isMocked = async (salt: BigNumberish) => {
+		try {
+			return await provider.call("pistols", build_rng_isMocked_calldata(salt));
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_rng_mock_isMocked_calldata = (salt: BigNumberish): DojoCall => {
+		return {
+			contractName: "rng_mock",
+			entrypoint: "is_mocked",
+			calldata: [salt],
+		};
+	};
+
+	const rng_mock_isMocked = async (salt: BigNumberish) => {
+		try {
+			return await provider.call("pistols", build_rng_mock_isMocked_calldata(salt));
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_rng_mock_mockValues_calldata = (mocked: Array<MockedValue>): DojoCall => {
+		return {
+			contractName: "rng_mock",
+			entrypoint: "mock_values",
+			calldata: [mocked],
+		};
+	};
+
+	const rng_mock_mockValues = async (snAccount: Account | AccountInterface, mocked: Array<MockedValue>) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_rng_mock_mockValues_calldata(mocked),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_rng_mock_reseed_calldata = (seed: BigNumberish, salt: BigNumberish, mocked: Array<MockedValue>): DojoCall => {
+		return {
+			contractName: "rng_mock",
+			entrypoint: "reseed",
+			calldata: [seed, salt, mocked],
+		};
+	};
+
+	const rng_mock_reseed = async (seed: BigNumberish, salt: BigNumberish, mocked: Array<MockedValue>) => {
+		try {
+			return await provider.call("pistols", build_rng_mock_reseed_calldata(seed, salt, mocked));
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_rng_reseed_calldata = (seed: BigNumberish, salt: BigNumberish, mocked: Array<MockedValue>): DojoCall => {
+		return {
+			contractName: "rng",
+			entrypoint: "reseed",
+			calldata: [seed, salt, mocked],
+		};
+	};
+
+	const rng_reseed = async (seed: BigNumberish, salt: BigNumberish, mocked: Array<MockedValue>) => {
+		try {
+			return await provider.call("pistols", build_rng_reseed_calldata(seed, salt, mocked));
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
 
 	const build_tutorial_calcDuelId_calldata = (playerId: BigNumberish, tutorialId: BigNumberish): DojoCall => {
 		return {
@@ -3600,8 +4163,8 @@ export function setupWorld(provider: DojoProvider) {
 			buildDuelistLostFameToPoolCalldata: build_bank_duelistLostFameToPool_calldata,
 			pegMintedFameToLords: bank_pegMintedFameToLords,
 			buildPegMintedFameToLordsCalldata: build_bank_pegMintedFameToLords_calldata,
-			// releaseLordsFromFameToBeBurned: bank_releaseLordsFromFameToBeBurned,
-			// buildReleaseLordsFromFameToBeBurnedCalldata: build_bank_releaseLordsFromFameToBeBurned_calldata,
+			releaseLordsFromFameToBeBurned: bank_releaseLordsFromFameToBeBurned,
+			buildReleaseLordsFromFameToBeBurnedCalldata: build_bank_releaseLordsFromFameToBeBurned_calldata,
 			sponsorDuelists: bank_sponsorDuelists,
 			buildSponsorDuelistsCalldata: build_bank_sponsorDuelists_calldata,
 			sponsorSeason: bank_sponsorSeason,
@@ -3742,8 +4305,8 @@ export function setupWorld(provider: DojoProvider) {
 			buildTotalSupplyCalldata: build_duelist_token_totalSupply_calldata,
 			transferFrom: duelist_token_transferFrom,
 			buildTransferFromCalldata: build_duelist_token_transferFrom_calldata,
-			// transferRewards: duelist_token_transferRewards,
-			// buildTransferRewardsCalldata: build_duelist_token_transferRewards_calldata,
+			transferRewards: duelist_token_transferRewards,
+			buildTransferRewardsCalldata: build_duelist_token_transferRewards_calldata,
 			updateContractMetadata: duelist_token_updateContractMetadata,
 			buildUpdateContractMetadataCalldata: build_duelist_token_updateContractMetadata_calldata,
 			updateTokenMetadata: duelist_token_updateTokenMetadata,
@@ -3847,10 +4410,10 @@ export function setupWorld(provider: DojoProvider) {
 			revealMoves: game_revealMoves,
 			buildRevealMovesCalldata: build_game_revealMoves_calldata,
 		},
-		// game_loop: {
-		// 	executeGameLoop: game_loop_executeGameLoop,
-		// 	buildExecuteGameLoopCalldata: build_game_loop_executeGameLoop_calldata,
-		// },
+		game_loop: {
+			executeGameLoop: game_loop_executeGameLoop,
+			buildExecuteGameLoopCalldata: build_game_loop_executeGameLoop_calldata,
+		},
 		lords_mock: {
 			allowance: lords_mock_allowance,
 			buildAllowanceCalldata: build_lords_mock_allowance_calldata,
@@ -3945,20 +4508,84 @@ export function setupWorld(provider: DojoProvider) {
 			updateTokensMetadata: pack_token_updateTokensMetadata,
 			buildUpdateTokensMetadataCalldata: build_pack_token_updateTokensMetadata_calldata,
 		},
-		// rng: {
-		// 	isMocked: rng_isMocked,
-		// 	buildIsMockedCalldata: build_rng_isMocked_calldata,
-		// 	reseed: rng_reseed,
-		// 	buildReseedCalldata: build_rng_reseed_calldata,
-		// },
-		// rng_mock: {
-		// 	isMocked: rng_mock_isMocked,
-		// 	buildIsMockedCalldata: build_rng_mock_isMocked_calldata,
-		// 	mockValues: rng_mock_mockValues,
-		// 	buildMockValuesCalldata: build_rng_mock_mockValues_calldata,
-		// 	reseed: rng_mock_reseed,
-		// 	buildReseedCalldata: build_rng_mock_reseed_calldata,
-		// },
+		ring_token: {
+			airdropRing: ring_token_airdropRing,
+			buildAirdropRingCalldata: build_ring_token_airdropRing_calldata,
+			approve: ring_token_approve,
+			buildApproveCalldata: build_ring_token_approve_calldata,
+			balanceOf: ring_token_balanceOf,
+			buildBalanceOfCalldata: build_ring_token_balanceOf_calldata,
+			balanceOfRing: ring_token_balanceOfRing,
+			buildBalanceOfRingCalldata: build_ring_token_balanceOfRing_calldata,
+			canMint: ring_token_canMint,
+			buildCanMintCalldata: build_ring_token_canMint_calldata,
+			claimSeasonRing: ring_token_claimSeasonRing,
+			buildClaimSeasonRingCalldata: build_ring_token_claimSeasonRing_calldata,
+			contractUri: ring_token_contractUri,
+			buildContractUriCalldata: build_ring_token_contractUri_calldata,
+			defaultRoyalty: ring_token_defaultRoyalty,
+			buildDefaultRoyaltyCalldata: build_ring_token_defaultRoyalty_calldata,
+			getApproved: ring_token_getApproved,
+			buildGetApprovedCalldata: build_ring_token_getApproved_calldata,
+			getClaimableSeasonRingType: ring_token_getClaimableSeasonRingType,
+			buildGetClaimableSeasonRingTypeCalldata: build_ring_token_getClaimableSeasonRingType_calldata,
+			hasClaimed: ring_token_hasClaimed,
+			buildHasClaimedCalldata: build_ring_token_hasClaimed_calldata,
+			isApprovedForAll: ring_token_isApprovedForAll,
+			buildIsApprovedForAllCalldata: build_ring_token_isApprovedForAll_calldata,
+			isMintingPaused: ring_token_isMintingPaused,
+			buildIsMintingPausedCalldata: build_ring_token_isMintingPaused_calldata,
+			isOwnerOf: ring_token_isOwnerOf,
+			buildIsOwnerOfCalldata: build_ring_token_isOwnerOf_calldata,
+			lastTokenId: ring_token_lastTokenId,
+			buildLastTokenIdCalldata: build_ring_token_lastTokenId_calldata,
+			maxSupply: ring_token_maxSupply,
+			buildMaxSupplyCalldata: build_ring_token_maxSupply_calldata,
+			name: ring_token_name,
+			buildNameCalldata: build_ring_token_name_calldata,
+			ownerOf: ring_token_ownerOf,
+			buildOwnerOfCalldata: build_ring_token_ownerOf_calldata,
+			royaltyInfo: ring_token_royaltyInfo,
+			buildRoyaltyInfoCalldata: build_ring_token_royaltyInfo_calldata,
+			safeTransferFrom: ring_token_safeTransferFrom,
+			buildSafeTransferFromCalldata: build_ring_token_safeTransferFrom_calldata,
+			setApprovalForAll: ring_token_setApprovalForAll,
+			buildSetApprovalForAllCalldata: build_ring_token_setApprovalForAll_calldata,
+			supportsInterface: ring_token_supportsInterface,
+			buildSupportsInterfaceCalldata: build_ring_token_supportsInterface_calldata,
+			symbol: ring_token_symbol,
+			buildSymbolCalldata: build_ring_token_symbol_calldata,
+			tokenRoyalty: ring_token_tokenRoyalty,
+			buildTokenRoyaltyCalldata: build_ring_token_tokenRoyalty_calldata,
+			tokenUri: ring_token_tokenUri,
+			buildTokenUriCalldata: build_ring_token_tokenUri_calldata,
+			tokenExists: ring_token_tokenExists,
+			buildTokenExistsCalldata: build_ring_token_tokenExists_calldata,
+			totalSupply: ring_token_totalSupply,
+			buildTotalSupplyCalldata: build_ring_token_totalSupply_calldata,
+			transferFrom: ring_token_transferFrom,
+			buildTransferFromCalldata: build_ring_token_transferFrom_calldata,
+			updateContractMetadata: ring_token_updateContractMetadata,
+			buildUpdateContractMetadataCalldata: build_ring_token_updateContractMetadata_calldata,
+			updateTokenMetadata: ring_token_updateTokenMetadata,
+			buildUpdateTokenMetadataCalldata: build_ring_token_updateTokenMetadata_calldata,
+			updateTokensMetadata: ring_token_updateTokensMetadata,
+			buildUpdateTokensMetadataCalldata: build_ring_token_updateTokensMetadata_calldata,
+		},
+		rng: {
+			isMocked: rng_isMocked,
+			buildIsMockedCalldata: build_rng_isMocked_calldata,
+			reseed: rng_reseed,
+			buildReseedCalldata: build_rng_reseed_calldata,
+		},
+		rng_mock: {
+			isMocked: rng_mock_isMocked,
+			buildIsMockedCalldata: build_rng_mock_isMocked_calldata,
+			mockValues: rng_mock_mockValues,
+			buildMockValuesCalldata: build_rng_mock_mockValues_calldata,
+			reseed: rng_mock_reseed,
+			buildReseedCalldata: build_rng_mock_reseed_calldata,
+		},
 		tutorial: {
 			calcDuelId: tutorial_calcDuelId,
 			buildCalcDuelIdCalldata: build_tutorial_calcDuelId_calldata,
