@@ -18,7 +18,19 @@ pub struct Ring {
     pub ring_id: u128,   // erc721 token_id
     //-----------------------
     pub ring_type: RingType,
-    pub granted_player_address: ContractAddress,
+    pub claimed_by: ContractAddress,
+}
+
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct RingBalance {
+    #[key]
+    pub player_address: ContractAddress,
+    #[key]
+    pub ring_type: RingType,
+    //-----------------------
+    pub claimed: bool,
+    pub balance: u128,
 }
 
 
@@ -69,17 +81,40 @@ mod RING_TYPES {
 //----------------------------------
 // Traits
 //
-use pistols::interfaces::dns::{
-    DnsTrait,
-    IDuelistTokenProtectedDispatcherTrait,
-};
-use pistols::models::pool::{PoolType};
-use pistols::types::duelist_profile::{DuelistProfile, GenesisKey};
+use core::num::traits::Zero;
+use pistols::models::challenge::{ChallengeValue};
+use pistols::types::challenge_state::{ChallengeStateTrait};
 use pistols::utils::short_string::{ShortStringTrait};
 use pistols::libs::store::{Store, StoreTrait};
 
 #[generate_trait]
 pub impl RingTypeImpl of RingTypeTrait {
+    fn get_season_ring_type(store: @Store, recipient: ContractAddress, duel_id: u128) -> Option<RingType> {
+        let challenge: ChallengeValue = store.get_challenge_value(duel_id);
+        (if (
+            recipient.is_non_zero() &&
+            challenge.state.is_concluded() &&
+            (challenge.address_a == recipient || challenge.address_b == recipient))
+        {
+            if (challenge.season_id <= 2) {
+                {Option::Some(RingType::GoldSignetRing)}
+            }
+            else if (challenge.season_id <= 4) {
+                {Option::Some(RingType::SilverSignetRing)}
+            }
+            else if (challenge.season_id <= 10) {
+                {Option::Some(RingType::LeadSignetRing)}
+            }
+            else {
+                {Option::None}
+            }
+        }
+        else {
+            {Option::None}
+        })
+    }
+    //
+    // Ring data
     fn descriptor(self: @RingType) -> RingDescriptor {
         match self {
             RingType::Unknown           => RING_TYPES::Unknown,

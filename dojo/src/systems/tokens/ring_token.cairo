@@ -56,25 +56,30 @@ pub trait IRingToken<TState> {
     // fn update_tokens_metadata(ref self: TState, from_token_id: u128, to_token_id: u128);
 
     // IRingTokenPublic
+    fn has_claimed(self: @TState, recipient: ContractAddress, ring_type: RingType) -> bool;
     fn get_claimable_season_ring_type(self: @TState, recipient: ContractAddress, duel_id: u128) -> Option<RingType>;
-    fn claim_season_ring(ref self: TState, recipient: ContractAddress, ring_type: RingType, duel_id: u128) -> bool;
-    fn airdrop_ring(ref self: TState, recipient: ContractAddress, ring_type: RingType) -> bool;
+    fn balance_of_ring(self: @TState, account: ContractAddress, ring_type: RingType) -> u128;
+    fn claim_season_ring(ref self: TState, duel_id: u128, ring_type: RingType) -> u128;
+    fn airdrop_ring(ref self: TState, recipient: ContractAddress, ring_type: RingType) -> u128;
 }
 
 // Exposed to clients
 #[starknet::interface]
 pub trait IRingTokenPublic<TState> {
     // view
+    fn has_claimed(self: @TState, recipient: ContractAddress, ring_type: RingType) -> bool;
     fn get_claimable_season_ring_type(self: @TState, recipient: ContractAddress, duel_id: u128) -> Option<RingType>;
+    fn balance_of_ring(self: @TState, account: ContractAddress, ring_type: RingType) -> u128;
     // write
-    fn claim_season_ring(ref self: TState, recipient: ContractAddress, ring_type: RingType, duel_id: u128) -> bool;
-    fn airdrop_ring(ref self: TState, recipient: ContractAddress, ring_type: RingType) -> bool;
+    fn claim_season_ring(ref self: TState, duel_id: u128, ring_type: RingType) -> u128;
+    fn airdrop_ring(ref self: TState, recipient: ContractAddress, ring_type: RingType) -> u128;
 }
 
 #[dojo::contract]
-pub mod ring_token {    
+pub mod ring_token {
+    use core::num::traits::Zero;
     use starknet::{ContractAddress};
-    use dojo::world::{WorldStorage};
+    use dojo::world::{WorldStorage, IWorldDispatcherTrait};
 
     //-----------------------------------
     // ERC-721 Start
@@ -124,28 +129,29 @@ pub mod ring_token {
     // ERC-721 End
     //-----------------------------------
 
-    use pistols::interfaces::dns::{
-        DnsTrait,
-        IBankProtectedDispatcherTrait,
-        IVrfProviderDispatcherTrait, Source,
-    };
     use pistols::models::{
-        ring::{Ring, RingValue, RingType, RingTypeTrait},
-        player::{Player, PlayerTrait},
-        events::{Activity},
-        pool::{PoolType},
+        ring::{
+            Ring, RingValue,
+            RingBalance, RingBalanceValue,
+            RingType, RingTypeTrait,
+        },
+        events::{Activity, ActivityTrait},
+    };
+    use pistols::interfaces::dns::{
+        DnsTrait, SELECTORS,
+        IAdminDispatcherTrait,
     };
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::short_string::{ShortStringTrait};
-    use pistols::utils::byte_arrays::{BoolToStringTrait};
-    use pistols::types::timestamp::{TimestampTrait, TIMESTAMP};
-    use pistols::types::constants::{METADATA};
+    use pistols::utils::math::{MathU128};
     use pistols::utils::misc::{ZERO};
+    use pistols::types::constants::{METADATA};
 
     pub mod Errors {
-        pub const NOT_IMPLEMENTED: felt252      = 'RING: Not implemented';
+        pub const CALLER_NOT_OWNER: felt252     = 'RING: Caller not owner';
+        pub const CALLER_NOT_ADMIN: felt252     = 'RING: Caller not admin';
         pub const INELIGIBLE: felt252           = 'RING: Ineligible';
-        pub const NOT_OWNER: felt252            = 'RING: Not owner';
+        pub const ALREADY_CLAIMED: felt252      = 'RING: Already claimed';
     }
 
     //*******************************
@@ -183,34 +189,52 @@ pub mod ring_token {
     //
     #[abi(embed_v0)]
     impl RingTokenPublicImpl of super::IRingTokenPublic<ContractState> {
+        fn has_claimed(self: @ContractState, recipient: ContractAddress, ring_type: RingType) -> bool {
+            let store: Store = StoreTrait::new(self.world_default());
+            (self._has_claimed(@store, recipient, ring_type))
+        }
 
         fn get_claimable_season_ring_type(self: @ContractState, recipient: ContractAddress, duel_id: u128) -> Option<RingType> {
-            // let mut store: Store = StoreTrait::new(self.world_default());
-            // let player: Player = store.get_player(recipient);
-            // (!player.timestamps.claimed_starter_pack)
-            (Option::None)
+            let store: Store = StoreTrait::new(self.world_default());
+            let ring_type: Option<RingType> = RingTypeTrait::get_season_ring_type(@store, recipient, duel_id);
+            (if (ring_type.is_some() && !self._has_claimed(@store, recipient, ring_type.unwrap())) {
+                (ring_type)
+            } else {
+                (Option::None)
+            })
         }
-        fn claim_season_ring(ref self: ContractState, recipient: ContractAddress, ring_type: RingType, duel_id: u128) -> bool {
-            // let recipient: ContractAddress = starknet::get_caller_address();
-            // assert(self.can_claim_starter_pack(recipient), Errors::INELIGIBLE);
+        fn balance_of_ring(self: @ContractState, account: ContractAddress, ring_type: RingType) -> u128 {
+            let store: Store = StoreTrait::new(self.world_default());
+            (store.get_ring_balance_value(account, ring_type).balance)
+        }
 
-            // // mint
-            // let lords_amount: u128 = self.calc_mint_fee(recipient, PackType::StarterPack);
-            // let pack: Pack = self._mint_pack(PackType::StarterPack, recipient, recipient.into(), lords_amount);
+        fn claim_season_ring(ref self: ContractState, duel_id: u128, ring_type: RingType) -> u128 {
+            let mut store: Store = StoreTrait::new(self.world_default());
+
+            // validate recipient to ring type
+            let recipient: ContractAddress = starknet::get_caller_address();
+            let ring_type: Option<RingType> = RingTypeTrait::get_season_ring_type(@store, recipient, duel_id);
+            assert(ring_type.is_some(), Errors::INELIGIBLE);
+            let ring_type: RingType = ring_type.unwrap();
+            assert(!self._has_claimed(@store, recipient, ring_type), Errors::ALREADY_CLAIMED);
+
+            // mint
+            let ring_id: u128 = self._mint_ring(ref store, recipient, ring_type);
             
-            // // events
-            // let mut store: Store = StoreTrait::new(self.world_default());
-            // PlayerTrait::check_in(ref store, Activity::PackStarter, recipient, pack.pack_id.into());
-
-            // // open immediately
-            // (self.open(pack.pack_id))
-            (false)
+            (ring_id)
         }
+
         //
-        // adin
+        // admin
         //
-        fn airdrop_ring(ref self: ContractState, recipient: ContractAddress, ring_type: RingType) -> bool {
-            (false)
+        fn airdrop_ring(ref self: ContractState, recipient: ContractAddress, ring_type: RingType) -> u128 {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            self._assert_caller_is_admin(@store);
+            // must not have claimed!
+            assert(!self._has_claimed(@store, recipient, ring_type), Errors::ALREADY_CLAIMED);
+            // mint it
+            let ring_id: u128 = self._mint_ring(ref store, recipient, ring_type);
+            (ring_id)
         }
     }
 
@@ -220,26 +244,42 @@ pub mod ring_token {
     //
     #[generate_trait]
     impl InternalImpl of InternalTrait {
-        fn _mint_ring(ref self: ContractState,
-            ring_type: RingType,
-            recipient: ContractAddress,
-            seed: felt252,
-            lords_amount: u128,
-        ) -> Ring {
-            let mut store: Store = StoreTrait::new(self.world_default());
+        #[inline(always)]
+        fn _assert_caller_is_admin(self: @ContractState, store: @Store) {
+            assert(store.world.admin_dispatcher().am_i_admin(starknet::get_caller_address()), Errors::CALLER_NOT_ADMIN);
+        }
+        #[inline(always)]
+        fn _assert_caller_is_owner(self: @ContractState, store: @Store) {
+            assert((*store.world.dispatcher).is_owner(SELECTORS::RING_TOKEN, starknet::get_caller_address()) == true, Errors::CALLER_NOT_OWNER);
+        }
 
+        fn _has_claimed(self: @ContractState, store: @Store, recipient: ContractAddress, ring_type: RingType) -> bool {
+            let ring_balance: RingBalanceValue = store.get_ring_balance_value(recipient, ring_type);
+            (ring_balance.claimed)
+        }
+
+        fn _mint_ring(ref self: ContractState, ref store: Store, recipient: ContractAddress, ring_type: RingType) -> u128 {
             // mint!
-            let token_id: u128 = self.token.mint_next(recipient);
+            let ring_id: u128 = self.token.mint_next(recipient);
 
             // create Duelist
             let mut ring = Ring {
-                ring_id: token_id,
+                ring_id,
                 ring_type,
-                granted_player_address: recipient,
+                claimed_by: recipient,
             };
             store.set_ring(@ring);
 
-            (ring)
+            // set claimed flag
+            let mut ring_balance: RingBalance = store.get_ring_balance(recipient, ring_type);
+            ring_balance.claimed = true;
+            ring_balance.balance += 1;
+            store.set_ring_balance(@ring_balance);
+
+            // events
+            Activity::ClaimedRing.emit(ref store.world, recipient, ring_id.into());
+
+            (ring_id)
         }
     }
 
@@ -248,6 +288,29 @@ pub mod ring_token {
     // ERC721ComboHooksTrait
     //
     pub impl ERC721ComboHooksImpl of ERC721ComboComponent::ERC721ComboHooksTrait<ContractState> {
+        fn before_update(ref self: ERC721ComboComponent::ComponentState<ContractState>, to: ContractAddress, token_id: u256, auth: ContractAddress) {
+            let mut self = self.get_contract_mut();
+            let mut erc721 = ERC721Component::HasComponent::get_component_mut(ref self);
+            let from: ContractAddress = erc721._owner_of(token_id);
+            // change ring type balances on transfers only
+            // mints are handled in _mint_ring()
+            if (from.is_non_zero()) {
+                // get ring type
+                let mut store: Store = StoreTrait::new(self.world_default());
+                let ring_type: RingType = store.get_ring_type(token_id.low);
+                // remove from balance
+                let mut ring_balance_from: RingBalance = store.get_ring_balance(from, ring_type);
+                ring_balance_from.balance.subi(1);
+                store.set_ring_balance(@ring_balance_from);
+                // add to new owner balance
+                if (to.is_non_zero()) {
+                    let mut ring_balance_to: RingBalance = store.get_ring_balance(to, ring_type);
+                    ring_balance_to.balance += 1;
+                    store.set_ring_balance(@ring_balance_to);
+                }
+            }
+        }
+
         fn render_contract_uri(self: @ERC721ComboComponent::ComponentState<ContractState>) -> Option<ContractMetadata> {
             let self = self.get_contract(); // get the component's contract state
             let base_uri: ByteArray = self.erc721._base_uri();

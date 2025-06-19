@@ -47,7 +47,7 @@ pub mod SELECTORS {
     pub const DUEL_TOKEN: felt252 = selector_from_tag!("pistols-duel_token");
     pub const DUELIST_TOKEN: felt252 = selector_from_tag!("pistols-duelist_token");
     pub const PACK_TOKEN: felt252 = selector_from_tag!("pistols-pack_token");
-    pub const ring_token: felt252 = selector_from_tag!("pistols-ring_token");
+    pub const RING_TOKEN: felt252 = selector_from_tag!("pistols-ring_token");
     pub const TOURNAMENT_TOKEN: felt252 = selector_from_tag!("pistols-tournament_token");
     pub const FAME_COIN: felt252 = selector_from_tag!("pistols-fame_coin");
     pub const FOOLS_COIN: felt252 = selector_from_tag!("pistols-fools_coin");

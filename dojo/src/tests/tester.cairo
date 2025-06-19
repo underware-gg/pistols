@@ -38,7 +38,7 @@ pub mod tester {
     pub use pistols::models::{
         player::{Player},
         pack::{Pack, PackType, PackTypeTrait},
-        ring::{Ring, RingType, RingTypeTrait},
+        ring::{Ring, RingType, RingTypeTrait, RingBalance},
         challenge::{
             Challenge, ChallengeValue,
             RoundValue,
@@ -115,6 +115,9 @@ pub mod tester {
 
     pub const SEASON_ID_1: u32 = 1;
     pub const SEASON_ID_2: u32 = 2;
+    pub const SEASON_ID_3: u32 = 3;
+    pub const SEASON_ID_4: u32 = 4;
+    pub const SEASON_ID_5: u32 = 5;
 
     pub const FAUCET_AMOUNT: u128 = 10_000_000_000_000_000_000_000;
 
@@ -272,6 +275,7 @@ pub mod tester {
             TestResource::Model(pistols::models::leaderboard::m_Leaderboard::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::pack::m_Pack::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::ring::m_Ring::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::ring::m_RingBalance::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::pact::m_Pact::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::pool::m_Pool::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::player::m_Player::TEST_CLASS_HASH),
@@ -838,6 +842,26 @@ pub mod tester {
         (new_state)
     }
 
+    // ::ring_token
+    pub fn execute_claim_season_ring(sys: @TestSystems, sender: ContractAddress,
+        duel_id: u128,
+        ring_type: RingType,
+    ) -> u128 {
+        impersonate(sender);
+        let ring_id: u128 = (*sys.rings).claim_season_ring(duel_id, ring_type);
+        _next_block();
+        (ring_id)
+    }
+    pub fn execute_airdrop_ring(sys: @TestSystems, sender: ContractAddress,
+        recipient: ContractAddress,
+        ring_type: RingType,
+    ) -> u128 {
+        impersonate(sender);
+        let ring_id: u128 = (*sys.rings).airdrop_ring(recipient, ring_type);
+        _next_block();
+        (ring_id)
+    }
+
     // // ::tournament_token
     // pub fn execute_start_tournament(sys: @TestSystems, sender: ContractAddress,
     //     pass_id: u64,
@@ -1011,6 +1035,14 @@ pub mod tester {
     }
     #[inline(always)]
     pub fn set_Pack(ref world: WorldStorage, model: @Pack) {
+        world.write_model_test(model);
+    }
+    #[inline(always)]
+    pub fn set_Ring(ref world: WorldStorage, model: @Ring) {
+        world.write_model_test(model);
+    }
+    #[inline(always)]
+    pub fn set_RingBalance(ref world: WorldStorage, model: @RingBalance) {
         world.write_model_test(model);
     }
     #[inline(always)]
