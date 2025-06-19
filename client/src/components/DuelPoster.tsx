@@ -529,7 +529,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
               </Col>
               {(state == constants.ChallengeState.InProgress && canCollectDuel) &&
                 <Col>
-                  <ActionButton large fillParent important label='Timed Out, Collect Duel' onClick={() => _collectDuel()} />
+                  <ActionButton large fillParent important label='Timed Out, Collect Duel' loading={isSubmitting} onClick={() => _collectDuel()} />
                 </Col>
               }
               {(state == constants.ChallengeState.Awaiting && isChallenger) &&
@@ -552,7 +552,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
                   ) : (
                     isInAction || lives < livesStaked ? (
                       <Col>
-                        <ActionButton large fillParent label='Select another duelist!' onClick={() => duelistSelectOpener.open()} />
+                        <ActionButton large fillParent label='Select another duelist!' loading={isSubmitting} onClick={() => duelistSelectOpener.open()} />
                       </Col>
                     ) : (
                       <Col>
@@ -563,12 +563,12 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
               }
               {((state == constants.ChallengeState.Awaiting && isChallenger) || state == constants.ChallengeState.InProgress || (state !== constants.ChallengeState.Awaiting && isCallToAction)) &&
                 <Col>
-                  <ActionButton large fillParent important label='Go to Live Duel!' onClick={() => _gotoDuel()} />
+                  <ActionButton large fillParent important label='Go to Live Duel!' loading={isSubmitting} onClick={() => _gotoDuel()} />
                 </Col>
               }
               {isFinished && !isCallToAction && (endedInBlades || endedInPaces) &&
                 <Col>
-                  <ActionButton large fillParent important label='Replay Duel!' onClick={() => _gotoDuel()} />
+                  <ActionButton large fillParent important label='Replay Duel!' loading={isSubmitting} onClick={() => _gotoDuel()} />
                 </Col>
               }
               {(needToSyncExpired && (isChallenger || isChallenged)) &&
