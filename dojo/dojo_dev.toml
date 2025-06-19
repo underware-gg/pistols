@@ -57,6 +57,7 @@ default = "pistols"
   "pistols-duel_token",
   "pistols-duelist_token",
   "pistols-pack_token",
+  "pistols-ring_token",
   # "pistols-tournament_token",
   "pistols-bank",
 ]
@@ -92,6 +93,10 @@ default = "pistols"
   "sstr:https://assets.underware.gg", # base_uri
 ]
 "pistols-pack_token" = [
+  # "sstr:http://localhost:3000", # base_uri
+  "sstr:https://assets.underware.gg", # base_uri
+]
+"pistols-ring_token" = [
   # "sstr:http://localhost:3000", # base_uri
   "sstr:https://assets.underware.gg", # base_uri
 ]
