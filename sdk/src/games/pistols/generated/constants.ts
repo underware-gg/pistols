@@ -130,6 +130,7 @@ export enum Activity {
   ChallengeResolved = 'ChallengeResolved', // 13
   ChallengeDraw = 'ChallengeDraw', // 14
   ClaimedGift = 'ClaimedGift', // 15
+  ClaimedRing = 'ClaimedRing', // 16
 };
 export const getActivityValue = (name: Activity): number | undefined => _indexOrUndefined(Object.keys(Activity).indexOf(name));
 export const getActivityFromValue = (value: number): Activity | undefined => Object.keys(Activity)[value] as Activity;
@@ -214,6 +215,17 @@ export enum ReleaseReason {
 export const getReleaseReasonValue = (name: ReleaseReason): number | undefined => _indexOrUndefined(Object.keys(ReleaseReason).indexOf(name));
 export const getReleaseReasonFromValue = (value: number): ReleaseReason | undefined => Object.keys(ReleaseReason)[value] as ReleaseReason;
 export const getReleaseReasonMap = (): Record<ReleaseReason, number> => Object.keys(ReleaseReason).reduce((acc, v, index) => { acc[v as ReleaseReason] = index; return acc; }, {} as Record<ReleaseReason, number>);
+
+// from: ../dojo/src/models/ring.cairo
+export enum RingType {
+  Unknown = 'Unknown', // 0
+  GoldSignetRing = 'GoldSignetRing', // 1
+  SilverSignetRing = 'SilverSignetRing', // 2
+  LeadSignetRing = 'LeadSignetRing', // 3
+};
+export const getRingTypeValue = (name: RingType): number | undefined => _indexOrUndefined(Object.keys(RingType).indexOf(name));
+export const getRingTypeFromValue = (value: number): RingType | undefined => Object.keys(RingType)[value] as RingType;
+export const getRingTypeMap = (): Record<RingType, number> => Object.keys(RingType).reduce((acc, v, index) => { acc[v as RingType] = index; return acc; }, {} as Record<RingType, number>);
 
 // from: ../dojo/src/models/season.cairo
 export enum SeasonPhase {
@@ -586,6 +598,14 @@ export type PackDescription = {
   quantity : number,
 };
 
+// from: ../dojo/src/models/ring.cairo
+export type RingDescriptor = {
+  id : string,
+  name : string,
+  description : string,
+  image_url : string,
+};
+
 // from: ../dojo/src/models/tournament.cairo
 export type TournamentRules = {
   settings_id : number,
@@ -728,6 +748,7 @@ type type_SELECTORS = {
   DUEL_TOKEN: bigint, // cairo: felt252
   DUELIST_TOKEN: bigint, // cairo: felt252
   PACK_TOKEN: bigint, // cairo: felt252
+  RING_TOKEN: bigint, // cairo: felt252
   TOURNAMENT_TOKEN: bigint, // cairo: felt252
   FAME_COIN: bigint, // cairo: felt252
   FOOLS_COIN: bigint, // cairo: felt252
@@ -744,6 +765,7 @@ export const SELECTORS: type_SELECTORS = {
   DUEL_TOKEN: BigInt('0x0670a5c673ac776e00e61c279cf7dc0efbe282787f4d719498e55643c5116063'), // selector_from_tag!("pistols-duel_token")
   DUELIST_TOKEN: BigInt('0x045c96d20393520c5dffeb2f2929fb599034d4fc6e9d423e6a641222fb60a25e'), // selector_from_tag!("pistols-duelist_token")
   PACK_TOKEN: BigInt('0x03d74e76192285c5a19a63c54a6c2ba5b015a1a25818c2d8f9cf75d7fef2b5c1'), // selector_from_tag!("pistols-pack_token")
+  RING_TOKEN: BigInt('0x02fc4959e710a2d442c974fa22583221e95567dc973fc5bf618c9ceb283aa88b'), // selector_from_tag!("pistols-ring_token")
   TOURNAMENT_TOKEN: BigInt('0x04ca33d8b161f957a982bee3486b9a85c5bc5de8baf22be1f987b3471e5c0b9c'), // selector_from_tag!("pistols-tournament_token")
   FAME_COIN: BigInt('0x0371b95cb7056eb2d21819662e973ed32c345c989aa9f6097e7811a5665a0b0a'), // selector_from_tag!("pistols-fame_coin")
   FOOLS_COIN: BigInt('0x058070034702ab2b03c2911459d7299e63048e70e3d41f77e1d806b4cb8f2dcd'), // selector_from_tag!("pistols-fools_coin")
@@ -811,6 +833,40 @@ type type_PlayerErrors = {
 };
 export const PlayerErrors: type_PlayerErrors = {
   PLAYER_NOT_REGISTERED: 'PLAYER: Not registered',
+};
+
+// from: ../dojo/src/models/ring.cairo
+type type_RING_TYPES = {
+  Unknown: RingDescriptor, // cairo: RingDescriptor
+  GoldSignetRing: RingDescriptor, // cairo: RingDescriptor
+  SilverSignetRing: RingDescriptor, // cairo: RingDescriptor
+  LeadSignetRing: RingDescriptor, // cairo: RingDescriptor
+};
+export const RING_TYPES: type_RING_TYPES = {
+  Unknown: {
+    id: 'Unknown',
+    name: 'Unknown',
+    description: 'Unknown',
+    image_url: '/tokens/Unknown.jpg',
+  },
+  GoldSignetRing: {
+    id: 'GoldSignetRing',
+    name: 'Gold Signet Ring',
+    description: 'Played Season 1 & 2',
+    image_url: '/tokens/rings/GoldRing.jpg',
+  },
+  SilverSignetRing: {
+    id: 'SilverSignetRing',
+    name: 'Silver Signet Ring',
+    description: 'Played Season 2 & 3',
+    image_url: '/tokens/rings/SilverRing.jpg',
+  },
+  LeadSignetRing: {
+    id: 'LeadSignetRing',
+    name: 'Lead Signet Ring',
+    description: 'Played Season 5 to 10',
+    image_url: '/tokens/rings/LeadRing.jpg',
+  },
 };
 
 // from: ../dojo/src/models/tournament.cairo
