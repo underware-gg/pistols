@@ -1,30 +1,31 @@
 use starknet::{ContractAddress};
-// use dojo::world::{WorldStorage};
+// use dojo::world::{WorldStorage, IWorldDispatcherTrait};
 use pistols::systems::{
+    admin::{IAdminDispatcherTrait},
     tokens::{
-        duelist_token::{IDuelistTokenDispatcherTrait},
-        pack_token::{IPackTokenDispatcherTrait},
-        lords_mock::{ILordsMockDispatcherTrait},
+        ring_token::{IRingTokenDispatcherTrait},
     },
 };
 use pistols::models::{
-    player::{Player, PlayerTrait},
-    pack::{Pack, PackType, PackTypeTrait},
-    config::{TokenConfig},
+    challenge::{ChallengeValue, RoundValue, DuelType},
+    ring::{Ring, RingType, RingTypeTrait},
+};
+use pistols::types::{
+    challenge_state::{ChallengeState},
 };
 
-use pistols::types::duelist_profile::{DuelistProfile, GenesisKey};
 // use pistols::interfaces::dns::{DnsTrait};
-use pistols::types::constants::{CONST};
-use pistols::types::timestamp::{TIMESTAMP};
+// use pistols::types::constants::{CONST};
 use pistols::tests::tester::{
     tester,
     tester::{
         StoreTrait,
         TestSystems, FLAGS,
-        OWNER, OTHER, BUMMER, SPENDER, SEASON_ID_1,
+        OWNER, OTHER, BUMMER, SPENDER,
+        SEASON_ID_1, SEASON_ID_2, SEASON_ID_3, SEASON_ID_4, SEASON_ID_5,
     },
 };
+use pistols::tests::prefabs::{prefabs};
 
 use nft_combo::erc721::erc721_combo::{ERC721ComboComponent as combo};
 use openzeppelin_token::erc721::interface;
@@ -40,41 +41,28 @@ const TOKEN_ID_4: u256 = 4;
 const TOKEN_ID_5: u256 = 5;
 
 
-fn setup(_fee_amount: u128) -> TestSystems {
-    let mut sys: TestSystems = tester::setup_world(FLAGS::DUELIST | FLAGS::FAME | FLAGS::LORDS);
+fn setup(flags: u16) -> TestSystems {
+    let mut sys: TestSystems = tester::setup_world(flags);
 
     tester::set_current_season(ref sys, SEASON_ID_1);
 
-    tester::execute_lords_faucet(@sys.lords, OWNER());
-    tester::execute_lords_faucet(@sys.lords, OTHER());
-
-    tester::fund_duelists_pool(@sys, 2);
-
     // drop all events
     tester::drop_all_events(sys.world.dispatcher.contract_address);
-    tester::drop_all_events(sys.pack.contract_address);
+    tester::drop_all_events(sys.rings.contract_address);
 
     tester::impersonate(OWNER());
 
     (sys)
 }
 
-fn _assert_minted_count(sys: @TestSystems, minted_count: u128, msg: ByteArray) {
-    let token_config: TokenConfig = (*sys.store).get_token_config((*sys.pack).contract_address);
-    assert_eq!(token_config.minted_count, minted_count, "{}", msg);
-}
-fn _assert_duelist_count(sys: @TestSystems, minted_count: u128, msg: ByteArray) {
-    let token_config: TokenConfig = (*sys.store).get_token_config((*sys.duelists).contract_address);
-    assert_eq!(token_config.minted_count, minted_count, "{}", msg);
-}
-
-fn _purchase(sys: @TestSystems, recipient: ContractAddress) -> u128 {
-    let price: u128 = (*sys.pack).calc_mint_fee(recipient, PackType::GenesisDuelists5x);
-    assert_ne!(price, 0, "invalid price");
-    tester::impersonate(recipient);
-    tester::execute_lords_approve(sys.lords, recipient, (*sys.bank).contract_address, price);
-    tester::execute_pack_purchase(sys, recipient, PackType::GenesisDuelists5x);
-    (price)
+fn _make_challenge(ref sys: TestSystems, address_a: ContractAddress, address_b: ContractAddress, season_id: u32) -> u128 {
+    tester::set_current_season(ref sys, season_id);
+    let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_miss();
+    let duel_id = prefabs::start_new_challenge(@sys, address_a, address_b, DuelType::Practice, 1);
+    let (challenge, _round): (ChallengeValue, RoundValue) = prefabs::commit_reveal_get(@sys, duel_id, address_a, address_b, mocked, moves_a, moves_b);
+    assert_eq!(challenge.state, ChallengeState::Draw, "bad state");
+    assert_eq!(challenge.season_id, season_id, "bad season_id");
+    (duel_id)
 }
 
 //
@@ -83,53 +71,36 @@ fn _purchase(sys: @TestSystems, recipient: ContractAddress) -> u128 {
 
 #[test]
 fn test_initializer() {
-    let mut sys: TestSystems = setup(0);
-    assert_eq!(sys.pack.symbol(), "PACK", "Symbol is wrong");
-
-    _assert_minted_count(@sys, 0, "Should eq 0");
-
-    assert!(sys.pack.supports_interface(interface::IERC721_ID), "should support IERC721_ID");
-    assert!(sys.pack.supports_interface(interface::IERC721_METADATA_ID), "should support METADATA");
+    let mut sys: TestSystems = setup(FLAGS::RINGS);
+    assert_eq!(sys.rings.symbol(), "RING", "Symbol is wrong");
+    assert!(sys.rings.supports_interface(interface::IERC721_ID), "should support IERC721_ID");
+    assert!(sys.rings.supports_interface(interface::IERC721_METADATA_ID), "should support METADATA");
 }
 
 #[test]
 fn test_contract_uri() {
-    let mut sys: TestSystems = setup(0);
-    let uri: ByteArray = sys.pack.contract_uri();
-    let uri_camel: ByteArray = sys.pack.contractURI();
-    println!("___pack.contract_uri():{}", uri);
+    let mut sys: TestSystems = setup(FLAGS::RINGS);
+    let uri: ByteArray = sys.rings.contract_uri();
+    let uri_camel: ByteArray = sys.rings.contractURI();
+    println!("___rings.contract_uri():{}", uri);
     assert!(tester::starts_with(uri.clone(), "data:"), "contract_uri() should be a json string");
     assert_eq!(uri.clone(), uri_camel.clone(), "uri_camel");
 }
 
 #[test]
 fn test_token_uri() {
-    let mut sys: TestSystems = setup(0);
-
-    let pack = Pack {
-        pack_id: TOKEN_ID_1.low,
-        pack_type: PackType::GenesisDuelists5x,
-        seed: 999999,
-        lords_amount: 50 * CONST::ETH_TO_WEI.low,
-        is_open: false,
-    };
-
-    tester::set_Pack(ref sys.world, @pack);
-
-    assert!(sys.pack.can_claim_starter_pack(OWNER()), "can_claim_starter_pack");
-    tester::execute_claim_starter_pack(@sys, OWNER());
-    _purchase(@sys, OWNER());
-
-    let uri = sys.pack.token_uri(TOKEN_ID_2);
+    let mut sys: TestSystems = setup(FLAGS::RINGS | FLAGS::ADMIN);
+    tester::execute_airdrop_ring(@sys, OWNER(), OWNER(), RingType::GoldSignetRing);
+    let uri = sys.rings.token_uri(TOKEN_ID_1);
     assert_gt!(uri.len(), 100, "Uri 1 should not be empty");
-    println!("___packs.token_uri(1):{}", uri);
+    println!("___rings.token_uri(1):{}", uri);
 }
 
 #[test]
 #[should_panic(expected: ('ERC721: invalid token ID', 'ENTRYPOINT_FAILED'))]
 fn test_token_uri_invalid() {
-    let mut sys: TestSystems = setup(0);
-    sys.pack.token_uri(999);
+    let mut sys: TestSystems = setup(FLAGS::RINGS);
+    sys.rings.token_uri(999);
 }
 
 
@@ -138,359 +109,229 @@ fn test_token_uri_invalid() {
 //
 
 #[test]
-fn test_claim_purchase() {
-    let mut sys: TestSystems = setup(0);
-    _assert_minted_count(@sys, 0, "total_supply init");
-    assert_eq!(sys.pack.balance_of(OWNER()), 0, "balance_of 0");
-
-    let player: Player = sys.store.get_player(OWNER());
-    assert!(!player.exists(), "!player.exists()");
-    assert!(!player.timestamps.claimed_starter_pack, "!player.timestamps.claimed_starter_pack");
-
-    let starter_pack_duelist_count: usize = PackType::StarterPack.description().quantity;
-
-    assert!(sys.pack.can_claim_starter_pack(OWNER()), "can_claim_starter_pack_OWNER");
-    let owner_ids: Span<u128> = tester::execute_claim_starter_pack(@sys, OWNER());
-    _assert_minted_count(@sys, 1, "total_supply 1");
-    _assert_duelist_count(@sys, starter_pack_duelist_count.into(), "duelist_supply [starter_pack_duelist_count]");
-    assert_eq!(sys.pack.balance_of(OWNER()), 0, "balance_of 0");
-
-    let player: Player = sys.store.get_player(OWNER());
-    assert!(player.exists(), "player.exists()");
-    assert!(player.timestamps.claimed_starter_pack, "player.timestamps.claimed_starter_pack");
-    let pack_1: Pack = sys.store.get_pack(TOKEN_ID_1.low);
-    assert_eq!(pack_1.pack_id, TOKEN_ID_1.low, "pack_1.pack_id");
-    assert_eq!(pack_1.pack_type, PackType::StarterPack, "pack_1.pack_type");
-    assert_ne!(pack_1.seed, 0, "pack_1.seed");
-    assert!(pack_1.is_open, "pack_1.is_open");
-
-    // balances before purchase
-    let balance_owner_initial: u128 = sys.lords.balance_of(OWNER()).low;
-    let balance_bank_initial: u128 = sys.lords.balance_of(sys.bank.contract_address).low;
-    assert_ne!(balance_owner_initial, 0, "balance_owner_initial");
-    assert_ne!(balance_bank_initial, 0, "balance_bank_initial");
-
-    let price: u128 = _purchase(@sys, OWNER());
-    _assert_minted_count(@sys, 2, "total_supply 2");
-    assert_eq!(sys.pack.balance_of(OWNER()), 1, "balance_of 1");
-    assert!(sys.pack.owner_of(TOKEN_ID_2) == OWNER(), "owner_of_2");
-
-    let pack_2: Pack = sys.store.get_pack(TOKEN_ID_2.low);
-    assert_eq!(pack_2.pack_id, TOKEN_ID_2.low, "pack_2.pack_id");
-    assert_eq!(pack_2.pack_type, PackType::GenesisDuelists5x, "pack_2.pack_type");
-    assert_ne!(pack_2.seed, pack_1.seed, "pack_2.seed");
-    assert!(!pack_2.is_open, "pack_2.is_open");
-
-    // balances after purchase
-    let balance_owner: u128 = sys.lords.balance_of(OWNER()).low;
-    let balance_bank: u128 = sys.lords.balance_of(sys.bank.contract_address).low;
-    assert_eq!(balance_owner, balance_owner_initial - price, "balance_owner");
-    assert_eq!(balance_bank, balance_bank_initial + price, "balance_bank");
-
-    assert!(sys.pack.can_claim_starter_pack(OTHER()), "can_claim_starter_pack_OTHER");
-    let other_ids: Span<u128> = tester::execute_claim_starter_pack(@sys, OTHER());
-
-    // duelists should be the same
-    let owner_profile_1: DuelistProfile = sys.store.get_duelist_profile(*owner_ids[0]);
-    let owner_profile_2: DuelistProfile = sys.store.get_duelist_profile(*owner_ids[1]);
-    let other_profile_1: DuelistProfile = sys.store.get_duelist_profile(*other_ids[0]);
-    let other_profile_2: DuelistProfile = sys.store.get_duelist_profile(*other_ids[1]);
-// println!("owner_profile_1:{}", owner_profile_1);
-// println!("owner_profile_2:{}", owner_profile_2);
-// println!("other_profile_1:{}", other_profile_1);
-// println!("other_profile_2:{}", other_profile_2);
-    assert_eq!(owner_profile_1, DuelistProfile::Genesis(GenesisKey::SerWalker), "owner_profile_1");
-    assert_eq!(other_profile_1, DuelistProfile::Genesis(GenesisKey::SerWalker), "other_profile_1");
-    assert_eq!(owner_profile_2, DuelistProfile::Genesis(GenesisKey::LadyVengeance), "owner_profile_2");
-    assert_eq!(other_profile_2, DuelistProfile::Genesis(GenesisKey::LadyVengeance), "other_profile_2");
+fn test_claim_ok() {
+    let mut sys: TestSystems = setup(FLAGS::RINGS | FLAGS::GAME | FLAGS::MOCK_RNG);
+    assert_eq!(sys.rings.total_supply(), 0, "total_supply 0");
+    assert_eq!(sys.rings.balance_of(OWNER()), 0, "balance_of(OWNER) 0");
+    assert_eq!(sys.rings.balance_of(OTHER()), 0, "balance_of(OTHER) 0");
+    assert_eq!(sys.rings.balance_of(BUMMER()), 0, "balance_of(BUMMER) 0");
+    assert_eq!(sys.rings.balance_of_ring(OWNER(), RingType::GoldSignetRing), 0, "balance_of_ring(OWNER, GoldSignetRing) 0");
+    assert_eq!(sys.rings.balance_of_ring(OTHER(), RingType::GoldSignetRing), 0, "balance_of_ring(OTHER, GoldSignetRing) 0");
+    assert_eq!(sys.rings.balance_of_ring(BUMMER(), RingType::GoldSignetRing), 0, "balance_of_ring(BUMMER, GoldSignetRing) 0");
+    assert_eq!(sys.rings.balance_of_ring(OWNER(), RingType::SilverSignetRing), 0, "balance_of_ring(OWNER, SilverSignetRing) 0");
+    assert_eq!(sys.rings.balance_of_ring(OTHER(), RingType::SilverSignetRing), 0, "balance_of_ring(OTHER, SilverSignetRing) 0");
+    assert_eq!(sys.rings.balance_of_ring(BUMMER(), RingType::SilverSignetRing), 0, "balance_of_ring(BUMMER, SilverSignetRing) 0");
+    //
+    // Season 1
+    assert!(!sys.rings.has_claimed(OWNER(), RingType::GoldSignetRing), "has_claimed(OWNER, GoldSignetRing, S1) init");
+    assert!(!sys.rings.has_claimed(OTHER(), RingType::GoldSignetRing), "has_claimed(OTHER, GoldSignetRing, S1) init");
+    assert!(!sys.rings.has_claimed(BUMMER(), RingType::GoldSignetRing), "has_claimed(BUMMER, GoldSignetRing, S1) init");
+    assert!(sys.rings.get_claimable_season_ring_type(OWNER(), 1).is_none(), "get_claimable_season_ring_type(OWNER, S1) init");
+    assert!(sys.rings.get_claimable_season_ring_type(OTHER(), 1).is_none(), "get_claimable_season_ring_type(OTHER, S1) init");
+    assert!(sys.rings.get_claimable_season_ring_type(BUMMER(), 1).is_none(), "get_claimable_season_ring_type(BUMMER, S1) init");
+    let duel_id: u128 = _make_challenge(ref sys, OWNER(), OTHER(), SEASON_ID_1);
+    assert_eq!(duel_id, 1, "bad duel_id");
+    assert_eq!(sys.rings.get_claimable_season_ring_type(OWNER(), duel_id).unwrap(), RingType::GoldSignetRing, "get_claimable_season_ring_type(OWNER, S1) YES");
+    assert_eq!(sys.rings.get_claimable_season_ring_type(OTHER(), duel_id).unwrap(), RingType::GoldSignetRing, "get_claimable_season_ring_type(OTHER, S1) YES");
+    assert!(sys.rings.get_claimable_season_ring_type(BUMMER(), duel_id).is_none(), "get_claimable_season_ring_type(BUMMER, S1) > NO");
+    tester::execute_claim_season_ring(@sys, OWNER(), duel_id, RingType::GoldSignetRing);
+    tester::execute_claim_season_ring(@sys, OTHER(), duel_id, RingType::GoldSignetRing);
+    assert!(sys.rings.has_claimed(OWNER(), RingType::GoldSignetRing), "has_claimed(OWNER, GoldSignetRing, S1) YES");
+    assert!(sys.rings.has_claimed(OTHER(), RingType::GoldSignetRing), "has_claimed(OTHER, GoldSignetRing, S1) YES");
+    assert!(!sys.rings.has_claimed(BUMMER(), RingType::GoldSignetRing), "has_claimed(BUMMER, GoldSignetRing, S1) NO");
+    assert!(sys.rings.get_claimable_season_ring_type(OWNER(), duel_id).is_none(), "get_claimable_season_ring_type(OWNER, S1) > None");
+    assert!(sys.rings.get_claimable_season_ring_type(OTHER(), duel_id).is_none(), "get_claimable_season_ring_type(OTHER, S1) > None");
+    assert!(sys.rings.get_claimable_season_ring_type(BUMMER(), duel_id).is_none(), "get_claimable_season_ring_type(BUMMER, S1) > None");
+    // balances
+    assert_eq!(sys.rings.total_supply(), 2, "total_supply 2");
+    assert_eq!(sys.rings.balance_of(OWNER()), 1, "balance_of(OWNER) 1");
+    assert_eq!(sys.rings.balance_of(OTHER()), 1, "balance_of(OTHER) 1");
+    assert_eq!(sys.rings.balance_of(BUMMER()), 0, "balance_of(BUMMER) 0");
+    assert_eq!(sys.rings.balance_of_ring(OWNER(), RingType::GoldSignetRing), 1, "balance_of_ring(OWNER, GoldSignetRing, S1) 1");
+    assert_eq!(sys.rings.balance_of_ring(OTHER(), RingType::GoldSignetRing), 1, "balance_of_ring(OTHER, GoldSignetRing, S1) 1");
+    assert_eq!(sys.rings.balance_of_ring(BUMMER(), RingType::GoldSignetRing), 0, "balance_of_ring(BUMMER, GoldSignetRing, S1) 0");
+    assert_eq!(sys.rings.balance_of_ring(OWNER(), RingType::SilverSignetRing), 0, "balance_of_ring(OWNER, SilverSignetRing, S1) 0");
+    assert_eq!(sys.rings.balance_of_ring(OTHER(), RingType::SilverSignetRing), 0, "balance_of_ring(OTHER, SilverSignetRing, S1) 0");
+    assert_eq!(sys.rings.balance_of_ring(BUMMER(), RingType::SilverSignetRing), 0, "balance_of_ring(BUMMER, SilverSignetRing, S1) 0");
+    //
+    // Season 2
+    let duel_id: u128 = _make_challenge(ref sys, OWNER(), BUMMER(), SEASON_ID_2);
+    assert!(sys.rings.get_claimable_season_ring_type(OWNER(), duel_id).is_none(), "get_claimable_season_ring_type(OWNER, S2) > NO");
+    assert!(sys.rings.get_claimable_season_ring_type(OTHER(), duel_id).is_none(), "get_claimable_season_ring_type(OTHER, S2) > NO");
+    assert_eq!(sys.rings.get_claimable_season_ring_type(BUMMER(), duel_id).unwrap(), RingType::GoldSignetRing, "get_claimable_season_ring_type(BUMMER, S2) YES");
+    tester::execute_claim_season_ring(@sys, BUMMER(), duel_id, RingType::SilverSignetRing);
+    assert!(sys.rings.has_claimed(OWNER(), RingType::GoldSignetRing), "has_claimed(OWNER, GoldSignetRing, S2) YES");
+    assert!(sys.rings.has_claimed(OTHER(), RingType::GoldSignetRing), "has_claimed(OTHER, GoldSignetRing, S2) YES");
+    assert!(sys.rings.has_claimed(BUMMER(), RingType::GoldSignetRing), "has_claimed(BUMMER, GoldSignetRing, S2) YES");
+    assert!(sys.rings.get_claimable_season_ring_type(OWNER(), duel_id).is_none(), "get_claimable_season_ring_type(OWNER, S2) > None");
+    assert!(sys.rings.get_claimable_season_ring_type(OTHER(), duel_id).is_none(), "get_claimable_season_ring_type(OTHER, S2) > None");
+    assert!(sys.rings.get_claimable_season_ring_type(BUMMER(), duel_id).is_none(), "get_claimable_season_ring_type(BUMMER, S2) > None");
+    // balances
+    assert_eq!(sys.rings.total_supply(), 3, "total_supply 3");
+    assert_eq!(sys.rings.balance_of(OWNER()), 1, "balance_of(OWNER) 1");
+    assert_eq!(sys.rings.balance_of(OTHER()), 1, "balance_of(OTHER) 1");
+    assert_eq!(sys.rings.balance_of(BUMMER()), 1, "balance_of(BUMMER) 1");
+    assert_eq!(sys.rings.balance_of_ring(OWNER(), RingType::GoldSignetRing), 1, "balance_of_ring(OWNER, GoldSignetRing, S2) 1");
+    assert_eq!(sys.rings.balance_of_ring(OTHER(), RingType::GoldSignetRing), 1, "balance_of_ring(OTHER, GoldSignetRing, S2) 1");
+    assert_eq!(sys.rings.balance_of_ring(BUMMER(), RingType::GoldSignetRing), 1, "balance_of_ring(BUMMER, GoldSignetRing, S2) 1");
+    assert_eq!(sys.rings.balance_of_ring(OWNER(), RingType::SilverSignetRing), 0, "balance_of_ring(OWNER, SilverSignetRing, S2) 0");
+    assert_eq!(sys.rings.balance_of_ring(OTHER(), RingType::SilverSignetRing), 0, "balance_of_ring(OTHER, SilverSignetRing, S2) 0");
+    assert_eq!(sys.rings.balance_of_ring(BUMMER(), RingType::SilverSignetRing), 0, "balance_of_ring(BUMMER, SilverSignetRing, S2) 0");
+    //
+    // Season 3
+    assert!(!sys.rings.has_claimed(OWNER(), RingType::SilverSignetRing), "has_claimed(OWNER, SilverSignetRing, S3) init");
+    assert!(!sys.rings.has_claimed(OTHER(), RingType::SilverSignetRing), "has_claimed(OTHER, SilverSignetRing, S3) init");
+    assert!(!sys.rings.has_claimed(BUMMER(), RingType::SilverSignetRing), "has_claimed(BUMMER, SilverSignetRing, S3) init");
+    let duel_id: u128 = _make_challenge(ref sys, OWNER(), BUMMER(), SEASON_ID_3);
+    assert_eq!(sys.rings.get_claimable_season_ring_type(OWNER(), duel_id).unwrap(), RingType::SilverSignetRing, "get_claimable_season_ring_type(OWNER, S3) YES");
+    assert!(sys.rings.get_claimable_season_ring_type(OTHER(), duel_id).is_none(), "get_claimable_season_ring_type(OTHER, S3) > NO");
+    assert_eq!(sys.rings.get_claimable_season_ring_type(BUMMER(), duel_id).unwrap(), RingType::SilverSignetRing, "get_claimable_season_ring_type(BUMMER, S3) YES");
+    tester::execute_claim_season_ring(@sys, OWNER(), duel_id, RingType::SilverSignetRing);
+    tester::execute_claim_season_ring(@sys, BUMMER(), duel_id, RingType::SilverSignetRing);
+    assert!(sys.rings.has_claimed(OWNER(), RingType::SilverSignetRing), "has_claimed(OWNER, SilverSignetRing, S3) YES");
+    assert!(!sys.rings.has_claimed(OTHER(), RingType::SilverSignetRing), "has_claimed(OTHER, SilverSignetRing, S3) NO");
+    assert!(sys.rings.has_claimed(BUMMER(), RingType::SilverSignetRing), "has_claimed(BUMMER, SilverSignetRing, S3) YES");
+    assert!(sys.rings.get_claimable_season_ring_type(OWNER(), duel_id).is_none(), "get_claimable_season_ring_type(OWNER, S3) > None");
+    assert!(sys.rings.get_claimable_season_ring_type(OTHER(), duel_id).is_none(), "get_claimable_season_ring_type(OTHER, S3) > None");
+    assert!(sys.rings.get_claimable_season_ring_type(BUMMER(), duel_id).is_none(), "get_claimable_season_ring_type(BUMMER, S3) > None");
+    // balances
+    assert_eq!(sys.rings.total_supply(), 5, "total_supply 5");
+    assert_eq!(sys.rings.balance_of(OWNER()), 2, "balance_of(OWNER) 2");
+    assert_eq!(sys.rings.balance_of(OTHER()), 1, "balance_of(OTHER) 1");
+    assert_eq!(sys.rings.balance_of(BUMMER()), 2, "balance_of(BUMMER) 2");
+    assert_eq!(sys.rings.balance_of_ring(OWNER(), RingType::GoldSignetRing), 1, "balance_of_ring(OWNER, GoldSignetRing, S3) 1");
+    assert_eq!(sys.rings.balance_of_ring(OTHER(), RingType::GoldSignetRing), 1, "balance_of_ring(OTHER, GoldSignetRing, S3) 1");
+    assert_eq!(sys.rings.balance_of_ring(BUMMER(), RingType::GoldSignetRing), 1, "balance_of_ring(BUMMER, GoldSignetRing, S3) 1");
+    assert_eq!(sys.rings.balance_of_ring(OWNER(), RingType::SilverSignetRing), 1, "balance_of_ring(OWNER, SilverSignetRing, S3) 1");
+    assert_eq!(sys.rings.balance_of_ring(OTHER(), RingType::SilverSignetRing), 0, "balance_of_ring(OTHER, SilverSignetRing, S3) 0");
+    assert_eq!(sys.rings.balance_of_ring(BUMMER(), RingType::SilverSignetRing), 1, "balance_of_ring(BUMMER, SilverSignetRing, S3) 1");
+    //
+    // Season 5
+    assert!(!sys.rings.has_claimed(OWNER(), RingType::LeadSignetRing), "has_claimed(OWNER, LeadSignetRing, S5) init");
+    assert!(!sys.rings.has_claimed(OTHER(), RingType::LeadSignetRing), "has_claimed(OTHER, LeadSignetRing, S5) init");
+    assert!(!sys.rings.has_claimed(BUMMER(), RingType::LeadSignetRing), "has_claimed(BUMMER, LeadSignetRing, S5) init");
+    let duel_id: u128 = _make_challenge(ref sys, OWNER(), OTHER(), SEASON_ID_5);
+    assert_eq!(sys.rings.get_claimable_season_ring_type(OWNER(), duel_id).unwrap(), RingType::LeadSignetRing, "get_claimable_season_ring_type(OWNER, S5) YES");
+    assert_eq!(sys.rings.get_claimable_season_ring_type(OTHER(), duel_id).unwrap(), RingType::LeadSignetRing, "get_claimable_season_ring_type(OTHER, S5) YES");
+    assert!(sys.rings.get_claimable_season_ring_type(BUMMER(), duel_id).is_none(), "get_claimable_season_ring_type(BUMMER, S5) > NO");
+    tester::execute_claim_season_ring(@sys, OWNER(), duel_id, RingType::LeadSignetRing);
+    tester::execute_claim_season_ring(@sys, OTHER(), duel_id, RingType::LeadSignetRing);
+    assert!(sys.rings.has_claimed(OWNER(), RingType::LeadSignetRing), "has_claimed(OWNER, LeadSignetRing, S5) YES");
+    assert!(sys.rings.has_claimed(OTHER(), RingType::LeadSignetRing), "has_claimed(OTHER, LeadSignetRing, S5) YES");
+    assert!(!sys.rings.has_claimed(BUMMER(), RingType::LeadSignetRing), "has_claimed(BUMMER, LeadSignetRing, S5) NO");
+    assert!(sys.rings.get_claimable_season_ring_type(OWNER(), duel_id).is_none(), "get_claimable_season_ring_type(OWNER, S5) > None");
+    assert!(sys.rings.get_claimable_season_ring_type(OTHER(), duel_id).is_none(), "get_claimable_season_ring_type(OTHER, S5) > None");
+    assert!(sys.rings.get_claimable_season_ring_type(BUMMER(), duel_id).is_none(), "get_claimable_season_ring_type(BUMMER, S5) > None");
+    // balances
+    assert_eq!(sys.rings.total_supply(), 7, "total_supply 7");
+    assert_eq!(sys.rings.balance_of(OWNER()), 3, "balance_of(OWNER) 3");
+    assert_eq!(sys.rings.balance_of(OTHER()), 2, "balance_of(OTHER) 2");
+    assert_eq!(sys.rings.balance_of(BUMMER()), 2, "balance_of(BUMMER) 2");
+    assert_eq!(sys.rings.balance_of_ring(OWNER(), RingType::GoldSignetRing), 1, "balance_of_ring(OWNER, GoldSignetRing, S5) 1");
+    assert_eq!(sys.rings.balance_of_ring(OTHER(), RingType::GoldSignetRing), 1, "balance_of_ring(OTHER, GoldSignetRing, S5) 1");
+    assert_eq!(sys.rings.balance_of_ring(BUMMER(), RingType::GoldSignetRing), 1, "balance_of_ring(BUMMER, GoldSignetRing, S5) 1");
+    assert_eq!(sys.rings.balance_of_ring(OWNER(), RingType::SilverSignetRing), 1, "balance_of_ring(OWNER, SilverSignetRing, S5) 1");
+    assert_eq!(sys.rings.balance_of_ring(OTHER(), RingType::SilverSignetRing), 0, "balance_of_ring(OTHER, SilverSignetRing, S5) 0");
+    assert_eq!(sys.rings.balance_of_ring(BUMMER(), RingType::SilverSignetRing), 1, "balance_of_ring(BUMMER, SilverSignetRing, S5) 1");
+    assert_eq!(sys.rings.balance_of_ring(OWNER(), RingType::LeadSignetRing), 1, "balance_of_ring(OWNER, LeadSignetRing, S5) 1");
+    assert_eq!(sys.rings.balance_of_ring(OTHER(), RingType::LeadSignetRing), 1, "balance_of_ring(OTHER, LeadSignetRing, S5) 1");
+    assert_eq!(sys.rings.balance_of_ring(BUMMER(), RingType::LeadSignetRing), 0, "balance_of_ring(BUMMER, LeadSignetRing, S5) 0");
+    //
+    // Season 10
+    let duel_id: u128 = _make_challenge(ref sys, OWNER(), SPENDER(), 10);
+    assert!(sys.rings.get_claimable_season_ring_type(OWNER(), duel_id).is_none(), "get_claimable_season_ring_type(OWNER, S10) > NO");
+    assert!(sys.rings.get_claimable_season_ring_type(OTHER(), duel_id).is_none(), "get_claimable_season_ring_type(OTHER, S10) > NO");
+    assert!(sys.rings.get_claimable_season_ring_type(BUMMER(), duel_id).is_none(), "get_claimable_season_ring_type(BUMMER, S10) > NO");
+    assert_eq!(sys.rings.get_claimable_season_ring_type(SPENDER(), duel_id).unwrap(), RingType::LeadSignetRing, "get_claimable_season_ring_type(SPENDER, S10) YES");
+    tester::execute_claim_season_ring(@sys, SPENDER(), duel_id, RingType::LeadSignetRing);
+    assert!(sys.rings.has_claimed(SPENDER(), RingType::LeadSignetRing), "has_claimed(SPENDER, LeadSignetRing, S10) YES");
+    assert!(sys.rings.get_claimable_season_ring_type(OWNER(), duel_id).is_none(), "get_claimable_season_ring_type(OWNER, S10) > None");
+    assert!(sys.rings.get_claimable_season_ring_type(OTHER(), duel_id).is_none(), "get_claimable_season_ring_type(OTHER, S10) > None");
+    assert!(sys.rings.get_claimable_season_ring_type(BUMMER(), duel_id).is_none(), "get_claimable_season_ring_type(BUMMER, S10) > None");
+    assert!(sys.rings.get_claimable_season_ring_type(SPENDER(), duel_id).is_none(), "get_claimable_season_ring_type(SPENDER, S10) > None");
+    // balances
+    assert_eq!(sys.rings.total_supply(), 8, "total_supply 8");
+    //
+    // Season 11
+    let duel_id: u128 = _make_challenge(ref sys, OWNER(), BUMMER(), 11);
+    assert!(sys.rings.get_claimable_season_ring_type(OWNER(), duel_id).is_none(), "get_claimable_season_ring_type(OWNER, S11) > None");
+    assert!(sys.rings.get_claimable_season_ring_type(OTHER(), duel_id).is_none(), "get_claimable_season_ring_type(OTHER, S11) > None");
+    assert!(sys.rings.get_claimable_season_ring_type(BUMMER(), duel_id).is_none(), "get_claimable_season_ring_type(BUMMER, S11) > None");
+    assert!(sys.rings.get_claimable_season_ring_type(SPENDER(), duel_id).is_none(), "get_claimable_season_ring_type(SPENDER, S11) > None");
 }
 
 #[test]
-#[should_panic(expected: ('BANK: insufficient LORDS pool', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
-fn test_claim_not_sponsored() {
-    let mut sys: TestSystems = setup(0);
-    assert!(sys.pack.can_claim_starter_pack(OWNER()), "can_claim_starter_pack_OWNER");
-    tester::execute_claim_starter_pack(@sys, OWNER());
-    assert!(sys.pack.can_claim_starter_pack(OTHER()), "can_claim_starter_pack_OTHER");
-    tester::execute_claim_starter_pack(@sys, OTHER());
-    assert!(sys.pack.can_claim_starter_pack(BUMMER()), "can_claim_starter_pack_BUMMER");
-    tester::execute_claim_starter_pack(@sys, BUMMER());
-}
-
-#[test]
-#[should_panic(expected: ('BANK: insufficient allowance', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
-fn test_mint_no_allowance_zero() {
-    let mut sys: TestSystems = setup(0);
-    assert!(sys.pack.can_claim_starter_pack(OWNER()), "can_claim_starter_pack_OWNER");
-    tester::execute_claim_starter_pack(@sys, OWNER());
-    tester::execute_pack_purchase(@sys, OWNER(), PackType::GenesisDuelists5x);
-}
-
-#[test]
-#[should_panic(expected: ('PACK: Ineligible', 'ENTRYPOINT_FAILED'))]
+#[should_panic(expected: ('RING: Already claimed', 'ENTRYPOINT_FAILED'))]
 fn test_claim_twice() {
-    let mut sys: TestSystems = setup(0);
-    assert!(sys.pack.can_claim_starter_pack(OWNER()), "can_claim_starter_pack_OWNER");
-    tester::execute_claim_starter_pack(@sys, OWNER());
-    assert!(!sys.pack.can_claim_starter_pack(OWNER()), "can_claim_starter_pack_OWNER");
-    tester::execute_claim_starter_pack(@sys, OWNER());
+    let mut sys: TestSystems = setup(FLAGS::RINGS | FLAGS::GAME | FLAGS::MOCK_RNG);
+    let duel_id: u128 = _make_challenge(ref sys, OWNER(), OTHER(), SEASON_ID_1);
+    tester::execute_claim_season_ring(@sys, OWNER(), duel_id, RingType::GoldSignetRing);
+    tester::execute_claim_season_ring(@sys, OWNER(), duel_id, RingType::GoldSignetRing);
 }
 
 #[test]
-#[should_panic(expected: ('BANK: insufficient allowance', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
-fn test_mint_no_allowance_half() {
-    let mut sys: TestSystems = setup(0);
-    tester::execute_claim_starter_pack(@sys, OWNER());
-    let price: u128 = sys.pack.calc_mint_fee(OWNER(), PackType::GenesisDuelists5x);
-    tester::execute_lords_approve(@sys.lords, OWNER(), sys.bank.contract_address, price / 2);
-    tester::execute_pack_purchase(@sys, OWNER(), PackType::GenesisDuelists5x);
+#[should_panic(expected: ('RING: Already claimed', 'ENTRYPOINT_FAILED'))]
+fn test_claim_transfer_claim() {
+    let mut sys: TestSystems = setup(FLAGS::RINGS | FLAGS::GAME | FLAGS::MOCK_RNG);
+    let duel_id: u128 = _make_challenge(ref sys, OWNER(), OTHER(), SEASON_ID_1);
+    tester::execute_claim_season_ring(@sys, OWNER(), duel_id, RingType::GoldSignetRing);
+    sys.rings.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
+    tester::execute_claim_season_ring(@sys, OWNER(), duel_id, RingType::GoldSignetRing);
 }
 
 #[test]
-#[should_panic(expected: ('PACK: Claim duelists first', 'ENTRYPOINT_FAILED'))]
-fn test_no_claim() {
-    let mut sys: TestSystems = setup(0);
-    _purchase(@sys, OWNER());
-}
-
-#[test]
-#[should_panic(expected: ('PACK: Not for sale', 'ENTRYPOINT_FAILED'))]
-fn test_mint_not_for_sale() {
-    let mut sys: TestSystems = setup(0);
-    tester::execute_claim_starter_pack(@sys, OWNER());
-    tester::execute_pack_purchase(@sys, OWNER(), PackType::StarterPack);
+fn test_claim_transfer_other_can_claim() {
+    let mut sys: TestSystems = setup(FLAGS::RINGS | FLAGS::GAME | FLAGS::MOCK_RNG);
+    let duel_id: u128 = _make_challenge(ref sys, OWNER(), OTHER(), SEASON_ID_1);
+    tester::execute_claim_season_ring(@sys, OWNER(), duel_id, RingType::GoldSignetRing);
+    sys.rings.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
+    tester::execute_claim_season_ring(@sys, OTHER(), duel_id, RingType::GoldSignetRing);
 }
 
 
 //
-// free gifts...
+// airdrops...
 //
 
 #[test]
-fn test_claim_gift() {
-    let mut sys: TestSystems = setup(0);
-    // 1: claim starter pack
-    assert!(!sys.pack.can_claim_gift(OWNER()), "!can_claim_gift_1");
-    tester::execute_claim_starter_pack(@sys, OWNER());
-    assert_eq!(sys.duelists.balance_of(OWNER()), 2, "balance_of(OWNER) 2");
-    assert_eq!(sys.store.get_player_alive_duelist_count(OWNER()), 2, "alive_duelist_count::claimed_starter_pack");
-    // 2: no alive duelists
-    assert!(!sys.pack.can_claim_gift(OWNER()), "!can_claim_gift_2");
-    tester::impersonate(OWNER());
-    sys.duelists.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
-    sys.duelists.transfer_from(OWNER(), OTHER(), TOKEN_ID_2);
-    assert_eq!(sys.duelists.balance_of(OWNER()), 0, "balance_of(OWNER) 0");
-    assert_eq!(sys.store.get_player_alive_duelist_count(OWNER()), 0, "alive_duelist_count::transferred_out");
-    // claim!
-    assert!(sys.pack.can_claim_gift(OWNER()), "can_claim_gift_CLAIM");
-    tester::execute_claim_gift(@sys, OWNER());
-    assert_eq!(sys.duelists.balance_of(OWNER()), 1, "balance_of(OWNER) 1");
-    assert_eq!(sys.store.get_player_alive_duelist_count(OWNER()), 1, "alive_duelist_count::claimed_gift");
-    // no more claim!
-    assert!(!sys.pack.can_claim_gift(OWNER()), "!can_claim_gift_AFTER");
-    // transfer out...
-    sys.duelists.transfer_from(OWNER(), OTHER(), TOKEN_ID_3);
-    assert_eq!(sys.duelists.balance_of(OWNER()), 0, "balance_of(OWNER) 0");
-    assert_eq!(sys.store.get_player_alive_duelist_count(OWNER()), 0, "alive_duelist_count::transferred_out");
-    // 3: passed 24 hours...
-    assert!(!sys.pack.can_claim_gift(OWNER()), "!can_claim_gift_transfered_gift");
-    tester::elapse_block_timestamp(TIMESTAMP::ONE_DAY + 1);
-    assert!(sys.pack.can_claim_gift(OWNER()), "can_claim_gift_next_day");
-    tester::execute_claim_gift(@sys, OWNER());
-    assert_eq!(sys.duelists.balance_of(OWNER()), 1, "balance_of(OWNER) 1");
-    assert_eq!(sys.store.get_player_alive_duelist_count(OWNER()), 1, "alive_duelist_count::claimed_gift");
-    // no more claim!
-    assert!(!sys.pack.can_claim_gift(OWNER()), "!can_claim_gift_END");
+fn test_airdrop_ok() {
+    let mut sys: TestSystems = setup(FLAGS::RINGS | FLAGS::ADMIN);
+    assert_eq!(sys.rings.total_supply(), 0, "total_supply 0");
+    assert_eq!(sys.rings.balance_of(OTHER()), 0, "balance_of(OTHER) 0");
+    assert_eq!(sys.rings.balance_of_ring(OTHER(), RingType::GoldSignetRing), 0, "balance_of_ring(OTHER, GoldSignetRing) 0");
+    assert_eq!(sys.rings.balance_of_ring(OTHER(), RingType::SilverSignetRing), 0, "balance_of_ring(OTHER, SilverSignetRing) 0");
+    assert!(!sys.rings.has_claimed(OTHER(), RingType::GoldSignetRing), "has_claimed(OTHER, GoldSignetRing) init");
+    assert!(!sys.rings.has_claimed(OTHER(), RingType::SilverSignetRing), "has_claimed(OTHER, SilverSignetRing) init");
+    // airdrop...
+    tester::execute_airdrop_ring(@sys, OWNER(), OTHER(), RingType::GoldSignetRing);
+    assert_eq!(sys.rings.total_supply(), 1, "total_supply 1");
+    assert_eq!(sys.rings.balance_of(OWNER()), 0, "balance_of(OWNER) 0");
+    assert_eq!(sys.rings.balance_of(OTHER()), 1, "balance_of(OTHER) 1");
+    assert_eq!(sys.rings.balance_of(BUMMER()), 0, "balance_of(BUMMER) 0");
+    assert_eq!(sys.rings.balance_of_ring(OWNER(), RingType::GoldSignetRing), 0, "balance_of_ring(OWNER, GoldSignetRing, S1) 0");
+    assert_eq!(sys.rings.balance_of_ring(OTHER(), RingType::GoldSignetRing), 1, "balance_of_ring(OTHER, GoldSignetRing, S1) 1");
+    assert_eq!(sys.rings.balance_of_ring(OWNER(), RingType::SilverSignetRing), 0, "balance_of_ring(OWNER, SilverSignetRing, S1) 0");
+    assert_eq!(sys.rings.balance_of_ring(OTHER(), RingType::SilverSignetRing), 0, "balance_of_ring(OTHER, SilverSignetRing, S1) 0");
+    assert!(!sys.rings.has_claimed(OWNER(), RingType::GoldSignetRing), "has_claimed(OWNER, GoldSignetRing, S1) YES");
+    assert!(sys.rings.has_claimed(OTHER(), RingType::GoldSignetRing), "has_claimed(OTHER, GoldSignetRing, S1) NO");
 }
 
 #[test]
-#[should_panic(expected: ('BANK: insufficient LORDS pool', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
-fn test_claim_gift_not_sponsored() {
-    let mut sys: TestSystems = setup(0);
-    // 1: claim starter pack -- DRAIN ALL LORDS
-    tester::execute_claim_starter_pack(@sys, OWNER());
-    tester::execute_claim_starter_pack(@sys, OTHER());
-    // 2: no alive duelists
-    tester::impersonate(OWNER());
-    sys.duelists.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
-    sys.duelists.transfer_from(OWNER(), OTHER(), TOKEN_ID_2);
-    // claim!
-    assert!(sys.pack.can_claim_gift(OWNER()), "can_claim_gift_CLAIM");
-    tester::execute_claim_gift(@sys, OWNER());
+#[should_panic(expected: ('RING: Caller not admin', 'ENTRYPOINT_FAILED'))]
+fn test_airdrop_not_admin() {
+    let mut sys: TestSystems = setup(FLAGS::RINGS | FLAGS::ADMIN);
+    tester::impersonate(OTHER());
+    tester::execute_airdrop_ring(@sys, OTHER(), OTHER(), RingType::GoldSignetRing);
 }
 
 #[test]
-fn test_claim_gift_sponsored() {
-    let mut sys: TestSystems = setup(0);
-    // 1: claim starter pack -- DRAIN ALL LORDS
-    tester::execute_claim_starter_pack(@sys, OWNER());
-    tester::execute_claim_starter_pack(@sys, OTHER());
-    // 2: no alive duelists
-    tester::impersonate(OWNER());
-    sys.duelists.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
-    sys.duelists.transfer_from(OWNER(), OTHER(), TOKEN_ID_2);
-    // sponsor...
-    tester::fund_duelists_pool(@sys, 1);
-    // claim!
-    assert!(sys.pack.can_claim_gift(OWNER()), "can_claim_gift_CLAIM");
-    tester::execute_claim_gift(@sys, OWNER());
-}
-
-#[test]
-#[should_panic(expected: ('PACK: Ineligible', 'ENTRYPOINT_FAILED'))]
-fn test_claim_gift_ineligible() {
-    let mut sys: TestSystems = setup(0);
-    assert!(!sys.pack.can_claim_gift(OWNER()), "can_claim_gift_OWNER");
-    tester::execute_claim_gift(@sys, OWNER());
-}
-
-
-//
-// opening...
-//
-
-#[test]
-fn test_open() {
-    let mut sys: TestSystems = setup(0);
-
-    let starter_pack_count: usize = PackType::StarterPack.description().quantity;
-    assert_eq!(starter_pack_count, 2, "starter_pack_count");
-
-    // claiming opens and mint duelists
-    assert_eq!(sys.store.get_player_alive_duelist_count(OWNER()), 0, "alive_duelist_count::zero");
-    tester::execute_claim_starter_pack(@sys, OWNER());
-    assert_eq!(sys.store.get_player_alive_duelist_count(OWNER()), 2, "alive_duelist_count::claimed_starter_pack");
-    _assert_duelist_count(@sys, starter_pack_count.into(), "duelist_supply");
-    let pack_1: Pack = sys.store.get_pack(TOKEN_ID_1.low);
-    assert!(pack_1.is_open, "pack_1.is_open == true");
-
-    // purchase, minted count does not change
-    _purchase(@sys, OWNER());
-    _assert_duelist_count(@sys, starter_pack_count.into(), "duelist_supply_after_purchase");
-    let pack_2: Pack = sys.store.get_pack(TOKEN_ID_2.low);
-    assert!(!pack_2.is_open, "pack_2.is_open == false");
-    assert_eq!(sys.store.get_player_alive_duelist_count(OWNER()), 2, "alive_duelist_count::unopened");
-
-    // open, minted count +5
-    tester::execute_pack_open(@sys, OWNER(), TOKEN_ID_2.low);
-    _assert_duelist_count(@sys, starter_pack_count.into() + 5, "duelist_supply_after_open");
-    let pack_2: Pack = sys.store.get_pack(TOKEN_ID_2.low);
-    assert!(pack_2.is_open, "pack_2.is_open == false");
-    assert_eq!(sys.store.get_player_alive_duelist_count(OWNER()), 2 + 5, "alive_duelist_count::opened");
-}
-
-#[test]
-#[should_panic(expected: ('ERC721: invalid token ID', 'ENTRYPOINT_FAILED'))]
-fn test_open_invalid() {
-    let mut sys: TestSystems = setup(0);
-    tester::impersonate(OWNER());
-    tester::execute_pack_open(@sys, OWNER(), TOKEN_ID_2.low);
-}
-
-#[test]
-#[should_panic(expected: ('ERC721: invalid token ID', 'ENTRYPOINT_FAILED'))] // burn!
-// #[should_panic(expected: ('PACK: Already opened', 'ENTRYPOINT_FAILED'))] // no burn
-fn test_already_opened() {
-    let mut sys: TestSystems = setup(0);
-    tester::execute_claim_starter_pack(@sys, OWNER());
-    tester::impersonate(OWNER());
-    tester::execute_pack_open(@sys, OWNER(), TOKEN_ID_1.low);
-}
-
-#[test]
-#[should_panic(expected: ('PACK: Not owner', 'ENTRYPOINT_FAILED'))]
-fn test_open_not_owner() {
-    let mut sys: TestSystems = setup(0);
-    tester::execute_claim_starter_pack(@sys, OWNER());
-    _purchase(@sys, OWNER());
-    tester::execute_pack_open(@sys, OTHER(), TOKEN_ID_2.low);
-}
-
-
-//
-// transfer...
-//
-
-#[test]
-#[should_panic(expected: ('ERC721: invalid token ID', 'ENTRYPOINT_FAILED'))] // burn!
-// #[should_panic(expected: ('PACK: Already opened', 'ENTRYPOINT_FAILED'))] // no burn
-fn test_transfer_opened() {
-    let mut sys: TestSystems = setup(0);
-    tester::execute_claim_starter_pack(@sys, OWNER());
-    // try to transfer already opened
-    tester::impersonate(OWNER());
-    sys.pack.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
-}
-
-#[test]
-#[should_panic(expected: ('ERC721: invalid token ID', 'ENTRYPOINT_FAILED'))] // burn!
-// #[should_panic(expected: ('PACK: Already opened', 'ENTRYPOINT_FAILED'))] // no burn
-fn test_transfer_opened_allowed() {
-    let mut sys: TestSystems = setup(0);
-    tester::execute_claim_starter_pack(@sys, OWNER());
-    // approve
-    tester::impersonate(OWNER());
-    sys.pack.approve(SPENDER(), TOKEN_ID_1);
-    // try to transfer from unauthorized
-    tester::impersonate(SPENDER());
-    sys.pack.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
-}
-
-#[test]
-#[should_panic(expected: ('ERC721: invalid token ID', 'ENTRYPOINT_FAILED'))] // burn!
-// #[should_panic(expected: ('ERC721: unauthorized caller', 'ENTRYPOINT_FAILED'))] // no burn
-fn test_transfer_opened_no_allowance() {
-    let mut sys: TestSystems = setup(0);
-    tester::execute_claim_starter_pack(@sys, OWNER());
-    // try to transfer from unauthorized
-    tester::impersonate(SPENDER());
-    sys.pack.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
-}
-
-#[test]
-fn test_transfer_unopened_ok() {
-    let mut sys: TestSystems = setup(0);
-    tester::execute_claim_starter_pack(@sys, OWNER());
-    _purchase(@sys, OWNER());
-    assert_eq!(sys.pack.balance_of(OWNER()), 1, "balance_of(OWNER) 1");
-    assert_eq!(sys.pack.balance_of(OTHER()), 0, "balance_of(OTHER) 0");
-    assert!(sys.pack.owner_of(TOKEN_ID_2) == OWNER(), "owner_of(OWNER)");
-    // transfer
-    tester::impersonate(OWNER());
-    sys.pack.transfer_from(OWNER(), OTHER(), TOKEN_ID_2);
-    assert_eq!(sys.pack.balance_of(OWNER()), 0, "balance_of(OWNER) 0");
-    assert_eq!(sys.pack.balance_of(OTHER()), 1, "balance_of(OTHER) 1");
-    assert!(sys.pack.owner_of(TOKEN_ID_2) == OTHER(), "owner_of(OTHER)");
-}
-
-#[test]
-fn test_transfer_unopened_allowed_ok() {
-    let mut sys: TestSystems = setup(0);
-    tester::execute_claim_starter_pack(@sys, OWNER());
-    _purchase(@sys, OWNER());
-    assert_eq!(sys.pack.balance_of(OWNER()), 1, "balance_of(OWNER) 1");
-    assert_eq!(sys.pack.balance_of(OTHER()), 0, "balance_of(OTHER) 0");
-    assert!(sys.pack.owner_of(TOKEN_ID_2) == OWNER(), "owner_of(OWNER)");
-    // approve
-    tester::impersonate(OWNER());
-    sys.pack.approve(SPENDER(), TOKEN_ID_2);
-    // transfer
-    tester::impersonate(SPENDER());
-    sys.pack.transfer_from(OWNER(), OTHER(), TOKEN_ID_2);
-    assert_eq!(sys.pack.balance_of(OWNER()), 0, "balance_of(OWNER) 0");
-    assert_eq!(sys.pack.balance_of(OTHER()), 1, "balance_of(OTHER) 1");
-    assert!(sys.pack.owner_of(TOKEN_ID_2) == OTHER(), "owner_of(OTHER)");
-}
-
-#[test]
-#[should_panic(expected: ('ERC721: unauthorized caller', 'ENTRYPOINT_FAILED'))]
-fn test_transfer_unopened_no_allowance() {
-    let mut sys: TestSystems = setup(0);
-    tester::execute_claim_starter_pack(@sys, OWNER());
-    _purchase(@sys, OWNER());
-    // try to transfer from unauthorized
-    tester::impersonate(SPENDER());
-    sys.pack.transfer_from(OWNER(), OTHER(), TOKEN_ID_2);
+fn test_airdrop_admin() {
+    let mut sys: TestSystems = setup(FLAGS::RINGS | FLAGS::ADMIN);
+    tester::impersonate(OTHER());
+    tester::execute_admin_set_is_team_member(@sys.admin, OWNER(), OTHER(), false, true);
+    assert!(sys.admin.am_i_admin(OTHER()), "admin_am_i_admin_3");
+    assert!(sys.store.get_player_is_admin(OTHER()), "store_am_i_admin_3");
+    tester::execute_airdrop_ring(@sys, OTHER(), OTHER(), RingType::GoldSignetRing);
 }
 
 
@@ -499,25 +340,16 @@ fn test_transfer_unopened_no_allowance() {
 //
 #[test]
 fn test_update_contract_metadata() {
-    let mut sys: TestSystems = setup(0);
-    tester::drop_all_events(sys.pack.contract_address);
-    sys.pack.update_contract_metadata();
-    let _event = tester::pop_log::<combo::ContractURIUpdated>(sys.pack.contract_address, selector!("ContractURIUpdated")).unwrap();
+    let mut sys: TestSystems = setup(FLAGS::RINGS);
+    tester::drop_all_events(sys.rings.contract_address);
+    sys.rings.update_contract_metadata();
+    let _event = tester::pop_log::<combo::ContractURIUpdated>(sys.rings.contract_address, selector!("ContractURIUpdated")).unwrap();
 }
 #[test]
 fn test_update_token_metadata() {
-    let mut sys: TestSystems = setup(0);
-    tester::drop_all_events(sys.pack.contract_address);
-    sys.pack.update_token_metadata(TOKEN_ID_1.low);
-    let event = tester::pop_log::<combo::MetadataUpdate>(sys.pack.contract_address, selector!("MetadataUpdate")).unwrap();
+    let mut sys: TestSystems = setup(FLAGS::RINGS);
+    tester::drop_all_events(sys.rings.contract_address);
+    sys.rings.update_token_metadata(TOKEN_ID_1.low);
+    let event = tester::pop_log::<combo::MetadataUpdate>(sys.rings.contract_address, selector!("MetadataUpdate")).unwrap();
     assert_eq!(event.token_id, TOKEN_ID_1.into(), "event.token_id");
 }
-// #[test]
-// fn test_update_tokens_metadata() {
-//     let mut sys: TestSystems = setup(0);
-//     tester::drop_all_events(sys.pack.contract_address);
-//     sys.pack.update_tokens_metadata(TOKEN_ID_1.low, TOKEN_ID_2.low);
-//     let event = tester::pop_log::<combo::BatchMetadataUpdate>(sys.pack.contract_address, selector!("BatchMetadataUpdate")).unwrap();
-//     assert_eq!(event.from_token_id, TOKEN_ID_1.into(), "event.from_token_id");
-//     assert_eq!(event.to_token_id, TOKEN_ID_2.into(), "event.to_token_id");
-// }
