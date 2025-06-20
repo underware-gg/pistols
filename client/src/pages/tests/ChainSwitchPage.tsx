@@ -10,7 +10,7 @@ import { NetworkId } from '@underware/pistols-sdk/pistols/config'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
 import { useDuelistStackStore, useDuelistStore } from '/src/stores/duelistStore'
 import { useChallengeStore } from '/src/stores/challengeStore'
-import { usePlayerStore } from '/src/stores/playerStore'
+import { usePlayerEntityStore } from '/src/stores/playerStore'
 import { useScoreboardStore } from '/src/stores/scoreboardStore'
 import { usePlayerDataStore } from '/src/stores/playerStore'
 import { usePackStore } from '/src/stores/packStore'
@@ -74,7 +74,7 @@ function StoreStats() {
   const bankState = useBankStore((state) => state)
   const packState = usePackStore((state) => state)
   // players
-  const playerState = usePlayerStore((state) => state)
+  const playerState = usePlayerEntityStore((state) => state)
   const playerDataState = usePlayerDataStore((state) => state)
   // duelists
   const duelistState = useDuelistStore((state) => state)

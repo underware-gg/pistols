@@ -88,6 +88,7 @@ const createStore = (tokenName: string) => {
 export const useDuelistTokenStore = createStore('duelist');
 export const useDuelTokenStore = createStore('duel');
 export const usePackTokenStore = createStore('pack');
+export const useRingTokenStore = createStore('ring');
 export const useTournamentTokenStore = createStore('tournament');
 
 export function useTokenStore(contractAddress: BigNumberish) {
@@ -95,6 +96,7 @@ export function useTokenStore(contractAddress: BigNumberish) {
     duelistContractAddress,
     duelContractAddress,
     packContractAddress,
+    ringContractAddress,
     tournamentContractAddress,
   } = useTokenContracts()
   const store = useMemo(() => {
@@ -104,10 +106,12 @@ export function useTokenStore(contractAddress: BigNumberish) {
       return useDuelTokenStore
     } else if (bigintEquals(contractAddress, packContractAddress)) {
       return usePackTokenStore
+    } else if (bigintEquals(contractAddress, ringContractAddress)) {
+      return useRingTokenStore
     } else if (bigintEquals(contractAddress, tournamentContractAddress)) {
       return useTournamentTokenStore
     }
-  }, [duelistContractAddress, duelContractAddress, packContractAddress, tournamentContractAddress, contractAddress])
+  }, [duelistContractAddress, duelContractAddress, packContractAddress, ringContractAddress, tournamentContractAddress, contractAddress])
   return store
 }
 

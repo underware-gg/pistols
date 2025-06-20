@@ -5,7 +5,7 @@ import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useConfigStore } from '/src/stores/configStore'
 import { useSeasonStore } from '/src/stores/seasonStore'
 import { useTokenConfigStore } from '/src/stores/tokenConfigStore'
-import { usePlayerStore, usePlayerDataStore } from '/src/stores/playerStore'
+import { usePlayerEntityStore, usePlayerDataStore } from '/src/stores/playerStore'
 import { useDuelistStore, useDuelistStackStore, useDuelistIdsStore } from '/src/stores/duelistStore'
 import { useChallengeIdsStore, useChallengeStore } from '/src/stores/challengeStore'
 import { useBankStore } from '/src/stores/bankStore'
@@ -32,6 +32,8 @@ const _modelsPlayers = [
   "pistols-Player",
   "pistols-PlayerFlags",
   "pistols-PlayerTeamFlags",
+  "pistols-Ring",
+  "pistols-RingBalance",
   // off-chain signed messages
   "pistols-PlayerOnline",
 ];
@@ -87,7 +89,7 @@ export function EntityStoreSync() {
   const bankState = useBankStore((state) => state)
   const packState = usePackStore((state) => state)
   // players
-  const playerState = usePlayerStore((state) => state)
+  const playerState = usePlayerEntityStore((state) => state)
   const playerDataState = usePlayerDataStore((state) => state)
   // duelists
   const duelistState = useDuelistStore((state) => state)
@@ -136,7 +138,7 @@ export function EntityStoreSync() {
       debug.log("EntityStoreSync() SET PLAYERS =======> [entities]:", entities)
       // debug.log("EntityStoreSync() SET PLAYERS =======> [Player]:", filterEntitiesByModels(entities, ['Player']))
       // debug.log("EntityStoreSync() SET PLAYERS =======> [PlayerOnline]:", filterEntitiesByModels(entities, ['PlayerOnline']))
-      playerState.setEntities(filterEntitiesByModels(entities, ['Player', 'PlayerFlags', 'PlayerTeamFlags']))
+      playerState.setEntities(filterEntitiesByModels(entities, ['Player', 'PlayerFlags', 'PlayerTeamFlags', 'Ring', 'RingBalance']))
       playerDataState.updateMessages(filterEntitiesByModels(entities, ['PlayerOnline']))
     },
   })

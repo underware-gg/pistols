@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import { Container, Table } from 'semantic-ui-react'
-import { usePlayer, usePlayerStore } from '/src/stores/playerStore'
+import { usePlayer, usePlayerEntityStore } from '/src/stores/playerStore'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
 import { PlayerNameSync } from '/src/stores/sync/PlayerNameSync'
 import { InternalPageMenu, InternalPageWrapper } from '/src/pages/internal/InternalPageIndex'
@@ -46,7 +46,7 @@ export default function PlayersPage() {
 }
 
 function Players() {
-  const entities = usePlayerStore((state) => state.entities)
+  const entities = usePlayerEntityStore((state) => state.entities)
   const players = useAllStoreModels<models.Player>(entities, 'Player')
 
   const playerAddresses = useMemo(() => players.map((p) => p.player_address), [players])
