@@ -2,7 +2,7 @@
 # torii config for profile [dev]
 #
 world_address = "0x51c0fbe7d5a06863d7c30dc9e5935a3343b1f7084eeb11ddd5b950bd7799bb"
-rpc = "http://localhost:5050"
+rpc = "http://127.0.0.1:5050"
 
 [events]
 raw = true
