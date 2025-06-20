@@ -93,15 +93,16 @@ export function TokenStoreSync() {
   })
 
   // cache all RINGS
-  // useSdkTokenBalancesGet({
-  //   contract: ringContractAddress,
-  //   setBalances: ring_state.setBalances,
-  //   enabled: (mounted && isPositiveBigint(ringContractAddress)),
-  //   updateProgress: (currentPage: number, finished?: boolean) => {
-  //     updateProgress('token_rings', currentPage, finished)
-  //   },
-  // })
+  useSdkTokenBalancesGet({
+    contract: ringContractAddress,
+    setBalances: ring_state.setBalances,
+    enabled: (mounted && isPositiveBigint(ringContractAddress)),
+    updateProgress: (currentPage: number, finished?: boolean) => {
+      updateProgress('token_rings', currentPage, finished)
+    },
+  })
 
+  // cache PACKS of player only (not all)
   useSdkTokenBalancesGet({
     contract: packContractAddress,
     accounts,

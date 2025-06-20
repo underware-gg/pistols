@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
@@ -9,11 +9,14 @@ import { arrayRemoveValue, bigintEquals, bigintToHex, bigintToNumber, isPositive
 import { useAllStoreModels, useStoreModelsByKeys } from '@underware/pistols-sdk/dojo'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { useDuelistTokenStore } from '/src/stores/tokenStore'
+import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
+import { useMyChallenges } from '/src/stores/challengeStore'
+import { useRingIdsOfAccount } from '/src/hooks/useTokenRings'
 import { SortDirection } from '/src/stores/queryParamsStore'
 import { PlayerColumn } from '/src/stores/queryParamsStore'
 import { useTotals } from '/src/stores/duelistStore'
-import { models } from '@underware/pistols-sdk/pistols/gen'
-import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
+import { models, constants } from '@underware/pistols-sdk/pistols/gen'
+import { parseEnumVariant } from '@underware/pistols-sdk/starknet'
 
 interface NamesByAddress {
   [address: string]: string
@@ -317,6 +320,58 @@ export const useQueryPlayerIds = (
   }
 }
 
+
+
+//--------------------------------
+// Signet rings
+//
+
+export const useRingsOfPlayer = () => {
+  const { address } = useAccount()
+  return useRingsOfOwner(address)
+}
+
+export const useRingsOfOwner = (address: BigNumberish) => {
+  const entities = usePlayerEntityStore((state) => state.entities);
+  const rings = useAllStoreModels<models.Ring>(entities, 'Ring')
+  const { ringIds } = useRingIdsOfAccount(address)
+  const ringTypes = useMemo(() => (
+    Array.from(
+      rings
+        .filter((r) => ringIds.includes(Number(r.ring_id)))
+        .map((r) => parseEnumVariant<constants.RingType>(r.ring_type))
+        .reduce((acc, r) => {
+          acc.add(r);
+          return acc;
+        }, new Set<constants.RingType>()))
+  ), [ringIds, rings])
+  // console.log("rings =>", ringIds, ringTypes)
+  return {
+    ringIds,
+    ringTypes,
+  }
+}
+
+export const useDuelIdsForClaiomingRings = () => {
+  const { myChallenges } = useMyChallenges()
+  const goldRingDuelIds = useMemo(() => (
+    myChallenges.filter((ch) => Number(ch.season_id) >= 1 && Number(ch.season_id) <= 2).map((ch) => BigInt(ch.duel_id))
+  ), [myChallenges])
+  const silverRingDuelIds = useMemo(() => (
+    myChallenges.filter((ch) => Number(ch.season_id) >= 3 && Number(ch.season_id) <= 4).map((ch) => BigInt(ch.duel_id))
+  ), [myChallenges])
+  const leadRingDuelIds = useMemo(() => (
+    myChallenges.filter((ch) => Number(ch.season_id) >= 5 && Number(ch.season_id) <= 10).map((ch) => BigInt(ch.duel_id))
+  ), [myChallenges])
+  useEffect(() => {
+    console.log("DUEL RINGS =>", goldRingDuelIds, silverRingDuelIds, leadRingDuelIds)
+  }, [goldRingDuelIds, silverRingDuelIds, leadRingDuelIds])
+  return {
+    goldRingDuelIds,
+    silverRingDuelIds,
+    leadRingDuelIds,
+  }
+}
 
 
 
