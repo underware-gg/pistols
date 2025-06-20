@@ -228,6 +228,24 @@ export const useCalcFeePack = (pack_type: constants.PackType) => {
 }
 
 
+//------------------------------------------
+// ring_token
+//
+
+export const useHasClaimedRing = (address: BigNumberish, ringType: constants.RingType) => {
+  const { ring_token: { hasClaimed } } = useDojoContractCalls()
+  const options = useMemo(() => ({
+    call: hasClaimed,
+    args: [address, constants.getRingTypeValue(ringType)],
+    enabled: isPositiveBigint(address),
+    defaultValue: false,
+  }), [address, ringType])
+  const { value, isLoading } = useSdkCallPromise<boolean>(options)
+  return {
+    hasClaimed: value,
+    isLoading,
+  }
+}
 
 
 //------------------------------------------
