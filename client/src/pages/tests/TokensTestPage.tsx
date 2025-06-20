@@ -42,6 +42,7 @@ export default function TokensTestPage() {
 
         <TestImages />
         <Purchases />
+        <Rings />
         <Tokens />
 
         <EntityStoreSync />
@@ -68,6 +69,7 @@ function Purchases() {
   if (!isConnected) return <></>
   return (
     <>
+      <h1>Purchases</h1>
       <LordsFaucet />
       &nbsp;&nbsp;<LordsBalance address={address} size='big' />
       &nbsp;&nbsp;<span className='Code'>(mint test LORDS, if available)</span>
@@ -84,9 +86,26 @@ function Purchases() {
   );
 }
 
+function Rings() {
+  const { account, address, isConnected } = useAccount()
+  const { pack_token } = useDojoSystemCalls()
+  const { packIds } = usePacksOfPlayer()
+  const { duelistIds } = useDuelistsOfPlayer()
+  const { canClaimStarterPack } = useCanClaimStarterPack(Math.min(duelistIds.length, 1))
+  if (!isConnected) return <></>
+  return (
+    <>
+      <hr />
+      <h1>Rings</h1>
+      <Button disabled={packIds.length === 0} onClick={() => pack_token.open(account, packIds[0])}>Claim Gold Ring</Button>
+    </>
+  );
+}
+
 function Tokens() {
   const {
     packContractAddress,
+    ringContractAddress,
     duelistContractAddress,
     duelContractAddress,
   } = useTokenContracts()
@@ -94,8 +113,11 @@ function Tokens() {
   if (!isConnected) return <></>
   return (
     <>
-      <br />
+      <hr />
+      <h1>Tokens</h1>
       <TokenContract contractAddress={packContractAddress} tokenName='Packs' attributes={['Is Open']} />
+      <br />
+      <TokenContract contractAddress={ringContractAddress} tokenName='Rings' attributes={['Is Open']} />
       <br />
       <TokenContract contractAddress={duelistContractAddress} tokenName='Duelists' hasFame
         renderer={(tokenId: bigint) => <DuelistTokenArt duelistId={tokenId} style={_style} />}

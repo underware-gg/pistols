@@ -3,7 +3,7 @@ import { useAccount } from '@starknet-react/core'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { useSdkTokenBalancesGet, useSdkTokenBalancesSub } from '@underware/pistols-sdk/dojo'
-import { useDuelistTokenStore, useDuelTokenStore, usePackTokenStore, useTournamentTokenStore } from '/src/stores/tokenStore'
+import { useDuelistTokenStore, useDuelTokenStore, usePackTokenStore, useRingTokenStore, useTournamentTokenStore } from '/src/stores/tokenStore'
 import { bigintToHex, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { useFameCoinStore, useLordsCoinStore, useFoolsCoinStore, useFetchAccountsBalances } from '/src/stores/coinStore'
 import { useProgressStore } from '/src/stores/progressStore'
@@ -18,6 +18,7 @@ export function TokenStoreSync() {
   const duelist_state = useDuelistTokenStore((state) => state)
   const duel_state = useDuelTokenStore((state) => state)
   const pack_state = usePackTokenStore((state) => state)
+  const ring_state = useRingTokenStore((state) => state)
   const tournament_state = useTournamentTokenStore((state) => state)
   // coin stores
   const lords_state = useLordsCoinStore((state) => state)
@@ -31,6 +32,7 @@ export function TokenStoreSync() {
     duelistContractAddress,
     duelContractAddress,
     packContractAddress,
+    ringContractAddress,
     tournamentContractAddress,
   } = useTokenContracts()
   
@@ -40,9 +42,9 @@ export function TokenStoreSync() {
     bigintToHex(foolsContractAddress),
     bigintToHex(duelistContractAddress),
     bigintToHex(packContractAddress),
-    // bigintToHex(packContractAddress),        // not needed
+    bigintToHex(ringContractAddress),
     // bigintToHex(tournamentContractAddress),  // not implemented yet
-  ], [lordsContractAddress, fameContractAddress, foolsContractAddress, duelistContractAddress, packContractAddress, packContractAddress, tournamentContractAddress])
+  ], [lordsContractAddress, fameContractAddress, foolsContractAddress, duelistContractAddress, packContractAddress, ringContractAddress, tournamentContractAddress])
 
 
   //----------------------------------------
@@ -54,6 +56,7 @@ export function TokenStoreSync() {
   // useEffect(() => fools_state.resetStore(), [foolsContractAddress, chainId])
   // useEffect(() => duelist_state.resetStore(), [duelistContractAddress, chainId])
   // useEffect(() => pack_state.resetStore(), [packContractAddress, chainId])
+  // useEffect(() => ring_state.resetStore(), [ringContractAddress, chainId])
   // useEffect(() => duel_state.resetStore(), [duelContractAddress, chainId])
   // useEffect(() => tournament_state.resetStore(), [tournamentContractAddress, chainId])
 
@@ -68,16 +71,6 @@ export function TokenStoreSync() {
   // cache player tokens
   useFetchAccountsBalances(foolsContractAddress, accounts, true)
   useFetchAccountsBalances(lordsContractAddress, accounts, true)
-
-  useSdkTokenBalancesGet({
-    contract: packContractAddress,
-    accounts,
-    setBalances: pack_state.setBalances,
-    enabled: (mounted && isPositiveBigint(packContractAddress)),
-    updateProgress: (currentPage: number, finished?: boolean) => {
-      updateProgress('token_packs', currentPage, finished)
-    },
-  })
 
   // cache all duelists
   useSdkTokenBalancesGet({
@@ -96,6 +89,26 @@ export function TokenStoreSync() {
     enabled: (mounted && isPositiveBigint(fameContractAddress)),
     updateProgress: (currentPage: number, finished?: boolean) => {
       updateProgress('token_fame', currentPage, finished)
+    },
+  })
+
+  // cache all RINGS
+  // useSdkTokenBalancesGet({
+  //   contract: ringContractAddress,
+  //   setBalances: ring_state.setBalances,
+  //   enabled: (mounted && isPositiveBigint(ringContractAddress)),
+  //   updateProgress: (currentPage: number, finished?: boolean) => {
+  //     updateProgress('token_rings', currentPage, finished)
+  //   },
+  // })
+
+  useSdkTokenBalancesGet({
+    contract: packContractAddress,
+    accounts,
+    setBalances: pack_state.setBalances,
+    enabled: (mounted && isPositiveBigint(packContractAddress)),
+    updateProgress: (currentPage: number, finished?: boolean) => {
+      updateProgress('token_packs', currentPage, finished)
     },
   })
 
@@ -119,6 +132,8 @@ export function TokenStoreSync() {
         duelist_state.updateBalance(balance)
       } else if (_contract == packContractAddress) {
         pack_state.updateBalance(balance)
+      } else if (_contract == ringContractAddress) {
+        ring_state.updateBalance(balance)
       } else if (_contract == duelContractAddress) {
         duel_state.updateBalance(balance)
       } else if (_contract == tournamentContractAddress) {
