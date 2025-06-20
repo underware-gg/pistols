@@ -255,7 +255,7 @@ export async function init(canvas, framerate = 60, statsEnabled = false) {
 }
 
 async function loadAssets() {
-  await shaders.loadShaders();
+  shaders.loadShaders();
 
   const loadingManager = new THREE.LoadingManager();
   const textureLoader = new THREE.TextureLoader(loadingManager);
@@ -1284,6 +1284,10 @@ export function setDuelTimePercentage(timePassed: number) {
 
 export function updatePlayerProgress(isA, duelistState, onClick) {
   _duelistManager.updatePlayerProgress(isA, duelistState, onClick)
+}
+
+export function setIsLoading(isA, isLoading) {
+  _duelistManager.setIsLoading(isA, isLoading)
 }
 
 export function setDuelistElement(isA, duelistElement) {

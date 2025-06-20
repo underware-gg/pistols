@@ -1,78 +1,88 @@
 import * as THREE from 'three'
 import { Reflector } from 'three/examples/jsm/objects/Reflector.js';
 
+// Import global shaders that get prepended to all shaders
+import commonGlsl from '../shaders/common.glsl'
+import noiseGlsl from '../shaders/noise.glsl'
+
+// Import individual shader files
+import grassVsh from '../shaders/grass-model-vsh.glsl'
+import grassFsh from '../shaders/grass-model-fsh.glsl'
+import waterVsh from '../shaders/water-model-vsh.glsl'
+import waterFsh from '../shaders/water-model-fsh.glsl'
+import waterNonreflectiveVsh from '../shaders/water-nonreflective-vsh.glsl'
+import waterNonreflectiveFsh from '../shaders/water-nonreflective-fsh.glsl'
+import highlightVsh from '../shaders/highlight-effect-vsh.glsl'
+import highlightFsh from '../shaders/highlight-effect-fsh.glsl'
+import interactibleMaskBlurVsh from '../shaders/interactible-mask-blur-vsh.glsl'
+import interactibleMaskBlurFsh from '../shaders/interactible-mask-blur-fsh.glsl'
+import interactibleMaskVsh from '../shaders/interactible-mask-vsh.glsl'
+import interactibleMaskFsh from '../shaders/interactible-mask-fsh.glsl'
+import interactibleTextureFsh from '../shaders/interactible-texture-fsh.glsl'
+import textureBlurVsh from '../shaders/texture-blur-vsh.glsl'
+import textureBlurFsh from '../shaders/texture-blur-fsh.glsl'
+import maskOcclusionVsh from '../shaders/mask-occlusion-vsh.glsl'
+import maskOcclusionFsh from '../shaders/mask-occlusion-fsh.glsl'
 
 export class ShaderManager {
   static shaderCode = {};
 };
 
-export async function loadShaders() {
-  const loadText = async (url) => {
-    const d = await fetch(url);
-    return await d.text();
-  };
-
-  const globalShaders = [
-    'common.glsl',
-    'noise.glsl',
-  ];
-
-  const globalShadersCode = [];
-  for (let i = 0; i < globalShaders.length; ++i) {
-    globalShadersCode.push(await loadText('/shaders/' + globalShaders[i]));
-  }
-
-  const loadShader = async (url) => {
-    const d = await fetch(url);
-    let shaderCode = '';
+// Recreate your original global shader concatenation system
+export function loadShaders() {
+  // Build global shader code exactly like your original system
+  const globalShadersCode = [commonGlsl, noiseGlsl];
+  
+  const loadShader = (shaderCode: string) => {
+    let result = '';
     for (let i = 0; i < globalShadersCode.length; ++i) {
-      shaderCode += globalShadersCode[i] + '\n';
+      result += globalShadersCode[i] + '\n';
     }
-    return shaderCode + '\n' + await d.text();
+    return result + '\n' + shaderCode;
   }
 
+  // Build shader code exactly like your original system
   ShaderManager.shaderCode['GRASS'] = {
-    vsh: await loadShader('/shaders/grass-model-vsh.glsl'),
-    fsh: await loadShader('/shaders/grass-model-fsh.glsl'),
+    vsh: loadShader(grassVsh),
+    fsh: loadShader(grassFsh),
   };
   ShaderManager.shaderCode['GRASS_SHADOW'] = {
-    vsh: await loadShader('/shaders/grass-model-vsh.glsl'),
+    vsh: loadShader(grassVsh),
     fsh: THREE.ShaderLib.shadow.fragmentShader,
   };
   ShaderManager.shaderCode['WATER'] = {
-    vsh: await loadShader('/shaders/water-model-vsh.glsl'),
-    fsh: await loadShader('/shaders/water-model-fsh.glsl'),
+    vsh: loadShader(waterVsh),
+    fsh: loadShader(waterFsh),
   };
   ShaderManager.shaderCode['WATER_NONREFLECTIVE'] = {
-    vsh: await loadShader('/shaders/water-nonreflective-vsh.glsl'),
-    fsh: await loadShader('/shaders/water-nonreflective-fsh.glsl'),
+    vsh: loadShader(waterNonreflectiveVsh),
+    fsh: loadShader(waterNonreflectiveFsh),
   };
   ShaderManager.shaderCode['HIGHLIGHT'] = {
-    vsh: await loadShader('/shaders/highlight-effect-vsh.glsl'),
-    fsh: await loadShader('/shaders/highlight-effect-fsh.glsl'),
+    vsh: loadShader(highlightVsh),
+    fsh: loadShader(highlightFsh),
   };
   ShaderManager.shaderCode['INTERACTIBLE_MASK_BLUR'] = {
-    vsh: await loadShader('/shaders/interactible-mask-blur-vsh.glsl'),
-    fsh: await loadShader('/shaders/interactible-mask-blur-fsh.glsl'),
+    vsh: loadShader(interactibleMaskBlurVsh),
+    fsh: loadShader(interactibleMaskBlurFsh),
   };
   ShaderManager.shaderCode['INTERACTIBLE_MASK'] = {
-    vsh: await loadShader('/shaders/interactible-mask-vsh.glsl'),
-    fsh: await loadShader('/shaders/interactible-mask-fsh.glsl'),
+    vsh: loadShader(interactibleMaskVsh),
+    fsh: loadShader(interactibleMaskFsh),
   };
   ShaderManager.shaderCode['INTERACTIBLE_TEXTURE'] = {
-    vsh: await loadShader('/shaders/interactible-mask-vsh.glsl'),
-    fsh: await loadShader('/shaders/interactible-texture-fsh.glsl'),
+    vsh: loadShader(interactibleMaskVsh),
+    fsh: loadShader(interactibleTextureFsh),
   };
   ShaderManager.shaderCode['TEXTURE_BLUR'] = {
-    vsh: await loadShader('/shaders/texture-blur-vsh.glsl'),
-    fsh: await loadShader('/shaders/texture-blur-fsh.glsl'),
+    vsh: loadShader(textureBlurVsh),
+    fsh: loadShader(textureBlurFsh),
   };
   ShaderManager.shaderCode['MASK_OCCLUSION'] = {
-    vsh: await loadShader('/shaders/mask-occlusion-vsh.glsl'),
-    fsh: await loadShader('/shaders/mask-occlusion-fsh.glsl'),
+    vsh: loadShader(maskOcclusionVsh),
+    fsh: loadShader(maskOcclusionFsh),
   };
 }
-
 
 export class ShaderMaterial extends THREE.ShaderMaterial {
 

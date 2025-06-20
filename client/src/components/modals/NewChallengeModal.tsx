@@ -7,7 +7,7 @@ import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { usePact } from '/src/queries/usePact'
 import { useCalcSeasonReward, useCanJoin } from '/src/hooks/usePistolsContractCalls'
 import { ActionButton } from '/src/components/ui/Buttons'
-import { formatOrdinalNumber } from '@underware/pistols-sdk/utils'
+import { formatOrdinalNumber, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { POSTER_HEIGHT_SMALL, POSTER_WIDTH_SMALL, ProfilePoster } from '/src/components/ui/ProfilePoster'
 import { DuelistCard } from '/src/components/cards/DuelistCard';
 import { FormInput } from '/src/components/ui/Form'
@@ -20,6 +20,7 @@ import { useGameAspect } from '/src/hooks/useGameAspect'
 import { useCurrentSeason } from '/src/stores/seasonStore'
 import { useConfig } from '/src/stores/configStore'
 import { COLORS } from '@underware/pistols-sdk/pistols/constants'
+import { useTransactionHandler } from '../../hooks/useTransaction'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -61,15 +62,19 @@ function _NewChallengeModal({
 
   const { hasPact, pactDuelId } = usePact(constants.DuelType.Seasonal, addressA, addressB, isOpen)
   const { seasonName } = useCurrentSeason()
+  const { currentSeasonId } = useConfig() 
+
   const [args, setArgs] = useState<any>(null)
-  const { currentSeasonId } = useConfig()
+
   const { canJoin } = useCanJoin(currentSeasonId, challengingDuelistId)
   const { rewards } = useCalcSeasonReward(currentSeasonId, challengingDuelistId, args?.lives_staked)
-  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  useEffect(() => {
-    setIsSubmitting(false)
-  }, [isOpen])
+  const { call: createDuel, isLoading, meta } = useTransactionHandler<boolean, [constants.DuelType, BigNumberish, BigNumberish, number, number, constants.Premise, string]>({
+    key: `create_duel${challengingAddress}`,
+    transactionCall: (duelType, duelistId, challengedAddr, livesStaked, expireHours, premise, message, key) => 
+      duel_token.create_duel(account, duelType, duelistId, challengedAddr, livesStaked, expireHours, premise, message, key),
+    indexerCheck: hasPact,
+  })
 
   useEffect(() => {
     if (hasPact) {
@@ -78,21 +83,17 @@ function _NewChallengeModal({
   }, [hasPact])
 
   const _create_duel = () => {
-    const _submit = async () => {
-      setIsSubmitting(true)
-      await duel_token.create_duel(
-        account,
+    if (args?.canSubmit) {
+      createDuel(
         constants.DuelType.Seasonal,
         challengingDuelistId,
         challengingAddress,
         args.lives_staked,
         args.expire_hours,
         args.premise,
-        args.message,
+        args.message
       )
-      setIsSubmitting(false)
     }
-    if (args?.canSubmit) _submit()
   }
 
   return (
@@ -146,7 +147,7 @@ function _NewChallengeModal({
                     isHanging shouldSwing isHangingLeft
                     isHighlightable 
                     duelistId={Number(challengingDuelistId)}
-                    onClick={() => duelistSelectOpener.open()}
+                    onClick={() => !isLoading && duelistSelectOpener.open()}
                   />
                 </div>
               </Col>
@@ -157,7 +158,12 @@ function _NewChallengeModal({
                 </div>
                 <div className='Spacer5' />
 
-                <NewChallengeForm duelistId={challengingDuelistId} setArgs={setArgs} />
+                <NewChallengeForm 
+                  duelistId={challengingDuelistId} 
+                  setArgs={setArgs} 
+                  isLoading={isLoading}
+                  meta={meta}
+                />
 
                 <div className='Spacer20' />
                 <div className='TextDivider bright NewChallengeDivider'>
@@ -309,7 +315,8 @@ function _NewChallengeModal({
                   <ActionButton
                     large
                     fill
-                    disabled={!args?.canSubmit || isSubmitting}
+                    loading={isLoading}
+                    disabled={!args?.canSubmit}
                     important={args?.canSubmit}
                     label='Submit Challenge!'
                     onClick={() => _create_duel()}
@@ -328,11 +335,16 @@ function _NewChallengeModal({
 function NewChallengeForm({
   duelistId,
   setArgs,
+  isLoading,
+  meta,
 }: {
   duelistId: BigNumberish
   setArgs: (args: any) => void
+  isLoading: boolean
+  meta: any
 }) {
   const { lives } = useDuelistFameBalance(duelistId)
+  const { dispatchChallengingDuelistId } = usePistolsContext()
 
   const { aspectWidth, aspectHeight } = useGameAspect()
   
@@ -343,6 +355,30 @@ function NewChallengeForm({
   const [highStakes, setHighStakes] = useState(false)
 
   const hasEnoughLives = useMemo(() => (lives >= 3n), [lives])
+
+  const metaData = useMemo(() => {
+    if (!meta || !Array.isArray(meta) || meta.every(item => item === undefined)) return null
+    return {
+      duelType: meta[0] as constants.DuelType,
+      duelistId: meta[1] as BigNumberish, 
+      challengedAddr: meta[2] as BigNumberish,
+      livesStaked: meta[3] as number,
+      expireHours: meta[4] as number,
+      premise: meta[5] as constants.Premise,
+      message: meta[6] as string,
+    }
+  }, [meta])
+
+  useEffect(() => {
+    if (metaData && isLoading) {
+      setPremise(metaData.premise)
+      setMessage(metaData.message)
+      setHighStakes(metaData.livesStaked === 3)
+      if (isPositiveBigint(metaData.duelistId)) {
+        dispatchChallengingDuelistId(metaData.duelistId)
+      }
+    }
+  }, [metaData, isLoading])
 
   useEffect(() => {
     setArgs({
@@ -361,6 +397,7 @@ function NewChallengeForm({
   })), [])
 
   const handleHighStakesToggle = () => {
+    if (isLoading) return
     if (hasEnoughLives) {
       setHighStakes(!highStakes)
     }
@@ -375,8 +412,9 @@ function NewChallengeForm({
           placeholder={null}
           selection
           fluid
+          disabled={isLoading}
           value={constants.PREMISES[premise].name}
-          onChange={(e, { value }) => setPremise(value as constants.Premise)}
+          onChange={(e, { value }) => !isLoading && setPremise(value as constants.Premise)}
         />
       </Form.Field>
 
@@ -386,9 +424,9 @@ function NewChallengeForm({
           placeholder={'OPTIONAL: DESCRIBE YOUR REASONING'}
           value={message}
           fluid
-          setValue={setMessage}
+          setValue={(value) => !isLoading && setMessage(value)}
           code={true}
-          disabled={false}
+          disabled={isLoading}
           maxLength={128}
         />
       </Form.Field>
@@ -404,10 +442,10 @@ function NewChallengeForm({
           marginTop: aspectHeight(1),
           marginBottom: aspectHeight(1),
           position: 'relative',
-          cursor: hasEnoughLives ? 'pointer' : 'not-allowed'
+          cursor: hasEnoughLives && !isLoading ? 'pointer' : 'not-allowed',
         }}
         onClick={handleHighStakesToggle}
-        tabIndex={hasEnoughLives ? 0 : -1}
+        tabIndex={hasEnoughLives && !isLoading ? 0 : -1}
         onKeyDown={(e) => e.key === 'Enter' && handleHighStakesToggle()}
         aria-label="Toggle high stakes"
       >

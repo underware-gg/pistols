@@ -42,6 +42,7 @@ import { NotificationProvider } from '/src/stores/notificationStore'
 import { helloPistols } from '@underware/pistols-sdk'
 import { CustomIcon } from '/src/components/ui/Icons'
 import { useGameAspect } from '/src/hooks/useGameAspect'
+import { useCheckPendingTransactions } from '/src/stores/transactionStore'
 
 helloPistols();
 export default function MainPage({
@@ -114,6 +115,7 @@ export default function MainPage({
 function MainUI() {
   // sync game context with url params
   useSyncRouterParams()
+  useCheckPendingTransactions()
 
   const { gameImpl } = useThreeJsContext()
   const { qualityConfig } = useQuality()

@@ -2320,6 +2320,7 @@ a.active.step:hover,
 }
 
 .dialog-button {
+  position: relative;
   width: 100%;
   height: aspect-width(2);
   padding: 5px 10px;
@@ -2336,56 +2337,109 @@ a.active.step:hover,
   background-color: #0056b3;
 }
 
-.dialog-spinner {
-  --c1:#673b14;
-  --c2:#f8b13b;
-  width: aspect-width(1);
+.moves-button-container {
+  position: relative;
+  display: inline-block;
+  width: 100%; 
   height: aspect-width(2);
-  margin-right: 10px;
-  border-top: 4px solid var(--c1);
-  border-bottom: 4px solid var(--c1);
-  background: linear-gradient(90deg, var(--c1) 2px, var(--c2) 0 5px,var(--c1) 0) 50%/7px 8px no-repeat;
+  border-radius: aspect-width(0.4);
+}
+
+.duel-dialog-spinner-container {
+  --scale: 0.6;
+  --c1: #673b14;
+  --c2: #f8b13b;
+  margin-right: aspect-width(1);
+}
+
+.duel-button-spinner-container {
+  --scale: 0.6;
+  --c1: #a67c52;
+  --c2: #ffeb99;
+  
+}
+
+.button-dialog-spinner-container {
+  --scale: 0.6;
+  --c1: #a67c52;
+  --c2: #ffeb99;
+}
+
+.button-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  margin: inherit;
+  background-color: rgba($color-darkest, 0.8);
+  border-radius: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.dialog-spinner {
+  width: calc(aspect-width(1.587) * var(--scale));
+  height: calc(aspect-width(3.175) * var(--scale));
+  border-top: calc(aspect-width(0.1587) * var(--scale)) solid var(--c1);
+  border-bottom: calc(aspect-width(0.1587) * var(--scale)) solid var(--c1);
+  background: linear-gradient(
+    90deg,
+    var(--c1) calc(aspect-width(0.0794) * var(--scale)),
+    var(--c2) 0 calc(aspect-width(0.1984) * var(--scale)),
+    var(--c1) 0
+  ) 50% / calc(aspect-width(0.2778) * var(--scale)) calc(aspect-width(0.3175) * var(--scale)) no-repeat;
   display: grid;
   overflow: hidden;
   animation: l5-0 2s infinite linear;
 }
+
 .dialog-spinner::before,
 .dialog-spinner::after {
   content: "";
   grid-area: 1/1;
   width: 75%;
-  height: calc(50% - 4px);
+  height: calc(50% - calc(aspect-width(0.1587) * var(--scale)));
   margin: 0 auto;
-  border: 2px solid var(--c1);
+  border: calc(aspect-width(0.0794) * var(--scale)) solid var(--c1);
   border-top: 0;
   box-sizing: content-box;
   border-radius: 0 0 40% 40%;
-  -webkit-mask: 
-    linear-gradient(#000 0 0) bottom/4px 2px no-repeat,
+
+  -webkit-mask:
+    linear-gradient(#000 0 0) bottom / calc(aspect-width(0.1587) * var(--scale)) calc(aspect-width(0.0794) * var(--scale)) no-repeat,
     linear-gradient(#000 0 0);
   -webkit-mask-composite: destination-out;
-          mask-composite: exclude;
-  background: 
-    linear-gradient(var(--d,0deg),var(--c2) 50%,#0000 0) bottom /100% 205%,
-    linear-gradient(var(--c2) 0 0) center/0 100%;
+  mask-composite: exclude;
+
+  background:
+    linear-gradient(var(--d, 0deg), var(--c2) 50%, #0000 0) bottom / 100% 205%,
+    linear-gradient(var(--c2) 0 0) center / 0 100%;
   background-repeat: no-repeat;
   animation: inherit;
   animation-name: l5-1;
 }
+
 .dialog-spinner::after {
-  transform-origin: 50% calc(100% + 2px);
+  transform-origin: 50% calc(100% + calc(aspect-width(0.0794) * var(--scale)));
   transform: scaleY(-1);
-  --s:3px;
-  --d:180deg;
+  --s: 2px;
+  --d: 180deg;
 }
+
 @keyframes l5-0 {
   80%  {transform: rotate(0)}
   100% {transform: rotate(0.5turn)}
 }
+
 @keyframes l5-1 {
-  10%,70%  {background-size:100% 205%,var(--s,0) 100%}
-  70%,100% {background-position: top,center}
+  10%,70%  {background-size: 100% 205%, var(--s, 0) 100%}
+  70%,100% {background-position: top, center}
 }
+
+
 
 .ContentSmall {
   font-size: aspect-width(2);

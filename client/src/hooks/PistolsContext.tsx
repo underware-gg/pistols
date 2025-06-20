@@ -1,4 +1,4 @@
-import React, { ReactNode, createContext, useReducer, useContext, useMemo, useEffect, useCallback, useState } from 'react'
+import React, { ReactNode, createContext, useReducer, useContext, useMemo, useEffect, useCallback, useState, useRef } from 'react'
 import { useNavigate, useSearchParams, useLocation, useParams } from 'react-router'
 import { BigNumberish } from 'starknet'
 import { Opener, useOpener } from '/src/hooks/useOpener'
@@ -108,12 +108,12 @@ const PistolsContext = createContext<{
 // Helper Functions
 //
 
-const shouldAddToHistory = (state: PistolsContextStateType): boolean => {
+const shouldAddToHistory = (state: PistolsContextStateType, navigatingToDuel: boolean = false): boolean => {
   return isPositiveBigint(state.selectedDuelId) || 
          isPositiveBigint(state.selectedDuelistId) || 
          isPositiveBigint(state.selectedPlayerAddress) || 
-         isPositiveBigint(state.challengingAddress) ||
-         isPositiveBigint(state.challengingDuelistId)
+         (!navigatingToDuel && isPositiveBigint(state.challengingAddress) ||
+         isPositiveBigint(state.challengingDuelistId))
 }
 
 const addToHistory = (state: PistolsContextStateType, oldState: PistolsContextStateType): PistolsContextStateType => {
@@ -184,10 +184,8 @@ const PistolsProvider = ({
     let newState = { ...state }
     switch (action.type) {
       case PistolsActions.RESET_VALUES: {
-        newState.selectedDuelId = 0n
-        newState.selectedDuelistId = 0n
-        newState.selectedPlayerAddress = 0n
-        newState.challengingAddress = 0n
+        newState = clearSelections(newState)
+        newState.selectionHistory = []
         break
       }
       case PistolsActions.SET_SIG: {
@@ -225,12 +223,14 @@ const PistolsProvider = ({
         break
       }
       case PistolsActions.SET_DUEL: {
+        newState = clearSelections(newState)
+        newState.selectionHistory = []
         newState.currentDuel = action.payload as bigint
         break
       }
       case PistolsActions.SELECT_DUEL: {
         const newDuelId = action.payload as bigint
-        if (newDuelId !== 0n && newDuelId !== state.selectedDuelId && shouldAddToHistory(state)) {
+        if (newDuelId !== 0n && newDuelId !== state.selectedDuelId && shouldAddToHistory(state, true)) {
           newState = addToHistory(newState, state)
         }
         newState = clearSelections(newState)
@@ -713,8 +713,16 @@ export const useSyncRouterParams = () => {
     dispatchChallengingPlayerAddress,
     dispatchChallengingDuelistId 
   } = usePistolsContext()
-  
+
+  const isUpdatingFromState = useRef(false)
+
   useEffect(() => {
+    // Only dispatch if the update didn't come from our internal state change
+    if (isUpdatingFromState.current) {
+      isUpdatingFromState.current = false
+      return
+    }
+    
     if (searchParams.get('duel')) {
       dispatchSelectDuel(searchParams.get('duel'))
     } else if (searchParams.get('duelist')) {
@@ -744,6 +752,9 @@ export const useSyncRouterParams = () => {
   } = usePistolsContext()
   
   useEffect(() => {
+    // Mark that we're updating from internal state
+    isUpdatingFromState.current = true
+    
     setSearchParams((prev) => {
       const params = new URLSearchParams()
       if (selectedDuelId) {

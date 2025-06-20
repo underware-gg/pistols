@@ -131,6 +131,12 @@ importers:
       '@underware/pistols-sdk':
         specifier: workspace:*
         version: link:../sdk
+      dexie:
+        specifier: ^4.0.11
+        version: 4.0.11
+      dexie-react-hooks:
+        specifier: ^1.1.7
+        version: 1.1.7(@types/react@18.3.20)(dexie@4.0.11)(react@18.3.1)
       event-emitter:
         specifier: ^0.3.5
         version: 0.3.5
@@ -231,6 +237,9 @@ importers:
       vite:
         specifier: ^6.0.5
         version: 6.3.3(@types/node@22.15.2)(sass@1.87.0)(terser@5.39.0)
+      vite-plugin-glsl:
+        specifier: ^1.5.0
+        version: 1.5.0(rollup@4.40.0)(vite@6.3.3(@types/node@22.15.2)(sass@1.87.0)(terser@5.39.0))
       vite-plugin-mkcert:
         specifier: ^1.17.6
         version: 1.17.8(vite@6.3.3(@types/node@22.15.2)(sass@1.87.0)(terser@5.39.0))
@@ -1262,6 +1271,15 @@ packages:
 
   '@rollup/plugin-virtual@3.0.2':
     resolution: {integrity: sha512-10monEYsBp3scM4/ND4LNH5Rxvh3e/cVeL3jWTgZ2SrQ+BmUoQcopVQvnaMcOnykb1VkxUFuDAN+0FnpTFRy2A==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
+    peerDependenciesMeta:
+      rollup:
+        optional: true
+
+  '@rollup/pluginutils@5.2.0':
+    resolution: {integrity: sha512-qWJ2ZTbmumwiLFomfzTyt5Kng4hwPi9rwCYN4SHb6eaRU1KNO4ccxINHr/VhH4GgPlt1XfSTLX2LBTme8ne4Zw==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
@@ -2423,6 +2441,16 @@ packages:
   detect-node@2.1.0:
     resolution: {integrity: sha512-T0NIuQpnTvFDATNuHN5roPwSBG83rFsuO+MXXH9/3N1eFbn4wcPjttvjMLEPWJ0RGUYgQE7cGgS3tNxbqCGM7g==}
 
+  dexie-react-hooks@1.1.7:
+    resolution: {integrity: sha512-Lwv5W0Hk+uOW3kGnsU9GZoR1er1B7WQ5DSdonoNG+focTNeJbHW6vi6nBoX534VKI3/uwHebYzSw1fwY6a7mTw==}
+    peerDependencies:
+      '@types/react': '>=16'
+      dexie: ^3.2 || ^4.0.1-alpha
+      react: '>=16'
+
+  dexie@4.0.11:
+    resolution: {integrity: sha512-SOKO002EqlvBYYKQSew3iymBoN2EQ4BDw/3yprjh7kAfFzjBYkaMNa/pZvcA7HSWlcKSQb9XhPe3wKyQ0x4A8A==}
+
   dijkstrajs@1.0.3:
     resolution: {integrity: sha512-qiSlmBq9+BCdCA/L46dw8Uy93mloxsPSbwnm5yrKn2vMPiy8KyAskTF6zuV/j5BMsmOGZDPs7KjU+mjb670kfA==}
 
@@ -2591,6 +2619,9 @@ packages:
   estraverse@5.3.0:
     resolution: {integrity: sha512-MMdARuVEQziNTeJD8DgMqmhwR11BRQ/cBP+pLtYdSTnf3MIO8fFeiINEbX36ZdNlfU/7A9f3gUw49B3oQsvwBA==}
     engines: {node: '>=4.0'}
+
+  estree-walker@2.0.2:
+    resolution: {integrity: sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w==}
 
   estree-walker@3.0.3:
     resolution: {integrity: sha512-7RUKfXgSMMkzt6ZuXmqapOurLGPPfgj6l9uRZ7lRGolvk0y2yocc35LdcxKC5PQZdn2DMqioAQ2NoWcrTKmm6g==}
@@ -4406,6 +4437,12 @@ packages:
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     hasBin: true
 
+  vite-plugin-glsl@1.5.0:
+    resolution: {integrity: sha512-hFUSXqSHcHLnz492o5jthfQukbyOAmJBuC1ZTLmwGrwtDoEmVT1IlDxcKGyXPaFqNl9kolFKoDY8mPJsMvKvQg==}
+    engines: {node: '>= 20.17.0', npm: '>= 10.8.3'}
+    peerDependencies:
+      vite: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0
+
   vite-plugin-mkcert@1.17.8:
     resolution: {integrity: sha512-S+4tNEyGqdZQ3RLAG54ETeO2qyURHWrVjUWKYikLAbmhh/iJ+36gDEja4OWwFyXNuvyXcZwNt5TZZR9itPeG5Q==}
     engines: {node: '>=v16.7.0'}
@@ -5970,6 +6007,14 @@ snapshots:
       - zod
 
   '@rollup/plugin-virtual@3.0.2(rollup@4.40.0)':
+    optionalDependencies:
+      rollup: 4.40.0
+
+  '@rollup/pluginutils@5.2.0(rollup@4.40.0)':
+    dependencies:
+      '@types/estree': 1.0.7
+      estree-walker: 2.0.2
+      picomatch: 4.0.2
     optionalDependencies:
       rollup: 4.40.0
 
@@ -7622,6 +7667,14 @@ snapshots:
 
   detect-node@2.1.0: {}
 
+  dexie-react-hooks@1.1.7(@types/react@18.3.20)(dexie@4.0.11)(react@18.3.1):
+    dependencies:
+      '@types/react': 18.3.20
+      dexie: 4.0.11
+      react: 18.3.1
+
+  dexie@4.0.11: {}
+
   dijkstrajs@1.0.3: {}
 
   dom-helpers@5.2.1:
@@ -7853,6 +7906,8 @@ snapshots:
       estraverse: 5.3.0
 
   estraverse@5.3.0: {}
+
+  estree-walker@2.0.2: {}
 
   estree-walker@3.0.3:
     dependencies:
@@ -9809,6 +9864,13 @@ snapshots:
       - terser
       - tsx
       - yaml
+
+  vite-plugin-glsl@1.5.0(rollup@4.40.0)(vite@6.3.3(@types/node@22.15.2)(sass@1.87.0)(terser@5.39.0)):
+    dependencies:
+      '@rollup/pluginutils': 5.2.0(rollup@4.40.0)
+      vite: 6.3.3(@types/node@22.15.2)(sass@1.87.0)(terser@5.39.0)
+    transitivePeerDependencies:
+      - rollup
 
   vite-plugin-mkcert@1.17.8(vite@6.3.3(@types/node@22.15.2)(sass@1.87.0)(terser@5.39.0)):
     dependencies:

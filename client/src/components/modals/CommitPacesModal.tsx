@@ -12,6 +12,10 @@ import { BladesCardsTextures, CardData, DodgeCardsTextures, FireCardsTextures, T
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { emitter } from '/src/three/game'
 import { DuelTutorialLevel } from '/src/data/tutorialConstants'
+// import { SALT_SERVER_URL } from '/src/utils/env'
+import { useDuelContext } from '/src/components/ui/duel/DuelContext'
+import { useTransactionHandler } from '/src/hooks/useTransaction'
+import { DuelStage } from '/src/hooks/useDuel'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -23,19 +27,19 @@ const STRATEGY_DESCRIPTIONS = {
 };
 
 const STRATEGY_WEIGHTS = {
-  villainous: {
+  [constants.Archetype.Villainous]: {
     fire: [10, 8, 6, 4, 2, 0, 0, 0, 0, 0],
     dodge: [10, 8, 5, 2, 0, 0, 0, 0, 0, 0],
     tactics: [0, 4, 10, 0, 4, 0],
     blades: [10, 0, 10, 0]
   },
-  trickster: {
+  [constants.Archetype.Trickster]: {
     fire: [0, 0, 2, 6, 10, 10, 6, 2, 0, 0],
     dodge: [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
     tactics: [10, 10, 1, 1, 10, 10],
     blades: [0, 10, 2, 10]
   },
-  honourable: {
+  [constants.Archetype.Honourable]: {
     fire: [0, 0, 0, 0, 0, 2, 4, 6, 8, 10],
     dodge: [5, 5, 5, 5, 5, 10, 10, 10, 10, 10],
     tactics: [0, 6, 0, 10, 6, 2],
@@ -69,13 +73,14 @@ function _CommitPacesModal({
   const { game } = useDojoSystemCalls()
   const { tutorialLevel } = usePistolsContext()
   const { starknetDomain, selectedNetworkConfig } = useDojoSetup()
+  const { completedStagesLeft } = useDuelContext()
 
   const [firePaces, setFirePaces] = useState(0)
   const [dodgePaces, setDodgePaces] = useState(0)
   const [tactics, setTactics] = useState(0)
   const [blades, setBlades] = useState(0)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [selectedStrategy, setSelectedStrategy] = useState<'villainous' | 'trickster' | 'honourable' | null>(null)
+  const [isLoadingHash, setIsLoadingHash] = useState(false)
+  const [selectedStrategy, setSelectedStrategy] = useState<constants.Archetype>(constants.Archetype.Undefined)
 
   // Card selector refs
   const fireSelectorRef = useRef<CardSelectorHandles>(null);
@@ -85,11 +90,21 @@ function _CommitPacesModal({
 
   const { aspectWidth, aspectHeight, boxW, boxH, pixelsToAspectHeight } = useGameAspect()
 
+  const { call: commitPaces, isLoading: isLoadingCommit } = useTransactionHandler<boolean, [bigint, bigint, bigint]>({
+    transactionCall: (duelistId, duelId, hash, key) => game.commit_moves(account, duelistId, duelId, hash, key),
+    indexerCheck: completedStagesLeft[DuelStage.Round1Commit],
+    onComplete: (result) => {
+      if (result instanceof Error || !result) return
+      _closeModal()
+    },
+    key: `commit_paces${duelId}`,
+  })
+
   const isSimpleTutorial = tutorialLevel === DuelTutorialLevel.SIMPLE
 
   useEffect(() => {
     clearCardSelections();
-    setSelectedStrategy(null)
+    setSelectedStrategy(constants.Archetype.Undefined)
   }, [isOpen])
 
   const messageToSign = useMemo<CommitMoveMessage>(() => ((duelId && duelistId) ? {
@@ -99,28 +114,30 @@ function _CommitPacesModal({
 
   const canSubmit = useMemo(() => {
     if (isSimpleTutorial) {
-      return account && messageToSign && firePaces && dodgePaces && firePaces != dodgePaces && !isSubmitting
+      return account && messageToSign && firePaces && dodgePaces && firePaces != dodgePaces && !isLoadingHash && !isLoadingCommit
     }
-    return account && messageToSign && firePaces && dodgePaces && firePaces != dodgePaces && tactics && blades && !isSubmitting
-  }, [account, messageToSign, firePaces, dodgePaces, tactics, blades, isSubmitting, isSimpleTutorial])
+    return account && messageToSign && firePaces && dodgePaces && firePaces != dodgePaces && tactics && blades && !isLoadingHash && !isLoadingCommit
+  }, [account, messageToSign, firePaces, dodgePaces, tactics, blades, isLoadingHash, isLoadingCommit, isSimpleTutorial])
 
   const _closeModal = useCallback(() => {
+    // Don't allow closing while transactions are in progress
+    if (isLoadingHash) return;
+    
     setIsOpen(false)
     setTimeout(() => {
       emitter.emit('hover_description', null)
     }, 300)
-  }, [setIsOpen])
+  }, [setIsOpen, isLoadingHash])
 
   const _submit = useCallback(async () => {
     if (canSubmit) {
-      setIsSubmitting(true)
+      setIsLoadingHash(true)
       const moves = isSimpleTutorial ? [firePaces, dodgePaces, 0, 0] : [firePaces, dodgePaces, tactics, blades]
       const { hash, salt } = await signAndGenerateMovesHash(selectedNetworkConfig.assetsServerUrl, account, starknetDomain, messageToSign, moves)
+      setIsLoadingHash(false)
       if (hash && salt) {
-        await game.commit_moves(account, duelistId, duelId, hash)
-        _closeModal()
+        commitPaces(duelistId, duelId, hash)
       }
-      setIsSubmitting(false)
     }
   }, [canSubmit, firePaces, dodgePaces, tactics, blades, isSimpleTutorial])
 
@@ -188,7 +205,7 @@ function _CommitPacesModal({
   }, [isSimpleTutorial]);
   
   // Helper function to generate random cards based on strategy
-  const generateRandomCards = useCallback((strategy: 'villainous' | 'trickster' | 'honourable') => {
+  const generateRandomCards = useCallback((strategy: constants.Archetype) => {
     const fireCards = Array.from({length: 10}, (_, i) => i + 1);
     const dodgeCards = Array.from({length: 10}, (_, i) => i + 1);
     const tacticsCards = Array.from({length: 6}, (_, i) => i + 1);
@@ -243,7 +260,7 @@ function _CommitPacesModal({
     setBlades(randomBlades);
   }, [isSimpleTutorial]);
   
-  const selectRandomStrategy = useCallback((strategy: 'villainous' | 'trickster' | 'honourable') => {
+  const selectRandomStrategy = useCallback((strategy: constants.Archetype) => {
     // If clicking the same strategy again, clear all cards and deselect the strategy
     if (selectedStrategy === strategy) {
       clearCardSelections();
@@ -286,6 +303,8 @@ function _CommitPacesModal({
       }}
       onClose={_closeModal}
       open={isOpen}
+      closeOnDimmerClick={!isLoadingHash}
+      closeOnEscape={!isLoadingHash}
     >
       {/* Header */}
       <Modal.Header 
@@ -317,10 +336,10 @@ function _CommitPacesModal({
           <ActionButton 
             large 
             fill 
-            active={selectedStrategy === 'villainous'}
-            important={selectedStrategy === 'villainous'}
+            active={selectedStrategy === constants.Archetype.Villainous}
+            important={selectedStrategy === constants.Archetype.Villainous}
             label='Villainous' 
-            onClick={() => selectRandomStrategy('villainous')} 
+            onClick={() => selectRandomStrategy(constants.Archetype.Villainous)} 
           />
         </div>
         <div 
@@ -331,10 +350,10 @@ function _CommitPacesModal({
           <ActionButton 
             large 
             fill 
-            active={selectedStrategy === 'trickster'}
-            important={selectedStrategy === 'trickster'}
+            active={selectedStrategy === constants.Archetype.Trickster}
+            important={selectedStrategy === constants.Archetype.Trickster}
             label='Trickster' 
-            onClick={() => selectRandomStrategy('trickster')} 
+            onClick={() => selectRandomStrategy(constants.Archetype.Trickster)} 
           />
         </div>
         <div 
@@ -345,10 +364,10 @@ function _CommitPacesModal({
           <ActionButton 
             large 
             fill 
-            active={selectedStrategy === 'honourable'}
-            important={selectedStrategy === 'honourable'}
+            active={selectedStrategy === constants.Archetype.Honourable}
+            important={selectedStrategy === constants.Archetype.Honourable}
             label='Honourable' 
-            onClick={() => selectRandomStrategy('honourable')} 
+            onClick={() => selectRandomStrategy(constants.Archetype.Honourable)} 
           />
         </div>
       </div>
@@ -484,10 +503,10 @@ function _CommitPacesModal({
         <Grid className='FillParent Padded' textAlign='center'>
           <Row columns='equal'>
             <Col>
-              <ActionButton large fill label='Close' onClick={() => setIsOpen(false)} />
+              <ActionButton large fill label='Close' onClick={_closeModal} disabled={isLoadingHash} />
             </Col>
             <Col>
-              <ActionButton large fill important label='Commit...' disabled={!canSubmit} onClick={() => _submit()} />
+              <ActionButton large fill important label='Commit...' disabled={!canSubmit} loading={isLoadingCommit || isLoadingHash} onClick={() => _submit()} />
             </Col>
           </Row>
         </Grid>

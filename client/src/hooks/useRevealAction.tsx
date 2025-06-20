@@ -46,7 +46,7 @@ export function useSignAndRestoreMovesFromHash(duelId: bigint, duelistId: bigint
   }
 }
 
-export function useRevealAction(duelId: bigint, duelistId: bigint, hash: bigint, enabled: boolean) {
+export function useRevealAction(duelId: bigint, duelistId: bigint, hash: bigint, enabled: boolean, key: string) {
   const { game, tutorial } = useDojoSystemCalls()
   const { account } = useAccount()
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -65,20 +65,22 @@ export function useRevealAction(duelId: bigint, duelistId: bigint, hash: bigint,
     const _reveal = async (salt: bigint, moves: number[]) => {
       if (moves?.length >= 2 && !isSubmitting) {
         setIsSubmitting(true)
+        let revealResult: Promise<boolean>
         if (duelistId == PLAYER_CHARACTER_ID) {
-          await tutorial.reveal_moves(account, duelistId, duelId, salt, moves)
+          revealResult = tutorial.reveal_moves(account, duelistId, duelId, salt, moves, key)
         } else {
-          await game.reveal_moves(account, duelistId, duelId, salt, moves)
+          revealResult = game.reveal_moves(account, duelistId, duelId, salt, moves, key)
         }
         setIsSubmitting(false)
+        return revealResult
       }
     }
 
     if (storedSalt && storedMoves) {
-      _reveal(storedSalt, storedMoves)
+      return _reveal(storedSalt, storedMoves)
     } else if (canReveal) {
       const { salt, moves } = await sign_and_restore()
-      _reveal(salt, moves)
+      return _reveal(salt, moves)
     }
   }, [account, duelistId, duelId, canReveal, storedSalt, storedMoves, isSubmitting])
 

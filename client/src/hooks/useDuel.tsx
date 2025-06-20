@@ -39,12 +39,12 @@ export const useDuel = (duelId: BigNumberish) => {
         [DuelStage.Round1Reveal]: Boolean(round1?.moves_b?.card_1),
       },
     }
-    }, [round1])
+  }, [round1])
 
   //
   // Players turns, need action
-  const turnA = useMemo(() => (completedStagesA[duelStage] === false), [duelStage, completedStagesA, challenge.isAwaiting])
-  const turnB = useMemo(() => (completedStagesB[duelStage] === false || challenge.isAwaiting), [duelStage, completedStagesB, challenge.isAwaiting])
+  const turnA = useMemo(() => (completedStagesA[duelStage] === false && challenge.isLive), [duelStage, completedStagesA, challenge.isLive])
+  const turnB = useMemo(() => ((completedStagesB[duelStage] === false || challenge.isAwaiting) && challenge.isLive), [duelStage, completedStagesB, challenge.isAwaiting, challenge.isLive])
 
   return {
     challenge,

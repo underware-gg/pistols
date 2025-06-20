@@ -2,7 +2,7 @@ import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState, us
 import { BigNumberish } from 'starknet'
 import { useChallengeDescription } from '/src/hooks/useChallengeDescription'
 import { useChallenge, useRound } from '/src/stores/challengeStore'
-import { useDuel } from '/src/hooks/useDuel'
+import { DuelStage, useDuel } from '/src/hooks/useDuel'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { DUELIST_CARD_WIDTH, DUELIST_CARD_HEIGHT } from '/src/data/cardConstants'
 import { DuelistCard } from '/src/components/cards/DuelistCard'
@@ -26,11 +26,13 @@ import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { useCanCollectDuel } from '/src/hooks/usePistolsContractCalls'
-import { useDiscordSocialLink, useDuelCallToAction } from '/src/stores/eventsModelStore'
+import { useDiscordSocialLink, useDuelCallToAction, useDuelCallToActionWithState } from '/src/stores/eventsModelStore'
 import { useDuelistFameBalance } from '/src/stores/coinStore'
-import { useDuelistFameOnDuel } from '/src/queries/useDuelistFameOnDuel'
 import { useExecuteEmitPlayerBookmark } from '/src/hooks/usePistolsSystemCalls'
 import { SceneName } from '/src/data/assets'
+import { useTransactionHandler } from '../hooks/useTransaction'
+import { isPositiveBigint } from '@underware/pistols-sdk/utils'
+import { useDuelistFameOnDuel } from '../queries/useDuelistFameOnDuel'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -96,15 +98,6 @@ const useDuelPosterData = (duelId?: bigint) => {
     return duelistId !== Number(winnerDuelistId) && isFinished && !isCallToAction
   }
 
-  //-------------------
-  // DISABLED by Roger
-  // use these hooks ONLY when presenting a single duel
-  // this was being called for all posters in the Past/Current duels screens
-  // adding 16 unnecessary queries to Torii, slowing it down
-  //-------------------
-  // const { fameBefore: fameBeforeA, fameAfter: fameAfterA } = useDuelistFameOnDuel(duelId, duelistIdA)
-  // const { fameBefore: fameBeforeB, fameAfter: fameAfterB } = useDuelistFameOnDuel(duelId, duelistIdB)listId)
-  
   return {
     leftDuelistId,
     leftDuelistAddress,
@@ -121,10 +114,6 @@ const useDuelPosterData = (duelId?: bigint) => {
     isDead,
     isYouA,
     isYouB,
-    // fameBeforeA,
-    // fameAfterA,
-    // fameBeforeB,
-    // fameAfterB,
     isCallToAction,
   }
 }
@@ -255,6 +244,9 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
   const { account } = useAccount()
   const { duelistSelectOpener } = usePistolsContext()
   const { leftDuelistId, rightDuelistId, leftDuelistAddress, rightDuelistAddress, leftPlayerName, rightPlayerName, isDead, isYouA, isYouB, leftIsBlocked, rightIsBlocked, isCallToAction, leftIsLinked, rightIsLinked, leftAvatarUrl, rightAvatarUrl } = useDuelPosterData(props.duelId)
+  const { fameBefore: fameBeforeA, fameAfter: fameAfterA } = useDuelistFameOnDuel(props.duelId, leftDuelistId)
+  const { fameBefore: fameBeforeB, fameAfter: fameAfterB } = useDuelistFameOnDuel(props.duelId, rightDuelistId)
+
   useFetchDuelistIdsByPlayerAddresses([leftDuelistAddress, rightDuelistAddress]) // fetch duelists in the store, if not already fetched
 
   const {
@@ -262,6 +254,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
     seasonName,
     isLive,
     isFinished,
+    isAwaiting,
     premise,
     message,
     livesStaked,
@@ -283,10 +276,37 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
   const { emit_player_bookmark, isDisabled: emitIsDisabled } = useExecuteEmitPlayerBookmark(duelContractAddress, props.duelId, !isBookmarked)
 
   const baseRef = useRef<InteractibleComponentHandle>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const { call: submitChallengeResponse, isLoading: isLoadingSubmit, meta } = useTransactionHandler<boolean, [bigint, BigNumberish?, boolean?]>({
+    transactionCall: (duelId, duelistId, accepted, key) => duel_token.reply_duel(account, duelId, duelistId, accepted, key),
+    onComplete: (result, [duelId, duelistId, accepted]) => {
+      if (result instanceof Error || !result) return
+      console.log(`submitChallengeResponse() =>`, result, [duelId, duelistId, accepted])
+      dispatchChallengingDuelistId(0n)
+      if (accepted) _gotoDuel()
+    },
+    indexerCheck: state != constants.ChallengeState.Awaiting,
+    key: `submit_challenge_response${props.duelId}`,
+  })
+
+  const { call: collectDuel, isLoading: isLoadingCollect } = useTransactionHandler<boolean, [bigint]>({
+    transactionCall: (duelId, key) => game.collect_duel(account, duelId, key),
+    indexerCheck: !canCollectDuel,
+    key: `collect_duel${props.duelId}`,
+  })
+
+  const isSubmitting = useMemo(() => isLoadingSubmit || isLoadingCollect, [isLoadingSubmit, isLoadingCollect])
+
+  useEffect(() => {
+    if (isSubmitting) {
+      if (meta[2] && isPositiveBigint(meta[1]) && challengingDuelistId != meta[1]) {
+        dispatchChallengingDuelistId(meta[1])
+      }
+    }
+  }, [meta, isSubmitting, challengingDuelistId])
 
   const _collectDuel = () => {
-    game.collect_duel(account, props.duelId)
+    collectDuel(props.duelId)
   }
 
   const _reply = (accepted: boolean) => {
@@ -297,12 +317,8 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
     }
   }
 
-  const _submit = async (duelistId?: BigNumberish, accepted?: boolean) => {
-    setIsSubmitting(true)
-    await duel_token.reply_duel(account, props.duelId, duelistId, accepted)
-    dispatchChallengingDuelistId(0n)
-    if (accepted) _gotoDuel()
-    setIsSubmitting(false)
+  const _submit = (duelistId?: BigNumberish, accepted?: boolean) => {
+    submitChallengeResponse(props.duelId, duelistId, accepted)
   }
 
   const _gotoDuel = () => {
@@ -408,6 +424,8 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
                 <DuelistCard
                   duelistId={Number(leftDuelistId || challengingDuelistId)}
                   isSmall={true}
+                  overrideFame={true}
+                  fame={isFinished && !isCallToAction ? fameAfterA : fameBeforeA}
                   isLeft={true}
                   isVisible={true}
                   isFlipped={true}
@@ -477,7 +495,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
               </Row>
               <Row columns='equal' textAlign='center'>
                 <Col>
-                  <h5 className='Darkest'>{challengeDescription}</h5>
+                  <h5 className='Darkest'>{isFinished && isCallToAction ? 'Waiting for result reveal.' : challengeDescription}</h5>
                   <span className='Code Darkest'><ChallengeTime duelId={props.duelId} prefixed /></span>
                 </Col>
               </Row>
@@ -487,6 +505,8 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
                 <DuelistCard
                   duelistId={Number(rightDuelistId)}
                   isSmall={true}
+                  overrideFame={true}
+                  fame={isFinished && !isCallToAction ? fameAfterB : fameBeforeB}
                   isLeft={false}
                   isVisible={true}
                   isFlipped={true}
@@ -509,51 +529,51 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
               </Col>
               {(state == constants.ChallengeState.InProgress && canCollectDuel) &&
                 <Col>
-                  <ActionButton large fill important label='Timed Out, Collect Duel' onClick={() => _collectDuel()} />
+                  <ActionButton large fillParent important label='Timed Out, Collect Duel' loading={isSubmitting} onClick={() => _collectDuel()} />
                 </Col>
               }
               {(state == constants.ChallengeState.Awaiting && isChallenger) &&
                 <>
                   <Col>
-                    <ActionButton large fillParent negative label='Cowardly Withdraw' disabled={isSubmitting} onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
+                    <ActionButton large fillParent negative label='Cowardly Withdraw' loading={isSubmitting} onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
                   </Col>
                 </>
               }
               {(state == constants.ChallengeState.Awaiting && isChallenged) &&
                 <Col>
-                  <ActionButton large fillParent negative label='Cowardly Refuse' disabled={isSubmitting} onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
+                  <ActionButton large fillParent negative label='Cowardly Refuse' loading={isSubmitting} onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
                 </Col>
               }
               {(state == constants.ChallengeState.Awaiting && isChallenged) &&
                 (!challengingDuelistId ? (
                     <Col>
-                      <ActionButton large fillParent important label='Select Duelist' disabled={isSubmitting} onClick={() => duelistSelectOpener.open()} />
+                      <ActionButton large fillParent important label='Select Duelist' loading={isSubmitting} onClick={() => duelistSelectOpener.open()} />
                     </Col>
                   ) : (
                     isInAction || lives < livesStaked ? (
                       <Col>
-                        <ActionButton large fillParent label='Select another duelist!' onClick={() => duelistSelectOpener.open()} />
+                        <ActionButton large fillParent label='Select another duelist!' loading={isSubmitting} onClick={() => duelistSelectOpener.open()} />
                       </Col>
                     ) : (
                       <Col>
-                        <BalanceRequiredButton label='Accept Challenge!' fillParent fill={false} disabled={isSubmitting} onClick={() => _submit(challengingDuelistId, true)} fee={0} />
+                        <BalanceRequiredButton label='Accept Challenge!' fillParent fill={false} loading={isSubmitting} onClick={() => _submit(challengingDuelistId, true)} fee={0} />
                       </Col>
                     )
                   ))
               }
               {((state == constants.ChallengeState.Awaiting && isChallenger) || state == constants.ChallengeState.InProgress || (state !== constants.ChallengeState.Awaiting && isCallToAction)) &&
                 <Col>
-                  <ActionButton large fillParent important label='Go to Live Duel!' onClick={() => _gotoDuel()} />
+                  <ActionButton large fillParent important label='Go to Live Duel!' loading={isSubmitting} onClick={() => _gotoDuel()} />
                 </Col>
               }
               {isFinished && !isCallToAction && (endedInBlades || endedInPaces) &&
                 <Col>
-                  <ActionButton large fillParent important label='Replay Duel!' onClick={() => _gotoDuel()} />
+                  <ActionButton large fillParent important label='Replay Duel!' loading={isSubmitting} onClick={() => _gotoDuel()} />
                 </Col>
               }
               {(needToSyncExpired && (isChallenger || isChallenged)) &&
                 <Col>
-                  <ActionButton large fillParent important label='Expired, Collect Duel' disabled={isSubmitting} onClick={() => _reply(false)} />
+                  <ActionButton large fillParent important label='Expired, Collect Duel' loading={isSubmitting} onClick={() => _reply(false)} />
                 </Col>
               }
             </Row>

@@ -107,13 +107,20 @@ export const FameBalanceDuelist = ({
 export const FameLivesDuelist = ({
   duelistId,
   size = null,
+  overrideFame = false,
+  fame = null,
 }: {
   duelistId: BigNumberish
   size?: IconSizeProp
+  overrideFame?: boolean
+  fame?: bigint
 }) => {
   const { balance } = useDuelistFameBalance(duelistId)
+  const _fame = useMemo(() => {
+    return overrideFame ? fame : balance
+  }, [overrideFame, fame, balance])
   return (
-    <Balance fame size={size} wei={balance / 1000n} />
+    <Balance fame size={size} wei={_fame / 1000n} />
   )
 }
 
@@ -126,17 +133,24 @@ export const FameProgressBar = ({
   width,
   height,
   hideValue = false,
+  overrideFame = false,
+  fame = null,
 }: {
   duelistId: BigNumberish
   label?: string
   width?: number
   height?: number
   hideValue?: boolean
+  overrideFame?: boolean
+  fame?: bigint
 }) => {
   const { balance } = useDuelistFameBalance(duelistId)
+  const _fame = useMemo(() => {
+    return overrideFame ? fame : balance
+  }, [overrideFame, fame, balance])
   const progressPercent = useMemo(() => {
-    return Number(weiToEth(balance)) % 1000
-  }, [balance])
+    return Number(weiToEth(_fame)) % 1000
+  }, [_fame])
 
   return (
     <ProgressBar className='FameProgressBar' value={progressPercent} total={1000} label={label} width={width} height={height} hideValue={hideValue} />

@@ -22,10 +22,28 @@ export function createSystemCalls(
   contractCalls: ReturnType<typeof setupWorld>,
   selectedNetworkConfig: DojoNetworkConfig,
 ) {
+
+    // Transaction status checker - can be used by transaction store
+  const checkTransactionStatus = async (signer: AccountInterface, hash: string, calls?: DojoCalls, key?: string, shouldEmit: boolean = true): Promise<boolean> => {
+    const receipt = await signer.waitForTransaction(hash, { retryInterval: 200 })
+    const success = getReceiptStatus(receipt, shouldEmit);
+
+    (success ? console.log : console.warn)(`execute success:`, success, 'receipt:', receipt, 'calls:', calls)
+    
+    if (key) {
+      if (success) {
+        emitter.emit('transaction_completed', { key, receipt })
+      } else {
+        emitter.emit('transaction_failed', { key, error: 'Transaction failed' })
+      }
+    }
+
+    return success
+  };
   
   // executeMulti() based on:
   // https://github.com/cartridge-gg/rollyourown/blob/f39bfd7adc866c1a10142f5ce30a3c6f900b467e/web/src/dojo/hooks/useSystems.ts#L178-L190
-  const _executeTransaction = async (signer: AccountInterface, calls: DojoCalls): Promise<boolean> => {
+  const _executeTransaction = async (signer: AccountInterface, calls: DojoCalls, key?: string): Promise<boolean> => {
     let success = false
     try {
       console.log(`_executeTransaction(): execute...`, calls, provider)
@@ -41,15 +59,22 @@ export function createSystemCalls(
       if (!tx) {
         throw new Error(`_executeTransaction(): provider returned undefined tx`)
       }
-      const receipt = await signer.waitForTransaction(tx.transaction_hash, { retryInterval: 200 })
-      success = getReceiptStatus(receipt);
-      (success ? console.log : console.warn)(`execute success:`, success, 'receipt:', receipt, 'calls:', calls)
+
+      // If we have a key, emit transaction hash event
+      if (key) {
+        emitter.emit('transaction_hash', { key, hash: tx.transaction_hash })
+      }
+
+      success = await checkTransactionStatus(signer, tx.transaction_hash, calls, key)
     } catch (e) {
       console.warn(`execute exception:`, calls, e)
-    } finally {
+      // If we have a key, emit error event
+      if (key) {
+        emitter.emit('transaction_failed', { key, error: e instanceof Error ? e.message : 'Transaction failed' })
+      }
     }
     return success
-  }
+  };
 
   // const _executeCall = async <T extends Result>(call: DojoCall): Promise<T | null> => {
   //   let results: Result = undefined
@@ -85,11 +110,14 @@ export function createSystemCalls(
   }
 
   return {
+    // Export the checkTransactionStatus function for transaction store
+    checkTransactionStatus,
+    
     //
     // game.cairo
     //
     game: {
-      commit_moves: async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, hash: BigNumberish): Promise<boolean> => {
+      commit_moves: async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, hash: BigNumberish, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
           contractCalls.game.buildCommitMovesCalldata(
             duelist_id,
@@ -97,9 +125,9 @@ export function createSystemCalls(
             hash,
           ),
         ]
-        return await _executeTransaction(signer, calls)
+        return await _executeTransaction(signer, calls, key)
       },
-      reveal_moves: async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, salt: BigNumberish, moves: number[]): Promise<boolean> => {
+      reveal_moves: async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, salt: BigNumberish, moves: number[], key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
           contractCalls.game.buildRevealMovesCalldata(
             duelist_id,
@@ -108,25 +136,25 @@ export function createSystemCalls(
             moves,
           ),
         ]
-        return await _executeTransaction(signer, calls)
+        return await _executeTransaction(signer, calls, key)
       },
-      collect_duel: async (signer: AccountInterface, duel_id: BigNumberish): Promise<boolean> => {
+      collect_duel: async (signer: AccountInterface, duel_id: BigNumberish, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
           contractCalls.game.buildCollectDuelCalldata(
             duel_id,
           ),
         ]
-        return await _executeTransaction(signer, calls)
+        return await _executeTransaction(signer, calls, key)
       },
-      clear_call_to_challenge: async (signer: AccountInterface, duel_id: BigNumberish): Promise<boolean> => {
+      clear_call_to_challenge: async (signer: AccountInterface, duel_id: BigNumberish, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
           contractCalls.game.buildClearCallToChallengeCalldata(
             duel_id,
           ),
         ]
-        return await _executeTransaction(signer, calls)
+        return await _executeTransaction(signer, calls, key)
       },
-      emit_player_bookmark: async (signer: AccountInterface, target_address: BigNumberish, target_id: BigNumberish, enabled: boolean): Promise<boolean> => {
+      emit_player_bookmark: async (signer: AccountInterface, target_address: BigNumberish, target_id: BigNumberish, enabled: boolean, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
           contractCalls.game.buildEmitPlayerBookmarkCalldata(
             bigintToHex(target_address),
@@ -134,17 +162,17 @@ export function createSystemCalls(
             enabled,
           ),
         ]
-        return await _executeTransaction(signer, calls)
+        return await _executeTransaction(signer, calls, key)
       },
-      clear_player_social_link: async (signer: AccountInterface, social_platform: constants.SocialPlatform): Promise<boolean> => {
+      clear_player_social_link: async (signer: AccountInterface, social_platform: constants.SocialPlatform, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
           contractCalls.game.buildClearPlayerSocialLinkCalldata(
             makeCustomEnum(social_platform),
           ),
         ]
-        return await _executeTransaction(signer, calls)
+        return await _executeTransaction(signer, calls, key)
       },
-      emit_player_setting: async (signer: AccountInterface, social_platform: constants.SocialPlatform, setting: constants.PlayerSetting, value: boolean): Promise<boolean> => {
+      emit_player_setting: async (signer: AccountInterface, social_platform: constants.SocialPlatform, setting: constants.PlayerSetting, value: boolean, key?: string): Promise<boolean> => {
         const settingValue = (
           setting == constants.PlayerSetting.OptOutNotifications ? makeCustomEnum(constants.PlayerSettingValue.Boolean, value)
             : undefined
@@ -155,23 +183,23 @@ export function createSystemCalls(
             settingValue,
           ),
         ]
-        return await _executeTransaction(signer, calls)
+        return await _executeTransaction(signer, calls, key)
       },
     },
     //
     // tutorial.cairo
     //
     tutorial: {
-      create_tutorial: async (signer: AccountInterface, player_id: BigNumberish, tutorial_id: BigNumberish): Promise<boolean> => {
+      create_tutorial: async (signer: AccountInterface, player_id: BigNumberish, tutorial_id: BigNumberish, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
           contractCalls.tutorial.buildCreateTutorialCalldata(
             player_id,
             tutorial_id,
           ),
         ]
-        return await _executeTransaction(signer, calls)
+        return await _executeTransaction(signer, calls, key)
       },
-      commit_moves: async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, hash: BigNumberish): Promise<boolean> => {
+      commit_moves: async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, hash: BigNumberish, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
           contractCalls.tutorial.buildCommitMovesCalldata(
             duelist_id,
@@ -179,9 +207,9 @@ export function createSystemCalls(
             hash,
           ),
         ]
-        return await _executeTransaction(signer, calls)
+        return await _executeTransaction(signer, calls, key)
       },
-      reveal_moves: async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, salt: BigNumberish, moves: number[]): Promise<boolean> => {
+      reveal_moves: async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, salt: BigNumberish, moves: number[], key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
           contractCalls.tutorial.buildRevealMovesCalldata(
             duelist_id,
@@ -190,14 +218,14 @@ export function createSystemCalls(
             moves,
           ),
         ]
-        return await _executeTransaction(signer, calls)
+        return await _executeTransaction(signer, calls, key)
       },
     },
     //
     // duel_token
     //
     duel_token: {
-      create_duel: async (signer: AccountInterface, duel_type: constants.DuelType, duelist_id: BigNumberish, challenged_address: BigNumberish, lives_staked: number, expire_hours: number, premise: constants.Premise, message: string): Promise<boolean> => {
+      create_duel: async (signer: AccountInterface, duel_type: constants.DuelType, duelist_id: BigNumberish, challenged_address: BigNumberish, lives_staked: number, expire_hours: number, premise: constants.Premise, message: string, key?: string): Promise<boolean> => {
         let calls: DojoCalls = [
           contractCalls.duel_token.buildCreateDuelCalldata(
             makeCustomEnum(duel_type),
@@ -209,9 +237,9 @@ export function createSystemCalls(
             message,
           ),
         ]
-        return await _executeTransaction(signer, calls)
+        return await _executeTransaction(signer, calls, key)
       },
-      reply_duel: async (signer: AccountInterface, duel_id: BigNumberish, duelist_id: BigNumberish, accepted: boolean): Promise<boolean> => {
+      reply_duel: async (signer: AccountInterface, duel_id: BigNumberish, duelist_id: BigNumberish, accepted: boolean, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
           contractCalls.duel_token.buildReplyDuelCalldata(
             duel_id,
@@ -219,20 +247,20 @@ export function createSystemCalls(
             accepted,
           ),
         ]
-        return await _executeTransaction(signer, calls)
+        return await _executeTransaction(signer, calls, key)
       },
     },
     //
     // pack_token
     //
     pack_token: {
-      claim_starter_pack: async (signer: AccountInterface): Promise<boolean> => {
+      claim_starter_pack: async (signer: AccountInterface, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
           contractCalls.pack_token.buildClaimStarterPackCalldata(),
         ]
-        return await _executeTransaction(signer, calls)
+        return await _executeTransaction(signer, calls, key)
       },
-      purchase: async (signer: AccountInterface, pack_type: constants.PackType): Promise<boolean> => {
+      purchase: async (signer: AccountInterface, pack_type: constants.PackType, key?: string): Promise<boolean> => {
         const pack_type_enum = makeCustomEnum(pack_type)
         const approved_value = await contractCalls.pack_token.calcMintFee(signer.address, pack_type_enum) as BigNumberish
         let calls: DojoCalls = [
@@ -242,22 +270,22 @@ export function createSystemCalls(
             pack_type_enum,
           ),
         ]
-        return await _executeTransaction(signer, calls)
+        return await _executeTransaction(signer, calls, key)
       },
-      open: async (signer: AccountInterface, pack_id: BigNumberish): Promise<boolean> => {
+      open: async (signer: AccountInterface, pack_id: BigNumberish, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
           contractCalls.pack_token.buildOpenCalldata(
             pack_id,
           ),
         ]
-        return await _executeTransaction(signer, calls)
+        return await _executeTransaction(signer, calls, key)
       },
     },
     //
     // bank
     //
     bank: {
-      sponsor_duelists: async (signer: AccountInterface, lords_amount: BigNumberish): Promise<boolean> => {
+      sponsor_duelists: async (signer: AccountInterface, lords_amount: BigNumberish, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
           approve_call(lords_amount),
           contractCalls.bank.buildSponsorDuelistsCalldata(
@@ -265,9 +293,9 @@ export function createSystemCalls(
             lords_amount,
           ),
         ]
-        return await _executeTransaction(signer, calls)
+        return await _executeTransaction(signer, calls, key)
       },
-      sponsor_season: async (signer: AccountInterface, lords_amount: BigNumberish): Promise<boolean> => {
+      sponsor_season: async (signer: AccountInterface, lords_amount: BigNumberish, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
           approve_call(lords_amount),
           contractCalls.bank.buildSponsorSeasonCalldata(
@@ -275,9 +303,9 @@ export function createSystemCalls(
             lords_amount,
           ),
         ]
-        return await _executeTransaction(signer, calls)
+        return await _executeTransaction(signer, calls, key)
       },
-      sponsor_tournament: async (signer: AccountInterface, lords_amount: BigNumberish, tournament_id: BigNumberish): Promise<boolean> => {
+      sponsor_tournament: async (signer: AccountInterface, lords_amount: BigNumberish, tournament_id: BigNumberish, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
           approve_call(lords_amount),
           contractCalls.bank.buildSponsorTournamentCalldata(
@@ -286,28 +314,28 @@ export function createSystemCalls(
             tournament_id,
           ),
         ]
-        return await _executeTransaction(signer, calls)
+        return await _executeTransaction(signer, calls, key)
       },
-      collect_season: async (signer: AccountInterface): Promise<boolean> => {
+      collect_season: async (signer: AccountInterface, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
           contractCalls.bank.buildCollectSeasonCalldata(),
         ]
-        return await _executeTransaction(signer, calls)
+        return await _executeTransaction(signer, calls, key)
       },
     },
     //
     // admin
     //
     admin: {
-      set_paused: async (signer: AccountInterface, paused: boolean): Promise<boolean> => {
+      set_paused: async (signer: AccountInterface, paused: boolean, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
           contractCalls.admin.buildSetPausedCalldata(
             paused,
           ),
         ]
-        return await _executeTransaction(signer, calls)
+        return await _executeTransaction(signer, calls, key)
       },
-      set_is_team_member: async (signer: AccountInterface, address: BigNumberish, is_team_member: boolean, is_admin: boolean): Promise<boolean> => {
+      set_is_team_member: async (signer: AccountInterface, address: BigNumberish, is_team_member: boolean, is_admin: boolean, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
           contractCalls.admin.buildSetIsTeamMemberCalldata(
             bigintToHex(address),
@@ -315,18 +343,18 @@ export function createSystemCalls(
             is_admin,
           ),
         ]
-        return await _executeTransaction(signer, calls)
+        return await _executeTransaction(signer, calls, key)
       },
-      set_is_blocked: async (signer: AccountInterface, address: BigNumberish, is_blocked: boolean): Promise<boolean> => {
+      set_is_blocked: async (signer: AccountInterface, address: BigNumberish, is_blocked: boolean, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
           contractCalls.admin.buildSetIsBlockedCalldata(
             bigintToHex(address),
             is_blocked,
           ),
         ]
-        return await _executeTransaction(signer, calls)
+        return await _executeTransaction(signer, calls, key)
       },
-      disqualify_duelist: async (signer: AccountInterface, season_id: BigNumberish, duelist_id: BigNumberish, block_owner: boolean): Promise<boolean> => {
+      disqualify_duelist: async (signer: AccountInterface, season_id: BigNumberish, duelist_id: BigNumberish, block_owner: boolean, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
           contractCalls.admin.buildDisqualifyDuelistCalldata(
             season_id,
@@ -334,33 +362,36 @@ export function createSystemCalls(
             block_owner,
           ),
         ]
-        return await _executeTransaction(signer, calls)
+        return await _executeTransaction(signer, calls, key)
       },
-      qualify_duelist: async (signer: AccountInterface, season_id: BigNumberish, duelist_id: BigNumberish): Promise<boolean> => {
+      qualify_duelist: async (signer: AccountInterface, season_id: BigNumberish, duelist_id: BigNumberish, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
           contractCalls.admin.buildQualifyDuelistCalldata(
             season_id,
             duelist_id,
           ),
         ]
-        return await _executeTransaction(signer, calls)
+        return await _executeTransaction(signer, calls, key)
       },
     },
   }
 }
 
-function getReceiptStatus(receipt: any): boolean {
+function getReceiptStatus(receipt: any, shouldEmit: boolean = true): boolean {
   if (receipt.execution_status != 'SUCCEEDED') {
     if (receipt.execution_status == 'REVERTED') {
       console.error(`Transaction reverted:`, receipt.revert_reason)
     } else {
       console.error(`Transaction error [${receipt.execution_status}]:`, receipt)
     }
-    emitter.emit('transaction_error', {
-      status: receipt.execution_status,
-      reason: receipt.revert_reason,
-    })
+    if (shouldEmit) {
+      emitter.emit('transaction_error', {
+        status: receipt.execution_status,
+        reason: receipt.revert_reason,
+      })
+    }
     return false
   }
   return true
 }
+
