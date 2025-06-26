@@ -3,18 +3,23 @@
 // Copy Notification Component Styles
 .CopyNotification {
   position: fixed;
+  top: 0px;
+  left: 0px;
   background: #3b2a23;
   color: #C0C0C0;
   padding: aspect-width(0.5) aspect-width(1);
   border-radius: aspect-width(0.4);
   border: 1px solid rgba(200, 182, 168, 0.3);
-  font-size: aspect-width(0.8);
+  font-size: aspect-width(1);
   font-weight: 500;
   z-index: 10000;
   box-shadow: 0 aspect-width(0.3) aspect-width(0.8) rgba(0, 0, 0, 0.6);
-  animation: CopyNotificationFadeInUp 0.3s ease-out;
+  animation: CopyNotificationFadeInUp 0.3s ease-out, CopyNotificationFadeOut 0.3s ease-out 1.7s forwards;
   pointer-events: none;
   transform: translateX(-50%);
+  white-space: normal;
+  text-align: center;
+  // min-width: aspect-width(16);
 }
 
 @keyframes CopyNotificationFadeInUp {
@@ -25,6 +30,15 @@
   to {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes CopyNotificationFadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
   }
 }
 

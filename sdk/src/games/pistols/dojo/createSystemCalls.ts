@@ -32,7 +32,7 @@ export function createSystemCalls(
     
     if (key) {
       if (success) {
-        emitter.emit('transaction_completed', { key, receipt })
+        emitter.emit('transaction_completed', { key, result: true })
       } else {
         emitter.emit('transaction_failed', { key, error: 'Transaction failed' })
       }

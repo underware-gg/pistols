@@ -455,18 +455,20 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
                           }} />
                         </Col>
                       )}
-                      {(state === constants.ChallengeState.InProgress && canCollectDuel) ? (
-                        <Col>
-                          <ActionButton large fillParent important label='Timed Out, Collect Duel' onClick={() => _collectDuel()} />
-                        </Col>
-                      ) : (needToSyncExpired && (isYouA || isYouB)) ? (
-                        <Col>
-                          <ActionButton large fillParent important label='Expired, Collect Duel' onClick={() => _submit(0n, false)} />
-                        </Col>
-                      ) : (
-                        <Col>
-                          <ChallengeButton challengedPlayerAddress={isYouA ? duelistAddressB : duelistAddressA} customLabel={isYouA || isYouB ? 'Rematch!' : null} fillParent />
-                        </Col>
+                      {(isYouA || isYouB) && (
+                        (state === constants.ChallengeState.InProgress && canCollectDuel) ? (
+                          <Col>
+                            <ActionButton large fillParent important label='Timed Out, Collect Duel' onClick={() => _collectDuel()} />
+                          </Col>
+                        ) : (needToSyncExpired) ? (
+                          <Col>
+                            <ActionButton large fillParent important label='Expired, Collect Duel' onClick={() => _submit(0n, false)} />
+                          </Col>
+                        ) : (
+                          <Col>
+                            <ChallengeButton challengedPlayerAddress={isYouA ? duelistAddressB : duelistAddressA} customLabel='Rematch!' fillParent />
+                          </Col>
+                        )
                       )}
                     </Row>
                   </Grid>

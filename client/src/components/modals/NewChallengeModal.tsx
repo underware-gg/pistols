@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Grid, Modal, Form, Dropdown } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
@@ -21,6 +21,7 @@ import { useCurrentSeason } from '/src/stores/seasonStore'
 import { useConfig } from '/src/stores/configStore'
 import { COLORS } from '@underware/pistols-sdk/pistols/constants'
 import { useTransactionHandler } from '../../hooks/useTransaction'
+import { showElementPopupNotification } from '/src/components/ui/ElementPopupNotification'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -39,7 +40,9 @@ function _NewChallengeModal({
   const { duel_token } = useDojoSystemCalls()
   const { account, address } = useAccount()
   const { aspectWidth, aspectHeight, boxH, boxW } = useGameAspect()
-
+  
+  const buttonRef = useRef<HTMLDivElement>(null)
+  
   const { 
     duelistSelectOpener, 
     challengingAddress, 
@@ -47,7 +50,6 @@ function _NewChallengeModal({
     dispatchChallengingPlayerAddress, 
     dispatchChallengingDuelistId, 
     dispatchSelectPlayerAddress, 
-    dispatchSelectDuelistId, 
     dispatchSelectDuel 
   } = usePistolsContext()
 
@@ -69,12 +71,18 @@ function _NewChallengeModal({
   const { canJoin } = useCanJoin(currentSeasonId, challengingDuelistId)
   const { rewards } = useCalcSeasonReward(currentSeasonId, challengingDuelistId, args?.lives_staked)
 
-  const { call: createDuel, isLoading, meta } = useTransactionHandler<boolean, [constants.DuelType, BigNumberish, BigNumberish, number, number, constants.Premise, string]>({
+  const { call: createDuel, isLoading, isWaitingForIndexer, meta } = useTransactionHandler<boolean, [constants.DuelType, BigNumberish, BigNumberish, number, number, constants.Premise, string]>({
     key: `create_duel${challengingAddress}`,
     transactionCall: (duelType, duelistId, challengedAddr, livesStaked, expireHours, premise, message, key) => 
       duel_token.create_duel(account, duelType, duelistId, challengedAddr, livesStaked, expireHours, premise, message, key),
     indexerCheck: hasPact,
   })
+
+  useEffect(() => {
+    if (isWaitingForIndexer) {
+      showElementPopupNotification(buttonRef, "Transaction successfull! Waiting for indexer...")
+    }
+  }, [isWaitingForIndexer])
 
   useEffect(() => {
     if (hasPact) {
@@ -310,7 +318,7 @@ function _NewChallengeModal({
               <Col>
                 <ActionButton large fill label='Nevermind!' onClick={() => _close()} />
               </Col>
-              <Col>
+              <Col ref={buttonRef}>
                 {canJoin &&
                   <ActionButton
                     large

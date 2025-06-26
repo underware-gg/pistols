@@ -37,6 +37,7 @@ import Duel from '/src/components/scenes/Duel'
 import { Header } from '/src/components/Header'
 import NotificationSystem from '/src/components/notifications/NotificationSystem'
 import { NotificationProvider } from '/src/stores/notificationStore'
+import ElementPopupNotification, { ElementPopupNotificationRef } from '/src/components/ui/ElementPopupNotification'
 
 // test sdk
 import { helloPistols } from '@underware/pistols-sdk'
@@ -54,6 +55,7 @@ export default function MainPage({
 
   const [showTutorial, setShowTutorial] = useState(tutorial)
   const overlayRef = useRef<HTMLDivElement>(null)
+  const globalNotificationRef = useRef<ElementPopupNotificationRef>(null)
 
   const overlay = useMemo(() => (
     <div 
@@ -90,6 +92,16 @@ export default function MainPage({
         .start()
     }
   }, [tutorial])
+
+  // Listen for global notification events
+  useEffect(() => {
+    const handleShowNotification = ({ targetRef, text, icon }: { targetRef: React.RefObject<HTMLElement>, text: string, icon?: string }) => {
+      globalNotificationRef.current?.show(targetRef, text, icon)
+    }
+
+    emitter.on('show_notification', handleShowNotification)
+    return () => emitter.off('show_notification', handleShowNotification)
+  }, [])
   
   useEffectOnce(() => console.log(`---------------- MAIN PAGE MOUNTED`), [])
 
@@ -106,6 +118,7 @@ export default function MainPage({
             <MouseToolTip />
             <TavernAudios />
             <NotificationSystem />
+            <ElementPopupNotification ref={globalNotificationRef} />
           </NotificationProvider>
         </Background>
       </AppGame>

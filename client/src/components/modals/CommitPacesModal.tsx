@@ -16,6 +16,7 @@ import { DuelTutorialLevel } from '/src/data/tutorialConstants'
 import { useDuelContext } from '/src/components/ui/duel/DuelContext'
 import { useTransactionHandler } from '/src/hooks/useTransaction'
 import { DuelStage } from '/src/hooks/useDuel'
+import { showElementPopupNotification } from '/src/components/ui/ElementPopupNotification'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -88,9 +89,11 @@ function _CommitPacesModal({
   const tacticsSelectorRef = useRef<CardSelectorHandles>(null);
   const bladesSelectorRef = useRef<CardSelectorHandles>(null);
 
+  const buttonsRowRef = useRef<HTMLDivElement>(null);
+
   const { aspectWidth, aspectHeight, boxW, boxH, pixelsToAspectHeight } = useGameAspect()
 
-  const { call: commitPaces, isLoading: isLoadingCommit } = useTransactionHandler<boolean, [bigint, bigint, bigint]>({
+  const { call: commitPaces, isLoading: isLoadingCommit, isWaitingForIndexer } = useTransactionHandler<boolean, [bigint, bigint, bigint]>({
     transactionCall: (duelistId, duelId, hash, key) => game.commit_moves(account, duelistId, duelId, hash, key),
     indexerCheck: completedStagesLeft[DuelStage.Round1Commit],
     onComplete: (result) => {
@@ -101,6 +104,12 @@ function _CommitPacesModal({
   })
 
   const isSimpleTutorial = tutorialLevel === DuelTutorialLevel.SIMPLE
+
+  useEffect(() => {
+    if (isWaitingForIndexer) {
+      showElementPopupNotification(buttonsRowRef, "Transaction successfull! Waiting for indexer...")
+    }
+  }, [isWaitingForIndexer])
 
   useEffect(() => {
     clearCardSelections();
@@ -120,7 +129,6 @@ function _CommitPacesModal({
   }, [account, messageToSign, firePaces, dodgePaces, tactics, blades, isLoadingHash, isLoadingCommit, isSimpleTutorial])
 
   const _closeModal = useCallback(() => {
-    // Don't allow closing while transactions are in progress
     if (isLoadingHash) return;
     
     setIsOpen(false)
@@ -241,8 +249,6 @@ function _CommitPacesModal({
         bladesCards.map(card => STRATEGY_WEIGHTS[strategy].blades[card - 1])
       );
     }
-    
-    console.log(randomFire, randomDodge, randomTactics, randomBlades);
     
     // Directly select the cards in the card selectors
     fireSelectorRef.current?.selectCard(randomFire);
@@ -499,7 +505,7 @@ function _CommitPacesModal({
         </Modal.Content>
       )}
 
-      <Modal.Actions className='NoPadding' style={{ height: aspectHeight(actionButtonsHeight) }}>
+      <Modal.Actions className='NoPadding' style={{ height: aspectHeight(actionButtonsHeight) }} ref={buttonsRowRef}>
         <Grid className='FillParent Padded' textAlign='center'>
           <Row columns='equal'>
             <Col>

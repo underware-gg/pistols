@@ -1,33 +1,44 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useImperativeHandle, forwardRef } from 'react'
 import { useGameAspect } from '/src/hooks/useGameAspect'
+import { emitter } from '@underware/pistols-sdk/dojo'
 
-interface ElementPopupNotificationProps {
-  show: boolean
-  targetRef: React.RefObject<HTMLElement>
-  text: string
-  icon: string
+export interface ElementPopupNotificationRef {
+  show: (targetRef: React.RefObject<HTMLElement>, text: string, icon?: string) => void
 }
 
-const ElementPopupNotification: React.FC<ElementPopupNotificationProps> = ({ 
-  show, 
-  targetRef, 
-  text,
-  icon
-}) => {
+export const showElementPopupNotification = (targetRef: React.RefObject<HTMLElement>, text: string, icon?: string) => {
+  emitter.emit('show_notification', { targetRef, text, icon })
+}
+
+const ElementPopupNotification = forwardRef<ElementPopupNotificationRef, {}>((props, ref) => {
   const { aspectHeight } = useGameAspect()
   const [position, setPosition] = useState({ top: 0, left: 0 })
+  const [isVisible, setIsVisible] = useState(false)
+  const [text, setText] = useState('')
+  const [icon, setIcon] = useState<string | undefined>()
 
-  useEffect(() => {
-    if (show && targetRef.current) {
-      const rect = targetRef.current.getBoundingClientRect()
-      setPosition({
-        top: rect.top - aspectHeight(6),
-        left: rect.left + rect.width / 2
-      })
+  useImperativeHandle(ref, () => ({
+    show: (targetRef: React.RefObject<HTMLElement>, showText: string, showIcon?: string) => {
+      if (targetRef.current) {
+        const rect = targetRef.current.getBoundingClientRect()
+        
+        setPosition({
+          top: rect.top - aspectHeight(6),
+          left: rect.left + rect.width / 2
+        })
+        setText(showText)
+        setIcon(showIcon)
+        setIsVisible(true)
+        
+        // Auto-hide after 2 seconds
+        setTimeout(() => {
+          setIsVisible(false)
+        }, 2000)
+      }
     }
-  }, [show, targetRef, aspectHeight])
+  }), [aspectHeight])
 
-  if (!show) return null
+  if (!isVisible) return null
 
   return (
     <div 
@@ -40,6 +51,8 @@ const ElementPopupNotification: React.FC<ElementPopupNotificationProps> = ({
       {icon} {text}
     </div>
   )
-}
+})
+
+ElementPopupNotification.displayName = 'ElementPopupNotification'
 
 export default ElementPopupNotification 
