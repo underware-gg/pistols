@@ -135,6 +135,12 @@ pub impl ChallengeImpl of ChallengeTrait {
         else {ZERO()})
     }
     #[inline(always)]
+    fn self_address(self: @Challenge, duelist_number: u8) -> ContractAddress {
+        (if (duelist_number == 1) {*self.address_a}
+        else if (duelist_number == 2) {*self.address_b}
+        else {ZERO()})
+    }
+    #[inline(always)]
     fn exists(self: @Challenge) -> bool {
         ((*self).state.exists())
     }

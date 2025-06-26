@@ -297,7 +297,8 @@ pub mod game {
             store.set_duelist_timestamp_active(duelist_id, timestamp);
 
             // events
-            Activity::MovesRevealed.emit(ref store.world, starknet::get_caller_address(), duel_id.into());
+            let caller: ContractAddress = starknet::get_caller_address();
+            Activity::MovesRevealed.emit(ref store.world, caller, duel_id.into());
 
             // missing reveal, just update and wait for final reveal
             if (!round.moves_a.has_revealed() || !round.moves_b.has_revealed()) {
@@ -313,8 +314,13 @@ pub mod game {
             // RESOLVED!!!
             //
 
-            // clear self duel
-            store.emit_challenge_action(@challenge, duelist_number, ChallengeAction::Finished);
+            if (caller == challenge.self_address(duelist_number)) {
+                // self revealed, clear action
+                store.emit_challenge_action(@challenge, duelist_number, ChallengeAction::Finished);
+            } else {
+                // auto revealed, call me to see the results
+                store.emit_challenge_action(@challenge, duelist_number, ChallengeAction::Results);
+            }
             // call other duelist to see the results
             store.emit_challenge_action(@challenge, if(duelist_number==1){2}else{1}, ChallengeAction::Results);
 
