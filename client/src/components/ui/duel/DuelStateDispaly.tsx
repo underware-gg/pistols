@@ -10,7 +10,6 @@ import { SceneName } from '/src/data/assets'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { DuelTutorialLevel } from '/src/data/tutorialConstants'
 import { SettingsActions, useSettings } from '/src/hooks/SettingsContext'
-import { useGetChallengeRewards } from '/src/queries/useChallengeRewards'
 import { usePlayer } from '/src/stores/playerStore'
 import { Balance } from '/src/components/account/Balance'
 import AnimatedText from '/src/components/ui/AnimatedText'
@@ -21,6 +20,8 @@ import { useCanCollectDuel } from '/src/hooks/usePistolsContractCalls'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
+import { useChallengeRewards } from '/src/stores/challengeRewardsStore'
+import { useFetchChallengeRewardsByDuelistIds } from '/src/stores/challengeRewardsStore'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -46,8 +47,10 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
 
   const { isMyAccount: isYouA } = useIsMyAccount(duelistAddressA)
   const { isMyAccount: isYouB } = useIsMyAccount(duelistAddressB)
-  const rewardsA = useGetChallengeRewards(isFinished ? duelId : 0n, duelistIdA)
-  const rewardsB = useGetChallengeRewards(isFinished ? duelId : 0n, duelistIdB)
+
+  useFetchChallengeRewardsByDuelistIds(isFinished ? [duelistIdA, duelistIdB] : [])
+  const rewardsA = useChallengeRewards(duelId, duelistIdA)
+  const rewardsB = useChallengeRewards(duelId, duelistIdB)
 
   // Determine if we need to swap the display (if player B is the current user)
   const shouldSwap = useMemo(() => isYouB, [isYouB])

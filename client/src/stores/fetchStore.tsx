@@ -66,6 +66,7 @@ const createStore = () => {
 
 
 export const useChallengeFetchStore = createStore();
+export const useChallengeRewardsFetchStore = createStore();
 export const useDuelistFetchStore = createStore();
 export const useDuelistStackFetchStore = createStore();
 export const useScoreboardFetchStore = createStore();

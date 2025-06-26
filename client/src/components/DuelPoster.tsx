@@ -29,10 +29,10 @@ import { useCanCollectDuel } from '/src/hooks/usePistolsContractCalls'
 import { useDiscordSocialLink, useDuelCallToAction, useDuelCallToActionWithState } from '/src/stores/eventsModelStore'
 import { useDuelistFameBalance } from '/src/stores/coinStore'
 import { useExecuteEmitPlayerBookmark } from '/src/hooks/usePistolsSystemCalls'
-import { SceneName } from '/src/data/assets'
-import { useTransactionHandler } from '../hooks/useTransaction'
+import { useDuelistFameOnDuel } from '/src/stores/challengeRewardsStore'
+import { useTransactionHandler } from '/src/hooks/useTransaction'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
-import { useDuelistFameOnDuel } from '../queries/useDuelistFameOnDuel'
+import { SceneName } from '/src/data/assets'
 
 const Row = Grid.Row
 const Col = Grid.Column

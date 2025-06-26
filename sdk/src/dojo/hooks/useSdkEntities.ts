@@ -78,7 +78,7 @@ const _useSdkGet = (prefix: string, {
           updateProgress?.(pageIndex);
           const response: PistolsToriiResponse = await fn({ query });
           if (!_mounted) return
-          debug.log(`${prefix} GOT[page:${pageIndex}]:`, response)
+          debug.log(`${prefix} GOT[page:${pageIndex}]:`, response, query)
           const entities = _filterItems(response.getItems())
           if (pageIndex == 0 && resetStore) {
             // debug.log(`${prefix} RESET>>>>>>>>>>>>`)
@@ -93,6 +93,7 @@ const _useSdkGet = (prefix: string, {
             ) ? response.getNextQuery(query) : null
             lastCursor = response.cursor
           } else {
+            setEntities([]); // notify that no events exist to stop trying
             query = null
             if (pageIndex == 0 && retryInterval > 0) {
               debug.log(`${prefix} retry...`, retryInterval)

@@ -16,6 +16,7 @@ import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
 import { useAccount } from '@starknet-react/core'
 import { useDuelistIdsOfOwners, useDuelistsOfPlayer, useOwnerOfDuelist } from '/src/hooks/useTokenDuelists'
 import { useDuelistFetchStore, useDuelistStackFetchStore } from '/src/stores/fetchStore'
+import { useFetchChallengeRewardsByDuelistIds } from '/src/stores/challengeRewardsStore'
 import { debug } from '@underware/pistols-sdk/pistols'
 
 export const useDuelistStore = createDojoStore<PistolsSchemaType>();
@@ -383,22 +384,6 @@ export const usePlayerDuelistsOrganized = () => {
 
 
 
-//------------------------------------------
-// Fetch new challenge and add to the store
-// (if not already in the store)
-//
-
-export const useGetDuelist = (duelist_id: BigNumberish) => {
-  // fetch if not already in the store
-  useFetchDuelist(duelist_id, 500)
-  // return duelist from the store
-  const result = useDuelist(duelist_id)
-  return result
-}
-
-
-
-
 //------------------------------------------------
 // Fetch multiple duelists per player or challenge
 // after fetching once, it won't fetch again the same duelists/players
@@ -414,6 +399,9 @@ export const useFetchDuelist = (duelist_id: BigNumberish, retryInterval?: number
 }
 
 export const useFetchDuelistIds = (duelistIds: BigNumberish[], retryInterval?: number) => {
+  // always fetch rewards for new duelists
+  useFetchChallengeRewardsByDuelistIds(duelistIds)
+
   const setEntities = useDuelistStore((state) => state.setEntities);
 
   const existingDuelistIds = useDuelistIdsStore((state) => state.duelistIds)

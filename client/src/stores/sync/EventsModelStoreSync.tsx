@@ -5,6 +5,7 @@ import { filterEntitiesByModels, formatQueryValue, useSdkEventsGet, useSdkEvents
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useEventsStore } from '/src/stores/eventsModelStore'
 import { usePlayerDataStore } from '/src/stores/playerStore'
+import { useChallengeRewardsStore } from '/src/stores/challengeRewardsStore'
 import { useProgressStore } from '/src/stores/progressStore'
 import { bigintEquals, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { debug } from '@underware/pistols-sdk/pistols'
@@ -14,6 +15,7 @@ import { debug } from '@underware/pistols-sdk/pistols'
 export function EventsModelStoreSync() {
   const eventsState = useEventsStore((state) => state)
   const playerDataState = usePlayerDataStore((state) => state)
+  const challengeRewardsState = useChallengeRewardsStore((state) => state)
   const updateProgress = useProgressStore((state) => state.updateProgress)
 
   const { address } = useAccount()
@@ -33,23 +35,33 @@ export function EventsModelStoreSync() {
     isPositiveBigint(address)
       ? new PistolsQueryBuilder()
         .withClause(
-          new PistolsClauseBuilder().keys(
-            [
-              'pistols-CallToChallengeEvent',
-              'pistols-PlayerBookmarkEvent',
-              'pistols-PlayerSocialLinkEvent',
-              'pistols-PlayerSettingEvent',
-            ],
-            // VariableLen means: must have at least the address key...
-            [formatQueryValue(address)],
-            "VariableLen"
-          ).build()
+          new PistolsClauseBuilder().compose().or([
+            new PistolsClauseBuilder().keys(
+              [
+                'pistols-CallToChallengeEvent',
+                'pistols-PlayerBookmarkEvent',
+                'pistols-PlayerSocialLinkEvent',
+                'pistols-PlayerSettingEvent',
+              ],
+              // VariableLen means: must have at least the address key...
+              [formatQueryValue(address)],
+              "VariableLen"
+            ),
+            new PistolsClauseBuilder().keys(
+              [
+                'pistols-ChallengeRewardsEvent',
+              ],
+              [undefined],
+              "VariableLen"
+            ),
+          ]).build()
         )
         .withEntityModels([
           'pistols-CallToChallengeEvent',
           'pistols-PlayerBookmarkEvent',
           'pistols-PlayerSocialLinkEvent',
           'pistols-PlayerSettingEvent',
+          'pistols-ChallengeRewardsEvent',
         ])
         .includeHashedKeys()
       : undefined
@@ -87,12 +99,13 @@ export function EventsModelStoreSync() {
     },
     updateEntity: (entity: PistolsEntity) => {
       debug.log(`SUB EventsModelStoreSync() ======> [player]`, entity)
-      const model =
+      // player-based events
+      const playerEvent =
         getEntityModel(entity, 'CallToChallengeEvent') ??
         getEntityModel(entity, 'PlayerBookmarkEvent') ??
         getEntityModel(entity, 'PlayerSocialLinkEvent') ??
         getEntityModel(entity, 'PlayerSettingEvent');
-      if (model && bigintEquals(model.player_address, address)) {
+      if (playerEvent && bigintEquals(playerEvent.player_address, address)) {
         debug.log(`SUB EventsModelStoreSync() ======> model:`, entity)
         if (entityContainsModels(entity, ['CallToChallengeEvent', 'PlayerSocialLinkEvent', 'PlayerSettingEvent'])) {
           eventsState.updateEntity(entity)
@@ -100,6 +113,10 @@ export function EventsModelStoreSync() {
         if (entityContainsModels(entity, ['PlayerBookmarkEvent'])) {
           playerDataState.updateMessages([entity])
         }
+      }
+      // other events
+      if (entityContainsModels(entity, ['ChallengeRewardsEvent'])) {
+        challengeRewardsState.updateEntity(entity)
       }
     },
   })
