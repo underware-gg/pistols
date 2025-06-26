@@ -126,7 +126,7 @@ if [[ "$CHAIN_ID" == "SN_SEPOLIA" || "$CHAIN_ID" == "SN_MAIN" ]]; then
   echo ">>> Generate controller preset..."
   # npm run generate-controller-preset --sdk=../sdk/src/games/pistols
   # npx --package=@underware/pistols-sdk generate-controller-preset --chain_id:"SN_MAIN" --out:"../sdk/src/games/pistols/generated/preset.json"
-  # ../sdk/dist/bin/generateControllerPreset.mjs --chain_id:"SN_MAIN" --out:"../sdk/src/games/pistols/generated/preset.json"
+  # node --experimental-wasm-modules ../sdk/dist/bin/generateControllerPreset.mjs --chain_id:"SN_MAIN" --out:"../sdk/src/games/pistols/generated/preset.json"
   # cd ../sdk && turbo build && cd -
   execute_command "npm run generate-controller-preset --chain_id="$CHAIN_ID" --sdk=$SDK_GAME_PATH"
   echo "👍?"

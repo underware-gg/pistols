@@ -31,7 +31,8 @@
                 "description": "Close expired duels"
               },
               {
-                "entrypoint": "clear_call_to_action"
+                "entrypoint": "clear_call_to_challenge",
+                "description": "Clear call to action for a player"
               },
               {
                 "entrypoint": "emit_player_bookmark",
@@ -44,6 +45,10 @@
               {
                 "entrypoint": "clear_player_social_link",
                 "description": "Unlink player from social platform"
+              },
+              {
+                "entrypoint": "emit_player_setting",
+                "description": "Store player settings"
               }
             ]
           },
