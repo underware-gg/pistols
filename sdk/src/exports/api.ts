@@ -1,4 +1,6 @@
+export * from '../api/reveal'
 export * from '../api/salt'
 export * from '../api/verify'
+export * from '../api/hooks/useApiAutoReveal'
 export * from '../api/hooks/useApiGenerateControllerSalt'
 export * from '../api/hooks/useApiVerifyControllerSignature'

@@ -3,12 +3,14 @@ import { Image } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { bigintToHex } from '@underware/pistols-sdk/utils'
 import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
+import { useDojoSetup } from '@underware/pistols-sdk/dojo'
+import { useApiAutoReveal } from '@underware/pistols-sdk/api'
 import { useRevealAction, useSignAndRestoreMovesFromHash } from '/src/hooks/useRevealAction'
 import { useIsMyDuelist } from '/src/hooks/useIsYou'
 import { DuelStage, useDuel } from '/src/hooks/useDuel'
 import CommitPacesModal from '/src/components/modals/CommitPacesModal'
 import { useTransactionHandler, useTransactionObserver } from '/src/hooks/useTransaction'
-import { useDuelContext } from './DuelContext'
+import { useDuelContext } from '/src/components/ui/duel/DuelContext'
 
 export default function DuelProgress({
   isA = false,
@@ -46,11 +48,18 @@ export default function DuelProgress({
   const [commitModalIsOpen, setCommitModalIsOpen] = useState(false)
   const { reveal, canReveal } = useRevealAction(duelId, isYou ? duelistId : 0n, round1Moves?.hashed, duelStage == DuelStage.Round1Reveal, `reveal_moves${duelId}`)
 
-  const { call: revealMoves, isLoading: isLoadingReveal } = useTransactionHandler<boolean, []>({
-    transactionCall: () => reveal(),
-    indexerCheck: completedStagesLeft[DuelStage.Round1Reveal] && !canReveal,
-    key: `reveal_moves${duelId}`,
-  })
+  // const { call: revealMoves, isLoading: isLoadingReveal } = useTransactionHandler<boolean, []>({
+  //   transactionCall: () => reveal(),
+  //   indexerCheck: completedStagesLeft[DuelStage.Round1Reveal] && !canReveal,
+  //   key: `reveal_moves${duelId}`,
+  // })
+
+  const { selectedNetworkConfig } = useDojoSetup()
+  const { isRevealing: isLoadingReveal, isRevealed } = useApiAutoReveal(
+    selectedNetworkConfig.assetsServerUrl,
+    duelId,
+    canAutoReveal && canReveal && isYou
+  )
 
   const { isLoading: isLoadingCommit } = useTransactionObserver({ key: `commit_paces${duelId}`, indexerCheck: completedStagesLeft[DuelStage.Round1Commit] })
 
@@ -58,12 +67,13 @@ export default function DuelProgress({
     if (isMyDuelist && isConnected && completedStages[duelStage] === false) {
       if (duelStage == DuelStage.Round1Commit) {
         setCommitModalIsOpen(true)
-      } else if (duelStage == DuelStage.Round1Reveal) {
-        if (canReveal && !isLoadingReveal && !isLoadingCommit && !isRevealingRef.current) {
-          isRevealingRef.current = true
-          revealMoves()
-        }
       }
+      // else if (duelStage == DuelStage.Round1Reveal) {
+      //   if (canReveal && !isLoadingReveal && !isLoadingCommit && !isRevealingRef.current) {
+      //     isRevealingRef.current = true
+      //     revealMoves()
+      //   }
+      // }
     }
   }, [isMyDuelist, isConnected, duelStage, completedStages, canReveal, isLoadingReveal, isLoadingCommit])
 
@@ -72,11 +82,11 @@ export default function DuelProgress({
   }, [isLoadingReveal, isLoadingCommit, isA])
 
   // Auto-reveal when conditions are met
-  useEffect(() => {
-    if (canAutoReveal && canReveal && isYou) {
-      onClick?.()
-    }
-  }, [onClick, canAutoReveal, canReveal, isYou])
+  // useEffect(() => {
+  //   if (canAutoReveal && canReveal && isYou) {
+  //     onClick?.()
+  //   }
+  // }, [onClick, canAutoReveal, canReveal, isYou])
 
   // Update player progress in the game
   useEffect(() => {

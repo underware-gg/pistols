@@ -1,55 +1,49 @@
-// import { BigNumberish } from 'starknet'
-// import { bigintToHex } from 'src/utils/misc/types'
+import { BigNumberish } from 'starknet'
+import { bigintToDecimal, bigintToHex } from 'src/utils/misc/types'
+import { useMemo } from 'react'
 
-// export type ControllerRevealParams = {
-//   chainId: string,
-//   duelId: BigNumberish,
-// }
-
-// export type VerifyResponse = {
-//   verified?: boolean,
-//   error?: string,
-// }
-
-// export const apiVerifyControllerSignature = async (
-//   serverUrl: string,
-//   address: BigNumberish,
-//   chainId: string,
-//   messageHash: BigNumberish,
-//   signature: BigNumberish[],
-// ): Promise<boolean> => {
-//   let result = false
-
-//   let params: ControllerVerifyParams = {
-//     address: bigintToHex(address),
-//     chainId,
-//     messageHash: bigintToHex(messageHash),
-//     signature: signature.map(s => bigintToHex(s)),
+// {
+//   "reveal_a": {
+//     "revealed": true,
+//     "duelistId": 29,
+//     "salt": "0x5eb8d1035c08381cee83cde0aae8fda54f106f918c1e7f842b770193442beb6",
+//     "moves": [1, 2, 3, 4]
+//   },
+//   "reveal_b": {
+//     "revealed": true,
+//     "duelistId": 2989,
+//     "salt": "0x71d6710ac0de551f70950a6605b9d98a17e9df4cca9927fb24d068747ca4a43",
+//     "moves": [3, 2, 5, 2]
 //   }
-
-//   try {
-//     const resp = await fetch(`${serverUrl}/api/controller/verify`,
-//       {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify(params),
-//       }
-//     );
-//     const response: VerifyResponse = await resp.json();
-//     // console.log(`apiVerifyControllerSignature() data:`, response)
-//     if (response.verified === true || response.verified === false) {
-//       result = response.verified;
-//       if (response.error) {
-//         console.warn("apiVerifyControllerSignature() INVALID:", response.error);
-//       }
-//     } else if (response.error) {
-//       console.error("apiVerifyControllerSignature() ERROR:", response.error);
-//     } else {
-//       console.error("apiVerifyControllerSignature() Invalid response:", response);
-//     }
-//   } catch (error) {
-//     console.error("apiVerifyControllerSignature() EXCEPTION:", error);
-//   }
-
-//   return result;
 // }
+export type AutoRevealResponse = {
+  reveal_a?: any,
+  reveal_b?: any,
+  error?: string,
+}
+
+export const apiAutoReveal = async (
+  serverUrl: string,
+  duelId: BigNumberish,
+  chainId: string,
+): Promise<boolean> => {
+  let result = false
+  const url = `${serverUrl}/api/pistols/reveal/${bigintToDecimal(duelId)}?` + new URLSearchParams({ chain_id : chainId });
+  try {
+    console.log(`apiAutoReveal() URL:`, url)
+    const resp = await fetch(url);
+    const response: AutoRevealResponse = await resp.json();
+    console.log(`apiAutoReveal() data:`, response)
+    if (response.reveal_a || response.reveal_b) {
+      result = true;
+    } else if (response.error) {
+      console.error("apiAutoReveal() ERROR:", response.error);
+    } else {
+      console.error("apiAutoReveal() Invalid response:", response);
+    }
+  } catch (error) {
+    console.error("apiAutoReveal() EXCEPTION:", error);
+  }
+
+  return result;
+}
