@@ -1,6 +1,6 @@
 import React, { forwardRef, useImperativeHandle, useMemo, useRef, useState, useEffect } from 'react'
 import { BigNumberish } from 'starknet'
-import { useDuelist, useDuelistStack } from '/src/stores/duelistStore'
+import { useDuelist, useDuelistStack, useFetchDuelist } from '/src/stores/duelistStore'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { useOwnerOfDuelist } from '/src/hooks/useTokenDuelists'
 import { useDuelistFameBalance } from '/src/stores/coinStore'
@@ -46,6 +46,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
   const { aspectWidth } = useGameAspect()
   const { dispatchSelectPlayerAddress, dispatchSelectDuel } = usePistolsContext()
   
+  useFetchDuelist(props.duelistId)
   const { nameAndId: name, profilePic, profileType, isInAction, totals, quote, currentDuelId } = useDuelist(props.duelistId)
   const { isAlive } = useDuelistFameBalance(props.duelistId)
   const { stackedDuelistIds, level } = useDuelistStack(props.duelistId)
