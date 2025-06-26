@@ -1,4 +1,4 @@
-import React, { ReactElement, useCallback, useEffect, useMemo, useState } from 'react'
+import React, { ReactElement, useEffect, useMemo, useRef, useState } from 'react'
 import { Menu, Button, Confirm, SemanticICONS, Icon } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
@@ -14,6 +14,7 @@ import { SceneName } from '/src/data/assets'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { useTransactionObserver } from '/src/hooks/useTransaction'
+import { showElementPopupNotification } from '/src/components/ui/ElementPopupNotification'
 
 //-----------------
 // Generic Action button
@@ -366,18 +367,27 @@ export function ChallengeButton({
   const { hasPact, pactDuelId } = usePact(constants.DuelType.Seasonal, address, challengedPlayerAddress, true)
   const canChallenge = (!hasPact && !isMyAccount)
 
-  const { isLoading } = useTransactionObserver({ key: `create_duel${challengedPlayerAddress}`, indexerCheck: hasPact })
+  const { isLoading, isWaitingForIndexer } = useTransactionObserver({ key: `create_duel${challengedPlayerAddress}`, indexerCheck: hasPact })
 
+  const buttonRef = useRef<HTMLDivElement>(null)
+  
   useEffect(() => {
-    console.log(`[useTransaction] isLoading: ${isLoading}`);
-  }, [isLoading])
+    if (isWaitingForIndexer) {
+      showElementPopupNotification(buttonRef, "Transaction successfull! Waiting for indexer...", "🔄")
+    }
+  }, [isWaitingForIndexer])
 
-  if (!hasPact) {
-    return <ActionButton large fill fillParent={fillParent} important disabled={!canChallenge} loading={isLoading} label={customLabel ?? 'Challenge for a Duel!'} onClick={() => {
-      dispatchChallengingPlayerAddress(challengedPlayerAddress)
-      duelistSelectOpener.open()
-    }} />
-  } else {
-    return <ActionButton large fill fillParent={fillParent} important label='Duel In Progress!' onClick={() => dispatchSelectDuel(pactDuelId)} />
-  }
+  return (
+    <>
+      <div className='NoMouse NoDrag' ref={buttonRef} style={{ position: 'absolute', width: '100%', height: '100%', top: 0, left: 0 }} /> {/* popupnotification anchor element */}
+      {!hasPact ? (
+        <ActionButton large fillParent={fillParent} important disabled={!canChallenge} loading={isLoading} label={customLabel ?? 'Challenge for a Duel!'} onClick={() => {
+          dispatchChallengingPlayerAddress(challengedPlayerAddress)
+          duelistSelectOpener.open()
+        }} />
+      ) : (
+        <ActionButton large fillParent={fillParent} important label='Duel In Progress!' onClick={() => dispatchSelectDuel(pactDuelId)} />
+      )}
+    </>
+  )
 }

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTransactionStore, useTransaction as useTransactionState, Transaction } from '../stores/transactionStore';
 
 interface UseTransactionHandlerProps<T, Args extends any[] = []> {
@@ -11,6 +11,7 @@ interface UseTransactionHandlerProps<T, Args extends any[] = []> {
 interface UseTransactionHandlerReturn<T, Args extends any[] = []> {
   call: (...args: Args) => Promise<void>;
   isLoading: boolean;
+  isWaitingForIndexer: boolean;
   meta: Args;
   transaction?: Transaction;
 }
@@ -22,38 +23,63 @@ export function useTransactionHandler<T, Args extends any[] = []>({
   onComplete,
 }: UseTransactionHandlerProps<T, Args>): UseTransactionHandlerReturn<T, Args> {
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isWaitingForIndexer, setIsWaitingForIndexer] = useState<boolean>(false);
   const [meta, setMeta] = useState<Args>([] as Args);
   const transactionStore = useTransactionStore((state) => state);
+
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   const transaction = useTransactionState(key);
 
   useEffect(() => {
+    let mounted = true
+
     const checkPersisted = async () => {
       if (!transaction) return
 
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+        timeoutRef.current = null
+      }
+
       setIsLoading(true)
+      setIsWaitingForIndexer(false)
       setMeta(transaction.meta)
 
-      if (transaction.status === 'completed') {
+      if (transaction.status === 'completed' && mounted) {
         const canComplete = indexerCheck === undefined ? true : indexerCheck
         
         if (canComplete) {
           setIsLoading(false)
+          clearTimeout(timeoutRef.current)
           onComplete?.(transaction.result as T, transaction.meta?.args as Args || [] as Args)
           transactionStore.removeTransaction(key)
         } else {
           setIsLoading(true)
+          timeoutRef.current = setTimeout(() => {
+            if (mounted) {
+              setIsWaitingForIndexer(true)
+            }
+          }, 1000)
         }
-      } else if (transaction.status === 'failed') {
+      } else if (transaction.status === 'failed' && mounted) {
         setIsLoading(false)
         onComplete?.(new Error(transaction.error || 'Transaction failed'), transaction.meta?.args as Args || [] as Args)
         transactionStore.removeTransaction(key)
-      } else if (transaction.status === 'pending') {
+      } else if (transaction.status === 'pending' && mounted) {
         setIsLoading(true)
       }
     }
     
     checkPersisted()
+
+    return () => {
+      mounted = false
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+        timeoutRef.current = null
+      }
+    }
   }, [transaction, indexerCheck, onComplete, key, transactionStore])
 
   const call = useCallback(async (...args: Args) => {
@@ -71,7 +97,7 @@ export function useTransactionHandler<T, Args extends any[] = []>({
     }
   }, [transactionCall, key, onComplete, transactionStore])
 
-  return { call, isLoading, meta, transaction };
+  return { call, isLoading, isWaitingForIndexer, meta, transaction };
 }
 
 // useTransactionObserver.ts
@@ -82,6 +108,7 @@ interface UseTransactionObserverProps {
 
 interface UseTransactionObserverReturn {
   isLoading: boolean;
+  isWaitingForIndexer: boolean;
   meta: any;
   transaction?: Transaction;
 }
@@ -89,7 +116,10 @@ interface UseTransactionObserverReturn {
 export function useTransactionObserver({ key, indexerCheck }: UseTransactionObserverProps): UseTransactionObserverReturn {
   const transactionStore = useTransactionStore((state) => state);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isWaitingForIndexer, setIsWaitingForIndexer] = useState<boolean>(false);
   const [meta, setMeta] = useState<any>(null);
+
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const transaction = useTransactionState(key);
 
@@ -99,7 +129,13 @@ export function useTransactionObserver({ key, indexerCheck }: UseTransactionObse
     const check = async () => {
       if (!transaction) return
 
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+        timeoutRef.current = null
+      }
+
       setIsLoading(true)
+      setIsWaitingForIndexer(false)
       setMeta(transaction.meta)
 
       if (transaction.status === 'completed' && mounted) {
@@ -110,6 +146,12 @@ export function useTransactionObserver({ key, indexerCheck }: UseTransactionObse
           setIsLoading(false)
         } else {
           setIsLoading(true)
+
+          timeoutRef.current = setTimeout(() => {
+            if (mounted) {
+              setIsWaitingForIndexer(true)
+            }
+          }, 1000)
         }
       } else if (transaction.status === 'failed' && mounted) {
         transactionStore.removeTransaction(key)
@@ -121,8 +163,12 @@ export function useTransactionObserver({ key, indexerCheck }: UseTransactionObse
 
     return () => {
       mounted = false
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+        timeoutRef.current = null
+      }
     }
   }, [transaction, indexerCheck, key, transactionStore])
 
-  return { isLoading, meta, transaction };
+  return { isLoading, isWaitingForIndexer, meta, transaction };
 }

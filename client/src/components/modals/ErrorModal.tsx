@@ -4,9 +4,8 @@ import { useDojoEmitterEvent } from '@underware/pistols-sdk/dojo'
 import { ActionButton } from '/src/components/ui/Buttons'
 import BugReportModal from '/src/components/modals/BugReportModal'
 import { useGameAspect } from '/src/hooks/useGameAspect'
-import ElementPopupNotification from '../ui/ElementPopupNotification'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
-
+import { showElementPopupNotification } from '/src/components/ui/ElementPopupNotification'
 
 const extractSimplifiedError = (errorText: string): string => {
   if (!errorText) return 'Unknown error'
@@ -52,7 +51,6 @@ export default function ErrorModal() {
   const { errorModalOpener, bugReportOpener } = usePistolsContext()
 
   const [isExpanded, setIsExpanded] = useState(false)
-  const [copyNotification, setCopyNotification] = useState(false)
 
   const copyButtonRef = useRef<HTMLDivElement>(null)
 
@@ -80,8 +78,7 @@ export default function ErrorModal() {
   const copyToClipboard = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text)
-      setCopyNotification(true)
-      setTimeout(() => setCopyNotification(false), 2000)
+      showElementPopupNotification(copyButtonRef, "Copied to clipboard!", "📋")
     } catch (err) {
       console.error('Failed to copy: ', err)
       const textArea = document.createElement('textarea')
@@ -90,8 +87,7 @@ export default function ErrorModal() {
       textArea.select()
       document.execCommand('copy')
       document.body.removeChild(textArea)
-      setCopyNotification(true)
-      setTimeout(() => setCopyNotification(false), 2000)
+      showElementPopupNotification(copyButtonRef, "Copied to clipboard!", "📋")
     }
   }
 
@@ -133,17 +129,15 @@ export default function ErrorModal() {
                     <Icon name="copy" style={{ marginRight: aspectWidth(0.15) }} />
                     <span style={{ fontSize: aspectWidth(0.8), fontWeight: '500' }}>Copy</span>
                   </div>
-                  </div>
-                  
-                  <span className="TechnicalLabel">Technical Details</span>
+                </div>
+                
+                <span className="TechnicalLabel">Technical Details</span>
                 <div className="ErrorText Code Negative">
                   {fullError}
                 </div>
               </div>
             </div>
           </div>
-
-
         </Modal.Content>
         
         <Modal.Actions className='NoPadding'>
@@ -170,8 +164,6 @@ export default function ErrorModal() {
           </Grid>
         </Modal.Actions>
       </Modal>
-
-      <ElementPopupNotification show={copyNotification} targetRef={copyButtonRef} text="Copied to clipboard!" icon="📋" />
 
       <BugReportModal
         opener={bugReportOpener}

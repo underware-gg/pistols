@@ -33,6 +33,7 @@ import { SceneName } from '/src/data/assets'
 import { useTransactionHandler } from '../hooks/useTransaction'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { useDuelistFameOnDuel } from '../queries/useDuelistFameOnDuel'
+import { showElementPopupNotification } from '/src/components/ui/ElementPopupNotification'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -276,8 +277,9 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
   const { emit_player_bookmark, isDisabled: emitIsDisabled } = useExecuteEmitPlayerBookmark(duelContractAddress, props.duelId, !isBookmarked)
 
   const baseRef = useRef<InteractibleComponentHandle>(null)
-
-  const { call: submitChallengeResponse, isLoading: isLoadingSubmit, meta } = useTransactionHandler<boolean, [bigint, BigNumberish?, boolean?]>({
+  const buttonsRowRef = useRef<HTMLDivElement>(null)
+  
+  const { call: submitChallengeResponse, isLoading: isLoadingSubmit, isWaitingForIndexer: isWaitingForIndexerSubmit, meta } = useTransactionHandler<boolean, [bigint, BigNumberish?, boolean?]>({
     transactionCall: (duelId, duelistId, accepted, key) => duel_token.reply_duel(account, duelId, duelistId, accepted, key),
     onComplete: (result, [duelId, duelistId, accepted]) => {
       if (result instanceof Error || !result) return
@@ -289,13 +291,19 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
     key: `submit_challenge_response${props.duelId}`,
   })
 
-  const { call: collectDuel, isLoading: isLoadingCollect } = useTransactionHandler<boolean, [bigint]>({
+  const { call: collectDuel, isLoading: isLoadingCollect, isWaitingForIndexer: isWaitingForIndexerCollect } = useTransactionHandler<boolean, [bigint]>({
     transactionCall: (duelId, key) => game.collect_duel(account, duelId, key),
     indexerCheck: !canCollectDuel,
     key: `collect_duel${props.duelId}`,
   })
 
   const isSubmitting = useMemo(() => isLoadingSubmit || isLoadingCollect, [isLoadingSubmit, isLoadingCollect])
+
+  useEffect(() => {
+    if (isWaitingForIndexerSubmit || isWaitingForIndexerCollect) {
+      showElementPopupNotification(buttonsRowRef, "Transaction successfull! Waiting for indexer...")
+    }
+  }, [isWaitingForIndexerSubmit, isWaitingForIndexerCollect])
 
   useEffect(() => {
     if (isSubmitting) {
@@ -523,7 +531,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
           </div>
 
           <Grid className='Padded YesMouse' textAlign='center' style={{ width: '90%' }}>
-            <Row columns='equal'>
+            <Row columns='equal' ref={buttonsRowRef}>
               <Col>
                 <ActionButton large fillParent label='Close' className='FillParent' onClick={props._close} />
               </Col>
