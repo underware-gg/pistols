@@ -6,7 +6,7 @@ import { isPositiveBigint } from 'src/utils/misc/types'
 import { feltToString } from 'src/starknet/starknet'
 
 
-export const useVerifyControllerSignatureApi = (
+export const useApiVerifyControllerSignature = (
   serverUrl: string,
   messageHash: BigNumberish,
   signature: BigNumberish[],

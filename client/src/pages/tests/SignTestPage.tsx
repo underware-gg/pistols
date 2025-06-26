@@ -3,7 +3,7 @@ import { Button, Container, Grid, Table } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSetup, useVerifyControllerSignature } from '@underware/pistols-sdk/dojo'
 import { useTypedMessage } from '@underware/pistols-sdk/utils/hooks'
-import { useVerifyControllerSignatureApi, useGenerateControllerSaltApi } from '@underware/pistols-sdk/api'
+import { useApiVerifyControllerSignature, useApiGenerateControllerSalt } from '@underware/pistols-sdk/api'
 import { Messages } from '@underware/pistols-sdk/starknet'
 import { bigintToHex, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { CommitMoveMessage } from '@underware/pistols-sdk/pistols/config'
@@ -100,8 +100,8 @@ function Sign({
     setIsSigning(false)
   }
   const { isLoading, isValid } = useVerifyControllerSignature(messageHash, signature)
-  const { isLoading: isLoadingApi, isValid: isValidApi } = useVerifyControllerSignatureApi(selectedNetworkConfig.assetsServerUrl, messageHash, signature, fromAccount)
-  const { isLoading: isLoadingSalt, isError: isErrorSalt, salt } = useGenerateControllerSaltApi(selectedNetworkConfig.assetsServerUrl, starknetDomain, messageHash, signature, fromAccount)
+  const { isLoading: isLoadingApi, isValid: isValidApi } = useApiVerifyControllerSignature(selectedNetworkConfig.assetsServerUrl, messageHash, signature, fromAccount)
+  const { isLoading: isLoadingSalt, isError: isErrorSalt, salt } = useApiGenerateControllerSalt(selectedNetworkConfig.assetsServerUrl, starknetDomain, messageHash, signature, fromAccount)
 
   return (
     <>

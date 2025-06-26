@@ -4,7 +4,7 @@ import { useAccount } from '@starknet-react/core'
 import { apiGenerateControllerSalt } from 'src/api/salt'
 import { isPositiveBigint } from 'src/utils/misc/types'
 
-export const useGenerateControllerSaltApi = (
+export const useApiGenerateControllerSalt = (
   serverUrl: string,
   starknetDomain: StarknetDomain,
   messageHash: BigNumberish,
