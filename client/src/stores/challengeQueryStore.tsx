@@ -9,6 +9,7 @@ import { useCurrentSeason } from '/src/stores/seasonStore';
 import { bigintToAddress, isPositiveBigint } from '@underware/pistols-sdk/utils';
 import { ChallengeColumn, SortDirection } from '/src/stores/queryParamsStore';
 import { constants } from '@underware/pistols-sdk/pistols/gen';
+import { useCallToChallenges } from './eventsModelStore';
 
 
 //--------------------------------
@@ -49,14 +50,25 @@ export const useQueryChallengeIds = (
   const { duelContractAddress } = useTokenContracts()
   const { bookmarkedDuels } = usePlayer(address)
   const { seasonId: currentSeasonId } = useCurrentSeason()
+  const { requiredDuelIds } = useCallToChallenges()
 
   const { query } = useMemo(() => {
     const columns = ['A.duel_id', 'COUNT(*) OVER() AS count']
     const tables = [`'pistols-Challenge' A`]
     const conditions = []
 
-    // filter by states, with special handling for required action duels
-    conditions.push(`A.state in (${filterStates.map((s) => `"${s}"`).join(',')})`)
+    // filter by states
+    let filterCondition = `(A.state in (${filterStates.map((s) => `"${s}"`).join(',')})`;
+    // handle required action duels
+    if (requiredDuelIds.length > 0) {
+      if (filterStates.includes(constants.ChallengeState.InProgress)) {
+        filterCondition += ` or A.duel_id in (${requiredDuelIds.map((id) => `"${bigintToAddress(id)}"`).join(',')})`;
+      } else if (filterStates.includes(constants.ChallengeState.Resolved)) {
+        filterCondition += ` and A.duel_id not in (${requiredDuelIds.map((id) => `"${bigintToAddress(id)}"`).join(',')})`;
+      }
+    }
+    filterCondition += `)`;
+    conditions.push(filterCondition)
 
     // filter by player address
     if (isPositiveBigint(playerAddress)) {
@@ -118,7 +130,7 @@ export const useQueryChallengeIds = (
   // fetch only NEW duels (not already in the store)
   useFetchChallengeIds(data?.duelIds ?? []);
 
-  useEffect(() => console.log('SQL QUERY:', query), [query])
+  useEffect(() => console.log('CHALLENGE SQL QUERY:', query), [query])
   // useEffect(() => console.log('SQL CHALLENGE IDs:', isLoading, data), [isLoading, data])
 
   const totalCount = useMemo(() => (data?.totalCount ?? 0), [data?.totalCount])
