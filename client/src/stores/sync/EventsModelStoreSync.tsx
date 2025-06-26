@@ -7,7 +7,7 @@ import { useEventsStore } from '/src/stores/eventsModelStore'
 import { usePlayerDataStore } from '/src/stores/playerStore'
 import { useChallengeRewardsStore } from '/src/stores/challengeRewardsStore'
 import { useProgressStore } from '/src/stores/progressStore'
-import { bigintEquals, isPositiveBigint } from '@underware/pistols-sdk/utils'
+import { bigintEquals, bigintToAddress, bigintToHex, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { debug } from '@underware/pistols-sdk/pistols'
 
 
@@ -22,11 +22,46 @@ export function EventsModelStoreSync() {
   const mounted = useMounted()
 
   // get for all players
-  const query_get = useMemo<PistolsQueryBuilder>(() => (
+  const query_get_player = useMemo<PistolsQueryBuilder>(() => (
+    isPositiveBigint(address)
+      ? new PistolsQueryBuilder()
+        .withClause(
+          new PistolsClauseBuilder().keys(
+            [
+              'pistols-CallToChallengeEvent',
+              'pistols-PlayerSettingEvent',
+              'pistols-PlayerBookmarkEvent',
+            ],
+            // VariableLen means: must have at least the address key...
+            [formatQueryValue(address)],
+            "VariableLen"
+          ).build()
+        )
+        .withEntityModels([
+          'pistols-CallToChallengeEvent',
+          'pistols-PlayerSettingEvent',
+          'pistols-PlayerBookmarkEvent',
+        ])
+        .withLimit(1000)
+        .includeHashedKeys()
+      : undefined
+  ), [address])
+
+  // get for all players
+  const query_get_all = useMemo<PistolsQueryBuilder>(() => (
     new PistolsQueryBuilder()
+      .withClause(
+        new PistolsClauseBuilder().keys(
+          // get everyone's social links
+          ['pistols-PlayerSocialLinkEvent'],
+          [undefined],
+          "VariableLen"
+        ).build()
+      )
       .withEntityModels([
         'pistols-PlayerSocialLinkEvent',
       ])
+      .withLimit(1000)
       .includeHashedKeys()
   ), [])
 
@@ -39,18 +74,20 @@ export function EventsModelStoreSync() {
             new PistolsClauseBuilder().keys(
               [
                 'pistols-CallToChallengeEvent',
-                'pistols-PlayerBookmarkEvent',
-                'pistols-PlayerSocialLinkEvent',
                 'pistols-PlayerSettingEvent',
+                'pistols-PlayerBookmarkEvent',
               ],
-              // VariableLen means: must have at least the address key...
+              // get only current player's events
               [formatQueryValue(address)],
+              // VariableLen means: must have at least one key
               "VariableLen"
             ),
             new PistolsClauseBuilder().keys(
               [
                 'pistols-ChallengeRewardsEvent',
+                'pistols-PlayerSocialLinkEvent',
               ],
+              // get it all
               [undefined],
               "VariableLen"
             ),
@@ -58,11 +95,12 @@ export function EventsModelStoreSync() {
         )
         .withEntityModels([
           'pistols-CallToChallengeEvent',
+          'pistols-PlayerSettingEvent',
           'pistols-PlayerBookmarkEvent',
           'pistols-PlayerSocialLinkEvent',
-          'pistols-PlayerSettingEvent',
           'pistols-ChallengeRewardsEvent',
         ])
+        .withLimit(1) // discard...
         .includeHashedKeys()
       : undefined
   ), [address])
@@ -72,16 +110,41 @@ export function EventsModelStoreSync() {
   // Initial fetch
   //
   useSdkEventsGet({
-    query: query_get,
-    enabled: (mounted && Boolean(query_get)),
+    query: query_get_player,
+    enabled: (mounted && Boolean(query_get_player)),
     updateProgress: (currentPage: number, finished?: boolean) => {
-      updateProgress('events_get', currentPage, finished)
+      updateProgress('events_get_player', currentPage, finished)
+    },
+    setEntities: (entities: PistolsEntity[]) => {
+      debug.log(`GET EventsModelStoreSync() ======> [Player]`, entities)
+      eventsState.setEntities(filterEntitiesByModels(entities, ['CallToChallengeEvent', 'PlayerSettingEvent']))
+      playerDataState.updateMessages(filterEntitiesByModels(entities, ['PlayerBookmarkEvent']))
+    },
+  })
+  useSdkEventsGet({
+    query: query_get_all,
+    enabled: (mounted && Boolean(query_get_all)),
+    updateProgress: (currentPage: number, finished?: boolean) => {
+      updateProgress('events_get_all', currentPage, finished)
     },
     setEntities: (entities: PistolsEntity[]) => {
       debug.log(`GET EventsModelStoreSync() ======> [PlayerSocialLinkEvent]`, entities)
-      eventsState.setEntities(filterEntitiesByModels(entities, ['PlayerSocialLinkEvent']))
+      eventsState.setEntities(entities)
     },
   })
+
+  const _filterPlayerEvents = (entities: PistolsEntity[]): PistolsEntity[] => {
+    return entities.filter((entity) => {
+      const playerEvent =
+        getEntityModel(entity, 'CallToChallengeEvent') ??
+        getEntityModel(entity, 'PlayerBookmarkEvent') ??
+        getEntityModel(entity, 'PlayerSettingEvent');
+      if (playerEvent && bigintEquals(playerEvent.player_address, address)) {
+        return true;
+      }
+      return false;
+    })
+  }
 
   //
   // Subscription
@@ -93,28 +156,25 @@ export function EventsModelStoreSync() {
       updateProgress('events_sub', currentPage, finished)
     },
     setEntities: (entities: PistolsEntity[]) => {
-      debug.log(`GET EventsModelStoreSync() ======> [player]`, entities)
-      eventsState.setEntities(filterEntitiesByModels(entities, ['CallToChallengeEvent', 'PlayerSocialLinkEvent', 'PlayerSettingEvent']))
-      playerDataState.updateMessages(filterEntitiesByModels(entities, ['PlayerBookmarkEvent']))
+      // debug.log(`SUB EventsModelStoreSync() ======> [player] DICARD`, entities)
     },
     updateEntity: (entity: PistolsEntity) => {
-      debug.log(`SUB EventsModelStoreSync() ======> [player]`, entity)
+      debug.log(`SUB EventsModelStoreSync() ======> []`, entity)
       // player-based events
-      const playerEvent =
-        getEntityModel(entity, 'CallToChallengeEvent') ??
-        getEntityModel(entity, 'PlayerBookmarkEvent') ??
-        getEntityModel(entity, 'PlayerSocialLinkEvent') ??
-        getEntityModel(entity, 'PlayerSettingEvent');
-      if (playerEvent && bigintEquals(playerEvent.player_address, address)) {
-        debug.log(`SUB EventsModelStoreSync() ======> model:`, entity)
-        if (entityContainsModels(entity, ['CallToChallengeEvent', 'PlayerSocialLinkEvent', 'PlayerSettingEvent'])) {
-          eventsState.updateEntity(entity)
+      const playerEvents = _filterPlayerEvents([entity])
+      if (playerEvents.length > 0) {
+        debug.log(`SUB EventsModelStoreSync() ======> [player]`, playerEvents)
+        if (entityContainsModels(playerEvents[0], ['CallToChallengeEvent', 'PlayerSettingEvent'])) {
+          eventsState.updateEntity(playerEvents[0])
         }
-        if (entityContainsModels(entity, ['PlayerBookmarkEvent'])) {
-          playerDataState.updateMessages([entity])
+        if (entityContainsModels(playerEvents[0], ['PlayerBookmarkEvent'])) {
+          playerDataState.updateMessages(playerEvents)
         }
       }
       // other events
+      if (entityContainsModels(entity, ['PlayerSocialLinkEvent'])) {
+        eventsState.updateEntity(entity)
+      }
       if (entityContainsModels(entity, ['ChallengeRewardsEvent'])) {
         challengeRewardsState.updateEntity(entity)
       }
