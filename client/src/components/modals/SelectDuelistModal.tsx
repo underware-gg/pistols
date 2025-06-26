@@ -383,25 +383,19 @@ function _SelectDuelistModal({
             }}
           />
 
-          {currentPage > 0 && (
-            <Button 
-              className='YesMouse NoDrag'
-              icon='chevron left'
-              style={{position: 'absolute', left: aspectWidth(25), top: '50%'}}
-              onClick={handlePrevPage}
-              disabled={isAnimating}
-            />
-          )}
+          <Button 
+            className='YesMouse NoDrag'
+            icon='chevron left'
+            style={{position: 'absolute', left: aspectWidth(25), top: '50%', opacity: isAnimating || currentPage <= 0 ? 0.5 : 1}}
+            onClick={handlePrevPage}
+          />
           
-          {currentPage < totalPages - 1 && (
-            <Button 
-              className='YesMouse NoDrag'
-              icon='chevron right'
-              style={{position: 'absolute', right: aspectWidth(25), top: '50%'}}
-              onClick={handleNextPage}
-              disabled={isAnimating}
-            />
-          )}
+          <Button 
+            className='YesMouse NoDrag'
+            icon='chevron right'
+            style={{position: 'absolute', right: aspectWidth(25), top: '50%', opacity: isAnimating || currentPage >= totalPages - 1 ? 0.5 : 1}}
+            onClick={handleNextPage}
+          />
         </div>
       </div>
     </Modal>
