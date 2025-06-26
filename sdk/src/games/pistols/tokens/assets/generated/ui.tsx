@@ -22,6 +22,8 @@ export const assets: AssetFolder = {
   _images_ui_hand_card_single_top_png: async () => (await import('./encoded/_images_ui_hand_card_single_top_png')).default,
   _images_ui_hand_sweep_png: async () => (await import('./encoded/_images_ui_hand_sweep_png')).default,
   _images_ui_hand_throw_png: async () => (await import('./encoded/_images_ui_hand_throw_png')).default,
+  _images_ui_notification_bartender_head_png: async () => (await import('./encoded/_images_ui_notification_bartender_head_png')).default,
+  _images_ui_notification_exclamation_png: async () => (await import('./encoded/_images_ui_notification_exclamation_png')).default,
   _images_ui_pistol_png: async () => (await import('./encoded/_images_ui_pistol_png')).default,
   _images_ui_seal_png: async () => (await import('./encoded/_images_ui_seal_png')).default,
 }
