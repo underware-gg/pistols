@@ -1,5 +1,5 @@
 import { Connector } from '@starknet-react/core'
-import type { Tokens } from '@cartridge/controller'
+import type { Tokens, Token } from '@cartridge/controller'
 import { getNetworkConfig, NetworkId } from 'src/games/pistols/config/networks'
 import { makeControllerConnector } from 'src/games/pistols/dojo/controller_connector'
 import { makePistolsPolicies } from 'src/games/pistols/dojo/policies'
@@ -16,9 +16,8 @@ import {
 export const makePistolsControllerConnector = (networkId: NetworkId, env?: any): Connector => {
   const tokens: Tokens = {
     erc20: [
-      getLordsAddress(networkId),
-      // getFameAddress(networkId),
-      getFoolsAddress(networkId),
+      getLordsAddress(networkId) as Token,
+      getFoolsAddress(networkId) as Token,
     ],
     //@ts-ignore
     erc721: [
