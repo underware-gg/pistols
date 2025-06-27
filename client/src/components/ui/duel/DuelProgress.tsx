@@ -54,14 +54,14 @@ export default function DuelProgress({
   //   key: `reveal_moves${duelId}`,
   // })
 
+  const { isLoading: isLoadingCommit } = useTransactionObserver({ key: `commit_paces${duelId}`, indexerCheck: completedStagesLeft[DuelStage.Round1Commit] })
+
   const { selectedNetworkConfig } = useDojoSetup()
   const { isRevealing: isLoadingReveal, isRevealed } = useApiAutoReveal(
     selectedNetworkConfig.assetsServerUrl,
     duelId,
-    canAutoReveal && canReveal && isYou
+    (canAutoReveal && canReveal && isYou && !isLoadingCommit)
   )
-
-  const { isLoading: isLoadingCommit } = useTransactionObserver({ key: `commit_paces${duelId}`, indexerCheck: completedStagesLeft[DuelStage.Round1Commit] })
 
   const onClick = useCallback(() => {
     if (isMyDuelist && isConnected && completedStages[duelStage] === false) {
