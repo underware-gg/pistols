@@ -18,7 +18,7 @@ import { debug } from '@underware/pistols-sdk/pistols'
 //---------------------------
 // Models to fetch at startup
 //
-const _modelsMisc = [
+const _modelsGet = [
   // admin
   "pistols-Config",
   "pistols-TokenConfig",
@@ -26,8 +26,6 @@ const _modelsMisc = [
   // season
   "pistols-SeasonConfig",
   "pistols-Leaderboard",
-];
-const _modelsPlayers = [
   // players
   "pistols-Player",
   "pistols-PlayerFlags",
@@ -57,22 +55,16 @@ const _modelsSubscribed = [
 ];
 
 
-const _limit = 1500
-const query_get_misc: PistolsQueryBuilder = new PistolsQueryBuilder()
-  .withEntityModels(_modelsMisc)
-  .withLimit(_limit)
-  .includeHashedKeys()
-const query_get_players: PistolsQueryBuilder = new PistolsQueryBuilder()
-  .withEntityModels(_modelsPlayers)
-  .withLimit(_limit)
+const query_get: PistolsQueryBuilder = new PistolsQueryBuilder()
+  .withEntityModels(_modelsGet)
+  .withLimit(2000)
   .includeHashedKeys()
 const query_sub: PistolsQueryBuilder = new PistolsQueryBuilder()
   .withEntityModels([
-    ..._modelsMisc,
-    ..._modelsPlayers,
+    ..._modelsGet,
     ..._modelsSubscribed,
   ])
-  .withLimit(10)
+  .withLimit(1) // discard
   .includeHashedKeys()
 
   
@@ -99,11 +91,11 @@ export function EntityStoreSync() {
   const mounted = useMounted()
   const updateProgress = useProgressStore((state) => state.updateProgress)
 
-  const { isFinished: isFinishedMisc } = useSdkEntitiesGet({
-    query: query_get_misc,
+  const { isFinished: isFinishedGet } = useSdkEntitiesGet({
+    query: query_get,
     enabled: mounted,
     updateProgress: (currentPage: number, finished?: boolean) => {
-      updateProgress('query_get_misc', currentPage, finished)
+      updateProgress('entities_get', currentPage, finished)
     },
     resetStore: () => {
       debug.log("EntityStoreSync() RESET MISC =======>")
@@ -119,23 +111,12 @@ export function EntityStoreSync() {
       // debug.log("EntityStoreSync() SET =======> [Pool]:", filterEntitiesByModels(entities, ['Pool']))
       // debug.log("EntityStoreSync() SET =======> [SeasonConfig]:", filterEntitiesByModels(entities, ['SeasonConfig', 'Leaderboard']))
       // debug.log("EntityStoreSync() SET =======> [Leaderboard]:", filterEntitiesByModels(entities, ['Leaderboard']))
+      // debug.log("EntityStoreSync() SET PLAYERS =======> [Player]:", filterEntitiesByModels(entities, ['Player']))
+      // debug.log("EntityStoreSync() SET PLAYERS =======> [PlayerOnline]:", filterEntitiesByModels(entities, ['PlayerOnline']))
       configState.setEntities(filterEntitiesByModels(entities, ['Config']))
       tokenState.setEntities(filterEntitiesByModels(entities, ['TokenConfig']))
       bankState.setEntities(filterEntitiesByModels(entities, ['Pool']))
       seasonState.setEntities(filterEntitiesByModels(entities, ['SeasonConfig', 'Leaderboard']))
-    },
-  })
-
-  const { isFinished: isFinishedPlayers } = useSdkEntitiesGet({
-    query: query_get_players,
-    enabled: (mounted),
-    updateProgress: (currentPage: number, finished?: boolean) => {
-      updateProgress('query_get_players', currentPage, finished)
-    },
-    setEntities: (entities: PistolsEntity[]) => {
-      debug.log("EntityStoreSync() SET PLAYERS =======> [entities]:", entities)
-      // debug.log("EntityStoreSync() SET PLAYERS =======> [Player]:", filterEntitiesByModels(entities, ['Player']))
-      // debug.log("EntityStoreSync() SET PLAYERS =======> [PlayerOnline]:", filterEntitiesByModels(entities, ['PlayerOnline']))
       playerState.setEntities(filterEntitiesByModels(entities, ['Player', 'PlayerFlags', 'PlayerTeamFlags']))
       playerDataState.updateMessages(filterEntitiesByModels(entities, ['PlayerOnline']))
     },
@@ -143,7 +124,7 @@ export function EntityStoreSync() {
 
   useSdkEntitiesSub({
     query: query_sub,
-    enabled: (mounted && isFinishedMisc && isFinishedPlayers),
+    enabled: (mounted && isFinishedGet),
     setEntities: (entities: PistolsEntity[]) => {
       debug.log("EntityStoreSync() SET =======> [entities]: DISCARD!", entities.length)
     },

@@ -13,6 +13,7 @@ interface LoaderState {
 }
 interface State {
   loaders: LoaderState,
+  counter: number,
   updateProgress: (key: string, currentPage: number, finished?: boolean) => void;
   getProgress: () => number;
   finished: () => boolean;
@@ -25,11 +26,13 @@ const createStore = () => {
   }
   return create<State>()(immer((set, get) => ({
     loaders: {},
+    counter: 0,
     updateProgress: (key: string, currentPage: number, finished?: boolean) => {
       set((state: State) => {
         const _progress = finished === true ? 1 : (currentPage / (currentPage + 1));
         state.loaders[key] = _progress;
-        debug.log(`PROGRESS(${key})[${currentPage}/]: ${_progress} / total(${Object.keys(state.loaders).length}): ${_calcProgress(state.loaders)}`)
+        if (currentPage > 0) state.counter++;
+        debug.log(`PROGRESS(${key})[${currentPage}] ${Math.floor(_progress * 100)}% / total(${Object.keys(state.loaders).length}): ${(Math.floor(_calcProgress(state.loaders) * 100))}% (+${state.counter})`)
       })
     },
     getProgress: (): number => {
@@ -50,9 +53,11 @@ export const useProgressStore = createStore();
 export function useStoreLoadingProgress() {
   const state = useProgressStore((state) => state)
   const progress = useMemo(() => state.getProgress(), [state.loaders])
+  const counter = useMemo(() => state.counter, [state.counter])
   const finished = useMemo(() => state.finished(), [state.loaders])
   return {
     progress,
+    counter,
     finished,
   }
 }

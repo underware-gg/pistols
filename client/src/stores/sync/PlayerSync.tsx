@@ -3,7 +3,7 @@ import { useAccount } from '@starknet-react/core'
 import { useFetchChallengeIdsByPlayer } from '/src/stores/challengeStore'
 import { useFetchDuelistIdsByPlayer } from '/src/stores/duelistStore'
 import { useFetchPacksOfPlayer } from '/src/stores/packStore'
-import { useProgressStore } from '../progressStore'
+import { useProgressStore } from '/src/stores/progressStore'
 
 
 //------------------------------------------------------

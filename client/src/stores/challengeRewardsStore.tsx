@@ -156,6 +156,7 @@ export const useFetchChallengeRewardsByDuelistIds = (duelistIds: BigNumberish[])
         .withEntityModels(
           ["pistols-ChallengeRewardsEvent"]
         )
+        .withLimit(1000)
         .includeHashedKeys()
       : null
   ), [newDuelistIds])
