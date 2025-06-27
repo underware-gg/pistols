@@ -45,7 +45,7 @@ mod tests {
         while (i < profiles.len()) {
             let profile: DuelistProfile = *profiles.at(i);
             let duelist: DuelistValue = sys.store.get_duelist_value(profile.make_duelist_id());
-            assert!(duelist.duelist_profile == profile, "Character profile not created: {}", profile.description().name);
+            assert!(duelist.duelist_profile == profile, "Character profile not created: {}", profile.descriptor().name);
             i += 1;
         };
         // Bots created
@@ -54,7 +54,7 @@ mod tests {
         while (i < profiles.len()) {
             let profile: DuelistProfile = *profiles.at(i);
             let duelist: DuelistValue = sys.store.get_duelist_value(profile.make_duelist_id());
-            assert!(duelist.duelist_profile == profile, "Bot profile not created: {}", profile.description().name);
+            assert!(duelist.duelist_profile == profile, "Bot profile not created: {}", profile.descriptor().name);
             i += 1;
         };
     }

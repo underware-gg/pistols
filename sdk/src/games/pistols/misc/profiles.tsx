@@ -2,7 +2,7 @@ import { BigNumberish } from 'starknet'
 import { bigintToHex } from 'src/utils/misc/types'
 import {
   DuelistProfile,
-  ProfileDescription,
+  ProfileDescriptor,
   CharacterKey,
   BotKey,
   GenesisKey,
@@ -10,7 +10,7 @@ import {
   GENESIS_PROFILES,
   CHARACTER_PROFILES,
   BOT_PROFILES,
-  CollectionDescription,
+  CollectionDescriptor,
   getGenesisKeyValue,
   getCharacterKeyValue,
   getBotKeyValue,
@@ -52,15 +52,15 @@ export const getProfileKey = (profileType: DuelistProfile, profileId: number): D
 //
 
 export const makeProfilePicUrl = (profileId: number | null, profileType = DuelistProfile.Genesis) => {
-  const collection = getCollectionDescription(profileType);
+  const collection = getCollectionDescriptor(profileType);
   return `/profiles/${collection.folder_name}/${('00' + profileId.toString()).slice(-2)}.jpg`;
 }
 
-export const getCollectionDescription = (profile: DuelistProfile): CollectionDescription => {
+export const getCollectionDescriptor = (profile: DuelistProfile): CollectionDescriptor => {
   return COLLECTIONS[profile];
 }
 
-export const getProfileDescription = (profileType: DuelistProfile, profileKey: DuelistProfileKey): ProfileDescription => {
+export const getProfileDescriptor = (profileType: DuelistProfile, profileKey: DuelistProfileKey): ProfileDescriptor => {
   switch (profileType) {
     case DuelistProfile.Genesis: return GENESIS_PROFILES[profileKey as GenesisKey];
     case DuelistProfile.Character: return CHARACTER_PROFILES[profileKey as CharacterKey];
@@ -78,7 +78,7 @@ export const makeCharacterDuelistId = (profileType: DuelistProfile, profileKey: 
       default: return 0;
     };
   };
-  const collection = getCollectionDescription(profileType);
+  const collection = getCollectionDescriptor(profileType);
   return bigintToHex((collection.duelist_id_base | BigInt(_getId())));
 }
 

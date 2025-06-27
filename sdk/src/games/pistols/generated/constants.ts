@@ -615,7 +615,7 @@ export type EnvCardPoints = {
 };
 
 // from: ../dojo/src/types/duelist_profile.cairo
-export type CollectionDescription = {
+export type CollectionDescriptor = {
   name : string,
   folder_name : string,
   profile_count : number,
@@ -624,7 +624,7 @@ export type CollectionDescription = {
 };
 
 // from: ../dojo/src/types/duelist_profile.cairo
-export type ProfileDescription = {
+export type ProfileDescriptor = {
   name : string,
 };
 
@@ -1068,10 +1068,10 @@ export const TACTICS_POINTS: type_TACTICS_POINTS = {
 
 // from: ../dojo/src/types/duelist_profile.cairo
 type type_COLLECTIONS = {
-  Undefined: CollectionDescription, // cairo: CollectionDescription
-  Character: CollectionDescription, // cairo: CollectionDescription
-  Bot: CollectionDescription, // cairo: CollectionDescription
-  Genesis: CollectionDescription, // cairo: CollectionDescription
+  Undefined: CollectionDescriptor, // cairo: CollectionDescriptor
+  Character: CollectionDescriptor, // cairo: CollectionDescriptor
+  Bot: CollectionDescriptor, // cairo: CollectionDescriptor
+  Genesis: CollectionDescriptor, // cairo: CollectionDescriptor
 };
 export const COLLECTIONS: type_COLLECTIONS = {
   Undefined: {
@@ -1106,11 +1106,11 @@ export const COLLECTIONS: type_COLLECTIONS = {
 
 // from: ../dojo/src/types/duelist_profile.cairo
 type type_CHARACTER_PROFILES = {
-  Unknown: ProfileDescription, // cairo: ProfileDescription
-  Bartender: ProfileDescription, // cairo: ProfileDescription
-  Drunkard: ProfileDescription, // cairo: ProfileDescription
-  Devil: ProfileDescription, // cairo: ProfileDescription
-  Player: ProfileDescription, // cairo: ProfileDescription
+  Unknown: ProfileDescriptor, // cairo: ProfileDescriptor
+  Bartender: ProfileDescriptor, // cairo: ProfileDescriptor
+  Drunkard: ProfileDescriptor, // cairo: ProfileDescriptor
+  Devil: ProfileDescriptor, // cairo: ProfileDescriptor
+  Player: ProfileDescriptor, // cairo: ProfileDescriptor
 };
 export const CHARACTER_PROFILES: type_CHARACTER_PROFILES = {
   Unknown: {
@@ -1132,10 +1132,10 @@ export const CHARACTER_PROFILES: type_CHARACTER_PROFILES = {
 
 // from: ../dojo/src/types/duelist_profile.cairo
 type type_BOT_PROFILES = {
-  Unknown: ProfileDescription, // cairo: ProfileDescription
-  TinMan: ProfileDescription, // cairo: ProfileDescription
-  Scarecrow: ProfileDescription, // cairo: ProfileDescription
-  Leon: ProfileDescription, // cairo: ProfileDescription
+  Unknown: ProfileDescriptor, // cairo: ProfileDescriptor
+  TinMan: ProfileDescriptor, // cairo: ProfileDescriptor
+  Scarecrow: ProfileDescriptor, // cairo: ProfileDescriptor
+  Leon: ProfileDescriptor, // cairo: ProfileDescriptor
 };
 export const BOT_PROFILES: type_BOT_PROFILES = {
   Unknown: {
@@ -1154,76 +1154,76 @@ export const BOT_PROFILES: type_BOT_PROFILES = {
 
 // from: ../dojo/src/types/duelist_profile.cairo
 type type_GENESIS_PROFILES = {
-  Unknown: ProfileDescription, // cairo: ProfileDescription
-  SerWalker: ProfileDescription, // cairo: ProfileDescription
-  LadyVengeance: ProfileDescription, // cairo: ProfileDescription
-  Duke: ProfileDescription, // cairo: ProfileDescription
-  Duella: ProfileDescription, // cairo: ProfileDescription
-  Jameson: ProfileDescription, // cairo: ProfileDescription
-  Misty: ProfileDescription, // cairo: ProfileDescription
-  Karaku: ProfileDescription, // cairo: ProfileDescription
-  Kenzu: ProfileDescription, // cairo: ProfileDescription
-  Pilgrim: ProfileDescription, // cairo: ProfileDescription
-  Jack: ProfileDescription, // cairo: ProfileDescription
-  Pops: ProfileDescription, // cairo: ProfileDescription
-  NynJah: ProfileDescription, // cairo: ProfileDescription
-  Thrak: ProfileDescription, // cairo: ProfileDescription
-  Bloberto: ProfileDescription, // cairo: ProfileDescription
-  Squiddo: ProfileDescription, // cairo: ProfileDescription
-  SlenderDuck: ProfileDescription, // cairo: ProfileDescription
-  Breadman: ProfileDescription, // cairo: ProfileDescription
-  Groggus: ProfileDescription, // cairo: ProfileDescription
-  Pistolopher: ProfileDescription, // cairo: ProfileDescription
-  Secreto: ProfileDescription, // cairo: ProfileDescription
-  ShadowMare: ProfileDescription, // cairo: ProfileDescription
-  Fjolnir: ProfileDescription, // cairo: ProfileDescription
-  ChimpDylan: ProfileDescription, // cairo: ProfileDescription
-  Hinata: ProfileDescription, // cairo: ProfileDescription
-  HelixVex: ProfileDescription, // cairo: ProfileDescription
-  BuccaneerJames: ProfileDescription, // cairo: ProfileDescription
-  TheSensei: ProfileDescription, // cairo: ProfileDescription
-  SenseiTarrence: ProfileDescription, // cairo: ProfileDescription
-  ThePainter: ProfileDescription, // cairo: ProfileDescription
-  Ashe: ProfileDescription, // cairo: ProfileDescription
-  SerGogi: ProfileDescription, // cairo: ProfileDescription
-  TheSurvivor: ProfileDescription, // cairo: ProfileDescription
-  TheFrenchman: ProfileDescription, // cairo: ProfileDescription
-  SerFocger: ProfileDescription, // cairo: ProfileDescription
-  SillySosij: ProfileDescription, // cairo: ProfileDescription
-  BloodBeard: ProfileDescription, // cairo: ProfileDescription
-  Fredison: ProfileDescription, // cairo: ProfileDescription
-  TheBard: ProfileDescription, // cairo: ProfileDescription
-  Ponzimancer: ProfileDescription, // cairo: ProfileDescription
-  DealerTani: ProfileDescription, // cairo: ProfileDescription
-  SerRichard: ProfileDescription, // cairo: ProfileDescription
-  Recipromancer: ProfileDescription, // cairo: ProfileDescription
-  Mataleone: ProfileDescription, // cairo: ProfileDescription
-  FortunaRegem: ProfileDescription, // cairo: ProfileDescription
-  Amaro: ProfileDescription, // cairo: ProfileDescription
-  Mononoke: ProfileDescription, // cairo: ProfileDescription
-  Parsa: ProfileDescription, // cairo: ProfileDescription
-  Jubilee: ProfileDescription, // cairo: ProfileDescription
-  LadyOfCrows: ProfileDescription, // cairo: ProfileDescription
-  BananaDuke: ProfileDescription, // cairo: ProfileDescription
-  LordGladstone: ProfileDescription, // cairo: ProfileDescription
-  LadyStrokes: ProfileDescription, // cairo: ProfileDescription
-  Bliss: ProfileDescription, // cairo: ProfileDescription
-  StormMirror: ProfileDescription, // cairo: ProfileDescription
-  Aldreda: ProfileDescription, // cairo: ProfileDescription
-  Petronella: ProfileDescription, // cairo: ProfileDescription
-  SeraphinaRose: ProfileDescription, // cairo: ProfileDescription
-  LucienDeSombrel: ProfileDescription, // cairo: ProfileDescription
-  FyernVirelock: ProfileDescription, // cairo: ProfileDescription
-  Noir: ProfileDescription, // cairo: ProfileDescription
-  QueenAce: ProfileDescription, // cairo: ProfileDescription
-  JoshPeel: ProfileDescription, // cairo: ProfileDescription
-  IronHandRogan: ProfileDescription, // cairo: ProfileDescription
-  GoodPupStarky: ProfileDescription, // cairo: ProfileDescription
-  ImyaSuspect: ProfileDescription, // cairo: ProfileDescription
-  TheAlchemist: ProfileDescription, // cairo: ProfileDescription
-  PonziusPilate: ProfileDescription, // cairo: ProfileDescription
-  MistressNoodle: ProfileDescription, // cairo: ProfileDescription
-  MasterOfSecrets: ProfileDescription, // cairo: ProfileDescription
+  Unknown: ProfileDescriptor, // cairo: ProfileDescriptor
+  SerWalker: ProfileDescriptor, // cairo: ProfileDescriptor
+  LadyVengeance: ProfileDescriptor, // cairo: ProfileDescriptor
+  Duke: ProfileDescriptor, // cairo: ProfileDescriptor
+  Duella: ProfileDescriptor, // cairo: ProfileDescriptor
+  Jameson: ProfileDescriptor, // cairo: ProfileDescriptor
+  Misty: ProfileDescriptor, // cairo: ProfileDescriptor
+  Karaku: ProfileDescriptor, // cairo: ProfileDescriptor
+  Kenzu: ProfileDescriptor, // cairo: ProfileDescriptor
+  Pilgrim: ProfileDescriptor, // cairo: ProfileDescriptor
+  Jack: ProfileDescriptor, // cairo: ProfileDescriptor
+  Pops: ProfileDescriptor, // cairo: ProfileDescriptor
+  NynJah: ProfileDescriptor, // cairo: ProfileDescriptor
+  Thrak: ProfileDescriptor, // cairo: ProfileDescriptor
+  Bloberto: ProfileDescriptor, // cairo: ProfileDescriptor
+  Squiddo: ProfileDescriptor, // cairo: ProfileDescriptor
+  SlenderDuck: ProfileDescriptor, // cairo: ProfileDescriptor
+  Breadman: ProfileDescriptor, // cairo: ProfileDescriptor
+  Groggus: ProfileDescriptor, // cairo: ProfileDescriptor
+  Pistolopher: ProfileDescriptor, // cairo: ProfileDescriptor
+  Secreto: ProfileDescriptor, // cairo: ProfileDescriptor
+  ShadowMare: ProfileDescriptor, // cairo: ProfileDescriptor
+  Fjolnir: ProfileDescriptor, // cairo: ProfileDescriptor
+  ChimpDylan: ProfileDescriptor, // cairo: ProfileDescriptor
+  Hinata: ProfileDescriptor, // cairo: ProfileDescriptor
+  HelixVex: ProfileDescriptor, // cairo: ProfileDescriptor
+  BuccaneerJames: ProfileDescriptor, // cairo: ProfileDescriptor
+  TheSensei: ProfileDescriptor, // cairo: ProfileDescriptor
+  SenseiTarrence: ProfileDescriptor, // cairo: ProfileDescriptor
+  ThePainter: ProfileDescriptor, // cairo: ProfileDescriptor
+  Ashe: ProfileDescriptor, // cairo: ProfileDescriptor
+  SerGogi: ProfileDescriptor, // cairo: ProfileDescriptor
+  TheSurvivor: ProfileDescriptor, // cairo: ProfileDescriptor
+  TheFrenchman: ProfileDescriptor, // cairo: ProfileDescriptor
+  SerFocger: ProfileDescriptor, // cairo: ProfileDescriptor
+  SillySosij: ProfileDescriptor, // cairo: ProfileDescriptor
+  BloodBeard: ProfileDescriptor, // cairo: ProfileDescriptor
+  Fredison: ProfileDescriptor, // cairo: ProfileDescriptor
+  TheBard: ProfileDescriptor, // cairo: ProfileDescriptor
+  Ponzimancer: ProfileDescriptor, // cairo: ProfileDescriptor
+  DealerTani: ProfileDescriptor, // cairo: ProfileDescriptor
+  SerRichard: ProfileDescriptor, // cairo: ProfileDescriptor
+  Recipromancer: ProfileDescriptor, // cairo: ProfileDescriptor
+  Mataleone: ProfileDescriptor, // cairo: ProfileDescriptor
+  FortunaRegem: ProfileDescriptor, // cairo: ProfileDescriptor
+  Amaro: ProfileDescriptor, // cairo: ProfileDescriptor
+  Mononoke: ProfileDescriptor, // cairo: ProfileDescriptor
+  Parsa: ProfileDescriptor, // cairo: ProfileDescriptor
+  Jubilee: ProfileDescriptor, // cairo: ProfileDescriptor
+  LadyOfCrows: ProfileDescriptor, // cairo: ProfileDescriptor
+  BananaDuke: ProfileDescriptor, // cairo: ProfileDescriptor
+  LordGladstone: ProfileDescriptor, // cairo: ProfileDescriptor
+  LadyStrokes: ProfileDescriptor, // cairo: ProfileDescriptor
+  Bliss: ProfileDescriptor, // cairo: ProfileDescriptor
+  StormMirror: ProfileDescriptor, // cairo: ProfileDescriptor
+  Aldreda: ProfileDescriptor, // cairo: ProfileDescriptor
+  Petronella: ProfileDescriptor, // cairo: ProfileDescriptor
+  SeraphinaRose: ProfileDescriptor, // cairo: ProfileDescriptor
+  LucienDeSombrel: ProfileDescriptor, // cairo: ProfileDescriptor
+  FyernVirelock: ProfileDescriptor, // cairo: ProfileDescriptor
+  Noir: ProfileDescriptor, // cairo: ProfileDescriptor
+  QueenAce: ProfileDescriptor, // cairo: ProfileDescriptor
+  JoshPeel: ProfileDescriptor, // cairo: ProfileDescriptor
+  IronHandRogan: ProfileDescriptor, // cairo: ProfileDescriptor
+  GoodPupStarky: ProfileDescriptor, // cairo: ProfileDescriptor
+  ImyaSuspect: ProfileDescriptor, // cairo: ProfileDescriptor
+  TheAlchemist: ProfileDescriptor, // cairo: ProfileDescriptor
+  PonziusPilate: ProfileDescriptor, // cairo: ProfileDescriptor
+  MistressNoodle: ProfileDescriptor, // cairo: ProfileDescriptor
+  MasterOfSecrets: ProfileDescriptor, // cairo: ProfileDescriptor
 };
 export const GENESIS_PROFILES: type_GENESIS_PROFILES = {
   Unknown: {

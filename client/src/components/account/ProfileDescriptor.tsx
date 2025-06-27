@@ -39,7 +39,7 @@ export function ProfileBadge({
   return <></>
 }
 
-export function ProfileDescription({
+export function ProfileDescriptor({
   duelistId,
   address,
   displayNameSmall = false,

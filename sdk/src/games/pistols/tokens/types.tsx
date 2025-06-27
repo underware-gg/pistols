@@ -1,4 +1,4 @@
-import { getCollectionDescription } from '../misc/profiles';
+import { getCollectionDescriptor } from '../misc/profiles';
 import * as constants from '../generated/constants'
 
 

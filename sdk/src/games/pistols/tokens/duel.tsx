@@ -12,7 +12,7 @@ import { assets as profileAssets } from './assets/generated/profiles'
 import { assets as cardsAssets } from './assets/generated/cards'
 import { assets as uiAssets } from './assets/generated/ui'
 import { getAsset } from './assets/assets'
-import { getProfileDescription, getProfileKey, makeProfilePicUrl } from '../misc/profiles'
+import { getProfileDescriptor, getProfileKey, makeProfilePicUrl } from '../misc/profiles'
 import * as constants from '../generated/constants'
 
 export type DuelSvgProps = {
@@ -63,8 +63,8 @@ const WEBSITE_Y = (HEIGHT * 0.97);
 export const renderSvg = async (props: DuelSvgProps, options: SvgRenderOptions = {}): Promise<string> => {
   const profile_key_a = getProfileKey(props.profile_type_a, props.profile_id_a)
   const profile_key_b = getProfileKey(props.profile_type_b, props.profile_id_b)
-  const profile_a = getProfileDescription(props.profile_type_a, profile_key_a)
-  const profile_b = getProfileDescription(props.profile_type_b, profile_key_b)
+  const profile_a = getProfileDescriptor(props.profile_type_a, profile_key_a)
+  const profile_b = getProfileDescriptor(props.profile_type_b, profile_key_b)
   const is_finished = (props.state === constants.ChallengeState.Resolved || props.state === constants.ChallengeState.Draw);
   const is_dead_a = (is_finished && props.winner != 1);
   const is_dead_b = (is_finished && props.winner != 2);

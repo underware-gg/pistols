@@ -7,7 +7,7 @@ import { useEntityIds, useDojoSystem, keysToEntityId, getCustomEnumCalldata, use
 import { useClientTimestamp, useMemoGate } from '@underware/pistols-sdk/utils/hooks'
 import { isPositiveBigint, bigintToDecimal, bigintToHex, bigintEquals } from '@underware/pistols-sdk/utils'
 import { makeAbiCustomEnum, parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/starknet'
-import { getCollectionDescription, getProfileDescription, getProfileGender, getProfileId, DuelistProfileKey, DuelistGender, getProfileQuote } from '@underware/pistols-sdk/pistols'
+import { getCollectionDescriptor, getProfileDescriptor, getProfileGender, getProfileId, DuelistProfileKey, DuelistGender, getProfileQuote } from '@underware/pistols-sdk/pistols'
 import { PistolsEntity, PistolsSchemaType, getEntityModel, PistolsQueryBuilder, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols/sdk'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { CharacterType } from '/src/data/assets'
@@ -58,8 +58,8 @@ const useDuelistProfile = (duelist: models.Duelist) => {
   const profileType: constants.DuelistProfile = variant;  // ex: GenesisKey
   const profileKey: DuelistProfileKey = value;            // ex: GenesisKey::Duke
 
-  const profileCollection: constants.CollectionDescription = useMemo(() => getCollectionDescription(profileType), [profileType])
-  const profileDescription: constants.ProfileDescription = useMemo(() => getProfileDescription(profileType, profileKey), [profileType, profileKey])
+  const profileCollection: constants.CollectionDescriptor = useMemo(() => getCollectionDescriptor(profileType), [profileType])
+  const profileDescription: constants.ProfileDescriptor = useMemo(() => getProfileDescriptor(profileType, profileKey), [profileType, profileKey])
   const profileId: number = useMemo(() => getProfileId(profileType, profileKey), [profileType, profileKey])
   const profileGender: DuelistGender = useMemo(() => (getProfileGender(profileType, profileKey)), [profileType, profileKey])
   const duelistName: string = useMemo(() => (profileDescription.name), [profileDescription])

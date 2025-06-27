@@ -17,7 +17,7 @@ const Header = Table.Header
 const HeaderCell = Table.HeaderCell
 
 type Profiles = {
-  [key: string]: constants.ProfileDescription,
+  [key: string]: constants.ProfileDescriptor,
 }
 
 export default function ProfilesTestPage() {
