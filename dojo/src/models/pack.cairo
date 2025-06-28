@@ -1,4 +1,5 @@
 use starknet::{ContractAddress};
+pub use pistols::types::duelist_profile::{DuelistProfile};
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
 pub enum PackType {
@@ -6,6 +7,7 @@ pub enum PackType {
     StarterPack,        // 1
     GenesisDuelists5x,  // 2
     FreeDuelist,        // 3
+    SingleDuelist,      // 4
 }
 
 //------------------------
@@ -21,6 +23,7 @@ pub struct Pack {
     pub seed: felt252,
     pub lords_amount: u128,
     pub is_open: bool,
+    pub duelist_profile: Option<DuelistProfile>,
 }
 
 
@@ -38,6 +41,7 @@ pub struct PackDescriptor {
     pub can_purchase: bool,
     pub price_lords: u128,
     pub quantity: usize,
+    pub contents: felt252, // @generateContants:shortstring
 }
 
 // to be exported to typescript by generateConstants
@@ -53,6 +57,7 @@ mod PACK_TYPES {
         can_purchase: false,
         price_lords: 0,
         quantity: 0,
+        contents: 'Void',
     };
     pub const StarterPack: PackDescriptor = PackDescriptor {
         id: 'StarterPack',
@@ -62,6 +67,7 @@ mod PACK_TYPES {
         can_purchase: false,
         price_lords: (20 * CONST::ETH_TO_WEI.low),
         quantity: 2,
+        contents: 'Ser Walker & Lady Vengeance',
     };
     pub const GenesisDuelists5x: PackDescriptor = PackDescriptor {
         id: 'GenesisDuelists5x',
@@ -71,6 +77,7 @@ mod PACK_TYPES {
         can_purchase: true,
         price_lords: (50 * CONST::ETH_TO_WEI.low),
         quantity: 5,
+        contents: 'Five Random Genesis Duelists',
     };
     pub const FreeDuelist: PackDescriptor = PackDescriptor {
         id: 'FreeDuelist',
@@ -80,6 +87,17 @@ mod PACK_TYPES {
         can_purchase: false,
         price_lords: (10 * CONST::ETH_TO_WEI.low),
         quantity: 1,
+        contents: 'One Random Genesis Duelist',
+    };
+    pub const SingleDuelist: PackDescriptor = PackDescriptor {
+        id: 'SingleDuelist',
+        name: 'Single Duelist',
+        image_url_closed: '/tokens/SingleDuelist.jpg',
+        image_url_open: '/tokens/SingleDuelist.jpg',
+        can_purchase: false,
+        price_lords: (10 * CONST::ETH_TO_WEI.low),
+        quantity: 1,
+        contents: 'One Special Duelist',
     };
 }
 
@@ -93,7 +111,7 @@ use pistols::interfaces::dns::{
     IDuelistTokenProtectedDispatcherTrait,
 };
 use pistols::models::pool::{PoolType};
-use pistols::types::duelist_profile::{DuelistProfile, GenesisKey};
+use pistols::types::duelist_profile::{DuelistProfileTrait, GenesisKey};
 use pistols::utils::short_string::{ShortStringTrait};
 use pistols::libs::store::{Store, StoreTrait};
 
@@ -107,9 +125,9 @@ pub impl PackImpl of PackTrait {
                 (store.world.duelist_token_protected_dispatcher()
                     .mint_duelists(
                         recipient,
-                        DuelistProfile::Genesis(GenesisKey::Unknown),
                         self.pack_type.descriptor().quantity,
-                        0x0100, // mint always Ser Walker + Lady Vengeance
+                        DuelistProfile::Genesis(GenesisKey::Unknown),
+                        0x0100, // fake seed: Ser Walker (0x__00) + Lady Vengeance (0x01__)
                     )
                 )
             },
@@ -118,9 +136,21 @@ pub impl PackImpl of PackTrait {
                 (store.world.duelist_token_protected_dispatcher()
                     .mint_duelists(
                         recipient,
-                        DuelistProfile::Genesis(GenesisKey::Unknown),
                         self.pack_type.descriptor().quantity,
+                        DuelistProfile::Genesis(GenesisKey::Unknown),
                         self.seed,
+                    )
+                )
+            },
+            PackType::SingleDuelist => {
+                assert(self.duelist_profile.is_some(), PackErrors::MISSING_DUELIST);
+                let duelist_profile: DuelistProfile = self.duelist_profile.unwrap();
+                (store.world.duelist_token_protected_dispatcher()
+                    .mint_duelists(
+                        recipient,
+                        self.pack_type.descriptor().quantity,
+                        duelist_profile,
+                        0,
                     )
                 )
             },
@@ -128,6 +158,16 @@ pub impl PackImpl of PackTrait {
         self.is_open = true;
         store.set_pack(@self);
         (token_ids)
+    }
+    fn contents(self: @Pack) -> ByteArray {
+        (match self.duelist_profile {
+            Option::Some(profile) => {
+                ((*profile).card_name())
+            },
+            Option::None => {
+                ((*self.pack_type).descriptor().contents.to_string())
+            },
+        })
     }
 }
 
@@ -139,6 +179,7 @@ pub impl PackTypeImpl of PackTypeTrait {
             PackType::StarterPack           => PACK_TYPES::StarterPack,
             PackType::GenesisDuelists5x     => PACK_TYPES::GenesisDuelists5x,
             PackType::FreeDuelist           => PACK_TYPES::FreeDuelist,
+            PackType::SingleDuelist         => PACK_TYPES::SingleDuelist,
         }
     }
     #[inline(always)]

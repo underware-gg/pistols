@@ -83,13 +83,12 @@ pub trait IDuelistTokenPublic<TState> {
     fn poke(ref self: TState, duelist_id: u128) -> bool; //@description: Reactivates an inactive Duelist
     fn sacrifice(ref self: TState, duelist_id: u128); //@description: Sacrifices a Duelist
     fn memorialize(ref self: TState, duelist_id: u128); //@description: Memorializes a Duelist
-    fn airdrop_duelist(ref self: TState, recipient: ContractAddress, duelist_profile: DuelistProfile) -> u128;
 }
 
 // Exposed to world
 #[starknet::interface]
 pub trait IDuelistTokenProtected<TState> {
-    fn mint_duelists(ref self: TState, recipient: ContractAddress, profile_sample: DuelistProfile, quantity: usize, seed: felt252) -> Span<u128>;
+    fn mint_duelists(ref self: TState, recipient: ContractAddress, quantity: usize, profile_type: DuelistProfile, seed: felt252) -> Span<u128>;
     fn get_validated_active_duelist_id(ref self: TState, address: ContractAddress, duelist_id: u128, lives_staked: u8) -> u128;
     fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u64, bonus: DuelBonus) -> (RewardValues, RewardValues);
 }
@@ -154,7 +153,6 @@ pub mod duelist_token {
         IFameCoinProtectedDispatcher, IFameCoinProtectedDispatcherTrait,
         IFoolsCoinProtectedDispatcher, IFoolsCoinProtectedDispatcherTrait,
         IBankProtectedDispatcher, IBankProtectedDispatcherTrait,
-        IAdminDispatcherTrait,
     };
     use pistols::models::{
         pool::{PoolType, PoolTypeTrait, LordsReleaseBill, ReleaseReason},
@@ -186,7 +184,6 @@ pub mod duelist_token {
     use graffiti::url::{UrlImpl};
 
     pub mod Errors {
-        pub const CALLER_NOT_ADMIN: felt252         = 'DUELIST: Caller not admin';
         pub const INVALID_CALLER: felt252           = 'DUELIST: Invalid caller';
         pub const INVALID_DUELIST: felt252          = 'DUELIST: Invalid duelist';
         pub const NOT_YOUR_DUELIST: felt252         = 'DUELIST: Not your duelist';
@@ -321,17 +318,6 @@ pub mod duelist_token {
             self.erc721_combo._require_owner_of(starknet::get_caller_address(), duelist_id.into());
             self._reactivate_or_sacrifice(duelist_id, Option::None, CauseOfDeath::Memorize);
         }
-
-        fn airdrop_duelist(ref self: ContractState,
-            recipient: ContractAddress,
-            duelist_profile: DuelistProfile,
-        ) -> u128 {
-            self._assert_caller_is_admin();
-            let duelist_id: u128 = self.token.mint_next(recipient);
-            let mut store: Store = StoreTrait::new(self.world_default());
-            self._spawn_duelist(ref store, recipient, duelist_id, duelist_profile);
-            (duelist_id)
-        }
     }
 
     //-----------------------------------
@@ -341,8 +327,8 @@ pub mod duelist_token {
     impl DuelistTokenProtectedImpl of super::IDuelistTokenProtected<ContractState> {
         fn mint_duelists(ref self: ContractState,
             recipient: ContractAddress,
-            profile_sample: DuelistProfile,
             quantity: usize,
+            profile_type: DuelistProfile,
             seed: felt252,
         ) -> Span<u128>{
             let mut store: Store = StoreTrait::new(self.world_default());
@@ -352,15 +338,21 @@ pub mod duelist_token {
             let duelist_ids: Span<u128> = self.token.mint_next_multiple(recipient, quantity);
 
             // create duelists
-            let mut rnd: u256 = seed.into();
+            let mut seed: u256 = seed.into();
             let mut i: usize = 0;
             while (i < duelist_ids.len()) {
+                let duelist_id: u128 = *duelist_ids[i];
+                let duelist_profile: DuelistProfile = 
+                    // unpacked in open()
+                    if (seed.is_zero()) {(profile_type)}
+                    // randomize based on unknown type
+                    else {(ProfileManagerTrait::randomize_profile(profile_type, seed.low.into()))};
                 self._spawn_duelist(ref store,
                     recipient,
-                    *duelist_ids[i],
-                    ProfileManagerTrait::randomize_profile(profile_sample, rnd.low.into()),
+                    duelist_profile,
+                    duelist_id,
                 );
-                rnd /= 0x100;
+                seed /= 0x100;
                 i += 1;
             };
 
@@ -452,16 +444,11 @@ pub mod duelist_token {
     //
     #[generate_trait]
     impl InternalImpl of InternalTrait {
-        fn _assert_caller_is_admin(self: @ContractState) {
-            let mut world = self.world_default();
-            assert(world.admin_dispatcher().am_i_admin(starknet::get_caller_address()) == true, Errors::CALLER_NOT_ADMIN);
-        }
-
         fn _spawn_duelist(ref self: ContractState,
             ref store: Store,
             recipient: ContractAddress,
-            duelist_id: u128,
             duelist_profile: DuelistProfile,
+            duelist_id: u128,
         ) {
             // create Duelist
             let duelist = Duelist {
@@ -740,7 +727,7 @@ pub mod duelist_token {
             let owner: ContractAddress = self.owner_of(token_id);
             let assignment: DuelistAssignmentValue = store.get_duelist_challenge_value(token_id.low);
             let archetype: Archetype = duelist.totals.get_archetype();
-            let duelist_image: ByteArray = duelist.duelist_profile.get_uri(base_uri.clone());
+            let duelist_image: ByteArray = duelist.duelist_profile.get_image_uri(base_uri.clone());
             let fame_balance: u128 = self._fame_balance(@store.world.fame_coin_dispatcher(), token_id.low);
             let lives: u128 = (fame_balance / FAME::ONE_LIFE.low);
             let fame_dispatcher: IFameCoinDispatcher = self.world_default().fame_coin_dispatcher();

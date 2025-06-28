@@ -69,6 +69,7 @@ pub mod tester {
     pub use pistols::types::{
         premise::{Premise},
         challenge_state::{ChallengeState},
+        duelist_profile::{DuelistProfile},
         trophies::{Trophy, TrophyTrait},
         constants::{CONST, FAME},
     };
@@ -753,16 +754,23 @@ pub mod tester {
         _next_block();
         (token_ids)
     }
-    pub fn execute_pack_purchase(sys: @TestSystems, sender: ContractAddress, pack_type: PackType) -> Pack {
+    pub fn execute_pack_purchase(sys: @TestSystems, sender: ContractAddress, pack_type: PackType) -> u128 {
         impersonate(sender);
-        let pack: Pack = (*sys.pack).purchase(pack_type);
+        let pack_id: u128 = (*sys.pack).purchase(pack_type);
         _next_block();
-        (pack)
+        (pack_id)
     }
-    pub fn execute_pack_open(sys: @TestSystems, sender: ContractAddress, pack_id: u128) {
+    pub fn execute_pack_airdrop(sys: @TestSystems, sender: ContractAddress, recipient: ContractAddress, pack_type: PackType, duelist_profile: Option<DuelistProfile>) -> u128 {
         impersonate(sender);
-        (*sys.pack).open(pack_id);
+        let pack_id: u128 = (*sys.pack).airdrop(recipient, pack_type, duelist_profile);
         _next_block();
+        (pack_id)
+    }
+    pub fn execute_pack_open(sys: @TestSystems, sender: ContractAddress, pack_id: u128) -> Span<u128> {
+        impersonate(sender);
+        let token_ids: Span<u128> = (*sys.pack).open(pack_id);
+        _next_block();
+        (token_ids)
     }
 
     // ::duelist_token

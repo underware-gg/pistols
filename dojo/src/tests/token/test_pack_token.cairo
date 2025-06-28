@@ -11,11 +11,12 @@ use pistols::models::{
     player::{Player, PlayerTrait},
     pack::{Pack, PackType, PackTypeTrait},
     config::{TokenConfig},
+    pool::{Pool, PoolType},
 };
 
-use pistols::types::duelist_profile::{DuelistProfile, GenesisKey};
+use pistols::types::duelist_profile::{DuelistProfile, BotKey, CharacterKey, GenesisKey, LegendsKey};
 // use pistols::interfaces::dns::{DnsTrait};
-use pistols::types::constants::{CONST};
+use pistols::types::constants::{CONST, FAME};
 use pistols::types::timestamp::{TIMESTAMP};
 use pistols::tests::tester::{
     tester,
@@ -48,7 +49,7 @@ fn setup(_fee_amount: u128) -> TestSystems {
     tester::execute_lords_faucet(@sys.lords, OWNER());
     tester::execute_lords_faucet(@sys.lords, OTHER());
 
-    tester::fund_duelists_pool(@sys, 2);
+    tester::fund_duelists_pool(@sys, 2); // 4 duelists
 
     // drop all events
     tester::drop_all_events(sys.world.dispatcher.contract_address);
@@ -106,23 +107,29 @@ fn test_contract_uri() {
 fn test_token_uri() {
     let mut sys: TestSystems = setup(0);
 
-    let pack = Pack {
-        pack_id: TOKEN_ID_1.low,
-        pack_type: PackType::GenesisDuelists5x,
-        seed: 999999,
-        lords_amount: 50 * CONST::ETH_TO_WEI.low,
-        is_open: false,
-    };
-
-    tester::set_Pack(ref sys.world, @pack);
-
-    assert!(sys.pack.can_claim_starter_pack(OWNER()), "can_claim_starter_pack");
     tester::execute_claim_starter_pack(@sys, OWNER());
     _purchase(@sys, OWNER());
+    _purchase(@sys, OWNER());
 
-    let uri = sys.pack.token_uri(TOKEN_ID_2);
-    assert_gt!(uri.len(), 100, "Uri 1 should not be empty");
-    println!("___packs.token_uri(1):{}", uri);
+    let uri_1 = sys.pack.token_uri(TOKEN_ID_2);
+    assert!(tester::starts_with(uri_1.clone(), "data:"), "token_uri(1) should be a json string");
+    println!("___packs.token_uri(1):{}", uri_1);
+
+    // including duelist...
+    let mut pack_2 = Pack {
+        pack_id: TOKEN_ID_3.low,
+        pack_type: PackType::SingleDuelist,
+        seed: 0,
+        lords_amount: (10 * CONST::ETH_TO_WEI.low),
+        is_open: true,
+        duelist_profile: Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)),
+    };
+    tester::set_Pack(ref sys.world, @pack_2);
+
+    let uri_2 = sys.pack.token_uri(TOKEN_ID_3);
+    assert!(tester::starts_with(uri_2.clone(), "data:"), "token_uri(2) should be a json string");
+    assert_ne!(uri_2, uri_1, "uris should be different");
+    println!("___packs.token_uri(2):{}", uri_2);
 }
 
 #[test]
@@ -492,6 +499,178 @@ fn test_transfer_unopened_no_allowance() {
     tester::impersonate(SPENDER());
     sys.pack.transfer_from(OWNER(), OTHER(), TOKEN_ID_2);
 }
+
+
+//
+// airdrops...
+//
+
+fn _airdrop_open(sys: @TestSystems, recipient: ContractAddress, pack_type: PackType, duelist_profile: Option<DuelistProfile>, prefix: ByteArray) {
+    let duelist_balance_before: u128 = (*sys.duelists).balance_of(recipient).low;
+    // airdrop...
+    let pack_id: u128 = tester::execute_pack_airdrop(sys, OWNER(), recipient, pack_type, duelist_profile);
+    assert_eq!((*sys.pack).owner_of(pack_id.into()), recipient, "{}:: owner_of(pack_id)", prefix);
+    // open...
+    let token_ids: Span<u128> = tester::execute_pack_open(sys, recipient, pack_id);
+    let duelist_id: u128 = *token_ids[0];
+    let minted_profile: DuelistProfile = sys.store.get_duelist_profile(duelist_id);
+    assert_eq!((*sys.duelists).owner_of(duelist_id.into()), recipient, "{}:: owner_of(duelist_id)", prefix);
+    assert_ne!(minted_profile, DuelistProfile::Undefined, "{}:: !DuelistProfile::Undefined", prefix);
+    // validated minted duelist profile
+    match pack_type {
+        PackType::StarterPack => {
+            assert_eq!(minted_profile, DuelistProfile::Genesis(GenesisKey::SerWalker), "{}:: GenesisKey::SerWalker", prefix);
+        },
+        PackType::FreeDuelist | PackType::GenesisDuelists5x => {
+            assert_ne!(minted_profile, DuelistProfile::Genesis(GenesisKey::Unknown), "{}:: !GenesisKey::Unknown", prefix);
+            assert_ne!(minted_profile, DuelistProfile::Genesis(GenesisKey::SerWalker), "{}:: !SerWalker", prefix);
+            assert_ne!(minted_profile, DuelistProfile::Genesis(GenesisKey::LadyVengeance), "{}:: !LadyVengeance", prefix);
+        },
+        PackType::SingleDuelist => {
+            assert_eq!(minted_profile, duelist_profile.unwrap(), "{}:: incorrect profile", prefix);
+        },
+        _ => {},
+    }
+    // validate new duelist balance
+    let duelist_balance_after: u128 = (*sys.duelists).balance_of(recipient).low;
+    assert_eq!(duelist_balance_after, duelist_balance_before + pack_type.descriptor().quantity.into(), "{}:: duelist_balance_after(recipient)", prefix);
+    // falidate duelist FAME
+    let duelist_fame_balance: u128 = (*sys.duelists).fame_balance(duelist_id.into());
+    assert_eq!(duelist_fame_balance, FAME::MINT_GRANT_AMOUNT.low, "{}:: duelist_fame_balance", prefix);
+}
+
+#[test]
+fn test_airdrop_ok() {
+    let mut sys: TestSystems = setup(0);
+    tester::fund_duelists_pool(@sys, 5);
+    _airdrop_open(@sys, OTHER(), PackType::StarterPack, Option::None, "StarterPack");
+    _airdrop_open(@sys, OTHER(), PackType::FreeDuelist, Option::None, "FreeDuelist");
+    _airdrop_open(@sys, OTHER(), PackType::GenesisDuelists5x, Option::None, "GenesisDuelists5x");
+    _airdrop_open(@sys, OTHER(), PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "GenesisKey::Duke");
+    _airdrop_open(@sys, OTHER(), PackType::SingleDuelist, Option::Some(DuelistProfile::Legends(LegendsKey::TGC1)), "LegendsKey::TGC1");
+}
+
+#[test]
+#[should_panic(expected: ('PACK: Caller not admin', 'ENTRYPOINT_FAILED'))]
+fn test_airdrop_not_admin() {
+    let mut sys: TestSystems = setup(0);
+    tester::execute_pack_airdrop(@sys, OTHER(), BUMMER(), PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)));
+}
+
+#[test]
+#[should_panic(expected: ('PACK: Missing duelist', 'ENTRYPOINT_FAILED'))]
+fn test_airdrop_missing_profile() {
+    let mut sys: TestSystems = setup(0);
+    tester::execute_pack_airdrop(@sys, OWNER(), OTHER(), PackType::SingleDuelist, Option::None);
+}
+
+#[test]
+#[should_panic(expected: ('PACK: Invalid duelist', 'ENTRYPOINT_FAILED'))]
+fn test_airdrop_undefined_profile() {
+    let mut sys: TestSystems = setup(0);
+    let duelist_profile = DuelistProfile::Undefined;
+    tester::execute_pack_airdrop(@sys, OWNER(), OTHER(), PackType::SingleDuelist, Option::Some(duelist_profile));
+}
+
+#[test]
+#[should_panic(expected: ('PACK: Invalid duelist', 'ENTRYPOINT_FAILED'))]
+fn test_airdrop_invalid_profile() {
+    let mut sys: TestSystems = setup(0);
+    let duelist_profile = DuelistProfile::Genesis(GenesisKey::Unknown);
+    tester::execute_pack_airdrop(@sys, OWNER(), OTHER(), PackType::SingleDuelist, Option::Some(duelist_profile));
+}
+
+#[test]
+#[should_panic(expected: ('PACK: Invalid duelist', 'ENTRYPOINT_FAILED'))]
+fn test_airdrop_invalid_bot() {
+    let mut sys: TestSystems = setup(0);
+    let duelist_profile = DuelistProfile::Bot(BotKey::Leon);
+    tester::execute_pack_airdrop(@sys, OWNER(), OTHER(), PackType::SingleDuelist, Option::Some(duelist_profile));
+}
+
+#[test]
+#[should_panic(expected: ('PACK: Invalid duelist', 'ENTRYPOINT_FAILED'))]
+fn test_airdrop_invalid_character() {
+    let mut sys: TestSystems = setup(0);
+    let duelist_profile = DuelistProfile::Character(CharacterKey::Bartender);
+    tester::execute_pack_airdrop(@sys, OWNER(), OTHER(), PackType::SingleDuelist, Option::Some(duelist_profile));
+}
+
+#[test]
+#[should_panic(expected: ('PACK: Invalid duelist', 'ENTRYPOINT_FAILED'))]
+fn test_airdrop_invalid_free() {
+    let mut sys: TestSystems = setup(0);
+    let duelist_profile = DuelistProfile::Legends(LegendsKey::TGC1);
+    tester::execute_pack_airdrop(@sys, OWNER(), OTHER(), PackType::FreeDuelist, Option::Some(duelist_profile));
+}
+
+#[test]
+fn test_airdrop_open_free_pool_ok() {
+    let mut sys: TestSystems = setup(0);
+    let duelist_profile = DuelistProfile::Legends(LegendsKey::TGC1);
+    // check pool balance
+    let pool_claimable_before: Pool = sys.store.get_pool(PoolType::Claimable);
+    let pool_fame_peg_before: Pool = sys.store.get_pool(PoolType::FamePeg);
+    assert_gt!(pool_claimable_before.balance_lords, 0, "pool_claimable_before");
+    assert_eq!(pool_fame_peg_before.balance_lords, 0, "pool_fame_peg_before");
+    // airdrop+open packs
+    _airdrop_open(@sys, OTHER(), PackType::SingleDuelist, Option::Some(duelist_profile), "pack 1");
+    _airdrop_open(@sys, OTHER(), PackType::SingleDuelist, Option::Some(duelist_profile), "pack 2");
+    _airdrop_open(@sys, OTHER(), PackType::SingleDuelist, Option::Some(duelist_profile), "pack 3");
+    _airdrop_open(@sys, OTHER(), PackType::SingleDuelist, Option::Some(duelist_profile), "pack 4");
+    // no panic!
+    let pool_claimable_after: Pool = sys.store.get_pool(PoolType::Claimable);
+    let pool_fame_peg_after: Pool = sys.store.get_pool(PoolType::FamePeg);
+    assert_eq!(pool_claimable_after.balance_lords, 0, "pool_claimable_after");
+    assert_eq!(pool_fame_peg_after.balance_lords, pool_claimable_before.balance_lords, "pool_fame_peg_after");
+}
+
+#[test]
+#[should_panic(expected: ('PACK: insufficient LORDS pool', 'ENTRYPOINT_FAILED'))]
+fn test_airdrop_open_free_pool_insufficient() {
+    let mut sys: TestSystems = setup(0);
+    let duelist_profile = DuelistProfile::Legends(LegendsKey::TGC1);
+    _airdrop_open(@sys, OTHER(), PackType::SingleDuelist, Option::Some(duelist_profile), "pack 1");
+    _airdrop_open(@sys, OTHER(), PackType::SingleDuelist, Option::Some(duelist_profile), "pack 2");
+    _airdrop_open(@sys, OTHER(), PackType::SingleDuelist, Option::Some(duelist_profile), "pack 3");
+    _airdrop_open(@sys, OTHER(), PackType::SingleDuelist, Option::Some(duelist_profile), "pack 4");
+    // panic!
+    _airdrop_open(@sys, OTHER(), PackType::SingleDuelist, Option::Some(duelist_profile), "pack 5");
+}
+
+#[test]
+fn test_airdrop_open_purchasable_pool_ok() {
+    let mut sys: TestSystems = setup(0);
+    tester::fund_duelists_pool(@sys, 3); // 6 more duelists = 10 total
+    // check pool balance
+    let pool_claimable_before: Pool = sys.store.get_pool(PoolType::Claimable);
+    let pool_purchase_before: Pool = sys.store.get_pool(PoolType::Purchases);
+    let pool_fame_peg_before: Pool = sys.store.get_pool(PoolType::FamePeg);
+    assert_gt!(pool_claimable_before.balance_lords, 0, "pool_claimable_before");
+    assert_eq!(pool_purchase_before.balance_lords, 0, "pool_purchase_before");
+    assert_eq!(pool_fame_peg_before.balance_lords, 0, "pool_fame_peg_before");
+    // airdrop...
+    let pack_1: u128 = tester::execute_pack_airdrop(@sys, OWNER(), OTHER(), PackType::GenesisDuelists5x, Option::None);
+    let pack_2: u128 = tester::execute_pack_airdrop(@sys, OWNER(), OTHER(), PackType::GenesisDuelists5x, Option::None);
+    // check pool balance
+    let pool_claimable_airdropped: Pool = sys.store.get_pool(PoolType::Claimable);
+    let pool_purchase_airdropped: Pool = sys.store.get_pool(PoolType::Purchases);
+    let pool_fame_peg_airdropped: Pool = sys.store.get_pool(PoolType::FamePeg);
+    assert_eq!(pool_claimable_airdropped.balance_lords, 0, "pool_claimable_airdropped");
+    assert_eq!(pool_purchase_airdropped.balance_lords, pool_claimable_before.balance_lords, "pool_purchase_airdropped");
+    assert_eq!(pool_fame_peg_airdropped.balance_lords, 0, "pool_fame_peg_airdropped");
+    // open...
+    tester::execute_pack_open(@sys, OTHER(), pack_1);
+    tester::execute_pack_open(@sys, OTHER(), pack_2);
+    // check pool balance
+    let pool_claimable_after: Pool = sys.store.get_pool(PoolType::Claimable);
+    let pool_purchase_after: Pool = sys.store.get_pool(PoolType::Purchases);
+    let pool_fame_peg_after: Pool = sys.store.get_pool(PoolType::FamePeg);
+    assert_eq!(pool_claimable_after.balance_lords, 0, "pool_claimable_after");
+    assert_eq!(pool_purchase_after.balance_lords, 0, "pool_purchase_after");
+    assert_eq!(pool_fame_peg_after.balance_lords, pool_claimable_before.balance_lords, "pool_fame_peg_after");
+}
+
 
 
 //---------------------------------

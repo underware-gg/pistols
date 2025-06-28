@@ -50,9 +50,9 @@ mod tests {
         tester::execute_claim_starter_pack(@sys, OTHER());
         // purchase 7 packs...
         // 3 will be opened...
-        let pack_id_1: u128 = tester::execute_pack_purchase(@sys, OWNER(), PackType::GenesisDuelists5x).pack_id;
-        let pack_id_2: u128 = tester::execute_pack_purchase(@sys, OWNER(), PackType::GenesisDuelists5x).pack_id;
-        let pack_id_3: u128 = tester::execute_pack_purchase(@sys, OWNER(), PackType::GenesisDuelists5x).pack_id;
+        let pack_id_1: u128 = tester::execute_pack_purchase(@sys, OWNER(), PackType::GenesisDuelists5x);
+        let pack_id_2: u128 = tester::execute_pack_purchase(@sys, OWNER(), PackType::GenesisDuelists5x);
+        let pack_id_3: u128 = tester::execute_pack_purchase(@sys, OWNER(), PackType::GenesisDuelists5x);
         // 4 will remain closed...
         tester::execute_pack_purchase(@sys, OWNER(), PackType::GenesisDuelists5x);
         tester::execute_pack_purchase(@sys, OWNER(), PackType::GenesisDuelists5x);

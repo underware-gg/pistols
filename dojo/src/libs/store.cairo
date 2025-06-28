@@ -22,7 +22,7 @@ pub use pistols::models::{
         PlayerDuelistStack, PlayerDuelistStackValue,
     },
     pack::{
-        Pack, PackValue,
+        Pack,
     },
     challenge::{
         Challenge, ChallengeValue,
@@ -120,10 +120,10 @@ pub impl StoreImpl of StoreTrait {
     fn get_pack(self: @Store, pack_id: u128) -> Pack {
         (self.world.read_model(pack_id))
     }
-    #[inline(always)]
-    fn get_pack_value(self: @Store, pack_id: u128) -> PackValue {
-        (self.world.read_value(pack_id))
-    }
+    // #[inline(always)]
+    // fn get_pack_value(self: @Store, pack_id: u128) -> PackValue {
+    //     (self.world.read_value(pack_id))
+    // }
 
     #[inline(always)]
     fn get_challenge(self: @Store, duel_id: u128) -> Challenge {

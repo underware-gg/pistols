@@ -562,11 +562,24 @@ pub impl DuelistProfileImpl of DuelistProfileTrait {
             (0)
         })
     }
+    fn is_playable(self: @DuelistProfile) -> bool {
+        let collection: CollectionDescriptor = self.collection();
+        (collection.is_playable)
+    }
     fn name(self: @DuelistProfile) -> ByteArray {
         let desc: ProfileDescriptor = self.descriptor();
         (desc.name.to_string())
     }
-    fn get_uri(self: @DuelistProfile,
+    fn card_name(self: @DuelistProfile) -> ByteArray {
+        (match *self {
+            DuelistProfile::Undefined =>        "Unknown Card",
+            DuelistProfile::Character(_) =>     format!("Character Card: {}", self.name()),
+            DuelistProfile::Bot(_) =>           format!("Bot Card: {}", self.name()),
+            DuelistProfile::Genesis(_) =>       format!("Genesis Card: {}", self.name()),
+            DuelistProfile::Legends(_) =>       format!("Legends Card: {}", self.name()),
+        })
+    }
+    fn get_image_uri(self: @DuelistProfile,
         base_uri: ByteArray,
     ) -> ByteArray {
         let folder_name: ByteArray = self.collection().folder_name.to_string();
@@ -908,8 +921,9 @@ impl U8IntoLegendsKey of core::traits::Into<u8, LegendsKey> {
 
 
 
+
 //----------------------------------------
-// Duelist id converters
+// Duelist id converters (NPCs only)
 //
 impl CharacterKeyIntoDuelistId of core::traits::Into<CharacterKey, u128> {
     fn into(self: CharacterKey) -> u128 {
@@ -919,11 +933,6 @@ impl CharacterKeyIntoDuelistId of core::traits::Into<CharacterKey, u128> {
 impl BotKeyIntoDuelistId of core::traits::Into<BotKey, u128> {
     fn into(self: BotKey) -> u128 {
         (DuelistProfile::Bot(self).to_duelist_id())
-    }
-}
-impl LegendsKeyIntoDuelistId of core::traits::Into<LegendsKey, u128> {
-    fn into(self: LegendsKey) -> u128 {
-        (DuelistProfile::Legends(self).to_duelist_id())
     }
 }
 impl DuelistIdIntoCharacterKey of core::traits::Into<u128, CharacterKey> {
@@ -940,16 +949,6 @@ impl DuelistIdIntoBotKey of core::traits::Into<u128, BotKey> {
         (id.into())
     }
 }
-impl DuelistIdIntoLegendsKey of core::traits::Into<u128, LegendsKey> {
-    fn into(self: u128) -> LegendsKey {
-        let zero: u128 = self ^ COLLECTIONS::Legends.duelist_id_base;
-        let id: u8 = if (zero < 0xff) { (self & 0xff).try_into().unwrap() } else { 0 };
-        (id.into())
-    }
-}
-
-
-
 
 
 //---------------------------
@@ -1166,12 +1165,13 @@ mod unit {
 
     #[test]
     fn test_profile_duelist_ids_character() {
-        assert_gt!(COLLECTIONS::Character.duelist_id_base, 0, "bad base id");
+        let duelist_id_base: u128 = COLLECTIONS::Character.duelist_id_base;
+        assert_gt!(duelist_id_base, 0, "bad base id");
         let mut p: u8 = 1;
         while (p <= COLLECTIONS::Character.profile_count.into()) {
             let key: CharacterKey = p.into();
-            let expected_id: u128 = (COLLECTIONS::Character.duelist_id_base | key.into());
-            assert_gt!(expected_id, COLLECTIONS::Character.duelist_id_base, "({}) low id", p);
+            let expected_id: u128 = (duelist_id_base | key.into());
+            assert_gt!(expected_id, duelist_id_base, "({}) low id", p);
             assert_eq!(expected_id, DuelistProfile::Character(key).to_duelist_id(), "({}) bad type_id", p);
             assert_eq!(expected_id.into(), key, "({}) bad profile", p);
             p += 1;
@@ -1180,12 +1180,13 @@ mod unit {
 
     #[test]
     fn test_profile_duelist_ids_bot() {
-        assert_gt!(COLLECTIONS::Bot.duelist_id_base, 0, "bad base id");
+        let duelist_id_base: u128 = COLLECTIONS::Bot.duelist_id_base;
+        assert_gt!(duelist_id_base, 0, "bad base id");
         let mut p: u8 = 1;
         while (p <= COLLECTIONS::Bot.profile_count.into()) {
             let key: BotKey = p.into();
-            let expected_id: u128 = (COLLECTIONS::Bot.duelist_id_base | key.into());
-            assert_gt!(expected_id, COLLECTIONS::Bot.duelist_id_base, "({}) low id", p);
+            let expected_id: u128 = (duelist_id_base | key.into());
+            assert_gt!(expected_id, duelist_id_base, "({}) low id", p);
             assert_eq!(expected_id, DuelistProfile::Bot(key).to_duelist_id(), "({}) bad type_id", p);
             assert_eq!(expected_id.into(), key, "({}) bad profile", p);
             p += 1;
@@ -1194,7 +1195,8 @@ mod unit {
 
     #[test]
     fn test_profile_duelist_ids_genesis() {
-        assert_eq!(COLLECTIONS::Genesis.duelist_id_base, 0, "bad base id");
+        let duelist_id_base: u128 = COLLECTIONS::Genesis.duelist_id_base;
+        assert_eq!(duelist_id_base, 0, "bad base id");
         let mut p: u8 = 1;
         while (p <= COLLECTIONS::Genesis.profile_count.into()) {
             let key: GenesisKey = p.into();

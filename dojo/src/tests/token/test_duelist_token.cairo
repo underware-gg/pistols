@@ -852,7 +852,7 @@ fn test_mint_duelist_not_minter() {
     let mut sys: TestSystems = setup(0);
     // let account: ContractAddress = tester::deploy_mock_account();
     // tester::impersonate(account);
-    _protected(@sys).mint_duelists(OWNER(), DuelistProfile::Genesis(GenesisKey::Unknown), 1, 0x1234);
+    _protected(@sys).mint_duelists(OWNER(), 1, DuelistProfile::Genesis(GenesisKey::Unknown), 0x1234);
 }
 
 #[test]
