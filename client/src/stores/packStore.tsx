@@ -12,13 +12,13 @@ export const usePackStore = createDojoStore<PistolsSchemaType>();
 
 
 export const usePackType = (packType: constants.PackType) => {
-  const description = useMemo(() => constants.PACK_TYPES[packType], [packType])
-  const name = useMemo(() => (description?.name ?? 'Pack'), [description])
-  const imageUrlOpen = useMemo(() => (description?.image_url_open ?? null), [description])
-  const imageUrlClosed = useMemo(() => (description?.image_url_closed ?? null), [description])
-  const canPurchase = useMemo(() => (description?.can_purchase ?? false), [description])
-  const priceLords = useMemo(() => (description?.price_lords ?? null), [description])
-  const quantity = useMemo(() => (description?.quantity ?? null), [description])
+  const descriptor = useMemo(() => constants.PACK_TYPES[packType], [packType])
+  const name = useMemo(() => (descriptor?.name ?? 'Pack'), [descriptor])
+  const imageUrlOpen = useMemo(() => (descriptor?.image_url_open ?? null), [descriptor])
+  const imageUrlClosed = useMemo(() => (descriptor?.image_url_closed ?? null), [descriptor])
+  const canPurchase = useMemo(() => (descriptor?.can_purchase ?? false), [descriptor])
+  const priceLords = useMemo(() => (descriptor?.price_lords ?? null), [descriptor])
+  const quantity = useMemo(() => (descriptor?.quantity ?? null), [descriptor])
   return {
     name,
     imageUrlOpen,
@@ -39,13 +39,13 @@ export const usePack = (pack_id: BigNumberish) => {
 
   const isOpen = useMemo(() => pack?.is_open ?? false, [pack])
   const packType = useMemo(() => parseEnumVariant<constants.PackType>(pack?.pack_type), [pack])
-  const packDescription = usePackType(packType)
+  const packDescriptor = usePackType(packType)
 
   return {
     packExists: (pack != null),
     packType,
     isOpen,
-    ...packDescription,
+    ...packDescriptor,
   }
 }
 

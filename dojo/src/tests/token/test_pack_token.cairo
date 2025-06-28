@@ -147,7 +147,7 @@ fn test_claim_purchase() {
     assert!(!player.exists(), "!player.exists()");
     assert!(!player.timestamps.claimed_starter_pack, "!player.timestamps.claimed_starter_pack");
 
-    let starter_pack_duelist_count: usize = PackType::StarterPack.description().quantity;
+    let starter_pack_duelist_count: usize = PackType::StarterPack.descriptor().quantity;
 
     assert!(sys.pack.can_claim_starter_pack(OWNER()), "can_claim_starter_pack_OWNER");
     let owner_ids: Span<u128> = tester::execute_claim_starter_pack(@sys, OWNER());
@@ -353,7 +353,7 @@ fn test_claim_gift_ineligible() {
 fn test_open() {
     let mut sys: TestSystems = setup(0);
 
-    let starter_pack_count: usize = PackType::StarterPack.description().quantity;
+    let starter_pack_count: usize = PackType::StarterPack.descriptor().quantity;
     assert_eq!(starter_pack_count, 2, "starter_pack_count");
 
     // claiming opens and mint duelists

@@ -576,7 +576,7 @@ export type DuelistHand = {
 };
 
 // from: ../dojo/src/models/pack.cairo
-export type PackDescription = {
+export type PackDescriptor = {
   id : string,
   name : string,
   image_url_closed : string,
@@ -761,10 +761,10 @@ export const CONFIG: type_CONFIG = {
 
 // from: ../dojo/src/models/pack.cairo
 type type_PACK_TYPES = {
-  Unknown: PackDescription, // cairo: PackDescription
-  StarterPack: PackDescription, // cairo: PackDescription
-  GenesisDuelists5x: PackDescription, // cairo: PackDescription
-  FreeDuelist: PackDescription, // cairo: PackDescription
+  Unknown: PackDescriptor, // cairo: PackDescriptor
+  StarterPack: PackDescriptor, // cairo: PackDescriptor
+  GenesisDuelists5x: PackDescriptor, // cairo: PackDescriptor
+  FreeDuelist: PackDescriptor, // cairo: PackDescriptor
 };
 export const PACK_TYPES: type_PACK_TYPES = {
   Unknown: {

@@ -938,7 +938,7 @@ pub mod tester {
         let balance: u256 = (*sys.lords).balance_of(sponsor);
         execute_lords_approve(sys.lords, sponsor, *sys.bank.contract_address, balance.low);
         // fund pool
-        let price_per_pack: u128 = PackType::StarterPack.description().price_lords;
+        let price_per_pack: u128 = PackType::StarterPack.descriptor().price_lords;
         let amount_sponsored: u128 = price_per_pack * quantity.into();
         execute_sponsor_duelists(sys, sponsor, amount_sponsored);
         (amount_sponsored)

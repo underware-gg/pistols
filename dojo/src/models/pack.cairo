@@ -30,7 +30,7 @@ pub struct Pack {
 //
 
 #[derive(Copy, Drop, Serde, Default)]
-pub struct PackDescription {
+pub struct PackDescriptor {
     pub id: felt252, // @generateContants:shortstring
     pub name: felt252, // @generateContants:shortstring
     pub image_url_closed: felt252, // @generateContants:shortstring
@@ -43,9 +43,9 @@ pub struct PackDescription {
 // to be exported to typescript by generateConstants
 // IMPORTANT: names must be in sync with enum PackType
 mod PACK_TYPES {
-    use super::{PackDescription};
+    use super::{PackDescriptor};
     use pistols::types::constants::{CONST};
-    pub const Unknown: PackDescription = PackDescription {
+    pub const Unknown: PackDescriptor = PackDescriptor {
         id: 'Unknown',
         name: 'Unknown',
         image_url_closed: '/tokens/Unknown.jpg',
@@ -54,31 +54,31 @@ mod PACK_TYPES {
         price_lords: 0,
         quantity: 0,
     };
-    pub const StarterPack: PackDescription = PackDescription {
+    pub const StarterPack: PackDescriptor = PackDescriptor {
         id: 'StarterPack',
         name: 'Starter Pack',
         image_url_closed: '/tokens/StarterPack.jpg',
         image_url_open: '/tokens/StarterPack.jpg',
         can_purchase: false,
-        price_lords: 20 * CONST::ETH_TO_WEI.low,
+        price_lords: (20 * CONST::ETH_TO_WEI.low),
         quantity: 2,
     };
-    pub const GenesisDuelists5x: PackDescription = PackDescription {
+    pub const GenesisDuelists5x: PackDescriptor = PackDescriptor {
         id: 'GenesisDuelists5x',
         name: 'Genesis Duelists 5-pack',
         image_url_closed: '/tokens/GenesisDuelists5x.png',
         image_url_open: '/tokens/GenesisDuelists5x.png',
         can_purchase: true,
-        price_lords: 50 * CONST::ETH_TO_WEI.low,
+        price_lords: (50 * CONST::ETH_TO_WEI.low),
         quantity: 5,
     };
-    pub const FreeDuelist: PackDescription = PackDescription {
+    pub const FreeDuelist: PackDescriptor = PackDescriptor {
         id: 'FreeDuelist',
-        name: 'Free Duelist',
+        name: 'Free Genesis Duelist',
         image_url_closed: '/tokens/StarterPack.jpg',
         image_url_open: '/tokens/StarterPack.jpg',
         can_purchase: false,
-        price_lords: 10 * CONST::ETH_TO_WEI.low,
+        price_lords: (10 * CONST::ETH_TO_WEI.low),
         quantity: 1,
     };
 }
@@ -108,7 +108,7 @@ pub impl PackImpl of PackTrait {
                     .mint_duelists(
                         recipient,
                         DuelistProfile::Genesis(GenesisKey::Unknown),
-                        self.pack_type.description().quantity,
+                        self.pack_type.descriptor().quantity,
                         0x0100, // mint always Ser Walker + Lady Vengeance
                     )
                 )
@@ -119,7 +119,7 @@ pub impl PackImpl of PackTrait {
                     .mint_duelists(
                         recipient,
                         DuelistProfile::Genesis(GenesisKey::Unknown),
-                        self.pack_type.description().quantity,
+                        self.pack_type.descriptor().quantity,
                         self.seed,
                     )
                 )
@@ -133,7 +133,7 @@ pub impl PackImpl of PackTrait {
 
 #[generate_trait]
 pub impl PackTypeImpl of PackTypeTrait {
-    fn description(self: @PackType) -> PackDescription {
+    fn descriptor(self: @PackType) -> PackDescriptor {
         match self {
             PackType::Unknown               => PACK_TYPES::Unknown,
             PackType::StarterPack           => PACK_TYPES::StarterPack,
@@ -143,22 +143,22 @@ pub impl PackTypeImpl of PackTypeTrait {
     }
     #[inline(always)]
     fn identifier(self: @PackType) -> felt252 {
-        ((*self).description().id)
+        ((*self).descriptor().id)
     }
     #[inline(always)]
     fn name(self: @PackType) -> ByteArray {
-        ((*self).description().name.to_string())
+        ((*self).descriptor().name.to_string())
     }
     fn image_url(self: @PackType, is_open: bool) -> ByteArray {
         if (is_open) {
-            ((*self).description().image_url_open.to_string())
+            ((*self).descriptor().image_url_open.to_string())
         } else {
-            ((*self).description().image_url_closed.to_string())
+            ((*self).descriptor().image_url_closed.to_string())
         }
     }
     #[inline(always)]
     fn can_purchase(self: @PackType) -> bool {
-        ((*self).description().can_purchase)
+        ((*self).descriptor().can_purchase)
     }
     #[inline(always)]
     fn deposited_pool_type(self: @PackType) -> PoolType {
@@ -170,7 +170,7 @@ pub impl PackTypeImpl of PackTypeTrait {
     }
     #[inline(always)]
     fn mint_fee(self: @PackType) -> u128 {
-        ((*self).description().price_lords)
+        ((*self).descriptor().price_lords)
     }
 }
 

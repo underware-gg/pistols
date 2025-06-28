@@ -90,8 +90,8 @@ export const useDuelist = (duelist_id: BigNumberish) => {
   // console.log(`useDuelist() =>`, duelist_id, duelist)
   // console.log(`DuelistMemorial =>`, duelist_id, duelistMemorial)
 
-  const timestampRegistered = useMemo(() => Number(duelist?.timestamps.registered ?? 0), [duelist])
-  const timestampActive = useMemo(() => Number(duelist?.timestamps.active ?? 0), [duelist])
+  const timestampRegistered = useMemo(() => Number(duelist?.timestamps?.registered ?? 0), [duelist])
+  const timestampActive = useMemo(() => Number(duelist?.timestamps?.active ?? 0), [duelist])
   const exists = useMemo(() => Boolean(timestampRegistered), [timestampRegistered])
 
   // inactivity
