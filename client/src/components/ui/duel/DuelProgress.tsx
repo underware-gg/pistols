@@ -27,7 +27,7 @@ export default function DuelProgress({
 }) {
   const { gameImpl } = useThreeJsContext()
   const { completedStagesLeft } = useDuelContext()
-  const { round1 } = useDuel(duelId)
+  const { round1, challenge: { isTutorial } } = useDuel(duelId)
 
   const round1Moves = useMemo(() => {
     if (swapSides) {
@@ -48,19 +48,19 @@ export default function DuelProgress({
   const [commitModalIsOpen, setCommitModalIsOpen] = useState(false)
   const { reveal, canReveal } = useRevealAction(duelId, isYou ? duelistId : 0n, round1Moves?.hashed, duelStage == DuelStage.Round1Reveal, `reveal_moves${duelId}`)
 
-  // const { call: revealMoves, isLoading: isLoadingReveal } = useTransactionHandler<boolean, []>({
-  //   transactionCall: () => reveal(),
-  //   indexerCheck: completedStagesLeft[DuelStage.Round1Reveal] && !canReveal,
-  //   key: `reveal_moves${duelId}`,
-  // })
+  const { call: revealMoves, isLoading: isLoadingReveal } = useTransactionHandler<boolean, []>({
+    transactionCall: () => reveal(),
+    indexerCheck: completedStagesLeft[DuelStage.Round1Reveal] && !canReveal,
+    key: `reveal_moves${duelId}`,
+  })
 
   const { isLoading: isLoadingCommit } = useTransactionObserver({ key: `commit_paces${duelId}`, indexerCheck: completedStagesLeft[DuelStage.Round1Commit] })
 
   const { selectedNetworkConfig } = useDojoSetup()
-  const { isRevealing: isLoadingReveal, isRevealed } = useApiAutoReveal(
+  const { isRevealing: isLoadingAutoReveal, isRevealed } = useApiAutoReveal(
     selectedNetworkConfig.assetsServerUrl,
     duelId,
-    (canAutoReveal && canReveal && isYou && !isLoadingCommit)
+    (canAutoReveal && canReveal && isYou && !isLoadingCommit && !isTutorial)
   )
 
   const onClick = useCallback(() => {
@@ -68,25 +68,27 @@ export default function DuelProgress({
       if (duelStage == DuelStage.Round1Commit) {
         setCommitModalIsOpen(true)
       }
-      // else if (duelStage == DuelStage.Round1Reveal) {
-      //   if (canReveal && !isLoadingReveal && !isLoadingCommit && !isRevealingRef.current) {
-      //     isRevealingRef.current = true
-      //     revealMoves()
-      //   }
-      // }
+      else if (duelStage == DuelStage.Round1Reveal) {
+        // ONLY FOR TUTORIALS
+        if (canReveal && !isLoadingReveal && !isLoadingCommit && !isRevealingRef.current && isTutorial) {
+          isRevealingRef.current = true
+          revealMoves()
+        }
+      }
     }
-  }, [isMyDuelist, isConnected, duelStage, completedStages, canReveal, isLoadingReveal, isLoadingCommit])
+  }, [isMyDuelist, isConnected, duelStage, completedStages, canReveal, isTutorial, isLoadingReveal, isLoadingCommit])
 
   useEffect(() => {
-    gameImpl.setIsLoading(isA, isLoadingReveal || isLoadingCommit)
-  }, [isLoadingReveal, isLoadingCommit, isA])
+    gameImpl.setIsLoading(isA, isLoadingAutoReveal || isLoadingCommit || isLoadingReveal)
+  }, [isLoadingAutoReveal, isLoadingCommit, isLoadingReveal, isA])
 
   // Auto-reveal when conditions are met
-  // useEffect(() => {
-  //   if (canAutoReveal && canReveal && isYou) {
-  //     onClick?.()
-  //   }
-  // }, [onClick, canAutoReveal, canReveal, isYou])
+  // ONLY FOR TUTORIALS
+  useEffect(() => {
+    if (canAutoReveal && canReveal && isYou && isTutorial) {
+      onClick?.()
+    }
+  }, [onClick, canAutoReveal, canReveal, isYou, isTutorial])
 
   // Update player progress in the game
   useEffect(() => {
