@@ -156,14 +156,14 @@ mod COLLECTIONS {
         folder_name: 'genesis',
         profile_count: 69,
         is_playable: true,
-        duelist_id_base: 0,
+        duelist_id_base: 0, // playable characters do not convert to duelist_id
     };
     pub const Legends: CollectionDescriptor = CollectionDescriptor {
         name: 'Legends Collection',
         folder_name: 'legends',
         profile_count: 1,
         is_playable: true,
-        duelist_id_base: 0x300000000,
+        duelist_id_base: 0, // playable characters do not convert to duelist_id
     };
 }
 
@@ -461,7 +461,7 @@ pub impl ProfileManagerImpl of ProfileManagerTrait {
             let duelist_profile: DuelistProfile = *profiles.at((i).into());
             let timestamp: u64 = starknet::get_block_timestamp();
             store.set_duelist(@Duelist {
-                duelist_id: duelist_profile.make_duelist_id(),
+                duelist_id: duelist_profile.to_duelist_id(),
                 duelist_profile,
                 timestamps: DuelistTimestamps {
                     registered: timestamp,
@@ -553,11 +553,13 @@ pub impl DuelistProfileImpl of DuelistProfileTrait {
     fn exists(self: @DuelistProfile) -> bool {
         (self.profile_id() != 0)
     }
-    fn make_duelist_id(self: @DuelistProfile) -> u128 {
-        (match *self {
-            DuelistProfile::Character(key) =>   key.into(),
-            DuelistProfile::Bot(key) =>         key.into(),
-            _ => 0,
+    fn to_duelist_id(self: @DuelistProfile) -> u128 {
+        let profile_id: u8 = self.profile_id();
+        let collection: CollectionDescriptor = self.collection();
+        (if (profile_id.is_non_zero() && collection.duelist_id_base.is_non_zero()) {
+            (collection.duelist_id_base | profile_id.into())
+        } else {
+            (0)
         })
     }
     fn name(self: @DuelistProfile) -> ByteArray {
@@ -911,20 +913,17 @@ impl U8IntoLegendsKey of core::traits::Into<u8, LegendsKey> {
 //
 impl CharacterKeyIntoDuelistId of core::traits::Into<CharacterKey, u128> {
     fn into(self: CharacterKey) -> u128 {
-        let profile_id: u8 = self.into();
-        (if (profile_id.is_non_zero())
-            {COLLECTIONS::Character.duelist_id_base + profile_id.into()}
-            else {0}
-        )
+        (DuelistProfile::Character(self).to_duelist_id())
     }
 }
 impl BotKeyIntoDuelistId of core::traits::Into<BotKey, u128> {
     fn into(self: BotKey) -> u128 {
-        let profile_id: u8 = self.into();
-        (if (profile_id.is_non_zero())
-            {COLLECTIONS::Bot.duelist_id_base + profile_id.into()}
-            else {0}
-        )
+        (DuelistProfile::Bot(self).to_duelist_id())
+    }
+}
+impl LegendsKeyIntoDuelistId of core::traits::Into<LegendsKey, u128> {
+    fn into(self: LegendsKey) -> u128 {
+        (DuelistProfile::Legends(self).to_duelist_id())
     }
 }
 impl DuelistIdIntoCharacterKey of core::traits::Into<u128, CharacterKey> {
@@ -937,6 +936,13 @@ impl DuelistIdIntoCharacterKey of core::traits::Into<u128, CharacterKey> {
 impl DuelistIdIntoBotKey of core::traits::Into<u128, BotKey> {
     fn into(self: u128) -> BotKey {
         let zero: u128 = self ^ COLLECTIONS::Bot.duelist_id_base;
+        let id: u8 = if (zero < 0xff) { (self & 0xff).try_into().unwrap() } else { 0 };
+        (id.into())
+    }
+}
+impl DuelistIdIntoLegendsKey of core::traits::Into<u128, LegendsKey> {
+    fn into(self: u128) -> LegendsKey {
+        let zero: u128 = self ^ COLLECTIONS::Legends.duelist_id_base;
         let id: u8 = if (zero < 0xff) { (self & 0xff).try_into().unwrap() } else { 0 };
         (id.into())
     }
@@ -1058,32 +1064,7 @@ mod unit {
         assert_eq!(profile.exists(), false, "(0) ! exists");
         let desc: ProfileDescriptor = profile.descriptor();
         assert_eq!(desc.name, 'Unknown', "(0) bad name: {}", desc.name);
-        assert_eq!(profile.make_duelist_id(), 0, "(0) bad duelist_id");
-    }
-
-    #[test]
-    fn test_descriptors_genesis() {
-        // invalid
-        let invalid_profile: DuelistProfile = DuelistProfile::Genesis(0_u8.into());
-        _test_invalid_profile(invalid_profile);
-        // validate profiles
-        let descriptors: Span<ProfileDescriptor> = ProfileManagerTrait::_get_all_descriptors_by_type(invalid_profile);
-        let mut last_profile_id: u8 = 0;
-        let mut last_desc: ProfileDescriptor = Default::default();
-        let mut p: u8 = 1;
-        while (p.into() <= descriptors.len()) {
-            let profile: DuelistProfile = DuelistProfile::Genesis(p.into());
-            assert!(profile.exists(), "({}) exists", p);
-            assert_eq!(profile.make_duelist_id(), 0, "({}) bad duelist_id", p);
-            assert_ne!(profile, DuelistProfile::Genesis(GenesisKey::Unknown), "Duelist({}) is Unknown", p);
-            assert_eq!(p, profile.profile_id(), "({}) bad p", p);
-            assert_eq!(p, last_profile_id + 1, "({}) == ({}): p", p, p-1);
-            let desc: ProfileDescriptor = *descriptors.at((p-1).into());
-            assert_ne!(desc.name, last_desc.name, "({}) == ({}): name {}", p, p-1, desc.name);
-            last_profile_id = p;
-            last_desc = desc;
-            p += 1;
-        };
+        assert_eq!(profile.to_duelist_id(), 0, "(0) bad duelist_id");
     }
 
     #[test]
@@ -1135,12 +1116,50 @@ mod unit {
     }
 
     #[test]
-    fn test_profile_duelist_ids_genesis() {
-        assert_eq!(COLLECTIONS::Genesis.duelist_id_base, 0, "bad base id");
+    fn test_descriptors_genesis() {
+        // invalid
+        let invalid_profile: DuelistProfile = DuelistProfile::Genesis(0_u8.into());
+        _test_invalid_profile(invalid_profile);
+        // validate profiles
+        let descriptors: Span<ProfileDescriptor> = ProfileManagerTrait::_get_all_descriptors_by_type(invalid_profile);
+        let mut last_profile_id: u8 = 0;
+        let mut last_desc: ProfileDescriptor = Default::default();
         let mut p: u8 = 1;
-        while (p <= COLLECTIONS::Genesis.profile_count.into()) {
-            let key: GenesisKey = p.into();
-            assert_eq!(DuelistProfile::Genesis(key).make_duelist_id(), 0, "({}) bad type_id", p);
+        while (p.into() <= descriptors.len()) {
+            let profile: DuelistProfile = DuelistProfile::Genesis(p.into());
+            assert!(profile.exists(), "({}) exists", p);
+            assert_eq!(profile.to_duelist_id(), 0, "({}) bad duelist_id", p);
+            assert_ne!(profile, DuelistProfile::Genesis(GenesisKey::Unknown), "({}) is Unknown", p);
+            assert_eq!(p, profile.profile_id(), "({}) bad p", p);
+            assert_eq!(p, last_profile_id + 1, "({}) == ({}): p", p, p-1);
+            let desc: ProfileDescriptor = *descriptors.at((p-1).into());
+            assert_ne!(desc.name, last_desc.name, "({}) == ({}): name {}", p, p-1, desc.name);
+            last_profile_id = p;
+            last_desc = desc;
+            p += 1;
+        };
+    }
+
+    #[test]
+    fn test_descriptors_legends() {
+        // invalid
+        let invalid_profile: DuelistProfile = DuelistProfile::Legends(0_u8.into());
+        _test_invalid_profile(invalid_profile);
+        // validate profiles
+        let descriptors: Span<ProfileDescriptor> = ProfileManagerTrait::_get_all_descriptors_by_type(invalid_profile);
+        let mut last_profile_id: u8 = 0;
+        let mut last_desc: ProfileDescriptor = Default::default();
+        let mut p: u8 = 1;
+        while (p.into() <= descriptors.len()) {
+            let profile: DuelistProfile = DuelistProfile::Legends(p.into());
+            assert!(profile.exists(), "({}) exists", p);
+            assert_ne!(profile, DuelistProfile::Legends(LegendsKey::Unknown), "({}) is Unknown", p);
+            assert_eq!(p, profile.profile_id(), "({}) bad profile_id", p);
+            assert_eq!(p, last_profile_id + 1, "({}) == ({}): profile_id", p, p-1);
+            let desc: ProfileDescriptor = *descriptors.at((p-1).into());
+            assert_ne!(desc.name, last_desc.name, "({}) == ({}): name {}", p, p-1, desc.name);
+            last_profile_id = p;
+            last_desc = desc;
             p += 1;
         };
     }
@@ -1153,7 +1172,7 @@ mod unit {
             let key: CharacterKey = p.into();
             let expected_id: u128 = (COLLECTIONS::Character.duelist_id_base | key.into());
             assert_gt!(expected_id, COLLECTIONS::Character.duelist_id_base, "({}) low id", p);
-            assert_eq!(expected_id, DuelistProfile::Character(key).make_duelist_id(), "({}) bad type_id", p);
+            assert_eq!(expected_id, DuelistProfile::Character(key).to_duelist_id(), "({}) bad type_id", p);
             assert_eq!(expected_id.into(), key, "({}) bad profile", p);
             p += 1;
         };
@@ -1167,8 +1186,30 @@ mod unit {
             let key: BotKey = p.into();
             let expected_id: u128 = (COLLECTIONS::Bot.duelist_id_base | key.into());
             assert_gt!(expected_id, COLLECTIONS::Bot.duelist_id_base, "({}) low id", p);
-            assert_eq!(expected_id, DuelistProfile::Bot(key).make_duelist_id(), "({}) bad type_id", p);
+            assert_eq!(expected_id, DuelistProfile::Bot(key).to_duelist_id(), "({}) bad type_id", p);
             assert_eq!(expected_id.into(), key, "({}) bad profile", p);
+            p += 1;
+        };
+    }
+
+    #[test]
+    fn test_profile_duelist_ids_genesis() {
+        assert_eq!(COLLECTIONS::Genesis.duelist_id_base, 0, "bad base id");
+        let mut p: u8 = 1;
+        while (p <= COLLECTIONS::Genesis.profile_count.into()) {
+            let key: GenesisKey = p.into();
+            assert_eq!(DuelistProfile::Genesis(key).to_duelist_id(), 0, "({}) bad type_id", p);
+            p += 1;
+        };
+    }
+
+    #[test]
+    fn test_profile_duelist_ids_legends() {
+        assert_eq!(COLLECTIONS::Legends.duelist_id_base, 0, "bad base id");
+        let mut p: u8 = 1;
+        while (p <= COLLECTIONS::Legends.profile_count.into()) {
+            let key: LegendsKey = p.into();
+            assert_eq!(DuelistProfile::Legends(key).to_duelist_id(), 0, "({}) bad type_id", p);
             p += 1;
         };
     }

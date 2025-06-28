@@ -117,8 +117,8 @@ pub mod tutorial {
                 // duelists
                 address_a: starknet::get_caller_address(),
                 address_b: starknet::get_caller_address(),
-                duelist_id_a: opponent_profile.make_duelist_id(),
-                duelist_id_b: player_profile.make_duelist_id(),
+                duelist_id_a: opponent_profile.to_duelist_id(),
+                duelist_id_b: player_profile.to_duelist_id(),
                 // progress
                 state: ChallengeState::InProgress,
                 season_id: 0,
