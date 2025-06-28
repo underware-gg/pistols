@@ -8,6 +8,7 @@ pub enum DuelistProfile {
     Character: CharacterKey,    // Character(id)
     Bot: BotKey,                // Bot(id)
     Genesis: GenesisKey,        // Genesis(id)
+    Legends: LegendsKey,        // Legends(id)
     // Eternum: u16,   // Eternum(realm id)
 }
 
@@ -105,6 +106,12 @@ pub enum GenesisKey {
     MasterOfSecrets,        // 69
 }
 
+#[derive(Copy, Drop, Serde, PartialEq, Introspect)]
+pub enum LegendsKey {
+    Unknown,
+    TGC1,
+}
+
 
 
 //--------------------------
@@ -150,6 +157,13 @@ mod COLLECTIONS {
         profile_count: 69,
         is_playable: true,
         duelist_id_base: 0,
+    };
+    pub const Legends: CollectionDescriptor = CollectionDescriptor {
+        name: 'Legends Collection',
+        folder_name: 'legends',
+        profile_count: 1,
+        is_playable: true,
+        duelist_id_base: 0x300000000,
     };
 }
 
@@ -416,6 +430,17 @@ mod GENESIS_PROFILES {
     };
 }
 
+// to be exported to typescript by generateConstants
+// IMPORTANT: names must be in sync with enum GenesisKey
+mod LEGENDS_PROFILES {
+    use super::{ProfileDescriptor};
+    pub const Unknown: ProfileDescriptor = ProfileDescriptor {
+        name: 'Unknown',
+    };
+    pub const TGC1: ProfileDescriptor = ProfileDescriptor { // 1
+        name: 'Daes',
+    };
+}
 
 
 //----------------------------------
@@ -455,6 +480,7 @@ pub impl ProfileManagerImpl of ProfileManagerTrait {
             DuelistProfile::Character(_) =>     DuelistProfile::Character(profile_id.into()),
             DuelistProfile::Bot(_) =>           DuelistProfile::Bot(profile_id.into()),
             DuelistProfile::Genesis(_) =>       DuelistProfile::Genesis(profile_id.into()),
+            DuelistProfile::Legends(_) =>       DuelistProfile::Legends(profile_id.into()),
         })
     }
 
@@ -470,6 +496,7 @@ pub impl ProfileManagerImpl of ProfileManagerTrait {
                 DuelistProfile::Character(_) =>     DuelistProfile::Character(i.into()),
                 DuelistProfile::Bot(_) =>           DuelistProfile::Bot(i.into()),
                 DuelistProfile::Genesis(_) =>       DuelistProfile::Genesis(i.into()),
+                DuelistProfile::Legends(_) =>       DuelistProfile::Legends(i.into()),
             };
             if (!profile.exists()) {
                 break;
@@ -488,6 +515,7 @@ pub impl ProfileManagerImpl of ProfileManagerTrait {
                 DuelistProfile::Character(_) =>     DuelistProfile::Character(i.into()),
                 DuelistProfile::Bot(_) =>           DuelistProfile::Bot(i.into()),
                 DuelistProfile::Genesis(_) =>       DuelistProfile::Genesis(i.into()),
+                DuelistProfile::Legends(_) =>       DuelistProfile::Legends(i.into()),
             };
             if (!profile.exists()) {
                 break;
@@ -510,6 +538,7 @@ pub impl DuelistProfileImpl of DuelistProfileTrait {
             DuelistProfile::Character(key) =>   key.into(),
             DuelistProfile::Bot(key) =>         key.into(),
             DuelistProfile::Genesis(key) =>     key.into(),
+            DuelistProfile::Legends(key) =>     key.into(),
         })
     }
     fn profile_id(self: @DuelistProfile) -> u8 {
@@ -518,6 +547,7 @@ pub impl DuelistProfileImpl of DuelistProfileTrait {
             DuelistProfile::Character(key) =>   key.into(),
             DuelistProfile::Bot(key) =>         key.into(),
             DuelistProfile::Genesis(key) =>     key.into(),
+            DuelistProfile::Legends(key) =>     key.into(),
         })
     }
     fn exists(self: @DuelistProfile) -> bool {
@@ -555,6 +585,7 @@ impl DuelistProfileIntoCollectionDescriptor of core::traits::Into<DuelistProfile
             DuelistProfile::Character(_) =>     COLLECTIONS::Character,
             DuelistProfile::Bot(_) =>           COLLECTIONS::Bot,
             DuelistProfile::Genesis(_) =>       COLLECTIONS::Genesis,
+            DuelistProfile::Legends(_) =>       COLLECTIONS::Legends,
         }
     }
 }
@@ -655,7 +686,14 @@ impl GenesisKeyIntoDescriptor of core::traits::Into<GenesisKey, ProfileDescripto
         }
     }
 }
-
+impl LegendsKeyIntoDescriptor of core::traits::Into<LegendsKey, ProfileDescriptor> {
+    fn into(self: LegendsKey) -> ProfileDescriptor {
+        match self {
+            LegendsKey::Unknown =>          LEGENDS_PROFILES::Unknown,
+            LegendsKey::TGC1 =>             LEGENDS_PROFILES::TGC1,             // 1
+        }
+    }
+}
 
 
 //----------------------------------------
@@ -851,7 +889,20 @@ impl U8IntoGenesisKey of core::traits::Into<u8, GenesisKey> {
         else                { GenesisKey::Unknown }
     }
 }
-
+impl LegendsKeyIntoU8 of core::traits::Into<LegendsKey, u8> {
+    fn into(self: LegendsKey) -> u8 {
+        match self {
+            LegendsKey::Unknown =>         0,
+            LegendsKey::TGC1 =>            1,
+        }
+    }
+}
+impl U8IntoLegendsKey of core::traits::Into<u8, LegendsKey> {
+    fn into(self: u8) -> LegendsKey {
+        if self == 1        { LegendsKey::TGC1 }
+        else                { LegendsKey::Unknown }
+    }
+}
 
 
 
@@ -876,7 +927,6 @@ impl BotKeyIntoDuelistId of core::traits::Into<BotKey, u128> {
         )
     }
 }
-
 impl DuelistIdIntoCharacterKey of core::traits::Into<u128, CharacterKey> {
     fn into(self: u128) -> CharacterKey {
         let id: u128 = self ^ COLLECTIONS::Character.duelist_id_base;
@@ -906,6 +956,7 @@ impl DuelistProfileIntoByteArray of core::traits::Into<DuelistProfile, ByteArray
             DuelistProfile::Character(_) =>     "Character",
             DuelistProfile::Bot(_) =>           "Bot",
             DuelistProfile::Genesis(_) =>       "Genesis",
+            DuelistProfile::Legends(_) =>       "Legends",
         }
     }
 }
@@ -917,6 +968,7 @@ pub impl DuelistProfileDisplay of core::fmt::Display<DuelistProfile> {
             DuelistProfile::Character(key) =>   { let id: u8 = (*key).into(); format!("Character::{}({})", self.name(), id) },
             DuelistProfile::Bot(key) =>         { let id: u8 = (*key).into(); format!("Bot::{}({})", self.name(), id) },
             DuelistProfile::Genesis(key) =>     { let id: u8 = (*key).into(); format!("Genesis::{}({})", self.name(), id) },
+            DuelistProfile::Legends(key) =>     { let id: u8 = (*key).into(); format!("Legends::{}({})", self.name(), id) },
         };
         f.buffer.append(@result);
         Result::Ok(())
@@ -950,6 +1002,13 @@ pub impl GenesisKeyDebug of core::fmt::Debug<GenesisKey> {
         Result::Ok(())
     }
 }
+pub impl LegendsKeyDebug of core::fmt::Debug<LegendsKey> {
+    fn fmt(self: @LegendsKey, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        let result: ByteArray = DuelistProfile::Legends(*self).name();
+        f.buffer.append(@result);
+        Result::Ok(())
+    }
+}
 
 
 
@@ -962,7 +1021,7 @@ mod unit {
 
     use super::{
         DuelistProfile, DuelistProfileTrait,
-        GenesisKey, CharacterKey, BotKey,
+        GenesisKey, CharacterKey, BotKey, LegendsKey,
         ProfileDescriptor,
         ProfileManagerTrait,
         COLLECTIONS,
