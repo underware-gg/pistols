@@ -1,6 +1,6 @@
 import type { SchemaType as ISchemaType } from "@dojoengine/sdk";
 
-import { CairoCustomEnum, BigNumberish } from 'starknet';
+import { CairoCustomEnum, CairoOption, CairoOptionVariant, BigNumberish } from 'starknet';
 
 // Type definition for `pistols::models::challenge::Challenge` struct
 export interface Challenge {
@@ -215,6 +215,7 @@ export interface Pack {
 	seed: BigNumberish;
 	lords_amount: BigNumberish;
 	is_open: boolean;
+	duelist_profile: CairoOption<DuelistProfileEnum>;
 }
 
 // Type definition for `pistols::models::pack::PackValue` struct
@@ -223,6 +224,7 @@ export interface PackValue {
 	seed: BigNumberish;
 	lords_amount: BigNumberish;
 	is_open: boolean;
+	duelist_profile: CairoOption<DuelistProfileEnum>;
 }
 
 // Type definition for `pistols::models::pact::Pact` struct
@@ -583,6 +585,7 @@ export const packType = [
 	'StarterPack',
 	'GenesisDuelists5x',
 	'FreeDuelist',
+	'SingleDuelist',
 ] as const;
 export type PackType = { [key in typeof packType[number]]: string };
 export type PackTypeEnum = CairoCustomEnum;
@@ -695,12 +698,14 @@ export const duelistProfile = [
 	'Character',
 	'Bot',
 	'Genesis',
+	'Legends',
 ] as const;
 export type DuelistProfile = { 
 	Undefined: string,
 	Character: CharacterKeyEnum,
 	Bot: BotKeyEnum,
 	Genesis: GenesisKeyEnum,
+	Legends: LegendsKeyEnum,
 };
 export type DuelistProfileEnum = CairoCustomEnum;
 
@@ -780,6 +785,14 @@ export const genesisKey = [
 export type GenesisKey = { [key in typeof genesisKey[number]]: string };
 export type GenesisKeyEnum = CairoCustomEnum;
 
+// Type definition for `pistols::types::duelist_profile::LegendsKey` enum
+export const legendsKey = [
+	'Unknown',
+	'TGC1',
+] as const;
+export type LegendsKey = { [key in typeof legendsKey[number]]: string };
+export type LegendsKeyEnum = CairoCustomEnum;
+
 // Type definition for `pistols::types::premise::Premise` enum
 export const premise = [
 	'Undefined',
@@ -833,6 +846,7 @@ export const activity = [
 	'ChallengeResolved',
 	'ChallengeDraw',
 	'ClaimedGift',
+	'AirdroppedPack',
 ] as const;
 export type Activity = { [key in typeof activity[number]]: string };
 export type ActivityEnum = CairoCustomEnum;
@@ -1141,7 +1155,8 @@ export const schema: SchemaType = {
 					Undefined: "",
 				Character: undefined,
 				Bot: undefined,
-				Genesis: undefined, }),
+				Genesis: undefined,
+				Legends: undefined, }),
 		timestamps: { registered: 0, active: 0, },
 		totals: { total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour: 0, honour_log: 0, },
 		},
@@ -1188,7 +1203,8 @@ export const schema: SchemaType = {
 					Undefined: "",
 				Character: undefined,
 				Bot: undefined,
-				Genesis: undefined, }),
+				Genesis: undefined,
+				Legends: undefined, }),
 		timestamps: { registered: 0, active: 0, },
 		totals: { total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour: 0, honour_log: 0, },
 		},
@@ -1217,20 +1233,24 @@ export const schema: SchemaType = {
 					Unknown: "",
 				StarterPack: undefined,
 				GenesisDuelists5x: undefined,
-				FreeDuelist: undefined, }),
+				FreeDuelist: undefined,
+				SingleDuelist: undefined, }),
 			seed: 0,
 			lords_amount: 0,
 			is_open: false,
+		duelist_profile: new CairoOption(CairoOptionVariant.None),
 		},
 		PackValue: {
 		pack_type: new CairoCustomEnum({ 
 					Unknown: "",
 				StarterPack: undefined,
 				GenesisDuelists5x: undefined,
-				FreeDuelist: undefined, }),
+				FreeDuelist: undefined,
+				SingleDuelist: undefined, }),
 			seed: 0,
 			lords_amount: 0,
 			is_open: false,
+		duelist_profile: new CairoOption(CairoOptionVariant.None),
 		},
 		Pact: {
 		duel_type: new CairoCustomEnum({ 
@@ -1257,7 +1277,8 @@ export const schema: SchemaType = {
 					Undefined: "",
 				Character: undefined,
 				Bot: undefined,
-				Genesis: undefined, }),
+				Genesis: undefined,
+				Legends: undefined, }),
 			active_duelist_id: 0,
 			level: 0,
 			stacked_ids: [0],
@@ -1481,7 +1502,8 @@ export const schema: SchemaType = {
 				PlayerTimedOut: undefined,
 				ChallengeResolved: undefined,
 				ChallengeDraw: undefined,
-				ClaimedGift: undefined, }),
+				ClaimedGift: undefined,
+				AirdroppedPack: undefined, }),
 			identifier: 0,
 			is_public: false,
 		},
@@ -1503,7 +1525,8 @@ export const schema: SchemaType = {
 				PlayerTimedOut: undefined,
 				ChallengeResolved: undefined,
 				ChallengeDraw: undefined,
-				ClaimedGift: undefined, }),
+				ClaimedGift: undefined,
+				AirdroppedPack: undefined, }),
 			identifier: 0,
 			is_public: false,
 		},
@@ -1634,6 +1657,7 @@ export enum ModelsMapping {
 	CharacterKey = 'pistols-CharacterKey',
 	DuelistProfile = 'pistols-DuelistProfile',
 	GenesisKey = 'pistols-GenesisKey',
+	LegendsKey = 'pistols-LegendsKey',
 	Premise = 'pistols-Premise',
 	RoundState = 'pistols-RoundState',
 	Rules = 'pistols-Rules',

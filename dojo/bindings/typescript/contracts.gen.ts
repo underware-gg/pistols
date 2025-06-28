@@ -1276,19 +1276,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_duelist_token_mintDuelists_calldata = (recipient: string, profileSample: CairoCustomEnum, quantity: BigNumberish, seed: BigNumberish): DojoCall => {
+	const build_duelist_token_mintDuelists_calldata = (recipient: string, quantity: BigNumberish, profileType: CairoCustomEnum, seed: BigNumberish): DojoCall => {
 		return {
 			contractName: "duelist_token",
 			entrypoint: "mint_duelists",
-			calldata: [recipient, profileSample, quantity, seed],
+			calldata: [recipient, quantity, profileType, seed],
 		};
 	};
 
-	const duelist_token_mintDuelists = async (snAccount: Account | AccountInterface, recipient: string, profileSample: CairoCustomEnum, quantity: BigNumberish, seed: BigNumberish) => {
+	const duelist_token_mintDuelists = async (snAccount: Account | AccountInterface, recipient: string, quantity: BigNumberish, profileType: CairoCustomEnum, seed: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_duelist_token_mintDuelists_calldata(recipient, profileSample, quantity, seed),
+				build_duelist_token_mintDuelists_calldata(recipient, quantity, profileType, seed),
 				"pistols",
 			);
 		} catch (error) {
@@ -2720,6 +2720,27 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
+	const build_pack_token_airdrop_calldata = (recipient: string, packType: CairoCustomEnum, duelistProfile: CairoOption<CairoCustomEnum>): DojoCall => {
+		return {
+			contractName: "pack_token",
+			entrypoint: "airdrop",
+			calldata: [recipient, packType, duelistProfile],
+		};
+	};
+
+	const pack_token_airdrop = async (snAccount: Account | AccountInterface, recipient: string, packType: CairoCustomEnum, duelistProfile: CairoOption<CairoCustomEnum>) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_pack_token_airdrop_calldata(recipient, packType, duelistProfile),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 	const build_pack_token_approve_calldata = (to: string, tokenId: BigNumberish): DojoCall => {
 		return {
 			contractName: "pack_token",
@@ -3876,6 +3897,8 @@ export function setupWorld(provider: DojoProvider) {
 			buildTransferFromCalldata: build_lords_mock_transferFrom_calldata,
 		},
 		pack_token: {
+			airdrop: pack_token_airdrop,
+			buildAirdropCalldata: build_pack_token_airdrop_calldata,
 			approve: pack_token_approve,
 			buildApproveCalldata: build_pack_token_approve_calldata,
 			balanceOf: pack_token_balanceOf,

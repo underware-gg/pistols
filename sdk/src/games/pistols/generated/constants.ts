@@ -39,6 +39,7 @@ export const INTERFACE_DESCRIPTIONS: any = {
     claim_starter_pack: 'Claim the starter pack, mint Duelists',
     claim_gift: 'Claim gift pack, if available',
     purchase: 'Purchase a closed pack',
+    airdrop: 'Airdrops a pack (admin)',
     open: 'Open a pack, mint its contents',
   },
   // from: ../dojo/src/systems/tutorial.cairo
@@ -130,6 +131,7 @@ export enum Activity {
   ChallengeResolved = 'ChallengeResolved', // 13
   ChallengeDraw = 'ChallengeDraw', // 14
   ClaimedGift = 'ClaimedGift', // 15
+  AirdroppedPack = 'AirdroppedPack', // 16
 };
 export const getActivityValue = (name: Activity): number | undefined => _indexOrUndefined(Object.keys(Activity).indexOf(name));
 export const getActivityFromValue = (value: number): Activity | undefined => Object.keys(Activity)[value] as Activity;
@@ -184,6 +186,7 @@ export enum PackType {
   StarterPack = 'StarterPack', // 1
   GenesisDuelists5x = 'GenesisDuelists5x', // 2
   FreeDuelist = 'FreeDuelist', // 3
+  SingleDuelist = 'SingleDuelist', // 4
 };
 export const getPackTypeValue = (name: PackType): number | undefined => _indexOrUndefined(Object.keys(PackType).indexOf(name));
 export const getPackTypeFromValue = (value: number): PackType | undefined => Object.keys(PackType)[value] as PackType;
@@ -382,6 +385,7 @@ export enum DuelistProfile {
   Character = 'Character', // 1
   Bot = 'Bot', // 2
   Genesis = 'Genesis', // 3
+  Legends = 'Legends', // 4
 };
 export const getDuelistProfileValue = (name: DuelistProfile): number | undefined => _indexOrUndefined(Object.keys(DuelistProfile).indexOf(name));
 export const getDuelistProfileFromValue = (value: number): DuelistProfile | undefined => Object.keys(DuelistProfile)[value] as DuelistProfile;
@@ -487,6 +491,15 @@ export const getGenesisKeyValue = (name: GenesisKey): number | undefined => _ind
 export const getGenesisKeyFromValue = (value: number): GenesisKey | undefined => Object.keys(GenesisKey)[value] as GenesisKey;
 export const getGenesisKeyMap = (): Record<GenesisKey, number> => Object.keys(GenesisKey).reduce((acc, v, index) => { acc[v as GenesisKey] = index; return acc; }, {} as Record<GenesisKey, number>);
 
+// from: ../dojo/src/types/duelist_profile.cairo
+export enum LegendsKey {
+  Unknown = 'Unknown', // 0
+  TGC1 = 'TGC1', // 1
+};
+export const getLegendsKeyValue = (name: LegendsKey): number | undefined => _indexOrUndefined(Object.keys(LegendsKey).indexOf(name));
+export const getLegendsKeyFromValue = (value: number): LegendsKey | undefined => Object.keys(LegendsKey)[value] as LegendsKey;
+export const getLegendsKeyMap = (): Record<LegendsKey, number> => Object.keys(LegendsKey).reduce((acc, v, index) => { acc[v as LegendsKey] = index; return acc; }, {} as Record<LegendsKey, number>);
+
 // from: ../dojo/src/types/premise.cairo
 export enum Premise {
   Undefined = 'Undefined', // 0
@@ -584,6 +597,7 @@ export type PackDescriptor = {
   can_purchase : boolean,
   price_lords : bigint,
   quantity : number,
+  contents : string,
 };
 
 // from: ../dojo/src/models/tournament.cairo
@@ -765,6 +779,7 @@ type type_PACK_TYPES = {
   StarterPack: PackDescriptor, // cairo: PackDescriptor
   GenesisDuelists5x: PackDescriptor, // cairo: PackDescriptor
   FreeDuelist: PackDescriptor, // cairo: PackDescriptor
+  SingleDuelist: PackDescriptor, // cairo: PackDescriptor
 };
 export const PACK_TYPES: type_PACK_TYPES = {
   Unknown: {
@@ -775,6 +790,7 @@ export const PACK_TYPES: type_PACK_TYPES = {
     can_purchase: false,
     price_lords: 0n,
     quantity: 0,
+    contents: 'Void',
   },
   StarterPack: {
     id: 'StarterPack',
@@ -784,6 +800,7 @@ export const PACK_TYPES: type_PACK_TYPES = {
     can_purchase: false,
     price_lords: (20n * CONST.ETH_TO_WEI),
     quantity: 2,
+    contents: 'Ser Walker & Lady Vengeance',
   },
   GenesisDuelists5x: {
     id: 'GenesisDuelists5x',
@@ -793,15 +810,27 @@ export const PACK_TYPES: type_PACK_TYPES = {
     can_purchase: true,
     price_lords: (50n * CONST.ETH_TO_WEI),
     quantity: 5,
+    contents: 'Five Random Genesis Duelists',
   },
   FreeDuelist: {
     id: 'FreeDuelist',
-    name: 'Free Duelist',
+    name: 'Free Genesis Duelist',
     image_url_closed: '/tokens/StarterPack.jpg',
     image_url_open: '/tokens/StarterPack.jpg',
     can_purchase: false,
     price_lords: (10n * CONST.ETH_TO_WEI),
     quantity: 1,
+    contents: 'One Random Genesis Duelist',
+  },
+  SingleDuelist: {
+    id: 'SingleDuelist',
+    name: 'Single Duelist',
+    image_url_closed: '/tokens/SingleDuelist.jpg',
+    image_url_open: '/tokens/SingleDuelist.jpg',
+    can_purchase: false,
+    price_lords: (10n * CONST.ETH_TO_WEI),
+    quantity: 1,
+    contents: 'One Special Duelist',
   },
 };
 
@@ -1072,6 +1101,7 @@ type type_COLLECTIONS = {
   Character: CollectionDescriptor, // cairo: CollectionDescriptor
   Bot: CollectionDescriptor, // cairo: CollectionDescriptor
   Genesis: CollectionDescriptor, // cairo: CollectionDescriptor
+  Legends: CollectionDescriptor, // cairo: CollectionDescriptor
 };
 export const COLLECTIONS: type_COLLECTIONS = {
   Undefined: {
@@ -1099,6 +1129,13 @@ export const COLLECTIONS: type_COLLECTIONS = {
     name: 'Genesis Collection',
     folder_name: 'genesis',
     profile_count: 69,
+    is_playable: true,
+    duelist_id_base: 0n,
+  },
+  Legends: {
+    name: 'Legends Collection',
+    folder_name: 'legends',
+    profile_count: 1,
     is_playable: true,
     duelist_id_base: 0n,
   },
@@ -1435,6 +1472,20 @@ export const GENESIS_PROFILES: type_GENESIS_PROFILES = {
   },
   MasterOfSecrets: {
     name: 'Master of Secrets',
+  },
+};
+
+// from: ../dojo/src/types/duelist_profile.cairo
+type type_LEGENDS_PROFILES = {
+  Unknown: ProfileDescriptor, // cairo: ProfileDescriptor
+  TGC1: ProfileDescriptor, // cairo: ProfileDescriptor
+};
+export const LEGENDS_PROFILES: type_LEGENDS_PROFILES = {
+  Unknown: {
+    name: 'Unknown',
+  },
+  TGC1: {
+    name: 'Daes',
   },
 };
 
