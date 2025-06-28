@@ -29,6 +29,21 @@ const Col = Grid.Column
 export default function NewChallengeModal() {
   const { challengingAddress, challengingDuelistId } = usePistolsContext()
   const isOpen = useMemo(() => (challengingAddress > 0n && challengingDuelistId > 0n), [challengingDuelistId, challengingDuelistId])
+
+  useEffect(() => {
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (isOpen) {
+      e.stopPropagation();
+    }
+  };
+
+  document.addEventListener("keydown", handleKeyDown, true);
+
+  return () => {
+    document.removeEventListener("keydown", handleKeyDown, true);
+  };
+}, [isOpen]);
+
   return (<>{isOpen && <_NewChallengeModal isOpen={isOpen} />}</>)
 }
 
