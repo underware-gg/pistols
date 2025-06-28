@@ -1028,29 +1028,29 @@ mod unit {
     };
 
     #[test]
-    fn test_get_all_profiles_by_type() {
+    fn test_profile_counts() {
         let profiles: Span<DuelistProfile> = ProfileManagerTrait::_get_all_profiles_by_type(DuelistProfile::Undefined);
-        assert_eq!(profiles.len(), 0, "0");
-        let profiles: Span<DuelistProfile> = ProfileManagerTrait::_get_all_profiles_by_type(DuelistProfile::Character(0_u8.into()));
-        assert_eq!(profiles.len(), COLLECTIONS::Character.profile_count.into(), "racter.profile_");
-        let profiles: Span<DuelistProfile> = ProfileManagerTrait::_get_all_profiles_by_type(DuelistProfile::Bot(0_u8.into()));
-        assert_eq!(profiles.len(), COLLECTIONS::Bot.profile_count.into(), "Bot.profile_count");
-        let profiles: Span<DuelistProfile> = ProfileManagerTrait::_get_all_profiles_by_type(DuelistProfile::Genesis(0_u8.into()));
-        assert_eq!(profiles.len(), COLLECTIONS::Genesis.profile_count.into(), "Genesis.profile_count");
-    }
-
-    #[test]
-    fn test_get_all_descriptors_by_type() {
         let descriptors: Span<ProfileDescriptor> = ProfileManagerTrait::_get_all_descriptors_by_type(DuelistProfile::Undefined);
-        assert_eq!(descriptors.len(), 0, "0");
+        assert_eq!(profiles.len(), 0, "Undefined.profiles");
+        assert_eq!(descriptors.len(), 0, "Undefined.descriptors");
+        let profiles: Span<DuelistProfile> = ProfileManagerTrait::_get_all_profiles_by_type(DuelistProfile::Character(0_u8.into()));
         let descriptors: Span<ProfileDescriptor> = ProfileManagerTrait::_get_all_descriptors_by_type(DuelistProfile::Character(0_u8.into()));
-        assert_eq!(descriptors.len(), COLLECTIONS::Character.profile_count.into(), "Character.profile_count");
+        assert_eq!(profiles.len(), COLLECTIONS::Character.profile_count.into(), "Character.profiles");
+        assert_eq!(descriptors.len(), COLLECTIONS::Character.profile_count.into(), "Character.descriptors");
+        let profiles: Span<DuelistProfile> = ProfileManagerTrait::_get_all_profiles_by_type(DuelistProfile::Bot(0_u8.into()));
         let descriptors: Span<ProfileDescriptor> = ProfileManagerTrait::_get_all_descriptors_by_type(DuelistProfile::Bot(0_u8.into()));
-        assert_eq!(descriptors.len(), COLLECTIONS::Bot.profile_count.into(), "Bot.profile_count");
+        assert_eq!(profiles.len(), COLLECTIONS::Bot.profile_count.into(), "Bot.profiles");
+        assert_eq!(descriptors.len(), COLLECTIONS::Bot.profile_count.into(), "Bot.descriptors");
+        let profiles: Span<DuelistProfile> = ProfileManagerTrait::_get_all_profiles_by_type(DuelistProfile::Genesis(0_u8.into()));
         let descriptors: Span<ProfileDescriptor> = ProfileManagerTrait::_get_all_descriptors_by_type(DuelistProfile::Genesis(0_u8.into()));
-        assert_eq!(descriptors.len(), COLLECTIONS::Genesis.profile_count.into(), "Genesis.profile_count");
+        assert_eq!(profiles.len(), COLLECTIONS::Genesis.profile_count.into(), "Genesis.profiles");
+        assert_eq!(descriptors.len(), COLLECTIONS::Genesis.profile_count.into(), "Genesis.descriptors");
+        let profiles: Span<DuelistProfile> = ProfileManagerTrait::_get_all_profiles_by_type(DuelistProfile::Legends(0_u8.into()));
+        let descriptors: Span<ProfileDescriptor> = ProfileManagerTrait::_get_all_descriptors_by_type(DuelistProfile::Legends(0_u8.into()));
+        assert_eq!(profiles.len(), COLLECTIONS::Legends.profile_count.into(), "Legends.profiles");
+        assert_eq!(descriptors.len(), COLLECTIONS::Legends.profile_count.into(), "Legends.descriptors");
     }
-
+    
     //
     // test profiles
     //
