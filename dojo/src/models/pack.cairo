@@ -36,8 +36,8 @@ pub struct Pack {
 pub struct PackDescriptor {
     pub id: felt252, // @generateContants:shortstring
     pub name: felt252, // @generateContants:shortstring
-    pub image_url_closed: felt252, // @generateContants:shortstring
-    pub image_url_open: felt252, // @generateContants:shortstring
+    pub image_file_closed: felt252, // @generateContants:shortstring
+    pub image_file_open: felt252, // @generateContants:shortstring
     pub can_purchase: bool,
     pub price_lords: u128,
     pub quantity: usize,
@@ -52,8 +52,8 @@ mod PACK_TYPES {
     pub const Unknown: PackDescriptor = PackDescriptor {
         id: 'Unknown',
         name: 'Unknown',
-        image_url_closed: '/tokens/Unknown.jpg',
-        image_url_open: '/tokens/Unknown.jpg',
+        image_file_closed: 'Unknown.jpg',
+        image_file_open: 'Unknown.jpg',
         can_purchase: false,
         price_lords: 0,
         quantity: 0,
@@ -62,8 +62,8 @@ mod PACK_TYPES {
     pub const StarterPack: PackDescriptor = PackDescriptor {
         id: 'StarterPack',
         name: 'Starter Pack',
-        image_url_closed: '/tokens/StarterPack.jpg',
-        image_url_open: '/tokens/StarterPack.jpg',
+        image_file_closed: 'StarterPack.jpg',
+        image_file_open: 'StarterPack.jpg',
         can_purchase: false,
         price_lords: (20 * CONST::ETH_TO_WEI.low),
         quantity: 2,
@@ -72,8 +72,8 @@ mod PACK_TYPES {
     pub const GenesisDuelists5x: PackDescriptor = PackDescriptor {
         id: 'GenesisDuelists5x',
         name: 'Genesis Duelists 5-pack',
-        image_url_closed: '/tokens/GenesisDuelists5x.png',
-        image_url_open: '/tokens/GenesisDuelists5x.png',
+        image_file_closed: 'GenesisDuelists5x.png',
+        image_file_open: 'GenesisDuelists5x.png',
         can_purchase: true,
         price_lords: (50 * CONST::ETH_TO_WEI.low),
         quantity: 5,
@@ -82,8 +82,8 @@ mod PACK_TYPES {
     pub const FreeDuelist: PackDescriptor = PackDescriptor {
         id: 'FreeDuelist',
         name: 'Free Genesis Duelist',
-        image_url_closed: '/tokens/StarterPack.jpg',
-        image_url_open: '/tokens/StarterPack.jpg',
+        image_file_closed: 'FreeDuelist.png',
+        image_file_open: 'FreeDuelist.png',
         can_purchase: false,
         price_lords: (10 * CONST::ETH_TO_WEI.low),
         quantity: 1,
@@ -92,8 +92,8 @@ mod PACK_TYPES {
     pub const SingleDuelist: PackDescriptor = PackDescriptor {
         id: 'SingleDuelist',
         name: 'Single Duelist',
-        image_url_closed: '/tokens/SingleDuelist.jpg',
-        image_url_open: '/tokens/SingleDuelist.jpg',
+        image_file_closed: 'SingleDuelist.png',
+        image_file_open: 'SingleDuelist.png',
         can_purchase: false,
         price_lords: (10 * CONST::ETH_TO_WEI.low),
         quantity: 1,
@@ -190,12 +190,11 @@ pub impl PackTypeImpl of PackTypeTrait {
     fn name(self: @PackType) -> ByteArray {
         ((*self).descriptor().name.to_string())
     }
-    fn image_url(self: @PackType, is_open: bool) -> ByteArray {
-        if (is_open) {
-            ((*self).descriptor().image_url_open.to_string())
-        } else {
-            ((*self).descriptor().image_url_closed.to_string())
-        }
+    fn image_url(self: @PackType, base_uri: ByteArray, is_open: bool) -> ByteArray {
+        (format!("{}/pistols/tokens/packs/{}", base_uri,
+            if (is_open) {self.descriptor().image_file_open.to_string()}
+            else {self.descriptor().image_file_closed.to_string()})
+        )
     }
     #[inline(always)]
     fn can_purchase(self: @PackType) -> bool {

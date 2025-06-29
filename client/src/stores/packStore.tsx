@@ -17,12 +17,16 @@ export const usePackStore = createDojoStore<PistolsSchemaType>();
 export const usePackType = (packType: constants.PackType) => {
   const descriptor = useMemo(() => constants.PACK_TYPES[packType], [packType])
   const name = useMemo(() => (descriptor?.name ?? 'Pack'), [descriptor])
-  const imageUrlOpen = useMemo(() => (descriptor?.image_url_open ?? null), [descriptor])
-  const imageUrlClosed = useMemo(() => (descriptor?.image_url_closed ?? null), [descriptor])
   const canPurchase = useMemo(() => (descriptor?.can_purchase ?? false), [descriptor])
   const priceLords = useMemo(() => (descriptor?.price_lords ?? null), [descriptor])
   const quantity = useMemo(() => (descriptor?.quantity ?? null), [descriptor])
   const contents = useMemo(() => (descriptor?.contents ?? null), [descriptor])
+  const imageUrlOpen = useMemo(() => (
+    descriptor ? `/tokens/packs/${descriptor.image_file_open}` : null
+  ), [descriptor])
+  const imageUrlClosed = useMemo(() => (
+    descriptor ? `/tokens/packs/${descriptor.image_file_closed}` : null
+  ), [descriptor])
   return {
     name,
     imageUrlOpen,
