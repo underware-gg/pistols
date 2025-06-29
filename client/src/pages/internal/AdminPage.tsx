@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { BigNumberish } from 'starknet'
-import { Button, Checkbox, Container, FormInput, Icon, Input, Table } from 'semantic-ui-react'
+import { Button, Checkbox, Container, Icon, Input, Table } from 'semantic-ui-react'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { STARKNET_ADDRESS_LENGTHS } from '@underware/pistols-sdk/starknet'
 import { ExplorerLink } from '@underware/pistols-sdk/starknet/components'
@@ -12,9 +12,10 @@ import { TokenStoreSync } from '/src/stores/sync/TokenStoreSync'
 import { InternalPageMenu, InternalPageWrapper } from '/src/pages/internal/InternalPageIndex'
 import { Connect } from '/src/pages/tests/ConnectTestPage'
 import { useAccount } from '@starknet-react/core'
-import { useBlockedPlayersAccounts, usePlayer, useTeamMembersAccounts } from '/src/stores/playerStore'
-import { PlayerNameSync } from '/src/stores/sync/PlayerNameSync'
+import { useBlockedPlayersAccounts, usePlayer, useTeamMembersAccounts, getPlayernameFromAddress, getAddressFromPlayername } from '/src/stores/playerStore'
 import { useValidateWalletAddress } from '@underware/pistols-sdk/utils/hooks'
+import { bigintToAddress, isBigint, isPositiveBigint } from '@underware/pistols-sdk/utils'
+import { PlayerNameSync } from '/src/stores/sync/PlayerNameSync'
 import { Leaderboards } from './SeasonsPage'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppDojo from '/src/components/AppDojo'
@@ -58,6 +59,63 @@ export default function AdminPage() {
   );
 }
 
+
+export function WalletAddressRow({
+  address,
+  setAddress
+}: {
+  address: string
+  setAddress: (address: string) => void
+}) {
+  // const { username: foundUsername } = usePlayer(address)
+  const [username, setUsername] = useState('')
+  useEffect(() => {
+    // find address from username
+    const foundAddress = getAddressFromPlayername(username)
+    if (BigInt(foundAddress ?? 0) !== BigInt(address ?? 0)) {
+      setAddress(isPositiveBigint(foundAddress) ? bigintToAddress(foundAddress) : '')
+    }
+  }, [username])
+  useEffect(() => {
+    // find username from address
+    const foundUsername = getPlayernameFromAddress(address) || ''
+    if (foundUsername !== username) {
+      setUsername(foundUsername)
+    }
+  }, [address])
+  return (
+    <Row>
+      <Cell className='Code'>
+        Wallet Address
+      </Cell>
+      <Cell>
+        <Input fluid className='Code'
+          value={username ?? ''}
+          onChange={(e) => setUsername(e.target.value)}
+          maxLength={20}
+          placeholder={null}
+          label='Controller Name:'
+        />
+        <Input fluid className='Code'
+          value={address ?? ''}
+          onChange={(e) => {
+            if (isBigint(e.target.value ?? '')) setAddress(e.target.value)
+          }}
+          maxLength={STARKNET_ADDRESS_LENGTHS[0]}
+          placeholder={null}
+          label='Address:'
+        />
+      </Cell>
+    </Row>
+  )
+}
+
+
+
+
+//------------------------------------
+// Config model
+//
 
 function Config() {
   const { account } = useAccount()
@@ -158,7 +216,6 @@ function Config() {
 }
 
 
-
 //--------------------------------
 // Team Members
 //
@@ -228,19 +285,7 @@ function TeamMembersEditor() {
         </Row>
       </Header>
       <Body>
-        <Row>
-          <Cell className='Code'>
-            Wallet Address
-          </Cell>
-          <Cell>
-            <Input fluid className='Code'
-              value={address ?? ''}
-              onChange={(e) => setAddress(e.target.value)}
-              maxLength={STARKNET_ADDRESS_LENGTHS[0]}
-              placeholder={null}
-            />
-          </Cell>
-        </Row>
+        <WalletAddressRow address={address} setAddress={setAddress} />
         <Row>
           <Cell className='Code'>
             Is Team Member?
@@ -335,19 +380,7 @@ function BlockedPlayersEditor() {
         </Row>
       </Header>
       <Body>
-        <Row>
-          <Cell className='ModalText Code'>
-            Wallet Address
-          </Cell>
-          <Cell>
-            <Input fluid className='Code'
-              value={address ?? ''}
-              onChange={(e) => setAddress(e.target.value)}
-              maxLength={STARKNET_ADDRESS_LENGTHS[0]}
-              placeholder={null}
-            />
-          </Cell>
-        </Row>
+        <WalletAddressRow address={address} setAddress={setAddress} />
         <Row>
           <Cell className='ModalText Code'>
             Is Blocked?

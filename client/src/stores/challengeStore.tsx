@@ -673,8 +673,8 @@ export const useQueryChallengeIdsByDuelist = (
 //     if (filterName) {
 //       const filterNameLower = filterName.toLowerCase();
 //       result = result.filter((ch) => (
-//         getPlayerName(ch.address_a)?.toLowerCase().includes(filterNameLower) ||
-//         getPlayerName(ch.address_b)?.toLowerCase().includes(filterNameLower)
+//         getPlayernameFromAddress(ch.address_a)?.toLowerCase().includes(filterNameLower) ||
+//         getPlayernameFromAddress(ch.address_b)?.toLowerCase().includes(filterNameLower)
 //       ))
 //     }
 

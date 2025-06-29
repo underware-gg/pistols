@@ -35,7 +35,8 @@ interface State {
   player_bookmarks: PlayerBookmarksByAddress,
   token_bookmarks: TokenBookmarksByAddress,
   updateUsernames: (usernames: Map<string, string>) => void;
-  getPlayerName: (address: BigNumberish) => string | undefined;
+  getPlayernameFromAddress: (address: BigNumberish) => string | undefined;
+  getAddressFromPlayername: (name: string) => BigNumberish | undefined;
   updateMessages: (entities: PistolsEntity[]) => void;
 }
 
@@ -62,9 +63,13 @@ const createStore = () => {
         // console.log("updateUsername()[Player] =>", usernames, state.players)
       });
     },
-    getPlayerName: (address: BigNumberish) => {
+    getPlayernameFromAddress: (address: BigNumberish) => {
       const players_names = get().players_names
       return players_names[_playerKey(address)]
+    },
+    getAddressFromPlayername: (name: string) => {
+      const players_names = get().players_names
+      return Object.keys(players_names).find((key) => players_names[key] === name)
     },
     updateMessages: (entities: PistolsEntity[]) => {
       // console.log("updateMessages()[Player] =>", entities)
@@ -274,7 +279,7 @@ export const useQueryPlayerIds = (
 
     // filter by name
     if (filterName) {
-      result = result.filter((p) => getPlayerName(p.player_address)?.toLowerCase().includes(filterName.toLowerCase()))
+      result = result.filter((p) => getPlayernameFromAddress(p.player_address)?.toLowerCase().includes(filterName.toLowerCase()))
     }
 
     // filter by bookmarked duelists
@@ -296,7 +301,7 @@ export const useQueryPlayerIds = (
         return isAscending ? a?.localeCompare(b) : b?.localeCompare(a)
       }
       if (sortColumn == PlayerColumn.Name) {
-        return _sortByName(getPlayerName(player_a.player_address), getPlayerName(player_b.player_address))
+        return _sortByName(getPlayernameFromAddress(player_a.player_address), getPlayernameFromAddress(player_b.player_address))
       }
 
       // Sort by values
@@ -324,8 +329,11 @@ export const useQueryPlayerIds = (
 // vanilla getters
 // (non-React)
 //
-export const getPlayerName = (address: BigNumberish): string | undefined => {
-  return usePlayerDataStore.getState().getPlayerName(address)
+export const getPlayernameFromAddress = (address: BigNumberish | undefined): string | undefined => {
+  return usePlayerDataStore.getState().getPlayernameFromAddress(address ?? '')
+}
+export const getAddressFromPlayername = (name: string | undefined): BigNumberish | undefined => {
+  return usePlayerDataStore.getState().getAddressFromPlayername(name ?? '')
 }
 
 export const getPlayerOnlineStatus = (address: BigNumberish): boolean => {
