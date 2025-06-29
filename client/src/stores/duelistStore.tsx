@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
-import { BigNumberish } from 'starknet'
+import { BigNumberish, CairoCustomEnum } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
 import { useEntityIds, useDojoSystem, keysToEntityId, getCustomEnumCalldata, useStoreModelsByKeys, useStoreModelsById, useAllStoreModels, formatQueryValue, useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
 import { useClientTimestamp, useMemoGate } from '@underware/pistols-sdk/utils/hooks'
@@ -53,8 +53,8 @@ export const useAllDuelistsIds = () => {
   }
 }
 
-const useDuelistProfile = (duelist: models.Duelist) => {
-  const { variant, value } = useMemo(() => parseCustomEnum<constants.DuelistProfile, DuelistProfileKey>(duelist?.duelist_profile), [duelist])
+export const useDuelistProfile = (duelist_profile: CairoCustomEnum | undefined) => {
+  const { variant, value } = useMemo(() => parseCustomEnum<constants.DuelistProfile, DuelistProfileKey>(duelist_profile), [duelist_profile])
   const profileType: constants.DuelistProfile = variant;  // ex: GenesisKey
   const profileKey: DuelistProfileKey = value;            // ex: GenesisKey::Duke
 
@@ -127,7 +127,7 @@ export const useDuelist = (duelist_id: BigNumberish) => {
     duelistName,
     isNpc,
     quote,
-  } = useDuelistProfile(duelist)
+  } = useDuelistProfile(duelist?.duelist_profile)
 
   // for animations
   const characterType = useMemo(() => (profileGender == 'Female' ? CharacterType.FEMALE : CharacterType.MALE), [profileGender])
@@ -282,7 +282,7 @@ export const useDuelistStack = (duelist_id: BigNumberish) => {
   const {
     profileType,
     profileId,
-  } = useDuelistProfile(duelist)
+  } = useDuelistProfile(duelist?.duelist_profile)
 
   // get stack
   const { owner } = useOwnerOfDuelist(duelist_id)

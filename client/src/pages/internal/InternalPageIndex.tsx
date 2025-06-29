@@ -12,6 +12,7 @@ import { usePlayer } from '/src/stores/playerStore'
 const internalPages = [
   { name: 'contracts', connected: true },
   { name: 'admin', connected: true },
+  { name: 'airdrop', connected: true },
   { name: 'pools', connected: true },
   { name: 'seasons', connected: true },
   { name: 'players', connected: true },

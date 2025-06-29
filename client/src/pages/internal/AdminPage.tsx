@@ -62,10 +62,12 @@ export default function AdminPage() {
 
 export function WalletAddressRow({
   address,
-  setAddress
+  setAddress,
+  label = 'Wallet Address',
 }: {
   address: string
   setAddress: (address: string) => void
+  label?: string
 }) {
   // const { username: foundUsername } = usePlayer(address)
   const [username, setUsername] = useState('')
@@ -86,7 +88,7 @@ export function WalletAddressRow({
   return (
     <Row>
       <Cell className='Code'>
-        Wallet Address
+        {label}
       </Cell>
       <Cell>
         <Input fluid className='Code'

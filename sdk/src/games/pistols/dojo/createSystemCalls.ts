@@ -1,6 +1,6 @@
 import { DojoCall, DojoProvider, getContractByName } from '@dojoengine/core'
-import { AccountInterface, BigNumberish, CairoCustomEnum, Call, CallData, UniversalDetails } from 'starknet'
-import { arrayClean, shortAddress, isPositiveBigint, bigintToHex } from 'src/utils/misc/types'
+import { AccountInterface, BigNumberish, CairoCustomEnum, Call, CallData, UniversalDetails, CairoOption, CairoOptionVariant } from 'starknet'
+import { arrayClean, shortAddress, isPositiveBigint, bigintToHex, bigintToAddress } from 'src/utils/misc/types'
 import { NAMESPACE, getLordsAddress, getBankAddress, getVrfAddress, DojoManifest } from 'src/games/pistols/config/config'
 import { bigintToU256 } from 'src/starknet/starknet'
 import { makeCustomEnum } from 'src/starknet/starknet_enum'
@@ -8,6 +8,7 @@ import { DojoNetworkConfig } from 'src/games/pistols/config/networks'
 import { setupWorld } from 'src/games/pistols/generated/contracts.gen'
 import { emitter } from 'src/dojo/hooks/useDojoEmitterEvent'
 import * as constants from 'src/games/pistols/generated/constants'
+import { DuelistProfileKey } from '../misc/profiles'
 
 export type SystemCalls = ReturnType<typeof createSystemCalls>;
 export type DojoCalls = Array<DojoCall | Call>
@@ -226,7 +227,7 @@ export function createSystemCalls(
     //
     duel_token: {
       create_duel: async (signer: AccountInterface, duel_type: constants.DuelType, duelist_id: BigNumberish, challenged_address: BigNumberish, lives_staked: number, expire_hours: number, premise: constants.Premise, message: string, key?: string): Promise<boolean> => {
-        let calls: DojoCalls = [
+        const calls: DojoCalls = [
           contractCalls.duel_token.buildCreateDuelCalldata(
             makeCustomEnum(duel_type),
             duelist_id,
@@ -263,11 +264,26 @@ export function createSystemCalls(
       purchase: async (signer: AccountInterface, pack_type: constants.PackType, key?: string): Promise<boolean> => {
         const pack_type_enum = makeCustomEnum(pack_type)
         const approved_value = await contractCalls.pack_token.calcMintFee(signer.address, pack_type_enum) as BigNumberish
-        let calls: DojoCalls = [
+        const calls: DojoCalls = [
           approve_call(approved_value),
           vrf_request_call(signer, 'pack_token'),
           contractCalls.pack_token.buildPurchaseCalldata(
             pack_type_enum,
+          ),
+        ]
+        return await _executeTransaction(signer, calls, key)
+      },
+      airdrop: async (signer: AccountInterface, recipient: BigNumberish, pack_type: constants.PackType, collection: constants.DuelistProfile | null, profile_key: DuelistProfileKey | null, key?: string): Promise<boolean> => {
+        const pack_type_enum = makeCustomEnum(pack_type)
+        const duelist_profile_enum = (collection && profile_key) ? makeCustomEnum(collection, makeCustomEnum(profile_key)) : undefined
+        const duelist_profile_option = new CairoOption(
+          duelist_profile_enum ? CairoOptionVariant.Some : CairoOptionVariant.None, duelist_profile_enum,
+        );
+        const calls: DojoCalls = [
+          contractCalls.pack_token.buildAirdropCalldata(
+            bigintToAddress(recipient),
+            pack_type_enum,
+            duelist_profile_option,
           ),
         ]
         return await _executeTransaction(signer, calls, key)

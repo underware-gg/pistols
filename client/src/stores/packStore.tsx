@@ -1,12 +1,15 @@
 import { useMemo } from 'react'
-import { BigNumberish } from 'starknet'
+import { BigNumberish, CairoCustomEnum } from 'starknet'
+import { useAccount } from '@starknet-react/core'
 import { createDojoStore } from '@dojoengine/sdk/react'
 import { parseEnumVariant } from '@underware/pistols-sdk/starknet'
 import { formatQueryValue, useEntitiesModel, useSdkEntitiesGet, useStoreModelsByKeys } from '@underware/pistols-sdk/dojo'
 import { PistolsSchemaType, PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols/sdk'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
-import { usePacksOfPlayer } from '/src/hooks/useTokenPacks'
+import { usePacksOfOwner } from '/src/hooks/useTokenPacks'
 import { debug } from '@underware/pistols-sdk/pistols'
+import { bigintToDecimal } from '@underware/pistols-sdk/utils'
+import { useDuelistProfile } from './duelistStore'
 
 export const usePackStore = createDojoStore<PistolsSchemaType>();
 
@@ -19,6 +22,7 @@ export const usePackType = (packType: constants.PackType) => {
   const canPurchase = useMemo(() => (descriptor?.can_purchase ?? false), [descriptor])
   const priceLords = useMemo(() => (descriptor?.price_lords ?? null), [descriptor])
   const quantity = useMemo(() => (descriptor?.quantity ?? null), [descriptor])
+  const contents = useMemo(() => (descriptor?.contents ?? null), [descriptor])
   return {
     name,
     imageUrlOpen,
@@ -26,6 +30,7 @@ export const usePackType = (packType: constants.PackType) => {
     canPurchase,
     priceLords,
     quantity,
+    contents,
   }
 }
 
@@ -37,15 +42,27 @@ export const usePack = (pack_id: BigNumberish) => {
   const entities = usePackStore((state) => state.entities);
   const pack = useStoreModelsByKeys<models.Pack>(entities, 'Pack', [pack_id])
 
+  const packExists = useMemo(() => Boolean(pack), [pack])
   const isOpen = useMemo(() => pack?.is_open ?? false, [pack])
   const packType = useMemo(() => parseEnumVariant<constants.PackType>(pack?.pack_type), [pack])
-  const packDescriptor = usePackType(packType)
+  const descriptor = usePackType(packType)
+
+  const packIdDisplay = useMemo(() => (
+    `Pack #${packExists ? bigintToDecimal(pack_id) : '?'}`
+  ), [pack_id, packExists])
+
+  const { profileType, profileKey } = useDuelistProfile(pack?.duelist_profile?.isSome() ? pack.duelist_profile.unwrap() : null)
+  const contents = useMemo(() => {
+    return (profileType && profileKey) ? `${profileType}: (${profileKey})` : descriptor.contents
+  }, [profileType, profileKey, descriptor])
 
   return {
-    packExists: (pack != null),
+    packExists,
     packType,
     isOpen,
-    ...packDescriptor,
+    packIdDisplay,
+    ...descriptor,
+    contents,
   }
 }
 
@@ -57,8 +74,13 @@ export const usePack = (pack_id: BigNumberish) => {
 //
 
 export const useFetchPacksOfPlayer = () => {
+  const { address } = useAccount()
+  return useFetchPacksByPlayer(address)
+}
+
+export const useFetchPacksByPlayer = (address: BigNumberish) => {
   const packState = usePackStore((state) => state)
-  const { packIds } = usePacksOfPlayer()
+  const { packIds } = usePacksOfOwner(address)
 
   const entities = useMemo(() => Object.values(packState.entities), [packState.entities])
   const packs = useEntitiesModel<models.Pack>(entities, 'Pack')
