@@ -1541,7 +1541,7 @@ export const LEGENDS_PROFILES: type_LEGENDS_PROFILES = {
     name: 'Unknown',
   },
   TGC1: {
-    name: 'Daes',
+    name: 'TGC1',
   },
 };
 

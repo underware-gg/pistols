@@ -438,7 +438,7 @@ mod LEGENDS_PROFILES {
         name: 'Unknown',
     };
     pub const TGC1: ProfileDescriptor = ProfileDescriptor { // 1
-        name: 'Daes',
+        name: 'TGC1',
     };
 }
 
