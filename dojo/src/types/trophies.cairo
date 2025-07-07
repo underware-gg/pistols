@@ -412,7 +412,7 @@ pub impl TrophyImpl of TrophyTrait {
         }
     }
 
-    fn task_count(self: @Trophy) -> u32 {
+    fn task_count(self: @Trophy) -> u128 {
         match self {
             Trophy::None                => 0,
             // TROPHY_GROUP::Player
@@ -509,7 +509,7 @@ pub impl TrophyImpl of TrophyTrait {
     // send a progress event to the arcade store
     // https://github.com/cartridge-gg/arcade/blob/main/packages/achievement/src/components/achievable.cairo#L99-L112
     // https://github.com/cartridge-gg/arcade/blob/main/packages/achievement/src/store.cairo#L59-L63
-    fn progress(self: @Trophy, store: @ArcadeStore, player_address: @ContractAddress, count: u32) {
+    fn progress(self: @Trophy, store: @ArcadeStore, player_address: @ContractAddress, count: u128) {
 // println!("___progress: {} {}", self, self.identifier());
         (*store).progress(
             (*player_address).into(),
