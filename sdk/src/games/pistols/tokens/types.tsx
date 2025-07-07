@@ -1,6 +1,5 @@
-import { getCollectionDescriptor } from '../misc/profiles';
+import { encodeBase64 } from '../../../utils/misc/decoder';
 import * as constants from '../generated/constants'
-
 
 export const STAR = '&#11088;' // ⭐️
 export const PISTOL = '&#x1F52B;' // 🔫
@@ -34,13 +33,15 @@ export const encodeSvg = (svg: string, options: SvgRenderOptions): string => {
   lines = lines.filter(l => l.length > 0);
   lines = lines.filter(l => !l.startsWith('<!--'));
   lines = lines.filter(l => !l.startsWith('//'));
-  const _svg = lines.join('');
+  const _svg_data = lines.join('');
   if (options.includeMimeType) {
-    // return `data:image/svg+xml;utf8,${encodeURI(svg)}`
-    return `data:image/svg+xml;utf8,${_svg
+    if (options.encodeBase64) {
+      return encodeBase64(_svg_data, 'svg');
+    }
+    const _utf8_data = _svg_data
       .replaceAll('#', '%23')
-      .replaceAll('"', '&quot;')
-      }`
+      .replaceAll('"', '&quot;');
+    return `data:image/svg+xml;utf8,${_utf8_data}`;
   }
-  return _svg
+  return _svg_data
 }

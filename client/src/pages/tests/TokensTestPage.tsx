@@ -70,7 +70,7 @@ function Purchases() {
   if (!isConnected) return <></>
   return (
     <>
-      <h1>Purchases</h1>
+      <h1>Duelist Packs (Claim + Purchase + Open)</h1>
       <LordsFaucet />
       &nbsp;&nbsp;<LordsBalance address={address} size='big' />
       &nbsp;&nbsp;<span className='Code'>(mint test LORDS, if available)</span>
@@ -146,7 +146,7 @@ function Tokens() {
       <h1>Tokens</h1>
       <TokenContract contractAddress={packContractAddress} tokenName='Packs' attributes={['Is Open']} />
       <br />
-      <TokenContract contractAddress={ringContractAddress} tokenName='Rings' attributes={['Is Open']} />
+      <TokenContract contractAddress={ringContractAddress} tokenName='Rings' />
       <br />
       <TokenContract contractAddress={duelistContractAddress} tokenName='Duelists' hasFame
         renderer={(tokenId: bigint) => <DuelistTokenArt duelistId={tokenId} style={_style} />}
