@@ -24,26 +24,6 @@ export interface ChallengeMessage {
 	message: string;
 }
 
-// Type definition for `pistols::models::challenge::ChallengeMessageValue` struct
-export interface ChallengeMessageValue {
-	message: string;
-}
-
-// Type definition for `pistols::models::challenge::ChallengeValue` struct
-export interface ChallengeValue {
-	duel_type: DuelTypeEnum;
-	premise: PremiseEnum;
-	lives_staked: BigNumberish;
-	address_a: string;
-	address_b: string;
-	duelist_id_a: BigNumberish;
-	duelist_id_b: BigNumberish;
-	state: ChallengeStateEnum;
-	season_id: BigNumberish;
-	winner: BigNumberish;
-	timestamps: Period;
-}
-
 // Type definition for `pistols::models::challenge::DuelistState` struct
 export interface DuelistState {
 	chances: BigNumberish;
@@ -75,25 +55,9 @@ export interface Round {
 	final_blow: FinalBlowEnum;
 }
 
-// Type definition for `pistols::models::challenge::RoundValue` struct
-export interface RoundValue {
-	moves_a: Moves;
-	moves_b: Moves;
-	state_a: DuelistState;
-	state_b: DuelistState;
-	state: RoundStateEnum;
-	final_blow: FinalBlowEnum;
-}
-
 // Type definition for `pistols::models::config::CoinConfig` struct
 export interface CoinConfig {
 	coin_address: string;
-	minter_address: string;
-	faucet_amount: BigNumberish;
-}
-
-// Type definition for `pistols::models::config::CoinConfigValue` struct
-export interface CoinConfigValue {
 	minter_address: string;
 	faucet_amount: BigNumberish;
 }
@@ -108,24 +72,9 @@ export interface Config {
 	is_paused: boolean;
 }
 
-// Type definition for `pistols::models::config::ConfigValue` struct
-export interface ConfigValue {
-	treasury_address: string;
-	lords_address: string;
-	vrf_address: string;
-	current_season_id: BigNumberish;
-	is_paused: boolean;
-}
-
 // Type definition for `pistols::models::config::TokenConfig` struct
 export interface TokenConfig {
 	token_address: string;
-	minter_address: string;
-	minted_count: BigNumberish;
-}
-
-// Type definition for `pistols::models::config::TokenConfigValue` struct
-export interface TokenConfigValue {
 	minter_address: string;
 	minted_count: BigNumberish;
 }
@@ -145,24 +94,9 @@ export interface DuelistAssignment {
 	pass_id: BigNumberish;
 }
 
-// Type definition for `pistols::models::duelist::DuelistAssignmentValue` struct
-export interface DuelistAssignmentValue {
-	duel_id: BigNumberish;
-	pass_id: BigNumberish;
-}
-
 // Type definition for `pistols::models::duelist::DuelistMemorial` struct
 export interface DuelistMemorial {
 	duelist_id: BigNumberish;
-	cause_of_death: CauseOfDeathEnum;
-	killed_by: BigNumberish;
-	fame_before_death: BigNumberish;
-	player_address: string;
-	season_id: BigNumberish;
-}
-
-// Type definition for `pistols::models::duelist::DuelistMemorialValue` struct
-export interface DuelistMemorialValue {
 	cause_of_death: CauseOfDeathEnum;
 	killed_by: BigNumberish;
 	fame_before_death: BigNumberish;
@@ -174,13 +108,6 @@ export interface DuelistMemorialValue {
 export interface DuelistTimestamps {
 	registered: BigNumberish;
 	active: BigNumberish;
-}
-
-// Type definition for `pistols::models::duelist::DuelistValue` struct
-export interface DuelistValue {
-	duelist_profile: DuelistProfileEnum;
-	timestamps: DuelistTimestamps;
-	totals: Totals;
 }
 
 // Type definition for `pistols::models::duelist::Totals` struct
@@ -201,25 +128,9 @@ export interface Leaderboard {
 	scores: BigNumberish;
 }
 
-// Type definition for `pistols::models::leaderboard::LeaderboardValue` struct
-export interface LeaderboardValue {
-	positions: BigNumberish;
-	duelist_ids: BigNumberish;
-	scores: BigNumberish;
-}
-
 // Type definition for `pistols::models::pack::Pack` struct
 export interface Pack {
 	pack_id: BigNumberish;
-	pack_type: PackTypeEnum;
-	seed: BigNumberish;
-	lords_amount: BigNumberish;
-	is_open: boolean;
-	duelist_profile: CairoOption<DuelistProfileEnum>;
-}
-
-// Type definition for `pistols::models::pack::PackValue` struct
-export interface PackValue {
 	pack_type: PackTypeEnum;
 	seed: BigNumberish;
 	lords_amount: BigNumberish;
@@ -231,11 +142,6 @@ export interface PackValue {
 export interface Pact {
 	duel_type: DuelTypeEnum;
 	pair: BigNumberish;
-	duel_id: BigNumberish;
-}
-
-// Type definition for `pistols::models::pact::PactValue` struct
-export interface PactValue {
 	duel_id: BigNumberish;
 }
 
@@ -256,21 +162,9 @@ export interface PlayerDuelistStack {
 	stacked_ids: Array<BigNumberish>;
 }
 
-// Type definition for `pistols::models::player::PlayerDuelistStackValue` struct
-export interface PlayerDuelistStackValue {
-	active_duelist_id: BigNumberish;
-	level: BigNumberish;
-	stacked_ids: Array<BigNumberish>;
-}
-
 // Type definition for `pistols::models::player::PlayerFlags` struct
 export interface PlayerFlags {
 	player_address: string;
-	is_blocked: boolean;
-}
-
-// Type definition for `pistols::models::player::PlayerFlagsValue` struct
-export interface PlayerFlagsValue {
 	is_blocked: boolean;
 }
 
@@ -280,20 +174,9 @@ export interface PlayerOnline {
 	timestamp: BigNumberish;
 }
 
-// Type definition for `pistols::models::player::PlayerOnlineValue` struct
-export interface PlayerOnlineValue {
-	timestamp: BigNumberish;
-}
-
 // Type definition for `pistols::models::player::PlayerTeamFlags` struct
 export interface PlayerTeamFlags {
 	player_address: string;
-	is_team_member: boolean;
-	is_admin: boolean;
-}
-
-// Type definition for `pistols::models::player::PlayerTeamFlagsValue` struct
-export interface PlayerTeamFlagsValue {
 	is_team_member: boolean;
 	is_admin: boolean;
 }
@@ -305,22 +188,9 @@ export interface PlayerTimestamps {
 	claimed_starter_pack: boolean;
 }
 
-// Type definition for `pistols::models::player::PlayerValue` struct
-export interface PlayerValue {
-	timestamps: PlayerTimestamps;
-	totals: Totals;
-	alive_duelist_count: BigNumberish;
-}
-
 // Type definition for `pistols::models::pool::Pool` struct
 export interface Pool {
 	pool_id: PoolTypeEnum;
-	balance_lords: BigNumberish;
-	balance_fame: BigNumberish;
-}
-
-// Type definition for `pistols::models::pool::PoolValue` struct
-export interface PoolValue {
 	balance_lords: BigNumberish;
 	balance_fame: BigNumberish;
 }
@@ -340,28 +210,9 @@ export interface RingBalance {
 	balance: BigNumberish;
 }
 
-// Type definition for `pistols::models::ring::RingBalanceValue` struct
-export interface RingBalanceValue {
-	claimed: boolean;
-	balance: BigNumberish;
-}
-
-// Type definition for `pistols::models::ring::RingValue` struct
-export interface RingValue {
-	ring_type: RingTypeEnum;
-	claimed_by: string;
-}
-
 // Type definition for `pistols::models::season::SeasonConfig` struct
 export interface SeasonConfig {
 	season_id: BigNumberish;
-	rules: RulesEnum;
-	phase: SeasonPhaseEnum;
-	period: Period;
-}
-
-// Type definition for `pistols::models::season::SeasonConfigValue` struct
-export interface SeasonConfigValue {
 	rules: RulesEnum;
 	phase: SeasonPhaseEnum;
 	period: Period;
@@ -374,35 +225,11 @@ export interface SeasonScoreboard {
 	points: BigNumberish;
 }
 
-// Type definition for `pistols::models::season::SeasonScoreboardValue` struct
-export interface SeasonScoreboardValue {
-	points: BigNumberish;
-}
-
 // Type definition for `pistols::systems::components::token_bound::TokenBoundAddress` struct
 export interface TokenBoundAddress {
 	recipient: string;
 	contract_address: string;
 	token_id: BigNumberish;
-}
-
-// Type definition for `pistols::systems::components::token_bound::TokenBoundAddressValue` struct
-export interface TokenBoundAddressValue {
-	contract_address: string;
-	token_id: BigNumberish;
-}
-
-// Type definition for `pistols::systems::rng_mock::MockedValue` struct
-export interface MockedValue {
-	salt: BigNumberish;
-	value: BigNumberish;
-	exists: boolean;
-}
-
-// Type definition for `pistols::systems::rng_mock::MockedValueValue` struct
-export interface MockedValueValue {
-	value: BigNumberish;
-	exists: boolean;
 }
 
 // Type definition for `pistols::types::timestamp::Period` struct
@@ -427,31 +254,10 @@ export interface TrophyCreation {
 	data: string;
 }
 
-// Type definition for `achievement::events::index::TrophyCreationValue` struct
-export interface TrophyCreationValue {
-	hidden: boolean;
-	index: BigNumberish;
-	points: BigNumberish;
-	start: BigNumberish;
-	end: BigNumberish;
-	group: BigNumberish;
-	icon: BigNumberish;
-	title: BigNumberish;
-	description: string;
-	tasks: Array<Task>;
-	data: string;
-}
-
 // Type definition for `achievement::events::index::TrophyProgression` struct
 export interface TrophyProgression {
 	player_id: BigNumberish;
 	task_id: BigNumberish;
-	count: BigNumberish;
-	time: BigNumberish;
-}
-
-// Type definition for `achievement::events::index::TrophyProgressionValue` struct
-export interface TrophyProgressionValue {
 	count: BigNumberish;
 	time: BigNumberish;
 }
@@ -471,12 +277,6 @@ export interface CallToChallengeEvent {
 	timestamp: BigNumberish;
 }
 
-// Type definition for `pistols::models::events::CallToChallengeEventValue` struct
-export interface CallToChallengeEventValue {
-	action: ChallengeActionEnum;
-	timestamp: BigNumberish;
-}
-
 // Type definition for `pistols::models::events::ChallengeRewardsEvent` struct
 export interface ChallengeRewardsEvent {
 	duel_id: BigNumberish;
@@ -484,21 +284,9 @@ export interface ChallengeRewardsEvent {
 	rewards: RewardValues;
 }
 
-// Type definition for `pistols::models::events::ChallengeRewardsEventValue` struct
-export interface ChallengeRewardsEventValue {
-	rewards: RewardValues;
-}
-
 // Type definition for `pistols::models::events::LordsReleaseEvent` struct
 export interface LordsReleaseEvent {
 	season_id: BigNumberish;
-	bill: LordsReleaseBill;
-	duel_id: BigNumberish;
-	timestamp: BigNumberish;
-}
-
-// Type definition for `pistols::models::events::LordsReleaseEventValue` struct
-export interface LordsReleaseEventValue {
 	bill: LordsReleaseBill;
 	duel_id: BigNumberish;
 	timestamp: BigNumberish;
@@ -513,24 +301,11 @@ export interface PlayerActivityEvent {
 	is_public: boolean;
 }
 
-// Type definition for `pistols::models::events::PlayerActivityEventValue` struct
-export interface PlayerActivityEventValue {
-	timestamp: BigNumberish;
-	activity: ActivityEnum;
-	identifier: BigNumberish;
-	is_public: boolean;
-}
-
 // Type definition for `pistols::models::events::PlayerBookmarkEvent` struct
 export interface PlayerBookmarkEvent {
 	player_address: string;
 	target_address: string;
 	target_id: BigNumberish;
-	enabled: boolean;
-}
-
-// Type definition for `pistols::models::events::PlayerBookmarkEventValue` struct
-export interface PlayerBookmarkEventValue {
 	enabled: boolean;
 }
 
@@ -541,22 +316,10 @@ export interface PlayerSettingEvent {
 	value: PlayerSettingValueEnum;
 }
 
-// Type definition for `pistols::models::events::PlayerSettingEventValue` struct
-export interface PlayerSettingEventValue {
-	value: PlayerSettingValueEnum;
-}
-
 // Type definition for `pistols::models::events::PlayerSocialLinkEvent` struct
 export interface PlayerSocialLinkEvent {
 	player_address: string;
 	social_platform: SocialPlatformEnum;
-	user_name: string;
-	user_id: string;
-	avatar: string;
-}
-
-// Type definition for `pistols::models::events::PlayerSocialLinkEventValue` struct
-export interface PlayerSocialLinkEventValue {
 	user_name: string;
 	user_id: string;
 	avatar: string;
@@ -913,14 +676,6 @@ export type PlayerSetting = {
 };
 export type PlayerSettingEnum = CairoCustomEnum;
 
-// Type definition for `pistols::models::events::PlayerSettingValue` enum
-export const playerSettingValue = [
-	'Undefined',
-	'Boolean',
-] as const;
-export type PlayerSettingValue = { [key in typeof playerSettingValue[number]]: string };
-export type PlayerSettingValueEnum = CairoCustomEnum;
-
 // Type definition for `pistols::models::events::SocialPlatform` enum
 export const socialPlatform = [
 	'Undefined',
@@ -946,79 +701,43 @@ export interface SchemaType extends ISchemaType {
 	pistols: {
 		Challenge: Challenge,
 		ChallengeMessage: ChallengeMessage,
-		ChallengeMessageValue: ChallengeMessageValue,
-		ChallengeValue: ChallengeValue,
 		DuelistState: DuelistState,
 		Moves: Moves,
 		Round: Round,
-		RoundValue: RoundValue,
 		CoinConfig: CoinConfig,
-		CoinConfigValue: CoinConfigValue,
 		Config: Config,
-		ConfigValue: ConfigValue,
 		TokenConfig: TokenConfig,
-		TokenConfigValue: TokenConfigValue,
 		Duelist: Duelist,
 		DuelistAssignment: DuelistAssignment,
-		DuelistAssignmentValue: DuelistAssignmentValue,
 		DuelistMemorial: DuelistMemorial,
-		DuelistMemorialValue: DuelistMemorialValue,
 		DuelistTimestamps: DuelistTimestamps,
-		DuelistValue: DuelistValue,
 		Totals: Totals,
 		Leaderboard: Leaderboard,
-		LeaderboardValue: LeaderboardValue,
 		Pack: Pack,
-		PackValue: PackValue,
 		Pact: Pact,
-		PactValue: PactValue,
 		Player: Player,
 		PlayerDuelistStack: PlayerDuelistStack,
-		PlayerDuelistStackValue: PlayerDuelistStackValue,
 		PlayerFlags: PlayerFlags,
-		PlayerFlagsValue: PlayerFlagsValue,
 		PlayerOnline: PlayerOnline,
-		PlayerOnlineValue: PlayerOnlineValue,
 		PlayerTeamFlags: PlayerTeamFlags,
-		PlayerTeamFlagsValue: PlayerTeamFlagsValue,
 		PlayerTimestamps: PlayerTimestamps,
-		PlayerValue: PlayerValue,
 		Pool: Pool,
-		PoolValue: PoolValue,
 		Ring: Ring,
 		RingBalance: RingBalance,
-		RingBalanceValue: RingBalanceValue,
-		RingValue: RingValue,
 		SeasonConfig: SeasonConfig,
-		SeasonConfigValue: SeasonConfigValue,
 		SeasonScoreboard: SeasonScoreboard,
-		SeasonScoreboardValue: SeasonScoreboardValue,
 		TokenBoundAddress: TokenBoundAddress,
-		TokenBoundAddressValue: TokenBoundAddressValue,
-		MockedValue: MockedValue,
-		MockedValueValue: MockedValueValue,
 		Period: Period,
-	},
-	achievement: {
 		TrophyCreation: TrophyCreation,
-		TrophyCreationValue: TrophyCreationValue,
 		TrophyProgression: TrophyProgression,
-		TrophyProgressionValue: TrophyProgressionValue,
 		Task: Task,
 		CallToChallengeEvent: CallToChallengeEvent,
-		CallToChallengeEventValue: CallToChallengeEventValue,
 		ChallengeRewardsEvent: ChallengeRewardsEvent,
-		ChallengeRewardsEventValue: ChallengeRewardsEventValue,
 		LordsReleaseEvent: LordsReleaseEvent,
-		LordsReleaseEventValue: LordsReleaseEventValue,
 		PlayerActivityEvent: PlayerActivityEvent,
-		PlayerActivityEventValue: PlayerActivityEventValue,
 		PlayerBookmarkEvent: PlayerBookmarkEvent,
-		PlayerBookmarkEventValue: PlayerBookmarkEventValue,
 		PlayerSettingEvent: PlayerSettingEvent,
-		PlayerSettingEventValue: PlayerSettingEventValue,
 		PlayerSocialLinkEvent: PlayerSocialLinkEvent,
-		PlayerSocialLinkEventValue: PlayerSocialLinkEventValue,
 		LordsReleaseBill: LordsReleaseBill,
 		RewardValues: RewardValues,
 	},
@@ -1067,46 +786,6 @@ export const schema: SchemaType = {
 			duel_id: 0,
 		message: "",
 		},
-		ChallengeMessageValue: {
-		message: "",
-		},
-		ChallengeValue: {
-		duel_type: new CairoCustomEnum({ 
-					Undefined: "",
-				Seasonal: undefined,
-				Tournament: undefined,
-				Tutorial: undefined,
-				Practice: undefined, }),
-		premise: new CairoCustomEnum({ 
-					Undefined: "",
-				Matter: undefined,
-				Debt: undefined,
-				Dispute: undefined,
-				Honour: undefined,
-				Hatred: undefined,
-				Blood: undefined,
-				Nothing: undefined,
-				Tournament: undefined,
-				Treaty: undefined,
-				Lesson: undefined, }),
-			lives_staked: 0,
-			address_a: "",
-			address_b: "",
-			duelist_id_a: 0,
-			duelist_id_b: 0,
-		state: new CairoCustomEnum({ 
-					Null: "",
-				Awaiting: undefined,
-				Withdrawn: undefined,
-				Refused: undefined,
-				Expired: undefined,
-				InProgress: undefined,
-				Resolved: undefined,
-				Draw: undefined, }),
-			season_id: 0,
-			winner: 0,
-		timestamps: { start: 0, end: 0, },
-		},
 		DuelistState: {
 			chances: 0,
 			damage: 0,
@@ -1141,29 +820,8 @@ export const schema: SchemaType = {
 				Forsaken: undefined,
 				Unpaired: undefined, }),
 		},
-		RoundValue: {
-		moves_a: { salt: 0, hashed: 0, timeout: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
-		moves_b: { salt: 0, hashed: 0, timeout: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
-		state_a: { chances: 0, damage: 0, health: 0, dice_fire: 0, honour: 0, },
-		state_b: { chances: 0, damage: 0, health: 0, dice_fire: 0, honour: 0, },
-		state: new CairoCustomEnum({ 
-					Null: "",
-				Commit: undefined,
-				Reveal: undefined,
-				Finished: undefined, }),
-		final_blow: new CairoCustomEnum({ 
-					Undefined: "",
-				Paces: undefined,
-				Blades: undefined,
-				Forsaken: undefined,
-				Unpaired: undefined, }),
-		},
 		CoinConfig: {
 			coin_address: "",
-			minter_address: "",
-			faucet_amount: 0,
-		},
-		CoinConfigValue: {
 			minter_address: "",
 			faucet_amount: 0,
 		},
@@ -1175,19 +833,8 @@ export const schema: SchemaType = {
 			current_season_id: 0,
 			is_paused: false,
 		},
-		ConfigValue: {
-			treasury_address: "",
-			lords_address: "",
-			vrf_address: "",
-			current_season_id: 0,
-			is_paused: false,
-		},
 		TokenConfig: {
 			token_address: "",
-			minter_address: "",
-			minted_count: 0,
-		},
-		TokenConfigValue: {
 			minter_address: "",
 			minted_count: 0,
 		},
@@ -1207,24 +854,8 @@ export const schema: SchemaType = {
 			duel_id: 0,
 			pass_id: 0,
 		},
-		DuelistAssignmentValue: {
-			duel_id: 0,
-			pass_id: 0,
-		},
 		DuelistMemorial: {
 			duelist_id: 0,
-		cause_of_death: new CairoCustomEnum({ 
-					None: "",
-				Duelling: undefined,
-				Memorize: undefined,
-				Sacrifice: undefined,
-				Forsaken: undefined, }),
-			killed_by: 0,
-			fame_before_death: 0,
-			player_address: "",
-			season_id: 0,
-		},
-		DuelistMemorialValue: {
 		cause_of_death: new CairoCustomEnum({ 
 					None: "",
 				Duelling: undefined,
@@ -1240,16 +871,6 @@ export const schema: SchemaType = {
 			registered: 0,
 			active: 0,
 		},
-		DuelistValue: {
-		duelist_profile: new CairoCustomEnum({ 
-					Undefined: "",
-				Character: undefined,
-				Bot: undefined,
-				Genesis: undefined,
-				Legends: undefined, }),
-		timestamps: { registered: 0, active: 0, },
-		totals: { total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour: 0, honour_log: 0, },
-		},
 		Totals: {
 			total_duels: 0,
 			total_wins: 0,
@@ -1264,25 +885,8 @@ export const schema: SchemaType = {
 			duelist_ids: 0,
 			scores: 0,
 		},
-		LeaderboardValue: {
-			positions: 0,
-			duelist_ids: 0,
-			scores: 0,
-		},
 		Pack: {
 			pack_id: 0,
-		pack_type: new CairoCustomEnum({ 
-					Unknown: "",
-				StarterPack: undefined,
-				GenesisDuelists5x: undefined,
-				FreeDuelist: undefined,
-				SingleDuelist: undefined, }),
-			seed: 0,
-			lords_amount: 0,
-			is_open: false,
-		duelist_profile: new CairoOption(CairoOptionVariant.None),
-		},
-		PackValue: {
 		pack_type: new CairoCustomEnum({ 
 					Unknown: "",
 				StarterPack: undefined,
@@ -1304,9 +908,6 @@ export const schema: SchemaType = {
 			pair: 0,
 			duel_id: 0,
 		},
-		PactValue: {
-			duel_id: 0,
-		},
 		Player: {
 			player_address: "",
 		timestamps: { registered: 0, claimed_gift: 0, claimed_starter_pack: false, },
@@ -1325,23 +926,12 @@ export const schema: SchemaType = {
 			level: 0,
 			stacked_ids: [0],
 		},
-		PlayerDuelistStackValue: {
-			active_duelist_id: 0,
-			level: 0,
-			stacked_ids: [0],
-		},
 		PlayerFlags: {
 			player_address: "",
 			is_blocked: false,
 		},
-		PlayerFlagsValue: {
-			is_blocked: false,
-		},
 		PlayerOnline: {
 			identity: "",
-			timestamp: 0,
-		},
-		PlayerOnlineValue: {
 			timestamp: 0,
 		},
 		PlayerTeamFlags: {
@@ -1349,19 +939,10 @@ export const schema: SchemaType = {
 			is_team_member: false,
 			is_admin: false,
 		},
-		PlayerTeamFlagsValue: {
-			is_team_member: false,
-			is_admin: false,
-		},
 		PlayerTimestamps: {
 			registered: 0,
 			claimed_gift: 0,
 			claimed_starter_pack: false,
-		},
-		PlayerValue: {
-		timestamps: { registered: 0, claimed_gift: 0, claimed_starter_pack: false, },
-		totals: { total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour: 0, honour_log: 0, },
-			alive_duelist_count: 0,
 		},
 		Pool: {
 		pool_id: new CairoCustomEnum({ 
@@ -1372,10 +953,6 @@ export const schema: SchemaType = {
 				Tournament: undefined,
 				Sacrifice: undefined,
 				Claimable: undefined, }),
-			balance_lords: 0,
-			balance_fame: 0,
-		},
-		PoolValue: {
 			balance_lords: 0,
 			balance_fame: 0,
 		},
@@ -1398,30 +975,8 @@ export const schema: SchemaType = {
 			claimed: false,
 			balance: 0,
 		},
-		RingBalanceValue: {
-			claimed: false,
-			balance: 0,
-		},
-		RingValue: {
-		ring_type: new CairoCustomEnum({ 
-					Unknown: "",
-				GoldSignetRing: undefined,
-				SilverSignetRing: undefined,
-				LeadSignetRing: undefined, }),
-			claimed_by: "",
-		},
 		SeasonConfig: {
 			season_id: 0,
-		rules: new CairoCustomEnum({ 
-					Undefined: "",
-				Season: undefined, }),
-		phase: new CairoCustomEnum({ 
-					Undefined: "",
-				InProgress: undefined,
-				Ended: undefined, }),
-		period: { start: 0, end: 0, },
-		},
-		SeasonConfigValue: {
 		rules: new CairoCustomEnum({ 
 					Undefined: "",
 				Season: undefined, }),
@@ -1436,26 +991,10 @@ export const schema: SchemaType = {
 			holder: 0,
 			points: 0,
 		},
-		SeasonScoreboardValue: {
-			points: 0,
-		},
 		TokenBoundAddress: {
 			recipient: "",
 			contract_address: "",
 			token_id: 0,
-		},
-		TokenBoundAddressValue: {
-			contract_address: "",
-			token_id: 0,
-		},
-		MockedValue: {
-			salt: 0,
-			value: 0,
-			exists: false,
-		},
-		MockedValueValue: {
-			value: 0,
-			exists: false,
 		},
 		Period: {
 			start: 0,
@@ -1475,26 +1014,9 @@ export const schema: SchemaType = {
 			tasks: [{ id: 0, total: 0, description: "", }],
 		data: "",
 		},
-		TrophyCreationValue: {
-			hidden: false,
-			index: 0,
-			points: 0,
-			start: 0,
-			end: 0,
-			group: 0,
-			icon: 0,
-			title: 0,
-		description: "",
-			tasks: [{ id: 0, total: 0, description: "", }],
-		data: "",
-		},
 		TrophyProgression: {
 			player_id: 0,
 			task_id: 0,
-			count: 0,
-			time: 0,
-		},
-		TrophyProgressionValue: {
 			count: 0,
 			time: 0,
 		},
@@ -1516,37 +1038,13 @@ export const schema: SchemaType = {
 				Finished: undefined, }),
 			timestamp: 0,
 		},
-		CallToChallengeEventValue: {
-		action: new CairoCustomEnum({ 
-					Undefined: "",
-				Reply: undefined,
-				Commit: undefined,
-				Reveal: undefined,
-				Waiting: undefined,
-				Results: undefined,
-				Finished: undefined, }),
-			timestamp: 0,
-		},
 		ChallengeRewardsEvent: {
 			duel_id: 0,
 			duelist_id: 0,
 		rewards: { fame_lost: 0, fame_gained: 0, fools_gained: 0, points_scored: 0, position: 0, fame_burned: 0, lords_unlocked: 0, survived: false, },
 		},
-		ChallengeRewardsEventValue: {
-		rewards: { fame_lost: 0, fame_gained: 0, fools_gained: 0, points_scored: 0, position: 0, fame_burned: 0, lords_unlocked: 0, survived: false, },
-		},
 		LordsReleaseEvent: {
 			season_id: 0,
-		bill: { reason: new CairoCustomEnum({ 
-					Undefined: "",
-				FameLostToCreator: undefined,
-				FameLostToDeveloper: undefined,
-				SacrificedToDeveloper: undefined,
-				LeaderboardPrize: undefined, }), duelist_id: 0, recipient: "", pegged_fame: 0, pegged_lords: 0, sponsored_lords: 0, },
-			duel_id: 0,
-			timestamp: 0,
-		},
-		LordsReleaseEventValue: {
 		bill: { reason: new CairoCustomEnum({ 
 					Undefined: "",
 				FameLostToCreator: undefined,
@@ -1581,37 +1079,10 @@ export const schema: SchemaType = {
 			identifier: 0,
 			is_public: false,
 		},
-		PlayerActivityEventValue: {
-			timestamp: 0,
-		activity: new CairoCustomEnum({ 
-					Undefined: "",
-				TutorialFinished: undefined,
-				PackStarter: undefined,
-				PackPurchased: undefined,
-				PackOpened: undefined,
-				DuelistSpawned: undefined,
-				DuelistDied: undefined,
-				ChallengeCreated: undefined,
-				ChallengeCanceled: undefined,
-				ChallengeReplied: undefined,
-				MovesCommitted: undefined,
-				MovesRevealed: undefined,
-				PlayerTimedOut: undefined,
-				ChallengeResolved: undefined,
-				ChallengeDraw: undefined,
-				ClaimedGift: undefined,
-				AirdroppedPack: undefined,
-				ClaimedRing: undefined, }),
-			identifier: 0,
-			is_public: false,
-		},
 		PlayerBookmarkEvent: {
 			player_address: "",
 			target_address: "",
 			target_id: 0,
-			enabled: false,
-		},
-		PlayerBookmarkEventValue: {
 			enabled: false,
 		},
 		PlayerSettingEvent: {
@@ -1623,11 +1094,6 @@ export const schema: SchemaType = {
 					Undefined: "",
 				Boolean: undefined, }),
 		},
-		PlayerSettingEventValue: {
-		value: new CairoCustomEnum({ 
-					Undefined: "",
-				Boolean: undefined, }),
-		},
 		PlayerSocialLinkEvent: {
 			player_address: "",
 		social_platform: new CairoCustomEnum({ 
@@ -1635,11 +1101,6 @@ export const schema: SchemaType = {
 				Discord: undefined,
 				Telegram: undefined,
 				X: undefined, }),
-		user_name: "",
-		user_id: "",
-		avatar: "",
-		},
-		PlayerSocialLinkEventValue: {
 		user_name: "",
 		user_id: "",
 		avatar: "",
@@ -1672,63 +1133,38 @@ export const schema: SchemaType = {
 export enum ModelsMapping {
 	Challenge = 'pistols-Challenge',
 	ChallengeMessage = 'pistols-ChallengeMessage',
-	ChallengeMessageValue = 'pistols-ChallengeMessageValue',
-	ChallengeValue = 'pistols-ChallengeValue',
 	DuelType = 'pistols-DuelType',
 	DuelistState = 'pistols-DuelistState',
 	Moves = 'pistols-Moves',
 	Round = 'pistols-Round',
-	RoundValue = 'pistols-RoundValue',
 	CoinConfig = 'pistols-CoinConfig',
-	CoinConfigValue = 'pistols-CoinConfigValue',
 	Config = 'pistols-Config',
-	ConfigValue = 'pistols-ConfigValue',
 	TokenConfig = 'pistols-TokenConfig',
-	TokenConfigValue = 'pistols-TokenConfigValue',
 	CauseOfDeath = 'pistols-CauseOfDeath',
 	Duelist = 'pistols-Duelist',
 	DuelistAssignment = 'pistols-DuelistAssignment',
-	DuelistAssignmentValue = 'pistols-DuelistAssignmentValue',
 	DuelistMemorial = 'pistols-DuelistMemorial',
-	DuelistMemorialValue = 'pistols-DuelistMemorialValue',
 	DuelistTimestamps = 'pistols-DuelistTimestamps',
-	DuelistValue = 'pistols-DuelistValue',
 	Totals = 'pistols-Totals',
 	Leaderboard = 'pistols-Leaderboard',
-	LeaderboardValue = 'pistols-LeaderboardValue',
 	Pack = 'pistols-Pack',
 	PackType = 'pistols-PackType',
-	PackValue = 'pistols-PackValue',
 	Pact = 'pistols-Pact',
-	PactValue = 'pistols-PactValue',
 	Player = 'pistols-Player',
 	PlayerDuelistStack = 'pistols-PlayerDuelistStack',
-	PlayerDuelistStackValue = 'pistols-PlayerDuelistStackValue',
 	PlayerFlags = 'pistols-PlayerFlags',
-	PlayerFlagsValue = 'pistols-PlayerFlagsValue',
 	PlayerOnline = 'pistols-PlayerOnline',
-	PlayerOnlineValue = 'pistols-PlayerOnlineValue',
 	PlayerTeamFlags = 'pistols-PlayerTeamFlags',
-	PlayerTeamFlagsValue = 'pistols-PlayerTeamFlagsValue',
 	PlayerTimestamps = 'pistols-PlayerTimestamps',
-	PlayerValue = 'pistols-PlayerValue',
 	Pool = 'pistols-Pool',
 	PoolType = 'pistols-PoolType',
-	PoolValue = 'pistols-PoolValue',
 	Ring = 'pistols-Ring',
 	RingBalance = 'pistols-RingBalance',
-	RingBalanceValue = 'pistols-RingBalanceValue',
 	RingType = 'pistols-RingType',
-	RingValue = 'pistols-RingValue',
 	SeasonConfig = 'pistols-SeasonConfig',
-	SeasonConfigValue = 'pistols-SeasonConfigValue',
 	SeasonPhase = 'pistols-SeasonPhase',
 	SeasonScoreboard = 'pistols-SeasonScoreboard',
-	SeasonScoreboardValue = 'pistols-SeasonScoreboardValue',
 	TokenBoundAddress = 'pistols-TokenBoundAddress',
-	TokenBoundAddressValue = 'pistols-TokenBoundAddressValue',
-	MockedValue = 'pistols-MockedValue',
-	MockedValueValue = 'pistols-MockedValueValue',
 	BladesCard = 'pistols-BladesCard',
 	FinalBlow = 'pistols-FinalBlow',
 	PacesCard = 'pistols-PacesCard',
@@ -1743,28 +1179,18 @@ export enum ModelsMapping {
 	Rules = 'pistols-Rules',
 	Period = 'pistols-Period',
 	TrophyCreation = 'achievement-TrophyCreation',
-	TrophyCreationValue = 'achievement-TrophyCreationValue',
 	TrophyProgression = 'achievement-TrophyProgression',
-	TrophyProgressionValue = 'achievement-TrophyProgressionValue',
 	Task = 'achievement-Task',
 	Activity = 'pistols-Activity',
 	CallToChallengeEvent = 'pistols-CallToChallengeEvent',
-	CallToChallengeEventValue = 'pistols-CallToChallengeEventValue',
 	ChallengeAction = 'pistols-ChallengeAction',
 	ChallengeRewardsEvent = 'pistols-ChallengeRewardsEvent',
-	ChallengeRewardsEventValue = 'pistols-ChallengeRewardsEventValue',
 	LordsReleaseEvent = 'pistols-LordsReleaseEvent',
-	LordsReleaseEventValue = 'pistols-LordsReleaseEventValue',
 	PlayerActivityEvent = 'pistols-PlayerActivityEvent',
-	PlayerActivityEventValue = 'pistols-PlayerActivityEventValue',
 	PlayerBookmarkEvent = 'pistols-PlayerBookmarkEvent',
-	PlayerBookmarkEventValue = 'pistols-PlayerBookmarkEventValue',
 	PlayerSetting = 'pistols-PlayerSetting',
 	PlayerSettingEvent = 'pistols-PlayerSettingEvent',
-	PlayerSettingEventValue = 'pistols-PlayerSettingEventValue',
-	PlayerSettingValue = 'pistols-PlayerSettingValue',
 	PlayerSocialLinkEvent = 'pistols-PlayerSocialLinkEvent',
-	PlayerSocialLinkEventValue = 'pistols-PlayerSocialLinkEventValue',
 	SocialPlatform = 'pistols-SocialPlatform',
 	LordsReleaseBill = 'pistols-LordsReleaseBill',
 	ReleaseReason = 'pistols-ReleaseReason',

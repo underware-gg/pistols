@@ -1,5 +1,5 @@
 import { DojoProvider, DojoCall } from "@dojoengine/core";
-import { Account, AccountInterface, BigNumberish, CairoOption, CairoCustomEnum, ByteArray } from "starknet";
+import { Account, AccountInterface, BigNumberish, CairoOption, CairoCustomEnum } from "starknet";
 import * as models from "./models.gen";
 
 export function setupWorld(provider: DojoProvider) {
@@ -446,7 +446,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_duel_token_createDuel_calldata = (duelType: CairoCustomEnum, duelistId: BigNumberish, challengedAddress: string, livesStaked: BigNumberish, expireHours: BigNumberish, premise: CairoCustomEnum, message: ByteArray): DojoCall => {
+	const build_duel_token_createDuel_calldata = (duelType: CairoCustomEnum, duelistId: BigNumberish, challengedAddress: string, livesStaked: BigNumberish, expireHours: BigNumberish, premise: CairoCustomEnum, message: string): DojoCall => {
 		return {
 			contractName: "duel_token",
 			entrypoint: "create_duel",
@@ -454,7 +454,7 @@ export function setupWorld(provider: DojoProvider) {
 		};
 	};
 
-	const duel_token_createDuel = async (snAccount: Account | AccountInterface, duelType: CairoCustomEnum, duelistId: BigNumberish, challengedAddress: string, livesStaked: BigNumberish, expireHours: BigNumberish, premise: CairoCustomEnum, message: ByteArray) => {
+	const duel_token_createDuel = async (snAccount: Account | AccountInterface, duelType: CairoCustomEnum, duelistId: BigNumberish, challengedAddress: string, livesStaked: BigNumberish, expireHours: BigNumberish, premise: CairoCustomEnum, message: string) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -2369,7 +2369,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_game_emitPlayerSocialLink_calldata = (socialPlatform: CairoCustomEnum, playerAddress: string, userName: ByteArray, userId: ByteArray, avatar: ByteArray): DojoCall => {
+	const build_game_emitPlayerSocialLink_calldata = (socialPlatform: CairoCustomEnum, playerAddress: string, userName: string, userId: string, avatar: string): DojoCall => {
 		return {
 			contractName: "game",
 			entrypoint: "emit_player_social_link",
@@ -2377,7 +2377,7 @@ export function setupWorld(provider: DojoProvider) {
 		};
 	};
 
-	const game_emitPlayerSocialLink = async (snAccount: Account | AccountInterface, socialPlatform: CairoCustomEnum, playerAddress: string, userName: ByteArray, userId: ByteArray, avatar: ByteArray) => {
+	const game_emitPlayerSocialLink = async (snAccount: Account | AccountInterface, socialPlatform: CairoCustomEnum, playerAddress: string, userName: string, userId: string, avatar: string) => {
 		try {
 			return await provider.execute(
 				snAccount,
