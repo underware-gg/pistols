@@ -82,5 +82,7 @@ export const assets: AssetFolder = {
   _profiles_genesis_67_jpg: async () => (await import('./encoded/_profiles_genesis_67_jpg')).default,
   _profiles_genesis_68_jpg: async () => (await import('./encoded/_profiles_genesis_68_jpg')).default,
   _profiles_genesis_69_jpg: async () => (await import('./encoded/_profiles_genesis_69_jpg')).default,
+  _profiles_legends_00_jpg: async () => (await import('./encoded/_profiles_legends_00_jpg')).default,
+  _profiles_legends_01_jpg: async () => (await import('./encoded/_profiles_legends_01_jpg')).default,
   _profiles_undefined_00_jpg: async () => (await import('./encoded/_profiles_undefined_00_jpg')).default,
 }
