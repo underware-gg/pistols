@@ -21,6 +21,7 @@ pub enum Activity {
     ChallengeDraw,      // 14
     ClaimedGift,        // 15
     AirdroppedPack,     // 16
+    ClaimedRing,        // 17
 }
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
@@ -184,6 +185,7 @@ pub impl ActivityImpl of ActivityTrait {
             Activity::PackPurchased
             | Activity::PackOpened
             | Activity::AirdroppedPack
+            | Activity::ClaimedRing
             => false,
             _ => true,
         }

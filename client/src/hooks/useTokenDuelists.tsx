@@ -26,12 +26,7 @@ export const useOwnerOfDuelist = (token_id: BigNumberish) => {
 
 export const useDuelistsOfPlayer = () => {
   const { address } = useAccount()
-  const state = useDuelistTokenStore((state) => state)
-  const tokenIds = useMemo(() => state.getTokenIdsOfOwner(address), [state.tokens, address])
-  return {
-    duelistIds: tokenIds,
-    isLoading: (state.tokens === null),
-  }
+  return useDuelistIdsOfOwner(address)
 }
 
 export const useDuelistIdsOfOwner = (owner: BigNumberish) => {

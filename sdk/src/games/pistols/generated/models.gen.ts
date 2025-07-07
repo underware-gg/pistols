@@ -325,6 +325,33 @@ export interface PoolValue {
 	balance_fame: BigNumberish;
 }
 
+// Type definition for `pistols::models::ring::Ring` struct
+export interface Ring {
+	ring_id: BigNumberish;
+	ring_type: RingTypeEnum;
+	claimed_by: string;
+}
+
+// Type definition for `pistols::models::ring::RingBalance` struct
+export interface RingBalance {
+	player_address: string;
+	ring_type: RingTypeEnum;
+	claimed: boolean;
+	balance: BigNumberish;
+}
+
+// Type definition for `pistols::models::ring::RingBalanceValue` struct
+export interface RingBalanceValue {
+	claimed: boolean;
+	balance: BigNumberish;
+}
+
+// Type definition for `pistols::models::ring::RingValue` struct
+export interface RingValue {
+	ring_type: RingTypeEnum;
+	claimed_by: string;
+}
+
 // Type definition for `pistols::models::season::SeasonConfig` struct
 export interface SeasonConfig {
 	season_id: BigNumberish;
@@ -603,6 +630,16 @@ export const poolType = [
 export type PoolType = { [key in typeof poolType[number]]: string };
 export type PoolTypeEnum = CairoCustomEnum;
 
+// Type definition for `pistols::models::ring::RingType` enum
+export const ringType = [
+	'Unknown',
+	'GoldSignetRing',
+	'SilverSignetRing',
+	'LeadSignetRing',
+] as const;
+export type RingType = { [key in typeof ringType[number]]: string };
+export type RingTypeEnum = CairoCustomEnum;
+
 // Type definition for `pistols::models::season::SeasonPhase` enum
 export const seasonPhase = [
 	'Undefined',
@@ -847,6 +884,7 @@ export const activity = [
 	'ChallengeDraw',
 	'ClaimedGift',
 	'AirdroppedPack',
+	'ClaimedRing',
 ] as const;
 export type Activity = { [key in typeof activity[number]]: string };
 export type ActivityEnum = CairoCustomEnum;
@@ -947,6 +985,10 @@ export interface SchemaType extends ISchemaType {
 		PlayerValue: PlayerValue,
 		Pool: Pool,
 		PoolValue: PoolValue,
+		Ring: Ring,
+		RingBalance: RingBalance,
+		RingBalanceValue: RingBalanceValue,
+		RingValue: RingValue,
 		SeasonConfig: SeasonConfig,
 		SeasonConfigValue: SeasonConfigValue,
 		SeasonScoreboard: SeasonScoreboard,
@@ -1337,6 +1379,37 @@ export const schema: SchemaType = {
 			balance_lords: 0,
 			balance_fame: 0,
 		},
+		Ring: {
+			ring_id: 0,
+		ring_type: new CairoCustomEnum({ 
+					Unknown: "",
+				GoldSignetRing: undefined,
+				SilverSignetRing: undefined,
+				LeadSignetRing: undefined, }),
+			claimed_by: "",
+		},
+		RingBalance: {
+			player_address: "",
+		ring_type: new CairoCustomEnum({ 
+					Unknown: "",
+				GoldSignetRing: undefined,
+				SilverSignetRing: undefined,
+				LeadSignetRing: undefined, }),
+			claimed: false,
+			balance: 0,
+		},
+		RingBalanceValue: {
+			claimed: false,
+			balance: 0,
+		},
+		RingValue: {
+		ring_type: new CairoCustomEnum({ 
+					Unknown: "",
+				GoldSignetRing: undefined,
+				SilverSignetRing: undefined,
+				LeadSignetRing: undefined, }),
+			claimed_by: "",
+		},
 		SeasonConfig: {
 			season_id: 0,
 		rules: new CairoCustomEnum({ 
@@ -1503,7 +1576,8 @@ export const schema: SchemaType = {
 				ChallengeResolved: undefined,
 				ChallengeDraw: undefined,
 				ClaimedGift: undefined,
-				AirdroppedPack: undefined, }),
+				AirdroppedPack: undefined,
+				ClaimedRing: undefined, }),
 			identifier: 0,
 			is_public: false,
 		},
@@ -1526,7 +1600,8 @@ export const schema: SchemaType = {
 				ChallengeResolved: undefined,
 				ChallengeDraw: undefined,
 				ClaimedGift: undefined,
-				AirdroppedPack: undefined, }),
+				AirdroppedPack: undefined,
+				ClaimedRing: undefined, }),
 			identifier: 0,
 			is_public: false,
 		},
@@ -1640,6 +1715,11 @@ export enum ModelsMapping {
 	Pool = 'pistols-Pool',
 	PoolType = 'pistols-PoolType',
 	PoolValue = 'pistols-PoolValue',
+	Ring = 'pistols-Ring',
+	RingBalance = 'pistols-RingBalance',
+	RingBalanceValue = 'pistols-RingBalanceValue',
+	RingType = 'pistols-RingType',
+	RingValue = 'pistols-RingValue',
 	SeasonConfig = 'pistols-SeasonConfig',
 	SeasonConfigValue = 'pistols-SeasonConfigValue',
 	SeasonPhase = 'pistols-SeasonPhase',

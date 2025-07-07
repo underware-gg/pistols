@@ -2,7 +2,7 @@
 # torii config for profile [dev]
 #
 world_address = "0x51c0fbe7d5a06863d7c30dc9e5935a3343b1f7084eeb11ddd5b950bd7799bb"
-rpc = "http://localhost:5050"
+rpc = "http://127.0.0.1:5050"
 
 [events]
 raw = true
@@ -25,6 +25,7 @@ contracts = [
   "erc721:0x749cf8d9bb0417c5580900c3f5285d69b69659a68670e097a2cb44970912d77", # duel_token
   "erc721:0x45624c58fede868d625cdc8df644440bc2963d5b21758c521277633988d6f6a", # duelist_token
   "erc721:0x2bdd613139374484ccd26ff55e70d79145702117009c8179bb007d976e44370", # pack_token
+  "erc721:0x1e0b02c6a248cbf3c162511658e3480fdbd3cdd6276bf138a414e6584a60ea5", # ring_token
   # "erc721:$tournament_token", # tournament_token
   "erc20:0x520908267f1a2ddbc6cb170e2566cc9f8f5c7f2954fbd96abbf18d02d95e81f", # fame_coin
   "erc20:0xf55ecf6eebacea3e70cd9a9a95ec17db495dc0683604bbb4adec93431a62da", # fools_coin

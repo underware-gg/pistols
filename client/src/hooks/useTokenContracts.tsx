@@ -2,12 +2,13 @@ import { useMemo } from 'react'
 import { useDojoSystem, useDojoSetup } from '@underware/pistols-sdk/dojo'
 import { bigintEquals, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import {
-  getFoolsAddress,
-  getDuelistTokenAddress,
-  getFameAddress,
   getLordsAddress,
+  getFameAddress,
+  getFoolsAddress,
   getPackTokenAddress,
+  getDuelistTokenAddress,
   getDuelTokenAddress,
+  getRingTokenAddress,
   getTournamentTokenAddress,
 } from '@underware/pistols-sdk/pistols/config'
 
@@ -21,6 +22,7 @@ export const useTokenContracts = () => {
   const packContractAddress = getPackTokenAddress(selectedNetworkId)
   const duelistContractAddress = getDuelistTokenAddress(selectedNetworkId)
   const duelContractAddress = getDuelTokenAddress(selectedNetworkId)
+  const ringContractAddress = getRingTokenAddress(selectedNetworkId)
   const tournamentContractAddress = getTournamentTokenAddress(selectedNetworkId)
   return {
     lordsContractAddress,
@@ -29,6 +31,7 @@ export const useTokenContracts = () => {
     packContractAddress,
     duelistContractAddress,
     duelContractAddress,
+    ringContractAddress,
     tournamentContractAddress,
   }
 }

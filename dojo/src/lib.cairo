@@ -19,6 +19,7 @@ mod systems {
         pub mod pack_token;
         pub mod duelist_token;
         pub mod duel_token;
+        pub mod ring_token;
         // pub mod tournament_token;
         // erc20
         pub mod fame_coin;
@@ -52,6 +53,7 @@ mod models {
     pub mod pact;
     pub mod player;
     pub mod pool;
+    pub mod ring;
     pub mod leaderboard;
     pub mod season;
     // pub mod tournament;
@@ -121,6 +123,7 @@ mod tests {
         pub mod test_duel_token;
         pub mod test_duelist_token;
         pub mod test_pack_token;
+        pub mod test_ring_token;
         // pub mod test_tournament_token;
         pub mod test_fame_coin;
         pub mod test_fools_coin;
