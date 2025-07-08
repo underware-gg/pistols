@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState, useMemo } from 'react'
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState, useMemo, useCallback } from 'react'
 import { BigNumberish } from 'starknet'
 import { useChallengeDescription } from '/src/hooks/useChallengeDescription'
 import { useChallenge, useRound } from '/src/stores/challengeStore'
@@ -278,15 +278,22 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
 
   const baseRef = useRef<InteractibleComponentHandle>(null)
   const buttonsRowRef = useRef<HTMLDivElement>(null)
+
+  const _gotoDuel = useCallback(() => {
+    dispatchSetScene(SceneName.Duel, { duelId: props.duelId })
+    props._close?.()
+  }, [props.duelId, props._close])
+
+  const onCompleteSubmitCallback = useCallback((result: boolean | Error, [duelId, duelistId, accepted]: [bigint, BigNumberish?, boolean?]) => {
+    if (result instanceof Error || !result) return
+    console.log(`submitChallengeResponse() =>`, result, [duelId, duelistId, accepted])
+    dispatchChallengingDuelistId(0n)
+    if (accepted) _gotoDuel()
+  }, [_gotoDuel])
   
   const { call: submitChallengeResponse, isLoading: isLoadingSubmit, isWaitingForIndexer: isWaitingForIndexerSubmit, meta } = useTransactionHandler<boolean, [bigint, BigNumberish?, boolean?]>({
     transactionCall: (duelId, duelistId, accepted, key) => duel_token.reply_duel(account, duelId, duelistId, accepted, key),
-    onComplete: (result, [duelId, duelistId, accepted]) => {
-      if (result instanceof Error || !result) return
-      console.log(`submitChallengeResponse() =>`, result, [duelId, duelistId, accepted])
-      dispatchChallengingDuelistId(0n)
-      if (accepted) _gotoDuel()
-    },
+    onComplete: onCompleteSubmitCallback,
     indexerCheck: state != constants.ChallengeState.Awaiting,
     key: `submit_challenge_response${props.duelId}`,
   })
@@ -327,11 +334,6 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
 
   const _submit = (duelistId?: BigNumberish, accepted?: boolean) => {
     submitChallengeResponse(props.duelId, duelistId, accepted)
-  }
-
-  const _gotoDuel = () => {
-    dispatchSetScene(SceneName.Duel, { duelId: props.duelId })
-    props._close?.()
   }
 
   useImperativeHandle(ref, () => ({

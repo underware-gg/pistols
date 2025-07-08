@@ -93,13 +93,24 @@ function _CommitPacesModal({
 
   const { aspectWidth, aspectHeight, boxW, boxH, pixelsToAspectHeight } = useGameAspect()
 
+  const _closeModal = useCallback(() => {
+    if (isLoadingHash) return;
+    
+    setIsOpen(false)
+    setTimeout(() => {
+      emitter.emit('hover_description', null)
+    }, 300)
+  }, [setIsOpen, isLoadingHash])
+
+  const onCompleteCallback = useCallback((result: boolean | Error) => {
+    if (result instanceof Error || !result) return
+    _closeModal()
+  }, [_closeModal])
+
   const { call: commitPaces, isLoading: isLoadingCommit, isWaitingForIndexer } = useTransactionHandler<boolean, [bigint, bigint, bigint]>({
     transactionCall: (duelistId, duelId, hash, key) => game.commit_moves(account, duelistId, duelId, hash, key),
     indexerCheck: completedStagesLeft[DuelStage.Round1Commit],
-    onComplete: (result) => {
-      if (result instanceof Error || !result) return
-      _closeModal()
-    },
+    onComplete: onCompleteCallback,
     key: `commit_paces${duelId}`,
   })
 
@@ -127,15 +138,6 @@ function _CommitPacesModal({
     }
     return account && messageToSign && firePaces && dodgePaces && firePaces != dodgePaces && tactics && blades && !isLoadingHash && !isLoadingCommit
   }, [account, messageToSign, firePaces, dodgePaces, tactics, blades, isLoadingHash, isLoadingCommit, isSimpleTutorial])
-
-  const _closeModal = useCallback(() => {
-    if (isLoadingHash) return;
-    
-    setIsOpen(false)
-    setTimeout(() => {
-      emitter.emit('hover_description', null)
-    }, 300)
-  }, [setIsOpen, isLoadingHash])
 
   const _submit = useCallback(async () => {
     if (canSubmit) {
