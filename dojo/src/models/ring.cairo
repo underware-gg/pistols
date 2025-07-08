@@ -60,19 +60,19 @@ mod RING_TYPES {
     pub const GoldSignetRing: RingDescriptor = RingDescriptor {
         id: 'GoldSignetRing',
         name: 'Gold Signet Ring',
-        description: 'Played Season 1 & 2',
+        description: 'Played Season 1',
         image_url: '/tokens/rings/GoldRing.png',
     };
     pub const SilverSignetRing: RingDescriptor = RingDescriptor {
         id: 'SilverSignetRing',
         name: 'Silver Signet Ring',
-        description: 'Played Season 2 & 3',
+        description: 'Played Season 2 to 4',
         image_url: '/tokens/rings/SilverRing.png',
     };
     pub const LeadSignetRing: RingDescriptor = RingDescriptor {
         id: 'LeadSignetRing',
         name: 'Lead Signet Ring',
-        description: 'Played Season 5 to 10',
+        description: 'Played Season 5 to 9',
         image_url: '/tokens/rings/LeadRing.png',
     };
 }
@@ -94,23 +94,24 @@ pub impl RingTypeImpl of RingTypeTrait {
         (if (
             recipient.is_non_zero() &&
             challenge.state.is_concluded() &&
+            challenge.season_id.is_non_zero() &&
             (challenge.address_a == recipient || challenge.address_b == recipient))
         {
-            if (challenge.season_id <= 2) {
-                {Option::Some(RingType::GoldSignetRing)}
+            if (challenge.season_id == 1) {
+                (Option::Some(RingType::GoldSignetRing))
             }
             else if (challenge.season_id <= 4) {
-                {Option::Some(RingType::SilverSignetRing)}
+                (Option::Some(RingType::SilverSignetRing))
             }
-            else if (challenge.season_id <= 10) {
-                {Option::Some(RingType::LeadSignetRing)}
+            else if (challenge.season_id <= 9) {
+                (Option::Some(RingType::LeadSignetRing))
             }
             else {
-                {Option::None}
+                (Option::None)
             }
         }
         else {
-            {Option::None}
+            (Option::None)
         })
     }
     //

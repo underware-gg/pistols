@@ -881,19 +881,19 @@ export const RING_TYPES: type_RING_TYPES = {
   GoldSignetRing: {
     id: 'GoldSignetRing',
     name: 'Gold Signet Ring',
-    description: 'Played Season 1 & 2',
+    description: 'Played Season 1',
     image_url: '/tokens/rings/GoldRing.png',
   },
   SilverSignetRing: {
     id: 'SilverSignetRing',
     name: 'Silver Signet Ring',
-    description: 'Played Season 2 & 3',
+    description: 'Played Season 2 to 4',
     image_url: '/tokens/rings/SilverRing.png',
   },
   LeadSignetRing: {
     id: 'LeadSignetRing',
     name: 'Lead Signet Ring',
-    description: 'Played Season 5 to 10',
+    description: 'Played Season 5 to 9',
     image_url: '/tokens/rings/LeadRing.png',
   },
 };

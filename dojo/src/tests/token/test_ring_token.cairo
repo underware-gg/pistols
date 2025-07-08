@@ -8,7 +8,7 @@ use pistols::systems::{
 };
 use pistols::models::{
     challenge::{ChallengeValue, RoundValue, DuelType},
-    ring::{Ring, RingType, RingTypeTrait},
+    ring::{RingType},
 };
 use pistols::types::{
     challenge_state::{ChallengeState},
@@ -22,7 +22,7 @@ use pistols::tests::tester::{
         StoreTrait,
         TestSystems, FLAGS,
         OWNER, OTHER, BUMMER, SPENDER,
-        SEASON_ID_1, SEASON_ID_2, SEASON_ID_3, SEASON_ID_4, SEASON_ID_5,
+        SEASON_ID_1, SEASON_ID_2, SEASON_ID_3, SEASON_ID_5,
     },
 };
 use pistols::tests::prefabs::{prefabs};
@@ -143,10 +143,10 @@ fn test_claim_ok() {
     assert!(sys.rings.get_claimable_season_ring_type(OTHER(), duel_id).is_none(), "get_claimable_season_ring_type(OTHER, S1) > None");
     assert!(sys.rings.get_claimable_season_ring_type(BUMMER(), duel_id).is_none(), "get_claimable_season_ring_type(BUMMER, S1) > None");
     // balances
-    assert_eq!(sys.rings.total_supply(), 2, "total_supply 2");
-    assert_eq!(sys.rings.balance_of(OWNER()), 1, "balance_of(OWNER) 1");
-    assert_eq!(sys.rings.balance_of(OTHER()), 1, "balance_of(OTHER) 1");
-    assert_eq!(sys.rings.balance_of(BUMMER()), 0, "balance_of(BUMMER) 0");
+    assert_eq!(sys.rings.total_supply(), 2, "S1: total_supply");
+    assert_eq!(sys.rings.balance_of(OWNER()), 1, "S1: balance_of(OWNER)");
+    assert_eq!(sys.rings.balance_of(OTHER()), 1, "S1: balance_of(OTHER)");
+    assert_eq!(sys.rings.balance_of(BUMMER()), 0, "S1: balance_of(BUMMER)");
     assert_eq!(sys.rings.balance_of_ring(OWNER(), RingType::GoldSignetRing), 1, "balance_of_ring(OWNER, GoldSignetRing, S1) 1");
     assert_eq!(sys.rings.balance_of_ring(OTHER(), RingType::GoldSignetRing), 1, "balance_of_ring(OTHER, GoldSignetRing, S1) 1");
     assert_eq!(sys.rings.balance_of_ring(BUMMER(), RingType::GoldSignetRing), 0, "balance_of_ring(BUMMER, GoldSignetRing, S1) 0");
@@ -155,56 +155,56 @@ fn test_claim_ok() {
     assert_eq!(sys.rings.balance_of_ring(BUMMER(), RingType::SilverSignetRing), 0, "balance_of_ring(BUMMER, SilverSignetRing, S1) 0");
     //
     // Season 2
+    assert!(!sys.rings.has_claimed(OWNER(), RingType::SilverSignetRing), "has_claimed(OWNER, SilverSignetRing, S2) init");
+    assert!(!sys.rings.has_claimed(OTHER(), RingType::SilverSignetRing), "has_claimed(OTHER, SilverSignetRing, S2) init");
+    assert!(!sys.rings.has_claimed(BUMMER(), RingType::SilverSignetRing), "has_claimed(BUMMER, SilverSignetRing, S2) init");
     let duel_id: u128 = _make_challenge(ref sys, OWNER(), BUMMER(), SEASON_ID_2);
-    assert!(sys.rings.get_claimable_season_ring_type(OWNER(), duel_id).is_none(), "get_claimable_season_ring_type(OWNER, S2) > NO");
+    assert_eq!(sys.rings.get_claimable_season_ring_type(OWNER(), duel_id).unwrap(), RingType::SilverSignetRing, "get_claimable_season_ring_type(OWNER, S2) YES");
     assert!(sys.rings.get_claimable_season_ring_type(OTHER(), duel_id).is_none(), "get_claimable_season_ring_type(OTHER, S2) > NO");
-    assert_eq!(sys.rings.get_claimable_season_ring_type(BUMMER(), duel_id).unwrap(), RingType::GoldSignetRing, "get_claimable_season_ring_type(BUMMER, S2) YES");
+    assert_eq!(sys.rings.get_claimable_season_ring_type(BUMMER(), duel_id).unwrap(), RingType::SilverSignetRing, "get_claimable_season_ring_type(BUMMER, S2) YES");
+    tester::execute_claim_season_ring(@sys, OWNER(), duel_id, RingType::SilverSignetRing);
     tester::execute_claim_season_ring(@sys, BUMMER(), duel_id, RingType::SilverSignetRing);
-    assert!(sys.rings.has_claimed(OWNER(), RingType::GoldSignetRing), "has_claimed(OWNER, GoldSignetRing, S2) YES");
-    assert!(sys.rings.has_claimed(OTHER(), RingType::GoldSignetRing), "has_claimed(OTHER, GoldSignetRing, S2) YES");
-    assert!(sys.rings.has_claimed(BUMMER(), RingType::GoldSignetRing), "has_claimed(BUMMER, GoldSignetRing, S2) YES");
+    assert!(sys.rings.has_claimed(OWNER(), RingType::SilverSignetRing), "has_claimed(OWNER, SilverSignetRing, S2) YES");
+    assert!(!sys.rings.has_claimed(OTHER(), RingType::SilverSignetRing), "has_claimed(OTHER, SilverSignetRing, S2) NO");
+    assert!(sys.rings.has_claimed(BUMMER(), RingType::SilverSignetRing), "has_claimed(BUMMER, SilverSignetRing, S2) YES");
     assert!(sys.rings.get_claimable_season_ring_type(OWNER(), duel_id).is_none(), "get_claimable_season_ring_type(OWNER, S2) > None");
     assert!(sys.rings.get_claimable_season_ring_type(OTHER(), duel_id).is_none(), "get_claimable_season_ring_type(OTHER, S2) > None");
     assert!(sys.rings.get_claimable_season_ring_type(BUMMER(), duel_id).is_none(), "get_claimable_season_ring_type(BUMMER, S2) > None");
     // balances
-    assert_eq!(sys.rings.total_supply(), 3, "total_supply 3");
-    assert_eq!(sys.rings.balance_of(OWNER()), 1, "balance_of(OWNER) 1");
-    assert_eq!(sys.rings.balance_of(OTHER()), 1, "balance_of(OTHER) 1");
-    assert_eq!(sys.rings.balance_of(BUMMER()), 1, "balance_of(BUMMER) 1");
+    assert_eq!(sys.rings.total_supply(), 4, "S2: total_supply");
+    assert_eq!(sys.rings.balance_of(OWNER()), 2, "S2: balance_of(OWNER)");
+    assert_eq!(sys.rings.balance_of(OTHER()), 1, "S2: balance_of(OTHER)");
+    assert_eq!(sys.rings.balance_of(BUMMER()), 1, "S2: balance_of(BUMMER)");
     assert_eq!(sys.rings.balance_of_ring(OWNER(), RingType::GoldSignetRing), 1, "balance_of_ring(OWNER, GoldSignetRing, S2) 1");
     assert_eq!(sys.rings.balance_of_ring(OTHER(), RingType::GoldSignetRing), 1, "balance_of_ring(OTHER, GoldSignetRing, S2) 1");
-    assert_eq!(sys.rings.balance_of_ring(BUMMER(), RingType::GoldSignetRing), 1, "balance_of_ring(BUMMER, GoldSignetRing, S2) 1");
-    assert_eq!(sys.rings.balance_of_ring(OWNER(), RingType::SilverSignetRing), 0, "balance_of_ring(OWNER, SilverSignetRing, S2) 0");
+    assert_eq!(sys.rings.balance_of_ring(BUMMER(), RingType::GoldSignetRing), 0, "balance_of_ring(BUMMER, GoldSignetRing, S2) 1");
+    assert_eq!(sys.rings.balance_of_ring(OWNER(), RingType::SilverSignetRing), 1, "balance_of_ring(OWNER, SilverSignetRing, S2) 1");
     assert_eq!(sys.rings.balance_of_ring(OTHER(), RingType::SilverSignetRing), 0, "balance_of_ring(OTHER, SilverSignetRing, S2) 0");
-    assert_eq!(sys.rings.balance_of_ring(BUMMER(), RingType::SilverSignetRing), 0, "balance_of_ring(BUMMER, SilverSignetRing, S2) 0");
+    assert_eq!(sys.rings.balance_of_ring(BUMMER(), RingType::SilverSignetRing), 1, "balance_of_ring(BUMMER, SilverSignetRing, S2) 1");
     //
     // Season 3
-    assert!(!sys.rings.has_claimed(OWNER(), RingType::SilverSignetRing), "has_claimed(OWNER, SilverSignetRing, S3) init");
-    assert!(!sys.rings.has_claimed(OTHER(), RingType::SilverSignetRing), "has_claimed(OTHER, SilverSignetRing, S3) init");
-    assert!(!sys.rings.has_claimed(BUMMER(), RingType::SilverSignetRing), "has_claimed(BUMMER, SilverSignetRing, S3) init");
-    let duel_id: u128 = _make_challenge(ref sys, OWNER(), BUMMER(), SEASON_ID_3);
-    assert_eq!(sys.rings.get_claimable_season_ring_type(OWNER(), duel_id).unwrap(), RingType::SilverSignetRing, "get_claimable_season_ring_type(OWNER, S3) YES");
-    assert!(sys.rings.get_claimable_season_ring_type(OTHER(), duel_id).is_none(), "get_claimable_season_ring_type(OTHER, S3) > NO");
-    assert_eq!(sys.rings.get_claimable_season_ring_type(BUMMER(), duel_id).unwrap(), RingType::SilverSignetRing, "get_claimable_season_ring_type(BUMMER, S3) YES");
-    tester::execute_claim_season_ring(@sys, OWNER(), duel_id, RingType::SilverSignetRing);
-    tester::execute_claim_season_ring(@sys, BUMMER(), duel_id, RingType::SilverSignetRing);
+    let duel_id: u128 = _make_challenge(ref sys, OWNER(), OTHER(), SEASON_ID_3);
+    assert!(sys.rings.get_claimable_season_ring_type(OWNER(), duel_id).is_none(), "get_claimable_season_ring_type(OWNER, S3) > NO");
+    assert_eq!(sys.rings.get_claimable_season_ring_type(OTHER(), duel_id).unwrap(), RingType::SilverSignetRing, "get_claimable_season_ring_type(OTHER, S3) YES");
+    assert!(sys.rings.get_claimable_season_ring_type(BUMMER(), duel_id).is_none(), "get_claimable_season_ring_type(BUMMER, S3) > NO");
+    tester::execute_claim_season_ring(@sys, OTHER(), duel_id, RingType::SilverSignetRing);
     assert!(sys.rings.has_claimed(OWNER(), RingType::SilverSignetRing), "has_claimed(OWNER, SilverSignetRing, S3) YES");
-    assert!(!sys.rings.has_claimed(OTHER(), RingType::SilverSignetRing), "has_claimed(OTHER, SilverSignetRing, S3) NO");
+    assert!(sys.rings.has_claimed(OTHER(), RingType::SilverSignetRing), "has_claimed(OTHER, SilverSignetRing, S3) YES");
     assert!(sys.rings.has_claimed(BUMMER(), RingType::SilverSignetRing), "has_claimed(BUMMER, SilverSignetRing, S3) YES");
     assert!(sys.rings.get_claimable_season_ring_type(OWNER(), duel_id).is_none(), "get_claimable_season_ring_type(OWNER, S3) > None");
     assert!(sys.rings.get_claimable_season_ring_type(OTHER(), duel_id).is_none(), "get_claimable_season_ring_type(OTHER, S3) > None");
     assert!(sys.rings.get_claimable_season_ring_type(BUMMER(), duel_id).is_none(), "get_claimable_season_ring_type(BUMMER, S3) > None");
     // balances
-    assert_eq!(sys.rings.total_supply(), 5, "total_supply 5");
-    assert_eq!(sys.rings.balance_of(OWNER()), 2, "balance_of(OWNER) 2");
-    assert_eq!(sys.rings.balance_of(OTHER()), 1, "balance_of(OTHER) 1");
-    assert_eq!(sys.rings.balance_of(BUMMER()), 2, "balance_of(BUMMER) 2");
-    assert_eq!(sys.rings.balance_of_ring(OWNER(), RingType::GoldSignetRing), 1, "balance_of_ring(OWNER, GoldSignetRing, S3) 1");
-    assert_eq!(sys.rings.balance_of_ring(OTHER(), RingType::GoldSignetRing), 1, "balance_of_ring(OTHER, GoldSignetRing, S3) 1");
-    assert_eq!(sys.rings.balance_of_ring(BUMMER(), RingType::GoldSignetRing), 1, "balance_of_ring(BUMMER, GoldSignetRing, S3) 1");
-    assert_eq!(sys.rings.balance_of_ring(OWNER(), RingType::SilverSignetRing), 1, "balance_of_ring(OWNER, SilverSignetRing, S3) 1");
-    assert_eq!(sys.rings.balance_of_ring(OTHER(), RingType::SilverSignetRing), 0, "balance_of_ring(OTHER, SilverSignetRing, S3) 0");
-    assert_eq!(sys.rings.balance_of_ring(BUMMER(), RingType::SilverSignetRing), 1, "balance_of_ring(BUMMER, SilverSignetRing, S3) 1");
+    assert_eq!(sys.rings.total_supply(), 5, "S3: total_supply 5");
+    assert_eq!(sys.rings.balance_of(OWNER()), 2, "S3: balance_of(OWNER)");
+    assert_eq!(sys.rings.balance_of(OTHER()), 2, "S3: balance_of(OTHER)");
+    assert_eq!(sys.rings.balance_of(BUMMER()), 1, "S3: balance_of(BUMMER)");
+    assert_eq!(sys.rings.balance_of_ring(OWNER(), RingType::GoldSignetRing), 1, "balance_of_ring(OWNER, GoldSignetRing, S3)");
+    assert_eq!(sys.rings.balance_of_ring(OTHER(), RingType::GoldSignetRing), 1, "balance_of_ring(OTHER, GoldSignetRing, S3)");
+    assert_eq!(sys.rings.balance_of_ring(BUMMER(), RingType::GoldSignetRing), 0, "balance_of_ring(BUMMER, GoldSignetRing, S3)");
+    assert_eq!(sys.rings.balance_of_ring(OWNER(), RingType::SilverSignetRing), 1, "balance_of_ring(OWNER, SilverSignetRing, S3)");
+    assert_eq!(sys.rings.balance_of_ring(OTHER(), RingType::SilverSignetRing), 1, "balance_of_ring(OTHER, SilverSignetRing, S3)");
+    assert_eq!(sys.rings.balance_of_ring(BUMMER(), RingType::SilverSignetRing), 1, "balance_of_ring(BUMMER, SilverSignetRing, S3)");
     //
     // Season 5
     assert!(!sys.rings.has_claimed(OWNER(), RingType::LeadSignetRing), "has_claimed(OWNER, LeadSignetRing, S5) init");
@@ -223,41 +223,46 @@ fn test_claim_ok() {
     assert!(sys.rings.get_claimable_season_ring_type(OTHER(), duel_id).is_none(), "get_claimable_season_ring_type(OTHER, S5) > None");
     assert!(sys.rings.get_claimable_season_ring_type(BUMMER(), duel_id).is_none(), "get_claimable_season_ring_type(BUMMER, S5) > None");
     // balances
-    assert_eq!(sys.rings.total_supply(), 7, "total_supply 7");
-    assert_eq!(sys.rings.balance_of(OWNER()), 3, "balance_of(OWNER) 3");
-    assert_eq!(sys.rings.balance_of(OTHER()), 2, "balance_of(OTHER) 2");
-    assert_eq!(sys.rings.balance_of(BUMMER()), 2, "balance_of(BUMMER) 2");
-    assert_eq!(sys.rings.balance_of_ring(OWNER(), RingType::GoldSignetRing), 1, "balance_of_ring(OWNER, GoldSignetRing, S5) 1");
-    assert_eq!(sys.rings.balance_of_ring(OTHER(), RingType::GoldSignetRing), 1, "balance_of_ring(OTHER, GoldSignetRing, S5) 1");
-    assert_eq!(sys.rings.balance_of_ring(BUMMER(), RingType::GoldSignetRing), 1, "balance_of_ring(BUMMER, GoldSignetRing, S5) 1");
-    assert_eq!(sys.rings.balance_of_ring(OWNER(), RingType::SilverSignetRing), 1, "balance_of_ring(OWNER, SilverSignetRing, S5) 1");
-    assert_eq!(sys.rings.balance_of_ring(OTHER(), RingType::SilverSignetRing), 0, "balance_of_ring(OTHER, SilverSignetRing, S5) 0");
-    assert_eq!(sys.rings.balance_of_ring(BUMMER(), RingType::SilverSignetRing), 1, "balance_of_ring(BUMMER, SilverSignetRing, S5) 1");
-    assert_eq!(sys.rings.balance_of_ring(OWNER(), RingType::LeadSignetRing), 1, "balance_of_ring(OWNER, LeadSignetRing, S5) 1");
-    assert_eq!(sys.rings.balance_of_ring(OTHER(), RingType::LeadSignetRing), 1, "balance_of_ring(OTHER, LeadSignetRing, S5) 1");
-    assert_eq!(sys.rings.balance_of_ring(BUMMER(), RingType::LeadSignetRing), 0, "balance_of_ring(BUMMER, LeadSignetRing, S5) 0");
+    assert_eq!(sys.rings.total_supply(), 7, "S5: total_supply");
+    assert_eq!(sys.rings.balance_of(OWNER()), 3, "S5: balance_of(OWNER)");
+    assert_eq!(sys.rings.balance_of(OTHER()), 3, "S5: balance_of(OTHER)");
+    assert_eq!(sys.rings.balance_of(BUMMER()), 1, "S5: balance_of(BUMMER)");
+    assert_eq!(sys.rings.balance_of(SPENDER()), 0, "S5: balance_of(SPENDER)");
+    assert_eq!(sys.rings.balance_of_ring(OWNER(), RingType::GoldSignetRing), 1, "balance_of_ring(OWNER, GoldSignetRing, S5)");
+    assert_eq!(sys.rings.balance_of_ring(OTHER(), RingType::GoldSignetRing), 1, "balance_of_ring(OTHER, GoldSignetRing, S5)");
+    assert_eq!(sys.rings.balance_of_ring(BUMMER(), RingType::GoldSignetRing), 0, "balance_of_ring(BUMMER, GoldSignetRing, S5)");
+    assert_eq!(sys.rings.balance_of_ring(OWNER(), RingType::SilverSignetRing), 1, "balance_of_ring(OWNER, SilverSignetRing, S5)");
+    assert_eq!(sys.rings.balance_of_ring(OTHER(), RingType::SilverSignetRing), 1, "balance_of_ring(OTHER, SilverSignetRing, S5)");
+    assert_eq!(sys.rings.balance_of_ring(BUMMER(), RingType::SilverSignetRing), 1, "balance_of_ring(BUMMER, SilverSignetRing, S5)");
+    assert_eq!(sys.rings.balance_of_ring(OWNER(), RingType::LeadSignetRing), 1, "balance_of_ring(OWNER, LeadSignetRing, S5)");
+    assert_eq!(sys.rings.balance_of_ring(OTHER(), RingType::LeadSignetRing), 1, "balance_of_ring(OTHER, LeadSignetRing, S5)");
+    assert_eq!(sys.rings.balance_of_ring(BUMMER(), RingType::LeadSignetRing), 0, "balance_of_ring(BUMMER, LeadSignetRing, S5)");
+    //
+    // Season 9
+    let duel_id: u128 = _make_challenge(ref sys, OWNER(), SPENDER(), 9);
+    assert!(sys.rings.get_claimable_season_ring_type(OWNER(), duel_id).is_none(), "get_claimable_season_ring_type(OWNER, S9) > NO");
+    assert!(sys.rings.get_claimable_season_ring_type(OTHER(), duel_id).is_none(), "get_claimable_season_ring_type(OTHER, S9) > NO");
+    assert!(sys.rings.get_claimable_season_ring_type(BUMMER(), duel_id).is_none(), "get_claimable_season_ring_type(BUMMER, S9) > NO");
+    assert_eq!(sys.rings.get_claimable_season_ring_type(SPENDER(), duel_id).unwrap(), RingType::LeadSignetRing, "get_claimable_season_ring_type(SPENDER, S9) YES");
+    tester::execute_claim_season_ring(@sys, SPENDER(), duel_id, RingType::LeadSignetRing);
+    assert!(sys.rings.has_claimed(SPENDER(), RingType::LeadSignetRing), "has_claimed(SPENDER, LeadSignetRing, S9) YES");
+    assert!(sys.rings.get_claimable_season_ring_type(OWNER(), duel_id).is_none(), "get_claimable_season_ring_type(OWNER, S9) > None");
+    assert!(sys.rings.get_claimable_season_ring_type(OTHER(), duel_id).is_none(), "get_claimable_season_ring_type(OTHER, S9) > None");
+    assert!(sys.rings.get_claimable_season_ring_type(BUMMER(), duel_id).is_none(), "get_claimable_season_ring_type(BUMMER, S9) > None");
+    assert!(sys.rings.get_claimable_season_ring_type(SPENDER(), duel_id).is_none(), "get_claimable_season_ring_type(SPENDER, S9) > None");
+    // balances
+    assert_eq!(sys.rings.balance_of(OWNER()), 3, "S9: balance_of(OWNER)");
+    assert_eq!(sys.rings.balance_of(OTHER()), 3, "S9: balance_of(OTHER)");
+    assert_eq!(sys.rings.balance_of(BUMMER()), 1, "S9: balance_of(BUMMER)");
+    assert_eq!(sys.rings.balance_of(SPENDER()), 1, "S9: balance_of(SPENDER)");
+    assert_eq!(sys.rings.total_supply(), 8, "S9: total_supply");
     //
     // Season 10
-    let duel_id: u128 = _make_challenge(ref sys, OWNER(), SPENDER(), 10);
-    assert!(sys.rings.get_claimable_season_ring_type(OWNER(), duel_id).is_none(), "get_claimable_season_ring_type(OWNER, S10) > NO");
-    assert!(sys.rings.get_claimable_season_ring_type(OTHER(), duel_id).is_none(), "get_claimable_season_ring_type(OTHER, S10) > NO");
-    assert!(sys.rings.get_claimable_season_ring_type(BUMMER(), duel_id).is_none(), "get_claimable_season_ring_type(BUMMER, S10) > NO");
-    assert_eq!(sys.rings.get_claimable_season_ring_type(SPENDER(), duel_id).unwrap(), RingType::LeadSignetRing, "get_claimable_season_ring_type(SPENDER, S10) YES");
-    tester::execute_claim_season_ring(@sys, SPENDER(), duel_id, RingType::LeadSignetRing);
-    assert!(sys.rings.has_claimed(SPENDER(), RingType::LeadSignetRing), "has_claimed(SPENDER, LeadSignetRing, S10) YES");
+    let duel_id: u128 = _make_challenge(ref sys, OWNER(), BUMMER(), 10);
     assert!(sys.rings.get_claimable_season_ring_type(OWNER(), duel_id).is_none(), "get_claimable_season_ring_type(OWNER, S10) > None");
     assert!(sys.rings.get_claimable_season_ring_type(OTHER(), duel_id).is_none(), "get_claimable_season_ring_type(OTHER, S10) > None");
     assert!(sys.rings.get_claimable_season_ring_type(BUMMER(), duel_id).is_none(), "get_claimable_season_ring_type(BUMMER, S10) > None");
     assert!(sys.rings.get_claimable_season_ring_type(SPENDER(), duel_id).is_none(), "get_claimable_season_ring_type(SPENDER, S10) > None");
-    // balances
-    assert_eq!(sys.rings.total_supply(), 8, "total_supply 8");
-    //
-    // Season 11
-    let duel_id: u128 = _make_challenge(ref sys, OWNER(), BUMMER(), 11);
-    assert!(sys.rings.get_claimable_season_ring_type(OWNER(), duel_id).is_none(), "get_claimable_season_ring_type(OWNER, S11) > None");
-    assert!(sys.rings.get_claimable_season_ring_type(OTHER(), duel_id).is_none(), "get_claimable_season_ring_type(OTHER, S11) > None");
-    assert!(sys.rings.get_claimable_season_ring_type(BUMMER(), duel_id).is_none(), "get_claimable_season_ring_type(BUMMER, S11) > None");
-    assert!(sys.rings.get_claimable_season_ring_type(SPENDER(), duel_id).is_none(), "get_claimable_season_ring_type(SPENDER, S11) > None");
 }
 
 #[test]
