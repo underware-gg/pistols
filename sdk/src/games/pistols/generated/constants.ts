@@ -42,6 +42,11 @@ export const INTERFACE_DESCRIPTIONS: any = {
     airdrop: 'Airdrops a pack (admin)',
     open: 'Open a pack, mint its contents',
   },
+  // from: ../dojo/src/systems/tokens/ring_token.cairo
+  IRingTokenPublic: {
+    claim_season_ring: 'Claim Signet Ring from a Duel season',
+    airdrop_ring: 'Airdrop Signet Rings (admin)',
+  },
   // from: ../dojo/src/systems/tutorial.cairo
   ITutorial: {
     create_tutorial: 'Initializes a turorial level',

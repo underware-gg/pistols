@@ -59,6 +59,11 @@ export const contractPolicyDescriptions_pistols: ContractPolicyDescriptions = {
     description: 'Duelist ERC721 contract',
     interfaces: ['IDuelistTokenPublic'],
   },
+  ring_token: {
+    name: 'Signet Ring token',
+    description: 'Signet Ring ERC721 contract',
+    interfaces: ['IRingTokenPublic'],
+  },
   tournament_token: {
     name: 'Tournament token',
     description: 'Tournament ERC721 contract',

@@ -71,8 +71,8 @@ pub trait IRingTokenPublic<TState> {
     fn get_claimable_season_ring_type(self: @TState, recipient: ContractAddress, duel_id: u128) -> Option<RingType>;
     fn balance_of_ring(self: @TState, account: ContractAddress, ring_type: RingType) -> u128;
     // write
-    fn claim_season_ring(ref self: TState, duel_id: u128, ring_type: RingType) -> u128;
-    fn airdrop_ring(ref self: TState, recipient: ContractAddress, ring_type: RingType) -> u128;
+    fn claim_season_ring(ref self: TState, duel_id: u128, ring_type: RingType) -> u128; //@description: Claim Signet Ring from a Duel season
+    fn airdrop_ring(ref self: TState, recipient: ContractAddress, ring_type: RingType) -> u128; //@description: Airdrop Signet Rings (admin)
 }
 
 #[dojo::contract]
