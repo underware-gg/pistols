@@ -676,6 +676,14 @@ export type PlayerSetting = {
 };
 export type PlayerSettingEnum = CairoCustomEnum;
 
+// Type definition for `pistols::models::events::PlayerSettingValue` enum
+export const playerSettingValue = [
+  'Undefined',
+  'Boolean',
+] as const;
+export type PlayerSettingValue = { [key in typeof playerSettingValue[number]]: string };
+export type PlayerSettingValueEnum = CairoCustomEnum;
+
 // Type definition for `pistols::models::events::SocialPlatform` enum
 export const socialPlatform = [
 	'Undefined',
