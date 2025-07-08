@@ -127,7 +127,7 @@ fi
 echo "------------------------------------------------------------------------------"
 echo "Profile    : $PROFILE"
 echo "Project    : $PROJECT_NAME"
-echo "PC Url     : $RPC_URL"
+echo "RPC Url    : $RPC_URL"
 echo "Chain Id   : $CHAIN_ID"
 echo "World      : $WORLD_ADDRESS"
 echo "Account    : $ACCOUNT_ADDRESS"

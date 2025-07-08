@@ -89,6 +89,10 @@
                 "description": "Purchase a closed pack"
               },
               {
+                "entrypoint": "airdrop",
+                "description": "Airdrops a pack (admin)"
+              },
+              {
                 "entrypoint": "open",
                 "description": "Open a pack, mint its contents"
               }
@@ -121,6 +125,19 @@
               {
                 "entrypoint": "memorialize",
                 "description": "Memorializes a Duelist"
+              }
+            ]
+          },
+          "0x014aa76e6c6f11e3f657ee2c213a62006c78ff2c6f8ed40b92c42fd554c246f2": {
+            "description": "Signet Ring ERC721 contract",
+            "methods": [
+              {
+                "entrypoint": "claim_season_ring",
+                "description": "Claim Signet Ring from a Duel season"
+              },
+              {
+                "entrypoint": "airdrop_ring",
+                "description": "Airdrop Signet Rings (admin)"
               }
             ]
           },
