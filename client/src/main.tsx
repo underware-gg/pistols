@@ -10,6 +10,7 @@ import ErrorModal from '/src/components/modals/ErrorModal'
 import MainPage from '/src/pages/MainPage'
 import InternalPageIndex from '/src/pages/internal/InternalPageIndex'
 import AdminPage from '/src/pages/internal/AdminPage'
+import AirdropPage from '/src/pages/internal/AirdropPage'
 import PoolsPage from '/src/pages/internal/PoolsPage'
 import SeasonsPage from '/src/pages/internal/SeasonsPage'
 import PlayersPage from '/src/pages/internal/PlayersPage'
@@ -84,6 +85,7 @@ const router = createBrowserRouter([
     children: [
       { path: "", element: <InternalPageIndex /> },
       { path: "admin", element: <AdminPage /> },
+      { path: "airdrop", element: <AirdropPage /> },
       { path: "pools", element: <PoolsPage /> },
       { path: "seasons", element: <SeasonsPage /> },
       { path: "players", element: <PlayersPage /> },

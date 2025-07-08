@@ -1,7 +1,7 @@
 {
   "world": {
-    "class_hash": "0x4c60dc46a8ca8bb47675b7b914053cef769afbf0e340523187336b72bd71d1f",
-    "address": "0x51c0fbe7d5a06863d7c30dc9e5935a3343b1f7084eeb11ddd5b950bd7799bb",
+    "class_hash": "0x7746f30d2b8494780387ed469797ecb5c62c7b6f49f4939a5e60e0f7ae5f99e",
+    "address": "0x6dee289c31fe8daef42ad5450afa2f698f0010230ec47dc8abb867662dca46a",
     "seed": "pistols",
     "name": "Pistols at Dawn",
     "entrypoints": [
@@ -1328,8 +1328,8 @@
   },
   "contracts": [
     {
-      "address": "0x4ce976a1146946b6f4c731848d851bf901a42ec315ba0731341362ccaef6807",
-      "class_hash": "0x5dd20a705232f3476ac5e35c0aa7f980a7e383f9186645b938b9cf2bb8b240a",
+      "address": "0x5f0f00afc60a86059c9f9d4e28cabb93f4bee4d6f06ceb9cab64253e70267a0",
+      "class_hash": "0x3c3c569bd2f47c18846b07aad736fc85e232f0686515efa565ba4d3cc9efb38",
       "abi": [
         {
           "type": "impl",
@@ -1706,8 +1706,8 @@
       ]
     },
     {
-      "address": "0x2736678d6f7fccfc90e68d7cf21e2cd31b6e03ea94e3459e43ff38dc73a78c6",
-      "class_hash": "0x6f2b690dcc87d28793b1c7c40a3f2acec7f9d238b61c1e734d221dec59253b8",
+      "address": "0x7b4fecfec1b2783b65babf6d6cae2d4625ee747ba4f4410266a20c5ed634a13",
+      "class_hash": "0x7c25af4f3251acc7a476408dbdb7c2f075a5411fb1bd0bf321c7ce8b33b410b",
       "abi": [
         {
           "type": "impl",
@@ -2184,8 +2184,8 @@
       ]
     },
     {
-      "address": "0x6f162b5457e47a59ab4577991d1bb880b8327ab2a59139fa30cf3d57aec309a",
-      "class_hash": "0xb24245fae76b813bf26d9277237877dfe60d182b646b92924f9ff506b7ff55",
+      "address": "0x60c2a1f2624ff6ce36a6dc65b8155d6dfcd7f3845d4fc7e894f0b1341d50678",
+      "class_hash": "0x3586723bf3d0ec975eb1f30a18abb7f146135998fa85967c777fd05ab3cf607",
       "abi": [
         {
           "type": "impl",
@@ -3494,8 +3494,8 @@
       ]
     },
     {
-      "address": "0x5767ee9f9884a86f86943859d1abe7636f675b3ada50591aeea3f30603eb87b",
-      "class_hash": "0x25b850f4bbb022d1d8b0e76a7a873af86123ce5ddd65f217941c98dc8b98c0f",
+      "address": "0x28948a59b0366849699f3a626e693831cc1810f97a0b6b7b22914b1c09ad1e7",
+      "class_hash": "0x5d351b7a1f70110a33e8babeb8d67994e16e5aab6e99fac9dbad104cad44979",
       "abi": [
         {
           "type": "impl",
@@ -4061,6 +4061,20 @@
         },
         {
           "type": "enum",
+          "name": "pistols::types::duelist_profile::LegendsKey",
+          "variants": [
+            {
+              "name": "Unknown",
+              "type": "()"
+            },
+            {
+              "name": "TGC1",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "enum",
           "name": "pistols::types::duelist_profile::DuelistProfile",
           "variants": [
             {
@@ -4078,6 +4092,10 @@
             {
               "name": "Genesis",
               "type": "pistols::types::duelist_profile::GenesisKey"
+            },
+            {
+              "name": "Legends",
+              "type": "pistols::types::duelist_profile::LegendsKey"
             }
           ]
         },
@@ -4356,12 +4374,12 @@
                   "type": "core::starknet::contract_address::ContractAddress"
                 },
                 {
-                  "name": "profile_sample",
-                  "type": "pistols::types::duelist_profile::DuelistProfile"
-                },
-                {
                   "name": "quantity",
                   "type": "core::integer::u32"
+                },
+                {
+                  "name": "profile_type",
+                  "type": "pistols::types::duelist_profile::DuelistProfile"
                 },
                 {
                   "name": "seed",
@@ -5394,8 +5412,8 @@
       ]
     },
     {
-      "address": "0x520908267f1a2ddbc6cb170e2566cc9f8f5c7f2954fbd96abbf18d02d95e81f",
-      "class_hash": "0x414f90fda86a3845abc862227ee5d3d0031e45c48615c97d925febf4a114167",
+      "address": "0x56a06cbeae8a77770ea5fceb6b5e8113cfaf000f2b372e6aef350c080c3c4a1",
+      "class_hash": "0xe5a1abdb44ab2cf2c91936249d5629d9eabe01aa6912e936dcb1a463724f2",
       "abi": [
         {
           "type": "impl",
@@ -6097,8 +6115,8 @@
       ]
     },
     {
-      "address": "0xf55ecf6eebacea3e70cd9a9a95ec17db495dc0683604bbb4adec93431a62da",
-      "class_hash": "0x68c6ac2413dc1271fb10a22af0626066d8d27e1a04964ccbef991f5ec1deb25",
+      "address": "0x465bda029eb6a3dc8299de70354f62a7ad0a64e0181f164ed1335b36d21793d",
+      "class_hash": "0x45f4a9d3c0c961034721bdbb0a545b505508482c09c44e7c7525ec2cfb74c7e",
       "abi": [
         {
           "type": "impl",
@@ -6617,8 +6635,8 @@
       ]
     },
     {
-      "address": "0x25a96bff69fcf4fc02393c1b5115b812cf68e65ac9e6df92cac9b2898becfa9",
-      "class_hash": "0x7fd176c9d598a66c5da400b152f51c966fc9a5891405b4e2a903d293356a974",
+      "address": "0x4dcb787b207271e01715ba454119eb3264162445331ea256899102ec0a057e9",
+      "class_hash": "0x416f8d28b3c67dbd8be425a40fc94d88b1108f5636992c9ce6fb2923b6e75e5",
       "abi": [
         {
           "type": "impl",
@@ -7598,7 +7616,7 @@
       ]
     },
     {
-      "address": "0x6914a7b76b931d4d7ee2414224152ef9e446e986edcf522a1882591bb6a545d",
+      "address": "0x312dee156e9d952180f44e780daa7322d908da1532e0209c5f118fc8aa7a491",
       "class_hash": "0x35b3a7047b92ddb5d2deaf1b3db751bf36c879b6251713c9418c822c9a08e1c",
       "abi": [
         {
@@ -8357,7 +8375,7 @@
       ]
     },
     {
-      "address": "0x42009edef8c8073d9fc6c8e41c7d034c7e0b0dce19ca7b48629d88abed9c26e",
+      "address": "0x4923f087d9fa182cf2ebed9bc7f89adb6b4c8bfda1dcacc8044c697515c0586",
       "class_hash": "0x1588ed91063d3b1c8d0c8121f9a0f99209cda8c4faee0beca20bc3e24aa7238",
       "abi": [
         {
@@ -8897,8 +8915,8 @@
       ]
     },
     {
-      "address": "0x2d4fff346456045e7e423126db576a9e6a51c7f151780c731b645a40f2dfcfb",
-      "class_hash": "0x2aa52f089e5f754d92b5f54cfe215802a70f9726ca755399b7f95aeb531a11d",
+      "address": "0x12c304caf724d7875cf6ed7a7c3fd9c1220b02ffc47af3ad48f4af00183c70e",
+      "class_hash": "0x773c45fb8f2ecb1d54bad3bec8311022f2b2f75fe8b2fa0a20dde2292f9bf20",
       "abi": [
         {
           "type": "impl",
@@ -9000,6 +9018,10 @@
             {
               "name": "FreeDuelist",
               "type": "()"
+            },
+            {
+              "name": "SingleDuelist",
+              "type": "()"
             }
           ]
         },
@@ -9014,28 +9036,390 @@
           ]
         },
         {
-          "type": "struct",
-          "name": "pistols::models::pack::Pack",
-          "members": [
+          "type": "enum",
+          "name": "pistols::types::duelist_profile::CharacterKey",
+          "variants": [
             {
-              "name": "pack_id",
-              "type": "core::integer::u128"
+              "name": "Unknown",
+              "type": "()"
             },
             {
-              "name": "pack_type",
-              "type": "pistols::models::pack::PackType"
+              "name": "Bartender",
+              "type": "()"
             },
             {
-              "name": "seed",
-              "type": "core::felt252"
+              "name": "Drunkard",
+              "type": "()"
             },
             {
-              "name": "lords_amount",
-              "type": "core::integer::u128"
+              "name": "Devil",
+              "type": "()"
             },
             {
-              "name": "is_open",
-              "type": "core::bool"
+              "name": "Player",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "pistols::types::duelist_profile::BotKey",
+          "variants": [
+            {
+              "name": "Unknown",
+              "type": "()"
+            },
+            {
+              "name": "TinMan",
+              "type": "()"
+            },
+            {
+              "name": "Scarecrow",
+              "type": "()"
+            },
+            {
+              "name": "Leon",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "pistols::types::duelist_profile::GenesisKey",
+          "variants": [
+            {
+              "name": "Unknown",
+              "type": "()"
+            },
+            {
+              "name": "SerWalker",
+              "type": "()"
+            },
+            {
+              "name": "LadyVengeance",
+              "type": "()"
+            },
+            {
+              "name": "Duke",
+              "type": "()"
+            },
+            {
+              "name": "Duella",
+              "type": "()"
+            },
+            {
+              "name": "Jameson",
+              "type": "()"
+            },
+            {
+              "name": "Misty",
+              "type": "()"
+            },
+            {
+              "name": "Karaku",
+              "type": "()"
+            },
+            {
+              "name": "Kenzu",
+              "type": "()"
+            },
+            {
+              "name": "Pilgrim",
+              "type": "()"
+            },
+            {
+              "name": "Jack",
+              "type": "()"
+            },
+            {
+              "name": "Pops",
+              "type": "()"
+            },
+            {
+              "name": "NynJah",
+              "type": "()"
+            },
+            {
+              "name": "Thrak",
+              "type": "()"
+            },
+            {
+              "name": "Bloberto",
+              "type": "()"
+            },
+            {
+              "name": "Squiddo",
+              "type": "()"
+            },
+            {
+              "name": "SlenderDuck",
+              "type": "()"
+            },
+            {
+              "name": "Breadman",
+              "type": "()"
+            },
+            {
+              "name": "Groggus",
+              "type": "()"
+            },
+            {
+              "name": "Pistolopher",
+              "type": "()"
+            },
+            {
+              "name": "Secreto",
+              "type": "()"
+            },
+            {
+              "name": "ShadowMare",
+              "type": "()"
+            },
+            {
+              "name": "Fjolnir",
+              "type": "()"
+            },
+            {
+              "name": "ChimpDylan",
+              "type": "()"
+            },
+            {
+              "name": "Hinata",
+              "type": "()"
+            },
+            {
+              "name": "HelixVex",
+              "type": "()"
+            },
+            {
+              "name": "BuccaneerJames",
+              "type": "()"
+            },
+            {
+              "name": "TheSensei",
+              "type": "()"
+            },
+            {
+              "name": "SenseiTarrence",
+              "type": "()"
+            },
+            {
+              "name": "ThePainter",
+              "type": "()"
+            },
+            {
+              "name": "Ashe",
+              "type": "()"
+            },
+            {
+              "name": "SerGogi",
+              "type": "()"
+            },
+            {
+              "name": "TheSurvivor",
+              "type": "()"
+            },
+            {
+              "name": "TheFrenchman",
+              "type": "()"
+            },
+            {
+              "name": "SerFocger",
+              "type": "()"
+            },
+            {
+              "name": "SillySosij",
+              "type": "()"
+            },
+            {
+              "name": "BloodBeard",
+              "type": "()"
+            },
+            {
+              "name": "Fredison",
+              "type": "()"
+            },
+            {
+              "name": "TheBard",
+              "type": "()"
+            },
+            {
+              "name": "Ponzimancer",
+              "type": "()"
+            },
+            {
+              "name": "DealerTani",
+              "type": "()"
+            },
+            {
+              "name": "SerRichard",
+              "type": "()"
+            },
+            {
+              "name": "Recipromancer",
+              "type": "()"
+            },
+            {
+              "name": "Mataleone",
+              "type": "()"
+            },
+            {
+              "name": "FortunaRegem",
+              "type": "()"
+            },
+            {
+              "name": "Amaro",
+              "type": "()"
+            },
+            {
+              "name": "Mononoke",
+              "type": "()"
+            },
+            {
+              "name": "Parsa",
+              "type": "()"
+            },
+            {
+              "name": "Jubilee",
+              "type": "()"
+            },
+            {
+              "name": "LadyOfCrows",
+              "type": "()"
+            },
+            {
+              "name": "BananaDuke",
+              "type": "()"
+            },
+            {
+              "name": "LordGladstone",
+              "type": "()"
+            },
+            {
+              "name": "LadyStrokes",
+              "type": "()"
+            },
+            {
+              "name": "Bliss",
+              "type": "()"
+            },
+            {
+              "name": "StormMirror",
+              "type": "()"
+            },
+            {
+              "name": "Aldreda",
+              "type": "()"
+            },
+            {
+              "name": "Petronella",
+              "type": "()"
+            },
+            {
+              "name": "SeraphinaRose",
+              "type": "()"
+            },
+            {
+              "name": "LucienDeSombrel",
+              "type": "()"
+            },
+            {
+              "name": "FyernVirelock",
+              "type": "()"
+            },
+            {
+              "name": "Noir",
+              "type": "()"
+            },
+            {
+              "name": "QueenAce",
+              "type": "()"
+            },
+            {
+              "name": "JoshPeel",
+              "type": "()"
+            },
+            {
+              "name": "IronHandRogan",
+              "type": "()"
+            },
+            {
+              "name": "GoodPupStarky",
+              "type": "()"
+            },
+            {
+              "name": "ImyaSuspect",
+              "type": "()"
+            },
+            {
+              "name": "TheAlchemist",
+              "type": "()"
+            },
+            {
+              "name": "PonziusPilate",
+              "type": "()"
+            },
+            {
+              "name": "MistressNoodle",
+              "type": "()"
+            },
+            {
+              "name": "MasterOfSecrets",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "pistols::types::duelist_profile::LegendsKey",
+          "variants": [
+            {
+              "name": "Unknown",
+              "type": "()"
+            },
+            {
+              "name": "TGC1",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "pistols::types::duelist_profile::DuelistProfile",
+          "variants": [
+            {
+              "name": "Undefined",
+              "type": "()"
+            },
+            {
+              "name": "Character",
+              "type": "pistols::types::duelist_profile::CharacterKey"
+            },
+            {
+              "name": "Bot",
+              "type": "pistols::types::duelist_profile::BotKey"
+            },
+            {
+              "name": "Genesis",
+              "type": "pistols::types::duelist_profile::GenesisKey"
+            },
+            {
+              "name": "Legends",
+              "type": "pistols::types::duelist_profile::LegendsKey"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "core::option::Option::<pistols::types::duelist_profile::DuelistProfile>",
+          "variants": [
+            {
+              "name": "Some",
+              "type": "pistols::types::duelist_profile::DuelistProfile"
+            },
+            {
+              "name": "None",
+              "type": "()"
             }
           ]
         },
@@ -9148,7 +9532,31 @@
               ],
               "outputs": [
                 {
-                  "type": "pistols::models::pack::Pack"
+                  "type": "core::integer::u128"
+                }
+              ],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "airdrop",
+              "inputs": [
+                {
+                  "name": "recipient",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "pack_type",
+                  "type": "pistols::models::pack::PackType"
+                },
+                {
+                  "name": "duelist_profile",
+                  "type": "core::option::Option::<pistols::types::duelist_profile::DuelistProfile>"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u128"
                 }
               ],
               "state_mutability": "external"
@@ -10123,6 +10531,7 @@
         "claim_starter_pack",
         "claim_gift",
         "purchase",
+        "airdrop",
         "open",
         "upgrade",
         "safe_transfer_from",
@@ -10138,7 +10547,1198 @@
       ]
     },
     {
-      "address": "0x645186eb6e3cde86776aa37a1ee747318f35d037bf10748baae9890fe906e34",
+      "address": "0x7756bf0018a433dcf37e1d1d4d32eed0e4041a7f09624c828740e0e7d0ecd8e",
+      "class_hash": "0x395dbb8d410dc89ebaab2065e95fb8ab00ceb944e085c6f803cbf3f32cc4fa4",
+      "abi": [
+        {
+          "type": "impl",
+          "name": "ring_token__ContractImpl",
+          "interface_name": "dojo::contract::interface::IContract"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::interface::IContract",
+          "items": []
+        },
+        {
+          "type": "impl",
+          "name": "ring_token__DeployedContractImpl",
+          "interface_name": "dojo::meta::interface::IDeployedResource"
+        },
+        {
+          "type": "struct",
+          "name": "core::byte_array::ByteArray",
+          "members": [
+            {
+              "name": "data",
+              "type": "core::array::Array::<core::bytes_31::bytes31>"
+            },
+            {
+              "name": "pending_word",
+              "type": "core::felt252"
+            },
+            {
+              "name": "pending_word_len",
+              "type": "core::integer::u32"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "dojo::meta::interface::IDeployedResource",
+          "items": [
+            {
+              "type": "function",
+              "name": "dojo_name",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "function",
+          "name": "dojo_init",
+          "inputs": [
+            {
+              "name": "base_uri",
+              "type": "core::felt252"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "impl",
+          "name": "RingTokenPublicImpl",
+          "interface_name": "pistols::systems::tokens::ring_token::IRingTokenPublic"
+        },
+        {
+          "type": "enum",
+          "name": "pistols::models::ring::RingType",
+          "variants": [
+            {
+              "name": "Unknown",
+              "type": "()"
+            },
+            {
+              "name": "GoldSignetRing",
+              "type": "()"
+            },
+            {
+              "name": "SilverSignetRing",
+              "type": "()"
+            },
+            {
+              "name": "LeadSignetRing",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "core::bool",
+          "variants": [
+            {
+              "name": "False",
+              "type": "()"
+            },
+            {
+              "name": "True",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "core::option::Option::<pistols::models::ring::RingType>",
+          "variants": [
+            {
+              "name": "Some",
+              "type": "pistols::models::ring::RingType"
+            },
+            {
+              "name": "None",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "pistols::systems::tokens::ring_token::IRingTokenPublic",
+          "items": [
+            {
+              "type": "function",
+              "name": "has_claimed",
+              "inputs": [
+                {
+                  "name": "recipient",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "ring_type",
+                  "type": "pistols::models::ring::RingType"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "get_claimable_season_ring_type",
+              "inputs": [
+                {
+                  "name": "recipient",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "duel_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::option::Option::<pistols::models::ring::RingType>"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "balance_of_ring",
+              "inputs": [
+                {
+                  "name": "account",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "ring_type",
+                  "type": "pistols::models::ring::RingType"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u128"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "claim_season_ring",
+              "inputs": [
+                {
+                  "name": "duel_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "ring_type",
+                  "type": "pistols::models::ring::RingType"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u128"
+                }
+              ],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "airdrop_ring",
+              "inputs": [
+                {
+                  "name": "recipient",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "ring_type",
+                  "type": "pistols::models::ring::RingType"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u128"
+                }
+              ],
+              "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "WorldProviderImpl",
+          "interface_name": "dojo::contract::components::world_provider::IWorldProvider"
+        },
+        {
+          "type": "struct",
+          "name": "dojo::world::iworld::IWorldDispatcher",
+          "members": [
+            {
+              "name": "contract_address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::components::world_provider::IWorldProvider",
+          "items": [
+            {
+              "type": "function",
+              "name": "world_dispatcher",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "dojo::world::iworld::IWorldDispatcher"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "UpgradeableImpl",
+          "interface_name": "dojo::contract::components::upgradeable::IUpgradeable"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::components::upgradeable::IUpgradeable",
+          "items": [
+            {
+              "type": "function",
+              "name": "upgrade",
+              "inputs": [
+                {
+                  "name": "new_class_hash",
+                  "type": "core::starknet::class_hash::ClassHash"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "ERC721ComboMixinImpl",
+          "interface_name": "nft_combo::erc721::interface::IERC721ComboABI"
+        },
+        {
+          "type": "struct",
+          "name": "core::integer::u256",
+          "members": [
+            {
+              "name": "low",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "high",
+              "type": "core::integer::u128"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<core::felt252>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<core::felt252>"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "nft_combo::erc721::interface::IERC721ComboABI",
+          "items": [
+            {
+              "type": "function",
+              "name": "supports_interface",
+              "inputs": [
+                {
+                  "name": "interface_id",
+                  "type": "core::felt252"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "balance_of",
+              "inputs": [
+                {
+                  "name": "account",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u256"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "owner_of",
+              "inputs": [
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "safe_transfer_from",
+              "inputs": [
+                {
+                  "name": "from",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "to",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u256"
+                },
+                {
+                  "name": "data",
+                  "type": "core::array::Span::<core::felt252>"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "transfer_from",
+              "inputs": [
+                {
+                  "name": "from",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "to",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "approve",
+              "inputs": [
+                {
+                  "name": "to",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "set_approval_for_all",
+              "inputs": [
+                {
+                  "name": "operator",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "approved",
+                  "type": "core::bool"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "get_approved",
+              "inputs": [
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "is_approved_for_all",
+              "inputs": [
+                {
+                  "name": "owner",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "operator",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "balanceOf",
+              "inputs": [
+                {
+                  "name": "account",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u256"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "ownerOf",
+              "inputs": [
+                {
+                  "name": "tokenId",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "safeTransferFrom",
+              "inputs": [
+                {
+                  "name": "from",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "to",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "tokenId",
+                  "type": "core::integer::u256"
+                },
+                {
+                  "name": "data",
+                  "type": "core::array::Span::<core::felt252>"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "transferFrom",
+              "inputs": [
+                {
+                  "name": "from",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "to",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "tokenId",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "setApprovalForAll",
+              "inputs": [
+                {
+                  "name": "operator",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "approved",
+                  "type": "core::bool"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "getApproved",
+              "inputs": [
+                {
+                  "name": "tokenId",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "isApprovedForAll",
+              "inputs": [
+                {
+                  "name": "owner",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "operator",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "name",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "symbol",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "token_uri",
+              "inputs": [
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "tokenURI",
+              "inputs": [
+                {
+                  "name": "tokenId",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "max_supply",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::integer::u256"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "total_supply",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::integer::u256"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "last_token_id",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::integer::u256"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "is_minting_paused",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "is_owner_of",
+              "inputs": [
+                {
+                  "name": "address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "token_exists",
+              "inputs": [
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "maxSupply",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::integer::u256"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "totalSupply",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::integer::u256"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "contract_uri",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "contractURI",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "royalty_info",
+              "inputs": [
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u256"
+                },
+                {
+                  "name": "sale_price",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "(core::starknet::contract_address::ContractAddress, core::integer::u256)"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "default_royalty",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "(core::starknet::contract_address::ContractAddress, core::integer::u128, core::integer::u128)"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "token_royalty",
+              "inputs": [
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "(core::starknet::contract_address::ContractAddress, core::integer::u128, core::integer::u128)"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "royaltyInfo",
+              "inputs": [
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u256"
+                },
+                {
+                  "name": "sale_price",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "(core::starknet::contract_address::ContractAddress, core::integer::u256)"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "defaultRoyalty",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "(core::starknet::contract_address::ContractAddress, core::integer::u128, core::integer::u128)"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "tokenRoyalty",
+              "inputs": [
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "(core::starknet::contract_address::ContractAddress, core::integer::u128, core::integer::u128)"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "TokenComponentPublicImpl",
+          "interface_name": "pistols::systems::components::token_component::ITokenComponentPublic"
+        },
+        {
+          "type": "interface",
+          "name": "pistols::systems::components::token_component::ITokenComponentPublic",
+          "items": [
+            {
+              "type": "function",
+              "name": "can_mint",
+              "inputs": [
+                {
+                  "name": "recipient",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "update_contract_metadata",
+              "inputs": [],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "update_token_metadata",
+              "inputs": [
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "update_tokens_metadata",
+              "inputs": [
+                {
+                  "name": "from_token_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "to_token_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "constructor",
+          "name": "constructor",
+          "inputs": []
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "class_hash",
+              "type": "core::starknet::class_hash::ClassHash",
+              "kind": "data"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "Upgraded",
+              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
+              "kind": "nested"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::world_provider::world_provider_cpt::Event",
+          "kind": "enum",
+          "variants": []
+        },
+        {
+          "type": "event",
+          "name": "openzeppelin_introspection::src5::SRC5Component::Event",
+          "kind": "enum",
+          "variants": []
+        },
+        {
+          "type": "event",
+          "name": "openzeppelin_token::erc721::erc721::ERC721Component::Transfer",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "from",
+              "type": "core::starknet::contract_address::ContractAddress",
+              "kind": "key"
+            },
+            {
+              "name": "to",
+              "type": "core::starknet::contract_address::ContractAddress",
+              "kind": "key"
+            },
+            {
+              "name": "token_id",
+              "type": "core::integer::u256",
+              "kind": "key"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "openzeppelin_token::erc721::erc721::ERC721Component::Approval",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "owner",
+              "type": "core::starknet::contract_address::ContractAddress",
+              "kind": "key"
+            },
+            {
+              "name": "approved",
+              "type": "core::starknet::contract_address::ContractAddress",
+              "kind": "key"
+            },
+            {
+              "name": "token_id",
+              "type": "core::integer::u256",
+              "kind": "key"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "openzeppelin_token::erc721::erc721::ERC721Component::ApprovalForAll",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "owner",
+              "type": "core::starknet::contract_address::ContractAddress",
+              "kind": "key"
+            },
+            {
+              "name": "operator",
+              "type": "core::starknet::contract_address::ContractAddress",
+              "kind": "key"
+            },
+            {
+              "name": "approved",
+              "type": "core::bool",
+              "kind": "data"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "openzeppelin_token::erc721::erc721::ERC721Component::Event",
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "Transfer",
+              "type": "openzeppelin_token::erc721::erc721::ERC721Component::Transfer",
+              "kind": "nested"
+            },
+            {
+              "name": "Approval",
+              "type": "openzeppelin_token::erc721::erc721::ERC721Component::Approval",
+              "kind": "nested"
+            },
+            {
+              "name": "ApprovalForAll",
+              "type": "openzeppelin_token::erc721::erc721::ERC721Component::ApprovalForAll",
+              "kind": "nested"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "nft_combo::erc721::erc721_combo::ERC721ComboComponent::ContractURIUpdated",
+          "kind": "struct",
+          "members": []
+        },
+        {
+          "type": "event",
+          "name": "nft_combo::erc721::erc721_combo::ERC721ComboComponent::MetadataUpdate",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "token_id",
+              "type": "core::integer::u256",
+              "kind": "key"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "nft_combo::erc721::erc721_combo::ERC721ComboComponent::BatchMetadataUpdate",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "from_token_id",
+              "type": "core::integer::u256",
+              "kind": "key"
+            },
+            {
+              "name": "to_token_id",
+              "type": "core::integer::u256",
+              "kind": "key"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "nft_combo::erc721::erc721_combo::ERC721ComboComponent::Event",
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "ContractURIUpdated",
+              "type": "nft_combo::erc721::erc721_combo::ERC721ComboComponent::ContractURIUpdated",
+              "kind": "nested"
+            },
+            {
+              "name": "MetadataUpdate",
+              "type": "nft_combo::erc721::erc721_combo::ERC721ComboComponent::MetadataUpdate",
+              "kind": "nested"
+            },
+            {
+              "name": "BatchMetadataUpdate",
+              "type": "nft_combo::erc721::erc721_combo::ERC721ComboComponent::BatchMetadataUpdate",
+              "kind": "nested"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "pistols::systems::components::token_component::TokenComponent::Event",
+          "kind": "enum",
+          "variants": []
+        },
+        {
+          "type": "event",
+          "name": "pistols::systems::tokens::ring_token::ring_token::Event",
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "UpgradeableEvent",
+              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
+              "kind": "nested"
+            },
+            {
+              "name": "WorldProviderEvent",
+              "type": "dojo::contract::components::world_provider::world_provider_cpt::Event",
+              "kind": "nested"
+            },
+            {
+              "name": "SRC5Event",
+              "type": "openzeppelin_introspection::src5::SRC5Component::Event",
+              "kind": "flat"
+            },
+            {
+              "name": "ERC721Event",
+              "type": "openzeppelin_token::erc721::erc721::ERC721Component::Event",
+              "kind": "flat"
+            },
+            {
+              "name": "ERC721ComboEvent",
+              "type": "nft_combo::erc721::erc721_combo::ERC721ComboComponent::Event",
+              "kind": "flat"
+            },
+            {
+              "name": "TokenEvent",
+              "type": "pistols::systems::components::token_component::TokenComponent::Event",
+              "kind": "flat"
+            }
+          ]
+        }
+      ],
+      "init_calldata": [
+        "sstr:https://assets.underware.gg"
+      ],
+      "tag": "pistols-ring_token",
+      "selector": "0x2fc4959e710a2d442c974fa22583221e95567dc973fc5bf618c9ceb283aa88b",
+      "systems": [
+        "dojo_init",
+        "claim_season_ring",
+        "airdrop_ring",
+        "upgrade",
+        "safe_transfer_from",
+        "transfer_from",
+        "approve",
+        "set_approval_for_all",
+        "safeTransferFrom",
+        "transferFrom",
+        "setApprovalForAll",
+        "update_contract_metadata",
+        "update_token_metadata",
+        "update_tokens_metadata"
+      ]
+    },
+    {
+      "address": "0xf058259a3dd52088485a1f9eed2af2b1c3deaf6aab04321f65dd0820e82c46",
       "class_hash": "0x441b500039f5f95100d43f94d4290c39a1a85ad16e9314151f2bbbd3ed68688",
       "abi": [
         {
@@ -10407,7 +12007,7 @@
       ]
     },
     {
-      "address": "0x14d281bb34a30fe03726e3cb857d931ddd43358527f46bfe0ba677adcf476ac",
+      "address": "0x5c640117116405523f46593bf564269beb84a398e47f5d29e1206b3ea38bf77",
       "class_hash": "0x1e59282be83ac9b2cd0e293fd23186df616fa1ac69a6733f9d42f717b3c276a",
       "abi": [
         {
@@ -10700,8 +12300,8 @@
       ]
     },
     {
-      "address": "0x1280387732701fe82772441358e70192ba62171c646dea5fcba8603666f738",
-      "class_hash": "0x39c644bfddb9025f14c1250256c28e3cb7d1df2d3b5f82e5ff9b0151a2c94f4",
+      "address": "0x2ea0f769d27da04cdae64a4d6a76c06a5f24398816ca69da26215e103a1001a",
+      "class_hash": "0x7ebafb74874f915eaa34e2288da578f14155d891ff7dcf27f5b2f680e48c759",
       "abi": [
         {
           "type": "impl",
@@ -11345,7 +12945,7 @@
       ]
     },
     {
-      "address": "0x49080c7fa5c5ce029b7f6d5f2367e01afcce54fed6ea7dd701789010a4c75f6",
+      "address": "0x2d8fb12e049008c7f2be0668566a8455dd75261431c0f7f753c8c4e532ef3dd",
       "class_hash": "0x2828fcd69654e1c959fe4b7d3429cb6eaa432a1a4a20e6e35e3ca878630746d",
       "abi": [
         {
@@ -11607,7 +13207,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x2f1cc8a4e21e78cee51f6c68381d501886669e282efc42d8b276ba1db4b14e2",
+      "class_hash": "0x3a867ced78f0cc937683ea9b8a9fb0e5f070301f560d8e266ce4624b818a617",
       "tag": "pistols-Duelist",
       "selector": "0x1ec34ce9ccaa39b540179d85e0dd0d46c1c1ae712f4cb40a9cd7f8c21ebaa46"
     },
@@ -11637,7 +13237,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x565027b2b6933226871e94dcc7ca665a5766859496471dba4ad8869e465fb25",
+      "class_hash": "0x37decd52ee24a3ed37ff2b66e7b428cda5cce5774f6b59569fb4ae4ec1ae5b5",
       "tag": "pistols-Pack",
       "selector": "0x64159b4947adcdc7a87b41f7889ba33495ac8e3a3a333305c7712806763fa2d"
     },
@@ -11655,7 +13255,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x257b1c7f7d3e897f7fc99e911a61752ffd4f7ab57245c6d3a1b9f6b1d7e63b6",
+      "class_hash": "0x4ae5a0a10af6ae3f94a9e629f319d595459e1c83fb05bfdb4a5eb0cc2ae7820",
       "tag": "pistols-PlayerDuelistStack",
       "selector": "0xb47a4ea3849ae004ed3d0ba58070c0eb3cdca2bed8c9a6ab6bfe01210effc6"
     },
@@ -11682,6 +13282,18 @@
       "class_hash": "0x4e29528b41c56c75bf382febe9833b6cb301e058333cfaf207d6955a78b45a5",
       "tag": "pistols-Pool",
       "selector": "0xb4328e5f120dfe361a8f367e6ea51e2be55dbc6b1c9f2c17a87b7d06ab8972"
+    },
+    {
+      "members": [],
+      "class_hash": "0x2808cea8f9fa67b944ef17b9c939e6ebef44d41b53798bf8a5bddf2ec115a85",
+      "tag": "pistols-Ring",
+      "selector": "0x34351c549b6e63b6b7342e3ea8e75c28c5ec360414805eab776b75a979bacc9"
+    },
+    {
+      "members": [],
+      "class_hash": "0x56c18bf002e28974b95d9fa923e459bf1fe59ac86925750dc2419e653fbedbb",
+      "tag": "pistols-RingBalance",
+      "selector": "0x771214858afa98884b58a8a719e616f10c80ce915c4c5233f658e69245c126b"
     },
     {
       "members": [],
@@ -11735,7 +13347,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x742a8b06468408b9086d21cd2515412728e1ff614c75752e2eb4d781b1851d2",
+      "class_hash": "0x30f045ec01d80f780a5e9c2d8e1bbf509281083c9aac074cb662d6184286c8a",
       "tag": "pistols-PlayerActivityEvent",
       "selector": "0x46a192c105a4598953e7aeaf3809703964eb9e6d65403156d0458dcd2ee379b"
     },
@@ -11759,13 +13371,13 @@
     },
     {
       "members": [],
-      "class_hash": "0x6fede2561a93b4808a6a00e19457a94d616e7ee53fc952f75af58da9bae45f5",
+      "class_hash": "0x702d5440a155e0704b268f8d6dbf74cb8ae09b164064fe3b4f896cf725dcac7",
       "tag": "pistols-TrophyCreation",
       "selector": "0x193f7990b65fed69ab857fd2526961d796fc50b6a72287c5be68f32415ad80c"
     },
     {
       "members": [],
-      "class_hash": "0x3d60f68ff66df399a5efc60c6aacda487ced739897ddcea54270b7c147206d",
+      "class_hash": "0x113e43bc604068a5811205b126a3e318b21e5c72746138efa6fb40277067f00",
       "tag": "pistols-TrophyProgression",
       "selector": "0x528aee6e1c2ad2e0f603b1bfe15e3aefc1ded821cd118e5eab5092b704c79b0"
     }

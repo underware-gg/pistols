@@ -1,6 +1,6 @@
 import { DojoCall, DojoProvider, getContractByName } from '@dojoengine/core'
-import { AccountInterface, BigNumberish, CairoCustomEnum, Call, CallData, UniversalDetails } from 'starknet'
-import { arrayClean, shortAddress, isPositiveBigint, bigintToHex } from 'src/utils/misc/types'
+import { AccountInterface, BigNumberish, CairoCustomEnum, Call, CallData, UniversalDetails, CairoOption, CairoOptionVariant } from 'starknet'
+import { arrayClean, shortAddress, isPositiveBigint, bigintToHex, bigintToAddress } from 'src/utils/misc/types'
 import { NAMESPACE, getLordsAddress, getBankAddress, getVrfAddress, DojoManifest } from 'src/games/pistols/config/config'
 import { bigintToU256 } from 'src/starknet/starknet'
 import { makeCustomEnum } from 'src/starknet/starknet_enum'
@@ -8,6 +8,7 @@ import { DojoNetworkConfig } from 'src/games/pistols/config/networks'
 import { setupWorld } from 'src/games/pistols/generated/contracts.gen'
 import { emitter } from 'src/dojo/hooks/useDojoEmitterEvent'
 import * as constants from 'src/games/pistols/generated/constants'
+import { DuelistProfileKey } from '../misc/profiles'
 
 export type SystemCalls = ReturnType<typeof createSystemCalls>;
 export type DojoCalls = Array<DojoCall | Call>
@@ -23,13 +24,13 @@ export function createSystemCalls(
   selectedNetworkConfig: DojoNetworkConfig,
 ) {
 
-    // Transaction status checker - can be used by transaction store
+  // Transaction status checker - can be used by transaction store
   const checkTransactionStatus = async (signer: AccountInterface, hash: string, calls?: DojoCalls, key?: string, shouldEmit: boolean = true): Promise<boolean> => {
     const receipt = await signer.waitForTransaction(hash, { retryInterval: 200 })
     const success = getReceiptStatus(receipt, shouldEmit);
 
     (success ? console.log : console.warn)(`execute success:`, success, 'receipt:', receipt, 'calls:', calls)
-    
+
     if (key) {
       if (success) {
         emitter.emit('transaction_completed', { key, result: true })
@@ -40,7 +41,7 @@ export function createSystemCalls(
 
     return success
   };
-  
+
   // executeMulti() based on:
   // https://github.com/cartridge-gg/rollyourown/blob/f39bfd7adc866c1a10142f5ce30a3c6f900b467e/web/src/dojo/hooks/useSystems.ts#L178-L190
   const _executeTransaction = async (signer: AccountInterface, calls: DojoCalls, key?: string): Promise<boolean> => {
@@ -112,7 +113,7 @@ export function createSystemCalls(
   return {
     // Export the checkTransactionStatus function for transaction store
     checkTransactionStatus,
-    
+
     //
     // game.cairo
     //
@@ -226,7 +227,7 @@ export function createSystemCalls(
     //
     duel_token: {
       create_duel: async (signer: AccountInterface, duel_type: constants.DuelType, duelist_id: BigNumberish, challenged_address: BigNumberish, lives_staked: number, expire_hours: number, premise: constants.Premise, message: string, key?: string): Promise<boolean> => {
-        let calls: DojoCalls = [
+        const calls: DojoCalls = [
           contractCalls.duel_token.buildCreateDuelCalldata(
             makeCustomEnum(duel_type),
             duelist_id,
@@ -263,13 +264,34 @@ export function createSystemCalls(
       purchase: async (signer: AccountInterface, pack_type: constants.PackType, key?: string): Promise<boolean> => {
         const pack_type_enum = makeCustomEnum(pack_type)
         const approved_value = await contractCalls.pack_token.calcMintFee(signer.address, pack_type_enum) as BigNumberish
-        let calls: DojoCalls = [
+        const calls: DojoCalls = [
           approve_call(approved_value),
           vrf_request_call(signer, 'pack_token'),
           contractCalls.pack_token.buildPurchaseCalldata(
             pack_type_enum,
           ),
         ]
+        return await _executeTransaction(signer, calls, key)
+      },
+      airdrop: async (signer: AccountInterface, recipient: BigNumberish, pack_type: constants.PackType, collection: constants.DuelistProfile | null, profile_key: DuelistProfileKey | null, key?: string): Promise<boolean> => {
+        const calls: DojoCalls = [];
+        // random packs need VRF
+        if (pack_type == constants.PackType.GenesisDuelists5x || pack_type == constants.PackType.FreeDuelist) {
+          calls.push(vrf_request_call(signer, 'pack_token'));
+        }
+        // airdrop call
+        const pack_type_enum = makeCustomEnum(pack_type)
+        const duelist_profile_enum = (collection && profile_key) ? makeCustomEnum(collection, makeCustomEnum(profile_key)) : undefined
+        const duelist_profile_option = new CairoOption(
+          duelist_profile_enum ? CairoOptionVariant.Some : CairoOptionVariant.None, duelist_profile_enum,
+        );
+        calls.push(
+          contractCalls.pack_token.buildAirdropCalldata(
+            bigintToAddress(recipient),
+            pack_type_enum,
+            duelist_profile_option,
+          ),
+        );
         return await _executeTransaction(signer, calls, key)
       },
       open: async (signer: AccountInterface, pack_id: BigNumberish, key?: string): Promise<boolean> => {
@@ -279,6 +301,31 @@ export function createSystemCalls(
           ),
         ]
         return await _executeTransaction(signer, calls, key)
+      },
+    },
+    //
+    // ring_token
+    //
+    // fn claim_season_ring(ref self: TState, duel_id: u128, ring_type: RingType) -> u128;
+    // fn airdrop_ring(ref self: TState, recipient: ContractAddress, ring_type: RingType) -> u128;
+    ring_token: {
+      claim_season_ring: async (signer: AccountInterface, duel_id: BigNumberish, ring_type: constants.RingType): Promise<boolean> => {
+        let calls: DojoCalls = [
+          contractCalls.ring_token.buildClaimSeasonRingCalldata(
+            bigintToHex(duel_id),
+            makeCustomEnum(ring_type),
+          ),
+        ]
+        return await _executeTransaction(signer, calls)
+      },
+      airdrop_ring: async (signer: AccountInterface, recipient: BigNumberish, ring_type: constants.RingType): Promise<boolean> => {
+        let calls: DojoCalls = [
+          contractCalls.ring_token.buildAirdropRingCalldata(
+            bigintToHex(recipient),
+            makeCustomEnum(ring_type),
+          ),
+        ]
+        return await _executeTransaction(signer, calls)
       },
     },
     //

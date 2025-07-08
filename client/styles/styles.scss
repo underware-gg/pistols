@@ -1142,7 +1142,7 @@ $ui-container-gap: 1em;
 //   height: 200px;
 //   // justify-self: right;
 // }
-.ProfileDescription {
+.ProfileDescriptor {
   margin: 0 1em 1em 1em!important;
 }
 .HealthBar {
@@ -1794,28 +1794,33 @@ input::placeholder {
 }
 //
 // <Tab> <TabPane>
+$table-bg-color: rgba($color-darkest, 0.6);
 .ui.attached.menu:not(.tabular) {
   border: 0;
   padding-left: 5px;
 }
+.ui.tabular.menu .item,
 .ui.secondary.pointing.menu .item {
   padding: 0.5em 1.0em 0.5em 0.5em; // semantic: 0.85714286em 1.14285714em;
-  background-color: transparent;
+  background-color: $table-bg-color;
   color: $color-bright;
   text-shadow: $title-shadow;
   border: 0!important;
   border-radius: 0!important;
 }
-#Door .ui.secondary.pointing.menu .item {
-  padding: 0.5em 1.9em 0.5em 1.9em;
-  font-size: 24px;
-}
+.ui.tabular.menu .active.item,
+.ui.tabular.menu .active.item:hover,
+.ui.tabular.menu a.item:hover,
+.ui.tabular.menu a.item:active,
 .ui.secondary.pointing.menu .active.item,
 .ui.secondary.pointing.menu .active.item:hover,
 .ui.secondary.pointing.menu a.item:hover,
 .ui.secondary.pointing.menu a.item:active {
   border-bottom: 2px solid $color-brightest!important;;
   color: $color-brightest;
+}
+.ui.tabular.menu .active.item {
+  background-color: $color-dark;
 }
 // Tab contents
 .ui.tab.active {
@@ -1827,7 +1832,6 @@ input::placeholder {
 }
 //
 // <Table>
-$table-bg-color: rgba($color-darkest, 0.6);
 .ui.table {
   background-color: $table-bg-color;
   color: $color-text;

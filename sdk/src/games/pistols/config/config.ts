@@ -56,6 +56,7 @@ export const getFoolsAddress = (networkId: NetworkId): string => (getContractByN
 export const getDuelistTokenAddress = (networkId: NetworkId): string => (getContractByName(manifests_per_network[networkId], NAMESPACE, 'duelist_token')?.address ?? '0x0')
 export const getDuelTokenAddress = (networkId: NetworkId): string => (getContractByName(manifests_per_network[networkId], NAMESPACE, 'duel_token')?.address ?? '0x0')
 export const getPackTokenAddress = (networkId: NetworkId): string => (getContractByName(manifests_per_network[networkId], NAMESPACE, 'pack_token')?.address ?? '0x0')
+export const getRingTokenAddress = (networkId: NetworkId): string => (getContractByName(manifests_per_network[networkId], NAMESPACE, 'ring_token')?.address ?? '0x0')
 export const getTournamentTokenAddress = (networkId: NetworkId): string => (getContractByName(manifests_per_network[networkId], NAMESPACE, 'tournament_token')?.address ?? '0x0')
 // contracts
 export const getWorldAddress = (networkId: NetworkId): string => (manifests_per_network[networkId]?.world?.address ?? '0x0')

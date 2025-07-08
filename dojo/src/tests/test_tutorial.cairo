@@ -44,8 +44,8 @@ mod tests {
         let mut i: usize = 0;
         while (i < profiles.len()) {
             let profile: DuelistProfile = *profiles.at(i);
-            let duelist: DuelistValue = sys.store.get_duelist_value(profile.make_duelist_id());
-            assert!(duelist.duelist_profile == profile, "Character profile not created: {}", profile.description().name);
+            let duelist: DuelistValue = sys.store.get_duelist_value(profile.to_duelist_id());
+            assert!(duelist.duelist_profile == profile, "Character profile not created: {}", profile.descriptor().name);
             i += 1;
         };
         // Bots created
@@ -53,8 +53,8 @@ mod tests {
         let mut i: usize = 0;
         while (i < profiles.len()) {
             let profile: DuelistProfile = *profiles.at(i);
-            let duelist: DuelistValue = sys.store.get_duelist_value(profile.make_duelist_id());
-            assert!(duelist.duelist_profile == profile, "Bot profile not created: {}", profile.description().name);
+            let duelist: DuelistValue = sys.store.get_duelist_value(profile.to_duelist_id());
+            assert!(duelist.duelist_profile == profile, "Bot profile not created: {}", profile.descriptor().name);
             i += 1;
         };
     }
@@ -79,8 +79,8 @@ mod tests {
         assert_eq!(challenge.premise, Premise::Lesson, "challenge.premise");
         assert_eq!(challenge.address_a, OWNER(), "challenge.address_a");
         assert_eq!(challenge.address_b, OWNER(), "challenge.address_b");
-        assert_eq!(challenge.duelist_id_a, duelist_profile.make_duelist_id(), "challenge.duelist_id_a");
-        assert_eq!(challenge.duelist_id_b, DuelistProfile::Character(CharacterKey::Player).make_duelist_id(), "challenge.duelist_id_b");
+        assert_eq!(challenge.duelist_id_a, duelist_profile.to_duelist_id(), "challenge.duelist_id_a");
+        assert_eq!(challenge.duelist_id_b, DuelistProfile::Character(CharacterKey::Player).to_duelist_id(), "challenge.duelist_id_b");
         assert_eq!(round.state, RoundState::Commit, "round.state");
     }
 

@@ -39,7 +39,13 @@ export const INTERFACE_DESCRIPTIONS: any = {
     claim_starter_pack: 'Claim the starter pack, mint Duelists',
     claim_gift: 'Claim gift pack, if available',
     purchase: 'Purchase a closed pack',
+    airdrop: 'Airdrops a pack (admin)',
     open: 'Open a pack, mint its contents',
+  },
+  // from: ../dojo/src/systems/tokens/ring_token.cairo
+  IRingTokenPublic: {
+    claim_season_ring: 'Claim Signet Ring from a Duel season',
+    airdrop_ring: 'Airdrop Signet Rings (admin)',
   },
   // from: ../dojo/src/systems/tutorial.cairo
   ITutorial: {
@@ -130,6 +136,8 @@ export enum Activity {
   ChallengeResolved = 'ChallengeResolved', // 13
   ChallengeDraw = 'ChallengeDraw', // 14
   ClaimedGift = 'ClaimedGift', // 15
+  AirdroppedPack = 'AirdroppedPack', // 16
+  ClaimedRing = 'ClaimedRing', // 17
 };
 export const getActivityValue = (name: Activity): number | undefined => _indexOrUndefined(Object.keys(Activity).indexOf(name));
 export const getActivityFromValue = (value: number): Activity | undefined => Object.keys(Activity)[value] as Activity;
@@ -184,6 +192,7 @@ export enum PackType {
   StarterPack = 'StarterPack', // 1
   GenesisDuelists5x = 'GenesisDuelists5x', // 2
   FreeDuelist = 'FreeDuelist', // 3
+  SingleDuelist = 'SingleDuelist', // 4
 };
 export const getPackTypeValue = (name: PackType): number | undefined => _indexOrUndefined(Object.keys(PackType).indexOf(name));
 export const getPackTypeFromValue = (value: number): PackType | undefined => Object.keys(PackType)[value] as PackType;
@@ -214,6 +223,17 @@ export enum ReleaseReason {
 export const getReleaseReasonValue = (name: ReleaseReason): number | undefined => _indexOrUndefined(Object.keys(ReleaseReason).indexOf(name));
 export const getReleaseReasonFromValue = (value: number): ReleaseReason | undefined => Object.keys(ReleaseReason)[value] as ReleaseReason;
 export const getReleaseReasonMap = (): Record<ReleaseReason, number> => Object.keys(ReleaseReason).reduce((acc, v, index) => { acc[v as ReleaseReason] = index; return acc; }, {} as Record<ReleaseReason, number>);
+
+// from: ../dojo/src/models/ring.cairo
+export enum RingType {
+  Unknown = 'Unknown', // 0
+  GoldSignetRing = 'GoldSignetRing', // 1
+  SilverSignetRing = 'SilverSignetRing', // 2
+  LeadSignetRing = 'LeadSignetRing', // 3
+};
+export const getRingTypeValue = (name: RingType): number | undefined => _indexOrUndefined(Object.keys(RingType).indexOf(name));
+export const getRingTypeFromValue = (value: number): RingType | undefined => Object.keys(RingType)[value] as RingType;
+export const getRingTypeMap = (): Record<RingType, number> => Object.keys(RingType).reduce((acc, v, index) => { acc[v as RingType] = index; return acc; }, {} as Record<RingType, number>);
 
 // from: ../dojo/src/models/season.cairo
 export enum SeasonPhase {
@@ -382,6 +402,7 @@ export enum DuelistProfile {
   Character = 'Character', // 1
   Bot = 'Bot', // 2
   Genesis = 'Genesis', // 3
+  Legends = 'Legends', // 4
 };
 export const getDuelistProfileValue = (name: DuelistProfile): number | undefined => _indexOrUndefined(Object.keys(DuelistProfile).indexOf(name));
 export const getDuelistProfileFromValue = (value: number): DuelistProfile | undefined => Object.keys(DuelistProfile)[value] as DuelistProfile;
@@ -487,6 +508,15 @@ export const getGenesisKeyValue = (name: GenesisKey): number | undefined => _ind
 export const getGenesisKeyFromValue = (value: number): GenesisKey | undefined => Object.keys(GenesisKey)[value] as GenesisKey;
 export const getGenesisKeyMap = (): Record<GenesisKey, number> => Object.keys(GenesisKey).reduce((acc, v, index) => { acc[v as GenesisKey] = index; return acc; }, {} as Record<GenesisKey, number>);
 
+// from: ../dojo/src/types/duelist_profile.cairo
+export enum LegendsKey {
+  Unknown = 'Unknown', // 0
+  TGC1 = 'TGC1', // 1
+};
+export const getLegendsKeyValue = (name: LegendsKey): number | undefined => _indexOrUndefined(Object.keys(LegendsKey).indexOf(name));
+export const getLegendsKeyFromValue = (value: number): LegendsKey | undefined => Object.keys(LegendsKey)[value] as LegendsKey;
+export const getLegendsKeyMap = (): Record<LegendsKey, number> => Object.keys(LegendsKey).reduce((acc, v, index) => { acc[v as LegendsKey] = index; return acc; }, {} as Record<LegendsKey, number>);
+
 // from: ../dojo/src/types/premise.cairo
 export enum Premise {
   Undefined = 'Undefined', // 0
@@ -576,14 +606,23 @@ export type DuelistHand = {
 };
 
 // from: ../dojo/src/models/pack.cairo
-export type PackDescription = {
+export type PackDescriptor = {
   id : string,
   name : string,
-  image_url_closed : string,
-  image_url_open : string,
+  image_file_closed : string,
+  image_file_open : string,
   can_purchase : boolean,
   price_lords : bigint,
   quantity : number,
+  contents : string,
+};
+
+// from: ../dojo/src/models/ring.cairo
+export type RingDescriptor = {
+  id : string,
+  name : string,
+  description : string,
+  image_url : string,
 };
 
 // from: ../dojo/src/models/tournament.cairo
@@ -615,7 +654,7 @@ export type EnvCardPoints = {
 };
 
 // from: ../dojo/src/types/duelist_profile.cairo
-export type CollectionDescription = {
+export type CollectionDescriptor = {
   name : string,
   folder_name : string,
   profile_count : number,
@@ -624,7 +663,7 @@ export type CollectionDescription = {
 };
 
 // from: ../dojo/src/types/duelist_profile.cairo
-export type ProfileDescription = {
+export type ProfileDescriptor = {
   name : string,
 };
 
@@ -728,6 +767,7 @@ type type_SELECTORS = {
   DUEL_TOKEN: bigint, // cairo: felt252
   DUELIST_TOKEN: bigint, // cairo: felt252
   PACK_TOKEN: bigint, // cairo: felt252
+  RING_TOKEN: bigint, // cairo: felt252
   TOURNAMENT_TOKEN: bigint, // cairo: felt252
   FAME_COIN: bigint, // cairo: felt252
   FOOLS_COIN: bigint, // cairo: felt252
@@ -744,6 +784,7 @@ export const SELECTORS: type_SELECTORS = {
   DUEL_TOKEN: BigInt('0x0670a5c673ac776e00e61c279cf7dc0efbe282787f4d719498e55643c5116063'), // selector_from_tag!("pistols-duel_token")
   DUELIST_TOKEN: BigInt('0x045c96d20393520c5dffeb2f2929fb599034d4fc6e9d423e6a641222fb60a25e'), // selector_from_tag!("pistols-duelist_token")
   PACK_TOKEN: BigInt('0x03d74e76192285c5a19a63c54a6c2ba5b015a1a25818c2d8f9cf75d7fef2b5c1'), // selector_from_tag!("pistols-pack_token")
+  RING_TOKEN: BigInt('0x02fc4959e710a2d442c974fa22583221e95567dc973fc5bf618c9ceb283aa88b'), // selector_from_tag!("pistols-ring_token")
   TOURNAMENT_TOKEN: BigInt('0x04ca33d8b161f957a982bee3486b9a85c5bc5de8baf22be1f987b3471e5c0b9c'), // selector_from_tag!("pistols-tournament_token")
   FAME_COIN: BigInt('0x0371b95cb7056eb2d21819662e973ed32c345c989aa9f6097e7811a5665a0b0a'), // selector_from_tag!("pistols-fame_coin")
   FOOLS_COIN: BigInt('0x058070034702ab2b03c2911459d7299e63048e70e3d41f77e1d806b4cb8f2dcd'), // selector_from_tag!("pistols-fools_coin")
@@ -761,47 +802,62 @@ export const CONFIG: type_CONFIG = {
 
 // from: ../dojo/src/models/pack.cairo
 type type_PACK_TYPES = {
-  Unknown: PackDescription, // cairo: PackDescription
-  StarterPack: PackDescription, // cairo: PackDescription
-  GenesisDuelists5x: PackDescription, // cairo: PackDescription
-  FreeDuelist: PackDescription, // cairo: PackDescription
+  Unknown: PackDescriptor, // cairo: PackDescriptor
+  StarterPack: PackDescriptor, // cairo: PackDescriptor
+  GenesisDuelists5x: PackDescriptor, // cairo: PackDescriptor
+  FreeDuelist: PackDescriptor, // cairo: PackDescriptor
+  SingleDuelist: PackDescriptor, // cairo: PackDescriptor
 };
 export const PACK_TYPES: type_PACK_TYPES = {
   Unknown: {
     id: 'Unknown',
     name: 'Unknown',
-    image_url_closed: '/tokens/Unknown.jpg',
-    image_url_open: '/tokens/Unknown.jpg',
+    image_file_closed: 'Unknown.jpg',
+    image_file_open: 'Unknown.jpg',
     can_purchase: false,
     price_lords: 0n,
     quantity: 0,
+    contents: 'Void',
   },
   StarterPack: {
     id: 'StarterPack',
     name: 'Starter Pack',
-    image_url_closed: '/tokens/StarterPack.jpg',
-    image_url_open: '/tokens/StarterPack.jpg',
+    image_file_closed: 'StarterPack.jpg',
+    image_file_open: 'StarterPack.jpg',
     can_purchase: false,
     price_lords: (20n * CONST.ETH_TO_WEI),
     quantity: 2,
+    contents: 'Ser Walker & Lady Vengeance',
   },
   GenesisDuelists5x: {
     id: 'GenesisDuelists5x',
     name: 'Genesis Duelists 5-pack',
-    image_url_closed: '/tokens/GenesisDuelists5x.png',
-    image_url_open: '/tokens/GenesisDuelists5x.png',
+    image_file_closed: 'GenesisDuelists5x.png',
+    image_file_open: 'GenesisDuelists5x.png',
     can_purchase: true,
     price_lords: (50n * CONST.ETH_TO_WEI),
     quantity: 5,
+    contents: 'Five Random Genesis Duelists',
   },
   FreeDuelist: {
     id: 'FreeDuelist',
-    name: 'Free Duelist',
-    image_url_closed: '/tokens/StarterPack.jpg',
-    image_url_open: '/tokens/StarterPack.jpg',
+    name: 'Free Genesis Duelist',
+    image_file_closed: 'FreeDuelist.png',
+    image_file_open: 'FreeDuelist.png',
     can_purchase: false,
     price_lords: (10n * CONST.ETH_TO_WEI),
     quantity: 1,
+    contents: 'One Random Genesis Duelist',
+  },
+  SingleDuelist: {
+    id: 'SingleDuelist',
+    name: 'Single Duelist',
+    image_file_closed: 'SingleDuelist.png',
+    image_file_open: 'SingleDuelist.png',
+    can_purchase: false,
+    price_lords: (10n * CONST.ETH_TO_WEI),
+    quantity: 1,
+    contents: 'One Special Duelist',
   },
 };
 
@@ -811,6 +867,40 @@ type type_PlayerErrors = {
 };
 export const PlayerErrors: type_PlayerErrors = {
   PLAYER_NOT_REGISTERED: 'PLAYER: Not registered',
+};
+
+// from: ../dojo/src/models/ring.cairo
+type type_RING_TYPES = {
+  Unknown: RingDescriptor, // cairo: RingDescriptor
+  GoldSignetRing: RingDescriptor, // cairo: RingDescriptor
+  SilverSignetRing: RingDescriptor, // cairo: RingDescriptor
+  LeadSignetRing: RingDescriptor, // cairo: RingDescriptor
+};
+export const RING_TYPES: type_RING_TYPES = {
+  Unknown: {
+    id: 'Unknown',
+    name: 'Unknown',
+    description: 'Unknown',
+    image_url: '/tokens/Unknown.jpg',
+  },
+  GoldSignetRing: {
+    id: 'GoldSignetRing',
+    name: 'Gold Signet Ring',
+    description: 'Played Season 1',
+    image_url: '/tokens/rings/GoldRing.png',
+  },
+  SilverSignetRing: {
+    id: 'SilverSignetRing',
+    name: 'Silver Signet Ring',
+    description: 'Played Season 2 to 4',
+    image_url: '/tokens/rings/SilverRing.png',
+  },
+  LeadSignetRing: {
+    id: 'LeadSignetRing',
+    name: 'Lead Signet Ring',
+    description: 'Played Season 5 to 9',
+    image_url: '/tokens/rings/LeadRing.png',
+  },
 };
 
 // from: ../dojo/src/models/tournament.cairo
@@ -1068,10 +1158,11 @@ export const TACTICS_POINTS: type_TACTICS_POINTS = {
 
 // from: ../dojo/src/types/duelist_profile.cairo
 type type_COLLECTIONS = {
-  Undefined: CollectionDescription, // cairo: CollectionDescription
-  Character: CollectionDescription, // cairo: CollectionDescription
-  Bot: CollectionDescription, // cairo: CollectionDescription
-  Genesis: CollectionDescription, // cairo: CollectionDescription
+  Undefined: CollectionDescriptor, // cairo: CollectionDescriptor
+  Character: CollectionDescriptor, // cairo: CollectionDescriptor
+  Bot: CollectionDescriptor, // cairo: CollectionDescriptor
+  Genesis: CollectionDescriptor, // cairo: CollectionDescriptor
+  Legends: CollectionDescriptor, // cairo: CollectionDescriptor
 };
 export const COLLECTIONS: type_COLLECTIONS = {
   Undefined: {
@@ -1102,15 +1193,22 @@ export const COLLECTIONS: type_COLLECTIONS = {
     is_playable: true,
     duelist_id_base: 0n,
   },
+  Legends: {
+    name: 'Legends Collection',
+    folder_name: 'legends',
+    profile_count: 1,
+    is_playable: true,
+    duelist_id_base: 0n,
+  },
 };
 
 // from: ../dojo/src/types/duelist_profile.cairo
 type type_CHARACTER_PROFILES = {
-  Unknown: ProfileDescription, // cairo: ProfileDescription
-  Bartender: ProfileDescription, // cairo: ProfileDescription
-  Drunkard: ProfileDescription, // cairo: ProfileDescription
-  Devil: ProfileDescription, // cairo: ProfileDescription
-  Player: ProfileDescription, // cairo: ProfileDescription
+  Unknown: ProfileDescriptor, // cairo: ProfileDescriptor
+  Bartender: ProfileDescriptor, // cairo: ProfileDescriptor
+  Drunkard: ProfileDescriptor, // cairo: ProfileDescriptor
+  Devil: ProfileDescriptor, // cairo: ProfileDescriptor
+  Player: ProfileDescriptor, // cairo: ProfileDescriptor
 };
 export const CHARACTER_PROFILES: type_CHARACTER_PROFILES = {
   Unknown: {
@@ -1132,10 +1230,10 @@ export const CHARACTER_PROFILES: type_CHARACTER_PROFILES = {
 
 // from: ../dojo/src/types/duelist_profile.cairo
 type type_BOT_PROFILES = {
-  Unknown: ProfileDescription, // cairo: ProfileDescription
-  TinMan: ProfileDescription, // cairo: ProfileDescription
-  Scarecrow: ProfileDescription, // cairo: ProfileDescription
-  Leon: ProfileDescription, // cairo: ProfileDescription
+  Unknown: ProfileDescriptor, // cairo: ProfileDescriptor
+  TinMan: ProfileDescriptor, // cairo: ProfileDescriptor
+  Scarecrow: ProfileDescriptor, // cairo: ProfileDescriptor
+  Leon: ProfileDescriptor, // cairo: ProfileDescriptor
 };
 export const BOT_PROFILES: type_BOT_PROFILES = {
   Unknown: {
@@ -1154,76 +1252,76 @@ export const BOT_PROFILES: type_BOT_PROFILES = {
 
 // from: ../dojo/src/types/duelist_profile.cairo
 type type_GENESIS_PROFILES = {
-  Unknown: ProfileDescription, // cairo: ProfileDescription
-  SerWalker: ProfileDescription, // cairo: ProfileDescription
-  LadyVengeance: ProfileDescription, // cairo: ProfileDescription
-  Duke: ProfileDescription, // cairo: ProfileDescription
-  Duella: ProfileDescription, // cairo: ProfileDescription
-  Jameson: ProfileDescription, // cairo: ProfileDescription
-  Misty: ProfileDescription, // cairo: ProfileDescription
-  Karaku: ProfileDescription, // cairo: ProfileDescription
-  Kenzu: ProfileDescription, // cairo: ProfileDescription
-  Pilgrim: ProfileDescription, // cairo: ProfileDescription
-  Jack: ProfileDescription, // cairo: ProfileDescription
-  Pops: ProfileDescription, // cairo: ProfileDescription
-  NynJah: ProfileDescription, // cairo: ProfileDescription
-  Thrak: ProfileDescription, // cairo: ProfileDescription
-  Bloberto: ProfileDescription, // cairo: ProfileDescription
-  Squiddo: ProfileDescription, // cairo: ProfileDescription
-  SlenderDuck: ProfileDescription, // cairo: ProfileDescription
-  Breadman: ProfileDescription, // cairo: ProfileDescription
-  Groggus: ProfileDescription, // cairo: ProfileDescription
-  Pistolopher: ProfileDescription, // cairo: ProfileDescription
-  Secreto: ProfileDescription, // cairo: ProfileDescription
-  ShadowMare: ProfileDescription, // cairo: ProfileDescription
-  Fjolnir: ProfileDescription, // cairo: ProfileDescription
-  ChimpDylan: ProfileDescription, // cairo: ProfileDescription
-  Hinata: ProfileDescription, // cairo: ProfileDescription
-  HelixVex: ProfileDescription, // cairo: ProfileDescription
-  BuccaneerJames: ProfileDescription, // cairo: ProfileDescription
-  TheSensei: ProfileDescription, // cairo: ProfileDescription
-  SenseiTarrence: ProfileDescription, // cairo: ProfileDescription
-  ThePainter: ProfileDescription, // cairo: ProfileDescription
-  Ashe: ProfileDescription, // cairo: ProfileDescription
-  SerGogi: ProfileDescription, // cairo: ProfileDescription
-  TheSurvivor: ProfileDescription, // cairo: ProfileDescription
-  TheFrenchman: ProfileDescription, // cairo: ProfileDescription
-  SerFocger: ProfileDescription, // cairo: ProfileDescription
-  SillySosij: ProfileDescription, // cairo: ProfileDescription
-  BloodBeard: ProfileDescription, // cairo: ProfileDescription
-  Fredison: ProfileDescription, // cairo: ProfileDescription
-  TheBard: ProfileDescription, // cairo: ProfileDescription
-  Ponzimancer: ProfileDescription, // cairo: ProfileDescription
-  DealerTani: ProfileDescription, // cairo: ProfileDescription
-  SerRichard: ProfileDescription, // cairo: ProfileDescription
-  Recipromancer: ProfileDescription, // cairo: ProfileDescription
-  Mataleone: ProfileDescription, // cairo: ProfileDescription
-  FortunaRegem: ProfileDescription, // cairo: ProfileDescription
-  Amaro: ProfileDescription, // cairo: ProfileDescription
-  Mononoke: ProfileDescription, // cairo: ProfileDescription
-  Parsa: ProfileDescription, // cairo: ProfileDescription
-  Jubilee: ProfileDescription, // cairo: ProfileDescription
-  LadyOfCrows: ProfileDescription, // cairo: ProfileDescription
-  BananaDuke: ProfileDescription, // cairo: ProfileDescription
-  LordGladstone: ProfileDescription, // cairo: ProfileDescription
-  LadyStrokes: ProfileDescription, // cairo: ProfileDescription
-  Bliss: ProfileDescription, // cairo: ProfileDescription
-  StormMirror: ProfileDescription, // cairo: ProfileDescription
-  Aldreda: ProfileDescription, // cairo: ProfileDescription
-  Petronella: ProfileDescription, // cairo: ProfileDescription
-  SeraphinaRose: ProfileDescription, // cairo: ProfileDescription
-  LucienDeSombrel: ProfileDescription, // cairo: ProfileDescription
-  FyernVirelock: ProfileDescription, // cairo: ProfileDescription
-  Noir: ProfileDescription, // cairo: ProfileDescription
-  QueenAce: ProfileDescription, // cairo: ProfileDescription
-  JoshPeel: ProfileDescription, // cairo: ProfileDescription
-  IronHandRogan: ProfileDescription, // cairo: ProfileDescription
-  GoodPupStarky: ProfileDescription, // cairo: ProfileDescription
-  ImyaSuspect: ProfileDescription, // cairo: ProfileDescription
-  TheAlchemist: ProfileDescription, // cairo: ProfileDescription
-  PonziusPilate: ProfileDescription, // cairo: ProfileDescription
-  MistressNoodle: ProfileDescription, // cairo: ProfileDescription
-  MasterOfSecrets: ProfileDescription, // cairo: ProfileDescription
+  Unknown: ProfileDescriptor, // cairo: ProfileDescriptor
+  SerWalker: ProfileDescriptor, // cairo: ProfileDescriptor
+  LadyVengeance: ProfileDescriptor, // cairo: ProfileDescriptor
+  Duke: ProfileDescriptor, // cairo: ProfileDescriptor
+  Duella: ProfileDescriptor, // cairo: ProfileDescriptor
+  Jameson: ProfileDescriptor, // cairo: ProfileDescriptor
+  Misty: ProfileDescriptor, // cairo: ProfileDescriptor
+  Karaku: ProfileDescriptor, // cairo: ProfileDescriptor
+  Kenzu: ProfileDescriptor, // cairo: ProfileDescriptor
+  Pilgrim: ProfileDescriptor, // cairo: ProfileDescriptor
+  Jack: ProfileDescriptor, // cairo: ProfileDescriptor
+  Pops: ProfileDescriptor, // cairo: ProfileDescriptor
+  NynJah: ProfileDescriptor, // cairo: ProfileDescriptor
+  Thrak: ProfileDescriptor, // cairo: ProfileDescriptor
+  Bloberto: ProfileDescriptor, // cairo: ProfileDescriptor
+  Squiddo: ProfileDescriptor, // cairo: ProfileDescriptor
+  SlenderDuck: ProfileDescriptor, // cairo: ProfileDescriptor
+  Breadman: ProfileDescriptor, // cairo: ProfileDescriptor
+  Groggus: ProfileDescriptor, // cairo: ProfileDescriptor
+  Pistolopher: ProfileDescriptor, // cairo: ProfileDescriptor
+  Secreto: ProfileDescriptor, // cairo: ProfileDescriptor
+  ShadowMare: ProfileDescriptor, // cairo: ProfileDescriptor
+  Fjolnir: ProfileDescriptor, // cairo: ProfileDescriptor
+  ChimpDylan: ProfileDescriptor, // cairo: ProfileDescriptor
+  Hinata: ProfileDescriptor, // cairo: ProfileDescriptor
+  HelixVex: ProfileDescriptor, // cairo: ProfileDescriptor
+  BuccaneerJames: ProfileDescriptor, // cairo: ProfileDescriptor
+  TheSensei: ProfileDescriptor, // cairo: ProfileDescriptor
+  SenseiTarrence: ProfileDescriptor, // cairo: ProfileDescriptor
+  ThePainter: ProfileDescriptor, // cairo: ProfileDescriptor
+  Ashe: ProfileDescriptor, // cairo: ProfileDescriptor
+  SerGogi: ProfileDescriptor, // cairo: ProfileDescriptor
+  TheSurvivor: ProfileDescriptor, // cairo: ProfileDescriptor
+  TheFrenchman: ProfileDescriptor, // cairo: ProfileDescriptor
+  SerFocger: ProfileDescriptor, // cairo: ProfileDescriptor
+  SillySosij: ProfileDescriptor, // cairo: ProfileDescriptor
+  BloodBeard: ProfileDescriptor, // cairo: ProfileDescriptor
+  Fredison: ProfileDescriptor, // cairo: ProfileDescriptor
+  TheBard: ProfileDescriptor, // cairo: ProfileDescriptor
+  Ponzimancer: ProfileDescriptor, // cairo: ProfileDescriptor
+  DealerTani: ProfileDescriptor, // cairo: ProfileDescriptor
+  SerRichard: ProfileDescriptor, // cairo: ProfileDescriptor
+  Recipromancer: ProfileDescriptor, // cairo: ProfileDescriptor
+  Mataleone: ProfileDescriptor, // cairo: ProfileDescriptor
+  FortunaRegem: ProfileDescriptor, // cairo: ProfileDescriptor
+  Amaro: ProfileDescriptor, // cairo: ProfileDescriptor
+  Mononoke: ProfileDescriptor, // cairo: ProfileDescriptor
+  Parsa: ProfileDescriptor, // cairo: ProfileDescriptor
+  Jubilee: ProfileDescriptor, // cairo: ProfileDescriptor
+  LadyOfCrows: ProfileDescriptor, // cairo: ProfileDescriptor
+  BananaDuke: ProfileDescriptor, // cairo: ProfileDescriptor
+  LordGladstone: ProfileDescriptor, // cairo: ProfileDescriptor
+  LadyStrokes: ProfileDescriptor, // cairo: ProfileDescriptor
+  Bliss: ProfileDescriptor, // cairo: ProfileDescriptor
+  StormMirror: ProfileDescriptor, // cairo: ProfileDescriptor
+  Aldreda: ProfileDescriptor, // cairo: ProfileDescriptor
+  Petronella: ProfileDescriptor, // cairo: ProfileDescriptor
+  SeraphinaRose: ProfileDescriptor, // cairo: ProfileDescriptor
+  LucienDeSombrel: ProfileDescriptor, // cairo: ProfileDescriptor
+  FyernVirelock: ProfileDescriptor, // cairo: ProfileDescriptor
+  Noir: ProfileDescriptor, // cairo: ProfileDescriptor
+  QueenAce: ProfileDescriptor, // cairo: ProfileDescriptor
+  JoshPeel: ProfileDescriptor, // cairo: ProfileDescriptor
+  IronHandRogan: ProfileDescriptor, // cairo: ProfileDescriptor
+  GoodPupStarky: ProfileDescriptor, // cairo: ProfileDescriptor
+  ImyaSuspect: ProfileDescriptor, // cairo: ProfileDescriptor
+  TheAlchemist: ProfileDescriptor, // cairo: ProfileDescriptor
+  PonziusPilate: ProfileDescriptor, // cairo: ProfileDescriptor
+  MistressNoodle: ProfileDescriptor, // cairo: ProfileDescriptor
+  MasterOfSecrets: ProfileDescriptor, // cairo: ProfileDescriptor
 };
 export const GENESIS_PROFILES: type_GENESIS_PROFILES = {
   Unknown: {
@@ -1435,6 +1533,20 @@ export const GENESIS_PROFILES: type_GENESIS_PROFILES = {
   },
   MasterOfSecrets: {
     name: 'Master of Secrets',
+  },
+};
+
+// from: ../dojo/src/types/duelist_profile.cairo
+type type_LEGENDS_PROFILES = {
+  Unknown: ProfileDescriptor, // cairo: ProfileDescriptor
+  TGC1: ProfileDescriptor, // cairo: ProfileDescriptor
+};
+export const LEGENDS_PROFILES: type_LEGENDS_PROFILES = {
+  Unknown: {
+    name: 'Unknown',
+  },
+  TGC1: {
+    name: 'TGC1',
   },
 };
 

@@ -1,13 +1,13 @@
 import { useEffect, useMemo } from 'react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
-import { BigNumberish } from 'starknet'
+import { BigNumberish, CairoCustomEnum } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
 import { useEntityIds, useDojoSystem, keysToEntityId, getCustomEnumCalldata, useStoreModelsByKeys, useStoreModelsById, useAllStoreModels, formatQueryValue, useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
 import { useClientTimestamp, useMemoGate } from '@underware/pistols-sdk/utils/hooks'
 import { isPositiveBigint, bigintToDecimal, bigintToHex, bigintEquals } from '@underware/pistols-sdk/utils'
 import { makeAbiCustomEnum, parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/starknet'
-import { getCollectionDescription, getProfileDescription, getProfileGender, getProfileId, DuelistProfileKey, DuelistGender, getProfileQuote } from '@underware/pistols-sdk/pistols'
+import { getCollectionDescriptor, getProfileDescriptor, getProfileGender, getProfileId, DuelistProfileKey, DuelistGender, getProfileQuote } from '@underware/pistols-sdk/pistols'
 import { PistolsEntity, PistolsSchemaType, getEntityModel, PistolsQueryBuilder, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols/sdk'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { CharacterType } from '/src/data/assets'
@@ -53,13 +53,13 @@ export const useAllDuelistsIds = () => {
   }
 }
 
-const useDuelistProfile = (duelist: models.Duelist) => {
-  const { variant, value } = useMemo(() => parseCustomEnum<constants.DuelistProfile, DuelistProfileKey>(duelist?.duelist_profile), [duelist])
+export const useDuelistProfile = (duelist_profile: CairoCustomEnum | undefined) => {
+  const { variant, value } = useMemo(() => parseCustomEnum<constants.DuelistProfile, DuelistProfileKey>(duelist_profile), [duelist_profile])
   const profileType: constants.DuelistProfile = variant;  // ex: GenesisKey
   const profileKey: DuelistProfileKey = value;            // ex: GenesisKey::Duke
 
-  const profileCollection: constants.CollectionDescription = useMemo(() => getCollectionDescription(profileType), [profileType])
-  const profileDescription: constants.ProfileDescription = useMemo(() => getProfileDescription(profileType, profileKey), [profileType, profileKey])
+  const profileCollection: constants.CollectionDescriptor = useMemo(() => getCollectionDescriptor(profileType), [profileType])
+  const profileDescription: constants.ProfileDescriptor = useMemo(() => getProfileDescriptor(profileType, profileKey), [profileType, profileKey])
   const profileId: number = useMemo(() => getProfileId(profileType, profileKey), [profileType, profileKey])
   const profileGender: DuelistGender = useMemo(() => (getProfileGender(profileType, profileKey)), [profileType, profileKey])
   const duelistName: string = useMemo(() => (profileDescription.name), [profileDescription])
@@ -90,8 +90,8 @@ export const useDuelist = (duelist_id: BigNumberish) => {
   // console.log(`useDuelist() =>`, duelist_id, duelist)
   // console.log(`DuelistMemorial =>`, duelist_id, duelistMemorial)
 
-  const timestampRegistered = useMemo(() => Number(duelist?.timestamps.registered ?? 0), [duelist])
-  const timestampActive = useMemo(() => Number(duelist?.timestamps.active ?? 0), [duelist])
+  const timestampRegistered = useMemo(() => Number(duelist?.timestamps?.registered ?? 0), [duelist])
+  const timestampActive = useMemo(() => Number(duelist?.timestamps?.active ?? 0), [duelist])
   const exists = useMemo(() => Boolean(timestampRegistered), [timestampRegistered])
 
   // inactivity
@@ -127,7 +127,7 @@ export const useDuelist = (duelist_id: BigNumberish) => {
     duelistName,
     isNpc,
     quote,
-  } = useDuelistProfile(duelist)
+  } = useDuelistProfile(duelist?.duelist_profile)
 
   // for animations
   const characterType = useMemo(() => (profileGender == 'Female' ? CharacterType.FEMALE : CharacterType.MALE), [profileGender])
@@ -282,7 +282,7 @@ export const useDuelistStack = (duelist_id: BigNumberish) => {
   const {
     profileType,
     profileId,
-  } = useDuelistProfile(duelist)
+  } = useDuelistProfile(duelist?.duelist_profile)
 
   // get stack
   const { owner } = useOwnerOfDuelist(duelist_id)

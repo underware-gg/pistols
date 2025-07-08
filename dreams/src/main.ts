@@ -29,7 +29,7 @@ import { buildCharacter } from "./context/pistols-character";
 
 export type BotContext = {
   duelist_profile: constants.BotKey
-  description: constants.ProfileDescription
+  description: constants.ProfileDescriptor
   emoji: string
   context: string
 }

@@ -82,7 +82,7 @@ fn test_initializer() {
     let mut sys: TestSystems = setup(0);
     assert_eq!(sys.duelists.symbol(), "DUELIST", "Symbol is wrong");
 
-    let starter_pack_duelist_count: usize = PackType::StarterPack.description().quantity;
+    let starter_pack_duelist_count: usize = PackType::StarterPack.descriptor().quantity;
 
     _assert_minted_count(@sys, starter_pack_duelist_count, "Should eq [starter_pack_duelist_count]");
     assert_eq!(sys.duelists.balance_of(OWNER()), starter_pack_duelist_count.into(), "Should eq [starter_pack_duelist_count]");
@@ -190,7 +190,7 @@ fn test_approve() {
 fn test_transfer_from() {
     let mut sys: TestSystems = setup(0);
 
-    let starter_pack_duelist_count: usize = PackType::StarterPack.description().quantity;
+    let starter_pack_duelist_count: usize = PackType::StarterPack.descriptor().quantity;
 
     assert_eq!(sys.duelists.balance_of(OWNER()), starter_pack_duelist_count.into(), "Should eq [starter_pack_duelist_count]");
     assert_eq!(sys.duelists.balance_of(OTHER()), 0, "Should eq 0");
@@ -852,7 +852,7 @@ fn test_mint_duelist_not_minter() {
     let mut sys: TestSystems = setup(0);
     // let account: ContractAddress = tester::deploy_mock_account();
     // tester::impersonate(account);
-    _protected(@sys).mint_duelists(OWNER(), DuelistProfile::Genesis(GenesisKey::Unknown), 1, 0x1234);
+    _protected(@sys).mint_duelists(OWNER(), 1, DuelistProfile::Genesis(GenesisKey::Unknown), 0x1234);
 }
 
 #[test]

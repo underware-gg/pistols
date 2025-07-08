@@ -1,22 +1,26 @@
 import { BigNumberish } from 'starknet'
 import { bigintToHex } from 'src/utils/misc/types'
 import {
+  CollectionDescriptor,
+  ProfileDescriptor,
   DuelistProfile,
-  ProfileDescription,
   CharacterKey,
   BotKey,
   GenesisKey,
+  LegendsKey,
+  getCharacterKeyValue,
+  getCharacterKeyFromValue,
+  getBotKeyValue,
+  getBotKeyFromValue,
+  getGenesisKeyValue,
+  getGenesisKeyFromValue,
+  getLegendsKeyValue,
+  getLegendsKeyFromValue,
   COLLECTIONS,
   GENESIS_PROFILES,
   CHARACTER_PROFILES,
   BOT_PROFILES,
-  CollectionDescription,
-  getGenesisKeyValue,
-  getCharacterKeyValue,
-  getBotKeyValue,
-  getGenesisKeyFromValue,
-  getCharacterKeyFromValue,
-  getBotKeyFromValue,
+  LEGENDS_PROFILES,
 } from '../generated/constants'
 
 
@@ -24,7 +28,7 @@ import {
 // (duelist_profile.cairo)
 //
 
-export type DuelistProfileKey = GenesisKey | CharacterKey | BotKey;
+export type DuelistProfileKey = GenesisKey | CharacterKey | BotKey | LegendsKey;
 
 // get numeric ID from profile key (string)
 export const getProfileId = (profileType: DuelistProfile, profileKey: DuelistProfileKey): number => {
@@ -32,6 +36,7 @@ export const getProfileId = (profileType: DuelistProfile, profileKey: DuelistPro
     case DuelistProfile.Genesis: return getGenesisKeyValue(profileKey as GenesisKey);
     case DuelistProfile.Character: return getCharacterKeyValue(profileKey as CharacterKey);
     case DuelistProfile.Bot: return getBotKeyValue(profileKey as BotKey);
+    case DuelistProfile.Legends: return getLegendsKeyValue(profileKey as LegendsKey);
     default: return 0;
   };
 }
@@ -42,6 +47,7 @@ export const getProfileKey = (profileType: DuelistProfile, profileId: number): D
     case DuelistProfile.Genesis: return getGenesisKeyFromValue(profileId)
     case DuelistProfile.Character: return getCharacterKeyFromValue(profileId);
     case DuelistProfile.Bot: return getBotKeyFromValue(profileId);
+    case DuelistProfile.Legends: return getLegendsKeyFromValue(profileId);
     default: return CharacterKey.Unknown;
   };
 }
@@ -52,19 +58,20 @@ export const getProfileKey = (profileType: DuelistProfile, profileId: number): D
 //
 
 export const makeProfilePicUrl = (profileId: number | null, profileType = DuelistProfile.Genesis) => {
-  const collection = getCollectionDescription(profileType);
+  const collection = getCollectionDescriptor(profileType);
   return `/profiles/${collection.folder_name}/${('00' + profileId.toString()).slice(-2)}.jpg`;
 }
 
-export const getCollectionDescription = (profile: DuelistProfile): CollectionDescription => {
+export const getCollectionDescriptor = (profile: DuelistProfile): CollectionDescriptor => {
   return COLLECTIONS[profile];
 }
 
-export const getProfileDescription = (profileType: DuelistProfile, profileKey: DuelistProfileKey): ProfileDescription => {
+export const getProfileDescriptor = (profileType: DuelistProfile, profileKey: DuelistProfileKey): ProfileDescriptor => {
   switch (profileType) {
     case DuelistProfile.Genesis: return GENESIS_PROFILES[profileKey as GenesisKey];
     case DuelistProfile.Character: return CHARACTER_PROFILES[profileKey as CharacterKey];
     case DuelistProfile.Bot: return BOT_PROFILES[profileKey as BotKey];
+    case DuelistProfile.Legends: return LEGENDS_PROFILES[profileKey as LegendsKey];
     default: return CHARACTER_PROFILES[CharacterKey.Unknown];
   };
 }
@@ -75,10 +82,11 @@ export const makeCharacterDuelistId = (profileType: DuelistProfile, profileKey: 
       case DuelistProfile.Genesis: return getGenesisKeyValue(profileKey as GenesisKey);
       case DuelistProfile.Character: return getCharacterKeyValue(profileKey as CharacterKey);
       case DuelistProfile.Bot: return getBotKeyValue(profileKey as BotKey);
+      case DuelistProfile.Legends: return getLegendsKeyValue(profileKey as LegendsKey);
       default: return 0;
     };
   };
-  const collection = getCollectionDescription(profileType);
+  const collection = getCollectionDescriptor(profileType);
   return bigintToHex((collection.duelist_id_base | BigInt(_getId())));
 }
 
@@ -90,6 +98,18 @@ export const isCharacterDuelistId = (duelistId: BigNumberish): boolean => {
 export const isBotDuelistId = (duelistId: BigNumberish): boolean => {
   const base_id = BigInt(duelistId) & ~BigInt('0xffffffff');
   return (base_id == COLLECTIONS.Bot.duelist_id_base);
+}
+
+const profileKeys: Record<DuelistProfile, DuelistProfileKey[]> = {
+  [DuelistProfile.Undefined]: [],
+  [DuelistProfile.Character]: Object.keys(CHARACTER_PROFILES).map((k) => k) as CharacterKey[],
+  [DuelistProfile.Bot]: Object.keys(BOT_PROFILES).map((k) => k) as BotKey[],
+  [DuelistProfile.Genesis]: Object.keys(GENESIS_PROFILES).map((k) => k) as GenesisKey[],
+  [DuelistProfile.Legends]: Object.keys(LEGENDS_PROFILES).map((k) => k) as LegendsKey[],
+};
+
+export const getCollectionProfileKeys = (profileType: DuelistProfile): DuelistProfileKey[] => {
+  return profileKeys[profileType] ?? [];
 }
 
 
@@ -182,12 +202,17 @@ const genesisQuotes: Record<GenesisKey, string> = {
   [GenesisKey.MistressNoodle]: "I am bound by sauce and prophecy.",
   [GenesisKey.MasterOfSecrets]: "The web that I spin is not of secrets, but of integrity.",
 };
+const legendsQuotes: Record<LegendsKey, string> = {
+  [LegendsKey.Unknown]: "...",
+  [LegendsKey.TGC1]: "The Golden Company legend.",
+};
 
 export const getProfileQuote = (profileType: DuelistProfile, profileKey: DuelistProfileKey): string => {
   switch (profileType) {
     case DuelistProfile.Character: return characterQuotes[profileKey as CharacterKey];
     case DuelistProfile.Bot: return botQuotes[profileKey as BotKey];
     case DuelistProfile.Genesis: return genesisQuotes[profileKey as GenesisKey];
+    case DuelistProfile.Legends: return legendsQuotes[profileKey as LegendsKey];
     default: return 'Male';
   };
 }
@@ -282,12 +307,17 @@ const genesisGenders: Record<GenesisKey, DuelistGender> = {
   [GenesisKey.MistressNoodle]: 'Female',
   [GenesisKey.MasterOfSecrets]: 'Male',
 };
+const legendsGenders: Record<LegendsKey, DuelistGender> = {
+  [LegendsKey.Unknown]: 'Male',
+  [LegendsKey.TGC1]: 'Male',
+};
 
 export const getProfileGender = (profileType: DuelistProfile, profileKey: DuelistProfileKey): DuelistGender => {
   switch (profileType) {
     case DuelistProfile.Character: return characterGenders[profileKey as CharacterKey];
     case DuelistProfile.Bot: return botGenders[profileKey as BotKey];
     case DuelistProfile.Genesis: return genesisGenders[profileKey as GenesisKey];
+    case DuelistProfile.Legends: return legendsGenders[profileKey as LegendsKey];
     default: return 'Male';
   };
 }

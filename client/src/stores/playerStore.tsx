@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
@@ -9,11 +9,14 @@ import { arrayRemoveValue, bigintEquals, bigintToHex, bigintToNumber, isPositive
 import { useAllStoreModels, useStoreModelsByKeys } from '@underware/pistols-sdk/dojo'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { useDuelistTokenStore } from '/src/stores/tokenStore'
+import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
+import { useMyChallenges } from '/src/stores/challengeStore'
+import { useRingIdsOfAccount } from '/src/hooks/useTokenRings'
 import { SortDirection } from '/src/stores/queryParamsStore'
 import { PlayerColumn } from '/src/stores/queryParamsStore'
 import { useTotals } from '/src/stores/duelistStore'
-import { models } from '@underware/pistols-sdk/pistols/gen'
-import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
+import { models, constants } from '@underware/pistols-sdk/pistols/gen'
+import { parseEnumVariant } from '@underware/pistols-sdk/starknet'
 
 interface NamesByAddress {
   [address: string]: string
@@ -35,7 +38,8 @@ interface State {
   player_bookmarks: PlayerBookmarksByAddress,
   token_bookmarks: TokenBookmarksByAddress,
   updateUsernames: (usernames: Map<string, string>) => void;
-  getPlayerName: (address: BigNumberish) => string | undefined;
+  getPlayernameFromAddress: (address: BigNumberish) => string | undefined;
+  getAddressFromPlayername: (name: string) => BigNumberish | undefined;
   updateMessages: (entities: PistolsEntity[]) => void;
 }
 
@@ -62,9 +66,13 @@ const createStore = () => {
         // console.log("updateUsername()[Player] =>", usernames, state.players)
       });
     },
-    getPlayerName: (address: BigNumberish) => {
+    getPlayernameFromAddress: (address: BigNumberish) => {
       const players_names = get().players_names
       return players_names[_playerKey(address)]
+    },
+    getAddressFromPlayername: (name: string) => {
+      const players_names = get().players_names
+      return Object.keys(players_names).find((key) => players_names[key] === name)
     },
     updateMessages: (entities: PistolsEntity[]) => {
       // console.log("updateMessages()[Player] =>", entities)
@@ -116,7 +124,7 @@ const createStore = () => {
   })))
 }
 
-export const usePlayerStore = createDojoStore<PistolsSchemaType>();
+export const usePlayerEntityStore = createDojoStore<PistolsSchemaType>();
 export const usePlayerDataStore = createStore();
 
 
@@ -125,7 +133,7 @@ export const usePlayerDataStore = createStore();
 //
 
 export const usePlayer = (address: BigNumberish) => {
-  const entities = usePlayerStore((state) => state.entities);
+  const entities = usePlayerEntityStore((state) => state.entities);
   const player = useStoreModelsByKeys<models.Player>(entities, 'Player', [address])
   const flags = useStoreModelsByKeys<models.PlayerFlags>(entities, 'PlayerFlags', [address])
   const teamFlags = useStoreModelsByKeys<models.PlayerTeamFlags>(entities, 'PlayerTeamFlags', [address])
@@ -179,7 +187,7 @@ export const usePlayer = (address: BigNumberish) => {
 }
 
 export const usePlayersAccounts = () => {
-  const entities = usePlayerStore((state) => state.entities)
+  const entities = usePlayerEntityStore((state) => state.entities)
   const players = useAllStoreModels<models.Player>(entities, 'Player')
   const playersAccounts = useMemo(() => (
     players.map((p) => (p.player_address))
@@ -190,7 +198,7 @@ export const usePlayersAccounts = () => {
 }
 
 export const useTeamMembersAccounts = () => {
-  const entities = usePlayerStore((state) => state.entities)
+  const entities = usePlayerEntityStore((state) => state.entities)
   const teamFlags = useAllStoreModels<models.PlayerTeamFlags>(entities, 'PlayerTeamFlags')
   const teamMembersAccounts = useMemo(() => (
     teamFlags.filter((p) => (p.is_team_member || p.is_admin)).map((p) => (p.player_address))
@@ -201,7 +209,7 @@ export const useTeamMembersAccounts = () => {
 }
 
 export const useBlockedPlayersAccounts = () => {
-  const entities = usePlayerStore((state) => state.entities)
+  const entities = usePlayerEntityStore((state) => state.entities)
   const playerFlags = useAllStoreModels<models.PlayerFlags>(entities, 'PlayerFlags')
   const blockedPlayersAccounts = useMemo(() => (
     playerFlags.filter((p) => (p.is_blocked)).map((p) => (p.player_address))
@@ -255,7 +263,7 @@ export const useQueryPlayerIds = (
 ) => {
   const { address } = useAccount()
   const { bookmarkedDuelists } = usePlayer(address)
-  const entities = usePlayerStore((state) => state.entities);
+  const entities = usePlayerEntityStore((state) => state.entities);
   const players = useAllStoreModels<models.Player>(entities, 'Player')
 
   const players_online = usePlayerDataStore((state) => state.players_online);
@@ -274,7 +282,7 @@ export const useQueryPlayerIds = (
 
     // filter by name
     if (filterName) {
-      result = result.filter((p) => getPlayerName(p.player_address)?.toLowerCase().includes(filterName.toLowerCase()))
+      result = result.filter((p) => getPlayernameFromAddress(p.player_address)?.toLowerCase().includes(filterName.toLowerCase()))
     }
 
     // filter by bookmarked duelists
@@ -296,7 +304,7 @@ export const useQueryPlayerIds = (
         return isAscending ? a?.localeCompare(b) : b?.localeCompare(a)
       }
       if (sortColumn == PlayerColumn.Name) {
-        return _sortByName(getPlayerName(player_a.player_address), getPlayerName(player_b.player_address))
+        return _sortByName(getPlayernameFromAddress(player_a.player_address), getPlayernameFromAddress(player_b.player_address))
       }
 
       // Sort by values
@@ -319,13 +327,72 @@ export const useQueryPlayerIds = (
 
 
 
+//--------------------------------
+// Signet rings
+//
+
+export const useRingsOfPlayer = () => {
+  const { address } = useAccount()
+  return useRingsOfOwner(address)
+}
+
+export const useRingsOfOwner = (address: BigNumberish) => {
+  const entities = usePlayerEntityStore((state) => state.entities);
+  const ringModels = useAllStoreModels<models.Ring>(entities, 'Ring')
+  const { ringIds } = useRingIdsOfAccount(address)
+  const ringTypes = useMemo(() => (
+    ringIds
+      // ids to models
+      .map((ringId) => ringModels.find((m) => bigintEquals(m.ring_id, ringId)))
+      // models to ring types
+      .map((m) => parseEnumVariant<constants.RingType>(m.ring_type))
+  ), [ringIds, ringModels])
+  const topRingType = useMemo(() => (
+    ringTypes.includes(constants.RingType.GoldSignetRing) ? constants.RingType.GoldSignetRing :
+      ringTypes.includes(constants.RingType.SilverSignetRing) ? constants.RingType.SilverSignetRing :
+        ringTypes.includes(constants.RingType.LeadSignetRing) ? constants.RingType.LeadSignetRing :
+          null
+  ), [ringTypes])
+  // console.log(`rings => [${topRingType}]`, ringIds, ringTypes)
+  return {
+    ringIds,
+    ringTypes,
+    topRingType,
+  }
+}
+
+export const useDuelIdsForClaimingRings = () => {
+  const { myChallenges } = useMyChallenges()
+  const goldRingDuelIds = useMemo(() => (
+    myChallenges.filter((ch) => Number(ch.season_id) == 1).map((ch) => BigInt(ch.duel_id))
+  ), [myChallenges])
+  const silverRingDuelIds = useMemo(() => (
+    myChallenges.filter((ch) => Number(ch.season_id) >= 2 && Number(ch.season_id) <= 4).map((ch) => BigInt(ch.duel_id))
+  ), [myChallenges])
+  const leadRingDuelIds = useMemo(() => (
+    myChallenges.filter((ch) => Number(ch.season_id) >= 5 && Number(ch.season_id) <= 9).map((ch) => BigInt(ch.duel_id))
+  ), [myChallenges])
+  useEffect(() => {
+    console.log("DUEL RINGS =>", goldRingDuelIds, silverRingDuelIds, leadRingDuelIds)
+  }, [goldRingDuelIds, silverRingDuelIds, leadRingDuelIds])
+  return {
+    goldRingDuelIds,
+    silverRingDuelIds,
+    leadRingDuelIds,
+  }
+}
+
+
 
 //----------------------------------------
 // vanilla getters
 // (non-React)
 //
-export const getPlayerName = (address: BigNumberish): string | undefined => {
-  return usePlayerDataStore.getState().getPlayerName(address)
+export const getPlayernameFromAddress = (address: BigNumberish | undefined): string | undefined => {
+  return usePlayerDataStore.getState().getPlayernameFromAddress(address ?? '')
+}
+export const getAddressFromPlayername = (name: string | undefined): BigNumberish | undefined => {
+  return usePlayerDataStore.getState().getAddressFromPlayername(name ?? '')
 }
 
 export const getPlayerOnlineStatus = (address: BigNumberish): boolean => {

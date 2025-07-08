@@ -8,6 +8,7 @@ pub enum DuelistProfile {
     Character: CharacterKey,    // Character(id)
     Bot: BotKey,                // Bot(id)
     Genesis: GenesisKey,        // Genesis(id)
+    Legends: LegendsKey,        // Legends(id)
     // Eternum: u16,   // Eternum(realm id)
 }
 
@@ -105,13 +106,19 @@ pub enum GenesisKey {
     MasterOfSecrets,        // 69
 }
 
+#[derive(Copy, Drop, Serde, PartialEq, Introspect)]
+pub enum LegendsKey {
+    Unknown,
+    TGC1,
+}
+
 
 
 //--------------------------
-// Collection Descriptions
+// Collection Descriptors
 //
 #[derive(Copy, Drop, Serde, Default)]
-pub struct CollectionDescription {
+pub struct CollectionDescriptor {
     pub name: felt252,          // @generateContants:shortstring
     pub folder_name: felt252,   // @generateContants:shortstring
     pub profile_count: u8,      // number of profiles in the collection
@@ -122,80 +129,87 @@ pub struct CollectionDescription {
 // to be exported to typescript by generateConstants
 // IMPORTANT: names must be in sync with enum DuelistProfile
 mod COLLECTIONS {
-    use super::{CollectionDescription};
-    pub const Undefined: CollectionDescription = CollectionDescription {
+    use super::{CollectionDescriptor};
+    pub const Undefined: CollectionDescriptor = CollectionDescriptor {
         name: 'Undefined',
         folder_name: 'undefined',
         profile_count: 0,
         is_playable: false,
         duelist_id_base: 0,
     };
-    pub const Character: CollectionDescription = CollectionDescription {
+    pub const Character: CollectionDescriptor = CollectionDescriptor {
         name: 'Tavern Characters',
         folder_name: 'characters',
         profile_count: 4,
         is_playable: false,
         duelist_id_base: 0x100000000,
     };
-    pub const Bot: CollectionDescription = CollectionDescription {
+    pub const Bot: CollectionDescriptor = CollectionDescriptor {
         name: 'Practice bots',
         folder_name: 'bots',
         profile_count: 3,
         is_playable: false,
         duelist_id_base: 0x200000000,
     };
-    pub const Genesis: CollectionDescription = CollectionDescription {
+    pub const Genesis: CollectionDescriptor = CollectionDescriptor {
         name: 'Genesis Collection',
         folder_name: 'genesis',
         profile_count: 69,
         is_playable: true,
-        duelist_id_base: 0,
+        duelist_id_base: 0, // playable characters do not convert to duelist_id
+    };
+    pub const Legends: CollectionDescriptor = CollectionDescriptor {
+        name: 'Legends Collection',
+        folder_name: 'legends',
+        profile_count: 1,
+        is_playable: true,
+        duelist_id_base: 0, // playable characters do not convert to duelist_id
     };
 }
 
 
 
 //--------------------------
-// Profile Descriptions
+// Profile Descriptors
 //
 #[derive(Copy, Drop, Serde, Default)]
-pub struct ProfileDescription {
+pub struct ProfileDescriptor {
     pub name: felt252, // @generateContants:shortstring
 }
 
 // IMPORTANT: names must be in sync with enum CharacterKey
 mod CHARACTER_PROFILES {
-    use super::{ProfileDescription};
-    pub const Unknown: ProfileDescription = ProfileDescription {
+    use super::{ProfileDescriptor};
+    pub const Unknown: ProfileDescriptor = ProfileDescriptor {
         name: 'Unknown',
     };
-    pub const Bartender: ProfileDescription = ProfileDescription {
+    pub const Bartender: ProfileDescriptor = ProfileDescriptor {
         name: 'Bartender',
     };
-    pub const Drunkard: ProfileDescription = ProfileDescription {
+    pub const Drunkard: ProfileDescriptor = ProfileDescriptor {
         name: 'Drunkard',
     };
-    pub const Devil: ProfileDescription = ProfileDescription {
+    pub const Devil: ProfileDescriptor = ProfileDescriptor {
         name: 'Devil',
     };
-    pub const Player: ProfileDescription = ProfileDescription {
+    pub const Player: ProfileDescriptor = ProfileDescriptor {
         name: 'Stranger',
     };
 }
 
 // IMPORTANT: names must be in sync with enum BotKey
 mod BOT_PROFILES {
-    use super::{ProfileDescription};
-    pub const Unknown: ProfileDescription = ProfileDescription {
+    use super::{ProfileDescriptor};
+    pub const Unknown: ProfileDescriptor = ProfileDescriptor {
         name: 'Unknown',
     };
-    pub const TinMan: ProfileDescription = ProfileDescription {
+    pub const TinMan: ProfileDescriptor = ProfileDescriptor {
         name: 'Tin Man',
     };
-    pub const Scarecrow: ProfileDescription = ProfileDescription {
+    pub const Scarecrow: ProfileDescriptor = ProfileDescriptor {
         name: 'Scarecrow',
     };
-    pub const Leon: ProfileDescription = ProfileDescription {
+    pub const Leon: ProfileDescriptor = ProfileDescriptor {
         name: 'Leon',
     };
 }
@@ -203,219 +217,230 @@ mod BOT_PROFILES {
 // to be exported to typescript by generateConstants
 // IMPORTANT: names must be in sync with enum GenesisKey
 mod GENESIS_PROFILES {
-    use super::{ProfileDescription};
-    pub const Unknown: ProfileDescription = ProfileDescription {
+    use super::{ProfileDescriptor};
+    pub const Unknown: ProfileDescriptor = ProfileDescriptor {
         name: 'Unknown',
     };
-    pub const SerWalker: ProfileDescription = ProfileDescription {  // 1
+    pub const SerWalker: ProfileDescriptor = ProfileDescriptor {  // 1
         name: 'Ser Walker',
     };
-    pub const LadyVengeance: ProfileDescription = ProfileDescription {  // 2
+    pub const LadyVengeance: ProfileDescriptor = ProfileDescriptor {  // 2
         name: 'Lady Vengeance',
     };
-    pub const Duke: ProfileDescription = ProfileDescription {  // 3
+    pub const Duke: ProfileDescriptor = ProfileDescriptor {  // 3
         name: 'Duke',
     };
-    pub const Duella: ProfileDescription = ProfileDescription {  // 4
+    pub const Duella: ProfileDescriptor = ProfileDescriptor {  // 4
         name: 'Duella',
     };
-    pub const Jameson: ProfileDescription = ProfileDescription {  // 5
+    pub const Jameson: ProfileDescriptor = ProfileDescriptor {  // 5
         name: 'Jameson',
     };
-    pub const Misty: ProfileDescription = ProfileDescription {  // 6
+    pub const Misty: ProfileDescriptor = ProfileDescriptor {  // 6
         name: 'Misty',
     };
-    pub const Karaku: ProfileDescription = ProfileDescription {  // 7
+    pub const Karaku: ProfileDescriptor = ProfileDescriptor {  // 7
         name: 'Karaku',
     };
-    pub const Kenzu: ProfileDescription = ProfileDescription {  // 8
+    pub const Kenzu: ProfileDescriptor = ProfileDescriptor {  // 8
         name: 'Kenzu',
     };
-    pub const Pilgrim: ProfileDescription = ProfileDescription {  // 9
+    pub const Pilgrim: ProfileDescriptor = ProfileDescriptor {  // 9
         name: 'Pilgrim',
     };
-    pub const Jack: ProfileDescription = ProfileDescription {  // 10
+    pub const Jack: ProfileDescriptor = ProfileDescriptor {  // 10
         name: 'Foolish Jack',
     };
-    pub const Pops: ProfileDescription = ProfileDescription {  // 11
+    pub const Pops: ProfileDescriptor = ProfileDescriptor {  // 11
         name: 'Pops',
     };
-    pub const NynJah: ProfileDescription = ProfileDescription {  // 12
+    pub const NynJah: ProfileDescriptor = ProfileDescriptor {  // 12
         name: 'Nyn Jah',
     };
-    pub const Thrak: ProfileDescription = ProfileDescription {  // 13
+    pub const Thrak: ProfileDescriptor = ProfileDescriptor {  // 13
         name: 'Thrak',
     };
-    pub const Bloberto: ProfileDescription = ProfileDescription {  // 14
+    pub const Bloberto: ProfileDescriptor = ProfileDescriptor {  // 14
         name: 'Bloberto',
     };
-    pub const Squiddo: ProfileDescription = ProfileDescription {  // 15
+    pub const Squiddo: ProfileDescriptor = ProfileDescriptor {  // 15
         name: 'Squiddo',
     };
-    pub const SlenderDuck: ProfileDescription = ProfileDescription {  // 16
+    pub const SlenderDuck: ProfileDescriptor = ProfileDescriptor {  // 16
         name: 'Slender Duck',
     };
-    pub const Breadman: ProfileDescription = ProfileDescription {  // 17
+    pub const Breadman: ProfileDescriptor = ProfileDescriptor {  // 17
         name: 'Breadman',
     };
-    pub const Groggus: ProfileDescription = ProfileDescription {  // 18
+    pub const Groggus: ProfileDescriptor = ProfileDescriptor {  // 18
         name: 'Groggus',
     };
-    pub const Pistolopher: ProfileDescription = ProfileDescription {  // 19
+    pub const Pistolopher: ProfileDescriptor = ProfileDescriptor {  // 19
         name: 'Carrot Calc',
     };
-    pub const Secreto: ProfileDescription = ProfileDescription {  // 20
+    pub const Secreto: ProfileDescriptor = ProfileDescriptor {  // 20
         name: 'Secreto',
     };
-    pub const ShadowMare: ProfileDescription = ProfileDescription {  // 21
+    pub const ShadowMare: ProfileDescriptor = ProfileDescriptor {  // 21
         name: 'Shadow Mare',
     };
-    pub const Fjolnir: ProfileDescription = ProfileDescription {  // 22
+    pub const Fjolnir: ProfileDescriptor = ProfileDescriptor {  // 22
         name: 'Fjolnir',
     };
-    pub const ChimpDylan: ProfileDescription = ProfileDescription {  // 23
+    pub const ChimpDylan: ProfileDescriptor = ProfileDescriptor {  // 23
         name: 'Chimp Dylan',
     };
-    pub const Hinata: ProfileDescription = ProfileDescription {  // 24
+    pub const Hinata: ProfileDescriptor = ProfileDescriptor {  // 24
         name: 'Hinata',
     };
-    pub const HelixVex: ProfileDescription = ProfileDescription {  // 25
+    pub const HelixVex: ProfileDescriptor = ProfileDescriptor {  // 25
         name: 'Helix Vex',
     };
-    pub const BuccaneerJames: ProfileDescription = ProfileDescription {  // 26
+    pub const BuccaneerJames: ProfileDescriptor = ProfileDescriptor {  // 26
         name: 'Buccaneer James',
     };
-    pub const TheSensei: ProfileDescription = ProfileDescription {  // 27
+    pub const TheSensei: ProfileDescriptor = ProfileDescriptor {  // 27
         name: 'The Sensei',
     };
-    pub const SenseiTarrence: ProfileDescription = ProfileDescription {  // 28
+    pub const SenseiTarrence: ProfileDescriptor = ProfileDescriptor {  // 28
         name: 'Sensei Tarrence',
     };
-    pub const ThePainter: ProfileDescription = ProfileDescription {  // 29
+    pub const ThePainter: ProfileDescriptor = ProfileDescriptor {  // 29
         name: 'The Painter',
     };
-    pub const Ashe: ProfileDescription = ProfileDescription {  // 30
+    pub const Ashe: ProfileDescriptor = ProfileDescriptor {  // 30
         name: 'Ashe',
     };
-    pub const SerGogi: ProfileDescription = ProfileDescription {  // 31
+    pub const SerGogi: ProfileDescriptor = ProfileDescriptor {  // 31
         name: 'Ser Gogi',
     };
-    pub const TheSurvivor: ProfileDescription = ProfileDescription {  // 32
+    pub const TheSurvivor: ProfileDescriptor = ProfileDescriptor {  // 32
         name: 'The Survivor',
     };
-    pub const TheFrenchman: ProfileDescription = ProfileDescription {  // 33
+    pub const TheFrenchman: ProfileDescriptor = ProfileDescriptor {  // 33
         name: 'The Frenchman',
     };
-    pub const SerFocger: ProfileDescription = ProfileDescription {  // 34
+    pub const SerFocger: ProfileDescriptor = ProfileDescriptor {  // 34
         name: 'Ser FOCGer',
     };
-    pub const SillySosij: ProfileDescription = ProfileDescription {  // 35
+    pub const SillySosij: ProfileDescriptor = ProfileDescriptor {  // 35
         name: 'Silly Sosij',
     };
-    pub const BloodBeard: ProfileDescription = ProfileDescription {  // 36
+    pub const BloodBeard: ProfileDescriptor = ProfileDescriptor {  // 36
         name: 'Blood Beard',
     };
-    pub const Fredison: ProfileDescription = ProfileDescription {  // 37
+    pub const Fredison: ProfileDescriptor = ProfileDescriptor {  // 37
         name: 'Fredison',
     };
-    pub const TheBard: ProfileDescription = ProfileDescription {  // 38
+    pub const TheBard: ProfileDescriptor = ProfileDescriptor {  // 38
         name: 'The Bard',
     };
-    pub const Ponzimancer: ProfileDescription = ProfileDescription {  // 39
+    pub const Ponzimancer: ProfileDescriptor = ProfileDescriptor {  // 39
         name: 'Ponzimancer',
     };
-    pub const DealerTani: ProfileDescription = ProfileDescription {  // 40
+    pub const DealerTani: ProfileDescriptor = ProfileDescriptor {  // 40
         name: 'Dealer Tani',
     };
-    pub const SerRichard: ProfileDescription = ProfileDescription {  // 41
+    pub const SerRichard: ProfileDescriptor = ProfileDescriptor {  // 41
         name: 'Ser Richard',
     };
-    pub const Recipromancer: ProfileDescription = ProfileDescription {  // 42
+    pub const Recipromancer: ProfileDescriptor = ProfileDescriptor {  // 42
         name: 'Ser Recipro',
     };
-    pub const Mataleone: ProfileDescription = ProfileDescription {  // 43
+    pub const Mataleone: ProfileDescriptor = ProfileDescriptor {  // 43
         name: 'Ser Mata',
     };
-    pub const FortunaRegem: ProfileDescription = ProfileDescription {  // 44
+    pub const FortunaRegem: ProfileDescriptor = ProfileDescriptor {  // 44
         name: 'Master of Veils',
     };
-    pub const Amaro: ProfileDescription = ProfileDescription {  // 45
+    pub const Amaro: ProfileDescriptor = ProfileDescriptor {  // 45
         name: 'Tentaccio',
     };
-    pub const Mononoke: ProfileDescription = ProfileDescription {  // 46
+    pub const Mononoke: ProfileDescriptor = ProfileDescriptor {  // 46
         name: 'The Duchess',
     };
-    pub const Parsa: ProfileDescription = ProfileDescription {  // 47
+    pub const Parsa: ProfileDescriptor = ProfileDescriptor {  // 47
         name: 'The Barbarian',
     };
-    pub const Jubilee: ProfileDescription = ProfileDescription {  // 48
+    pub const Jubilee: ProfileDescriptor = ProfileDescriptor {  // 48
         name: 'Magus Jubilee',
     };
-    pub const LadyOfCrows: ProfileDescription = ProfileDescription {  // 49
+    pub const LadyOfCrows: ProfileDescriptor = ProfileDescriptor {  // 49
         name: 'Lady of Crows',
     };
-    pub const BananaDuke: ProfileDescription = ProfileDescription {  // 50
+    pub const BananaDuke: ProfileDescriptor = ProfileDescriptor {  // 50
         name: 'Banana Duke',
     };
-    pub const LordGladstone: ProfileDescription = ProfileDescription {  // 51
+    pub const LordGladstone: ProfileDescriptor = ProfileDescriptor {  // 51
         name: 'Lord Gladstone',
     };
-    pub const LadyStrokes: ProfileDescription = ProfileDescription {  // 52
+    pub const LadyStrokes: ProfileDescriptor = ProfileDescriptor {  // 52
         name: 'Lady Strokes',
     };
-    pub const Bliss: ProfileDescription = ProfileDescription {  // 53
+    pub const Bliss: ProfileDescriptor = ProfileDescriptor {  // 53
         name: 'Bliss',
     };
-    pub const StormMirror: ProfileDescription = ProfileDescription {  // 54
+    pub const StormMirror: ProfileDescriptor = ProfileDescriptor {  // 54
         name: 'Javy The Bold',
     };
-    pub const Aldreda: ProfileDescription = ProfileDescription {  // 55
+    pub const Aldreda: ProfileDescriptor = ProfileDescriptor {  // 55
         name: 'Aldreda',
     };
-    pub const Petronella: ProfileDescription = ProfileDescription {  // 56
+    pub const Petronella: ProfileDescriptor = ProfileDescriptor {  // 56
         name: 'Petronella Gigglefern',
     };
-    pub const SeraphinaRose: ProfileDescription = ProfileDescription {  // 57
+    pub const SeraphinaRose: ProfileDescriptor = ProfileDescriptor {  // 57
         name: 'Seraphina Rose',
     };
-    pub const LucienDeSombrel: ProfileDescription = ProfileDescription {  // 58
+    pub const LucienDeSombrel: ProfileDescriptor = ProfileDescriptor {  // 58
         name: 'Lucien De Sombrel',
     };
-    pub const FyernVirelock: ProfileDescription = ProfileDescription {  // 59
+    pub const FyernVirelock: ProfileDescriptor = ProfileDescriptor {  // 59
         name: 'Fyern Virelock',
     };
-    pub const Noir: ProfileDescription = ProfileDescription {  // 60
+    pub const Noir: ProfileDescriptor = ProfileDescriptor {  // 60
         name: 'Noir',
     };
-    pub const QueenAce: ProfileDescription = ProfileDescription {  // 61
+    pub const QueenAce: ProfileDescriptor = ProfileDescriptor {  // 61
         name: 'Queen Ace',
     };
-    pub const JoshPeel: ProfileDescription = ProfileDescription {  // 62
+    pub const JoshPeel: ProfileDescriptor = ProfileDescriptor {  // 62
         name: 'Josh Peel',
     };
-    pub const IronHandRogan: ProfileDescription = ProfileDescription {  // 63
+    pub const IronHandRogan: ProfileDescriptor = ProfileDescriptor {  // 63
         name: 'Iron Hand Rogan',
     };
-    pub const GoodPupStarky: ProfileDescription = ProfileDescription {  // 64
+    pub const GoodPupStarky: ProfileDescriptor = ProfileDescriptor {  // 64
         name: 'Good Pup Starky',
     };
-    pub const ImyaSuspect: ProfileDescription = ProfileDescription {  // 65
+    pub const ImyaSuspect: ProfileDescriptor = ProfileDescriptor {  // 65
         name: 'Imya Suspect',
     };
-    pub const TheAlchemist: ProfileDescription = ProfileDescription {  // 66
+    pub const TheAlchemist: ProfileDescriptor = ProfileDescriptor {  // 66
         name: 'The Alchemist',
     };
-    pub const PonziusPilate: ProfileDescription = ProfileDescription {  // 67
+    pub const PonziusPilate: ProfileDescriptor = ProfileDescriptor {  // 67
         name: 'Ponzius Pilate',
     };
-    pub const MistressNoodle: ProfileDescription = ProfileDescription {  // 68
+    pub const MistressNoodle: ProfileDescriptor = ProfileDescriptor {  // 68
         name: 'Mistress Noodle',
     };
-    pub const MasterOfSecrets: ProfileDescription = ProfileDescription {  // 69
+    pub const MasterOfSecrets: ProfileDescriptor = ProfileDescriptor {  // 69
         name: 'Master of Secrets',
     };
 }
 
+// to be exported to typescript by generateConstants
+// IMPORTANT: names must be in sync with enum GenesisKey
+mod LEGENDS_PROFILES {
+    use super::{ProfileDescriptor};
+    pub const Unknown: ProfileDescriptor = ProfileDescriptor {
+        name: 'Unknown',
+    };
+    pub const TGC1: ProfileDescriptor = ProfileDescriptor { // 1
+        name: 'TGC1',
+    };
+}
 
 
 //----------------------------------
@@ -436,7 +461,7 @@ pub impl ProfileManagerImpl of ProfileManagerTrait {
             let duelist_profile: DuelistProfile = *profiles.at((i).into());
             let timestamp: u64 = starknet::get_block_timestamp();
             store.set_duelist(@Duelist {
-                duelist_id: duelist_profile.make_duelist_id(),
+                duelist_id: duelist_profile.to_duelist_id(),
                 duelist_profile,
                 timestamps: DuelistTimestamps {
                     registered: timestamp,
@@ -448,13 +473,14 @@ pub impl ProfileManagerImpl of ProfileManagerTrait {
         };
     }
     fn randomize_profile(sample: DuelistProfile, seed: felt252) -> DuelistProfile {
-        let collection: CollectionDescription = sample.collection();
+        let collection: CollectionDescriptor = sample.collection();
         let profile_id: u8 = (seed.to_u8_lossy() % collection.profile_count) + 1;
         (match sample {
             DuelistProfile::Undefined =>        DuelistProfile::Undefined,
             DuelistProfile::Character(_) =>     DuelistProfile::Character(profile_id.into()),
             DuelistProfile::Bot(_) =>           DuelistProfile::Bot(profile_id.into()),
             DuelistProfile::Genesis(_) =>       DuelistProfile::Genesis(profile_id.into()),
+            DuelistProfile::Legends(_) =>       DuelistProfile::Legends(profile_id.into()),
         })
     }
 
@@ -470,6 +496,7 @@ pub impl ProfileManagerImpl of ProfileManagerTrait {
                 DuelistProfile::Character(_) =>     DuelistProfile::Character(i.into()),
                 DuelistProfile::Bot(_) =>           DuelistProfile::Bot(i.into()),
                 DuelistProfile::Genesis(_) =>       DuelistProfile::Genesis(i.into()),
+                DuelistProfile::Legends(_) =>       DuelistProfile::Legends(i.into()),
             };
             if (!profile.exists()) {
                 break;
@@ -479,8 +506,8 @@ pub impl ProfileManagerImpl of ProfileManagerTrait {
         };
         (result.span())
     }
-    fn _get_all_descriptions_by_type(sample: DuelistProfile) -> Span<ProfileDescription> {
-        let mut result: Array<ProfileDescription> = array![];
+    fn _get_all_descriptors_by_type(sample: DuelistProfile) -> Span<ProfileDescriptor> {
+        let mut result: Array<ProfileDescriptor> = array![];
         let mut i: u8 = 1;
         loop {
             let profile: DuelistProfile = match sample {
@@ -488,11 +515,12 @@ pub impl ProfileManagerImpl of ProfileManagerTrait {
                 DuelistProfile::Character(_) =>     DuelistProfile::Character(i.into()),
                 DuelistProfile::Bot(_) =>           DuelistProfile::Bot(i.into()),
                 DuelistProfile::Genesis(_) =>       DuelistProfile::Genesis(i.into()),
+                DuelistProfile::Legends(_) =>       DuelistProfile::Legends(i.into()),
             };
             if (!profile.exists()) {
                 break;
             };
-            result.append(profile.description());
+            result.append(profile.descriptor());
             i += 1;
         };
         (result.span())
@@ -501,15 +529,16 @@ pub impl ProfileManagerImpl of ProfileManagerTrait {
 
 #[generate_trait]
 pub impl DuelistProfileImpl of DuelistProfileTrait {
-    fn collection(self: @DuelistProfile) -> CollectionDescription {
+    fn collection(self: @DuelistProfile) -> CollectionDescriptor {
         (*self).into()
     }
-    fn description(self: @DuelistProfile) -> ProfileDescription {
+    fn descriptor(self: @DuelistProfile) -> ProfileDescriptor {
         (match *self {
             DuelistProfile::Undefined =>        CHARACTER_PROFILES::Unknown,
             DuelistProfile::Character(key) =>   key.into(),
             DuelistProfile::Bot(key) =>         key.into(),
             DuelistProfile::Genesis(key) =>     key.into(),
+            DuelistProfile::Legends(key) =>     key.into(),
         })
     }
     fn profile_id(self: @DuelistProfile) -> u8 {
@@ -518,23 +547,39 @@ pub impl DuelistProfileImpl of DuelistProfileTrait {
             DuelistProfile::Character(key) =>   key.into(),
             DuelistProfile::Bot(key) =>         key.into(),
             DuelistProfile::Genesis(key) =>     key.into(),
+            DuelistProfile::Legends(key) =>     key.into(),
         })
     }
     fn exists(self: @DuelistProfile) -> bool {
         (self.profile_id() != 0)
     }
-    fn make_duelist_id(self: @DuelistProfile) -> u128 {
-        (match *self {
-            DuelistProfile::Character(key) =>   key.into(),
-            DuelistProfile::Bot(key) =>         key.into(),
-            _ => 0,
+    fn to_duelist_id(self: @DuelistProfile) -> u128 {
+        let profile_id: u8 = self.profile_id();
+        let collection: CollectionDescriptor = self.collection();
+        (if (profile_id.is_non_zero() && collection.duelist_id_base.is_non_zero()) {
+            (collection.duelist_id_base | profile_id.into())
+        } else {
+            (0)
         })
     }
+    fn is_playable(self: @DuelistProfile) -> bool {
+        let collection: CollectionDescriptor = self.collection();
+        (collection.is_playable)
+    }
     fn name(self: @DuelistProfile) -> ByteArray {
-        let desc: ProfileDescription = self.description();
+        let desc: ProfileDescriptor = self.descriptor();
         (desc.name.to_string())
     }
-    fn get_uri(self: @DuelistProfile,
+    fn card_name(self: @DuelistProfile) -> ByteArray {
+        (match *self {
+            DuelistProfile::Undefined =>        "Unknown Card",
+            DuelistProfile::Character(_) =>     format!("Character Card: {}", self.name()),
+            DuelistProfile::Bot(_) =>           format!("Bot Card: {}", self.name()),
+            DuelistProfile::Genesis(_) =>       format!("Genesis Card: {}", self.name()),
+            DuelistProfile::Legends(_) =>       format!("Legends Card: {}", self.name()),
+        })
+    }
+    fn get_image_uri(self: @DuelistProfile,
         base_uri: ByteArray,
     ) -> ByteArray {
         let folder_name: ByteArray = self.collection().folder_name.to_string();
@@ -546,20 +591,21 @@ pub impl DuelistProfileImpl of DuelistProfileTrait {
 
 
 //----------------------------------------
-// Descriptions
+// Descriptors
 //
-impl DuelistProfileIntoCollectionDescription of core::traits::Into<DuelistProfile, CollectionDescription> {
-    fn into(self: DuelistProfile) -> CollectionDescription {
+impl DuelistProfileIntoCollectionDescriptor of core::traits::Into<DuelistProfile, CollectionDescriptor> {
+    fn into(self: DuelistProfile) -> CollectionDescriptor {
         match self {
             DuelistProfile::Undefined =>        COLLECTIONS::Undefined,
             DuelistProfile::Character(_) =>     COLLECTIONS::Character,
             DuelistProfile::Bot(_) =>           COLLECTIONS::Bot,
             DuelistProfile::Genesis(_) =>       COLLECTIONS::Genesis,
+            DuelistProfile::Legends(_) =>       COLLECTIONS::Legends,
         }
     }
 }
-impl CharacterKeyIntoDescription of core::traits::Into<CharacterKey, ProfileDescription> {
-    fn into(self: CharacterKey) -> ProfileDescription {
+impl CharacterKeyIntoDescriptor of core::traits::Into<CharacterKey, ProfileDescriptor> {
+    fn into(self: CharacterKey) -> ProfileDescriptor {
         match self {
             CharacterKey::Unknown =>        CHARACTER_PROFILES::Unknown,
             CharacterKey::Bartender =>      CHARACTER_PROFILES::Bartender,
@@ -569,8 +615,8 @@ impl CharacterKeyIntoDescription of core::traits::Into<CharacterKey, ProfileDesc
         }
     }
 }
-impl BotKeyIntoDescription of core::traits::Into<BotKey, ProfileDescription> {
-    fn into(self: BotKey) -> ProfileDescription {
+impl BotKeyIntoDescriptor of core::traits::Into<BotKey, ProfileDescriptor> {
+    fn into(self: BotKey) -> ProfileDescriptor {
         match self {
             BotKey::Unknown =>      BOT_PROFILES::Unknown,
             BotKey::TinMan =>       BOT_PROFILES::TinMan,
@@ -579,8 +625,8 @@ impl BotKeyIntoDescription of core::traits::Into<BotKey, ProfileDescription> {
         }
     }
 }
-impl GenesisKeyIntoDescription of core::traits::Into<GenesisKey, ProfileDescription> {
-    fn into(self: GenesisKey) -> ProfileDescription {
+impl GenesisKeyIntoDescriptor of core::traits::Into<GenesisKey, ProfileDescriptor> {
+    fn into(self: GenesisKey) -> ProfileDescriptor {
         match self {
             GenesisKey::Unknown =>          GENESIS_PROFILES::Unknown,          // 0
             GenesisKey::SerWalker =>        GENESIS_PROFILES::SerWalker,        // 1
@@ -655,7 +701,14 @@ impl GenesisKeyIntoDescription of core::traits::Into<GenesisKey, ProfileDescript
         }
     }
 }
-
+impl LegendsKeyIntoDescriptor of core::traits::Into<LegendsKey, ProfileDescriptor> {
+    fn into(self: LegendsKey) -> ProfileDescriptor {
+        match self {
+            LegendsKey::Unknown =>          LEGENDS_PROFILES::Unknown,
+            LegendsKey::TGC1 =>             LEGENDS_PROFILES::TGC1,             // 1
+        }
+    }
+}
 
 
 //----------------------------------------
@@ -851,32 +904,37 @@ impl U8IntoGenesisKey of core::traits::Into<u8, GenesisKey> {
         else                { GenesisKey::Unknown }
     }
 }
+impl LegendsKeyIntoU8 of core::traits::Into<LegendsKey, u8> {
+    fn into(self: LegendsKey) -> u8 {
+        match self {
+            LegendsKey::Unknown =>         0,
+            LegendsKey::TGC1 =>            1,
+        }
+    }
+}
+impl U8IntoLegendsKey of core::traits::Into<u8, LegendsKey> {
+    fn into(self: u8) -> LegendsKey {
+        if self == 1        { LegendsKey::TGC1 }
+        else                { LegendsKey::Unknown }
+    }
+}
 
 
 
 
 //----------------------------------------
-// Duelist id converters
+// Duelist id converters (NPCs only)
 //
 impl CharacterKeyIntoDuelistId of core::traits::Into<CharacterKey, u128> {
     fn into(self: CharacterKey) -> u128 {
-        let profile_id: u8 = self.into();
-        (if (profile_id.is_non_zero())
-            {COLLECTIONS::Character.duelist_id_base + profile_id.into()}
-            else {0}
-        )
+        (DuelistProfile::Character(self).to_duelist_id())
     }
 }
 impl BotKeyIntoDuelistId of core::traits::Into<BotKey, u128> {
     fn into(self: BotKey) -> u128 {
-        let profile_id: u8 = self.into();
-        (if (profile_id.is_non_zero())
-            {COLLECTIONS::Bot.duelist_id_base + profile_id.into()}
-            else {0}
-        )
+        (DuelistProfile::Bot(self).to_duelist_id())
     }
 }
-
 impl DuelistIdIntoCharacterKey of core::traits::Into<u128, CharacterKey> {
     fn into(self: u128) -> CharacterKey {
         let id: u128 = self ^ COLLECTIONS::Character.duelist_id_base;
@@ -893,9 +951,6 @@ impl DuelistIdIntoBotKey of core::traits::Into<u128, BotKey> {
 }
 
 
-
-
-
 //---------------------------
 // String converters
 //
@@ -906,6 +961,7 @@ impl DuelistProfileIntoByteArray of core::traits::Into<DuelistProfile, ByteArray
             DuelistProfile::Character(_) =>     "Character",
             DuelistProfile::Bot(_) =>           "Bot",
             DuelistProfile::Genesis(_) =>       "Genesis",
+            DuelistProfile::Legends(_) =>       "Legends",
         }
     }
 }
@@ -917,6 +973,7 @@ pub impl DuelistProfileDisplay of core::fmt::Display<DuelistProfile> {
             DuelistProfile::Character(key) =>   { let id: u8 = (*key).into(); format!("Character::{}({})", self.name(), id) },
             DuelistProfile::Bot(key) =>         { let id: u8 = (*key).into(); format!("Bot::{}({})", self.name(), id) },
             DuelistProfile::Genesis(key) =>     { let id: u8 = (*key).into(); format!("Genesis::{}({})", self.name(), id) },
+            DuelistProfile::Legends(key) =>     { let id: u8 = (*key).into(); format!("Legends::{}({})", self.name(), id) },
         };
         f.buffer.append(@result);
         Result::Ok(())
@@ -950,6 +1007,13 @@ pub impl GenesisKeyDebug of core::fmt::Debug<GenesisKey> {
         Result::Ok(())
     }
 }
+pub impl LegendsKeyDebug of core::fmt::Debug<LegendsKey> {
+    fn fmt(self: @LegendsKey, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        let result: ByteArray = DuelistProfile::Legends(*self).name();
+        f.buffer.append(@result);
+        Result::Ok(())
+    }
+}
 
 
 
@@ -962,88 +1026,63 @@ mod unit {
 
     use super::{
         DuelistProfile, DuelistProfileTrait,
-        GenesisKey, CharacterKey, BotKey,
-        ProfileDescription,
+        GenesisKey, CharacterKey, BotKey, LegendsKey,
+        ProfileDescriptor,
         ProfileManagerTrait,
         COLLECTIONS,
     };
 
     #[test]
-    fn test_get_all_profiles_by_type() {
+    fn test_profile_counts() {
         let profiles: Span<DuelistProfile> = ProfileManagerTrait::_get_all_profiles_by_type(DuelistProfile::Undefined);
-        assert_eq!(profiles.len(), 0, "0");
+        let descriptors: Span<ProfileDescriptor> = ProfileManagerTrait::_get_all_descriptors_by_type(DuelistProfile::Undefined);
+        assert_eq!(profiles.len(), 0, "Undefined.profiles");
+        assert_eq!(descriptors.len(), 0, "Undefined.descriptors");
         let profiles: Span<DuelistProfile> = ProfileManagerTrait::_get_all_profiles_by_type(DuelistProfile::Character(0_u8.into()));
-        assert_eq!(profiles.len(), COLLECTIONS::Character.profile_count.into(), "racter.profile_");
+        let descriptors: Span<ProfileDescriptor> = ProfileManagerTrait::_get_all_descriptors_by_type(DuelistProfile::Character(0_u8.into()));
+        assert_eq!(profiles.len(), COLLECTIONS::Character.profile_count.into(), "Character.profiles");
+        assert_eq!(descriptors.len(), COLLECTIONS::Character.profile_count.into(), "Character.descriptors");
         let profiles: Span<DuelistProfile> = ProfileManagerTrait::_get_all_profiles_by_type(DuelistProfile::Bot(0_u8.into()));
-        assert_eq!(profiles.len(), COLLECTIONS::Bot.profile_count.into(), "Bot.profile_count");
+        let descriptors: Span<ProfileDescriptor> = ProfileManagerTrait::_get_all_descriptors_by_type(DuelistProfile::Bot(0_u8.into()));
+        assert_eq!(profiles.len(), COLLECTIONS::Bot.profile_count.into(), "Bot.profiles");
+        assert_eq!(descriptors.len(), COLLECTIONS::Bot.profile_count.into(), "Bot.descriptors");
         let profiles: Span<DuelistProfile> = ProfileManagerTrait::_get_all_profiles_by_type(DuelistProfile::Genesis(0_u8.into()));
-        assert_eq!(profiles.len(), COLLECTIONS::Genesis.profile_count.into(), "Genesis.profile_count");
+        let descriptors: Span<ProfileDescriptor> = ProfileManagerTrait::_get_all_descriptors_by_type(DuelistProfile::Genesis(0_u8.into()));
+        assert_eq!(profiles.len(), COLLECTIONS::Genesis.profile_count.into(), "Genesis.profiles");
+        assert_eq!(descriptors.len(), COLLECTIONS::Genesis.profile_count.into(), "Genesis.descriptors");
+        let profiles: Span<DuelistProfile> = ProfileManagerTrait::_get_all_profiles_by_type(DuelistProfile::Legends(0_u8.into()));
+        let descriptors: Span<ProfileDescriptor> = ProfileManagerTrait::_get_all_descriptors_by_type(DuelistProfile::Legends(0_u8.into()));
+        assert_eq!(profiles.len(), COLLECTIONS::Legends.profile_count.into(), "Legends.profiles");
+        assert_eq!(descriptors.len(), COLLECTIONS::Legends.profile_count.into(), "Legends.descriptors");
     }
-
-    #[test]
-    fn test_get_all_descriptions_by_type() {
-        let descriptions: Span<ProfileDescription> = ProfileManagerTrait::_get_all_descriptions_by_type(DuelistProfile::Undefined);
-        assert_eq!(descriptions.len(), 0, "0");
-        let descriptions: Span<ProfileDescription> = ProfileManagerTrait::_get_all_descriptions_by_type(DuelistProfile::Character(0_u8.into()));
-        assert_eq!(descriptions.len(), COLLECTIONS::Character.profile_count.into(), "Character.profile_count");
-        let descriptions: Span<ProfileDescription> = ProfileManagerTrait::_get_all_descriptions_by_type(DuelistProfile::Bot(0_u8.into()));
-        assert_eq!(descriptions.len(), COLLECTIONS::Bot.profile_count.into(), "Bot.profile_count");
-        let descriptions: Span<ProfileDescription> = ProfileManagerTrait::_get_all_descriptions_by_type(DuelistProfile::Genesis(0_u8.into()));
-        assert_eq!(descriptions.len(), COLLECTIONS::Genesis.profile_count.into(), "Genesis.profile_count");
-    }
-
+    
     //
     // test profiles
     //
     fn _test_invalid_profile(profile: DuelistProfile) {
         assert_eq!(profile.exists(), false, "(0) ! exists");
-        let desc: ProfileDescription = profile.description();
+        let desc: ProfileDescriptor = profile.descriptor();
         assert_eq!(desc.name, 'Unknown', "(0) bad name: {}", desc.name);
-        assert_eq!(profile.make_duelist_id(), 0, "(0) bad duelist_id");
+        assert_eq!(profile.to_duelist_id(), 0, "(0) bad duelist_id");
     }
 
     #[test]
-    fn test_descriptions_genesis() {
-        // invalid
-        let invalid_profile: DuelistProfile = DuelistProfile::Genesis(0_u8.into());
-        _test_invalid_profile(invalid_profile);
-        // validate profiles
-        let descriptions: Span<ProfileDescription> = ProfileManagerTrait::_get_all_descriptions_by_type(invalid_profile);
-        let mut last_profile_id: u8 = 0;
-        let mut last_desc: ProfileDescription = Default::default();
-        let mut p: u8 = 1;
-        while (p.into() <= descriptions.len()) {
-            let profile: DuelistProfile = DuelistProfile::Genesis(p.into());
-            assert!(profile.exists(), "({}) exists", p);
-            assert_eq!(profile.make_duelist_id(), 0, "({}) bad duelist_id", p);
-            assert_ne!(profile, DuelistProfile::Genesis(GenesisKey::Unknown), "Duelist({}) is Unknown", p);
-            assert_eq!(p, profile.profile_id(), "({}) bad p", p);
-            assert_eq!(p, last_profile_id + 1, "({}) == ({}): p", p, p-1);
-            let desc: ProfileDescription = *descriptions.at((p-1).into());
-            assert_ne!(desc.name, last_desc.name, "({}) == ({}): name {}", p, p-1, desc.name);
-            last_profile_id = p;
-            last_desc = desc;
-            p += 1;
-        };
-    }
-
-    #[test]
-    fn test_descriptions_character() {
+    fn test_descriptors_character() {
         // invalid
         let invalid_profile: DuelistProfile = DuelistProfile::Character(0_u8.into());
         _test_invalid_profile(invalid_profile);
         // validate profiles
-        let descriptions: Span<ProfileDescription> = ProfileManagerTrait::_get_all_descriptions_by_type(invalid_profile);
+        let descriptors: Span<ProfileDescriptor> = ProfileManagerTrait::_get_all_descriptors_by_type(invalid_profile);
         let mut last_profile_id: u8 = 0;
-        let mut last_desc: ProfileDescription = Default::default();
+        let mut last_desc: ProfileDescriptor = Default::default();
         let mut p: u8 = 1;
-        while (p.into() <= descriptions.len()) {
+        while (p.into() <= descriptors.len()) {
             let profile: DuelistProfile = DuelistProfile::Character(p.into());
             assert!(profile.exists(), "({}) exists", p);
             assert_ne!(profile, DuelistProfile::Character(CharacterKey::Unknown), "({}) is Unknown", p);
             assert_eq!(p, profile.profile_id(), "({}) bad p", p);
             assert_eq!(p, last_profile_id + 1, "({}) == ({}): p", p, p-1);
-            let desc: ProfileDescription = *descriptions.at((p-1).into());
+            let desc: ProfileDescriptor = *descriptors.at((p-1).into());
             assert_ne!(desc.name, last_desc.name, "({}) == ({}): name {}", p, p-1, desc.name);
             last_profile_id = p;
             last_desc = desc;
@@ -1052,22 +1091,22 @@ mod unit {
     }
 
     #[test]
-    fn test_descriptions_bot() {
+    fn test_descriptors_bot() {
         // invalid
         let invalid_profile: DuelistProfile = DuelistProfile::Bot(0_u8.into());
         _test_invalid_profile(invalid_profile);
         // validate profiles
-        let descriptions: Span<ProfileDescription> = ProfileManagerTrait::_get_all_descriptions_by_type(invalid_profile);
+        let descriptors: Span<ProfileDescriptor> = ProfileManagerTrait::_get_all_descriptors_by_type(invalid_profile);
         let mut last_profile_id: u8 = 0;
-        let mut last_desc: ProfileDescription = Default::default();
+        let mut last_desc: ProfileDescriptor = Default::default();
         let mut p: u8 = 1;
-        while (p.into() <= descriptions.len()) {
+        while (p.into() <= descriptors.len()) {
             let profile: DuelistProfile = DuelistProfile::Bot(p.into());
             assert!(profile.exists(), "({}) exists", p);
             assert_ne!(profile, DuelistProfile::Bot(BotKey::Unknown), "({}) is Unknown", p);
             assert_eq!(p, profile.profile_id(), "({}) bad profile_id", p);
             assert_eq!(p, last_profile_id + 1, "({}) == ({}): profile_id", p, p-1);
-            let desc: ProfileDescription = *descriptions.at((p-1).into());
+            let desc: ProfileDescriptor = *descriptors.at((p-1).into());
             assert_ne!(desc.name, last_desc.name, "({}) == ({}): name {}", p, p-1, desc.name);
             last_profile_id = p;
             last_desc = desc;
@@ -1076,25 +1115,64 @@ mod unit {
     }
 
     #[test]
-    fn test_profile_duelist_ids_genesis() {
-        assert_eq!(COLLECTIONS::Genesis.duelist_id_base, 0, "bad base id");
+    fn test_descriptors_genesis() {
+        // invalid
+        let invalid_profile: DuelistProfile = DuelistProfile::Genesis(0_u8.into());
+        _test_invalid_profile(invalid_profile);
+        // validate profiles
+        let descriptors: Span<ProfileDescriptor> = ProfileManagerTrait::_get_all_descriptors_by_type(invalid_profile);
+        let mut last_profile_id: u8 = 0;
+        let mut last_desc: ProfileDescriptor = Default::default();
         let mut p: u8 = 1;
-        while (p <= COLLECTIONS::Genesis.profile_count.into()) {
-            let key: GenesisKey = p.into();
-            assert_eq!(DuelistProfile::Genesis(key).make_duelist_id(), 0, "({}) bad type_id", p);
+        while (p.into() <= descriptors.len()) {
+            let profile: DuelistProfile = DuelistProfile::Genesis(p.into());
+            assert!(profile.exists(), "({}) exists", p);
+            assert_eq!(profile.to_duelist_id(), 0, "({}) bad duelist_id", p);
+            assert_ne!(profile, DuelistProfile::Genesis(GenesisKey::Unknown), "({}) is Unknown", p);
+            assert_eq!(p, profile.profile_id(), "({}) bad p", p);
+            assert_eq!(p, last_profile_id + 1, "({}) == ({}): p", p, p-1);
+            let desc: ProfileDescriptor = *descriptors.at((p-1).into());
+            assert_ne!(desc.name, last_desc.name, "({}) == ({}): name {}", p, p-1, desc.name);
+            last_profile_id = p;
+            last_desc = desc;
+            p += 1;
+        };
+    }
+
+    #[test]
+    fn test_descriptors_legends() {
+        // invalid
+        let invalid_profile: DuelistProfile = DuelistProfile::Legends(0_u8.into());
+        _test_invalid_profile(invalid_profile);
+        // validate profiles
+        let descriptors: Span<ProfileDescriptor> = ProfileManagerTrait::_get_all_descriptors_by_type(invalid_profile);
+        let mut last_profile_id: u8 = 0;
+        let mut last_desc: ProfileDescriptor = Default::default();
+        let mut p: u8 = 1;
+        while (p.into() <= descriptors.len()) {
+            let profile: DuelistProfile = DuelistProfile::Legends(p.into());
+            assert!(profile.exists(), "({}) exists", p);
+            assert_ne!(profile, DuelistProfile::Legends(LegendsKey::Unknown), "({}) is Unknown", p);
+            assert_eq!(p, profile.profile_id(), "({}) bad profile_id", p);
+            assert_eq!(p, last_profile_id + 1, "({}) == ({}): profile_id", p, p-1);
+            let desc: ProfileDescriptor = *descriptors.at((p-1).into());
+            assert_ne!(desc.name, last_desc.name, "({}) == ({}): name {}", p, p-1, desc.name);
+            last_profile_id = p;
+            last_desc = desc;
             p += 1;
         };
     }
 
     #[test]
     fn test_profile_duelist_ids_character() {
-        assert_gt!(COLLECTIONS::Character.duelist_id_base, 0, "bad base id");
+        let duelist_id_base: u128 = COLLECTIONS::Character.duelist_id_base;
+        assert_gt!(duelist_id_base, 0, "bad base id");
         let mut p: u8 = 1;
         while (p <= COLLECTIONS::Character.profile_count.into()) {
             let key: CharacterKey = p.into();
-            let expected_id: u128 = (COLLECTIONS::Character.duelist_id_base | key.into());
-            assert_gt!(expected_id, COLLECTIONS::Character.duelist_id_base, "({}) low id", p);
-            assert_eq!(expected_id, DuelistProfile::Character(key).make_duelist_id(), "({}) bad type_id", p);
+            let expected_id: u128 = (duelist_id_base | key.into());
+            assert_gt!(expected_id, duelist_id_base, "({}) low id", p);
+            assert_eq!(expected_id, DuelistProfile::Character(key).to_duelist_id(), "({}) bad type_id", p);
             assert_eq!(expected_id.into(), key, "({}) bad profile", p);
             p += 1;
         };
@@ -1102,14 +1180,38 @@ mod unit {
 
     #[test]
     fn test_profile_duelist_ids_bot() {
-        assert_gt!(COLLECTIONS::Bot.duelist_id_base, 0, "bad base id");
+        let duelist_id_base: u128 = COLLECTIONS::Bot.duelist_id_base;
+        assert_gt!(duelist_id_base, 0, "bad base id");
         let mut p: u8 = 1;
         while (p <= COLLECTIONS::Bot.profile_count.into()) {
             let key: BotKey = p.into();
-            let expected_id: u128 = (COLLECTIONS::Bot.duelist_id_base | key.into());
-            assert_gt!(expected_id, COLLECTIONS::Bot.duelist_id_base, "({}) low id", p);
-            assert_eq!(expected_id, DuelistProfile::Bot(key).make_duelist_id(), "({}) bad type_id", p);
+            let expected_id: u128 = (duelist_id_base | key.into());
+            assert_gt!(expected_id, duelist_id_base, "({}) low id", p);
+            assert_eq!(expected_id, DuelistProfile::Bot(key).to_duelist_id(), "({}) bad type_id", p);
             assert_eq!(expected_id.into(), key, "({}) bad profile", p);
+            p += 1;
+        };
+    }
+
+    #[test]
+    fn test_profile_duelist_ids_genesis() {
+        let duelist_id_base: u128 = COLLECTIONS::Genesis.duelist_id_base;
+        assert_eq!(duelist_id_base, 0, "bad base id");
+        let mut p: u8 = 1;
+        while (p <= COLLECTIONS::Genesis.profile_count.into()) {
+            let key: GenesisKey = p.into();
+            assert_eq!(DuelistProfile::Genesis(key).to_duelist_id(), 0, "({}) bad type_id", p);
+            p += 1;
+        };
+    }
+
+    #[test]
+    fn test_profile_duelist_ids_legends() {
+        assert_eq!(COLLECTIONS::Legends.duelist_id_base, 0, "bad base id");
+        let mut p: u8 = 1;
+        while (p <= COLLECTIONS::Legends.profile_count.into()) {
+            let key: LegendsKey = p.into();
+            assert_eq!(DuelistProfile::Legends(key).to_duelist_id(), 0, "({}) bad type_id", p);
             p += 1;
         };
     }

@@ -22,7 +22,12 @@ pub use pistols::models::{
         PlayerDuelistStack, PlayerDuelistStackValue,
     },
     pack::{
-        Pack, PackValue,
+        Pack,
+    },
+    ring::{
+        Ring, RingValue,
+        RingBalance, RingBalanceValue,
+        RingType,
     },
     challenge::{
         Challenge, ChallengeValue,
@@ -120,9 +125,27 @@ pub impl StoreImpl of StoreTrait {
     fn get_pack(self: @Store, pack_id: u128) -> Pack {
         (self.world.read_model(pack_id))
     }
+    // #[inline(always)]
+    // fn get_pack_value(self: @Store, pack_id: u128) -> PackValue {
+    //     (self.world.read_value(pack_id))
+    // }
+
     #[inline(always)]
-    fn get_pack_value(self: @Store, pack_id: u128) -> PackValue {
-        (self.world.read_value(pack_id))
+    fn get_ring(self: @Store, ring_id: u128) -> Ring {
+        (self.world.read_model(ring_id))
+    }
+    #[inline(always)]
+    fn get_ring_value(self: @Store, ring_id: u128) -> RingValue {
+        (self.world.read_value(ring_id))
+    }
+
+    #[inline(always)]
+    fn get_ring_balance(self: @Store, player_address: ContractAddress, ring_type: RingType) -> RingBalance {
+        (self.world.read_model((player_address, ring_type),))
+    }
+    #[inline(always)]
+    fn get_ring_balance_value(self: @Store, player_address: ContractAddress, ring_type: RingType) -> RingBalanceValue {
+        (self.world.read_value((player_address, ring_type),))
     }
 
     #[inline(always)]
@@ -320,7 +343,18 @@ pub impl StoreImpl of StoreTrait {
         self.world.write_model(model);
     }
 
+    #[inline(always)]
     fn set_pack(ref self: Store, model: @Pack) {
+        self.world.write_model(model);
+    }
+
+    #[inline(always)]
+    fn set_ring(ref self: Store, model: @Ring) {
+        self.world.write_model(model);
+    }
+
+    #[inline(always)]
+    fn set_ring_balance(ref self: Store, model: @RingBalance) {
         self.world.write_model(model);
     }
 
@@ -524,6 +558,10 @@ pub impl StoreImpl of StoreTrait {
             address,
             self.get_duelist_profile(duelist_id)
         ),), selector!("active_duelist_id")))
+    }
+    #[inline(always)]
+    fn get_ring_type(self: @Store, ring_id: u128) -> RingType {
+        (self.world.read_member(Model::<Ring>::ptr_from_keys(ring_id), selector!("ring_type")))
     }
 
     //----------------------------------

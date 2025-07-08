@@ -13,7 +13,7 @@ import { assets as cardsAssets } from './assets/generated/cards'
 import { shortAddress } from 'src/utils/misc/types'
 import { map } from 'src/utils/misc/math'
 import { getAsset } from './assets/assets'
-import { getProfileDescription, getProfileKey, makeProfilePicUrl } from '../misc/profiles'
+import { getProfileDescriptor, getProfileKey, makeProfilePicUrl } from '../misc/profiles'
 import * as constants from '../generated/constants'
 
 
@@ -92,7 +92,7 @@ const _renderStat = (x: number, y: number, key: string, value: string) => {
 
 export const renderSvg = async (props: DuelistSvgProps, options: SvgRenderOptions = {}): Promise<string> => {
   const profile_key = getProfileKey(props.profile_type, props.profile_id)
-  const profile = getProfileDescription(props.profile_type, profile_key)
+  const profile = getProfileDescriptor(props.profile_type, profile_key)
   const profile_url = makeProfilePicUrl(props.profile_id, props.profile_type);
   const card_url = ArchetypeCardUrl[props.archetype];
   const life_bar_value = (props.fame % 1000);

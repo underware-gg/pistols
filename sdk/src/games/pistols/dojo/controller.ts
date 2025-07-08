@@ -4,13 +4,15 @@ import { getNetworkConfig, NetworkId } from 'src/games/pistols/config/networks'
 import { makeControllerConnector } from 'src/games/pistols/dojo/controller_connector'
 import { makePistolsPolicies } from 'src/games/pistols/dojo/policies'
 import {
+  NAMESPACE,
   getLordsAddress,
-  getFameAddress,
+  // getFameAddress,
   getFoolsAddress,
   getDuelistTokenAddress,
   getDuelTokenAddress,
   getPackTokenAddress,
-  NAMESPACE,
+  getRingTokenAddress,
+  // getTournamentTokenAddress,
 } from 'src/games/pistols/config/config'
 
 export const makePistolsControllerConnector = (networkId: NetworkId, env?: any): Connector => {
@@ -24,6 +26,8 @@ export const makePistolsControllerConnector = (networkId: NetworkId, env?: any):
       getDuelistTokenAddress(networkId),
       getDuelTokenAddress(networkId),
       getPackTokenAddress(networkId),
+      getRingTokenAddress(networkId), 
+      // getTournamentTokenAddress(networkId),
     ],
   }
 

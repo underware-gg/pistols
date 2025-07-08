@@ -20,6 +20,8 @@ pub enum Activity {
     ChallengeResolved,  // 13
     ChallengeDraw,      // 14
     ClaimedGift,        // 15
+    AirdroppedPack,     // 16
+    ClaimedRing,        // 17
 }
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
@@ -180,8 +182,11 @@ pub impl ActivityImpl of ActivityTrait {
     }
     fn is_public(self: @Activity) -> bool {
         match self {
-            Activity::PackPurchased |
-            Activity::PackOpened => false,
+            Activity::PackPurchased
+            | Activity::PackOpened
+            | Activity::AirdroppedPack
+            | Activity::ClaimedRing
+            => false,
             _ => true,
         }
     }

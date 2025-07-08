@@ -17,7 +17,7 @@ const Header = Table.Header
 const HeaderCell = Table.HeaderCell
 
 type Profiles = {
-  [key: string]: constants.ProfileDescription,
+  [key: string]: constants.ProfileDescriptor,
 }
 
 export default function ProfilesTestPage() {
@@ -25,6 +25,8 @@ export default function ProfilesTestPage() {
     <App>
       <Container>
         <TestPageMenu />
+        <br />
+        <Profiles profiles={constants.LEGENDS_PROFILES as unknown as Profiles} profileType={constants.DuelistProfile.Legends} />
         <br />
         <Profiles profiles={constants.GENESIS_PROFILES as unknown as Profiles} profileType={constants.DuelistProfile.Genesis} />
         <br />

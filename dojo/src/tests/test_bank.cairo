@@ -5,7 +5,7 @@ mod tests {
     use pistols::models::{
         challenge::{DuelType},
         pool::{Pool, PoolType},
-        pack::{Pack, PackType, PackTypeTrait},
+        pack::{PackType, PackTypeTrait},
         leaderboard::{Leaderboard, LeaderboardTrait, LeaderboardPosition},
         season::{SeasonConfig},
     };
@@ -425,8 +425,8 @@ tester::print_pools(@sys, 1, "COLLECTED");
         let mut sys: TestSystems = tester::setup_world(FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE);
 
         let bank_address: ContractAddress = sys.bank.contract_address;
-        let price_starter: u128 = PackType::StarterPack.description().price_lords;
-        let price_pack: u128 = PackType::GenesisDuelists5x.description().price_lords;
+        let price_starter: u128 = PackType::StarterPack.descriptor().price_lords;
+        let price_pack: u128 = PackType::GenesisDuelists5x.descriptor().price_lords;
         assert_ne!(price_starter, 0, "price_starter");
         assert_ne!(price_pack, 0, "price_pack");
 
@@ -454,14 +454,14 @@ tester::print_pools(@sys, 1, "COLLECTED");
         pool_peg = tester::assert_balance(sys.store.get_pool(PoolType::FamePeg).balance_lords, pool_peg, 0, price_starter, "pool_peg CLAIM");
 
         // purchase to PoolType::Purchases
-        let pack: Pack = tester::execute_pack_purchase(@sys, OWNER(), PackType::GenesisDuelists5x);
+        let pack_id: u128 = tester::execute_pack_purchase(@sys, OWNER(), PackType::GenesisDuelists5x);
         balance_bank = tester::assert_lords_balance(sys.lords, bank_address, balance_bank, 0, price_pack, "balance_bank PURCHASE");
         pool_claimable = tester::assert_balance(sys.store.get_pool(PoolType::Claimable).balance_lords, pool_claimable, 0, 0, "pool_claimable PURCHASE");
         pool_purchases = tester::assert_balance(sys.store.get_pool(PoolType::Purchases).balance_lords, pool_purchases, 0, price_pack, "pool_purchases PURCHASE");
         pool_peg = tester::assert_balance(sys.store.get_pool(PoolType::FamePeg).balance_lords, pool_peg, 0, 0, "pool_peg PURCHASE");
 
         // open pack
-        tester::execute_pack_open(@sys, OWNER(), pack.pack_id);
+        tester::execute_pack_open(@sys, OWNER(), pack_id);
         balance_bank = tester::assert_lords_balance(sys.lords, bank_address, balance_bank, 0, 0, "balance_bank PURCHASE");
         pool_claimable = tester::assert_balance(sys.store.get_pool(PoolType::Claimable).balance_lords, pool_claimable, 0, 0, "pool_claimable PURCHASE");
         pool_purchases = tester::assert_balance(sys.store.get_pool(PoolType::Purchases).balance_lords, pool_purchases, price_pack, 0, "pool_purchases PURCHASE");

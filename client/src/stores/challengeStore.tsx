@@ -302,6 +302,20 @@ export function useMyActiveDuels(notificationDuelIds: bigint[] = []) {
   return result
 }
 
+export function useMyChallenges() {
+  const { address } = useAccount()
+  const entities = useChallengeStore((state) => state.entities)
+  const challenges = useAllStoreModels<models.Challenge>(entities, 'Challenge')
+  const myChallenges = useMemo(() => (
+    !address ? [] : challenges.filter(ch => (bigintEquals(ch.address_a, address) || bigintEquals(ch.address_b, address)))
+  ), [challenges, address])
+  const duelIds = useMemo(() => (myChallenges).map(ch => BigInt(ch.duel_id)), [myChallenges])
+  return {
+    myChallenges,
+    duelIds,
+  }
+}
+
 
 
 
@@ -673,8 +687,8 @@ export const useQueryChallengeIdsByDuelist = (
 //     if (filterName) {
 //       const filterNameLower = filterName.toLowerCase();
 //       result = result.filter((ch) => (
-//         getPlayerName(ch.address_a)?.toLowerCase().includes(filterNameLower) ||
-//         getPlayerName(ch.address_b)?.toLowerCase().includes(filterNameLower)
+//         getPlayernameFromAddress(ch.address_a)?.toLowerCase().includes(filterNameLower) ||
+//         getPlayernameFromAddress(ch.address_b)?.toLowerCase().includes(filterNameLower)
 //       ))
 //     }
 

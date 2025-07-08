@@ -31,3 +31,11 @@ export const errorSvg = encodeSvg(`
 </svg>
 `, { includeMimeType: true });
 
+export const placeholderMissingSvgBase64 = encodeSvg(`
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' width='100' height='100' viewBox='0 0 100 100'>
+  <g>
+    <rect fill='#ff00ff' x='0' y='0' width='100' height='100' />
+  </g>
+</svg>
+`, { includeMimeType: true, encodeBase64: true });
+

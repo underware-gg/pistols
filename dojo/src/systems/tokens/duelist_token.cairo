@@ -88,7 +88,7 @@ pub trait IDuelistTokenPublic<TState> {
 // Exposed to world
 #[starknet::interface]
 pub trait IDuelistTokenProtected<TState> {
-    fn mint_duelists(ref self: TState, recipient: ContractAddress, profile_sample: DuelistProfile, quantity: usize, seed: felt252) -> Span<u128>;
+    fn mint_duelists(ref self: TState, recipient: ContractAddress, quantity: usize, profile_type: DuelistProfile, seed: felt252) -> Span<u128>;
     fn get_validated_active_duelist_id(ref self: TState, address: ContractAddress, duelist_id: u128, lives_staked: u8) -> u128;
     fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u64, bonus: DuelBonus) -> (RewardValues, RewardValues);
 }
@@ -327,8 +327,8 @@ pub mod duelist_token {
     impl DuelistTokenProtectedImpl of super::IDuelistTokenProtected<ContractState> {
         fn mint_duelists(ref self: ContractState,
             recipient: ContractAddress,
-            profile_sample: DuelistProfile,
             quantity: usize,
+            profile_type: DuelistProfile,
             seed: felt252,
         ) -> Span<u128>{
             let mut store: Store = StoreTrait::new(self.world_default());
@@ -338,34 +338,21 @@ pub mod duelist_token {
             let duelist_ids: Span<u128> = self.token.mint_next_multiple(recipient, quantity);
 
             // create duelists
-            let timestamp: u64 = starknet::get_block_timestamp();
-            let mut rnd: u256 = seed.into();
+            let mut seed: u256 = seed.into();
             let mut i: usize = 0;
             while (i < duelist_ids.len()) {
-                // create Duelist
-                let duelist = Duelist {
-                    duelist_id: *duelist_ids[i],
-                    duelist_profile: ProfileManagerTrait::randomize_profile(profile_sample, rnd.low.into()),
-                    timestamps: DuelistTimestamps {
-                        registered: timestamp,
-                        active: 0,
-                    },
-                    totals: Default::default(),
-                };
-                store.set_duelist(@duelist);
-
-                // add to player's stack
-                let mut stack: PlayerDuelistStack = store.get_player_duelist_stack(recipient, duelist.duelist_profile);
-                stack.append(duelist.duelist_id);
-                store.set_player_duelist_stack(@stack);
-
-                // mint fame
-                store.world.fame_coin_protected_dispatcher().minted_duelist(duelist.duelist_id);
-
-                // events
-                Activity::DuelistSpawned.emit(ref store.world, recipient, duelist.duelist_id.into());
-
-                rnd /= 0x100;
+                let duelist_id: u128 = *duelist_ids[i];
+                let duelist_profile: DuelistProfile = 
+                    // unpacked in open()
+                    if (seed.is_zero()) {(profile_type)}
+                    // randomize based on unknown type
+                    else {(ProfileManagerTrait::randomize_profile(profile_type, seed.low.into()))};
+                self._spawn_duelist(ref store,
+                    recipient,
+                    duelist_profile,
+                    duelist_id,
+                );
+                seed /= 0x100;
                 i += 1;
             };
 
@@ -457,6 +444,36 @@ pub mod duelist_token {
     //
     #[generate_trait]
     impl InternalImpl of InternalTrait {
+        fn _spawn_duelist(ref self: ContractState,
+            ref store: Store,
+            recipient: ContractAddress,
+            duelist_profile: DuelistProfile,
+            duelist_id: u128,
+        ) {
+            // create Duelist
+            let duelist = Duelist {
+                duelist_id,
+                duelist_profile,
+                timestamps: DuelistTimestamps {
+                    registered: starknet::get_block_timestamp(),
+                    active: 0,
+                },
+                totals: Default::default(),
+            };
+            store.set_duelist(@duelist);
+
+            // add to player's stack
+            let mut stack: PlayerDuelistStack = store.get_player_duelist_stack(recipient, duelist.duelist_profile);
+            stack.append(duelist.duelist_id);
+            store.set_player_duelist_stack(@stack);
+
+            // mint fame
+            store.world.fame_coin_protected_dispatcher().minted_duelist(duelist.duelist_id);
+
+            // events
+            Activity::DuelistSpawned.emit(ref store.world, recipient, duelist.duelist_id.into());
+        }
+
         #[inline(always)]
         fn _fame_balance(self: @ContractState,
             fame_dispatcher: @IFameCoinDispatcher,
@@ -710,7 +727,7 @@ pub mod duelist_token {
             let owner: ContractAddress = self.owner_of(token_id);
             let assignment: DuelistAssignmentValue = store.get_duelist_challenge_value(token_id.low);
             let archetype: Archetype = duelist.totals.get_archetype();
-            let duelist_image: ByteArray = duelist.duelist_profile.get_uri(base_uri.clone());
+            let duelist_image: ByteArray = duelist.duelist_profile.get_image_uri(base_uri.clone());
             let fame_balance: u128 = self._fame_balance(@store.world.fame_coin_dispatcher(), token_id.low);
             let lives: u128 = (fame_balance / FAME::ONE_LIFE.low);
             let fame_dispatcher: IFameCoinDispatcher = self.world_default().fame_coin_dispatcher();

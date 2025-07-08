@@ -12,6 +12,7 @@ import { usePlayer } from '/src/stores/playerStore'
 const internalPages = [
   { name: 'contracts', connected: true },
   { name: 'admin', connected: true },
+  { name: 'airdrop', connected: true },
   { name: 'pools', connected: true },
   { name: 'seasons', connected: true },
   { name: 'players', connected: true },
@@ -79,7 +80,7 @@ export function InternalPageWrapper({ children }: { children?: React.ReactNode }
   const { isAdmin, isTeamMember } = usePlayer(address)
   const isAuthorized = useMemo(() => (
     connector?.id === 'predeployed'
-    || chainId != stringToFelt(ChainId.SN_MAIN)
+    || (chainId && chainId != stringToFelt(ChainId.SN_MAIN))
     || isAdmin || isTeamMember
     || bigintEquals(address, '0x0550212d3f13a373dfe9e3ef6aa41fba4124bde63fd7955393f879de19f3f47f') // mata
     || bigintEquals(address, '0x052eaece65e70b394f6907fbef609a143466ee0b861bc339306ab54dc8668a25') // reci

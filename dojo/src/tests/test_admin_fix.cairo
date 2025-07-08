@@ -28,8 +28,8 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::OWNER | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE);
 
         let bank_address: ContractAddress = sys.bank.contract_address;
-        let price_starter: u128 = PackType::StarterPack.description().price_lords;
-        let price_pack: u128 = PackType::GenesisDuelists5x.description().price_lords;
+        let price_starter: u128 = PackType::StarterPack.descriptor().price_lords;
+        let price_pack: u128 = PackType::GenesisDuelists5x.descriptor().price_lords;
         assert_ne!(price_starter, 0, "price_starter");
         assert_ne!(price_pack, 0, "price_pack");
 
@@ -50,9 +50,9 @@ mod tests {
         tester::execute_claim_starter_pack(@sys, OTHER());
         // purchase 7 packs...
         // 3 will be opened...
-        let pack_id_1: u128 = tester::execute_pack_purchase(@sys, OWNER(), PackType::GenesisDuelists5x).pack_id;
-        let pack_id_2: u128 = tester::execute_pack_purchase(@sys, OWNER(), PackType::GenesisDuelists5x).pack_id;
-        let pack_id_3: u128 = tester::execute_pack_purchase(@sys, OWNER(), PackType::GenesisDuelists5x).pack_id;
+        let pack_id_1: u128 = tester::execute_pack_purchase(@sys, OWNER(), PackType::GenesisDuelists5x);
+        let pack_id_2: u128 = tester::execute_pack_purchase(@sys, OWNER(), PackType::GenesisDuelists5x);
+        let pack_id_3: u128 = tester::execute_pack_purchase(@sys, OWNER(), PackType::GenesisDuelists5x);
         // 4 will remain closed...
         tester::execute_pack_purchase(@sys, OWNER(), PackType::GenesisDuelists5x);
         tester::execute_pack_purchase(@sys, OWNER(), PackType::GenesisDuelists5x);

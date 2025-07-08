@@ -16,13 +16,14 @@ import { DuelTokenArt } from '/src/components/cards/DuelTokenArt'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { useAccount } from '@starknet-react/core'
-import { useCanClaimStarterPack } from '/src/hooks/usePistolsContractCalls'
+import { useCanClaimStarterPack, useHasClaimedRing } from '/src/hooks/usePistolsContractCalls'
 import { LordsFaucet } from '/src/components/account/LordsFaucet'
 import { FameBalanceDuelist, FameLivesDuelist, LordsBalance } from '/src/components/account/LordsBalance'
 import { usePacksOfPlayer } from '/src/hooks/useTokenPacks'
 import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppDojo from '/src/components/AppDojo'
+import { useDuelIdsForClaimingRings, useRingsOfPlayer } from '/src/stores/playerStore'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -42,6 +43,7 @@ export default function TokensTestPage() {
 
         <TestImages />
         <Purchases />
+        <Rings />
         <Tokens />
 
         <EntityStoreSync />
@@ -68,6 +70,7 @@ function Purchases() {
   if (!isConnected) return <></>
   return (
     <>
+      <h1>Duelist Packs (Claim + Purchase + Open)</h1>
       <LordsFaucet />
       &nbsp;&nbsp;<LordsBalance address={address} size='big' />
       &nbsp;&nbsp;<span className='Code'>(mint test LORDS, if available)</span>
@@ -79,14 +82,59 @@ function Purchases() {
       &nbsp;&nbsp;<span className='Code'>(transfer $LORDS + mint PACK)</span>
       <br />
       <Button disabled={packIds.length === 0} onClick={() => pack_token.open(account, packIds[0])}>Open Pack {packIds[0] ?? ''}</Button>
-      &nbsp;&nbsp;<span className='Code'>[{packIds.join(',')}] (burn PACK + mint 5 DUELISTS)</span>
+      &nbsp;&nbsp;<span className='Code'>ids:[{packIds.join(',')}] (burn PACK + mint 5 DUELISTS)</span>
     </>
   );
 }
 
+function Rings() {
+  const { isConnected } = useAccount()
+  const { goldRingDuelIds, silverRingDuelIds, leadRingDuelIds } = useDuelIdsForClaimingRings()
+  const { ringTypes } = useRingsOfPlayer()
+  if (!isConnected) return <></>
+  return (
+    <>
+      <hr />
+      <h1>Rings</h1>
+      <h3>Owned: [<span className='Code Important'>{ringTypes.join(', ')}</span>]</h3>
+      <RingsClaimButton ringType={constants.RingType.GoldSignetRing} duelIds={goldRingDuelIds} />
+      <br />
+      <RingsClaimButton ringType={constants.RingType.SilverSignetRing} duelIds={silverRingDuelIds} />
+      <br />
+      <RingsClaimButton ringType={constants.RingType.LeadSignetRing} duelIds={leadRingDuelIds} />
+    </>
+  );
+}
+
+function RingsClaimButton({
+  ringType,
+  duelIds,
+}: {
+  ringType: constants.RingType,
+  duelIds: bigint[],
+}) {
+  const { account, address } = useAccount()
+  const { hasClaimed } = useHasClaimedRing(address, ringType)
+  const { ring_token: { claim_season_ring } } = useDojoSystemCalls()
+
+  const _claim = async () => {
+    const result = await claim_season_ring(account, duelIds[0], ringType)
+    console.log("result =>", result)
+  }
+
+  return (
+    <>
+      <Button disabled={hasClaimed || duelIds.length === 0} onClick={() => _claim()}>Claim {ringType}</Button>
+      &nbsp;&nbsp;<span className='Code'>duels:[{duelIds.join(',')}]</span>
+    </>
+  );
+}
+
+
 function Tokens() {
   const {
     packContractAddress,
+    ringContractAddress,
     duelistContractAddress,
     duelContractAddress,
   } = useTokenContracts()
@@ -94,8 +142,11 @@ function Tokens() {
   if (!isConnected) return <></>
   return (
     <>
-      <br />
+      <hr />
+      <h1>Tokens</h1>
       <TokenContract contractAddress={packContractAddress} tokenName='Packs' attributes={['Is Open']} />
+      <br />
+      <TokenContract contractAddress={ringContractAddress} tokenName='Rings' />
       <br />
       <TokenContract contractAddress={duelistContractAddress} tokenName='Duelists' hasFame
         renderer={(tokenId: bigint) => <DuelistTokenArt duelistId={tokenId} style={_style} />}

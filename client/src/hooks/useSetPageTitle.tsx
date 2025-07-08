@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { bigintToDecimal } from '@underware/pistols-sdk/utils'
-import { getPlayerName } from '/src/stores/playerStore'
+import { getPlayernameFromAddress } from '/src/stores/playerStore'
 import { SceneName } from '/src/data/assets'
 
 export const MenuLabels: Partial<Record<SceneName, string>> = {
@@ -23,7 +23,7 @@ export const useSetPageTitle = () => {
     } else if (selectedDuelistId) {
       return `Duelist #${bigintToDecimal(selectedDuelistId)}`
     } else if (selectedPlayerAddress) {
-      const name = getPlayerName(selectedPlayerAddress)
+      const name = getPlayernameFromAddress(selectedPlayerAddress)
       return name ?? `Player`
     }
     return MenuLabels[currentScene]
