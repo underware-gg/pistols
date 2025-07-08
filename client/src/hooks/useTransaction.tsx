@@ -35,7 +35,10 @@ export function useTransactionHandler<T, Args extends any[] = []>({
     let mounted = true
 
     const checkPersisted = async () => {
-      if (!transaction) return
+      if (!transaction) {
+        setIsLoading(false)
+        return
+      }
 
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current)
@@ -43,7 +46,6 @@ export function useTransactionHandler<T, Args extends any[] = []>({
       }
 
       setIsLoading(true)
-      setIsWaitingForIndexer(false)
       setMeta(transaction.meta)
 
       if (transaction.status === 'completed' && mounted) {
@@ -51,19 +53,22 @@ export function useTransactionHandler<T, Args extends any[] = []>({
         
         if (canComplete) {
           setIsLoading(false)
-          clearTimeout(timeoutRef.current)
+          setIsWaitingForIndexer(false)
           onComplete?.(transaction.result as T, transaction.meta?.args as Args || [] as Args)
           transactionStore.removeTransaction(key)
         } else {
           setIsLoading(true)
-          timeoutRef.current = setTimeout(() => {
-            if (mounted) {
-              setIsWaitingForIndexer(true)
-            }
-          }, 1000)
+          if (!isWaitingForIndexer) {
+            timeoutRef.current = setTimeout(() => {
+              if (mounted) {
+                setIsWaitingForIndexer(true)
+              }
+            }, 1000)
+          }
         }
       } else if (transaction.status === 'failed' && mounted) {
         setIsLoading(false)
+        setIsWaitingForIndexer(false)
         onComplete?.(new Error(transaction.error || 'Transaction failed'), transaction.meta?.args as Args || [] as Args)
         transactionStore.removeTransaction(key)
       } else if (transaction.status === 'pending' && mounted) {
@@ -84,6 +89,7 @@ export function useTransactionHandler<T, Args extends any[] = []>({
 
   const call = useCallback(async (...args: Args) => {
     setIsLoading(true)
+    setIsWaitingForIndexer(false)
     
     setMeta(args)
 
@@ -93,6 +99,7 @@ export function useTransactionHandler<T, Args extends any[] = []>({
     } catch (error) {
       transactionStore.setTransactionError(key, error instanceof Error ? error.message : 'Transaction failed')
       setIsLoading(false)
+      setIsWaitingForIndexer(false)
       onComplete?.(error as Error, args)
     }
   }, [transactionCall, key, onComplete, transactionStore])
@@ -127,7 +134,10 @@ export function useTransactionObserver({ key, indexerCheck }: UseTransactionObse
     let mounted = true
 
     const check = async () => {
-      if (!transaction) return
+      if (!transaction) {
+        setIsLoading(false)
+        return
+      }
 
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current)
@@ -135,7 +145,6 @@ export function useTransactionObserver({ key, indexerCheck }: UseTransactionObse
       }
 
       setIsLoading(true)
-      setIsWaitingForIndexer(false)
       setMeta(transaction.meta)
 
       if (transaction.status === 'completed' && mounted) {
@@ -144,18 +153,21 @@ export function useTransactionObserver({ key, indexerCheck }: UseTransactionObse
         if (canComplete) {
           transactionStore.removeTransaction(key)
           setIsLoading(false)
+          setIsWaitingForIndexer(false)
         } else {
           setIsLoading(true)
-
-          timeoutRef.current = setTimeout(() => {
-            if (mounted) {
-              setIsWaitingForIndexer(true)
-            }
-          }, 1000)
+          if (!isWaitingForIndexer) {
+            timeoutRef.current = setTimeout(() => {
+              if (mounted) {
+                setIsWaitingForIndexer(true)
+              }
+            }, 1000)
+          }
         }
       } else if (transaction.status === 'failed' && mounted) {
         transactionStore.removeTransaction(key)
         setIsLoading(false)
+        setIsWaitingForIndexer(false)
       }
     }
 
