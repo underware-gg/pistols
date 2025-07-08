@@ -236,8 +236,8 @@ export const useHasClaimedRing = (address: BigNumberish, ringType: constants.Rin
   const { ring_token: { hasClaimed } } = useDojoContractCalls()
   const options = useMemo(() => ({
     call: hasClaimed,
-    args: [address, constants.getRingTypeValue(ringType)],
-    enabled: isPositiveBigint(address),
+    args: [address, makeCustomEnum(ringType)],
+    enabled: isPositiveBigint(address) && ringType != constants.RingType.Unknown,
     defaultValue: false,
   }), [address, ringType])
   const { value, isLoading } = useSdkCallPromise<boolean>(options)

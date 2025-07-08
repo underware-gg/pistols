@@ -338,26 +338,30 @@ export const useRingsOfPlayer = () => {
 
 export const useRingsOfOwner = (address: BigNumberish) => {
   const entities = usePlayerEntityStore((state) => state.entities);
-  const rings = useAllStoreModels<models.Ring>(entities, 'Ring')
+  const ringModels = useAllStoreModels<models.Ring>(entities, 'Ring')
   const { ringIds } = useRingIdsOfAccount(address)
   const ringTypes = useMemo(() => (
-    Array.from(
-      rings
-        .filter((r) => ringIds.includes(Number(r.ring_id)))
-        .map((r) => parseEnumVariant<constants.RingType>(r.ring_type))
-        .reduce((acc, r) => {
-          acc.add(r);
-          return acc;
-        }, new Set<constants.RingType>()))
-  ), [ringIds, rings])
-  // console.log("rings =>", ringIds, ringTypes)
+    ringIds
+      // ids to models
+      .map((ringId) => ringModels.find((m) => bigintEquals(m.ring_id, ringId)))
+      // models to ring types
+      .map((m) => parseEnumVariant<constants.RingType>(m.ring_type))
+  ), [ringIds, ringModels])
+  const topRingType = useMemo(() => (
+    ringTypes.includes(constants.RingType.GoldSignetRing) ? constants.RingType.GoldSignetRing :
+      ringTypes.includes(constants.RingType.SilverSignetRing) ? constants.RingType.SilverSignetRing :
+        ringTypes.includes(constants.RingType.LeadSignetRing) ? constants.RingType.LeadSignetRing :
+          null
+  ), [ringTypes])
+  // console.log(`rings => [${topRingType}]`, ringIds, ringTypes)
   return {
     ringIds,
     ringTypes,
+    topRingType,
   }
 }
 
-export const useDuelIdsForClaiomingRings = () => {
+export const useDuelIdsForClaimingRings = () => {
   const { myChallenges } = useMyChallenges()
   const goldRingDuelIds = useMemo(() => (
     myChallenges.filter((ch) => Number(ch.season_id) == 1).map((ch) => BigInt(ch.duel_id))

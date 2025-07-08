@@ -23,7 +23,7 @@ import { usePacksOfPlayer } from '/src/hooks/useTokenPacks'
 import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppDojo from '/src/components/AppDojo'
-import { useDuelIdsForClaiomingRings, useRingsOfPlayer } from '/src/stores/playerStore'
+import { useDuelIdsForClaimingRings, useRingsOfPlayer } from '/src/stores/playerStore'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -89,7 +89,7 @@ function Purchases() {
 
 function Rings() {
   const { isConnected } = useAccount()
-  const { goldRingDuelIds, silverRingDuelIds, leadRingDuelIds } = useDuelIdsForClaiomingRings()
+  const { goldRingDuelIds, silverRingDuelIds, leadRingDuelIds } = useDuelIdsForClaimingRings()
   const { ringTypes } = useRingsOfPlayer()
   if (!isConnected) return <></>
   return (
@@ -120,7 +120,7 @@ function RingsClaimButton({
   const _claim = async () => {
     const result = await claim_season_ring(account, duelIds[0], ringType)
     console.log("result =>", result)
-  } 
+  }
 
   return (
     <>

@@ -1,28 +1,28 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { BigNumberish } from 'starknet'
-import { Button, Checkbox, Container, Dropdown, Table } from 'semantic-ui-react'
+import { Button, Checkbox, Container, Dropdown, Tab, Table, TabPane } from 'semantic-ui-react'
+import { useAccount } from '@starknet-react/core'
+import { bigintToDecimal } from '@underware/pistols-sdk/utils'
+import { useValidateWalletAddress } from '@underware/pistols-sdk/utils/hooks'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { ExplorerLink } from '@underware/pistols-sdk/starknet/components'
-import { Address } from '/src/components/ui/Address'
+import { DuelistProfileKey, getCollectionProfileKeys } from '@underware/pistols-sdk/pistols'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
 import { TokenStoreSync } from '/src/stores/sync/TokenStoreSync'
 import { InternalPageMenu, InternalPageWrapper } from '/src/pages/internal/InternalPageIndex'
-import { Connect } from '/src/pages/tests/ConnectTestPage'
-import { useAccount } from '@starknet-react/core'
-import { usePlayer, useTeamMembersAccounts } from '/src/stores/playerStore'
+import { usePlayer, useRingsOfOwner } from '/src/stores/playerStore'
 import { useDuelistIdsOfOwner } from '/src/hooks/useTokenDuelists'
 import { useFetchPacksByPlayer, usePack } from '/src/stores/packStore'
+import { useDuelist, useFetchDuelistIdsByPlayer } from '/src/stores/duelistStore'
+import { useHasClaimedRing } from '/src/hooks/usePistolsContractCalls'
 import { usePacksOfOwner } from '/src/hooks/useTokenPacks'
 import { PlayerNameSync } from '/src/stores/sync/PlayerNameSync'
-import { useValidateWalletAddress } from '@underware/pistols-sdk/utils/hooks'
 import { WalletAddressRow } from './AdminPage'
+import { Address } from '/src/components/ui/Address'
+import { Connect } from '/src/pages/tests/ConnectTestPage'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppDojo from '/src/components/AppDojo'
-import { bigintToDecimal } from '@underware/pistols-sdk/utils'
-import { useDuelist, useFetchDuelistIdsByPlayer } from '/src/stores/duelistStore'
-import { constants } from '@underware/pistols-sdk/pistols/gen'
-import { FormSelectFromMap } from '/src/components/ui/Form'
-import { DuelistProfileKey, getCollectionProfileKeys } from '@underware/pistols-sdk/pistols'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -42,7 +42,7 @@ export default function AirdropPage() {
         <Connect />
 
         <InternalPageWrapper>
-          <DuellistAirDropper />
+          <AirDropper />
           <br />
         </InternalPageWrapper>
 
@@ -59,14 +59,47 @@ export default function AirdropPage() {
 // Team Members
 //
 
-function DuellistAirDropper() {
+function AirDropper() {
   const { account } = useAccount()
-  const { pack_token } = useDojoSystemCalls()
   const [address, setAddress] = useState('')
   const { isStarknetAddress } = useValidateWalletAddress(address)
+  return (
+    <>
+      <Table celled stackable size='small' color='green'>
+        <Header>
+          <Row>
+            <HeaderCell width={3}><h3>Airdrop To...</h3></HeaderCell>
+            <HeaderCell></HeaderCell>
+            <HeaderCell></HeaderCell>
+          </Row>
+        </Header>
+        <Body>
+          <WalletAddressRow address={address} setAddress={setAddress} label='Recipient Wallet' />
+        </Body>
+      </Table>
+
+      <Tab panes={[
+        { menuItem: 'Duelist Packs', render: () => <TabPane className='NoBorder'><AirDropperDuelists address={isStarknetAddress ? address : undefined} /></TabPane> },
+        { menuItem: 'Signet Rings', render: () => <TabPane className='NoBorder'><AirDropSignetRings address={isStarknetAddress ? address : undefined} /></TabPane> },
+      ]} />
+
+      <PlayerTokens address={address} />
+    </>
+  )
+}
+
+
+
+function AirDropperDuelists({
+  address,
+}: {
+  address: BigNumberish
+}) {
+  const { account } = useAccount()
+  const { pack_token } = useDojoSystemCalls()
 
   // select properties
-  const [packType, setPackType] = useState<constants.PackType>(constants.PackType.SingleDuelist)
+  const [packType, setPackType] = useState<constants.PackType>(constants.PackType.FreeDuelist)
   const [collection, setCollection] = useState<constants.DuelistProfile>()
   const [profileKey, setProfileKey] = useState<DuelistProfileKey>()
   useMemo(() => {
@@ -75,67 +108,107 @@ function DuellistAirDropper() {
   }, [packType])
 
   const canAirdrop = useMemo(() => {
-    return isStarknetAddress && packType && (
+    return address && packType && (
       packType != constants.PackType.SingleDuelist || (collection && profileKey)
     )
-  }, [isStarknetAddress, packType, collection, profileKey])
+  }, [address, packType, collection, profileKey])
 
   const _airdrop = useCallback(() => {
     pack_token.airdrop(account, address, packType, collection, profileKey)
   }, [account, address, packType, collection, profileKey])
   return (
-    <>
-      <Table celled striped size='small' color='green'>
-        <Header>
-          <Row>
-            <HeaderCell width={3}><h3>Airdrop Packs</h3></HeaderCell>
-            <HeaderCell></HeaderCell>
-            <HeaderCell></HeaderCell>
-          </Row>
-        </Header>
-        <Body>
-          <WalletAddressRow address={address} setAddress={setAddress} label='Recipient Wallet' />
-          <Row>
-            <Cell className='Code'>
-              Pack Type
-            </Cell>
-            <Cell>
-              <PackTypeSelector packType={packType} setPackType={setPackType} />
-            </Cell>
-          </Row>
-          <Row>
-            <Cell className='Code'>
-              Collection
-            </Cell>
-            <Cell>
-              <DuelistProfileSelector packType={packType} collection={collection} setCollection={setCollection} />
-            </Cell>
-          </Row>
-          <Row>
-            <Cell className='Code'>
-              Duelist Profile
-            </Cell>
-            <Cell>
-              <ProfileKeySelector packType={packType} collection={collection} profileKey={profileKey} setProfileKey={setProfileKey} />
-            </Cell>
-          </Row>
-          <Row>
-            <Cell></Cell>
-            <Cell>
-              <Button disabled={!canAirdrop} onClick={_airdrop}>Airdrop...</Button>
-              &nbsp;&nbsp;
-              <span className='Code'>
-                [{packType}][{collection}][{profileKey}]
-              </span>
-            </Cell>
-          </Row>
-        </Body>
-      </Table>
-      <PlayerTokens address={address} />
-    </>
+    <Table celled striped size='small'>
+      <Body>
+        <Row>
+          <Cell width={3} className='Code'>
+            Pack Type
+          </Cell>
+          <Cell>
+            <PackTypeSelector packType={packType} setPackType={setPackType} />
+          </Cell>
+        </Row>
+        <Row>
+          <Cell className='Code'>
+            Collection
+          </Cell>
+          <Cell>
+            <DuelistProfileSelector packType={packType} collection={collection} setCollection={setCollection} />
+          </Cell>
+        </Row>
+        <Row>
+          <Cell className='Code'>
+            Duelist Profile
+          </Cell>
+          <Cell>
+            <ProfileKeySelector packType={packType} collection={collection} profileKey={profileKey} setProfileKey={setProfileKey} />
+          </Cell>
+        </Row>
+        <Row>
+          <Cell></Cell>
+          <Cell>
+            <Button disabled={!canAirdrop} onClick={_airdrop}>Airdrop...</Button>
+            &nbsp;&nbsp;
+            <span className='Code'>
+              [{packType}][{collection}][{profileKey}]
+            </span>
+          </Cell>
+        </Row>
+      </Body>
+    </Table>
   )
 }
 
+
+function AirDropSignetRings({
+  address,
+}: {
+  address: BigNumberish
+}) {
+  const { account } = useAccount()
+  const { ring_token } = useDojoSystemCalls()
+
+  // select properties
+  const [ringType, setRingType] = useState<constants.RingType>(constants.RingType.GoldSignetRing)
+
+  const { hasClaimed } = useHasClaimedRing(address, ringType)
+  const canAirdrop = useMemo(() => (
+    address && ringType != constants.RingType.Unknown && !hasClaimed
+  ), [address, ringType, hasClaimed])
+
+  const _airdrop = useCallback(() => {
+    ring_token.airdrop_ring(account, address, ringType)
+  }, [account, address, ringType])
+
+  return (
+    <Table celled striped size='small'>
+      <Body>
+        <Row>
+          <Cell width={3} className='Code'>
+            Ring Type
+          </Cell>
+          <Cell>
+            <SignetRingTypeSelector ringType={ringType} setRingType={setRingType} />
+          </Cell>
+        </Row>
+        <Row>
+          <Cell></Cell>
+          <Cell>
+            <Button disabled={!canAirdrop} onClick={_airdrop}>{hasClaimed ? 'Already Claimed' : 'Airdrop...'}</Button>
+            &nbsp;&nbsp;
+            <span className='Code'>
+              [{ringType}]
+            </span>
+          </Cell>
+        </Row>
+      </Body>
+    </Table>
+  )
+}
+
+
+//--------------------------------
+// Player Tokens
+//
 
 function PlayerTokens({
   address,
@@ -146,6 +219,7 @@ function PlayerTokens({
   useFetchPacksByPlayer(address)
   const { duelistIds } = useDuelistIdsOfOwner(address)
   const { packIds } = usePacksOfOwner(address)
+  const { ringIds, ringTypes } = useRingsOfOwner(address)
   return (
     <Table celled striped size='small'>
       <Header>
@@ -155,12 +229,19 @@ function PlayerTokens({
           <HeaderCell></HeaderCell>
         </Row>
       </Header>
-      <PlayerNameRow address={address} />
       <Body>
+        <PlayerNameRow address={address} />
+
+        {ringIds.length == 0 && <RingTokenRow ringId={0} ringType={constants.RingType.Unknown} ringNumber={0} total={0} />}
+        {ringIds.map((ringId, index) => (
+          <RingTokenRow key={ringId} ringId={ringId} ringType={ringTypes[index]} ringNumber={index + 1} total={ringIds.length} />
+        ))}
+
         {packIds.length == 0 && <PackTokenRow packId={0} packNumber={0} total={0} />}
         {packIds.map((packId, index) => (
           <PackTokenRow key={bigintToDecimal(packId)} packId={packId} packNumber={index + 1} total={packIds.length} />
         ))}
+
         {duelistIds.length == 0 && <DuelistTokenRow duelistId={0} duelistNumber={0} total={0} />}
         {duelistIds.map((duelistId, index) => (
           <DuelistTokenRow key={bigintToDecimal(duelistId)} duelistId={duelistId} duelistNumber={index + 1} total={duelistIds.length} />
@@ -216,7 +297,6 @@ function DuelistTokenRow({
   )
 }
 
-
 function PackTokenRow({
   packId,
   packNumber,
@@ -237,6 +317,32 @@ function PackTokenRow({
       </Cell>
       <Cell className='Code'>
         {`Pack ${packNumber} / ${total}`}
+      </Cell>
+    </Row>
+  )
+}
+
+function RingTokenRow({
+  ringId,
+  ringType,
+  ringNumber,
+  total,
+}: {
+  ringId: BigNumberish
+  ringType: constants.RingType
+  ringNumber: number
+  total: number
+}) {
+  return (
+    <Row className='H5'>
+      <Cell className='Code'>
+        {`Ring #${ringId || '?'}`}
+      </Cell>
+      <Cell className='Code'>
+        {ringId ? ringType : '...'}
+      </Cell>
+      <Cell className='Code'>
+        {`Ring ${ringNumber} / ${total}`}
       </Cell>
     </Row>
   )
@@ -336,6 +442,33 @@ function ProfileKeySelector({
       options={options}
       onChange={(e, { value }) => setProfileKey(value as DuelistProfileKey)}
       disabled={disabled}
+      button
+      fluid
+    />
+  )
+}
+
+function SignetRingTypeSelector({
+  ringType,
+  setRingType,
+}: {
+  ringType: constants.RingType
+  setRingType: (ringType: constants.RingType) => void
+}) {
+  const options = useMemo(() => [
+    constants.RingType.GoldSignetRing,
+    constants.RingType.SilverSignetRing,
+    constants.RingType.LeadSignetRing,
+  ].map((p) => ({
+    key: `${p}`,
+    value: `${p}`,
+    text: `${p}`,
+  })), [])
+  return (
+    <Dropdown
+      value={ringType}
+      options={options}
+      onChange={(e, { value }) => setRingType(value as constants.RingType)}
       button
       fluid
     />
