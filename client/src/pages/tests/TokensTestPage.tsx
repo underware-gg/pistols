@@ -21,9 +21,10 @@ import { LordsFaucet } from '/src/components/account/LordsFaucet'
 import { FameBalanceDuelist, FameLivesDuelist, LordsBalance } from '/src/components/account/LordsBalance'
 import { usePacksOfPlayer } from '/src/hooks/useTokenPacks'
 import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
+import { useDuelIdsForClaimingRings } from '/src/queries/useDuelIdsForClaimingRings'
+import { useRingsOfPlayer } from '/src/stores/playerStore'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppDojo from '/src/components/AppDojo'
-import { useDuelIdsForClaimingRings, useRingsOfPlayer } from '/src/stores/playerStore'
 
 // const Row = Grid.Row
 // const Col = Grid.Column

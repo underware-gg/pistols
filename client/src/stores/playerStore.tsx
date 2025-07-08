@@ -361,27 +361,6 @@ export const useRingsOfOwner = (address: BigNumberish) => {
   }
 }
 
-export const useDuelIdsForClaimingRings = () => {
-  const { myChallenges } = useMyChallenges()
-  const goldRingDuelIds = useMemo(() => (
-    myChallenges.filter((ch) => Number(ch.season_id) == 1).map((ch) => BigInt(ch.duel_id))
-  ), [myChallenges])
-  const silverRingDuelIds = useMemo(() => (
-    myChallenges.filter((ch) => Number(ch.season_id) >= 2 && Number(ch.season_id) <= 4).map((ch) => BigInt(ch.duel_id))
-  ), [myChallenges])
-  const leadRingDuelIds = useMemo(() => (
-    myChallenges.filter((ch) => Number(ch.season_id) >= 5 && Number(ch.season_id) <= 9).map((ch) => BigInt(ch.duel_id))
-  ), [myChallenges])
-  useEffect(() => {
-    console.log("DUEL RINGS =>", goldRingDuelIds, silverRingDuelIds, leadRingDuelIds)
-  }, [goldRingDuelIds, silverRingDuelIds, leadRingDuelIds])
-  return {
-    goldRingDuelIds,
-    silverRingDuelIds,
-    leadRingDuelIds,
-  }
-}
-
 
 
 //----------------------------------------
