@@ -265,7 +265,12 @@ export function useDuelistSeasonStats(duelistId: BigNumberish, seasonId?: BigNum
     return stats
   }, [result, duelistId, seasonId])
 
-  return stats
+  // console.log(`useDuelistSeasonStats(${Number(duelistId)}, ${Number(seasonId)}) =>`, stats, result)
+
+  return {
+    ...stats,
+    isLoading: (result.length === 0),
+  }
 }
 
 

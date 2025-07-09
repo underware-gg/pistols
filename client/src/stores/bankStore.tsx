@@ -26,6 +26,7 @@ const _usePool = (pool_type: string, value?: bigint) => {
   // const poolId = useMemo(() => (pool?.pool_id ?? '?'), [pool])
   const balanceLords = useMemo(() => BigInt(pool?.balance_lords ?? 0), [pool])
   const balanceFame = useMemo(() => BigInt(pool?.balance_fame ?? 0), [pool])
+  const balanceFameToLords = useMemo(() => ((balanceFame / 3000n) * 10n), [balanceFame])
 
   return {
     poolType: pool_type,
@@ -33,6 +34,7 @@ const _usePool = (pool_type: string, value?: bigint) => {
     tournamentId: value,
     balanceLords,
     balanceFame,
+    balanceFameToLords,
   }
 }
 

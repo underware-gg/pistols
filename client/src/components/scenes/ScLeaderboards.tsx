@@ -20,6 +20,7 @@ import { useDuelistSeasonStats, useFetchChallengeIdsByDuelistIds } from '/src/st
 import { useSeason, useAllSeasonIds, useFullLeaderboard, useLeaderboard } from '/src/stores/seasonStore';
 import { useSeasonTotals } from '/src/queries/useSeason';
 import { useDiscordSocialLink } from '/src/stores/eventsModelStore';
+import { LoadingIcon } from '/src/components/ui/Icons';
 
 const calculateReward = (rank: number, totalPrizePool: bigint): bigint => {
   if (rank > 10) return 0n;
@@ -102,7 +103,7 @@ const SeasonRow = memo(({
         <Grid.Column width={4}>
           <div style={{ fontSize: aspectWidth(0.9), color: '#888' }}>Prize Pool:</div>
           <div style={{ fontSize: aspectWidth(1.1), fontWeight: 'bold', color: 'white' }}>
-            <Balance lords wei={poolSeason.balanceLords + ((poolSeason.balanceFame / 3000n) * 10n)} />
+            <Balance lords wei={poolSeason.balanceLords + poolSeason.balanceFameToLords} />
           </div>
         </Grid.Column>
         
@@ -138,14 +139,14 @@ const PlayerRow = memo(({
   const { owner } = useOwnerOfDuelist(duelistId);
   const { name: playerName } = usePlayer(owner);
   const { isMyAccount: isMe } = useIsMyAccount(owner);
-  const seasonStats = useDuelistSeasonStats(duelistId, selectedSeasonId);
+  const { wins, losses, isLoading } = useDuelistSeasonStats(duelistId, selectedSeasonId);
   const poolSeason = useSeasonPool(selectedSeasonId || 0);
   const { isActive } = useSeason(selectedSeasonId || 0);
   const { isLinked, avatarUrl } = useDiscordSocialLink(owner);
 
   const totalPrizePool = useMemo(() => {
     if (!poolSeason) return 0n;
-    return poolSeason.balanceLords + ((poolSeason.balanceFame / 3000n) * 10n);
+    return poolSeason.balanceLords + poolSeason.balanceFameToLords;
   }, [poolSeason]);
 
   const reward = useMemo(() => calculateReward(rank, totalPrizePool), [rank, totalPrizePool]);
@@ -196,12 +197,12 @@ const PlayerRow = memo(({
 
         <Grid.Column width={2}>
           <div style={{ fontSize: aspectWidth(0.9), color: '#888' }}>Wins:</div>
-          <div style={{ fontSize: aspectWidth(1.3), fontWeight: 'bold', color: 'green' }}>{seasonStats.wins}</div>
+          <div style={{ fontSize: aspectWidth(1.3), fontWeight: 'bold', color: 'green' }}>{isLoading ? <LoadingIcon className='Brightest' /> : wins}</div>
         </Grid.Column>
 
         <Grid.Column width={2}>
           <div style={{ fontSize: aspectWidth(0.9), color: '#888' }}>Losses:</div>
-          <div style={{ fontSize: aspectWidth(1.3), fontWeight: 'bold', color: 'red' }}>{seasonStats.losses}</div>
+          <div style={{ fontSize: aspectWidth(1.3), fontWeight: 'bold', color: 'red' }}>{isLoading ? <LoadingIcon className='Brightest' /> : losses}</div>
         </Grid.Column>
 
         <Grid.Column width={2}>
@@ -246,14 +247,14 @@ const LeaderboardPodium = memo(({
   const posterRef = useRef<ProfilePosterHandle>(null);
   const { isDead } = useDuelist(Number(duelistId));
   const { owner } = useOwnerOfDuelist(Number(duelistId));
-  const { wins, losses } = useDuelistSeasonStats(Number(duelistId), selectedSeasonId);
+  const { wins, losses, isLoading } = useDuelistSeasonStats(Number(duelistId), selectedSeasonId);
   const { isMyAccount: isMe } = useIsMyAccount(owner);
   const poolSeason = useSeasonPool(selectedSeasonId || 0);
   const { isActive } = useSeason(selectedSeasonId || 0);
 
   const totalPrizePool = useMemo(() => {
     if (!poolSeason) return 0n;
-    return poolSeason.balanceLords + ((poolSeason.balanceFame / 3000n) * 10n);
+    return poolSeason.balanceLords + poolSeason.balanceFameToLords;
   }, [poolSeason]);
 
   const reward = useMemo(() => calculateReward(rank, totalPrizePool), [rank, totalPrizePool]);
@@ -375,12 +376,12 @@ const LeaderboardPodium = memo(({
             
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: aspectWidth(1) }}>
               <div style={{ color: '#ffffff', fontSize: aspectWidth(1), fontWeight: 'bold' }}>WINS:</div>
-              <div style={{ color: '#00ff00', fontSize: aspectWidth(1), fontWeight: 'bold', textShadow: '0 0 10px rgba(0,255,0,0.5)' }}>{wins}</div>
+              <div style={{ color: '#00ff00', fontSize: aspectWidth(1), fontWeight: 'bold', textShadow: '0 0 10px rgba(0,255,0,0.5)' }}>{isLoading ? <LoadingIcon className='Brightest' /> : wins}</div>
             </div>
             
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: aspectWidth(1) }}>
               <div style={{ color: '#ffffff', fontSize: aspectWidth(1), fontWeight: 'bold' }}>LOSSES:</div>
-              <div style={{ color: '#ff4444', fontSize: aspectWidth(1), fontWeight: 'bold', textShadow: '0 0 10px rgba(255,0,0,0.5)' }}>{losses}</div>
+              <div style={{ color: '#ff4444', fontSize: aspectWidth(1), fontWeight: 'bold', textShadow: '0 0 10px rgba(255,0,0,0.5)' }}>{isLoading ? <LoadingIcon className='Brightest' /> : losses}</div>
             </div>
           </div>
         </div>
