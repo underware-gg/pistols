@@ -43,29 +43,29 @@ export type SeasonLeaderboardPrizes = {
   }
 }
 
-export const useSeasonLeaderboardPrizes = () => {
+export const useSeasonsLeaderboardRewards = () => {
   const query = `select * from "event_messages_historical" where data like "%LeaderboardPrize%"`;
   const { data, isLoading, queryHash } = useSdkSqlQuery({
     query,
     formatFn,
   });
 
-  const prizesPerSeason = useMemo(() => {
-    return data.reduce((acc, prize) => {
-      if (!acc[prize.seasonId]) {
-        acc[prize.seasonId] = {
+  const rewardsPerSeason = useMemo(() => {
+    return data.reduce((acc, reward) => {
+      if (!acc[reward.seasonId]) {
+        acc[reward.seasonId] = {
           totalLords: 0n,
           duelists: {},
         };
       }
-      const totalLords = (prize.peggedLords + prize.sponsoredLords);
-      acc[prize.seasonId].totalLords += totalLords;
-      acc[prize.seasonId].duelists[bigintToDecimal(prize.duelistId)] = totalLords;
+      const totalLords = (reward.peggedLords + reward.sponsoredLords);
+      acc[reward.seasonId].totalLords += totalLords;
+      acc[reward.seasonId].duelists[bigintToDecimal(reward.duelistId)] = totalLords;
       return acc;
     }, {} as Record<number, SeasonLeaderboardPrizes>);
   }, [data]);
 
   // useEffect(() => console.log(`leaderboardPrizes:`, data, prizesPerSeason), [data, prizesPerSeason]);
 
-  return prizesPerSeason;
+  return rewardsPerSeason;
 }

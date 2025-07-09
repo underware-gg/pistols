@@ -656,12 +656,8 @@ pub mod game {
                 self._update_scoreboards(ref store, @challenge, @round, ref rewards_a, ref rewards_b);
 
                 // send duel token to winner
-                if (challenge.winner != 0) {
+                if (challenge.winner.is_non_zero()) {
                     store.world.duel_token_protected_dispatcher().transfer_to_winner(challenge.duel_id);
-                }
-
-                // events
-                if (challenge.winner != 0) {
                     Activity::ChallengeResolved.emit(ref store.world, challenge.winner_address(), challenge.duel_id.into());
                 } else {
                     Activity::ChallengeDraw.emit(ref store.world, starknet::get_caller_address(), challenge.duel_id.into());

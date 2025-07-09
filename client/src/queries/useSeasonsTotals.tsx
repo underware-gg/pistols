@@ -17,7 +17,7 @@ export type SeasonTotals = {
   duelCount: number;
 }
 
-export const useSeasonTotals = () => {
+export const useSeasonsTotals = () => {
   const query = `
 select season_id,
 (select count(*) from(

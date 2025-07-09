@@ -218,7 +218,7 @@ export const useRoundTimeout = (duelId: BigNumberish, autoUpdate = false) => {
  * @param seasonId The ID of the season to query (optional)
  * @returns Object containing wins, losses, and draws counts
  */
-export function useDuelistSeasonStats(duelistId: BigNumberish, seasonId?: BigNumberish) {
+export function useDuelistSeasonStats(duelistId: BigNumberish, seasonId: BigNumberish) {
   const entities = useChallengeStore((state) => state.entities);
   const challenges = useAllStoreModels<models.Challenge>(entities, 'Challenge')
 
@@ -231,9 +231,7 @@ export function useDuelistSeasonStats(duelistId: BigNumberish, seasonId?: BigNum
           state === constants.ChallengeState.Draw ||
           state === constants.ChallengeState.Expired
       })
-      .filter((e) =>
-        BigInt(e.season_id) === BigInt(seasonId)
-      )
+      .filter((e) => bigintEquals(e.season_id, seasonId))
   ), [challenges, duelistId])
 
   const stats = useMemo(() => {

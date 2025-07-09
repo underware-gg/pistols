@@ -10,7 +10,7 @@ import { useClientTimestamp, useMemoGate, useMounted } from '@underware/pistols-
 import { useCanCollectSeason } from '/src/hooks/usePistolsContractCalls'
 import { useLordsReleaseEvents, Bill } from '/src/queries/useLordsReleaseEvents'
 import { useSeasonPool } from '/src/stores/bankStore'
-import { useSeasonTotals } from '/src/queries/useSeasonTotals'
+import { useSeasonsTotals } from '/src/queries/useSeasonsTotals'
 import { useAccount } from '@starknet-react/core'
 import { useConfig } from '/src/stores/configStore'
 import { usePlayer } from '/src/stores/playerStore'
@@ -55,7 +55,7 @@ function Seasons() {
   const { currentSeasonId } = useConfig()
   const { seasonIdsDescending: seasonIds } = useAllSeasonIds()
   const [reportSeasonId, setReportSeasonId] = useState<number>()
-  const totalsPerSeason = useSeasonTotals()
+  const totalsPerSeason = useSeasonsTotals()
   const header = (
     <Header fullWidth>
       <Row>
