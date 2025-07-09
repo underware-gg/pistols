@@ -23,7 +23,7 @@ chain_id = "WP_PISTOLS_ACADEMY"
 rpc_url = "https://api.cartridge.gg/x/pistols-academy/katana"
 account_address = "0x127fd5f1fe78a71f8bcd1fec63e3fe2f0486b6ecd5c86a0466c3a21fa5cfcec"
 private_key = "0xc5b2fcab997346f3ea1c00b002ecf6f382c5f9c9659a3894eb783c5320f912"
-world_address = "0x8b4838140a3cbd36ebe64d4b5aaf56a30cc3753c928a79338bf56c53f506c5"
+world_address = "0x490fbd1ee25354a172b8c8318bbe823addfe641c62839513f4897aa2c7e24f5"
 world_block = 1
 
 #--------------------------
