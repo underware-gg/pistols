@@ -19,7 +19,7 @@ import { Balance } from '/src/components/account/Balance';
 import { useIsMyAccount } from '/src/hooks/useIsYou';
 import { useDuelistSeasonStats, useFetchChallengeIdsByDuelistIds } from '/src/stores/challengeStore';
 import { useSeason, useAllSeasonIds, useFullLeaderboard, useLeaderboard } from '/src/stores/seasonStore';
-import { useSeasonTotals } from '/src/queries/useSeason';
+import { SeasonTotals, useSeasonTotals } from '/src/queries/useSeasonTotals';
 import { useDiscordSocialLink } from '/src/stores/eventsModelStore';
 import { useSeasonLeaderboardPrizes, SeasonLeaderboardPrizes } from '/src/queries/useSeasonLeaderboardPrizes';
 import { LoadingIcon } from '/src/components/ui/Icons';
@@ -34,11 +34,13 @@ const calculateReward = (rank: number, totalPrizePool: bigint): bigint => {
 const SeasonRow = memo(({ 
   season, 
   isSelected,
+  seasonTotals,
   seasonPrizes,
   onClick
 }: { 
   season: number, 
   isSelected: boolean, 
+  seasonTotals: SeasonTotals,
   seasonPrizes?: SeasonLeaderboardPrizes,
   onClick: () => void
 }) => {
@@ -46,7 +48,6 @@ const SeasonRow = memo(({
   const [isHovered, setIsHovered] = useState(false);
   const { timestamp_end, isActive } = useSeason(season);
   const { clientTimestamp } = useClientTimestamp(isActive);
-  const { accountsCount } = useSeasonTotals(season);
   const { scores } = useLeaderboard(season);
   
   const poolSeason = useSeasonPool(season);
@@ -105,7 +106,7 @@ const SeasonRow = memo(({
 
         <Grid.Column width={4}>
           <div style={{ fontSize: aspectWidth(0.9), color: '#888' }}>Participants:</div>
-          <div style={{ fontSize: aspectWidth(1.1), fontWeight: 'bold', color: 'white' }}>{accountsCount}</div>
+          <div style={{ fontSize: aspectWidth(1.1), fontWeight: 'bold', color: 'white' }}>{seasonTotals?.playerCount ?? <LoadingIcon className='Brightest' />}</div>
         </Grid.Column>
         
         <Grid.Column width={4}>
@@ -141,6 +142,7 @@ const PlayerRow = memo(({
   score: number,
   selectedSeasonId: number | null,
   seasonPrizes?: SeasonLeaderboardPrizes,
+  seasonTotals?: SeasonTotals,
 }) => {
   const { aspectWidth } = useGameAspect();
   const { dispatchSelectPlayerAddress, dispatchSelectDuelistId } = usePistolsContext();
@@ -251,6 +253,7 @@ const LeaderboardPodium = memo(({
   cardScale?: number,
   selectedSeasonId: number | null,
   seasonPrizes?: SeasonLeaderboardPrizes,
+  seasonTotals?: SeasonTotals,
 }) => {
   const { aspectWidth, aspectHeight } = useGameAspect();
   const { dispatchSelectPlayerAddress, dispatchSelectDuelistId } = usePistolsContext();
@@ -535,6 +538,7 @@ export default function ScLeaderboards() {
   }, [seasonIds, selectedSeasonId]);
 
   const prizesPerSeason = useSeasonLeaderboardPrizes();
+  const totalsPerSeason = useSeasonTotals();
 
   const { scores } = useFullLeaderboard(selectedSeasonId || 0);
   useFetchDuelistIds(scores.map(s => s.duelistId))
@@ -558,13 +562,14 @@ export default function ScLeaderboards() {
 
   const seasonRows = useMemo(() => {
     if (seasonIds.length < 2) return null;
-    return seasonIds.slice(1).map(season => (
+    return seasonIds.slice(1).map(seasonId => (
       <SeasonRow
-        key={season}
-        season={season}
-        isSelected={selectedSeasonId === season}
-        onClick={() => handleSeasonSelect(season)}
-        seasonPrizes={prizesPerSeason[season]}
+        key={seasonId}
+        season={seasonId}
+        isSelected={selectedSeasonId === seasonId}
+        onClick={() => handleSeasonSelect(seasonId)}
+        seasonTotals={totalsPerSeason[seasonId]}
+        seasonPrizes={prizesPerSeason[seasonId]}
       />
     ));
   }, [seasonIds, selectedSeasonId, handleSeasonSelect]);
@@ -584,6 +589,7 @@ export default function ScLeaderboards() {
               season={seasonIds[0]}
               isSelected={selectedSeasonId === seasonIds[0]}
               onClick={() => handleSeasonSelect(seasonIds[0])}
+              seasonTotals={totalsPerSeason[seasonIds[0]]}
             />
           )}
           
