@@ -5,7 +5,7 @@ import { parseCustomEnum } from '@underware/pistols-sdk/starknet'
 import { useMemoGate } from '@underware/pistols-sdk/utils/hooks'
 import { models, constants } from '@underware/pistols-sdk/pistols/gen'
 
-export type LordsReleaseBill = {
+export type Bill = {
   seasonId: number,
   duelistId: bigint,
   duelId: bigint,
@@ -42,7 +42,7 @@ export const useLordsReleaseEvents = (season_id: number) => {
   const bills = useMemo(() => (
     events.map(e => {
       const { variant, value } = parseCustomEnum<constants.ReleaseReason, number>(e.bill.reason)
-      const bill: LordsReleaseBill = {
+      const bill: Bill = {
         seasonId: Number(e.season_id),
         duelistId: BigInt(e.bill.duelist_id),
         duelId: BigInt(e.duel_id ?? 0),

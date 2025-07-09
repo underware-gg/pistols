@@ -8,7 +8,7 @@ import { useDojoSystemCalls, useSdkEntitiesGetState } from '@underware/pistols-s
 import { parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/starknet'
 import { useClientTimestamp, useMemoGate, useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useCanCollectSeason } from '/src/hooks/usePistolsContractCalls'
-import { useLordsReleaseEvents, LordsReleaseBill } from '/src/hooks/useLordsReleaseEvents'
+import { useLordsReleaseEvents, Bill } from '/src/queries/useLordsReleaseEvents'
 import { useSeasonPool } from '/src/stores/bankStore'
 import { useSeasonTotals } from '/src/queries/useSeason'
 import { useAccount } from '@starknet-react/core'
@@ -486,6 +486,37 @@ function LordsReleaseEvents({
   seasonId: number,
 }) {
   const { bills } = useLordsReleaseEvents(seasonId)
+  const {
+    otherBills,
+    developerBills,
+    consolidatedDeveloperBill,
+  } = useMemo(() => {
+    const otherBills = bills.filter((bill) => bill.reason !== constants.ReleaseReason.FameLostToDeveloper);
+    const developerBills = bills.filter((bill) => bill.reason === constants.ReleaseReason.FameLostToDeveloper);
+    const consolidatedDeveloperBill = developerBills.reduce((acc, bill) => {
+      acc.peggedFame += bill.peggedFame;
+      acc.peggedLords += bill.peggedLords;
+      acc.sponsoredLords += bill.sponsoredLords;
+      acc.recipient = bill.recipient;
+      return acc;
+    }, {
+      seasonId,
+      duelistId: 0n,
+      duelId: 0n,
+      timestamp: 0,
+      recipient: 0n,
+      reason: constants.ReleaseReason.FameLostToDeveloper,
+      position: 0,
+      peggedFame: 0n,
+      peggedLords: 0n,
+      sponsoredLords: 0n,
+    } as Bill);
+    return {
+      otherBills,
+      developerBills,
+      consolidatedDeveloperBill
+    };
+  }, [bills])
   return (
     <Table celled color='green'>
       <Header fullWidth>
@@ -502,9 +533,10 @@ function LordsReleaseEvents({
         </Row>
       </Header>
       <Body>
-        {bills.map((bill, index) => (
-          <BillRow key={`${index}`} bill={bill} />
-        ))}
+        {/* {bills.map((bill, index) => <BillRow key={`${index}`} bill={bill} />)} */}
+        {/* {developerBills.map((bill, index) => <BillRow key={`${index}`} bill={bill} />)} */}
+        <BillRow bill={consolidatedDeveloperBill} />
+        {otherBills.map((bill, index) => <BillRow key={`${index}`} bill={bill} />)}
       </Body>
     </Table>
   )
@@ -513,7 +545,7 @@ function LordsReleaseEvents({
 function BillRow({
   bill,
 }: {
-  bill: LordsReleaseBill,
+  bill: Bill,
 }) {
   const { owner, isLoading: isLoadingOwner } = useOwnerOfDuelist(bill.duelistId)
   const { username } = usePlayer(owner)

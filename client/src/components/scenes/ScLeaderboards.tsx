@@ -12,6 +12,7 @@ import { DuelistCard } from '/src/components/cards/DuelistCard';
 import { DUELIST_CARD_HEIGHT, DUELIST_CARD_WIDTH } from '/src/data/cardConstants';
 import { formatTimestampDeltaCountdown } from '@underware/pistols-sdk/utils';
 import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks';
+import { get_season_distribution } from '@underware/pistols-sdk/pistols';
 import { useOwnerOfDuelist } from '/src/hooks/useTokenDuelists';
 import { useSeasonPool } from '/src/stores/bankStore';
 import { Balance } from '/src/components/account/Balance';
@@ -20,22 +21,25 @@ import { useDuelistSeasonStats, useFetchChallengeIdsByDuelistIds } from '/src/st
 import { useSeason, useAllSeasonIds, useFullLeaderboard, useLeaderboard } from '/src/stores/seasonStore';
 import { useSeasonTotals } from '/src/queries/useSeason';
 import { useDiscordSocialLink } from '/src/stores/eventsModelStore';
+import { useSeasonLeaderboardPrizes, SeasonLeaderboardPrizes } from '/src/queries/useSeasonLeaderboardPrizes';
 import { LoadingIcon } from '/src/components/ui/Icons';
 
 const calculateReward = (rank: number, totalPrizePool: bigint): bigint => {
   if (rank > 10) return 0n;
-  const rewardPercentages = [25, 20, 15, 10, 8, 6, 6, 4, 4, 2];
+  const rewardPercentages = get_season_distribution();
   return (totalPrizePool * BigInt(rewardPercentages[rank - 1])) / 100n;
 };
 
 // Memoized SeasonRow component
 const SeasonRow = memo(({ 
   season, 
-  isSelected, 
+  isSelected,
+  seasonPrizes,
   onClick
 }: { 
   season: number, 
   isSelected: boolean, 
+  seasonPrizes?: SeasonLeaderboardPrizes,
   onClick: () => void
 }) => {
   const { aspectWidth } = useGameAspect();
@@ -43,9 +47,13 @@ const SeasonRow = memo(({
   const { timestamp_end, isActive } = useSeason(season);
   const { clientTimestamp } = useClientTimestamp(isActive);
   const { accountsCount } = useSeasonTotals(season);
-  const poolSeason = useSeasonPool(season);
   const { scores } = useLeaderboard(season);
   
+  const poolSeason = useSeasonPool(season);
+  const totalPrizePool = useMemo(() => {
+    return seasonPrizes?.totalLords ?? (poolSeason.balanceLords + poolSeason.balanceFameToLords);
+  }, [seasonPrizes, poolSeason]);
+
   const winnerDuelistId = useMemo(() => {
     if (isActive || !scores || scores.length === 0) return null;
     return scores[0].duelistId;
@@ -103,7 +111,7 @@ const SeasonRow = memo(({
         <Grid.Column width={4}>
           <div style={{ fontSize: aspectWidth(0.9), color: '#888' }}>Prize Pool:</div>
           <div style={{ fontSize: aspectWidth(1.1), fontWeight: 'bold', color: 'white' }}>
-            <Balance lords wei={poolSeason.balanceLords + poolSeason.balanceFameToLords} />
+            <Balance lords wei={totalPrizePool} />
           </div>
         </Grid.Column>
         
@@ -125,12 +133,14 @@ const PlayerRow = memo(({
   duelistId, 
   rank, 
   score,
-  selectedSeasonId
+  selectedSeasonId,
+  seasonPrizes,
 }: { 
   duelistId: BigNumberish, 
   rank: number, 
   score: number,
-  selectedSeasonId: number | null
+  selectedSeasonId: number | null,
+  seasonPrizes?: SeasonLeaderboardPrizes,
 }) => {
   const { aspectWidth } = useGameAspect();
   const { dispatchSelectPlayerAddress, dispatchSelectDuelistId } = usePistolsContext();
@@ -140,16 +150,14 @@ const PlayerRow = memo(({
   const { name: playerName } = usePlayer(owner);
   const { isMyAccount: isMe } = useIsMyAccount(owner);
   const { wins, losses, isLoading } = useDuelistSeasonStats(duelistId, selectedSeasonId);
-  const poolSeason = useSeasonPool(selectedSeasonId || 0);
   const { isActive } = useSeason(selectedSeasonId || 0);
   const { isLinked, avatarUrl } = useDiscordSocialLink(owner);
 
-  const totalPrizePool = useMemo(() => {
-    if (!poolSeason) return 0n;
-    return poolSeason.balanceLords + poolSeason.balanceFameToLords;
-  }, [poolSeason]);
-
-  const reward = useMemo(() => calculateReward(rank, totalPrizePool), [rank, totalPrizePool]);
+  const poolSeason = useSeasonPool(selectedSeasonId || 0);
+  const reward = useMemo(() => {
+    return seasonPrizes?.duelists[duelistId.toString()]
+      ?? calculateReward(rank, poolSeason.balanceLords + poolSeason.balanceFameToLords);
+  }, [seasonPrizes, rank, poolSeason]);
 
   const backgroundImage = `/images/ui/leaderboards/duelist_background${isMe ? '_mine' : ''}${isDead ? '_dead' : ''}.png`;
 
@@ -232,7 +240,8 @@ const LeaderboardPodium = memo(({
   duelistId,
   score,
   cardScale = 0.6,
-  selectedSeasonId
+  selectedSeasonId,
+  seasonPrizes,
 }: {
   rank: 1 | 2 | 3,
   color: string,
@@ -240,7 +249,8 @@ const LeaderboardPodium = memo(({
   duelistId: BigNumberish,
   score: number,
   cardScale?: number,
-  selectedSeasonId: number | null
+  selectedSeasonId: number | null,
+  seasonPrizes?: SeasonLeaderboardPrizes,
 }) => {
   const { aspectWidth, aspectHeight } = useGameAspect();
   const { dispatchSelectPlayerAddress, dispatchSelectDuelistId } = usePistolsContext();
@@ -249,15 +259,13 @@ const LeaderboardPodium = memo(({
   const { owner } = useOwnerOfDuelist(Number(duelistId));
   const { wins, losses, isLoading } = useDuelistSeasonStats(Number(duelistId), selectedSeasonId);
   const { isMyAccount: isMe } = useIsMyAccount(owner);
-  const poolSeason = useSeasonPool(selectedSeasonId || 0);
   const { isActive } = useSeason(selectedSeasonId || 0);
 
-  const totalPrizePool = useMemo(() => {
-    if (!poolSeason) return 0n;
-    return poolSeason.balanceLords + poolSeason.balanceFameToLords;
-  }, [poolSeason]);
-
-  const reward = useMemo(() => calculateReward(rank, totalPrizePool), [rank, totalPrizePool]);
+  const poolSeason = useSeasonPool(selectedSeasonId || 0);
+  const reward = useMemo(() => {
+    return seasonPrizes?.duelists[duelistId.toString()]
+      ?? calculateReward(rank, poolSeason.balanceLords + poolSeason.balanceFameToLords);
+  }, [seasonPrizes, rank, poolSeason]);
   
   const podiumType = rank === 1 ? 'gold' : rank === 2 ? 'silver' : 'bronze';
   const podiumImage = `/images/ui/leaderboards/podium_${podiumType}${isDead ? '_dead' : ''}.png`;
@@ -526,6 +534,8 @@ export default function ScLeaderboards() {
     }
   }, [seasonIds, selectedSeasonId]);
 
+  const prizesPerSeason = useSeasonLeaderboardPrizes();
+
   const { scores } = useFullLeaderboard(selectedSeasonId || 0);
   useFetchDuelistIds(scores.map(s => s.duelistId))
 
@@ -554,6 +564,7 @@ export default function ScLeaderboards() {
         season={season}
         isSelected={selectedSeasonId === season}
         onClick={() => handleSeasonSelect(season)}
+        seasonPrizes={prizesPerSeason[season]}
       />
     ));
   }, [seasonIds, selectedSeasonId, handleSeasonSelect]);
@@ -605,6 +616,7 @@ export default function ScLeaderboards() {
                       duelistId={Number(scores[1].duelistId)}
                       score={scores[1].points}
                       selectedSeasonId={selectedSeasonId}
+                      seasonPrizes={prizesPerSeason[selectedSeasonId]}
                     />
                   ) : (
                     <EmptyPodium rank={2} color="silver" height={67} />
@@ -618,6 +630,7 @@ export default function ScLeaderboards() {
                       duelistId={Number(scores[0].duelistId)}
                       score={scores[0].points}
                       selectedSeasonId={selectedSeasonId}
+                      seasonPrizes={prizesPerSeason[selectedSeasonId]}
                     />
                   ) : (
                     <EmptyPodium rank={1} color="gold" height={69} />
@@ -631,6 +644,7 @@ export default function ScLeaderboards() {
                       duelistId={Number(scores[2].duelistId)}
                       score={scores[2].points}
                       selectedSeasonId={selectedSeasonId}
+                      seasonPrizes={prizesPerSeason[selectedSeasonId]}
                     />
                   ) : (
                     <EmptyPodium rank={3} color="#cd7f32" height={65} />
@@ -647,6 +661,7 @@ export default function ScLeaderboards() {
                       rank={startIndex + index + 1}
                       score={entry.points}
                       selectedSeasonId={selectedSeasonId}
+                      seasonPrizes={prizesPerSeason[selectedSeasonId]}
                     />
                   ))}
                 </div>
