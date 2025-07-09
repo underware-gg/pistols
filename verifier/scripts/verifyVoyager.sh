@@ -21,7 +21,7 @@ verify_contract () {
   export CLASS_HASH=$(get_contract_class_hash "$CONTRACT_NAME")
   echo "[$CONTRACT_NAME] submitting... class_hash:$CLASS_HASH"
   # verify
-  export EXECUTE_RESULT=$(cargo run -- --network $NETWORK submit --contract "$CONTRACT_NAME" --hash "$CLASS_HASH" --path "$SCARB_PROJECT_PATH" --execute)
+  export EXECUTE_RESULT=$(cargo run -- --network $NETWORK verify --contract-name "$CONTRACT_NAME" --class-hash "$CLASS_HASH" --path "$SCARB_PROJECT_PATH" --execute)
   export JOB_ID=$(echo $EXECUTE_RESULT | cut -d ':' -f 2 | xargs)
   echo "[$CONTRACT_NAME] waiting... job_id:$JOB_ID"
   cargo run -- --network $NETWORK status --job "$JOB_ID"
