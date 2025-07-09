@@ -212,64 +212,6 @@ export const useRoundTimeout = (duelId: BigNumberish, autoUpdate = false) => {
   }
 }
 
-/**
- * Returns the number of wins, losses, and draws for a specific duelist in a given season
- * @param duelistId The ID of the duelist to query
- * @param seasonId The ID of the season to query (optional)
- * @returns Object containing wins, losses, and draws counts
- */
-export function useDuelistSeasonStats(duelistId: BigNumberish, seasonId: BigNumberish) {
-  const entities = useChallengeStore((state) => state.entities);
-  const challenges = useAllStoreModels<models.Challenge>(entities, 'Challenge')
-
-  const result = useMemo(() => (
-    challenges
-      .filter((e) => bigintEquals(e?.duelist_id_a, duelistId) || bigintEquals(e?.duelist_id_b, duelistId))
-      .filter((e) => {
-        const state = parseEnumVariant<constants.ChallengeState>(e.state)
-        return state === constants.ChallengeState.Resolved ||
-          state === constants.ChallengeState.Draw ||
-          state === constants.ChallengeState.Expired
-      })
-      .filter((e) => bigintEquals(e.season_id, seasonId))
-  ), [challenges, duelistId])
-
-  const stats = useMemo(() => {
-    if (!duelistId || !seasonId) {
-      return { wins: 0, losses: 0 }
-    }
-    // Count wins, losses and draws
-    const stats = result.reduce((acc, challenge) => {
-      const isDuelistA = BigInt(challenge.duelist_id_a) === BigInt(duelistId)
-      const winner = challenge.winner
-
-      // Draw case
-      if (winner === 0n) {
-        acc.losses++
-      }
-      // Win case
-      else if ((isDuelistA && winner === 1) ||
-        (!isDuelistA && winner === 2)) {
-        acc.wins++
-      }
-      // Loss case
-      else {
-        acc.losses++
-      }
-
-      return acc
-    }, { wins: 0, losses: 0 })
-
-    return stats
-  }, [result, duelistId, seasonId])
-
-  // console.log(`useDuelistSeasonStats(${Number(duelistId)}, ${Number(seasonId)}) =>`, stats, result)
-
-  return {
-    ...stats,
-    isLoading: (result.length === 0),
-  }
-}
 
 
 /**

@@ -10,17 +10,17 @@ import { BigNumberish } from 'starknet';
 import { usePistolsContext } from '/src/hooks/PistolsContext';
 import { DuelistCard } from '/src/components/cards/DuelistCard';
 import { DUELIST_CARD_HEIGHT, DUELIST_CARD_WIDTH } from '/src/data/cardConstants';
-import { formatTimestampDeltaCountdown } from '@underware/pistols-sdk/utils';
+import { bigintToDecimal, formatTimestampDeltaCountdown } from '@underware/pistols-sdk/utils';
 import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks';
 import { get_season_distribution } from '@underware/pistols-sdk/pistols';
 import { useOwnerOfDuelist } from '/src/hooks/useTokenDuelists';
 import { useSeasonPool } from '/src/stores/bankStore';
 import { Balance } from '/src/components/account/Balance';
 import { useIsMyAccount } from '/src/hooks/useIsYou';
-import { useDuelistSeasonStats, useFetchChallengeIdsByDuelistIds } from '/src/stores/challengeStore';
 import { useSeason, useAllSeasonIds, useFullLeaderboard, useLeaderboard } from '/src/stores/seasonStore';
 import { useSeasonsTotals, SeasonTotals } from '/src/queries/useSeasonsTotals';
 import { useSeasonsLeaderboardRewards, SeasonLeaderboardPrizes } from '/src/queries/useSeasonsLeaderboardRewards';
+import { useSeasonDuelistsStats, SeasonDuelistsStats } from '/src/queries/useSeasonDuelistsStats';
 import { useDiscordSocialLink } from '/src/stores/eventsModelStore';
 import { LoadingIcon } from '/src/components/ui/Icons';
 
@@ -136,6 +136,7 @@ const PlayerRow = memo(({
   score,
   selectedSeasonId,
   seasonRewards,
+  stats,
 }: { 
   duelistId: BigNumberish, 
   rank: number, 
@@ -143,6 +144,7 @@ const PlayerRow = memo(({
   selectedSeasonId: number | null,
   seasonRewards?: SeasonLeaderboardPrizes,
   seasonTotals?: SeasonTotals,
+  stats: SeasonDuelistsStats,
 }) => {
   const { aspectWidth } = useGameAspect();
   const { dispatchSelectPlayerAddress, dispatchSelectDuelistId } = usePistolsContext();
@@ -151,7 +153,6 @@ const PlayerRow = memo(({
   const { owner } = useOwnerOfDuelist(duelistId);
   const { name: playerName } = usePlayer(owner);
   const { isMyAccount: isMe } = useIsMyAccount(owner);
-  const { wins, losses, isLoading } = useDuelistSeasonStats(duelistId, selectedSeasonId);
   const { isActive } = useSeason(selectedSeasonId || 0);
   const { isLinked, avatarUrl } = useDiscordSocialLink(owner);
 
@@ -207,12 +208,12 @@ const PlayerRow = memo(({
 
         <Grid.Column width={2}>
           <div style={{ fontSize: aspectWidth(0.9), color: '#888' }}>Wins:</div>
-          <div style={{ fontSize: aspectWidth(1.3), fontWeight: 'bold', color: 'green' }}>{isLoading ? <LoadingIcon className='Brightest' /> : wins}</div>
+          <div style={{ fontSize: aspectWidth(1.3), fontWeight: 'bold', color: 'green' }}>{stats?.wins ?? <LoadingIcon className='Brightest' />}</div>
         </Grid.Column>
 
         <Grid.Column width={2}>
           <div style={{ fontSize: aspectWidth(0.9), color: '#888' }}>Losses:</div>
-          <div style={{ fontSize: aspectWidth(1.3), fontWeight: 'bold', color: 'red' }}>{isLoading ? <LoadingIcon className='Brightest' /> : losses}</div>
+          <div style={{ fontSize: aspectWidth(1.3), fontWeight: 'bold', color: 'red' }}>{stats?.losses ?? <LoadingIcon className='Brightest' />}</div>
         </Grid.Column>
 
         <Grid.Column width={2}>
@@ -244,6 +245,7 @@ const LeaderboardPodium = memo(({
   cardScale = 0.6,
   selectedSeasonId,
   seasonRewards,
+  stats,
 }: {
   rank: 1 | 2 | 3,
   color: string,
@@ -254,13 +256,13 @@ const LeaderboardPodium = memo(({
   selectedSeasonId: number | null,
   seasonRewards?: SeasonLeaderboardPrizes,
   seasonTotals?: SeasonTotals,
+  stats: SeasonDuelistsStats,
 }) => {
   const { aspectWidth, aspectHeight } = useGameAspect();
   const { dispatchSelectPlayerAddress, dispatchSelectDuelistId } = usePistolsContext();
   const posterRef = useRef<ProfilePosterHandle>(null);
   const { isDead } = useDuelist(Number(duelistId));
   const { owner } = useOwnerOfDuelist(Number(duelistId));
-  const { wins, losses, isLoading } = useDuelistSeasonStats(Number(duelistId), selectedSeasonId);
   const { isMyAccount: isMe } = useIsMyAccount(owner);
   const { isActive } = useSeason(selectedSeasonId || 0);
 
@@ -387,12 +389,12 @@ const LeaderboardPodium = memo(({
             
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: aspectWidth(1) }}>
               <div style={{ color: '#ffffff', fontSize: aspectWidth(1), fontWeight: 'bold' }}>WINS:</div>
-              <div style={{ color: '#00ff00', fontSize: aspectWidth(1), fontWeight: 'bold', textShadow: '0 0 10px rgba(0,255,0,0.5)' }}>{isLoading ? <LoadingIcon className='Brightest' /> : wins}</div>
+              <div style={{ color: '#00ff00', fontSize: aspectWidth(1), fontWeight: 'bold', textShadow: '0 0 10px rgba(0,255,0,0.5)' }}>{stats?.wins ??<LoadingIcon className='Brightest' />}</div>
             </div>
             
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: aspectWidth(1) }}>
               <div style={{ color: '#ffffff', fontSize: aspectWidth(1), fontWeight: 'bold' }}>LOSSES:</div>
-              <div style={{ color: '#ff4444', fontSize: aspectWidth(1), fontWeight: 'bold', textShadow: '0 0 10px rgba(255,0,0,0.5)' }}>{isLoading ? <LoadingIcon className='Brightest' /> : losses}</div>
+              <div style={{ color: '#ff4444', fontSize: aspectWidth(1), fontWeight: 'bold', textShadow: '0 0 10px rgba(255,0,0,0.5)' }}>{stats?.losses ?? <LoadingIcon className='Brightest' />}</div>
             </div>
           </div>
         </div>
@@ -539,6 +541,7 @@ export default function ScLeaderboards() {
 
   const rewardsPerSeason = useSeasonsLeaderboardRewards();
   const totalsPerSeason = useSeasonsTotals();
+  const duelistsStats = useSeasonDuelistsStats(selectedSeasonId || 0);
 
   const { scores } = useFullLeaderboard(selectedSeasonId || 0);
   useFetchDuelistIds(scores.map(s => s.duelistId))
@@ -554,7 +557,6 @@ export default function ScLeaderboards() {
     if (!scores) return [];
     return scores.slice(startIndex, startIndex + itemsPerPage);
   }, [scores, startIndex, itemsPerPage]);
-  useFetchChallengeIdsByDuelistIds(paginatedScores.map(s => s.duelistId))
 
   const handlePageChange = useCallback((_, data) => {
     setActivePage(Number(data.activePage));
@@ -623,6 +625,7 @@ export default function ScLeaderboards() {
                       score={scores[1].points}
                       selectedSeasonId={selectedSeasonId}
                       seasonRewards={rewardsPerSeason[selectedSeasonId]}
+                      stats={duelistsStats[bigintToDecimal(scores[1].duelistId)]}
                     />
                   ) : (
                     <EmptyPodium rank={2} color="silver" height={67} />
@@ -637,6 +640,7 @@ export default function ScLeaderboards() {
                       score={scores[0].points}
                       selectedSeasonId={selectedSeasonId}
                       seasonRewards={rewardsPerSeason[selectedSeasonId]}
+                      stats={duelistsStats[bigintToDecimal(scores[0].duelistId)]}
                     />
                   ) : (
                     <EmptyPodium rank={1} color="gold" height={69} />
@@ -651,6 +655,7 @@ export default function ScLeaderboards() {
                       score={scores[2].points}
                       selectedSeasonId={selectedSeasonId}
                       seasonRewards={rewardsPerSeason[selectedSeasonId]}
+                      stats={duelistsStats[bigintToDecimal(scores[2].duelistId)]}
                     />
                   ) : (
                     <EmptyPodium rank={3} color="#cd7f32" height={65} />
@@ -668,6 +673,7 @@ export default function ScLeaderboards() {
                       score={entry.points}
                       selectedSeasonId={selectedSeasonId}
                       seasonRewards={rewardsPerSeason[selectedSeasonId]}
+                      stats={duelistsStats[bigintToDecimal(entry.duelistId)]}
                     />
                   ))}
                 </div>
