@@ -96,6 +96,7 @@ function Contracts() {
         <ContractRow name='duel_token' />
         <ContractRow name='duelist_token' />
         <ContractRow name='pack_token' />
+        <ContractRow name='ring_token' />
         <ContractRow name='tournament_token' />
       </Body>
     </Table>
