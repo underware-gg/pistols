@@ -84,6 +84,12 @@ pub trait IPackTokenPublic<TState> {
     fn open(ref self: TState, pack_id: u128) -> Span<u128>; //@description: Open a pack, mint its contents
 }
 
+// Exposed to world
+#[starknet::interface]
+pub trait IPackTokenProtected<TState> {
+    fn mint_bot_duelist(ref self: TState, duelist_profile: DuelistProfile) -> u128;
+}
+
 #[dojo::contract]
 pub mod pack_token {    
     use starknet::{ContractAddress};
@@ -142,6 +148,7 @@ pub mod pack_token {
         IBankProtectedDispatcherTrait,
         IVrfProviderDispatcherTrait, Source,
         IAdminDispatcherTrait,
+        IDuelistTokenProtectedDispatcherTrait,
     };
     use pistols::models::{
         pack::{Pack, PackTrait, PackType, PackTypeTrait},
@@ -150,7 +157,7 @@ pub mod pack_token {
         pool::{Pool, PoolTrait, PoolType},
     };
     use pistols::types::{
-        duelist_profile::{DuelistProfile, DuelistProfileTrait},
+        duelist_profile::{DuelistProfile, DuelistProfileTrait, GenesisKey},
         timestamp::{TimestampTrait, TIMESTAMP},
         constants::{METADATA},
     };
@@ -160,6 +167,7 @@ pub mod pack_token {
     use pistols::utils::misc::{ZERO};
 
     pub mod Errors {
+        pub const INVALID_CALLER: felt252       = 'PACK: Invalid caller';
         pub const CALLER_NOT_ADMIN: felt252     = 'PACK: Caller not admin';
         pub const NOT_IMPLEMENTED: felt252      = 'PACK: Not implemented';
         pub const INELIGIBLE: felt252           = 'PACK: Ineligible';
@@ -381,7 +389,12 @@ pub mod pack_token {
 
             // open...
             let mut pack: Pack = store.get_pack(pack_id);
-            let token_ids: Span<u128> = pack.open(ref store, recipient);
+            assert(!pack.is_open, Errors::ALREADY_OPENED);
+
+            // open...
+            let token_ids: Span<u128> = self._mint_pack_duelists(ref store, pack, recipient);
+            pack.is_open = true;
+            store.set_pack(@pack);
 
             // minted fame, peg to paid LORDS
             let from_pool_type: PoolType = pack.pack_type.deposited_pool_type();
@@ -394,6 +407,27 @@ pub mod pack_token {
             PlayerTrait::check_in(ref store, Activity::PackOpened, recipient, pack_id.into());
 
             (token_ids)
+        }
+    }
+
+
+    //-----------------------------------
+    // Protected
+    //
+    #[abi(embed_v0)]
+    impl PackTokenProtectedImpl of super::IPackTokenProtected<ContractState> {
+        fn mint_bot_duelist(ref self: ContractState, duelist_profile: DuelistProfile) -> u128 {
+            let mut store: Store = StoreTrait::new(self.world_default());
+
+            // only bot contract can mint a bot duelist
+            let bot_address: ContractAddress = store.world.bot_player_address();
+            assert(starknet::get_caller_address() == bot_address, Errors::INVALID_CALLER);
+
+            let token_ids: Span<u128> = store.world.duelist_token_protected_dispatcher().mint_duelists(
+                bot_address, 1, duelist_profile, 0
+            );
+
+            (*token_ids[0])
         }
     }
 
@@ -418,8 +452,7 @@ pub mod pack_token {
         ) -> Pack {
             // mint!
             let token_id: u128 = self.token.mint_next(recipient);
-
-            // create Duelist
+            // create Pack
             let mut pack = Pack {
                 pack_id: token_id,
                 pack_type,
@@ -429,8 +462,51 @@ pub mod pack_token {
                 duelist_profile,
             };
             store.set_pack(@pack);
-
             (pack)
+        }
+
+        fn _mint_pack_duelists(ref self: ContractState,
+            ref store: Store,
+            pack: Pack,
+            recipient: ContractAddress,
+        ) -> Span<u128> {
+            let token_ids: Span<u128> = match pack.pack_type {
+                PackType::Unknown => { [].span() },
+                PackType::StarterPack => {
+                    (store.world.duelist_token_protected_dispatcher()
+                        .mint_duelists(
+                            recipient,
+                            pack.pack_type.descriptor().quantity,
+                            DuelistProfile::Genesis(GenesisKey::Unknown),
+                            0x0100, // fake seed: Ser Walker (0x__00) + Lady Vengeance (0x01__)
+                        )
+                    )
+                },
+                PackType::FreeDuelist |
+                PackType::GenesisDuelists5x => {
+                    (store.world.duelist_token_protected_dispatcher()
+                        .mint_duelists(
+                            recipient,
+                            pack.pack_type.descriptor().quantity,
+                            DuelistProfile::Genesis(GenesisKey::Unknown),
+                            pack.seed,
+                        )
+                    )
+                },
+                PackType::SingleDuelist => {
+                    assert(pack.duelist_profile.is_some(), Errors::MISSING_DUELIST);
+                    let duelist_profile: DuelistProfile = pack.duelist_profile.unwrap();
+                    (store.world.duelist_token_protected_dispatcher()
+                        .mint_duelists(
+                            recipient,
+                            pack.pack_type.descriptor().quantity,
+                            duelist_profile,
+                            0,
+                        )
+                    )
+                },
+            };
+            (token_ids)
         }
     }
 

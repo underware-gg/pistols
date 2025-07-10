@@ -1,4 +1,3 @@
-use starknet::{ContractAddress};
 pub use pistols::types::duelist_profile::{DuelistProfile};
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
@@ -105,60 +104,12 @@ mod PACK_TYPES {
 //----------------------------------
 // Traits
 //
-use pistols::systems::tokens::pack_token::pack_token::{Errors as PackErrors};
-use pistols::interfaces::dns::{
-    DnsTrait,
-    IDuelistTokenProtectedDispatcherTrait,
-};
 use pistols::models::pool::{PoolType};
-use pistols::types::duelist_profile::{DuelistProfileTrait, GenesisKey};
+use pistols::types::duelist_profile::{DuelistProfileTrait};
 use pistols::utils::short_string::{ShortStringTrait};
-use pistols::libs::store::{Store, StoreTrait};
 
 #[generate_trait]
 pub impl PackImpl of PackTrait {
-    fn open(ref self: Pack, ref store: Store, recipient: ContractAddress) -> Span<u128> {
-        assert(!self.is_open, PackErrors::ALREADY_OPENED);
-        let token_ids: Span<u128> = match self.pack_type {
-            PackType::Unknown => { [].span() },
-            PackType::StarterPack => {
-                (store.world.duelist_token_protected_dispatcher()
-                    .mint_duelists(
-                        recipient,
-                        self.pack_type.descriptor().quantity,
-                        DuelistProfile::Genesis(GenesisKey::Unknown),
-                        0x0100, // fake seed: Ser Walker (0x__00) + Lady Vengeance (0x01__)
-                    )
-                )
-            },
-            PackType::FreeDuelist |
-            PackType::GenesisDuelists5x => {
-                (store.world.duelist_token_protected_dispatcher()
-                    .mint_duelists(
-                        recipient,
-                        self.pack_type.descriptor().quantity,
-                        DuelistProfile::Genesis(GenesisKey::Unknown),
-                        self.seed,
-                    )
-                )
-            },
-            PackType::SingleDuelist => {
-                assert(self.duelist_profile.is_some(), PackErrors::MISSING_DUELIST);
-                let duelist_profile: DuelistProfile = self.duelist_profile.unwrap();
-                (store.world.duelist_token_protected_dispatcher()
-                    .mint_duelists(
-                        recipient,
-                        self.pack_type.descriptor().quantity,
-                        duelist_profile,
-                        0,
-                    )
-                )
-            },
-        };
-        self.is_open = true;
-        store.set_pack(@self);
-        (token_ids)
-    }
     fn contents(self: @Pack) -> ByteArray {
         (match self.duelist_profile {
             Option::Some(profile) => {

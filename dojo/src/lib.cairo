@@ -10,6 +10,7 @@ mod systems {
     pub mod bank;
     pub mod game;
     pub mod game_loop;
+    pub mod bot_player;
     pub mod rng;
     pub mod rng_mock;
     pub mod tutorial;
@@ -100,6 +101,7 @@ mod utils {
 mod tests {
     pub mod test_admin;
     pub mod test_admin_fix;
+    pub mod test_bot_player;
     pub mod test_bank;
     pub mod test_cards;
     pub mod test_challenge;

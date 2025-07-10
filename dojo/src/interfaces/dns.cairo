@@ -11,13 +11,14 @@ pub use pistols::systems::{
     bank::{IBankDispatcher, IBankDispatcherTrait, IBankProtectedDispatcher, IBankProtectedDispatcherTrait},
     game::{IGameDispatcher, IGameDispatcherTrait},
     game_loop::{IGameLoopDispatcher, IGameLoopDispatcherTrait},
+    bot_player::{IBotPlayerDispatcher, IBotPlayerDispatcherTrait, IBotPlayerProtectedDispatcher, IBotPlayerProtectedDispatcherTrait},
     tutorial::{ITutorialDispatcher, ITutorialDispatcherTrait},
     rng::{IRngDispatcher, IRngDispatcherTrait},
     rng_mock::{IRngMockDispatcher, IRngMockDispatcherTrait},
     tokens::{
         duel_token::{IDuelTokenDispatcher, IDuelTokenDispatcherTrait, IDuelTokenProtectedDispatcher, IDuelTokenProtectedDispatcherTrait},
         duelist_token::{IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait, IDuelistTokenProtectedDispatcher, IDuelistTokenProtectedDispatcherTrait},
-        pack_token::{IPackTokenDispatcher, IPackTokenDispatcherTrait},
+        pack_token::{IPackTokenDispatcher, IPackTokenDispatcherTrait, IPackTokenProtectedDispatcher, IPackTokenProtectedDispatcherTrait},
         ring_token::{IRingTokenDispatcher, IRingTokenDispatcherTrait},
         // tournament_token::{ITournamentTokenDispatcher, ITournamentTokenDispatcherTrait},
         fame_coin::{IFameCoinDispatcher, IFameCoinDispatcherTrait, IFameCoinProtectedDispatcher, IFameCoinProtectedDispatcherTrait},
@@ -41,6 +42,7 @@ pub mod SELECTORS {
     pub const BANK: felt252 = selector_from_tag!("pistols-bank");
     pub const GAME: felt252 = selector_from_tag!("pistols-game");
     pub const GAME_LOOP: felt252 = selector_from_tag!("pistols-game_loop");
+    pub const BOT_PLAYER: felt252 = selector_from_tag!("pistols-bot_player");
     pub const RNG: felt252 = selector_from_tag!("pistols-rng");
     pub const RNG_MOCK: felt252 = selector_from_tag!("pistols-rng_mock");
     // tokens
@@ -102,6 +104,10 @@ pub impl DnsImpl of DnsTrait {
     #[inline(always)]
     fn game_loop_address(self: @WorldStorage) -> ContractAddress {
         (self.find_contract_address(@"game_loop"))
+    }
+    #[inline(always)]
+    fn bot_player_address(self: @WorldStorage) -> ContractAddress {
+        (self.find_contract_address(@"bot_player"))
     }
     #[inline(always)]
     fn tutorial_address(self: @WorldStorage) -> ContractAddress {
@@ -182,6 +188,14 @@ pub impl DnsImpl of DnsTrait {
     fn caller_is_duel_contract(self: @WorldStorage) -> bool {
         (starknet::get_caller_address() == self.duel_token_address())
     }
+    #[inline(always)]
+    fn is_bot_player_contract(self: @WorldStorage, address: ContractAddress) -> bool {
+        (address == self.bot_player_address())
+    }
+    #[inline(always)]
+    fn caller_is_bot_player_contract(self: @WorldStorage) -> bool {
+        (starknet::get_caller_address() == self.bot_player_address())
+    }
     // #[inline(always)]
     // fn caller_is_tournament_contract(self: @WorldStorage) -> bool {
     //     (starknet::get_caller_address() == self.tournament_token_address())
@@ -209,6 +223,14 @@ pub impl DnsImpl of DnsTrait {
     #[inline(always)]
     fn game_loop_dispatcher(self: @WorldStorage) -> IGameLoopDispatcher {
         (IGameLoopDispatcher{ contract_address: self.game_loop_address() })
+    }
+    #[inline(always)]
+    fn bot_player_dispatcher(self: @WorldStorage) -> IBotPlayerDispatcher {
+        (IBotPlayerDispatcher{ contract_address: self.bot_player_address() })
+    }
+    #[inline(always)]
+    fn bot_player_protected_dispatcher(self: @WorldStorage) -> IBotPlayerProtectedDispatcher {
+        (IBotPlayerProtectedDispatcher{ contract_address: self.bot_player_address() })
     }
     #[inline(always)]
     fn tutorial_dispatcher(self: @WorldStorage) -> ITutorialDispatcher {
@@ -241,6 +263,10 @@ pub impl DnsImpl of DnsTrait {
     #[inline(always)]
     fn pack_token_dispatcher(self: @WorldStorage) -> IPackTokenDispatcher {
         (IPackTokenDispatcher{ contract_address: self.pack_token_address() })
+    }
+    #[inline(always)]
+    fn pack_token_protected_dispatcher(self: @WorldStorage) -> IPackTokenProtectedDispatcher {
+        (IPackTokenProtectedDispatcher{ contract_address: self.pack_token_address() })
     }
     #[inline(always)]
     fn ring_token_dispatcher(self: @WorldStorage) -> IRingTokenDispatcher {
