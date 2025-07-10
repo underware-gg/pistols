@@ -205,7 +205,7 @@ mod tests {
     }
 
     #[test]
-    fn test_challenge_reply_expired() {
+    fn test_challenge_reply_expired_is_OK() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let A = OWNER();
         let B = OTHER();
@@ -215,20 +215,11 @@ mod tests {
 
         tester::assert_pact(@sys, duel_id, ch, true, false, "created");
         assert!(!sys.game.can_collect_duel(duel_id), "!can_collect_duel");
-        let (_block_number, timestamp) = tester::elapse_block_timestamp(TimestampTrait::from_hours(expire_hours));
+        let (_block_number, _timestamp) = tester::elapse_block_timestamp(TimestampTrait::from_hours(expire_hours));
         assert!(sys.game.can_collect_duel(duel_id), "can_collect_duel");
-        let new_state: ChallengeState = tester::execute_reply_duel(@sys.duels, A, ID(A), duel_id, true);
-        assert_eq!(new_state, ChallengeState::Expired, "expired");
-        tester::assert_pact(@sys, duel_id, ch, false, false, "replied");
-
-        let ch = sys.store.get_challenge_value(duel_id);
-        assert_eq!(ch.state, new_state, "state");
-        assert_eq!(ch.winner, 0, "winner");
-        assert_eq!(ch.season_id, sys.store.get_current_season_id(), "season_id");
-        assert_gt!(ch.timestamps.start, 0, "timestamps.start");
-        assert_eq!(ch.timestamps.end, timestamp, "timestamps.end");
-
-        _assert_empty_progress(@sys, duel_id);
+        let new_state: ChallengeState = tester::execute_reply_duel(@sys.duels, B, ID(A), duel_id, true);
+        assert_eq!(new_state, ChallengeState::InProgress, "expired");
+        tester::assert_pact(@sys, duel_id, ch, true, true, "replied");
     }
 
     #[test]

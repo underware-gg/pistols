@@ -182,7 +182,7 @@ pub mod duel_token {
         challenge_state::{ChallengeState, ChallengeStateTrait},
         round_state::{RoundState},
         premise::{Premise, PremiseTrait},
-        timestamp::{Period, PeriodTrait, TimestampTrait, TIMESTAMP},
+        timestamp::{Period, TimestampTrait, TIMESTAMP},
         constants::{METADATA},
     };
     use pistols::libs::store::{Store, StoreTrait};
@@ -383,10 +383,7 @@ pub mod duel_token {
             let address_b: ContractAddress = starknet::get_caller_address();
             let timestamp: u64 = starknet::get_block_timestamp();
 
-            if (challenge.timestamps.has_expired()) {
-                // Expired, close it!
-                challenge.state = ChallengeState::Expired;
-            } else if (address_b == challenge.address_a) {
+            if (address_b == challenge.address_a) {
                 // same duelist, can only withdraw...
                 assert(accepted == false, Errors::INVALID_REPLY_SELF);
                 challenge.state = ChallengeState::Withdrawn;
