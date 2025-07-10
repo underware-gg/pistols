@@ -364,7 +364,7 @@ pub mod duelist_token {
         fn get_validated_active_duelist_id(ref self: ContractState, address: ContractAddress, duelist_id: u128, lives_staked: u8) -> u128 {
             assert(duelist_id.is_non_zero(), Errors::INVALID_DUELIST);
 
-           // validate duelist ownership
+            // validate duelist ownership
             let mut store: Store = StoreTrait::new(self.world_default());
             assert(self.is_owner_of(address, duelist_id.into()) == true, Errors::NOT_YOUR_DUELIST);
             

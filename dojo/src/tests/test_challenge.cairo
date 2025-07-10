@@ -3,7 +3,9 @@ mod tests {
     use starknet::{ContractAddress};
     use pistols::models::{
         challenge::{ChallengeTrait, DuelType},
+        duelist::{Duelist},
         player::{Player, PlayerTrait},
+        pack::{PackType},
     };
     use pistols::types::{
         cards::hand::{DeckType},
@@ -22,6 +24,7 @@ mod tests {
             FAKE_OWNER_OF_1, OWNED_BY_OWNER, MESSAGE,
         }
     };
+    use pistols::tests::token::test_pack_token::_airdrop_open;
 
 
     fn _assert_empty_progress(sys: @TestSystems, duel_id: u128) {
@@ -437,13 +440,19 @@ mod tests {
         tester::fund_duelists_pool(sys, 2);
         let tokens1: Span<u128> = tester::execute_claim_starter_pack(sys, acc1);
         let tokens2: Span<u128> = tester::execute_claim_starter_pack(sys, acc2);
-        let duelist_id_1_1: u128 = sys.store.get_duelist(*tokens1[0]).duelist_id;
-        let duelist_id_1_2: u128 = sys.store.get_duelist(*tokens1[1]).duelist_id;
-        let duelist_id_2_1: u128 = sys.store.get_duelist(*tokens2[0]).duelist_id;
-        let duelist_id_2_2: u128 = sys.store.get_duelist(*tokens2[1]).duelist_id;
-        assert_eq!(sys.store.get_player_alive_duelist_count(acc1), 2, "acc1:claimed_starter_pack:alive_duelist_count");
-        assert_eq!(sys.store.get_player_alive_duelist_count(acc2), 2, "acc2:claimed_starter_pack:alive_duelist_count");
-        (duelist_id_1_1, duelist_id_1_2, duelist_id_2_1, duelist_id_2_2)
+        let duelist_1_1: Duelist = sys.store.get_duelist(*tokens1[0]);
+        let _duelist_1_2: Duelist = sys.store.get_duelist(*tokens1[1]);
+        let duelist_2_1: Duelist = sys.store.get_duelist(*tokens2[0]);
+        let _duelist_2_2: Duelist = sys.store.get_duelist(*tokens2[1]);
+        assert_eq!(sys.store.get_player_alive_duelist_count(acc1), 2, "acc1:claimed_starter_pack:alive_duelist_count (2)");
+        assert_eq!(sys.store.get_player_alive_duelist_count(acc2), 2, "acc2:claimed_starter_pack:alive_duelist_count (2)");
+        // mint to stack
+        tester::fund_duelists_pool(sys, 1);
+        let duelist_id_1_3: u128 = _airdrop_open(sys, acc1, PackType::SingleDuelist, Option::Some(duelist_1_1.duelist_profile), "SingleDuelist_acc1");
+        let duelist_id_2_3: u128 = _airdrop_open(sys, acc2, PackType::SingleDuelist, Option::Some(duelist_2_1.duelist_profile), "SingleDuelist_acc2");
+        assert_eq!(sys.store.get_player_alive_duelist_count(acc1), 3, "acc1:claimed_starter_pack:alive_duelist_count (3)");
+        assert_eq!(sys.store.get_player_alive_duelist_count(acc2), 3, "acc2:claimed_starter_pack:alive_duelist_count (3)");
+        (duelist_1_1.duelist_id, duelist_id_1_3, duelist_2_1.duelist_id, duelist_id_2_3)
     }
 
     #[test]
@@ -452,7 +461,7 @@ mod tests {
         let A = STACKER();
         let B = STACKER2();
         let (duelist_id_a_active, duelist_id_a_inactive, duelist_id_b_active, duelist_id_b_inactive) = _mint_stacker_duelists(@sys, A, B);
-
+        // use inactive duelist > will swich to active
         let duel_id: u128 = tester::execute_create_duel_ID(@sys.duels, A, duelist_id_a_inactive, B, MESSAGE(), DuelType::Practice, 48, 1);
         let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.state, ChallengeState::Awaiting, "state");
@@ -460,7 +469,7 @@ mod tests {
         assert_eq!(ch.address_b, B, "challenged");
         assert_eq!(ch.duelist_id_a, duelist_id_a_active, "challenger_id");
         assert_eq!(ch.duelist_id_b, 0, "challenged_id"); // challenged an address, id is empty
-        // reply...
+        // reply... inactive > active
         tester::execute_reply_duel(@sys.duels, B, duelist_id_b_inactive, duel_id, true);
         let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.state, ChallengeState::InProgress, "ChallengeState::InProgress");

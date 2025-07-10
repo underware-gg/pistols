@@ -980,7 +980,7 @@ pub mod tester {
         (*sys.bank).sponsor_duelists(sender, amount);
         _next_block();
     }
-    pub fn fund_duelists_pool(sys: @TestSystems, quantity: u8) -> u128 {
+    pub fn fund_duelists_pool(sys: @TestSystems, stater_pack_quantity: u8) -> u128 {
         // mint lords
         let sponsor: ContractAddress = starknet::contract_address_const::<0x12178517312>();
         execute_lords_faucet(sys.lords, sponsor);
@@ -989,7 +989,7 @@ pub mod tester {
         execute_lords_approve(sys.lords, sponsor, *sys.bank.contract_address, balance.low);
         // fund pool
         let price_per_pack: u128 = PackType::StarterPack.descriptor().price_lords;
-        let amount_sponsored: u128 = price_per_pack * quantity.into();
+        let amount_sponsored: u128 = price_per_pack * stater_pack_quantity.into();
         execute_sponsor_duelists(sys, sponsor, amount_sponsored);
         (amount_sponsored)
     }

@@ -874,7 +874,9 @@ pub mod tests {
         // time travel...
         let round: RoundValue = sys.store.get_round_value(duel_id);
         tester::set_block_timestamp(round.moves_b.timeout + 1);
-        tester::execute_reveal_moves(@sys.game, B, duel_id, moves_b.salt, moves_b.moves);
+        // tester::execute_reveal_moves(@sys.game, B, duel_id, moves_b.salt, moves_b.moves);
+        assert!(sys.game.can_collect_duel(duel_id), "can_collect_duel");
+        tester::execute_collect_duel(@sys.game, A, duel_id);
         _assert_timed_out(@sys, duel_id, 1); // 1 wins
         // timeout duel, do not affect honour!
         let totals_a: Totals = sys.store.get_player_totals(A);
@@ -920,7 +922,9 @@ pub mod tests {
         // time travel...
         let round: RoundValue = sys.store.get_round_value(duel_id);
         tester::set_block_timestamp(round.moves_a.timeout + 1);
-        tester::execute_reveal_moves(@sys.game, A, duel_id, moves_a.salt, moves_a.moves);
+        // tester::execute_reveal_moves(@sys.game, A, duel_id, moves_a.salt, moves_a.moves);
+        assert!(sys.game.can_collect_duel(duel_id), "can_collect_duel");
+        tester::execute_collect_duel(@sys.game, B, duel_id);
         _assert_timed_out(@sys, duel_id, 2); // 1 wins
         // timeout duel, do not affect honour!
         let totals_a: Totals = sys.store.get_player_totals(A);

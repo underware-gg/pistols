@@ -505,7 +505,7 @@ fn test_transfer_unopened_no_allowance() {
 // airdrops...
 //
 
-fn _airdrop_open(sys: @TestSystems, recipient: ContractAddress, pack_type: PackType, duelist_profile: Option<DuelistProfile>, prefix: ByteArray) {
+pub fn _airdrop_open(sys: @TestSystems, recipient: ContractAddress, pack_type: PackType, duelist_profile: Option<DuelistProfile>, prefix: ByteArray) -> u128 {
     let duelist_balance_before: u128 = (*sys.duelists).balance_of(recipient).low;
     // airdrop...
     let pack_id: u128 = tester::execute_pack_airdrop(sys, OWNER(), recipient, pack_type, duelist_profile);
@@ -537,6 +537,7 @@ fn _airdrop_open(sys: @TestSystems, recipient: ContractAddress, pack_type: PackT
     // falidate duelist FAME
     let duelist_fame_balance: u128 = (*sys.duelists).fame_balance(duelist_id.into());
     assert_eq!(duelist_fame_balance, FAME::MINT_GRANT_AMOUNT.low, "{}:: duelist_fame_balance", prefix);
+    (duelist_id)
 }
 
 #[test]
