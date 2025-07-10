@@ -164,6 +164,7 @@ pub mod duel_token {
     use pistols::interfaces::dns::{
         DnsTrait,
         IDuelistTokenProtectedDispatcher, IDuelistTokenProtectedDispatcherTrait,
+        IBotPlayerProtectedDispatcherTrait,
         // IGameDispatcherTrait,
     };
     use pistols::models::{
@@ -292,6 +293,12 @@ pub mod duel_token {
             let address_b: ContractAddress = challenged_address;
             assert(address_b != address_a, Errors::INVALID_CHALLENGED_SELF);
 
+            // against bot player
+            let against_bot_player: bool = store.world.is_bot_player_contract(address_b);
+            if (against_bot_player) {
+                assert(duel_type == DuelType::Practice, Errors::INVALID_DUEL_TYPE);
+            }
+
             // get active duelist from stack
             let duelist_dispatcher: IDuelistTokenProtectedDispatcher = store.world.duelist_token_protected_dispatcher();
             let duelist_id_a: u128 = duelist_dispatcher.get_validated_active_duelist_id(address_a, duelist_id, lives_staked);
@@ -364,6 +371,11 @@ pub mod duel_token {
 
             // events
             PlayerTrait::check_in(ref store, Activity::ChallengeCreated, address_a, duel_id.into());
+
+            // bot player reply
+            if (against_bot_player) {
+                store.world.bot_player_protected_dispatcher().reply_duel(duel_id);
+            }
 
             (duel_id)
         }

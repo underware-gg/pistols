@@ -16,6 +16,7 @@ pub mod tester {
         admin::{admin, IAdminDispatcher, IAdminDispatcherTrait},
         game::{game, IGameDispatcher, IGameDispatcherTrait},
         game_loop::{game_loop, IGameLoopDispatcher, IGameLoopDispatcherTrait},
+        bot_player::{bot_player, IBotPlayerDispatcher, IBotPlayerDispatcherTrait},
         tutorial::{tutorial, ITutorialDispatcher, ITutorialDispatcherTrait},
         rng::{rng, IRngDispatcher, IRngDispatcherTrait},
         rng_mock::{rng_mock, IRngMockDispatcher, IRngMockDispatcherTrait},
@@ -177,6 +178,7 @@ pub mod tester {
         pub const TOURNAMENT: u16 = 0b10000000000;
         pub const OWNER: u16      = 0b100000000000;
         pub const RINGS: u16      = 0b1000000000000;
+        pub const BOT_PLAYER: u16 = 0b10000000000000;
     }
 
     #[derive(Copy, Drop)]
@@ -185,6 +187,7 @@ pub mod tester {
         pub store: Store,
         pub game: IGameDispatcher,
         pub game_loop: IGameLoopDispatcher,
+        pub bot_player: IBotPlayerDispatcher,
         pub tut: ITutorialDispatcher,
         pub admin: IAdminDispatcher,
         pub bank: IBankDispatcher,
@@ -209,6 +212,7 @@ pub mod tester {
                 world,
                 game: world.game_dispatcher(),
                 game_loop: world.game_loop_dispatcher(),
+                bot_player: world.bot_player_dispatcher(),
                 store: StoreTrait::new(world),
                 tut: world.tutorial_dispatcher(),
                 admin: world.admin_dispatcher(),
@@ -242,6 +246,7 @@ pub mod tester {
         let mut deploy_tournament: bool = (flags & FLAGS::TOURNAMENT) != 0;
         let mut deploy_owner: bool = (flags & FLAGS::OWNER) != 0;
         let mut deploy_rings: bool = (flags & FLAGS::RINGS) != 0;
+        let mut deploy_bot_player: bool = (flags & FLAGS::BOT_PLAYER) != 0;
         let mut deploy_game_loop: bool = false;
         let mut deploy_duelist_mock: bool = false;
         let mut deploy_bank: bool = false;
@@ -250,11 +255,12 @@ pub mod tester {
         let mut deploy_vrf: bool = false;
         
         deploy_game         = deploy_game || approve;
+        deploy_duelist      = deploy_duelist || deploy_bot_player;
         deploy_game_loop    = deploy_game_loop || deploy_game || deploy_tutorial;
         deploy_lords        = deploy_lords || deploy_game || deploy_duelist || approve;
         deploy_admin        = deploy_admin || deploy_game || deploy_lords || deploy_tournament;
-        deploy_duel         = deploy_duel || deploy_game;
-        deploy_pack         = deploy_pack || deploy_duelist;
+        deploy_duel         = deploy_duel || deploy_game || deploy_bot_player;
+        deploy_pack         = deploy_pack || deploy_duelist || deploy_bot_player;
         deploy_fame         = deploy_fame || deploy_game || deploy_duelist;
         deploy_fools        = deploy_fools || deploy_game;
         deploy_rng_mock     = deploy_rng_mock || deploy_tutorial;
@@ -329,6 +335,12 @@ pub mod tester {
             resources.append(TestResource::Contract(game_loop::TEST_CLASS_HASH));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"game_loop")
+            );
+        }
+        if (deploy_bot_player) {
+            resources.append(TestResource::Contract(bot_player::TEST_CLASS_HASH));
+            contract_defs.append(
+                ContractDefTrait::new(@"pistols", @"bot_player")
             );
         }
 
