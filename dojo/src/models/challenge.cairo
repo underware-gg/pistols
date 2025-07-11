@@ -37,6 +37,7 @@ pub enum DuelType {
     Tournament,     // 2
     Tutorial,       // 3
     Practice,       // 4
+    BotPlayer,      // 5
 }
 
 #[derive(Clone, Drop, Serde)]
@@ -151,6 +152,10 @@ pub impl ChallengeImpl of ChallengeTrait {
     #[inline(always)]
     fn is_tournament(self: @Challenge) -> bool {
         (*self.duel_type == DuelType::Tournament)
+    }
+    #[inline(always)]
+    fn is_against_bot_player(self: @Challenge) -> bool {
+        (*self.duel_type == DuelType::BotPlayer)
     }
     fn get_deck_type(self: @Challenge) -> DeckType {
         if (
@@ -287,6 +292,7 @@ impl DuelTypeIntoByteArray of core::traits::Into<DuelType, ByteArray> {
             DuelType::Tournament   => "DuelType::Tournament",
             DuelType::Tutorial     => "DuelType::Tutorial",
             DuelType::Practice     => "DuelType::Practice",
+            DuelType::BotPlayer    => "DuelType::BotPlayer",
         }
     }
 }

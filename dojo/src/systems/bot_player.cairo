@@ -3,25 +3,6 @@
 // Exposed to clients
 #[starknet::interface]
 pub trait IBotPlayer<TState> {
-    // Game actions
-    fn commit_moves( //@description: Commit moves of a Duelist in a Duel
-        ref self: TState,
-        duelist_id: u128,
-        duel_id: u128,
-        hashed: u128,
-    );
-    fn reveal_moves( //@description: Reveal moves of a Duelist in a Duel
-        ref self: TState,
-        duelist_id: u128,
-        duel_id: u128,
-        salt: felt252,
-        moves: Span<u8>,
-    );
-}
-
-// Exposed to world
-#[starknet::interface]
-pub trait IBotPlayerProtected<TState> {
     fn reply_duel(ref self: TState, duel_id: u128);
 }
 
@@ -60,33 +41,6 @@ pub mod bot_player {
 
     #[abi(embed_v0)]
     impl BotPlayerImpl of super::IBotPlayer<ContractState> {
-
-        //------------------------
-        // Game actions
-        //
-
-        fn commit_moves(ref self: ContractState,
-            duelist_id: u128,
-            duel_id: u128,
-            hashed: u128,
-        ) {
-        }
-
-        fn reveal_moves(ref self: ContractState,
-            duelist_id: u128,
-            duel_id: u128,
-            salt: felt252,
-            moves: Span<u8>,
-        ) {
-        }
-
-    }
-
-    //-----------------------------------
-    // Protected
-    //
-    #[abi(embed_v0)]
-    impl BotPlayerProtectedImpl of super::IBotPlayerProtected<ContractState> {
         fn reply_duel(ref self: ContractState, duel_id: u128) {
             let mut store: Store = StoreTrait::new(self.world_default());
             // only duel contract can request a reply
