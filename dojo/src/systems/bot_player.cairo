@@ -38,7 +38,7 @@ pub mod bot_player {
         // SELECTORS,
     };
     use pistols::models::{
-        player::{PlayerDuelistStack},
+        player::{PlayerDuelistStack, PlayerDuelistStackTrait},
     };
     use pistols::types::{
         duelist_profile::{DuelistProfile, BotKey, ProfileManagerTrait},
@@ -97,12 +97,10 @@ pub mod bot_player {
             let seed: felt252 = make_seed(bot_address, duel_id.into());
             let duelist_profile: DuelistProfile = ProfileManagerTrait::randomize_profile(DuelistProfile::Bot(BotKey::Unknown), seed);
             let stack: PlayerDuelistStack = store.get_player_duelist_stack(bot_address, duelist_profile);
-            let duelist_id: u128 = if (stack.active_duelist_id.is_non_zero()) {
-                // use active duelist
-                (stack.active_duelist_id)
-            } else {
+            let mut duelist_id: u128 = stack.get_first_available_duelist_id(@store);
+            if (duelist_id.is_zero()) {
                 // mint new duelist
-                (store.world.pack_token_protected_dispatcher().mint_bot_duelist(duelist_profile))
+                duelist_id = store.world.pack_token_protected_dispatcher().mint_bot_duelist(duelist_profile);
             };
 
             // reply to the duel

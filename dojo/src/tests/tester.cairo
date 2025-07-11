@@ -76,10 +76,13 @@ pub mod tester {
         trophies::{Trophy, TrophyTrait},
         constants::{CONST, FAME},
     };
-    use pistols::utils::byte_arrays::{BoolToString};
-    use pistols::utils::misc::{ContractAddressIntoU256};
-    use pistols::utils::short_string::{ShortString};
-    use pistols::utils::serde::{SerializedAppend};
+    use pistols::utils::{
+        byte_arrays::{BoolToString},
+        arrays::{ArrayTestUtilsTrait},
+        misc::{ContractAddressIntoU256},
+        short_string::{ShortString},
+        serde::{SerializedAppend},
+    };
     pub use pistols::interfaces::dns::{DnsTrait};
     pub use pistols::libs::store::{Store, StoreTrait};
 
@@ -640,7 +643,7 @@ pub mod tester {
                 let mut keys = array![];
                 keys.append_serde(trophy.identifier());
                 keys.append_serde(address);
-                _compare_values(event.keys, keys.span(), "keys");
+                ArrayTestUtilsTrait::assert_span_eq(event.keys, keys.span(), "keys");
             },
             _ => {},
         }
@@ -655,11 +658,11 @@ pub mod tester {
                 keys.append_serde(player_address);
                 keys.append_serde(target_address);
                 keys.append_serde(target_id);
-                _compare_values(event.keys, keys.span(), "keys");
+                ArrayTestUtilsTrait::assert_span_eq(event.keys, keys.span(), "keys");
                 // compare values
                 let mut values = array![];
                 values.append_serde(enabled);
-                _compare_values(event.values, values.span(), "values");
+                ArrayTestUtilsTrait::assert_span_eq(event.values, values.span(), "values");
             },
             _ => {},
         }
@@ -673,13 +676,13 @@ pub mod tester {
                 let mut keys = array![];
                 keys.append_serde(player_address);
                 keys.append_serde(social_platform);
-                _compare_values(event.keys, keys.span(), "keys");
+                ArrayTestUtilsTrait::assert_span_eq(event.keys, keys.span(), "keys");
                 // compare values
                 let mut values = array![];
                 values.append_serde(user_name);
                 values.append_serde(user_id);
                 values.append_serde(avatar);
-                _compare_values(event.values, values.span(), "values");
+                ArrayTestUtilsTrait::assert_span_eq(event.values, values.span(), "values");
             },
             _ => {},
         }
@@ -693,25 +696,16 @@ pub mod tester {
                 let mut keys = array![];
                 keys.append_serde(player_address);
                 keys.append_serde(setting);
-                _compare_values(event.keys, keys.span(), "keys");
+                ArrayTestUtilsTrait::assert_span_eq(event.keys, keys.span(), "keys");
                 // compare values
                 let mut values = array![];
                 values.append_serde(value);
-                _compare_values(event.values, values.span(), "values");
+                ArrayTestUtilsTrait::assert_span_eq(event.values, values.span(), "values");
             },
             _ => {},
         }
     }
     
-    pub fn _compare_values(v1: Span<felt252>, v2: Span<felt252>, prefix: ByteArray) {
-        assert_eq!(v1.len(), v2.len(), "[{}] Invalid values length", prefix);
-        let mut i = 0;
-        while (i < v1.len()) {
-            assert_eq!(v1.at(i), v2.at(i), "[{}] Invalid value {}", prefix, i);
-            i += 1;
-        }
-    }
-
 
     //--------------------------
     // mock account contract
@@ -1186,12 +1180,12 @@ pub mod tester {
             "[{}] __assert_pact() not [{}]", prefix, has_pact.to_string()
         );
         let expected_duel_id: u128 = if (has_pact) {duel_id} else {0};
-        let duelist_duel_id: u128 = (*sys.store).get_duelist_challenge(ch.duelist_id_a).duel_id;
+        let duelist_duel_id: u128 = (*sys.store).get_duelist_assignment(ch.duelist_id_a).duel_id;
         assert!(duelist_duel_id == expected_duel_id,
             "[{}] duelist_challenge_a: [{}] not [{}]", prefix, duelist_duel_id, expected_duel_id
         );
         let expected_duel_id: u128 = if (has_pact && accepted) {duel_id} else {0};
-        let duelist_duel_id: u128 = (*sys.store).get_duelist_challenge(ch.duelist_id_b).duel_id;
+        let duelist_duel_id: u128 = (*sys.store).get_duelist_assignment(ch.duelist_id_b).duel_id;
         assert!(duelist_duel_id == expected_duel_id,
             "[{}] duelist_challenge_b: [{}] not [{}]", prefix, duelist_duel_id, expected_duel_id
         );

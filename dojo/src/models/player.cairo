@@ -162,4 +162,70 @@ pub impl PlayerDuelistStackImpl of PlayerDuelistStackTrait {
             (false)
         }
     }
+    // for bots only (no active duelist)
+    fn get_first_available_duelist_id(self: @PlayerDuelistStack, store: @Store) -> u128 {
+        let mut result: u128 = 0;
+        let mut i: usize = 0;
+        while (result.is_zero() && i < self.stacked_ids.len()) {
+            let duelist_id: u128 = *self.stacked_ids[i];
+            if (store.get_duelist_assigned_duel_id(duelist_id).is_zero()) {
+                result = duelist_id;
+            }
+            i += 1;
+        };
+        (result)
+    }
+}
+
+
+
+//------------------------------------------------------
+// libs::utils tests
+//
+#[cfg(test)]
+mod unit {
+    use super::{PlayerDuelistStack, PlayerDuelistStackTrait};
+    use pistols::types::duelist_profile::{DuelistProfile, GenesisKey};
+    use pistols::utils::arrays::{ArrayTestUtilsTrait};
+
+    fn _test_stack(ref stack: PlayerDuelistStack, expected: Span<u128>) {
+        ArrayTestUtilsTrait::assert_span_eq(stack.stacked_ids.span(), expected, format!("stacked_ids[{}]", expected.len()));
+        assert_eq!(stack.level.into(), expected.len(), "level");
+        if (expected.len() > 0) {
+            assert_eq!(stack.active_duelist_id, *expected[0], "active_duelist_id");
+        } else {
+            assert_eq!(stack.active_duelist_id, 0, "active_ZERO");
+        }
+    }
+
+    #[test]
+    fn test_stack_append_remove() {
+        let profile = DuelistProfile::Genesis(GenesisKey::Duke);
+        let mut stack = PlayerDuelistStack {
+            player_address: starknet::contract_address_const::<0x1>(),
+            duelist_profile: profile,
+            active_duelist_id: 0,
+            level: 0,
+            stacked_ids: array![],
+        };
+        stack.append(1);
+        stack.append(2);
+        stack.append(3);
+        stack.append(5);
+        stack.append(4);
+        _test_stack(ref stack, [1, 2, 3, 5, 4].span());
+        // remove one by one...
+        stack.remove(1);
+        _test_stack(ref stack, [2, 3, 5, 4].span());
+        stack.remove(5);
+        _test_stack(ref stack, [2, 3, 4].span());
+        stack.remove(999); // no changes
+        _test_stack(ref stack, [2, 3, 4].span());
+        stack.remove(3);
+        _test_stack(ref stack, [2, 4].span());
+        stack.remove(4);
+        _test_stack(ref stack, [2].span());
+        stack.remove(2);
+        _test_stack(ref stack, [].span());
+    }
 }

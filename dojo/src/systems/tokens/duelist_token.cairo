@@ -725,7 +725,7 @@ pub mod duelist_token {
             // TODO: use memorized player, FAME, season, cause_of_death
             let base_uri: ByteArray = self.erc721._base_uri();
             let owner: ContractAddress = self.owner_of(token_id);
-            let assignment: DuelistAssignmentValue = store.get_duelist_challenge_value(token_id.low);
+            let assignment: DuelistAssignmentValue = store.get_duelist_assignment_value(token_id.low);
             let archetype: Archetype = duelist.totals.get_archetype();
             let duelist_image: ByteArray = duelist.duelist_profile.get_image_uri(base_uri.clone());
             let fame_balance: u128 = self._fame_balance(@store.world.fame_coin_dispatcher(), token_id.low);
