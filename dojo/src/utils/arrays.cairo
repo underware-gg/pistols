@@ -66,6 +66,27 @@ pub impl ArrayUtilsImpl<T, +Clone<T>, +Drop<T>> of ArrayUtilsTrait<T> {
     }
 }
 
+#[generate_trait]
+pub impl ArrayTestUtilsImpl<T, +Clone<T>, +Drop<T>> of ArrayTestUtilsTrait<T> {
+    fn assert_array_eq<+PartialEq<T>, +core::fmt::Debug<T>>(v1: Array<T>, v2: Array<T>, prefix: ByteArray) {
+        assert_eq!(v1.len(), v2.len(), "[{}] Invalid values length", prefix);
+        let mut i = 0;
+        while (i < v1.len()) {
+            assert_eq!(v1.at(i), v2.at(i), "[{}] Invalid value {}", prefix, i);
+            i += 1;
+        }
+    }
+    fn assert_span_eq<+PartialEq<T>, +core::fmt::Debug<T>>(v1: Span<T>, v2: Span<T>, prefix: ByteArray) {
+        assert_eq!(v1.len(), v2.len(), "[{}] Invalid values length", prefix);
+        let mut i = 0;
+        while (i < v1.len()) {
+            assert_eq!(v1.at(i), v2.at(i), "[{}] Invalid value {}", prefix, i);
+            i += 1;
+        }
+    }
+}
+
+
 //----------------------------------------
 // Defaults
 //

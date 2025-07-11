@@ -269,7 +269,7 @@ pub mod duel_token {
             duel_type: DuelType,
             duelist_id: u128,
             challenged_address: ContractAddress,
-            lives_staked: u8,
+            mut lives_staked: u8,
             expire_hours: u64,
             premise: Premise,
             message: ByteArray,
@@ -297,6 +297,7 @@ pub mod duel_token {
             let against_bot_player: bool = store.world.is_bot_player_contract(address_b);
             if (against_bot_player) {
                 assert(duel_type == DuelType::Practice, Errors::INVALID_DUEL_TYPE);
+                lives_staked = 1; // bot practice always stakes 1 life
             }
 
             // get active duelist from stack
@@ -412,9 +413,15 @@ pub mod duel_token {
 
                 // Challenged is accepting...
                 if (accepted) {
-                    // get active duelist from stack
-                    let duelist_dispatcher: IDuelistTokenProtectedDispatcher = store.world.duelist_token_protected_dispatcher();
-                    challenge.duelist_id_b = duelist_dispatcher.get_validated_active_duelist_id(address_b, duelist_id, challenge.lives_staked);
+                    let against_bot_player: bool = store.world.is_bot_player_contract(address_b);
+                    challenge.duelist_id_b = if (against_bot_player) {
+                        // bot duelist is already validated (active in stack concept does not apply)
+                        (duelist_id)
+                    } else {
+                        // get active duelist from stack
+                        let duelist_dispatcher: IDuelistTokenProtectedDispatcher = store.world.duelist_token_protected_dispatcher();
+                        (duelist_dispatcher.get_validated_active_duelist_id(address_b, duelist_id, challenge.lives_staked))
+                    };
 
                     // validate duelist
                     assert(challenge.duelist_id_b != challenge.duelist_id_a, Errors::INVALID_CHALLENGED_SELF);

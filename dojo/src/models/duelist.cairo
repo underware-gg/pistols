@@ -85,27 +85,27 @@ pub impl DuelistImpl of DuelistTrait {
         (*self.timestamps.active != 0)
     }
     fn enter_challenge(ref self: Store, duelist_id: u128, duel_id: u128) {
-        let mut assignment: DuelistAssignment = self.get_duelist_challenge(duelist_id);
+        let mut assignment: DuelistAssignment = self.get_duelist_assignment(duelist_id);
         assert(assignment.duel_id == 0, DuelErrors::DUELIST_IN_CHALLENGE);
         assignment.duel_id = duel_id;
         self.set_duelist_challenge(@assignment);
     }
     fn exit_challenge(ref self: Store, duelist_id: u128) {
         if (duelist_id.is_non_zero()) {
-            let mut assignment: DuelistAssignment = self.get_duelist_challenge(duelist_id);
+            let mut assignment: DuelistAssignment = self.get_duelist_assignment(duelist_id);
             assignment.duel_id = 0;
             self.set_duelist_challenge(@assignment);
         }
     }
     // fn enter_tournament(ref self: Store, duelist_id: u128, pass_id: u64) {
-    //     let mut assignment: DuelistAssignment = self.get_duelist_challenge(duelist_id);
+    //     let mut assignment: DuelistAssignment = self.get_duelist_assignment(duelist_id);
     //     assert(assignment.duel_id.is_zero(), TournamentErrors::DUELIST_IN_CHALLENGE);
     //     assert(assignment.pass_id.is_zero(), TournamentErrors::DUELIST_IN_TOURNAMENT);
     //     assignment.pass_id = pass_id;
     //     self.set_duelist_challenge(@assignment);
     // }
     fn exit_tournament(ref self: Store, duelist_id: u128) {
-        let mut assignment: DuelistAssignment = self.get_duelist_challenge(duelist_id);
+        let mut assignment: DuelistAssignment = self.get_duelist_assignment(duelist_id);
         assignment.pass_id = 0;
         self.set_duelist_challenge(@assignment);
     }

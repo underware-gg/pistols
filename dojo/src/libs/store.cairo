@@ -182,13 +182,14 @@ pub impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn get_duelist_challenge(self: @Store, duelist_id: u128) -> DuelistAssignment {
+    fn get_duelist_assignment(self: @Store, duelist_id: u128) -> DuelistAssignment {
         (self.world.read_model(duelist_id))
     }
     #[inline(always)]
-    fn get_duelist_challenge_value(self: @Store, duelist_id: u128) -> DuelistAssignmentValue {
+    fn get_duelist_assignment_value(self: @Store, duelist_id: u128) -> DuelistAssignmentValue {
         (self.world.read_value(duelist_id))
     }
+    
     #[inline(always)]
     fn get_duelist_memorial_value(self: @Store, duelist_id: u128) -> DuelistMemorialValue {
         (self.world.read_value(duelist_id))
@@ -530,6 +531,10 @@ pub impl StoreImpl of StoreTrait {
     #[inline(always)]
     fn get_duelist_totals(self: @Store, duelist_id: u128) -> Totals {
         (self.world.read_member(Model::<Duelist>::ptr_from_keys(duelist_id), selector!("totals")))
+    }
+    #[inline(always)]
+    fn get_duelist_assigned_duel_id(self: @Store, duelist_id: u128) -> u128 {
+        (self.world.read_member(Model::<DuelistAssignment>::ptr_from_keys(duelist_id), selector!("duel_id")))
     }
 
     #[inline(always)]
