@@ -80,6 +80,7 @@ pub mod game {
         IDuelTokenDispatcherTrait,
         IDuelTokenProtectedDispatcherTrait,
         ITutorialDispatcherTrait,
+        IBotPlayerDispatcherTrait,
         IAdminDispatcherTrait,
         SELECTORS,
     };
@@ -238,6 +239,11 @@ pub mod game {
             PlayerTrait::check_in(ref store, Activity::MovesCommitted, starknet::get_caller_address(), duel_id.into());
 
             store.set_round(@round);
+
+            // bot player responds immediately
+            if (challenge.is_against_bot_player() && duelist_number == 1) {
+                store.world.bot_player_dispatcher().commit_moves(duel_id);
+            }
         }
 
         fn reveal_moves(ref self: ContractState,

@@ -4,6 +4,7 @@
 #[starknet::interface]
 pub trait IBotPlayer<TState> {
     fn reply_duel(ref self: TState, duel_id: u128);
+    fn commit_moves(ref self: TState, duel_id: u128);
 }
 
 #[dojo::contract]
@@ -16,16 +17,21 @@ pub mod bot_player {
         DnsTrait,
         IDuelTokenDispatcherTrait,
         IPackTokenProtectedDispatcherTrait,
-        // SELECTORS,
+        IGameDispatcherTrait,
     };
     use pistols::models::{
+        challenge::{Challenge, MovesTrait},
         player::{PlayerDuelistStack, PlayerDuelistStackTrait},
     };
     use pistols::types::{
         duelist_profile::{DuelistProfile, BotKey, ProfileManagerTrait},
     };
-    use pistols::libs::store::{Store, StoreTrait};
-    use pistols::libs::seeder::{make_seed};
+    use pistols::libs::{
+        store::{Store, StoreTrait},
+        seeder::{make_seed},
+        bot::{BotPlayetMovesTrait},
+    };
+    use pistols::utils::hash::{hash_values};
 
     pub mod Errors {
         pub const INVALID_CALLER: felt252           = 'BOT_PLAYER: Invalid caller';
@@ -42,8 +48,8 @@ pub mod bot_player {
     #[abi(embed_v0)]
     impl BotPlayerImpl of super::IBotPlayer<ContractState> {
         fn reply_duel(ref self: ContractState, duel_id: u128) {
-            let mut store: Store = StoreTrait::new(self.world_default());
             // only duel contract can request a reply
+            let mut store: Store = StoreTrait::new(self.world_default());
             assert(store.world.caller_is_duel_contract(), Errors::INVALID_CALLER);
 
             // randomize a bot profile
@@ -59,6 +65,25 @@ pub mod bot_player {
 
             // reply to the duel
             store.world.duel_token_dispatcher().reply_duel(duel_id, duelist_id, true);
+        }
+
+        fn commit_moves(ref self: ContractState, duel_id: u128) {
+            // only game contract can request a commit
+            let mut store: Store = StoreTrait::new(self.world_default());
+            assert(store.world.caller_is_game_contract(), Errors::INVALID_CALLER);
+
+            // get duel and duelist
+            let challenge: Challenge = store.get_challenge(duel_id);
+            let duelist_id: u128 = challenge.duelist_id_b;
+            let duelist_profile: DuelistProfile = store.get_duelist_profile(duelist_id);
+
+            // make moves
+            let salt: felt252 = hash_values([duel_id.into()].span()); // salt is always the duel_id for permissionless reveal
+            let moves: Span<u8> = duelist_profile.make_moves(@challenge);
+            let moves_hash: u128 = MovesTrait::make_moves_hash(salt, moves);
+
+            // commit!
+            store.world.game_dispatcher().commit_moves(duelist_id, duel_id, moves_hash);
         }
     }
 

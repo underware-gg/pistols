@@ -43,6 +43,7 @@ mod libs {
     pub mod seeder;
     pub mod store;
     pub mod tut;
+    pub mod bot;
 }
 
 mod models {

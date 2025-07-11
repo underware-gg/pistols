@@ -3,7 +3,7 @@ use starknet::{ContractAddress};
 use pistols::systems::{
     tokens::{
         duelist_token::{IDuelistTokenDispatcherTrait},
-        pack_token::{IPackTokenDispatcherTrait},
+        pack_token::{IPackTokenDispatcherTrait, IPackTokenProtectedDispatcher, IPackTokenProtectedDispatcherTrait},
         lords_mock::{ILordsMockDispatcherTrait},
     },
 };
@@ -76,6 +76,10 @@ fn _purchase(sys: @TestSystems, recipient: ContractAddress) -> u128 {
     tester::execute_lords_approve(sys.lords, recipient, (*sys.bank).contract_address, price);
     tester::execute_pack_purchase(sys, recipient, PackType::GenesisDuelists5x);
     (price)
+}
+
+pub fn _protected(sys: @TestSystems) -> IPackTokenProtectedDispatcher {
+    (IPackTokenProtectedDispatcher{contract_address: (*sys.pack).contract_address})
 }
 
 //
@@ -268,6 +272,13 @@ fn test_mint_not_for_sale() {
     tester::execute_pack_purchase(@sys, OWNER(), PackType::StarterPack);
 }
 
+#[test]
+#[should_panic(expected: ('PACK: Invalid caller', 'ENTRYPOINT_FAILED'))]
+fn test_mint_bot_duelist_invalid_caller() {
+    let mut sys: TestSystems = setup(0);
+    tester::impersonate(OWNER());
+    _protected(@sys).mint_bot_duelist(DuelistProfile::Bot(BotKey::Leon));
+}
 
 //
 // free gifts...
