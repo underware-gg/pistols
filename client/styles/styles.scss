@@ -1000,7 +1000,7 @@ $ui-container-gap: 1em;
   align-items: flex-start;
   align-content: flex-start;
   position: absolute;
-  width: aspect-width(28);
+  width: aspect-width(38);
   z-index: 100;
 }
 
@@ -1125,10 +1125,17 @@ $ui-container-gap: 1em;
 }
 
 .ProfileName {
-  width: aspect-width(13); 
+  width: aspect-width(22); 
   height: aspect-width(1.6);
-  line-height: aspect-width(1.6);
+  line-height: aspect-width(1.8);
   align-content: end;
+
+  &.DuelistName {
+    width: aspect-width(15);
+    margin-top: aspect-width(0.8);
+    margin-left: aspect-width(0.4);
+    margin-right: aspect-width(0.4);
+  }
 }
 
 .ProfileAddress {
@@ -2263,13 +2270,24 @@ a.active.step:hover,
 .dialog-title {
   font-weight: lighter;
   font-size: aspect-width(0.7);
+  margin-top: aspect-width(0.2);
   margin-bottom: 2%;
+  margin-left: aspect-width(2.3);
+  margin-right: aspect-width(2.3);
   color: black;
 }
 
 .dialog-duelist, .dialog-quote {
   font-weight: normal;
   color: black;
+
+  &.Left {
+    margin-left: aspect-width(2.3);
+  }
+
+  &.Right {
+    margin-right: aspect-width(2);
+  }
 }
 
 .dialog-duelist[data-contentlength="0"], .dialog-quote[data-contentlength="0"], .ProfileName[data-contentlength="0"] {
@@ -2318,35 +2336,143 @@ a.active.step:hover,
   height: aspect-width(3);
   display: flex;
   flex-direction: row;
+  flex-grow: 1;
   align-items: center;
   justify-content: space-between;
-  flex-grow: 1;
 }
 
 .dialog-button {
   position: relative;
   width: 100%;
   height: aspect-width(2);
-  padding: 5px 10px;
+  padding: aspect-width(0.3) aspect-width(0.8);
   border: none;
-  border-radius: 5px;
-  background-color: $color-darkest;
-  color: white;
+  border-radius: aspect-width(0.3);
+  
+  // Rich duel background 🔥
+  background-color: rgba(139, 69, 19, 0.95);
+  
+  // Clean metallic border ⚔️
+  border: aspect-width(0.15) solid rgba(160, 82, 45, 0.8);
+  box-shadow: 
+    inset 0 aspect-width(0.05) aspect-width(0.1) rgba(255, 255, 255, 0.2), // Subtle inner highlight
+    inset 0 aspect-width(-0.05) aspect-width(0.1) rgba(0, 0, 0, 0.3),      // Subtle inner shadow
+    0 aspect-width(0.1) aspect-width(0.2) rgba(0, 0, 0, 0.4);              // Clean drop shadow
+  
+  // Clean epic text styling 💫
+  color: $color-brightest;
+  font-family: $font-family;
+  font-weight: 700;
+  font-size: aspect-width(0.9);
+  text-transform: uppercase;
+  letter-spacing: aspect-width(0.05);
+  text-shadow: aspect-width(0.1) aspect-width(0.1) aspect-width(0.2) rgba(0, 0, 0, 0.8);
+  
   cursor: pointer;
   text-align: center;
   pointer-events: all;
+  
+  // Remove blue focus outline 🚫
+  outline: none !important;
+  
+  // Remove any focus styles that might show blue
+  &:focus, &:focus-visible {
+    outline: none !important;
+    border-color: rgba(160, 82, 45, 0.8) !important;
+  }
+  
+  // Smooth transitions for all the magic ✨
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  
+  // Subtle idle animation - pulsing with duel energy ⚡
+  animation: duel-button-pulse 2s ease-in-out infinite;
+  
+  // Tentacle magic overlay (because you asked for tentacles!) 🐙
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
 }
 
 .dialog-button:hover {
-  background-color: #0056b3;
+  // Epic hover transformation 🌟
+  transform: scale(1.05) translateY(aspect-width(-0.05));
+  
+  // Enhanced shadow on hover
+  box-shadow: 
+    inset 0 aspect-width(0.05) aspect-width(0.1) rgba(255, 255, 255, 0.3), // Brighter inner highlight
+    inset 0 aspect-width(-0.05) aspect-width(0.1) rgba(0, 0, 0, 0.2),      // Softer inner shadow
+    0 aspect-width(0.2) aspect-width(0.4) rgba(0, 0, 0, 0.5);              // Bigger drop shadow
+  
+  // Brighter background on hover
+  background-color: rgba(160, 82, 45, 0.98);
+  border-color: rgba(184, 134, 11, 0.9);
+  
+  // Clean enhanced text shadow
+  text-shadow: 
+    aspect-width(0.1) aspect-width(0.1) aspect-width(0.2) rgba(0, 0, 0, 0.9),
+    aspect-width(0.05) aspect-width(0.05) aspect-width(0.1) rgba(0, 0, 0, 0.6);
+  
+  // Activate the tentacle magic overlay 🐙
+  &::before {
+    opacity: 1;
+  }
+}
+
+.dialog-button:active {
+  // Satisfying click feedback 💥
+  transform: scale(0.98) translateY(aspect-width(0.02));
+  
+    // Slightly dimmed on press
+  box-shadow: 
+    inset 0 aspect-width(0.05) aspect-width(0.1) rgba(255, 255, 255, 0.1),
+    inset 0 aspect-width(-0.05) aspect-width(0.1) rgba(0, 0, 0, 0.5),
+    0 aspect-width(0.05) aspect-width(0.1) rgba(0, 0, 0, 0.3);
+  
+  // Darker on press
+  background-color: rgba(101, 67, 33, 0.98);
+  border-color: rgba(139, 69, 19, 0.9);
+ }
+
+// Epic pulse animation keyframes ⚡
+@keyframes duel-button-pulse {
+  0% {
+    box-shadow: 
+      inset 0 aspect-width(0.05) aspect-width(0.1) rgba(255, 255, 255, 0.2),
+      inset 0 aspect-width(-0.05) aspect-width(0.1) rgba(0, 0, 0, 0.3),
+      0 aspect-width(0.1) aspect-width(0.2) rgba(0, 0, 0, 0.4);
+  }
+  50% {
+    box-shadow: 
+      inset 0 aspect-width(0.05) aspect-width(0.1) rgba(255, 255, 255, 0.25),
+      inset 0 aspect-width(-0.05) aspect-width(0.1) rgba(0, 0, 0, 0.25),
+      0 aspect-width(0.1) aspect-width(0.2) rgba(0, 0, 0, 0.4);
+  }
+  100% {
+    box-shadow: 
+      inset 0 aspect-width(0.05) aspect-width(0.1) rgba(255, 255, 255, 0.2),
+      inset 0 aspect-width(-0.05) aspect-width(0.1) rgba(0, 0, 0, 0.3),
+      0 aspect-width(0.1) aspect-width(0.2) rgba(0, 0, 0, 0.4);
+  }
 }
 
 .moves-button-container {
   position: relative;
-  display: inline-block;
+  display: flex;
+  flex: 1; // Take up all available space in the flex container
   width: 100%; 
   height: aspect-width(2);
   border-radius: aspect-width(0.4);
+  padding-left: aspect-width(0.5);
+  padding-right: aspect-width(0.5);
 }
 
 .duel-dialog-spinner-container {
@@ -2372,7 +2498,7 @@ a.active.step:hover,
 .button-loading-overlay {
   position: absolute;
   top: 0;
-  left: 0;
+  left: aspect-width(0.5);
   width: 100%;
   height: 100%;
   margin: inherit;

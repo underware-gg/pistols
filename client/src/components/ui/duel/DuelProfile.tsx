@@ -6,9 +6,9 @@ import { useGameAspect } from '/src/hooks/useGameAspect'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { ProfilePic } from '/src/components/account/ProfilePic'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
-import { usePlayer } from '/src/stores/playerStore'
-import { DuelTutorialLevel } from '/src/data/tutorialConstants'
+import { usePlayer, useRingsOfOwner } from '/src/stores/playerStore'
 import { useDiscordSocialLink } from '/src/stores/eventsModelStore'
+import { StampImage } from '/src/components/ui/StampImage'
 
 export default function DuelProfile({
   playerAddress,
@@ -21,7 +21,8 @@ export default function DuelProfile({
   floated: SemanticFLOATS,
   isTutorial: boolean
 }) {
-  const { name } = usePlayer(playerAddress)
+  const { name, isBlocked, isTeamMember } = usePlayer(playerAddress)
+  const { topRingType } = useRingsOfOwner(playerAddress)
   const { aspectWidth } = useGameAspect()
   const { dispatchSelectPlayerAddress } = usePistolsContext()
   const { avatarUrl, isLinked } = useDiscordSocialLink(playerAddress)
@@ -30,6 +31,8 @@ export default function DuelProfile({
 
   const contentLength = useMemo(() => Math.floor(name.length/10), [name])
   const duelistContentLength = useMemo(() => Math.floor(duelistName.length/10), [duelistName])
+
+  const hasStamp = useMemo(() => isBlocked || isTeamMember || topRingType !== null, [isBlocked, isTeamMember, topRingType])
 
   return (
     <>
@@ -44,10 +47,11 @@ export default function DuelProfile({
             className='NoMouse NoDrag' 
           />
           </div>
-          <Image className='NoMouse NoDrag' src='/images/ui/duel/player_profile.png' style={{ position: 'absolute' }} />
+          <Image className='NoMouse NoDrag' src={hasStamp ? '/images/ui/duel/player_profile_stamp.png' : '/images/ui/duel/player_profile.png'} style={{ position: 'absolute' }} />
+          <StampImage playerAddress={playerAddress} size="DuelProfile" position="Left" />
           <div className='NoMouse NoDrag' style={{ zIndex: 10, position: 'absolute', top: aspectWidth(0.2), left: aspectWidth(8.3) }}>
             {!isTutorial && <div className='NoMargin ProfileName' data-contentlength={contentLength}>{name}</div>}
-            <div className={`ProfileName ${isTutorial ? '' : 'NoMargin '}`} data-contentlength={duelistContentLength} style={{ marginTop: isTutorial ? aspectWidth(0.4) : '0px' }}>{duelistName}</div>
+            <div className="ProfileName DuelistName" data-contentlength={duelistContentLength} style={ isTutorial ? { marginTop: aspectWidth(0.4) } : undefined }>{duelistName}</div>
           </div>
         </>
       }
@@ -55,12 +59,13 @@ export default function DuelProfile({
         <>
           <div className='NoMouse NoDrag' style={{ zIndex: 10, position: 'absolute', top: aspectWidth(0.2), right: aspectWidth(8.3), display: 'flex', flexDirection: 'column', alignItems: 'end' }}>
             {!isTutorial && <div className='NoMargin ProfileName' data-contentlength={contentLength}>{name}</div>}
-            <div className={`ProfileName ${isTutorial ? '' : 'NoMargin '}`} data-contentlength={duelistContentLength} style={{ marginTop: isTutorial ? aspectWidth(0.4) : '0px' }}>{duelistName}</div>
+            <div className={`ProfileName DuelistName`} data-contentlength={duelistContentLength} style={ isTutorial ? { marginTop: aspectWidth(0.4) } : undefined }>{duelistName}</div>
           </div>
           <div className='YesMouse NoDrag' onClick={() => dispatchSelectPlayerAddress(playerAddress)}>
           <ProfilePic circle profilePic={isTutorial ? profilePic : 0} profileType={isTutorial ? profileType : constants.DuelistProfile.Character} className='NoMouse NoDrag' />
           </div>
-          <Image className='FlipHorizontal NoMouse NoDrag' src='/images/ui/duel/player_profile.png' style={{ position: 'absolute' }} />
+          <Image className='FlipHorizontal NoMouse NoDrag' src={hasStamp ? '/images/ui/duel/player_profile_stamp.png' : '/images/ui/duel/player_profile.png'} style={{ position: 'absolute' }} />
+          <StampImage playerAddress={playerAddress} size="DuelProfile" position="Right" />
         </>
       }
     </>

@@ -21,6 +21,7 @@ import { ChallengeButton } from '/src/components/ui/Buttons'
 import { useDiscordSocialLink } from '/src/stores/eventsModelStore'
 import { useFetchDuelistIdsByPlayer } from '/src/stores/duelistStore'
 import { COLORS } from '@underware/pistols-sdk/pistols/constants'
+import { StampImage } from './StampImage'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -53,7 +54,7 @@ export interface ProfilePosterHandle extends InteractibleComponentHandle {}
 
 // Shared data hook between small and full components
 const useProfilePosterData = (playerAddress?: BigNumberish) => {
-  const { name, isBlocked } = usePlayer(playerAddress)
+  const { name } = usePlayer(playerAddress)
   const { isMyAccount } = useIsMyAccount(playerAddress)
   const isOnline = getPlayerOnlineStatus(playerAddress)
   const { isLinked, avatarUrl } = useDiscordSocialLink(playerAddress)
@@ -62,7 +63,6 @@ const useProfilePosterData = (playerAddress?: BigNumberish) => {
     name,
     isMyAccount,
     isOnline,
-    isBlocked,
     isLinked,
     avatarUrl
   }
@@ -71,7 +71,7 @@ const useProfilePosterData = (playerAddress?: BigNumberish) => {
 // Small version of the ProfilePoster
 const ProfilePosterSmall = forwardRef<ProfilePosterHandle, ProfilePosterProps>((props, ref) => {
   const { aspectWidth, aspectHeight } = useGameAspect()
-  const { name, isOnline, isBlocked, isLinked, avatarUrl } = useProfilePosterData(props.playerAddress)
+  const { name, isOnline, isLinked, avatarUrl } = useProfilePosterData(props.playerAddress)
 
   const baseRef = useRef<InteractibleComponentHandle>(null)
 
@@ -135,7 +135,7 @@ const ProfilePosterSmall = forwardRef<ProfilePosterHandle, ProfilePosterProps>((
             <div className='PlayerName Small'>{name}</div>
           </div>
 
-          {isBlocked && <div className='BlockedOverlay ProfileSmall Right' />}
+          <StampImage playerAddress={props.playerAddress} size="ProfileSmall" position="Right" />
 
           <div className={`OnlineStatusSection ${ props.width && props.width !== POSTER_WIDTH_SMALL ? 'Smaller' : 'Small'}`}>
             <div className={`OnlineStatus Small ${isOnline ? 'Online' : 'Offline'}`} />
@@ -151,7 +151,7 @@ const ProfilePosterFull = forwardRef<ProfilePosterHandle, ProfilePosterProps>((p
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSetScene } = usePistolsScene()
   const { dispatchSelectDuelistId } = usePistolsContext()
-  const { name, isMyAccount, isOnline, isBlocked, isLinked, avatarUrl } = useProfilePosterData(props.playerAddress)
+  const { name, isMyAccount, isOnline, isLinked, avatarUrl } = useProfilePosterData(props.playerAddress)
   
   // Full-specific data
   useFetchDuelistIdsByPlayer(props.playerAddress) // fetch duelists in the store, if not already fetched
@@ -287,7 +287,7 @@ const ProfilePosterFull = forwardRef<ProfilePosterHandle, ProfilePosterProps>((p
             <BookmarkIcon isBookmarked={isBookmarked} size='big' fitted disabled={emitIsDisabled} onClick={emit_player_bookmark} />
           </div>
 
-          {isBlocked && <div className='BlockedOverlay ProfileLarge Right' />}
+          <StampImage playerAddress={props.playerAddress} size="ProfileLarge" position="Right" />
 
           <div className='OnlineStatusSection'>
             <div className={`OnlineStatus ${isOnline ? 'Online' : 'Offline'}`} />

@@ -690,17 +690,21 @@ export class ProgressDialogMesh {
   private updateElement() {
     if (!this.element) return
 
-    const bubbleImage = this.isThinkingBubble ? '/images/ui/duel/bubble_thinking.png' : '/images/ui/duel/bubble_speech.png'
+    const bubbleImage = this.isThinkingBubble ? this.isYou ? '/images/ui/duel/bubble_thinking_me.png' : '/images/ui/duel/bubble_thinking.png' : this.isYou ? '/images/ui/duel/bubble_speech_me.png' : '/images/ui/duel/bubble_speech.png'
     const textColor = this.isYou ? '#77d64d' : '#e34a4a'
 
     const title = this.element.querySelector('.dialog-title') as HTMLElement
     title.textContent = this.dialogTitle
     title.style.color = textColor
+    title.style.textAlign = this.isLeft ? 'left' : 'right'
     
     const name = this.element.querySelector('.dialog-duelist') as HTMLElement
     name.textContent = this.duelistName
     name.dataset.contentlength = Math.floor(this.duelistName?.length / 10).toString()
     name.style.color = textColor
+    name.style.textAlign = this.isLeft ? 'left' : 'right'
+    name.classList.remove('Left', 'Right')
+    name.classList.add(this.isLeft ? 'Left' : 'Right')
 
     const background = this.element.querySelector('.dialog-background') as HTMLImageElement
     background.style.transform = !this.isLeft ? 'scaleX(-1)' : ''
@@ -710,6 +714,7 @@ export class ProgressDialogMesh {
     button.textContent = this.message
     button.dataset.contentlength = Math.floor(this.message?.length / 10).toString()
     button.style.pointerEvents = this.isLoading ? 'none' : 'auto'
+    
     const buttonLoading = this.element.querySelector('.button-loading-overlay') as HTMLElement
     buttonLoading.style.display = this.isLoading ? 'flex' : 'none'
 
@@ -718,6 +723,7 @@ export class ProgressDialogMesh {
     const message = this.element.querySelector('.dialog-quote') as HTMLElement
     message.textContent = this.message
     message.dataset.contentlength = Math.floor(this.message?.length / 10).toString()
+    message.style.textAlign = this.isLeft ? 'left' : 'right'
     const spinner = this.element.querySelector('#dialog-spinner') as HTMLElement
 
     button.offsetWidth;

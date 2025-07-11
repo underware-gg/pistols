@@ -361,12 +361,31 @@
   }
 }
 
-.BlockedOverlay {
+.StampOverlay {
   position: absolute;
-  background-image: url('/images/ui/black_stamp_cork.png');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
+
+  &.Blocked {
+    background-image: url('/images/ui/stamps/black_stamp_cork.png');
+  }
+
+  &.Team {
+    background-image: url('/images/ui/stamps/team_stamp_cork.png');
+  }
+
+  &.Gold {
+    background-image: url('/images/ui/stamps/gold_stamp_cork.png');
+  }
+
+  &.Silver {
+    background-image: url('/images/ui/stamps/silver_stamp_cork.png');
+  }
+
+  &.Lead {
+    background-image: url('/images/ui/stamps/lead_stamp_cork.png');
+  }
   
   &.ProfileSmall {
     width: aspect-width(2.4);
@@ -425,6 +444,21 @@
     &.Right {
       bottom: aspect-width(-0.8);
       right: aspect-width(-0.4);
+    }
+  }
+
+  &.DuelProfile {
+    width: aspect-width(2.35);
+    height: aspect-width(2.35);
+
+    &.Left {
+      top: aspect-width(6.84);
+      left: aspect-width(0.4);
+    }
+
+    &.Right {
+      top: aspect-width(6.84);
+      right: aspect-width(0.4);
     }
   }
 }
