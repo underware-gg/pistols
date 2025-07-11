@@ -164,7 +164,7 @@ pub mod duel_token {
     use pistols::interfaces::dns::{
         DnsTrait,
         IDuelistTokenProtectedDispatcher, IDuelistTokenProtectedDispatcherTrait,
-        IBotPlayerProtectedDispatcherTrait,
+        IBotPlayerDispatcherTrait,
         // IGameDispatcherTrait,
     };
     use pistols::models::{
@@ -276,10 +276,19 @@ pub mod duel_token {
         ) -> u128 {
             let mut store: Store = StoreTrait::new(self.world_default());
 
+            // validate challenged
+            let address_a: ContractAddress = starknet::get_caller_address();
+            let mut address_b: ContractAddress = challenged_address;
+            assert(address_b != address_a, Errors::INVALID_CHALLENGED_SELF);
+
             // validate duel type
             match duel_type {
                 DuelType::Seasonal | 
                 DuelType::Practice => {}, // ok!
+                DuelType::BotPlayer => {
+                    address_b = store.world.bot_player_address();
+                    lives_staked = 1; // bot practice always stakes 1 life
+                },
                 DuelType::Undefined | 
                 DuelType::Tournament |
                 DuelType::Tutorial => {
@@ -287,18 +296,6 @@ pub mod duel_token {
                     assert(false, Errors::INVALID_DUEL_TYPE);
                 },
             };
-
-            // validate challenged
-            let address_a: ContractAddress = starknet::get_caller_address();
-            let address_b: ContractAddress = challenged_address;
-            assert(address_b != address_a, Errors::INVALID_CHALLENGED_SELF);
-
-            // against bot player
-            let against_bot_player: bool = store.world.is_bot_player_contract(address_b);
-            if (against_bot_player) {
-                assert(duel_type == DuelType::Practice, Errors::INVALID_DUEL_TYPE);
-                lives_staked = 1; // bot practice always stakes 1 life
-            }
 
             // get active duelist from stack
             let duelist_dispatcher: IDuelistTokenProtectedDispatcher = store.world.duelist_token_protected_dispatcher();
@@ -374,8 +371,8 @@ pub mod duel_token {
             PlayerTrait::check_in(ref store, Activity::ChallengeCreated, address_a, duel_id.into());
 
             // bot player reply
-            if (against_bot_player) {
-                store.world.bot_player_protected_dispatcher().reply_duel(duel_id);
+            if (challenge.is_against_bot_player()) {
+                store.world.bot_player_dispatcher().reply_duel(duel_id);
             }
 
             (duel_id)
@@ -413,8 +410,7 @@ pub mod duel_token {
 
                 // Challenged is accepting...
                 if (accepted) {
-                    let against_bot_player: bool = store.world.is_bot_player_contract(address_b);
-                    challenge.duelist_id_b = if (against_bot_player) {
+                    challenge.duelist_id_b = if (challenge.is_against_bot_player()) {
                         // bot duelist is already validated (active in stack concept does not apply)
                         (duelist_id)
                     } else {

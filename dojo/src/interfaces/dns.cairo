@@ -11,7 +11,7 @@ pub use pistols::systems::{
     bank::{IBankDispatcher, IBankDispatcherTrait, IBankProtectedDispatcher, IBankProtectedDispatcherTrait},
     game::{IGameDispatcher, IGameDispatcherTrait},
     game_loop::{IGameLoopDispatcher, IGameLoopDispatcherTrait},
-    bot_player::{IBotPlayerDispatcher, IBotPlayerDispatcherTrait, IBotPlayerProtectedDispatcher, IBotPlayerProtectedDispatcherTrait},
+    bot_player::{IBotPlayerDispatcher, IBotPlayerDispatcherTrait},
     tutorial::{ITutorialDispatcher, ITutorialDispatcherTrait},
     rng::{IRngDispatcher, IRngDispatcherTrait},
     rng_mock::{IRngMockDispatcher, IRngMockDispatcherTrait},
@@ -189,6 +189,10 @@ pub impl DnsImpl of DnsTrait {
         (starknet::get_caller_address() == self.duel_token_address())
     }
     #[inline(always)]
+    fn caller_is_game_contract(self: @WorldStorage) -> bool {
+        (starknet::get_caller_address() == self.game_address())
+    }
+    #[inline(always)]
     fn is_bot_player_contract(self: @WorldStorage, address: ContractAddress) -> bool {
         (address == self.bot_player_address())
     }
@@ -227,10 +231,6 @@ pub impl DnsImpl of DnsTrait {
     #[inline(always)]
     fn bot_player_dispatcher(self: @WorldStorage) -> IBotPlayerDispatcher {
         (IBotPlayerDispatcher{ contract_address: self.bot_player_address() })
-    }
-    #[inline(always)]
-    fn bot_player_protected_dispatcher(self: @WorldStorage) -> IBotPlayerProtectedDispatcher {
-        (IBotPlayerProtectedDispatcher{ contract_address: self.bot_player_address() })
     }
     #[inline(always)]
     fn tutorial_dispatcher(self: @WorldStorage) -> ITutorialDispatcher {
