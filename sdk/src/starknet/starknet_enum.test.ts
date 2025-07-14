@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 import { cairo, CairoCustomEnum } from "starknet";
 import { makeCustomEnum, parseCustomEnum, parseEnumVariant } from "./starknet_enum";
-import { bigintToHex } from "../misc/types";
+import { bigintToHex } from "../utils/misc/types";
 
 //---------------------------------------
 // CairoCustomEnum helpers

@@ -46,9 +46,9 @@ export const restore_moves_from_hash = (
     // there are 2 to 4 decks...
     for (let di = 0; di < decks.length; ++di) {
       const deck = decks[di]
-      const mask = _make_move_mask(di)
+      const stored_hash = (hash & _make_move_mask(di))
       // is deck is empty, no move
-      if (deck.length == 0) {
+      if (stored_hash == 0n || deck.length == 0) {
         // console.log(`___RESTORE D${di}: SKIP`)
         moves.push(0) // did not move here
         continue
@@ -57,17 +57,11 @@ export const restore_moves_from_hash = (
       for (let mi = 0; mi < deck.length; ++mi) {
         const move = deck[mi]
         const move_hash = _make_move_hash(salt, di, move)
-        const stored_hash = (hash & mask)
-        if (stored_hash == 0n) {
-          moves.push(0) // did not move here
+        // console.log(`___RESTORE D${di}/M${mi}:`, bigintToHex(stored_hash), '>', bigintToHex(move_hash), '?', move)
+        if (stored_hash == move_hash) {
+          moves.push(Number(move))
+          // console.log(`___RESTORE D${di}/M${mi}: FOUND!`, move)
           break
-        } else {
-          // console.log(`___RESTORE D${di}/M${mi}:`, bigintToHex(stored_hash), '>', bigintToHex(move_hash), '?', move)
-          if (stored_hash == move_hash) {
-            moves.push(Number(move))
-            // console.log(`___RESTORE D${di}/M${mi}: FOUND!`, move)
-            break
-          }
         }
       }
       if (moves.length != di + 1) {

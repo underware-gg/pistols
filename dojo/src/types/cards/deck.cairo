@@ -70,6 +70,14 @@ pub impl DeckImpl of DeckTrait {
             *self.blades_cards,
         ].span())
     }
+    fn from_span(moves: Span<Span<u8>>) -> Deck {
+        (Deck {
+            fire_cards: if (moves.len() > 0) {*moves[0]} else {[].span()},
+            dodge_cards: if (moves.len() > 1) {*moves[1]} else {[].span()},
+            tactics_cards: if (moves.len() > 2) {*moves[2]} else {[].span()},
+            blades_cards: if (moves.len() > 3) {*moves[3]} else {[].span()},
+        })
+    }
 }
 
 
@@ -101,6 +109,7 @@ pub impl DeckTypeDebug of core::fmt::Debug<DeckType> {
 #[cfg(test)]
 mod unit {
     use super::{Deck, DeckTrait, DeckType, DeckTypeTrait};
+    use pistols::utils::arrays::{ArrayTestUtilsTrait};
     use pistols::types::cards::hand::{
         DuelistHand,
         PacesCard,
@@ -173,5 +182,17 @@ mod unit {
         assert_eq!(hand.card_tactics, TacticsCard::None, "hand.card_tactics");
         assert_eq!(hand.card_blades, BladesCard::None, "hand.card_blades");
     }
-}
 
+    #[test]
+    fn test_deck_from_span() {
+        let span_0: Span<Span<u8>> = [
+            [1,2,3,4].span(),
+            [2,3,4,1].span(),
+            [3,4,1,2].span(),
+            [4,1,2,3].span(),
+        ].span();
+        let deck: Deck = DeckTrait::from_span(span_0);
+        let span_1: Span<Span<u8>> = deck.to_span();
+        ArrayTestUtilsTrait::assert_span_eq(span_0, span_1, "error!");
+    }
+}
