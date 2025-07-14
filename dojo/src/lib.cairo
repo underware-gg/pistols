@@ -40,6 +40,7 @@ mod systems {
 mod libs {
     pub mod admin_fix;
     pub mod game_loop;
+    pub mod moves_hash;
     pub mod seeder;
     pub mod store;
     pub mod tut;

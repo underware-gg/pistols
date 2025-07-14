@@ -4,7 +4,7 @@ pub mod prefabs {
 
     // use dojo::world::{WorldStorage};
 
-    use pistols::models::challenge::{ChallengeValue, RoundValue, DuelType, MovesTrait};
+    use pistols::models::challenge::{ChallengeValue, RoundValue, DuelType};
     use pistols::types::challenge_state::{ChallengeState};
     use pistols::types::round_state::{RoundState};
     use pistols::types::timestamp::{TimestampTrait};
@@ -15,6 +15,7 @@ pub mod prefabs {
             ID, MESSAGE,
         }
     };
+    use pistols::libs::moves_hash::{MovesHashTrait};
     use pistols::systems::rng_mock::{IRngMockDispatcherTrait, MockedValue, MockedValueTrait};
     use pistols::types::cards::env::{ENV_DICES};
 
@@ -43,7 +44,7 @@ pub mod prefabs {
     #[generate_trait]
     pub impl PlayerMovesImpl of PlayerMovesTrait {
         fn new(salt: felt252, moves: Span<u8>) -> PlayerMoves {
-            (PlayerMoves{salt, moves, hashed: MovesTrait::make_moves_hash(salt, moves)})
+            (PlayerMoves{salt, moves, hashed: MovesHashTrait::hash(salt, moves)})
         }
     }
 

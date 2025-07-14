@@ -4,15 +4,15 @@
 //
 use pistols::models::challenge::{Challenge};
 use pistols::types::duelist_profile::{DuelistProfile};
-use pistols::types::cards::{
-    hand::{DuelistHand, DuelistHandTrait},
-    paces::{PacesCard},
-    tactics::{TacticsCard},
-    blades::{BladesCard},
-};
+// use pistols::types::cards::{
+//     hand::{DuelistHand, DuelistHandTrait},
+//     paces::{PacesCard},
+//     tactics::{TacticsCard},
+//     blades::{BladesCard},
+// };
 
 #[generate_trait]
-pub impl BotPlayetMovesImpl of BotPlayetMovesTrait {
+pub impl BotPlayetMovesImpl of BotPlayerMovesTrait {
     fn make_moves(self: @DuelistProfile, challenge: @Challenge) -> Span<u8> {
         // let mut hand: DuelistHand = Default::default();
 

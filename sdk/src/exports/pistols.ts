@@ -5,6 +5,6 @@ export * from '../games/pistols/misc/salt'
 export * from '../games/pistols/misc/debug'
 // in sync with cairo sources
 export * from '../games/pistols/cairo/pact'
-export * from '../games/pistols/cairo/make_moves_hash'
+export * from '../games/pistols/cairo/moves_hash'
 export * from '../games/pistols/cairo/rules'
 export * from '../games/pistols/cairo/token_bound'

@@ -20,7 +20,7 @@ pub mod bot_player {
         IGameDispatcherTrait,
     };
     use pistols::models::{
-        challenge::{Challenge, MovesTrait},
+        challenge::{Challenge},
         player::{PlayerDuelistStack, PlayerDuelistStackTrait},
     };
     use pistols::types::{
@@ -29,7 +29,8 @@ pub mod bot_player {
     use pistols::libs::{
         store::{Store, StoreTrait},
         seeder::{make_seed},
-        bot::{BotPlayetMovesTrait},
+        bot::{BotPlayerMovesTrait},
+        moves_hash::{MovesHashTrait},
     };
     use pistols::utils::hash::{hash_values};
 
@@ -80,7 +81,7 @@ pub mod bot_player {
             // make moves
             let salt: felt252 = hash_values([duel_id.into()].span()); // salt is always the duel_id for permissionless reveal
             let moves: Span<u8> = duelist_profile.make_moves(@challenge);
-            let moves_hash: u128 = MovesTrait::make_moves_hash(salt, moves);
+            let moves_hash: u128 = MovesHashTrait::hash(salt, moves);
 
             // commit!
             store.world.game_dispatcher().commit_moves(duelist_id, duel_id, moves_hash);

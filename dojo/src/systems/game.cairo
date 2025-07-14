@@ -106,8 +106,11 @@ pub mod game {
         constants::{FAME},
     };
     use pistols::types::trophies::{Trophy, TrophyTrait, TrophyProgressTrait, TROPHY_ID};
-    use pistols::libs::store::{Store, StoreTrait};
-    use pistols::libs::game_loop::{GameLoopContractTrait};
+    use pistols::libs::{
+        store::{Store, StoreTrait},
+        game_loop::{GameLoopContractTrait},
+        moves_hash::{MovesHashTrait},
+    };
 
     pub mod Errors {
         pub const CALLER_NOT_OWNER: felt252          = 'PISTOLS: Caller not owner';
@@ -283,7 +286,7 @@ pub mod game {
             // assert(moves.len() >= 2 && moves.len() <= 4, Errors::INVALID_MOVES_COUNT);
 
             // validate hash
-            let hashed: u128 = MovesTrait::make_moves_hash(salt, moves);
+            let hashed: u128 = MovesHashTrait::hash(salt, moves);
             if (duelist_number == 1) {
                 assert(!round.moves_a.has_revealed(), Errors::ALREADY_REVEALED);
                 assert(round.moves_a.hashed == hashed, Errors::MOVES_HASH_MISMATCH);

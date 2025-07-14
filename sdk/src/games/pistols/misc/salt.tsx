@@ -1,7 +1,7 @@
 import Cookies from 'universal-cookie';
 import { AccountInterface, StarknetDomain } from 'starknet'
-import { make_moves_hash, _make_move_mask, _make_move_hash } from 'src/games/pistols/cairo/make_moves_hash'
 import { CommitMoveMessage, GeneralPurposeMessage } from 'src/games/pistols/config/typed_data'
+import { make_moves_hash, restore_moves_from_hash } from 'src/games/pistols/cairo/moves_hash'
 import { signMessages, Messages } from 'src/starknet/starknet_sign'
 import { bigintToHex, shortAddress } from 'src/utils/misc/types'
 import { apiGenerateControllerSalt } from 'src/api/salt'
@@ -111,7 +111,7 @@ export const signAndRestoreMovesFromHash = async (
   const salt: bigint = await signAndGenerateMovesSalt(serverUrl, account, starknetDomain, messageToSign)
   console.log(`___RESTORE decks:`, decks)
   console.log(`___RESTORE message:`, messageToSign, '\nsalt:', bigintToHex(salt), '\nhash:', bigintToHex(hash))
-  let moves: number[] = restoreMovesFromHash(salt, hash, decks)
+  let moves: number[] = restore_moves_from_hash(salt, hash, decks)
   if (moves.length == decks.length) {
     console.log(`___RESTORED ALL MOVES:`, moves)
   } else {
@@ -122,50 +122,6 @@ export const signAndRestoreMovesFromHash = async (
     salt,
     moves,
   }
-}
-
-/** @returns the original action from an action hash, or 0 if fail */
-export const restoreMovesFromHash = (
-  salt: bigint,
-  hash: bigint,
-  decks: number[][]
-): number[] => {
-  let moves: number[] = []
-  if (salt > 0n) {
-    // there are 2 to 4 decks...
-    for (let di = 0; di < decks.length; ++di) {
-      const deck = decks[di]
-      const mask = _make_move_mask(di)
-      // is deck is empty, no move
-      if (deck.length == 0) {
-        // console.log(`___RESTORE D${di}: SKIP`)
-        moves.push(0) // did not move here
-        continue
-      }
-      // each deck can contain up to 10 cards/moves...
-      for (let mi = 0; mi < deck.length; ++mi) {
-        const move = deck[mi]
-        const move_hash = _make_move_hash(salt, di, move)
-        const stored_hash = (hash & mask)
-        if (stored_hash == 0n) {
-          moves.push(0) // did not move here
-          break
-        } else {
-          // console.log(`___RESTORE D${di}/M${mi}:`, bigintToHex(stored_hash), '>', bigintToHex(move_hash), '?', move)
-          if (stored_hash == move_hash) {
-            moves.push(Number(move))
-            // console.log(`___RESTORE D${di}/M${mi}: FOUND!`, move)
-            break
-          }
-        }
-      }
-      if (moves.length != di + 1) {
-        console.warn(`___RESTORE NOT FOUND for deck ${di}`)
-        break
-      }
-    }
-  }
-  return moves;
 }
 
 //------------------------------------------
