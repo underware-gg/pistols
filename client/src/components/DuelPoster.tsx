@@ -359,6 +359,8 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
     getStyle: () => baseRef.current?.getStyle() || { translateX: 0, translateY: 0, rotation: 0, scale: 1 },
   }))
 
+  // console.log(`needToSyncExpired`, state, needToSyncExpired, isCallToAction)
+
   return (
     <InteractibleComponent
       width={aspectWidth(POSTER_WIDTH_BIG)}
@@ -571,7 +573,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
                     )
                   ))
               }
-              {((state == constants.ChallengeState.Awaiting && isChallenger) || state == constants.ChallengeState.InProgress || (state !== constants.ChallengeState.Awaiting && isCallToAction)) &&
+              {((state == constants.ChallengeState.Awaiting && isChallenger) || state == constants.ChallengeState.InProgress || (isFinished && isChallenged && isCallToAction)) &&
                 <Col>
                   <ActionButton large fillParent important label='Go to Live Duel!' loading={isSubmitting} onClick={() => _gotoDuel()} />
                 </Col>
@@ -581,7 +583,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
                   <ActionButton large fillParent important label='Replay Duel!' loading={isSubmitting} onClick={() => _gotoDuel()} />
                 </Col>
               }
-              {(needToSyncExpired && (isChallenger || isChallenged)) &&
+              {(needToSyncExpired && isChallenger) &&
                 <Col>
                   <ActionButton large fillParent important label='Expired, Collect Duel' loading={isSubmitting} onClick={() => _reply(false)} />
                 </Col>

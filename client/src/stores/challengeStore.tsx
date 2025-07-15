@@ -83,13 +83,10 @@ export const useChallenge = (duelId: BigNumberish) => {
   const timestampEnd = useMemo(() => Number(challenge?.timestamps.end ?? 0), [challenge])
 
   const { clientSeconds } = useClientTimestamp(false)
-  let _state = useMemo(() => parseEnumVariant<constants.ChallengeState>(challenge?.state), [challenge])
-  let state = useMemo(() => {
-    if (_state == constants.ChallengeState.Awaiting && (timestampEnd < clientSeconds)) {
-      return constants.ChallengeState.Expired
-    }
-    return _state
-  }, [_state, clientSeconds, timestampEnd])
+  let state = useMemo(() => parseEnumVariant<constants.ChallengeState>(challenge?.state), [challenge])
+  let needToSyncExpired = useMemo(() => (
+    state == constants.ChallengeState.Awaiting && (timestampEnd < clientSeconds)
+  ), [state, clientSeconds, timestampEnd])
 
   return {
     challengeExists: (challenge != null),
@@ -119,7 +116,7 @@ export const useChallenge = (duelId: BigNumberish) => {
     isDraw: (state == constants.ChallengeState.Draw),
     isCanceled: (state == constants.ChallengeState.Withdrawn || state == constants.ChallengeState.Refused),
     isExpired: (state == constants.ChallengeState.Expired),
-    needToSyncExpired: (state == constants.ChallengeState.Expired && state != _state),
+    needToSyncExpired,
     // times
     timestampStart,
     timestampEnd,
