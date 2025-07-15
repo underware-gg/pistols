@@ -115,7 +115,7 @@ export const formatTimestampDeltaCountdown = (s_start: number, s_end: number): F
           : (ts.months == 1) ? `${ts.months} month`
             : (ts.weeks >= 2) ? `${ts.weeks}+ weeks`
               : (ts.days > 1) ? `${ts.days} days`
-                : (ts.days == 1) ? `${ts.days} day`
+                : (ts.days == 1) ? `${ts.days} day ${ts.hours}hs`
                   : (ts.hours > 0) ? `${ts.hours}h`
                     : (ts.minutes > 0) ? `${ts.minutes}m`
                       : (ts.seconds > 0) ? `${ts.seconds}s`
