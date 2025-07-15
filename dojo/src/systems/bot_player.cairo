@@ -3,8 +3,10 @@
 // Exposed to clients
 #[starknet::interface]
 pub trait IBotPlayer<TState> {
+    fn make_salt(self: @TState, duel_id: u128) -> felt252;
     fn reply_duel(ref self: TState, duel_id: u128);
     fn commit_moves(ref self: TState, duel_id: u128);
+    fn reveal_moves(ref self: TState, duel_id: u128);
 }
 
 #[dojo::contract]
@@ -20,10 +22,11 @@ pub mod bot_player {
         IGameDispatcherTrait,
     };
     use pistols::models::{
-        challenge::{Challenge},
+        challenge::{Challenge, ChallengeTrait, RoundValue},
         player::{PlayerDuelistStack, PlayerDuelistStackTrait},
     };
     use pistols::types::{
+        cards::deck::{Deck},
         duelist_profile::{DuelistProfile, BotKey, ProfileManagerTrait},
     };
     use pistols::libs::{
@@ -48,6 +51,11 @@ pub mod bot_player {
 
     #[abi(embed_v0)]
     impl BotPlayerImpl of super::IBotPlayer<ContractState> {
+        fn make_salt(self: @ContractState, duel_id: u128) -> felt252 {
+            // salt is always the duel_id for permissionless reveal
+            (hash_values([duel_id.into()].span()))
+        }
+
         fn reply_duel(ref self: ContractState, duel_id: u128) {
             // only duel contract can request a reply
             let mut store: Store = StoreTrait::new(self.world_default());
@@ -79,12 +87,27 @@ pub mod bot_player {
             let duelist_profile: DuelistProfile = store.get_duelist_profile(duelist_id);
 
             // make moves
-            let salt: felt252 = hash_values([duel_id.into()].span()); // salt is always the duel_id for permissionless reveal
+            let salt: felt252 = self.make_salt(duel_id);
             let moves: Span<u8> = duelist_profile.make_moves(@challenge);
             let moves_hash: u128 = MovesHashTrait::hash(salt, moves);
 
             // commit!
             store.world.game_dispatcher().commit_moves(duelist_id, duel_id, moves_hash);
+        }
+
+        fn reveal_moves(ref self: ContractState, duel_id: u128) {
+            // anyone can request a reveal
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let challenge: Challenge = store.get_challenge(duel_id);
+            let round: RoundValue = store.get_round_value(duel_id);
+
+            // make moves
+            let salt: felt252 = self.make_salt(duel_id);
+            let deck: Deck = challenge.get_deck();
+            let moves: Span<u8> = MovesHashTrait::restore(salt, round.moves_b.hashed, deck);
+
+            // reveal!
+            store.world.game_dispatcher().reveal_moves(challenge.duelist_id_b, duel_id, salt, moves);
         }
     }
 

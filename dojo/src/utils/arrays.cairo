@@ -66,6 +66,7 @@ pub impl ArrayUtilsImpl<T, +Clone<T>, +Drop<T>> of ArrayUtilsTrait<T> {
     }
 }
 
+#[cfg(test)]
 #[generate_trait]
 pub impl ArrayTestUtilsImpl<T, +Clone<T>, +Drop<T>> of ArrayTestUtilsTrait<T> {
     fn assert_array_eq<+PartialEq<T>, +core::fmt::Debug<T>>(v1: Array<T>, v2: Array<T>, prefix: ByteArray) {
