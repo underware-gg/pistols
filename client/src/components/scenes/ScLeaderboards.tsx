@@ -574,7 +574,7 @@ export default function ScLeaderboards() {
         seasonRewards={rewardsPerSeason[seasonId]}
       />
     ));
-  }, [seasonIds, selectedSeasonId, handleSeasonSelect]);
+  }, [seasonIds, selectedSeasonId, totalsPerSeason, rewardsPerSeason, handleSeasonSelect]);
 
   return (
     <div style={{ position: 'absolute', bottom: 0, left: 0, width: aspectWidth(100), height: aspectHeight(87), display: 'flex' }}>
