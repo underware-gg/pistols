@@ -1,4 +1,5 @@
 use core::num::traits::Zero;
+use core::ops::AddAssign;
 
 //
 // Based on Alexandria array and span extensions
@@ -10,6 +11,25 @@ use core::num::traits::Zero;
 pub impl SpanUtilsImpl<T, +Clone<T>, +Drop<T>> of SpanUtilsTrait<T> {
     fn value_or_zero<+Copy<T>, +Zero<T>>(self: Span<T>, index: usize) -> T {
         (if (index < self.len()) { *self[index] } else { Zero::zero() })
+    }
+    fn sum_values<+Zero<T>, +Copy<T>, +AddAssign<T, T>>(mut self: Span<T>) -> T {
+        let mut ret: T = Zero::zero();
+        loop {
+            match self.pop_front() {
+                Option::Some(v) => { ret += *v; },
+                Option::None => { break; },
+            };
+        };
+        (ret)
+    }
+    fn sum_range<+Zero<T>, +Copy<T>, +AddAssign<T, T>>(self: Span<T>, start_index: usize, length: usize) -> T {
+        let mut ret: T = Zero::zero();
+        let mut i: usize = 0;
+        while (i < length) {
+            ret += *self[start_index + i];
+            i += 1;
+        };
+        (ret)
     }
     //
     // from alexandria
@@ -192,5 +212,26 @@ mod unit {
         assert_eq!(span.value_or_zero(2), 33, "span_value_or_zero(2) != 33");
         assert_eq!(span.value_or_zero(3), 0, "span_value_or_zero(3) != 0");
         assert_eq!(span.value_or_zero(999), 0, "span_value_or_zero(999) != 0");
+    }
+
+    #[test]
+    fn test_span_sum_range() {
+        let arr: Array<usize> = array![1, 2, 3, 4, 5];
+        let span: Span<usize> = arr.span();
+        // test default values
+        assert_eq!([].span().sum_values(), 0, "sum_values()");
+        assert_eq!(span.sum_values(), 15, "sum_values()");
+        assert_eq!(span.sum_range(0,0), 0, "sum_range()");
+        assert_eq!(span.sum_range(2,0), 0, "sum_range()");
+        assert_eq!(span.sum_range(4,0), 0, "sum_range()");
+        assert_eq!(span.sum_range(0,1), 1, "sum_range()");
+        assert_eq!(span.sum_range(0,2), 3, "sum_range()");
+        assert_eq!(span.sum_range(0,3), 6, "sum_range()");
+        assert_eq!(span.sum_range(0,4), 10, "sum_range()");
+        assert_eq!(span.sum_range(0,5), 15, "sum_range()");
+        assert_eq!(span.sum_range(2,1), 3, "sum_range()");
+        assert_eq!(span.sum_range(4,1), 5, "sum_range()");
+        assert_eq!(span.sum_range(2,2), 7, "sum_range()");
+        assert_eq!(span.sum_range(2,3), 12, "sum_range()");
     }
 }

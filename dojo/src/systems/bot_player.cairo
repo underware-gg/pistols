@@ -91,8 +91,9 @@ pub mod bot_player {
             let duelist_profile: DuelistProfile = store.get_duelist_profile(duelist_id);
 
             // make moves
+            let mut dice: Dice = self._make_dice(@store, duel_id);
             let salt: felt252 = self.make_salt(duel_id);
-            let moves: Span<u8> = duelist_profile.make_moves(@challenge);
+            let moves: Span<u8> = duelist_profile.make_moves(@challenge, ref dice);
             let moves_hash: u128 = MovesHashTrait::hash(salt, moves);
 
             // commit!

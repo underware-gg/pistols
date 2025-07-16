@@ -1,4 +1,3 @@
-// use starknet::{ContractAddress};
 pub use pistols::systems::rng_mock::{MockedValue, RngWrap, RngWrapTrait};
 
 //--------------------------------
@@ -33,6 +32,8 @@ pub mod rng {
 //--------------------------------
 // Public dice trait
 //
+use core::num::traits::Zero;
+use pistols::utils::arrays::{SpanUtilsTrait};
 
 #[derive(Copy, Drop)]
 pub struct Dice {
@@ -74,6 +75,34 @@ pub impl DiceImpl of DiceTrait {
         let dice: u8 = self.throw(salt, faces);
         let result: bool = (dice <= chances);
         (dice, result)
+    }
+
+    // weighted values
+    fn throw_weighted_dice(ref self: Dice, salt: felt252, values: Span<u8>, weights: Span<u8>) -> u8 {
+        let mut result: u8 = 0;
+        let length: usize = core::cmp::min(values.len(), weights.len());
+        if (length.is_non_zero()) {
+            let mut sum: u8 = weights.sum_range(0, length);
+            if (sum.is_non_zero()) {
+                let mut dice_value: u8 = self.throw(salt, sum);
+                result = Self::_get_weighted_value(values, weights, dice_value);
+            }
+        }
+        (result)
+    }
+    fn _get_weighted_value(values: Span<u8>, weights: Span<u8>, mut dice_value: u8) -> u8 {
+        let mut result: u8 = 0;
+        let mut i: usize = 0;
+        while (i < weights.len()) {
+            let weight: u8 = *weights[i];
+            if (dice_value <= weight) {
+                result = *values[i];
+                break;
+            }
+            dice_value -= weight;
+            i += 1;
+        };
+        (result)
     }
 }
 
@@ -117,5 +146,43 @@ pub impl ShuffleImpl of ShuffleTrait {
         self.last_card = self.shuffler.get_next(self.seed);
 // println!("draw_next(): {} of {} = {}", self.shuffler.pos, self.shuffler.size, self.last_card);
         (self.last_card)
+    }
+}
+
+
+
+//----------------------------------------
+// Unit  tests
+//
+#[cfg(test)]
+mod unit {
+    use super::{DiceTrait};
+
+    #[test]
+    fn test_weighted_value() {
+        let values:  Span<u8> = ([1,  2, 3, 4,  5].span());
+        let weights: Span<u8> = ([10, 1, 4, 5, 10].span());
+        assert_eq!(DiceTrait::_get_weighted_value(values, weights, 0), 1, "_get_weighted_value()");
+        assert_eq!(DiceTrait::_get_weighted_value(values, weights, 1), 1, "_get_weighted_value()");
+        assert_eq!(DiceTrait::_get_weighted_value(values, weights, 10), 1, "_get_weighted_value()");
+        assert_eq!(DiceTrait::_get_weighted_value(values, weights, 11), 2, "_get_weighted_value()");
+        assert_eq!(DiceTrait::_get_weighted_value(values, weights, 12), 3, "_get_weighted_value()");
+        assert_eq!(DiceTrait::_get_weighted_value(values, weights, 13), 3, "_get_weighted_value()");
+        assert_eq!(DiceTrait::_get_weighted_value(values, weights, 14), 3, "_get_weighted_value()");
+        assert_eq!(DiceTrait::_get_weighted_value(values, weights, 15), 3, "_get_weighted_value()");
+        assert_eq!(DiceTrait::_get_weighted_value(values, weights, 16), 4, "_get_weighted_value()");
+        assert_eq!(DiceTrait::_get_weighted_value(values, weights, 20), 4, "_get_weighted_value()");
+        assert_eq!(DiceTrait::_get_weighted_value(values, weights, 21), 5, "_get_weighted_value()");
+        assert_eq!(DiceTrait::_get_weighted_value(values, weights, 30), 5, "_get_weighted_value()");
+        assert_eq!(DiceTrait::_get_weighted_value(values, weights, 31), 0, "_get_weighted_value()");
+        // empties
+        assert_eq!(DiceTrait::_get_weighted_value([].span(), [].span(), 10), 0, "_get_weighted_value()");
+        // assert_eq!(DiceTrait::_get_weighted_value([].span(), weights, 1), 0, "_get_weighted_value()");
+        // assert_eq!(DiceTrait::_get_weighted_value([1].span(), weights, 10), 1, "_get_weighted_value()");
+        // assert_eq!(DiceTrait::_get_weighted_value([1].span(), weights, 11), 0, "_get_weighted_value()");
+        // assert_eq!(DiceTrait::_get_weighted_value(values, [].span(), 1), 0, "_get_weighted_value()");
+        // assert_eq!(DiceTrait::_get_weighted_value(values, [10].span(), 1), 0, "_get_weighted_value()");
+        // assert_eq!(DiceTrait::_get_weighted_value(values, [10].span(), 10), 1, "_get_weighted_value()");
+        // assert_eq!(DiceTrait::_get_weighted_value(values, [10].span(), 11), 0, "_get_weighted_value()");
     }
 }

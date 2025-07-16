@@ -451,7 +451,7 @@ mod LEGENDS_PROFILES {
 // Traits
 //
 use core::num::traits::Zero;
-use pistols::models::duelist::{Duelist, DuelistTimestamps};
+use pistols::models::duelist::{Duelist, DuelistTimestamps, Archetype};
 use pistols::libs::store::{Store, StoreTrait};
 use pistols::utils::short_string::{ShortStringTrait};
 use pistols::utils::misc::{FeltToLossy};
@@ -590,6 +590,20 @@ pub impl DuelistProfileImpl of DuelistProfileTrait {
         let profile_id: u8 = self.profile_id();
         let number = if (profile_id < 10) {format!("0{}", profile_id)} else {format!("{}", profile_id)};
         (format!("{}/profiles/{}/{}.jpg", base_uri, folder_name, number))
+    }
+    // archetype for bot_player
+    fn get_archetype(self: @DuelistProfile) -> Archetype {
+        (match *self {
+            DuelistProfile::Bot(key) => {
+                (match key {
+                    BotKey::Unknown =>      Archetype::Undefined,
+                    BotKey::TinMan =>       Archetype::Villainous,
+                    BotKey::Scarecrow =>    Archetype::Trickster,
+                    BotKey::Leon =>         Archetype::Honourable,
+                })
+            },
+            _ => Archetype::Undefined,
+        })
     }
 }
 

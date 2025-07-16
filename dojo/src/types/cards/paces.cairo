@@ -36,6 +36,24 @@ pub impl PacesCardImpl of PacesCardTrait {
     fn is_after(self: @PacesCard, other: @PacesCard) -> bool {
         (self > other)
     }
+    #[inline(always)]
+    fn previous_pace(self: @PacesCard) -> PacesCard {
+        (if (*self == PacesCard::Paces1) {
+            (PacesCard::Paces1)}
+        else {
+            let value: u8 = (*self).into();
+            (value - 1).into()}
+        )
+    }
+    #[inline(always)]
+    fn next_pace(self: @PacesCard) -> PacesCard {
+        (if (*self == PacesCard::Paces10) {
+            (PacesCard::Paces10)}
+        else {
+            let value: u8 = (*self).into();
+            (value + 1).into()}
+        )
+    }
     fn honour(self: @PacesCard) -> u8 {
         match self {
             PacesCard::Paces1 |

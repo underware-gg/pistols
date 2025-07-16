@@ -14,10 +14,10 @@ pub enum DeckType {
 
 #[derive(Copy, Drop, Serde)]
 pub struct Deck {
-    fire_cards: Span<u8>,
-    dodge_cards: Span<u8>,
-    tactics_cards: Span<u8>,
-    blades_cards: Span<u8>,
+    pub fire_cards: Span<u8>,
+    pub dodge_cards: Span<u8>,
+    pub tactics_cards: Span<u8>,
+    pub blades_cards: Span<u8>,
 }
 
 
@@ -101,6 +101,17 @@ pub impl DeckTypeDebug of core::fmt::Debug<DeckType> {
         Result::Ok(())
     }
 }
+
+// impl DeckDefault of Default<Deck> {
+//     fn default() -> Deck {
+//         (Deck {
+//             fire_cards: [].span(),
+//             dodge_cards: [].span(),
+//             tactics_cards: [].span(),
+//             blades_cards: [].span(),
+//         })
+//     }
+// }
 
 
 //----------------------------------------
