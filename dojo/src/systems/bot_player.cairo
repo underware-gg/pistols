@@ -21,6 +21,7 @@ pub mod bot_player {
         IPackTokenProtectedDispatcherTrait,
         IGameDispatcherTrait,
     };
+    use pistols::systems::rng::{RngWrap, RngWrapTrait, Dice, DiceTrait};
     use pistols::models::{
         challenge::{Challenge, ChallengeTrait, RoundValue},
         player::{PlayerDuelistStack, PlayerDuelistStackTrait},
@@ -62,9 +63,12 @@ pub mod bot_player {
             assert(store.world.caller_is_duel_contract(), Errors::INVALID_CALLER);
 
             // randomize a bot profile
-            let bot_address: ContractAddress = store.world.bot_player_address();
-            let seed: felt252 = make_seed(bot_address, duel_id.into());
-            let duelist_profile: DuelistProfile = ProfileManagerTrait::randomize_profile(DuelistProfile::Bot(BotKey::Unknown), seed);
+            let mut dice: Dice = self._make_dice(@store, duel_id);
+            let duelist_seed: u8 = dice.throw('archetype', 255);
+            let duelist_profile: DuelistProfile = ProfileManagerTrait::randomize_profile(DuelistProfile::Bot(BotKey::Unknown), duelist_seed.into());
+
+            // get or mint a duelist
+            let bot_address: ContractAddress = starknet::get_caller_address();
             let stack: PlayerDuelistStack = store.get_player_duelist_stack(bot_address, duelist_profile);
             let mut duelist_id: u128 = stack.get_first_available_duelist_id(@store);
             if (duelist_id.is_zero()) {
@@ -116,14 +120,13 @@ pub mod bot_player {
     //
     #[generate_trait]
     impl InternalImpl of InternalTrait {
-        // fn _assert_caller_is_owner(self: @ContractState) {
-        //     let mut world = self.world_default();
-        //     assert(world.dispatcher.is_owner(SELECTORS::BOT_PLAYER, starknet::get_caller_address()) == true, Errors::CALLER_NOT_OWNER);
-        // }
-        // fn _assert_caller_is_admin(self: @ContractState) {
-        //     let mut world = self.world_default();
-        //     assert(world.admin_dispatcher().am_i_admin(starknet::get_caller_address()) == true, Errors::CALLER_NOT_ADMIN);
-        // }
+        fn _make_dice(self: @ContractState, store: @Store, duel_id: u128) -> Dice {
+            let bot_address: ContractAddress = starknet::get_caller_address();
+            let seed: felt252 = make_seed(bot_address, duel_id.into());
+            let wrapped: @RngWrap = RngWrapTrait::new(store.world.rng_address());
+            let dice: Dice = DiceTrait::new(wrapped, seed);
+            (dice)
+        }
     }
 }
 
