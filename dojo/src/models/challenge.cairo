@@ -108,6 +108,7 @@ use pistols::types::{
     timestamp::{TimestampTrait},
     constants::{CONST},
 };
+use pistols::libs::store::{Store, StoreTrait};
 use pistols::utils::arrays::{SpanUtilsTrait};
 use pistols::utils::bitwise::{BitwiseU32, BitwiseU128};
 use pistols::utils::hash::{hash_values};
@@ -170,6 +171,23 @@ pub impl ChallengeImpl of ChallengeTrait {
     #[inline(always)]
     fn get_deck(self: @Challenge) -> Deck {
         (self.get_deck_type().build_deck())
+    }
+}
+
+#[generate_trait]
+pub impl DuelTypeImpl of DuelTypeTrait {
+    fn get_rules(self: @DuelType, store: @Store) -> Rules {
+        (match self {
+            // season rules + pools
+            DuelType::Seasonal |
+            DuelType::Tournament => store.get_current_season_rules(),
+            // no points, burns FAME
+            DuelType::BotPlayer => Rules::Unranked,
+            // no rules, no points, no FAME
+            DuelType::Undefined |
+            DuelType::Tutorial |
+            DuelType::Practice => Rules::Undefined,
+        })
     }
 }
 

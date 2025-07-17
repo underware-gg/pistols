@@ -80,14 +80,19 @@ pub mod game {
         IDuelTokenDispatcherTrait,
         IDuelTokenProtectedDispatcherTrait,
         ITutorialDispatcherTrait,
-        IBotPlayerDispatcherTrait,
+        IBotPlayerProtectedDispatcherTrait,
         IAdminDispatcherTrait,
         SELECTORS,
     };
     use pistols::systems::rng::{RngWrap, RngWrapTrait};
     use pistols::models::{
         player::{PlayerTrait},
-        challenge::{Challenge, ChallengeTrait, DuelType, Round, RoundTrait, MovesTrait},
+        challenge::{
+            Challenge, ChallengeTrait,
+            DuelType, DuelTypeTrait,
+            Round, RoundTrait,
+            MovesTrait,
+        },
         duelist::{DuelistTrait, Totals, TotalsTrait},
         leaderboard::{Leaderboard, LeaderboardTrait, LeaderboardPosition},
         pact::{PactTrait},
@@ -212,7 +217,7 @@ pub mod game {
 
             // move to reveal phase?
             let timestamp: u64 = starknet::get_block_timestamp();
-            let rules: Rules = store.get_current_season_rules();
+            let rules: Rules = challenge.duel_type.get_rules(@store);
             if (round.moves_a.has_comitted() && round.moves_b.has_comitted()) {
                 round.state = RoundState::Reveal;
                 round.set_reveal_timeout(rules, timestamp);
@@ -245,7 +250,7 @@ pub mod game {
 
             // bot player responds immediately
             if (challenge.is_against_bot_player() && duelist_number == 1) {
-                store.world.bot_player_dispatcher().commit_moves(duel_id);
+                store.world.bot_player_protected_dispatcher().commit_moves(duel_id);
             }
         }
 
@@ -299,7 +304,7 @@ pub mod game {
 
             // reset timeouts
             let timestamp: u64 = starknet::get_block_timestamp();
-            let rules: Rules = store.get_current_season_rules();
+            let rules: Rules = challenge.duel_type.get_rules(@store);
             round.set_reveal_timeout(rules, timestamp);
             
             // update duelist timestamps
@@ -664,9 +669,14 @@ pub mod game {
                 // update leaderboards
                 self._update_scoreboards(ref store, @challenge, @round, ref rewards_a, ref rewards_b);
 
-                // send duel token to winner
                 if (challenge.winner.is_non_zero()) {
+                    // send duel token to winner
                     store.world.duel_token_protected_dispatcher().transfer_to_winner(challenge.duel_id);
+                    // send bot token to winner
+                    if (challenge.is_against_bot_player() && challenge.winner == 1) {
+                        store.world.bot_player_protected_dispatcher().transfer_to_winner(challenge.duel_id, challenge.duelist_id_b, challenge.address_a);
+                    }
+                    // emit events
                     Activity::ChallengeResolved.emit(ref store.world, challenge.winner_address(), challenge.duel_id.into());
                 } else {
                     Activity::ChallengeDraw.emit(ref store.world, starknet::get_caller_address(), challenge.duel_id.into());
@@ -718,23 +728,29 @@ pub mod game {
             store.set_duelist_totals(*challenge.duelist_id_a, totals_duelist_a);
             store.set_duelist_totals(*challenge.duelist_id_b, totals_duelist_b);
 
-            // per season score
-            let mut scoreboard_a: SeasonScoreboard = store.get_scoreboard(*challenge.season_id, (*challenge).duelist_id_a.into());
-            let mut scoreboard_b: SeasonScoreboard = store.get_scoreboard(*challenge.season_id, (*challenge).duelist_id_b.into());
-            scoreboard_a.apply_rewards(@rewards_a);
-            scoreboard_b.apply_rewards(@rewards_b);
-            // save
-            store.set_scoreboard(@scoreboard_a);
-            store.set_scoreboard(@scoreboard_b);
-
-            // update leaderboards
             let mut leaderboard: Leaderboard = store.get_leaderboard(*challenge.season_id);
-            if (leaderboard.is_qualified(@store, *challenge.address_a)) {
-                rewards_a.position = leaderboard.insert_score(*challenge.duelist_id_a, scoreboard_a.points);
+
+            if (rewards_a.points_scored.is_non_zero()) {
+                // per season score
+                let mut scoreboard_a: SeasonScoreboard = store.get_scoreboard(*challenge.season_id, (*challenge).duelist_id_a.into());
+                scoreboard_a.apply_rewards(@rewards_a);
+                store.set_scoreboard(@scoreboard_a);
+                // update leaderboards
+                if (leaderboard.is_qualified(@store, *challenge.address_a)) {
+                    rewards_a.position = leaderboard.insert_score(*challenge.duelist_id_a, scoreboard_a.points);
+                }
             }
-            if (leaderboard.is_qualified(@store, *challenge.address_b)) {
-                rewards_b.position = leaderboard.insert_score(*challenge.duelist_id_b, scoreboard_b.points);
+            if (rewards_b.points_scored.is_non_zero()) {
+                // per season score
+                let mut scoreboard_b: SeasonScoreboard = store.get_scoreboard(*challenge.season_id, (*challenge).duelist_id_b.into());
+                scoreboard_b.apply_rewards(@rewards_b);
+                store.set_scoreboard(@scoreboard_b);
+                // update leaderboards
+                if (leaderboard.is_qualified(@store, *challenge.address_b)) {
+                    rewards_b.position = leaderboard.insert_score(*challenge.duelist_id_b, scoreboard_b.points);
+                }
             }
+
             if (rewards_a.position != 0 || rewards_b.position != 0) {
                 // adjust [a] if [b] moved up
                 if (rewards_b.position <= rewards_a.position) {

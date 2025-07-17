@@ -139,7 +139,7 @@ pub mod tests {
         tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
         tester::drop_dojo_events(@sys);
         tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
-        let (challenge, round) = tester::get_Challenge_Round(@sys, duel_id);
+        let (challenge, round) = tester::get_Challenge_Round_value(@sys, duel_id);
         tester::assert_pact(@sys, duel_id, challenge, false, false, "ended");
 // challenge.winner.print();
 // round.state_a.health.print();
@@ -253,14 +253,14 @@ pub mod tests {
         assert_gt!(round_1.moves_a.timeout, 0, "1__timeout_commit_a");
         assert_gt!(round_1.moves_b.timeout, 0, "1__timeout_commit_b");
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
-        let (_challenge, round) = tester::get_Challenge_Round(@sys, duel_id);
+        let (_challenge, round) = tester::get_Challenge_Round_value(@sys, duel_id);
         assert_eq!(round.state, RoundState::Commit, "1__state");
         assert_eq!(round.moves_a.hashed, moves_a.hashed, "1__hash");
         assert_eq!(round.moves_a.timeout, 0, "1__timeout_commit_reset_a");
 
         // 2nd commit > Reveal
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
-        let (_challenge, round) = tester::get_Challenge_Round(@sys, duel_id);
+        let (_challenge, round) = tester::get_Challenge_Round_value(@sys, duel_id);
         assert_eq!(round.state, RoundState::Reveal, "2__state");
         assert_eq!(round.moves_a.hashed, moves_a.hashed, "21__hash");
         assert_eq!(round.moves_b.hashed, moves_b.hashed, "2__hash");
@@ -270,7 +270,7 @@ pub mod tests {
 
         // 1st reveal
         tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
-        let (_challenge, round) = tester::get_Challenge_Round(@sys, duel_id);
+        let (_challenge, round) = tester::get_Challenge_Round_value(@sys, duel_id);
         assert_eq!(round.state, RoundState::Reveal, "3__state");
         assert_eq!(round.moves_a.hashed, moves_a.hashed, "3__hash");
         assert_eq!(round.moves_a.salt, moves_a.salt, "3__salt");
@@ -280,7 +280,7 @@ pub mod tests {
 
         // 2nd reveal > Finished
         tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
-        let (challenge, round) = tester::get_Challenge_Round(@sys, duel_id);
+        let (challenge, round) = tester::get_Challenge_Round_value(@sys, duel_id);
         tester::assert_pact(@sys, duel_id, challenge, false, false, "ended");
 // challenge.winner.print();
 // // challenge.state.print();
@@ -389,7 +389,7 @@ pub mod tests {
         assert_eq!(round.moves_b.timeout, 0, "++ timeout_reveal_b_reset");
         tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
         tester::assert_pact(@sys, duel_id, challenge, false, false, "ended_2");
-        let (challenge, round) = tester::get_Challenge_Round(@sys, duel_id);
+        let (challenge, round) = tester::get_Challenge_Round_value(@sys, duel_id);
         assert_eq!(challenge.state, ChallengeState::Resolved, "challenge.state ++");
         assert_ne!(challenge.winner, 0, "challenge.winner ++");
         assert_eq!(challenge.season_id, sys.store.get_current_season_id(), "challenge_season_id ++");
@@ -1206,7 +1206,7 @@ pub mod tests {
     //
 
     fn _assert_timed_out(sys: @TestSystems, duel_id: u128, winner: u8) {
-        let (challenge, round): (ChallengeValue, RoundValue) = tester::get_Challenge_Round(sys, duel_id);
+        let (challenge, round): (ChallengeValue, RoundValue) = tester::get_Challenge_Round_value(sys, duel_id);
         assert_eq!(challenge.winner, winner, "_assert_timed_out: challenge.winner");
         if (winner == 0) {
             assert_eq!(challenge.state, ChallengeState::Draw, "_assert_timed_out: ChallengeState::Draw");
@@ -1220,7 +1220,7 @@ pub mod tests {
     }
 
     fn _assert_not_timed_out(sys: @TestSystems, duel_id: u128) {
-        let (challenge, round): (ChallengeValue, RoundValue) = tester::get_Challenge_Round(sys, duel_id);
+        let (challenge, round): (ChallengeValue, RoundValue) = tester::get_Challenge_Round_value(sys, duel_id);
         if (round.state == RoundState::Finished) {
             // not forsaken
             assert_ne!(round.final_blow, FinalBlow::Forsaken, "_assert_not_timed_out: round.final_blow");

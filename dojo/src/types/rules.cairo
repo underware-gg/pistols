@@ -7,6 +7,7 @@ use pistols::utils::arrays::{SpanDefault};
 pub enum Rules {
     Undefined,      // 0
     Season,         // 1
+    Unranked,       // 2
 }
 
 #[derive(Copy, Drop, Serde, Introspect, Default)]
@@ -59,10 +60,6 @@ use pistols::utils::misc::{ZERO};
 
 #[generate_trait]
 pub impl RulesImpl of RulesTrait {
-    #[inline(always)]
-    fn exists(self: @Rules) -> bool {
-        (*self != Rules::Undefined)
-    }
     fn get_reply_timeout(self: @Rules) -> u64 {
         (match self {
             _ => TIMESTAMP::ONE_DAY,
@@ -73,6 +70,7 @@ pub impl RulesImpl of RulesTrait {
     //
     fn get_rewards_distribution(self: @Rules, season_id: u32, tournament_id: u64) -> @PoolDistribution {
         let mut result: PoolDistribution = match self {
+            Rules::Undefined => Default::default(),
             Rules::Season => PoolDistribution {
                 underware_percent: 30,
                 creator_percent: 30,
@@ -80,7 +78,13 @@ pub impl RulesImpl of RulesTrait {
                 pool_percent: 40,
                 pool_id: PoolType::Season(season_id),
             },
-            _ => Default::default()
+            Rules::Unranked => PoolDistribution {
+                underware_percent: 100,
+                creator_percent: 0,
+                creator_address: ZERO(),
+                pool_percent: 0,
+                pool_id: PoolType::Undefined,
+            },
         };
         // not a tournament, creator is underware
         if (result.creator_percent != 0 && result.creator_address.is_zero()) {
@@ -91,13 +95,19 @@ pub impl RulesImpl of RulesTrait {
     }
     // end game calculations
     fn calc_rewards(self: @Rules, fame_balance: u128, lives_staked: u8, is_winner: bool, bonus: @DuelistBonus) -> RewardValues {
-        (match self {
+        let one_life: u128 = FAME::ONE_LIFE.low;
+        let mut result: RewardValues = Default::default();
+        match self {
+            Rules::Undefined => {},
+            Rules::Unranked => {
+                if (is_winner) {
+                    result.survived = true;
+                } else {
+                    result.fame_lost = one_life * lives_staked.into();
+                }
+            },
             Rules::Season => {
-                let mut result: RewardValues = Default::default();
-                let one_life: u128 = FAME::ONE_LIFE.low;
-                if (fame_balance == 0) {
-                    result.survived = false;
-                } else if (is_winner) {
+                if (is_winner) {
                     result.survived = true;
                     let k_fame: u128 = 1;
                     result.fame_gained = (one_life / (((fame_balance / one_life) + 1) / k_fame));
@@ -123,10 +133,9 @@ pub impl RulesImpl of RulesTrait {
                     result.points_scored = 0;
                 }
                 //--------------------------------
-                (result)
             },
-            _ => Default::default()
-        })
+        };
+        (result)
     }
     //
     // Season rewards
@@ -147,7 +156,8 @@ pub impl RulesImpl of RulesTrait {
                     percents.append(4);  // 9
                     percents.append(2);  // 10
                 },
-                _ => {}
+                Rules::Unranked |
+                Rules::Undefined => {}
             };
             // distribute leftovers to winner
             if (percents.len() > recipient_count) {
@@ -179,7 +189,11 @@ pub impl RulesImpl of RulesTrait {
 pub impl PoolDistributionImpl of PoolDistributionTrait {
     #[inline(always)]
     fn is_payable(self: @PoolDistribution) -> bool {
-        (*self.underware_percent != 0 || *self.creator_percent != 0 || *self.pool_percent != 0)
+        (
+            (*self.underware_percent).is_non_zero() ||
+            (*self.creator_percent).is_non_zero() ||
+            (*self.pool_percent).is_non_zero()
+        )
     }
 }
 
@@ -193,6 +207,7 @@ impl RulesIntoByteArray of core::traits::Into<Rules, ByteArray> {
         match self {
             Rules::Undefined    => "Rules::Undefined",
             Rules::Season       => "Rules::Season",
+            Rules::Unranked     => "Rules::Unranked",
         }
     }
 }

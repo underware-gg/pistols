@@ -155,7 +155,7 @@ pub mod duelist_token {
         IBankProtectedDispatcher, IBankProtectedDispatcherTrait,
     };
     use pistols::models::{
-        pool::{PoolType, PoolTypeTrait, LordsReleaseBill, ReleaseReason},
+        challenge::{Challenge, DuelTypeTrait},
         duelist::{
             Duelist, DuelistValue,
             DuelistTimestamps,
@@ -165,7 +165,7 @@ pub mod duelist_token {
             Archetype,
         },
         player::{PlayerTrait, PlayerDuelistStack, PlayerDuelistStackTrait},
-        challenge::{Challenge},
+        pool::{PoolType, PoolTypeTrait, LordsReleaseBill, ReleaseReason},
         events::{Activity, ActivityTrait},
     };
     use pistols::types::{
@@ -397,7 +397,7 @@ pub mod duelist_token {
 
             // get fees distribution
             let season_id: u32 = store.get_current_season_id();
-            let rules: Rules = store.get_season_rules(season_id);
+            let rules: Rules = challenge.duel_type.get_rules(@store);
             let distribution: @PoolDistribution = rules.get_rewards_distribution(season_id, tournament_id);
             if (!distribution.is_payable()) {
                 return (Default::default(), Default::default());
@@ -466,7 +466,6 @@ pub mod duelist_token {
             let mut stack: PlayerDuelistStack = store.get_player_duelist_stack(recipient, duelist.duelist_profile);
             stack.append(duelist.duelist_id);
             store.set_player_duelist_stack(@stack);
-
             // mint fame
             store.world.fame_coin_protected_dispatcher().minted_duelist(duelist.duelist_id);
 

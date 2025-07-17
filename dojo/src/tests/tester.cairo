@@ -16,7 +16,7 @@ pub mod tester {
         admin::{admin, IAdminDispatcher, IAdminDispatcherTrait},
         game::{game, IGameDispatcher, IGameDispatcherTrait},
         game_loop::{game_loop, IGameLoopDispatcher, IGameLoopDispatcherTrait},
-        bot_player::{bot_player, IBotPlayerDispatcher, IBotPlayerDispatcherTrait},
+        bot_player::{bot_player, IBotPlayerDispatcher, IBotPlayerDispatcherTrait, IBotPlayerProtectedDispatcher, IBotPlayerProtectedDispatcherTrait},
         tutorial::{tutorial, ITutorialDispatcher, ITutorialDispatcherTrait},
         rng::{rng, IRngDispatcher, IRngDispatcherTrait},
         rng_mock::{rng_mock, IRngMockDispatcher, IRngMockDispatcherTrait},
@@ -1011,7 +1011,7 @@ pub mod tester {
     //
 
     #[inline(always)]
-    pub fn get_Challenge_Round(sys: @TestSystems, duel_id: u128) -> (ChallengeValue, RoundValue) {
+    pub fn get_Challenge_Round_value(sys: @TestSystems, duel_id: u128) -> (ChallengeValue, RoundValue) {
         let challenge: ChallengeValue = (*sys.store).get_challenge_value(duel_id);
         let round: RoundValue = (*sys.store).get_round_value(duel_id);
         (challenge, round)

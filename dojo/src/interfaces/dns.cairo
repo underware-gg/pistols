@@ -11,7 +11,7 @@ pub use pistols::systems::{
     bank::{IBankDispatcher, IBankDispatcherTrait, IBankProtectedDispatcher, IBankProtectedDispatcherTrait},
     game::{IGameDispatcher, IGameDispatcherTrait},
     game_loop::{IGameLoopDispatcher, IGameLoopDispatcherTrait},
-    bot_player::{IBotPlayerDispatcher, IBotPlayerDispatcherTrait},
+    bot_player::{IBotPlayerDispatcher, IBotPlayerDispatcherTrait, IBotPlayerProtectedDispatcher, IBotPlayerProtectedDispatcherTrait},
     tutorial::{ITutorialDispatcher, ITutorialDispatcherTrait},
     rng::{IRngDispatcher, IRngDispatcherTrait},
     rng_mock::{IRngMockDispatcher, IRngMockDispatcherTrait},
@@ -231,6 +231,10 @@ pub impl DnsImpl of DnsTrait {
     #[inline(always)]
     fn bot_player_dispatcher(self: @WorldStorage) -> IBotPlayerDispatcher {
         (IBotPlayerDispatcher{ contract_address: self.bot_player_address() })
+    }
+    #[inline(always)]
+    fn bot_player_protected_dispatcher(self: @WorldStorage) -> IBotPlayerProtectedDispatcher {
+        (IBotPlayerProtectedDispatcher{ contract_address: self.bot_player_address() })
     }
     #[inline(always)]
     fn tutorial_dispatcher(self: @WorldStorage) -> ITutorialDispatcher {

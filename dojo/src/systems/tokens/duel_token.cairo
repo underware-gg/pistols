@@ -164,12 +164,17 @@ pub mod duel_token {
     use pistols::interfaces::dns::{
         DnsTrait,
         IDuelistTokenProtectedDispatcher, IDuelistTokenProtectedDispatcherTrait,
-        IBotPlayerDispatcherTrait,
+        IBotPlayerProtectedDispatcherTrait,
         // IGameDispatcherTrait,
     };
     use pistols::models::{
         player::{PlayerTrait},
-        challenge::{Challenge, ChallengeTrait, ChallengeValue, ChallengeMessage, ChallengeMessageValue, DuelType, Round, RoundTrait},
+        challenge::{
+            Challenge, ChallengeTrait, ChallengeValue,
+            ChallengeMessage, ChallengeMessageValue,
+            DuelType, DuelTypeTrait,
+            Round, RoundTrait,
+        },
         duelist::{DuelistTrait, DuelistProfile, DuelistProfileTrait},
         pact::{PactTrait},
         events::{Activity, ActivityTrait, ChallengeAction},
@@ -372,7 +377,7 @@ pub mod duel_token {
 
             // bot player reply
             if (challenge.is_against_bot_player()) {
-                store.world.bot_player_dispatcher().reply_duel(duel_id);
+                store.world.bot_player_protected_dispatcher().reply_duel(duel_id);
             }
 
             (duel_id)
@@ -438,7 +443,7 @@ pub mod duel_token {
 
                     // set reply timeouts
                     let mut round: Round = store.get_round(duel_id);
-                    round.set_commit_timeout(store.get_current_season_rules(), timestamp);
+                    round.set_commit_timeout(challenge.duel_type.get_rules(@store), timestamp);
                     store.set_round(@round);
                 } else {
                     // Challenged is Refusing
@@ -562,7 +567,7 @@ pub mod duel_token {
 //                     state_b: Default::default(),
 //                     final_blow: Default::default(),
 //                 };
-//                 round.set_commit_timeout(store.get_current_season_rules(), timestamp);
+//                 round.set_commit_timeout(challenge.duel_type.get_rules(@store), timestamp);
 
 //                 // save!
 //                 store.set_challenge(@challenge);
