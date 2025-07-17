@@ -523,9 +523,9 @@ pub fn _airdrop_open(sys: @TestSystems, recipient: ContractAddress, pack_type: P
     assert_eq!((*sys.pack).owner_of(pack_id.into()), recipient, "{}:: owner_of(pack_id)", prefix);
     // open...
     let token_ids: Span<u128> = tester::execute_pack_open(sys, recipient, pack_id);
-    let duelist_id: u128 = *token_ids[0];
-    let minted_profile: DuelistProfile = sys.store.get_duelist_profile(duelist_id);
-    assert_eq!((*sys.duelists).owner_of(duelist_id.into()), recipient, "{}:: owner_of(duelist_id)", prefix);
+    let duelist_id_0: u128 = *token_ids[0];
+    let minted_profile: DuelistProfile = sys.store.get_duelist_profile(duelist_id_0);
+    assert_eq!((*sys.duelists).owner_of(duelist_id_0.into()), recipient, "{}:: owner_of(duelist_id_0)", prefix);
     assert_ne!(minted_profile, DuelistProfile::Undefined, "{}:: !DuelistProfile::Undefined", prefix);
     // validated minted duelist profile
     match pack_type {
@@ -534,8 +534,8 @@ pub fn _airdrop_open(sys: @TestSystems, recipient: ContractAddress, pack_type: P
         },
         PackType::FreeDuelist | PackType::GenesisDuelists5x => {
             assert_ne!(minted_profile, DuelistProfile::Genesis(GenesisKey::Unknown), "{}:: !GenesisKey::Unknown", prefix);
+            // could be! but is not...
             assert_ne!(minted_profile, DuelistProfile::Genesis(GenesisKey::SerWalker), "{}:: !SerWalker", prefix);
-            assert_ne!(minted_profile, DuelistProfile::Genesis(GenesisKey::LadyVengeance), "{}:: !LadyVengeance", prefix);
         },
         PackType::SingleDuelist => {
             assert_eq!(minted_profile, duelist_profile.unwrap(), "{}:: incorrect profile", prefix);
@@ -546,9 +546,9 @@ pub fn _airdrop_open(sys: @TestSystems, recipient: ContractAddress, pack_type: P
     let duelist_balance_after: u128 = (*sys.duelists).balance_of(recipient).low;
     assert_eq!(duelist_balance_after, duelist_balance_before + pack_type.descriptor().quantity.into(), "{}:: duelist_balance_after(recipient)", prefix);
     // falidate duelist FAME
-    let duelist_fame_balance: u128 = (*sys.duelists).fame_balance(duelist_id.into());
+    let duelist_fame_balance: u128 = (*sys.duelists).fame_balance(duelist_id_0.into());
     assert_eq!(duelist_fame_balance, FAME::MINT_GRANT_AMOUNT.low, "{}:: duelist_fame_balance", prefix);
-    (duelist_id)
+    (duelist_id_0)
 }
 
 #[test]

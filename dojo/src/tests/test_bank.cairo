@@ -99,10 +99,10 @@ mod tests {
         assert_eq!(fools_balance_b, 0, "RESOLVED_fools_balance_b");
 
         // commit+reveal
-        tester::execute_commit_moves(sys.game, address_a, duel_id, moves_a.hashed);
-        tester::execute_commit_moves(sys.game, address_b, duel_id, moves_b.hashed);
-        tester::execute_reveal_moves(sys.game, address_a, duel_id, moves_a.salt, moves_a.moves);
-        tester::execute_reveal_moves(sys.game, address_b, duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_commit_moves(sys, address_a, duel_id, moves_a.hashed);
+        tester::execute_commit_moves(sys, address_b, duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(sys, address_a, duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_reveal_moves(sys, address_b, duel_id, moves_b.salt, moves_b.moves);
         let (challenge, _round) = tester::get_Challenge_Round_value(sys, duel_id);
         assert_eq!(challenge.winner, winner, "RESOLVED_challenge.winner");
 
@@ -200,10 +200,10 @@ mod tests {
         }
 
         // commit+reveal
-        tester::execute_commit_moves(sys.game, address_a, duel_id, moves_a.hashed);
-        tester::execute_commit_moves(sys.game, address_b, duel_id, moves_b.hashed);
-        tester::execute_reveal_moves(sys.game, address_a, duel_id, moves_a.salt, moves_a.moves);
-        tester::execute_reveal_moves(sys.game, address_b, duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_commit_moves(sys, address_a, duel_id, moves_a.hashed);
+        tester::execute_commit_moves(sys, address_b, duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(sys, address_a, duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_reveal_moves(sys, address_b, duel_id, moves_b.salt, moves_b.moves);
         let (challenge, _round) = tester::get_Challenge_Round_value(sys, duel_id);
         assert_eq!(challenge.winner, 0, "DEATH_challenge.winner");
 

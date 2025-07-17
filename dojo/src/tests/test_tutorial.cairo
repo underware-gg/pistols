@@ -72,7 +72,7 @@ mod tests {
         assert_eq!(tutorial_id_from_duel_id, tutorial_id, "tutorial_id_from_duel_id");
         assert_eq!(tut_duel_id, level.make_duel_id(ID(OWNER())), "level.make_duel_id");
         // create tutorial
-        let duel_id: u128 = tester::execute_create_tutorial(@sys.tut, OWNER(), tutorial_id);
+        let duel_id: u128 = tester::execute_create_tutorial(@sys, OWNER(), tutorial_id);
         assert_eq!(duel_id, tut_duel_id, "tut_duel_id");
         let challenge: Challenge = sys.store.get_challenge(duel_id);
         let round: RoundValue = sys.store.get_round_value(duel_id);
@@ -101,14 +101,14 @@ mod tests {
     #[should_panic(expected:('TUTORIAL: Invalid level', 'ENTRYPOINT_FAILED'))]
     fn test_tutorial_create_level_3_panic() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::TUTORIAL);
-        tester::execute_create_tutorial(@sys.tut, OWNER(), 3);
+        tester::execute_create_tutorial(@sys, OWNER(), 3);
     }
 
     #[test]
     #[should_panic(expected:('TUTORIAL: Invalid player', 'ENTRYPOINT_FAILED'))]
     fn test_tutorial_create_invalid_player() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::TUTORIAL);
-        tester::execute_create_tutorial(@sys.tut, ZERO(), 1);
+        tester::execute_create_tutorial(@sys, ZERO(), 1);
     }
 
     
@@ -119,20 +119,20 @@ mod tests {
     fn _test_tutorial_level_1(fire: PacesCard, dodge: PacesCard) {
         let mut sys: TestSystems = tester::setup_world(FLAGS::TUTORIAL);
         let tutorial_id: u128 = 1;
-        let duel_id: u128 = tester::execute_create_tutorial(@sys.tut, OWNER(), tutorial_id);
+        let duel_id: u128 = tester::execute_create_tutorial(@sys, OWNER(), tutorial_id);
         // check deck
         let challenge: Challenge = sys.store.get_challenge(duel_id);
         assert_eq!(challenge.get_deck_type(), DeckType::PacesOnly, "challenge.deck_type");
         // commit
         let moves: Span<u8> = [fire.into(), dodge.into()].span();
         let hashed: u128 = MovesHashTrait::hash(SALT_A, moves);
-        tester::execute_commit_moves_tutorial(@sys.tut, OWNER(), challenge.duelist_id_b, duel_id, hashed);
+        tester::execute_commit_moves_tutorial(@sys, OWNER(), challenge.duelist_id_b, duel_id, hashed);
         let round: RoundValue = sys.store.get_round_value(duel_id);
         assert_eq!(round.state, RoundState::Reveal, "round.state");
         assert!(round.moves_a.hashed > 0, "round.moves_a.hashed");
         assert_eq!(round.moves_b.hashed, hashed, "round.moves_b.hashed");
         // reveal -- different salt as it does not matter
-        tester::execute_reveal_moves_tutorial(@sys.tut, OWNER(), challenge.duelist_id_b, duel_id, SALT_B, moves);
+        tester::execute_reveal_moves_tutorial(@sys, OWNER(), challenge.duelist_id_b, duel_id, SALT_B, moves);
         let challenge: ChallengeValue = sys.store.get_challenge_value(duel_id);
         let round: RoundValue = sys.store.get_round_value(duel_id);
         assert_eq!(challenge.state, ChallengeState::Resolved, "challenge.state");
@@ -208,20 +208,20 @@ mod tests {
 
     fn _test_tutorial_level_2(sys: @TestSystems, fire: PacesCard, dodge: PacesCard, tactics: TacticsCard, blades: BladesCard) -> DuelProgress {
         let tutorial_id: u128 = 2;
-        let duel_id: u128 = tester::execute_create_tutorial(sys.tut, OWNER(), tutorial_id);
+        let duel_id: u128 = tester::execute_create_tutorial(sys, OWNER(), tutorial_id);
         // check deck
         let challenge: Challenge = (*sys.store).get_challenge(duel_id);
         assert_eq!(challenge.get_deck_type(), DeckType::Classic, "challenge.deck_type");
         // commit
         let moves: Span<u8> = [fire.into(), dodge.into(), tactics.into(), blades.into()].span();
         let hashed: u128 = MovesHashTrait::hash(SALT_A, moves);
-        tester::execute_commit_moves_tutorial(sys.tut, OWNER(), challenge.duelist_id_b, duel_id, hashed);
+        tester::execute_commit_moves_tutorial(sys, OWNER(), challenge.duelist_id_b, duel_id, hashed);
         let round: RoundValue = (*sys.store).get_round_value(duel_id);
         assert_eq!(round.state, RoundState::Reveal, "round.state");
         assert!(round.moves_a.hashed > 0, "round.moves_a.hashed");
         assert_eq!(round.moves_b.hashed, hashed, "round.moves_b.hashed");
         // reveal -- different salt as it does not matter
-        tester::execute_reveal_moves_tutorial(sys.tut, OWNER(), challenge.duelist_id_b, duel_id, SALT_B, moves);
+        tester::execute_reveal_moves_tutorial(sys, OWNER(), challenge.duelist_id_b, duel_id, SALT_B, moves);
         let challenge: ChallengeValue = (*sys.store).get_challenge_value(duel_id);
         let round: RoundValue = (*sys.store).get_round_value(duel_id);
         assert_eq!(challenge.state, ChallengeState::Resolved, "challenge.state");
@@ -249,12 +249,12 @@ mod tests {
 
     fn _test_tutorial_level_2_game(sys: @TestSystems, fire: PacesCard, dodge: PacesCard, tactics: TacticsCard, blades: BladesCard) -> DuelProgress {
         let tutorial_id: u128 = 2;
-        let duel_id: u128 = tester::execute_create_tutorial(sys.tut, OWNER(), tutorial_id);
+        let duel_id: u128 = tester::execute_create_tutorial(sys, OWNER(), tutorial_id);
         let challenge: Challenge = (*sys.store).get_challenge(duel_id);
         let moves: Span<u8> = [fire.into(), dodge.into(), tactics.into(), blades.into()].span();
         let hashed: u128 = MovesHashTrait::hash(SALT_A, moves);
-        tester::execute_commit_moves_ID(sys.game, OWNER(), challenge.duelist_id_b, duel_id, hashed);
-        tester::execute_reveal_moves_ID(sys.game, OWNER(), challenge.duelist_id_b, duel_id, SALT_B, moves);
+        tester::execute_commit_moves_ID(sys, OWNER(), challenge.duelist_id_b, duel_id, hashed);
+        tester::execute_reveal_moves_ID(sys, OWNER(), challenge.duelist_id_b, duel_id, SALT_B, moves);
         // check challenge
         let challenge: ChallengeValue = (*sys.store).get_challenge_value(duel_id);
         let round: RoundValue = (*sys.store).get_round_value(duel_id);
@@ -364,16 +364,16 @@ mod tests {
     // #[should_panic(expected:('TUTORIAL: Not your duel', 'ENTRYPOINT_FAILED'))]
     // fn test_tutorial_commit_invalid_duel() {
     //     let mut sys: TestSystems = tester::setup_world(FLAGS::TUTORIAL);
-    //     tester::execute_create_tutorial(@sys.tut, OWNER(), tutorial_id);
-    //     tester::execute_commit_moves_tutorial(@sys.tut, OWNER(), challenge.duelist_id_b, duel_id, 0x1234);
+    //     tester::execute_create_tutorial(@sys, OWNER(), tutorial_id);
+    //     tester::execute_commit_moves_tutorial(@sys, OWNER(), challenge.duelist_id_b, duel_id, 0x1234);
     // }
 
     // #[test]
     // #[should_panic(expected:('TUTORIAL: Not your duel', 'ENTRYPOINT_FAILED'))]
     // fn test_tutorial_commit_invalid_player() {
     //     let mut sys: TestSystems = tester::setup_world(FLAGS::TUTORIAL);
-    //     tester::execute_create_tutorial(@sys.tut, OWNER(), duel_id);
-    //     tester::execute_commit_moves_tutorial(@sys.tut, OWNER(), challenge.duelist_id_b, duel_id, 0x1234);
+    //     tester::execute_create_tutorial(@sys, OWNER(), duel_id);
+    //     tester::execute_commit_moves_tutorial(@sys, OWNER(), challenge.duelist_id_b, duel_id, 0x1234);
     // }
 
 }

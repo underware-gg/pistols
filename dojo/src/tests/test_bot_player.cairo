@@ -80,7 +80,7 @@ mod tests {
     fn test_mint_bot_insufficient_lords() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER);
         tester::execute_claim_starter_pack(@sys, OWNER());
-        tester::execute_create_duel_ID(@sys.duels, OWNER(), TOKEN_ID_1, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 1);
+        tester::execute_create_duel_ID(@sys, OWNER(), TOKEN_ID_1, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 1);
     }
     
     #[test]
@@ -90,27 +90,27 @@ mod tests {
         // 1
         sys.rng.mock_values([MockedValueTrait::new('archetype', MOCKED_VILLAIN)].span());
         let duelist_id_1: u128 = *tester::execute_claim_starter_pack(@sys, OWNER())[0];
-        let bot_id_1: u128 = sys.store.get_challenge_value(tester::execute_create_duel_ID(@sys.duels, OWNER(), duelist_id_1, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 1)).duelist_id_b;
+        let bot_id_1: u128 = sys.store.get_challenge_value(tester::execute_create_duel_ID(@sys, OWNER(), duelist_id_1, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 1)).duelist_id_b;
         _assert_bot_duelist(@sys, bot_id_1, "bot_1", Option::Some(BotKey::TinMan), 1);
         // 2
         sys.rng.mock_values([MockedValueTrait::new('archetype', MOCKED_TRICKSTER)].span());
         let duelist_id_2: u128 = *tester::execute_claim_starter_pack(@sys, OTHER())[0];
-        let bot_id_2: u128 = sys.store.get_challenge_value(tester::execute_create_duel_ID(@sys.duels, OTHER(), duelist_id_2, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 1)).duelist_id_b;
+        let bot_id_2: u128 = sys.store.get_challenge_value(tester::execute_create_duel_ID(@sys, OTHER(), duelist_id_2, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 1)).duelist_id_b;
         _assert_bot_duelist(@sys, bot_id_2, "bot_2", Option::Some(BotKey::Scarecrow), 1);
         // 3
         sys.rng.mock_values([MockedValueTrait::new('archetype', MOCKED_LORD)].span());
         let duelist_id_3: u128 = *tester::execute_claim_starter_pack(@sys, BUMMER())[0];
-        let bot_id_3: u128 = sys.store.get_challenge_value(tester::execute_create_duel_ID(@sys.duels, BUMMER(), duelist_id_3, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 1)).duelist_id_b;
+        let bot_id_3: u128 = sys.store.get_challenge_value(tester::execute_create_duel_ID(@sys, BUMMER(), duelist_id_3, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 1)).duelist_id_b;
         _assert_bot_duelist(@sys, bot_id_3, "bot_3", Option::Some(BotKey::Leon), 1);
         // 4
         sys.rng.mock_values([MockedValueTrait::new('archetype', MOCKED_VILLAIN)].span());
         let duelist_id_4: u128 = *tester::execute_claim_starter_pack(@sys, RECIPIENT())[0];
-        let bot_id_4: u128 = sys.store.get_challenge_value(tester::execute_create_duel_ID(@sys.duels, RECIPIENT(), duelist_id_4, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 1)).duelist_id_b;
+        let bot_id_4: u128 = sys.store.get_challenge_value(tester::execute_create_duel_ID(@sys, RECIPIENT(), duelist_id_4, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 1)).duelist_id_b;
         _assert_bot_duelist(@sys, bot_id_4, "bot_4", Option::Some(BotKey::TinMan), 2);
         // 5
         sys.rng.mock_values([MockedValueTrait::new('archetype', MOCKED_TRICKSTER)].span());
         let duelist_id_5: u128 = *tester::execute_claim_starter_pack(@sys, SPENDER())[0];
-        let bot_id_5: u128 = sys.store.get_challenge_value(tester::execute_create_duel_ID(@sys.duels, SPENDER(), duelist_id_5, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 1)).duelist_id_b;
+        let bot_id_5: u128 = sys.store.get_challenge_value(tester::execute_create_duel_ID(@sys, SPENDER(), duelist_id_5, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 1)).duelist_id_b;
         _assert_bot_duelist(@sys, bot_id_5, "bot_5", Option::Some(BotKey::Scarecrow), 2);
         // minted duelists:
         // bot_1: [3], Bot::Scarecrow(2)
@@ -133,7 +133,7 @@ mod tests {
         tester::fund_duelists_pool(@sys, 1);
         tester::execute_claim_starter_pack(@sys, OWNER());
         assert_eq!(sys.duelists.total_supply(), 2, "total_supply 2");
-        let duel_id: u128 = tester::execute_create_duel_ID(@sys.duels, OWNER(), TOKEN_ID_1, any_address, MESSAGE(), DuelType::BotPlayer, 0, 1);
+        let duel_id: u128 = tester::execute_create_duel_ID(@sys, OWNER(), TOKEN_ID_1, any_address, MESSAGE(), DuelType::BotPlayer, 0, 1);
         let (ch, round) = tester::get_Challenge_Round_value(@sys, duel_id);
         assert_eq!(ch.state, ChallengeState::InProgress, "challenge.state_CREATE");
         assert_eq!(round.state, RoundState::Commit, "round.state_CREATE");
@@ -154,7 +154,7 @@ mod tests {
         //
         // player commits, bot commits
         let (_mocked, moves_a, _moves_b) = prefabs::get_moves_dual_miss();
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
         let (ch, round) = tester::get_Challenge_Round_value(@sys, duel_id);
         assert_eq!(ch.state, ChallengeState::InProgress, "challenge.state_COMMIT");
         assert_eq!(round.state, RoundState::Reveal, "round.state_COMMIT");
@@ -162,7 +162,7 @@ mod tests {
         assert_gt!(round.moves_b.hashed, 0, "round.moves_b.hashed");
         //
         // call bot reveal
-        tester::execute_reveal_moves_ID(@sys.game, OWNER(), TOKEN_ID_1, duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_reveal_moves_ID(@sys, OWNER(), TOKEN_ID_1, duel_id, moves_a.salt, moves_a.moves);
         sys.bot_player.reveal_moves(duel_id);
         let (ch, round) = tester::get_Challenge_Round_value(@sys, duel_id);
         assert_ne!(ch.state, ChallengeState::InProgress, "challenge.state_REVEAL");
@@ -191,10 +191,10 @@ mod tests {
         tester::fund_duelists_pool(@sys, 1);
         tester::execute_claim_starter_pack(@sys, OWNER());
         assert_eq!(sys.duelists.total_supply(), 2, "total_supply 2");
-        let duel_id: u128 = tester::execute_create_duel_ID(@sys.duels, OWNER(), TOKEN_ID_1, any_address, MESSAGE(), DuelType::BotPlayer, 0, 1);
+        let duel_id: u128 = tester::execute_create_duel_ID(@sys, OWNER(), TOKEN_ID_1, any_address, MESSAGE(), DuelType::BotPlayer, 0, 1);
         // player commits, bot commits
         let (_mocked, moves_a, _moves_b) = prefabs::get_moves_dual_miss();
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
         //
         // restore and reveal...
         let ch = sys.store.get_challenge(duel_id);
@@ -202,8 +202,8 @@ mod tests {
         let deck: Deck = ch.get_deck();
         let bot_salt: felt252 = sys.bot_player.make_salt(duel_id);
         let bot_moves: Span<u8> = MovesHashTrait::restore(bot_salt, round.moves_b.hashed, deck);
-        tester::execute_reveal_moves_ID(@sys.game, OWNER(), TOKEN_ID_1, duel_id, moves_a.salt, moves_a.moves);
-        tester::execute_reveal_moves_ID(@sys.game, bot_address, ch.duelist_id_b, duel_id, bot_salt, bot_moves);
+        tester::execute_reveal_moves_ID(@sys, OWNER(), TOKEN_ID_1, duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_reveal_moves_ID(@sys, bot_address, ch.duelist_id_b, duel_id, bot_salt, bot_moves);
         let (ch, round) = tester::get_Challenge_Round_value(@sys, duel_id);
         assert_ne!(ch.state, ChallengeState::InProgress, "challenge.state_REVEAL");
         assert_eq!(round.state, RoundState::Finished, "round.state_REVEAL");
@@ -215,7 +215,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER);
         tester::fund_duelists_pool(@sys, 1);
         tester::execute_claim_starter_pack(@sys, OWNER());
-        let duel_id: u128 = tester::execute_create_duel_ID(@sys.duels, OWNER(), TOKEN_ID_1, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 1);
+        let duel_id: u128 = tester::execute_create_duel_ID(@sys, OWNER(), TOKEN_ID_1, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 1);
         tester::impersonate(OTHER());
         _protected(@sys).reply_duel(duel_id);
     }
@@ -226,7 +226,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER);
         tester::fund_duelists_pool(@sys, 1);
         tester::execute_claim_starter_pack(@sys, OWNER());
-        let duel_id: u128 = tester::execute_create_duel_ID(@sys.duels, OWNER(), TOKEN_ID_1, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 1);
+        let duel_id: u128 = tester::execute_create_duel_ID(@sys, OWNER(), TOKEN_ID_1, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 1);
         tester::impersonate(OTHER());
         _protected(@sys).commit_moves(duel_id);
     }
@@ -282,11 +282,11 @@ mod tests {
         let (mocked, moves_a, _moves_b) = _get_bot_moves_crit_a(Archetype::Trickster);
         (*sys.rng).mock_values(mocked);
         // challenge
-        let duel_id: u128 = tester::execute_create_duel_ID(sys.duels, challenger, duelist_id, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 1);
+        let duel_id: u128 = tester::execute_create_duel_ID(sys, challenger, duelist_id, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 1);
         // commits
-        tester::execute_commit_moves(sys.game,challenger, duel_id, moves_a.hashed);
+        tester::execute_commit_moves(sys, challenger, duel_id, moves_a.hashed);
         // reveals
-        tester::execute_reveal_moves_ID(sys.game,challenger, duelist_id, duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_reveal_moves_ID(sys,challenger, duelist_id, duel_id, moves_a.salt, moves_a.moves);
         (*sys.bot_player).reveal_moves(duel_id);
         let (ch, _round) = tester::get_Challenge_Round_value(sys, duel_id);
         assert_eq!(ch.state, ChallengeState::Resolved, "[{}] challenge.state_REVEAL", prefix);

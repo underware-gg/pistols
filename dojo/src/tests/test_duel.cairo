@@ -134,11 +134,11 @@ pub mod tests {
         // duel nft owned by contract
         assert_eq!(sys.duels.owner_of(duel_id.into()), sys.game.contract_address, "duels.owner_of");
 
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
-        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(@sys, OWNER(), duel_id, moves_a.salt, moves_a.moves);
         tester::drop_dojo_events(@sys);
-        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_reveal_moves(@sys, OTHER(), duel_id, moves_b.salt, moves_b.moves);
         let (challenge, round) = tester::get_Challenge_Round_value(@sys, duel_id);
         tester::assert_pact(@sys, duel_id, challenge, false, false, "ended");
 // challenge.winner.print();
@@ -252,14 +252,14 @@ pub mod tests {
         // 1st commit
         assert_gt!(round_1.moves_a.timeout, 0, "1__timeout_commit_a");
         assert_gt!(round_1.moves_b.timeout, 0, "1__timeout_commit_b");
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
         let (_challenge, round) = tester::get_Challenge_Round_value(@sys, duel_id);
         assert_eq!(round.state, RoundState::Commit, "1__state");
         assert_eq!(round.moves_a.hashed, moves_a.hashed, "1__hash");
         assert_eq!(round.moves_a.timeout, 0, "1__timeout_commit_reset_a");
 
         // 2nd commit > Reveal
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_b.hashed);
         let (_challenge, round) = tester::get_Challenge_Round_value(@sys, duel_id);
         assert_eq!(round.state, RoundState::Reveal, "2__state");
         assert_eq!(round.moves_a.hashed, moves_a.hashed, "21__hash");
@@ -269,7 +269,7 @@ pub mod tests {
         assert_gt!(round_1.moves_b.timeout, 0, "2__timeout_reveal_b");
 
         // 1st reveal
-        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_reveal_moves(@sys, OWNER(), duel_id, moves_a.salt, moves_a.moves);
         let (_challenge, round) = tester::get_Challenge_Round_value(@sys, duel_id);
         assert_eq!(round.state, RoundState::Reveal, "3__state");
         assert_eq!(round.moves_a.hashed, moves_a.hashed, "3__hash");
@@ -279,7 +279,7 @@ pub mod tests {
         assert_eq!(round.moves_a.timeout, 0, "3__timeout_reveal_reset_a");
 
         // 2nd reveal > Finished
-        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_reveal_moves(@sys, OTHER(), duel_id, moves_b.salt, moves_b.moves);
         let (challenge, round) = tester::get_Challenge_Round_value(@sys, duel_id);
         tester::assert_pact(@sys, duel_id, challenge, false, false, "ended");
 // challenge.winner.print();
@@ -377,17 +377,17 @@ pub mod tests {
         assert_gt!(round_2.moves_a.timeout, 0, "++ timeout_commit_a");
         assert_gt!(round_2.moves_b.timeout, 0, "++ timeout_commit_b");
         // invert player order just for fun, expect same results!
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_b.hashed);
         let round: RoundValue = sys.store.get_round_value(duel_id);
         assert_eq!(round.moves_b.timeout, 0, "++ timeout_commit_b_reset");
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
         let round: RoundValue = sys.store.get_round_value(duel_id);
         assert_gt!(round.moves_a.timeout, 0, "++ timeout_reveal_a");
         assert_gt!(round.moves_b.timeout, 0, "++ timeout_reveal_b");
-        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_reveal_moves(@sys, OTHER(), duel_id, moves_b.salt, moves_b.moves);
         let round: RoundValue = sys.store.get_round_value(duel_id);
         assert_eq!(round.moves_b.timeout, 0, "++ timeout_reveal_b_reset");
-        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_reveal_moves(@sys, OWNER(), duel_id, moves_a.salt, moves_a.moves);
         tester::assert_pact(@sys, duel_id, challenge, false, false, "ended_2");
         let (challenge, round) = tester::get_Challenge_Round_value(@sys, duel_id);
         assert_eq!(challenge.state, ChallengeState::Resolved, "challenge.state ++");
@@ -469,7 +469,7 @@ pub mod tests {
         // try to commmit with another account
         let (_mocked, moves_a, _moves_b) = prefabs::get_moves_dual_crit();
         sys.duelists.transfer_from(OWNER(), BUMMER(), ID(OWNER()).into());
-        tester::execute_commit_moves_ID(@sys.game, BUMMER(), ID(OWNER()).into(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves_ID(@sys, BUMMER(), ID(OWNER()).into(), duel_id, moves_a.hashed);
         // no panic
         let challenge: ChallengeValue = sys.store.get_challenge_value(duel_id);
         assert_eq!(challenge.address_a, BUMMER(), "challenge.address_a_committed");
@@ -484,9 +484,9 @@ pub mod tests {
         assert_eq!(challenge.address_b, OTHER(), "challenge.address_b");
         // try to commmit with another account
         let (_mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
         sys.duelists.transfer_from(OTHER(), BUMMER(), ID(OTHER()).into());
-        tester::execute_commit_moves_ID(@sys.game, BUMMER(), ID(OTHER()).into(), duel_id, moves_b.hashed);
+        tester::execute_commit_moves_ID(@sys, BUMMER(), ID(OTHER()).into(), duel_id, moves_b.hashed);
         // no panic
         let challenge: ChallengeValue = sys.store.get_challenge_value(duel_id);
         assert_eq!(challenge.address_a, OWNER(), "challenge.address_a");
@@ -501,7 +501,7 @@ pub mod tests {
         // try to commmit with another account
         let (_mocked, moves_a, _moves_b) = prefabs::get_moves_dual_crit();
         sys.duelists.transfer_from(OWNER(), BUMMER(), ID(OWNER()).into());
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
     }
 
     #[test]
@@ -511,9 +511,9 @@ pub mod tests {
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         // try to commmit with another account
         let (_mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
         sys.duelists.transfer_from(OTHER(), BUMMER(), ID(OTHER()).into());
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_b.hashed);
     }
 
 
@@ -552,10 +552,10 @@ pub mod tests {
         while (i < challenge_count) {
             assert_eq!((*sys).duelists.life_count(loser_id), loser_lives, "____life_count(loser_id) [{}]", i);
             let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), DuelType::Seasonal, lives_staked);
-            tester::execute_commit_moves(sys.game, OWNER(), duel_id, moves_a.hashed);
-            tester::execute_commit_moves(sys.game, OTHER(), duel_id, moves_b.hashed);
-            tester::execute_reveal_moves(sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
-            tester::execute_reveal_moves(sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+            tester::execute_commit_moves(sys, OWNER(), duel_id, moves_a.hashed);
+            tester::execute_commit_moves(sys, OTHER(), duel_id, moves_b.hashed);
+            tester::execute_reveal_moves(sys, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+            tester::execute_reveal_moves(sys, OTHER(), duel_id, moves_b.salt, moves_b.moves);
             let challenge: ChallengeValue = (*sys.store).get_challenge_value(duel_id);
             assert_eq!(challenge.winner, winner, "challenge.winner:{}", i);
             loser_lives -= lives_staked;
@@ -869,15 +869,15 @@ pub mod tests {
         let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_miss();
         sys.rng.mock_values(mocked);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, A, B, DuelType::Seasonal, 1);
-        tester::execute_commit_moves(@sys.game, A, duel_id, moves_a.hashed);
-        tester::execute_commit_moves(@sys.game, B, duel_id, moves_b.hashed);
-        tester::execute_reveal_moves(@sys.game, A, duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_commit_moves(@sys, A, duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, B, duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(@sys, A, duel_id, moves_a.salt, moves_a.moves);
         // time travel...
         let round: RoundValue = sys.store.get_round_value(duel_id);
         tester::set_block_timestamp(round.moves_b.timeout + 1);
-        // tester::execute_reveal_moves(@sys.game, B, duel_id, moves_b.salt, moves_b.moves);
+        // tester::execute_reveal_moves(@sys, B, duel_id, moves_b.salt, moves_b.moves);
         assert!(sys.game.can_collect_duel(duel_id), "can_collect_duel");
-        tester::execute_collect_duel(@sys.game, A, duel_id);
+        tester::execute_collect_duel(@sys, A, duel_id);
         _assert_timed_out(@sys, duel_id, 1); // 1 wins
         // timeout duel, do not affect honour!
         let totals_a: Totals = sys.store.get_player_totals(A);
@@ -917,15 +917,15 @@ pub mod tests {
         let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_miss();
         sys.rng.mock_values(mocked);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, A, B, DuelType::Seasonal, 1);
-        tester::execute_commit_moves(@sys.game, A, duel_id, moves_a.hashed);
-        tester::execute_commit_moves(@sys.game, B, duel_id, moves_b.hashed);
-        tester::execute_reveal_moves(@sys.game, B, duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_commit_moves(@sys, A, duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, B, duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(@sys, B, duel_id, moves_b.salt, moves_b.moves);
         // time travel...
         let round: RoundValue = sys.store.get_round_value(duel_id);
         tester::set_block_timestamp(round.moves_a.timeout + 1);
-        // tester::execute_reveal_moves(@sys.game, A, duel_id, moves_a.salt, moves_a.moves);
+        // tester::execute_reveal_moves(@sys, A, duel_id, moves_a.salt, moves_a.moves);
         assert!(sys.game.can_collect_duel(duel_id), "can_collect_duel");
-        tester::execute_collect_duel(@sys.game, B, duel_id);
+        tester::execute_collect_duel(@sys, B, duel_id);
         _assert_timed_out(@sys, duel_id, 2); // 1 wins
         // timeout duel, do not affect honour!
         let totals_a: Totals = sys.store.get_player_totals(A);
@@ -978,8 +978,8 @@ pub mod tests {
     #[test]
     fn test_commit_before_reply_a_OK() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), MESSAGE(), DuelType::Seasonal, 48, 1);
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, 0x1212112);
+        let duel_id: u128 = tester::execute_create_duel(@sys, OWNER(), OTHER(), MESSAGE(), DuelType::Seasonal, 48, 1);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, 0x1212112);
         // no panic!
     }
 
@@ -987,8 +987,8 @@ pub mod tests {
     #[should_panic(expected:('PISTOLS: Accept challenge first', 'ENTRYPOINT_FAILED'))]
     fn test_commit_before_reply_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), MESSAGE(), DuelType::Seasonal, 48, 1);
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, 0x1212112);
+        let duel_id: u128 = tester::execute_create_duel(@sys, OWNER(), OTHER(), MESSAGE(), DuelType::Seasonal, 48, 1);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, 0x1212112);
     }
 
     #[test]
@@ -999,7 +999,7 @@ pub mod tests {
         // try to commmit with another account
         let someone_else: ContractAddress = starknet::contract_address_const::<0x999>();
         let hashed: u128 = MovesHashTrait::hash(0x12121, [1, 1].span());
-        tester::execute_commit_moves(@sys.game, someone_else, duel_id, hashed);
+        tester::execute_commit_moves(@sys, someone_else, duel_id, hashed);
     }
 
     #[test]
@@ -1009,7 +1009,7 @@ pub mod tests {
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         // try to commmit with another account
         let hashed: u128 = MovesHashTrait::hash(0x12121, [1, 1].span());
-        tester::execute_commit_moves(@sys.game, FAKE_OWNER_OF_1(), duel_id, hashed);
+        tester::execute_commit_moves(@sys, FAKE_OWNER_OF_1(), duel_id, hashed);
     }
 
     #[test]
@@ -1018,8 +1018,8 @@ pub mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         let hashed: u128 = MovesHashTrait::hash(0x12121, [1, 1].span());
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, hashed);
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, hashed);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, hashed);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, hashed);
     }
     #[test]
     #[should_panic(expected:('PISTOLS: Already committed', 'ENTRYPOINT_FAILED'))]
@@ -1027,8 +1027,8 @@ pub mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         let hashed: u128 = MovesHashTrait::hash(0x12121, [1, 1].span());
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, hashed);
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, hashed);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, hashed);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, hashed);
     }
 
     #[test]
@@ -1037,10 +1037,10 @@ pub mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         let (_mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
-        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
-        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(@sys, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_reveal_moves(@sys, OWNER(), duel_id, moves_a.salt, moves_a.moves);
     }
     #[test]
     #[should_panic(expected:('PISTOLS: Already revealed', 'ENTRYPOINT_FAILED'))]
@@ -1048,10 +1048,10 @@ pub mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         let (_mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
-        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
-        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(@sys, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_reveal_moves(@sys, OTHER(), duel_id, moves_b.salt, moves_b.moves);
     }
 
     #[test]
@@ -1060,9 +1060,9 @@ pub mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         let (_mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
     }
 
     #[test]
@@ -1071,8 +1071,8 @@ pub mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         let (_mocked, moves_a, _moves_b) = prefabs::get_moves_dual_crit();
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
-        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_reveal_moves(@sys, OWNER(), duel_id, moves_a.salt, moves_a.moves);
     }
 
     #[test]
@@ -1081,8 +1081,8 @@ pub mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         let (_mocked, _moves_a, moves_b) = prefabs::get_moves_dual_crit();
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
-        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(@sys, OTHER(), duel_id, moves_b.salt, moves_b.moves);
     }
 
     #[test]
@@ -1091,9 +1091,9 @@ pub mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         let (_mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
-        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, 0x0, moves_b.moves);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_reveal_moves(@sys, OTHER(), duel_id, 0x0, moves_b.moves);
     }
 
     #[test]
@@ -1102,11 +1102,11 @@ pub mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         let (_mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
-        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
-        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_reveal_moves(@sys, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_reveal_moves(@sys, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
     }
 
     #[test]
@@ -1115,11 +1115,11 @@ pub mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         let (_mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
-        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
-        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
-        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_reveal_moves(@sys, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_reveal_moves(@sys, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_reveal_moves(@sys, OWNER(), duel_id, moves_a.salt, moves_a.moves);
     }
 
     #[test]
@@ -1128,9 +1128,9 @@ pub mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         let (_mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_a.hashed);
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_b.hashed);
-        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, 0x12121, moves_a.moves);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(@sys, OWNER(), duel_id, 0x12121, moves_a.moves);
     }
 
     #[test]
@@ -1139,9 +1139,9 @@ pub mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         let (_mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_a.hashed);
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_b.hashed);
-        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, 0x12121, moves_b.moves);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(@sys, OTHER(), duel_id, 0x12121, moves_b.moves);
     }
 
     #[test]
@@ -1150,9 +1150,9 @@ pub mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         let (_mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_a.hashed);
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_b.hashed);
-        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, [7, 7].span());
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(@sys, OWNER(), duel_id, moves_a.salt, [7, 7].span());
     }
     #[test]
     #[should_panic(expected:('PISTOLS: Moves hash mismatch', 'ENTRYPOINT_FAILED'))]
@@ -1160,9 +1160,9 @@ pub mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         let (_mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_a.hashed);
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_b.hashed);
-        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, [7, 7].span());
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(@sys, OTHER(), duel_id, moves_b.salt, [7, 7].span());
     }
 
     #[test]
@@ -1171,7 +1171,7 @@ pub mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         let (_mocked, moves_a, _moves_b) = prefabs::get_moves_custom([].span(), [1,2].span());
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
     }
 
     #[test]
@@ -1180,7 +1180,7 @@ pub mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         let (_mocked, _moves_a, moves_b) = prefabs::get_moves_custom([1,2].span(), [].span());
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_b.hashed);
     }
 
     #[test]
@@ -1189,12 +1189,12 @@ pub mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         let (_mocked, moves_a, moves_b) = prefabs::get_moves_custom([1].span(), [1].span());
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
-        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(@sys, OWNER(), duel_id, moves_a.salt, moves_a.moves);
         // would panic hwre if Errors::INVALID_MOVES_COUNT is active
         // instead duel is finished
-        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_reveal_moves(@sys, OTHER(), duel_id, moves_b.salt, moves_b.moves);
         let challenge: ChallengeValue = sys.store.get_challenge_value(duel_id);
         assert_eq!(challenge.state, ChallengeState::Draw, "challenge.state");
     }
@@ -1241,7 +1241,7 @@ pub mod tests {
         // commit A
         tester::set_block_timestamp(round_0.moves_a.timeout);
         assert!(!sys.game.can_collect_duel(duel_id), "round_0: can_collect_duel");
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
         // B timeout extended
         let round_commit_1: RoundValue = sys.store.get_round_value(duel_id);
         assert_eq!(round_commit_1.moves_a.timeout, 0, "round_commit_1.moves_a.timeout");
@@ -1249,7 +1249,7 @@ pub mod tests {
         // commit B
         tester::set_block_timestamp(round_commit_1.moves_b.timeout);
         assert!(!sys.game.can_collect_duel(duel_id), "round_commit_1: can_collect_duel");
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_b.hashed);
         // A timeout extended
         let round_commit_2: RoundValue = sys.store.get_round_value(duel_id);
         assert_gt!(round_commit_2.moves_a.timeout, round_commit_1.moves_b.timeout, "round_commit_2.moves_a.timeout");
@@ -1257,7 +1257,7 @@ pub mod tests {
         // reveal A
         tester::set_block_timestamp(round_commit_2.moves_a.timeout);
         assert!(!sys.game.can_collect_duel(duel_id), "round_commit_2: can_collect_duel");
-        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_reveal_moves(@sys, OWNER(), duel_id, moves_a.salt, moves_a.moves);
         // B timeout extended
         let round_reveal_1: RoundValue = sys.store.get_round_value(duel_id);
         assert_eq!(round_reveal_1.moves_a.timeout, 0, "round_reveal_1.moves_a.timeout");
@@ -1265,7 +1265,7 @@ pub mod tests {
         // Reveal B
         tester::set_block_timestamp(round_reveal_1.moves_b.timeout);
         assert!(!sys.game.can_collect_duel(duel_id), "round_reveal_1: can_collect_duel");
-        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_reveal_moves(@sys, OTHER(), duel_id, moves_b.salt, moves_b.moves);
         // A timeout extended
         let round_reveal_2: RoundValue = sys.store.get_round_value(duel_id);
         assert_eq!(round_reveal_2.moves_a.timeout, 0, "round_reveal_2.moves_a.timeout");
@@ -1287,7 +1287,7 @@ pub mod tests {
         // commit B
         tester::set_block_timestamp(round_0.moves_b.timeout);
         assert!(!sys.game.can_collect_duel(duel_id), "round_0: can_collect_duel");
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_b.hashed);
         // B timeout extended
         let round_commit_1: RoundValue = sys.store.get_round_value(duel_id);
         assert_eq!(round_commit_1.moves_b.timeout, 0, "round_commit_1.moves_b.timeout");
@@ -1295,7 +1295,7 @@ pub mod tests {
         // commit B
         tester::set_block_timestamp(round_commit_1.moves_a.timeout);
         assert!(!sys.game.can_collect_duel(duel_id), "round_commit_1: can_collect_duel");
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
         // A timeout extended
         let round_commit_2: RoundValue = sys.store.get_round_value(duel_id);
         assert_gt!(round_commit_2.moves_a.timeout, round_commit_1.moves_b.timeout, "round_commit_2.moves_a.timeout");
@@ -1303,7 +1303,7 @@ pub mod tests {
         // reveal A
         tester::set_block_timestamp(round_commit_2.moves_b.timeout);
         assert!(!sys.game.can_collect_duel(duel_id), "round_commit_2: can_collect_duel");
-        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_reveal_moves(@sys, OTHER(), duel_id, moves_b.salt, moves_b.moves);
         // B timeout extended
         let round_reveal_1: RoundValue = sys.store.get_round_value(duel_id);
         assert_eq!(round_reveal_1.moves_b.timeout, 0, "round_reveal_1.moves_b.timeout");
@@ -1311,7 +1311,7 @@ pub mod tests {
         // Reveal B
         tester::set_block_timestamp(round_reveal_1.moves_a.timeout);
         assert!(!sys.game.can_collect_duel(duel_id), "round_reveal_1: can_collect_duel");
-        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_reveal_moves(@sys, OWNER(), duel_id, moves_a.salt, moves_a.moves);
         // A timeout extended
         let round_reveal_2: RoundValue = sys.store.get_round_value(duel_id);
         assert_eq!(round_reveal_2.moves_a.timeout, 0, "round_reveal_2.moves_a.timeout");
@@ -1329,7 +1329,7 @@ pub mod tests {
         assert!(!sys.game.can_collect_duel(duel_id), "!can_collect_duel");
         tester::set_block_timestamp(round.moves_a.timeout + 1);
         assert!(sys.game.can_collect_duel(duel_id), "can_collect_duel");
-        tester::execute_collect_duel(@sys.game, OWNER(), duel_id);
+        tester::execute_collect_duel(@sys, OWNER(), duel_id);
         _assert_timed_out(@sys, duel_id, 0); // dual timeout
     }
 
@@ -1340,7 +1340,7 @@ pub mod tests {
         assert!(!sys.game.can_collect_duel(duel_id), "!can_collect_duel");
         tester::set_block_timestamp(round.moves_a.timeout + 1);
         assert!(sys.game.can_collect_duel(duel_id), "can_collect_duel");
-        tester::execute_collect_duel(@sys.game, BUMMER(), duel_id);
+        tester::execute_collect_duel(@sys, BUMMER(), duel_id);
         _assert_timed_out(@sys, duel_id, 0); // dual timeout
     }
 
@@ -1351,7 +1351,7 @@ pub mod tests {
         assert!(!sys.game.can_collect_duel(duel_id), "!can_collect_duel");
         tester::set_block_timestamp(round.moves_a.timeout + 1);
         assert!(sys.game.can_collect_duel(duel_id), "can_collect_duel");
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, 0x1212112);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, 0x1212112);
         _assert_not_timed_out(@sys, duel_id);
     }
 
@@ -1359,13 +1359,13 @@ pub mod tests {
     fn test_timeout_commit_collect_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, 0x1212112);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, 0x1212112);
         // time travel...
         assert!(!sys.game.can_collect_duel(duel_id), "!can_collect_duel");
         let round: RoundValue = sys.store.get_round_value(duel_id);
         tester::set_block_timestamp(round.moves_b.timeout + 1);
         assert!(sys.game.can_collect_duel(duel_id), "can_collect_duel");
-        tester::execute_collect_duel(@sys.game, OTHER(), duel_id);
+        tester::execute_collect_duel(@sys, OTHER(), duel_id);
         _assert_timed_out(@sys, duel_id, 1); // 1 wins
     }
 
@@ -1373,13 +1373,13 @@ pub mod tests {
     fn test_timeout_commit_collect_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, 0x1212112);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, 0x1212112);
         // time travel...
         assert!(!sys.game.can_collect_duel(duel_id), "!can_collect_duel");
         let round: RoundValue = sys.store.get_round_value(duel_id);
         tester::set_block_timestamp(round.moves_a.timeout + 1);
         assert!(sys.game.can_collect_duel(duel_id), "can_collect_duel");
-        tester::execute_collect_duel(@sys.game, OWNER(), duel_id);
+        tester::execute_collect_duel(@sys, OWNER(), duel_id);
         _assert_timed_out(@sys, duel_id, 2); // 2 wins
     }
 
@@ -1387,13 +1387,13 @@ pub mod tests {
     fn test_timeout_commit_continue_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, 0x1212112);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, 0x1212112);
         // time travel...
         assert!(!sys.game.can_collect_duel(duel_id), "!can_collect_duel");
         let round: RoundValue = sys.store.get_round_value(duel_id);
         tester::set_block_timestamp(round.moves_b.timeout + 1);
         assert!(sys.game.can_collect_duel(duel_id), "can_collect_duel");
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, 0x1212112);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, 0x1212112);
         _assert_not_timed_out(@sys, duel_id);
     }
 
@@ -1401,13 +1401,13 @@ pub mod tests {
     fn test_timeout_commit_continue_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, 0x1212112);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, 0x1212112);
         // time travel...
         assert!(!sys.game.can_collect_duel(duel_id), "!can_collect_duel");
         let round: RoundValue = sys.store.get_round_value(duel_id);
         tester::set_block_timestamp(round.moves_a.timeout + 1);
         assert!(sys.game.can_collect_duel(duel_id), "can_collect_duel");
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, 0x1212112);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, 0x1212112);
         _assert_not_timed_out(@sys, duel_id);
     }
 
@@ -1417,8 +1417,8 @@ pub mod tests {
         let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         sys.rng.mock_values(mocked);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_b.hashed);
         // time travel...
         let round: RoundValue = sys.store.get_round_value(duel_id);
         tester::set_block_timestamp(round.moves_a.timeout);
@@ -1426,7 +1426,7 @@ pub mod tests {
         tester::set_block_timestamp(round.moves_a.timeout + 1);
         assert!(sys.game.can_collect_duel(duel_id), "can_collect_duel");
         // collect...
-        tester::execute_collect_duel(@sys.game, OWNER(), duel_id);
+        tester::execute_collect_duel(@sys, OWNER(), duel_id);
         _assert_timed_out(@sys, duel_id, 0); // dual timeout
     }
 
@@ -1436,9 +1436,9 @@ pub mod tests {
         let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         sys.rng.mock_values(mocked);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
-        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(@sys, OWNER(), duel_id, moves_a.salt, moves_a.moves);
         // time travel...
         let round: RoundValue = sys.store.get_round_value(duel_id);
         tester::set_block_timestamp(round.moves_b.timeout);
@@ -1446,7 +1446,7 @@ pub mod tests {
         tester::set_block_timestamp(round.moves_b.timeout + 1);
         assert!(sys.game.can_collect_duel(duel_id), "can_collect_duel");
         // collect...
-        tester::execute_collect_duel(@sys.game, OTHER(), duel_id);
+        tester::execute_collect_duel(@sys, OTHER(), duel_id);
         _assert_timed_out(@sys, duel_id, 1); // 1 wins
     }
 
@@ -1456,9 +1456,9 @@ pub mod tests {
         let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         sys.rng.mock_values(mocked);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
-        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(@sys, OTHER(), duel_id, moves_b.salt, moves_b.moves);
         // time travel...
         let round: RoundValue = sys.store.get_round_value(duel_id);
         tester::set_block_timestamp(round.moves_a.timeout);
@@ -1466,7 +1466,7 @@ pub mod tests {
         tester::set_block_timestamp(round.moves_a.timeout + 1);
         assert!(sys.game.can_collect_duel(duel_id), "can_collect_duel");
         // collect...
-        tester::execute_collect_duel(@sys.game, OWNER(), duel_id);
+        tester::execute_collect_duel(@sys, OWNER(), duel_id);
         _assert_timed_out(@sys, duel_id, 2); // 2 wins
     }
 
@@ -1476,8 +1476,8 @@ pub mod tests {
         let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         sys.rng.mock_values(mocked);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_b.hashed);
         // time travel...
         let round: RoundValue = sys.store.get_round_value(duel_id);
         tester::set_block_timestamp(round.moves_a.timeout);
@@ -1485,8 +1485,8 @@ pub mod tests {
         tester::set_block_timestamp(round.moves_a.timeout + 1);
         assert!(sys.game.can_collect_duel(duel_id), "can_collect_duel");
         // reveal...
-        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
-        // tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_reveal_moves(@sys, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        // tester::execute_reveal_moves(@sys, OTHER(), duel_id, moves_b.salt, moves_b.moves);
         _assert_not_timed_out(@sys, duel_id);
     }
 
@@ -1496,8 +1496,8 @@ pub mod tests {
         let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         sys.rng.mock_values(mocked);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_b.hashed);
         // time travel...
         let round: RoundValue = sys.store.get_round_value(duel_id);
         tester::set_block_timestamp(round.moves_a.timeout);
@@ -1505,8 +1505,8 @@ pub mod tests {
         tester::set_block_timestamp(round.moves_a.timeout + 1);
         assert!(sys.game.can_collect_duel(duel_id), "can_collect_duel");
         // reveal...
-        // tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
-        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        // tester::execute_reveal_moves(@sys, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_reveal_moves(@sys, OTHER(), duel_id, moves_b.salt, moves_b.moves);
         _assert_not_timed_out(@sys, duel_id);
     }
 
@@ -1516,9 +1516,9 @@ pub mod tests {
         let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         sys.rng.mock_values(mocked);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
-        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(@sys, OWNER(), duel_id, moves_a.salt, moves_a.moves);
         // time travel...
         let round: RoundValue = sys.store.get_round_value(duel_id);
         tester::set_block_timestamp(round.moves_b.timeout);
@@ -1526,7 +1526,7 @@ pub mod tests {
         tester::set_block_timestamp(round.moves_b.timeout + 1);
         assert!(sys.game.can_collect_duel(duel_id), "can_collect_duel");
         // reveal...
-        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_reveal_moves(@sys, OTHER(), duel_id, moves_b.salt, moves_b.moves);
         _assert_not_timed_out(@sys, duel_id);
     }
 
@@ -1536,9 +1536,9 @@ pub mod tests {
         let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         sys.rng.mock_values(mocked);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
-        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(@sys, OTHER(), duel_id, moves_b.salt, moves_b.moves);
         // time travel...
         let round: RoundValue = sys.store.get_round_value(duel_id);
         tester::set_block_timestamp(round.moves_a.timeout);
@@ -1546,7 +1546,7 @@ pub mod tests {
         tester::set_block_timestamp(round.moves_a.timeout + 1);
         assert!(sys.game.can_collect_duel(duel_id), "can_collect_duel");
         // reveal...
-        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_reveal_moves(@sys, OWNER(), duel_id, moves_a.salt, moves_a.moves);
         _assert_not_timed_out(@sys, duel_id);
     }
 
@@ -1570,10 +1570,10 @@ pub mod tests {
         let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, OWNER())[0];
         let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, OTHER())[0];
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
-        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
-        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(@sys, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_reveal_moves(@sys, OTHER(), duel_id, moves_b.salt, moves_b.moves);
         let challenge: ChallengeValue = sys.store.get_challenge_value(duel_id);
         assert_eq!(challenge.state, ChallengeState::Draw, "challenge.state");
         assert_eq!(challenge.winner, 0, "challenge.winner");
@@ -1598,10 +1598,10 @@ pub mod tests {
         let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, OWNER())[0];
         let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, OTHER())[0];
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
-        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
-        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(@sys, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_reveal_moves(@sys, OTHER(), duel_id, moves_b.salt, moves_b.moves);
         let challenge: ChallengeValue = sys.store.get_challenge_value(duel_id);
         assert_eq!(challenge.state, ChallengeState::Draw, "challenge.state");
         assert_eq!(challenge.winner, 0, "challenge.winner");
@@ -1626,10 +1626,10 @@ pub mod tests {
         let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, OWNER())[0];
         let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, OTHER())[0];
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
-        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
-        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(@sys, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_reveal_moves(@sys, OTHER(), duel_id, moves_b.salt, moves_b.moves);
         let challenge: ChallengeValue = sys.store.get_challenge_value(duel_id);
         assert_eq!(challenge.winner, 1, "challenge.winner");
         // A dodged and won: ZERO POINTS
@@ -1654,10 +1654,10 @@ pub mod tests {
         let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, OWNER())[0];
         let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, OTHER())[0];
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
-        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
-        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
-        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
-        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(@sys, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_reveal_moves(@sys, OTHER(), duel_id, moves_b.salt, moves_b.moves);
         let challenge: ChallengeValue = sys.store.get_challenge_value(duel_id);
         assert_eq!(challenge.winner, 2, "challenge.winner");
         // B dodged and won: ZERO POINTS

@@ -804,15 +804,15 @@ pub mod tester {
     // ::duelist_token
     pub fn execute_transfer_duelist(system: @IDuelistTokenDispatcher, sender: ContractAddress,
         to: ContractAddress,
-        token_id: u128,
+        duelist_id: u128,
     ) {
         impersonate(sender);
-        (*system).transfer_from(sender, to, token_id.into());
+        (*system).transfer_from(sender, to, duelist_id.into());
         _next_block();
     }
 
-    pub fn activate_duelist(ref sys: TestSystems, token_id: u128) {
-        let mut duelist: Duelist = sys.store.get_duelist(token_id);
+    pub fn activate_duelist(ref sys: TestSystems, duelist_id: u128) {
+        let mut duelist: Duelist = sys.store.get_duelist(duelist_id);
         if (duelist.timestamps.active == 0) {
             duelist.timestamps.active = core::cmp::max(get_block_timestamp() - 1, 1);
             set_Duelist(ref sys.world, @duelist);
@@ -821,7 +821,7 @@ pub mod tester {
 
 
     // ::duel_token
-    pub fn execute_create_duel(system: @IDuelTokenDispatcher, sender: ContractAddress,
+    pub fn execute_create_duel(sys: @TestSystems, sender: ContractAddress,
         challenged: ContractAddress,
         // premise: Premise,
         message: ByteArray,
@@ -829,10 +829,10 @@ pub mod tester {
         expire_hours: u64,
         lives_staked: u8,
     ) -> u128 {
-        (execute_create_duel_ID(system, sender, ID(sender), challenged, message, duel_type, expire_hours, lives_staked))
+        (execute_create_duel_ID(sys, sender, ID(sender), challenged, message, duel_type, expire_hours, lives_staked))
     }
-    pub fn execute_create_duel_ID(system: @IDuelTokenDispatcher, sender: ContractAddress,
-        token_id: u128,
+    pub fn execute_create_duel_ID(sys: @TestSystems, sender: ContractAddress,
+        duelist_id: u128,
         challenged: ContractAddress,
         // premise: Premise,
         message: ByteArray,
@@ -841,17 +841,17 @@ pub mod tester {
         lives_staked: u8,
     ) -> u128 {
         impersonate(sender);
-        let duel_id: u128 = (*system).create_duel(duel_type, token_id, challenged, lives_staked, expire_hours, Premise::Nothing, message);
+        let duel_id: u128 = (*sys.duels).create_duel(duel_type, duelist_id, challenged, lives_staked, expire_hours, Premise::Nothing, message);
         _next_block();
         (duel_id)
     }
-    pub fn execute_reply_duel(system: @IDuelTokenDispatcher, sender: ContractAddress,
-        token_id: u128,
+    pub fn execute_reply_duel(sys: @TestSystems, sender: ContractAddress,
+        duelist_id: u128,
         duel_id: u128,
         accepted: bool,
     ) -> ChallengeState {
         impersonate(sender);
-        let new_state: ChallengeState = (*system).reply_duel(duel_id, token_id, accepted);
+        let new_state: ChallengeState = (*sys.duels).reply_duel(duel_id, duelist_id, accepted);
         _next_block();
         (new_state)
     }
@@ -911,70 +911,70 @@ pub mod tester {
     // }
 
     // ::game
-    pub fn execute_commit_moves(system: @IGameDispatcher, sender: ContractAddress,
+    pub fn execute_commit_moves(sys: @TestSystems, sender: ContractAddress,
         duel_id: u128,
         hash: u128,
     ) {
-        execute_commit_moves_ID(system, sender, ID(sender), duel_id, hash);
+        execute_commit_moves_ID(sys, sender, ID(sender), duel_id, hash);
     }
-    pub fn execute_commit_moves_ID(system: @IGameDispatcher, sender: ContractAddress,
+    pub fn execute_commit_moves_ID(sys: @TestSystems, sender: ContractAddress,
         token_id: u128,
         duel_id: u128,
         hash: u128,
     ) {
         impersonate(sender);
-        (*system).commit_moves(token_id, duel_id, hash);
+        (*sys.game).commit_moves(token_id, duel_id, hash);
         _next_block();
     }
-    pub fn execute_reveal_moves(system: @IGameDispatcher, sender: ContractAddress,
+    pub fn execute_reveal_moves(sys: @TestSystems, sender: ContractAddress,
         duel_id: u128,
         salt: felt252,
         moves: Span<u8>,
     ) {
-        execute_reveal_moves_ID(system, sender, ID(sender), duel_id, salt, moves);
+        execute_reveal_moves_ID(sys, sender, ID(sender), duel_id, salt, moves);
     }
-    pub fn execute_reveal_moves_ID(system: @IGameDispatcher, sender: ContractAddress,
+    pub fn execute_reveal_moves_ID(sys: @TestSystems, sender: ContractAddress,
         token_id: u128,
         duel_id: u128,
         salt: felt252,
         moves: Span<u8>,
     ) {
         impersonate(sender);
-        (*system).reveal_moves(token_id, duel_id, salt, moves);
+        (*sys.game).reveal_moves(token_id, duel_id, salt, moves);
         _next_block();
     }
-    pub fn execute_collect_duel(system: @IGameDispatcher, sender: ContractAddress, duel_id: u128) {
+    pub fn execute_collect_duel(sys: @TestSystems, sender: ContractAddress, duel_id: u128) {
         impersonate(sender);
-        (*system).collect_duel(duel_id);
+        (*sys.game).collect_duel(duel_id);
         _next_block();
     }
 
     // ::tutorial
-    pub fn execute_create_tutorial(system: @ITutorialDispatcher, sender: ContractAddress,
+    pub fn execute_create_tutorial(sys: @TestSystems, sender: ContractAddress,
         tutorial_id: u128,
     ) -> u128 {
         impersonate(sender);
-        let duel_id: u128 = (*system).create_tutorial(ID(sender), tutorial_id);
+        let duel_id: u128 = (*sys.tut).create_tutorial(ID(sender), tutorial_id);
         _next_block();
         (duel_id)
     }
-    pub fn execute_commit_moves_tutorial(system: @ITutorialDispatcher, sender: ContractAddress,
+    pub fn execute_commit_moves_tutorial(sys: @TestSystems, sender: ContractAddress,
         duelist_id: u128,
         duel_id: u128,
         hashed: u128,
     ) {
         impersonate(sender);
-        (*system).commit_moves(duelist_id, duel_id, hashed);
+        (*sys.tut).commit_moves(duelist_id, duel_id, hashed);
         _next_block();
     }
-    pub fn execute_reveal_moves_tutorial(system: @ITutorialDispatcher, sender: ContractAddress,
+    pub fn execute_reveal_moves_tutorial(sys: @TestSystems, sender: ContractAddress,
         duelist_id: u128,
         duel_id: u128,
         salt: felt252,
         moves: Span<u8>,
     ) {
         impersonate(sender);
-        (*system).reveal_moves(duelist_id, duel_id, salt, moves);
+        (*sys.tut).reveal_moves(duelist_id, duel_id, salt, moves);
         _next_block();
     }
 

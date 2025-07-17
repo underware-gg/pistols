@@ -259,22 +259,22 @@ fn test_commit_reveal_a_b() {
     // commit/reveal
     let (mocked, moves_a, moves_b) = prefabs::get_moves_crit_a();
     sys.rng.mock_values(mocked);
-    tester::execute_commit_moves_ID(@sys.game, P1().address, P1().duelist_id, duel_id_p1, moves_a.hashed);
+    tester::execute_commit_moves_ID(@sys, P1().address, P1().duelist_id, duel_id_p1, moves_a.hashed);
     let round: TournamentRound = sys.store.get_tournament_round(tournament_id, 1);
     assert!(round.results.is_winning(1), "commit_p1_a");
     assert!(!round.results.is_winning(2), "commit_p1_b");
-    tester::execute_commit_moves_ID(@sys.game, P2().address, P2().duelist_id, duel_id_p1, moves_b.hashed);
+    tester::execute_commit_moves_ID(@sys, P2().address, P2().duelist_id, duel_id_p1, moves_b.hashed);
     let round: TournamentRound = sys.store.get_tournament_round(tournament_id, 1);
     assert!(!round.results.is_winning(1), "commit_p2_a");
     assert!(!round.results.is_winning(2), "commit_p2_b");
-    tester::execute_reveal_moves_ID(@sys.game, P1().address, P1().duelist_id, duel_id_p1, moves_a.salt, moves_a.moves);
+    tester::execute_reveal_moves_ID(@sys, P1().address, P1().duelist_id, duel_id_p1, moves_a.salt, moves_a.moves);
     let round: TournamentRound = sys.store.get_tournament_round(tournament_id, 1);
     assert!(round.results.is_winning(1), "reveal_p1_a");
     assert!(!round.results.is_winning(2), "reveal_p1_b");
     assert!(round.results.is_playing(1), "round.results.is_playing(1)");
     assert!(round.results.is_playing(2), "round.results.is_playing(2)");
     // last move!
-    tester::execute_reveal_moves_ID(@sys.game, P2().address, P2().duelist_id, duel_id_p1, moves_b.salt, moves_b.moves);
+    tester::execute_reveal_moves_ID(@sys, P2().address, P2().duelist_id, duel_id_p1, moves_b.salt, moves_b.moves);
     let round: TournamentRound = sys.store.get_tournament_round(tournament_id, 1);
     assert!(round.results.is_winning(1), "reveal_p2_a");
     assert!(!round.results.is_winning(2), "reveal_p2_b");
@@ -308,22 +308,22 @@ fn test_commit_reveal_b_a() {
     // commit/reveal
     let (mocked, moves_a, moves_b) = prefabs::get_moves_crit_b();
     sys.rng.mock_values(mocked);
-    tester::execute_commit_moves_ID(@sys.game, P2().address, P2().duelist_id, duel_id_p1, moves_b.hashed);
+    tester::execute_commit_moves_ID(@sys, P2().address, P2().duelist_id, duel_id_p1, moves_b.hashed);
     let round: TournamentRound = sys.store.get_tournament_round(tournament_id, 1);
     assert!(!round.results.is_winning(1), "commit_p1_a");
     assert!(round.results.is_winning(2), "commit_p1_b");
-    tester::execute_commit_moves_ID(@sys.game, P1().address, P1().duelist_id, duel_id_p1, moves_a.hashed);
+    tester::execute_commit_moves_ID(@sys, P1().address, P1().duelist_id, duel_id_p1, moves_a.hashed);
     let round: TournamentRound = sys.store.get_tournament_round(tournament_id, 1);
     assert!(!round.results.is_winning(1), "commit_p2_a");
     assert!(!round.results.is_winning(2), "commit_p2_b");
-    tester::execute_reveal_moves_ID(@sys.game, P2().address, P2().duelist_id, duel_id_p1, moves_b.salt, moves_b.moves);
+    tester::execute_reveal_moves_ID(@sys, P2().address, P2().duelist_id, duel_id_p1, moves_b.salt, moves_b.moves);
     let round: TournamentRound = sys.store.get_tournament_round(tournament_id, 1);
     assert!(!round.results.is_winning(1), "reveal_p1_a");
     assert!(round.results.is_winning(2), "reveal_p1_b");
     assert!(round.results.is_playing(1), "round.results.is_playing(1)");
     assert!(round.results.is_playing(2), "round.results.is_playing(2)");
     // last move!
-    tester::execute_reveal_moves_ID(@sys.game, P1().address, P1().duelist_id, duel_id_p1, moves_a.salt, moves_a.moves);
+    tester::execute_reveal_moves_ID(@sys, P1().address, P1().duelist_id, duel_id_p1, moves_a.salt, moves_a.moves);
     let round: TournamentRound = sys.store.get_tournament_round(tournament_id, 1);
     assert!(!round.results.is_winning(1), "reveal_p2_a");
     assert!(round.results.is_winning(2), "reveal_p2_b");
@@ -349,10 +349,10 @@ fn test_commit_reveal_draw_dead() {
     assert_eq!(ch_1.lives_staked, 3, "ch_1.lives_staked");
     let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
     sys.rng.mock_values(mocked);
-    tester::execute_commit_moves_ID(@sys.game, P1().address, P1().duelist_id, duel_id_p1, moves_a.hashed);
-    tester::execute_commit_moves_ID(@sys.game, P2().address, P2().duelist_id, duel_id_p1, moves_b.hashed);
-    tester::execute_reveal_moves_ID(@sys.game, P2().address, P2().duelist_id, duel_id_p1, moves_b.salt, moves_b.moves);
-    tester::execute_reveal_moves_ID(@sys.game, P1().address, P1().duelist_id, duel_id_p1, moves_a.salt, moves_a.moves);
+    tester::execute_commit_moves_ID(@sys, P1().address, P1().duelist_id, duel_id_p1, moves_a.hashed);
+    tester::execute_commit_moves_ID(@sys, P2().address, P2().duelist_id, duel_id_p1, moves_b.hashed);
+    tester::execute_reveal_moves_ID(@sys, P2().address, P2().duelist_id, duel_id_p1, moves_b.salt, moves_b.moves);
+    tester::execute_reveal_moves_ID(@sys, P1().address, P1().duelist_id, duel_id_p1, moves_a.salt, moves_a.moves);
     let round: TournamentRound = sys.store.get_tournament_round(tournament_id, 1);
     assert!(!round.results.is_winning(1), "finished_a");
     assert!(!round.results.is_winning(2), "finished_b");
@@ -375,10 +375,10 @@ fn test_commit_reveal_draw_alive() {
     assert_eq!(ch_1.lives_staked, 1, "ch_1.lives_staked");
     let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
     sys.rng.mock_values(mocked);
-    tester::execute_commit_moves_ID(@sys.game, P2().address, P2().duelist_id, duel_id_p1, moves_b.hashed);
-    tester::execute_commit_moves_ID(@sys.game, P1().address, P1().duelist_id, duel_id_p1, moves_a.hashed);
-    tester::execute_reveal_moves_ID(@sys.game, P1().address, P1().duelist_id, duel_id_p1, moves_a.salt, moves_a.moves);
-    tester::execute_reveal_moves_ID(@sys.game, P2().address, P2().duelist_id, duel_id_p1, moves_b.salt, moves_b.moves);
+    tester::execute_commit_moves_ID(@sys, P2().address, P2().duelist_id, duel_id_p1, moves_b.hashed);
+    tester::execute_commit_moves_ID(@sys, P1().address, P1().duelist_id, duel_id_p1, moves_a.hashed);
+    tester::execute_reveal_moves_ID(@sys, P1().address, P1().duelist_id, duel_id_p1, moves_a.salt, moves_a.moves);
+    tester::execute_reveal_moves_ID(@sys, P2().address, P2().duelist_id, duel_id_p1, moves_b.salt, moves_b.moves);
     let round: TournamentRound = sys.store.get_tournament_round(tournament_id, 1);
     assert!(!round.results.is_winning(1), "finished_a");
     assert!(!round.results.is_winning(2), "finished_b");
@@ -397,7 +397,7 @@ fn test_commit_reveal_expire_collect_a() {
     let duel_id_p1: u128 = *duel_ids[0];
     let (mocked, moves_a, _moves_b) = prefabs::get_moves_dual_crit();
     sys.rng.mock_values(mocked);
-    tester::execute_commit_moves_ID(@sys.game, P1().address, P1().duelist_id, duel_id_p1, moves_a.hashed);
+    tester::execute_commit_moves_ID(@sys, P1().address, P1().duelist_id, duel_id_p1, moves_a.hashed);
     let round: TournamentRound = sys.store.get_tournament_round(tournament_id, 1);
     assert!(round.results.is_winning(1), "commit_a");
     assert!(!round.results.is_winning(2), "commit_b");
@@ -407,7 +407,7 @@ fn test_commit_reveal_expire_collect_a() {
     // tester::elapse_block_timestamp(TIMESTAMP::ONE_DAY + 1);
     tester::set_block_timestamp(round.timestamps.end + 1);
     assert!(sys.game.can_collect_duel(duel_id_p1), "can_collect()");
-    tester::execute_collect_duel(@sys.game, P1().address, duel_id_p1);
+    tester::execute_collect_duel(@sys, P1().address, duel_id_p1);
     assert!(!sys.game.can_collect_duel(duel_id_p1), "!can_collect()_after");
     // check round
     let round: TournamentRound = sys.store.get_tournament_round(tournament_id, 1);
@@ -430,7 +430,7 @@ fn test_commit_reveal_expire_collect_b() {
     let duel_id_p1: u128 = *duel_ids[0];
     let (mocked, _moves_a, moves_b) = prefabs::get_moves_dual_crit();
     sys.rng.mock_values(mocked);
-    tester::execute_commit_moves_ID(@sys.game, P2().address, P2().duelist_id, duel_id_p1, moves_b.hashed);
+    tester::execute_commit_moves_ID(@sys, P2().address, P2().duelist_id, duel_id_p1, moves_b.hashed);
     let round: TournamentRound = sys.store.get_tournament_round(tournament_id, 1);
     assert!(!round.results.is_winning(1), "commit_a");
     assert!(round.results.is_winning(2), "commit_b");
@@ -439,7 +439,7 @@ fn test_commit_reveal_expire_collect_b() {
     assert!(!sys.game.can_collect_duel(duel_id_p1), "!can_collect()");
     tester::set_block_timestamp(round.timestamps.end + 1);
     assert!(sys.game.can_collect_duel(duel_id_p1), "can_collect()");
-    tester::execute_collect_duel(@sys.game, P2().address, duel_id_p1);
+    tester::execute_collect_duel(@sys, P2().address, duel_id_p1);
     assert!(!sys.game.can_collect_duel(duel_id_p1), "!can_collect()_after");
     // check round
     let round: TournamentRound = sys.store.get_tournament_round(tournament_id, 1);
@@ -470,7 +470,7 @@ fn test_commit_reveal_expire_collect_a_b() {
     assert!(!sys.game.can_collect_duel(duel_id_p1), "!can_collect()");
     tester::set_block_timestamp(round.timestamps.end + 1);
     assert!(sys.game.can_collect_duel(duel_id_p1), "can_collect()");
-    tester::execute_collect_duel(@sys.game, OTHER(), duel_id_p1);
+    tester::execute_collect_duel(@sys, OTHER(), duel_id_p1);
     assert!(!sys.game.can_collect_duel(duel_id_p1), "!can_collect()_after");
     // check round
     let round: TournamentRound = sys.store.get_tournament_round(tournament_id, 1);
@@ -493,7 +493,7 @@ fn test_commit_reveal_bad_pair() {
     let duel_id_p1: u128 = *duel_ids[0];
     let (mocked, moves_a, _moves_b) = prefabs::get_moves_crit_b();
     sys.rng.mock_values(mocked);
-    tester::execute_commit_moves_ID(@sys.game, P2().address, P2().duelist_id, duel_id_p1, moves_a.hashed);
+    tester::execute_commit_moves_ID(@sys, P2().address, P2().duelist_id, duel_id_p1, moves_a.hashed);
     // panic!
 }
 
@@ -720,10 +720,10 @@ fn test_end_round_left_players_winning() {
     let duel_id_p1: u128 = *duel_ids[0];
     let (mocked, moves_a, _moves_b) = prefabs::get_moves_crit_a();
     sys.rng.mock_values(mocked);
-    tester::execute_commit_moves_ID(@sys.game, P1().address, P1().duelist_id, duel_id_p1, moves_a.hashed);
-    // tester::execute_commit_moves_ID(@sys.game, P2().address, P2().duelist_id, duel_id_p1, moves_b.hashed);
-    // tester::execute_reveal_moves_ID(@sys.game, P1().address, P1().duelist_id, duel_id_p1, moves_a.salt, moves_a.moves);
-    // tester::execute_reveal_moves_ID(@sys.game, P2().address, P2().duelist_id, duel_id_p1, moves_b.salt, moves_b.moves);
+    tester::execute_commit_moves_ID(@sys, P1().address, P1().duelist_id, duel_id_p1, moves_a.hashed);
+    // tester::execute_commit_moves_ID(@sys, P2().address, P2().duelist_id, duel_id_p1, moves_b.hashed);
+    // tester::execute_reveal_moves_ID(@sys, P1().address, P1().duelist_id, duel_id_p1, moves_a.salt, moves_a.moves);
+    // tester::execute_reveal_moves_ID(@sys, P2().address, P2().duelist_id, duel_id_p1, moves_b.salt, moves_b.moves);
     // end_round
     let round: TournamentRound = sys.store.get_tournament_round(tournament_id, 1);
     assert!(round.results.is_winning(EN_1), "a_is_winning");
@@ -738,7 +738,7 @@ fn test_end_round_left_players_winning() {
     // player can collect now...
     tester::impersonate(P1().address); // needed to call can_collect_duel()
     assert!(sys.game.can_collect_duel(duel_id_p1), "can_collect()");
-    tester::execute_collect_duel(@sys.game, P1().address, duel_id_p1);
+    tester::execute_collect_duel(@sys, P1().address, duel_id_p1);
 }
 
 #[test]
@@ -787,10 +787,10 @@ fn test_end_round_unpaired_win_collected() {
     let _ch_1: Challenge = sys.store.get_challenge(duel_id_p1);
     let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
     sys.rng.mock_values(mocked);
-    tester::execute_commit_moves_ID(@sys.game, P2().address, P2().duelist_id, duel_id_p1, moves_b.hashed);
-    tester::execute_commit_moves_ID(@sys.game, P1().address, P1().duelist_id, duel_id_p1, moves_a.hashed);
-    tester::execute_reveal_moves_ID(@sys.game, P1().address, P1().duelist_id, duel_id_p1, moves_a.salt, moves_a.moves);
-    tester::execute_reveal_moves_ID(@sys.game, P2().address, P2().duelist_id, duel_id_p1, moves_b.salt, moves_b.moves);
+    tester::execute_commit_moves_ID(@sys, P2().address, P2().duelist_id, duel_id_p1, moves_b.hashed);
+    tester::execute_commit_moves_ID(@sys, P1().address, P1().duelist_id, duel_id_p1, moves_a.hashed);
+    tester::execute_reveal_moves_ID(@sys, P1().address, P1().duelist_id, duel_id_p1, moves_a.salt, moves_a.moves);
+    tester::execute_reveal_moves_ID(@sys, P2().address, P2().duelist_id, duel_id_p1, moves_b.salt, moves_b.moves);
     let round: TournamentRound = sys.store.get_tournament_round(tournament_id, 1);
     assert!(!round.results.is_winning(1), "is_winning_a");
     assert!(!round.results.is_winning(2), "is_winning_b");
@@ -997,10 +997,10 @@ fn test_next_round_join_next() {
     let duel_id_p1: u128 = *duel_ids[0];
     let (mocked, moves_a, moves_b) = prefabs::get_moves_crit_a();
     sys.rng.mock_values(mocked);
-    tester::execute_commit_moves_ID(@sys.game, P1().address, P1().duelist_id, duel_id_p1, moves_a.hashed);
-    tester::execute_commit_moves_ID(@sys.game, P2().address, P2().duelist_id, duel_id_p1, moves_b.hashed);
-    tester::execute_reveal_moves_ID(@sys.game, P1().address, P1().duelist_id, duel_id_p1, moves_a.salt, moves_a.moves);
-    tester::execute_reveal_moves_ID(@sys.game, P2().address, P2().duelist_id, duel_id_p1, moves_b.salt, moves_b.moves);
+    tester::execute_commit_moves_ID(@sys, P1().address, P1().duelist_id, duel_id_p1, moves_a.hashed);
+    tester::execute_commit_moves_ID(@sys, P2().address, P2().duelist_id, duel_id_p1, moves_b.hashed);
+    tester::execute_reveal_moves_ID(@sys, P1().address, P1().duelist_id, duel_id_p1, moves_a.salt, moves_a.moves);
+    tester::execute_reveal_moves_ID(@sys, P2().address, P2().duelist_id, duel_id_p1, moves_b.salt, moves_b.moves);
     //
     // current state
     let round: TournamentRound = sys.store.get_tournament_round(tournament_id, 1);
@@ -1037,10 +1037,10 @@ fn test_next_round_join_next() {
     // P3 wins...
     let (mocked, moves_a, moves_b) = prefabs::get_moves_crit_b();
     sys.rng.mock_values(mocked);
-    tester::execute_commit_moves_ID(@sys.game, P1().address, P1().duelist_id, next_duel_id_p1, moves_a.hashed);
-    tester::execute_commit_moves_ID(@sys.game, P3().address, P3().duelist_id, next_duel_id_p1, moves_b.hashed);
-    tester::execute_reveal_moves_ID(@sys.game, P1().address, P1().duelist_id, next_duel_id_p1, moves_a.salt, moves_a.moves);
-    tester::execute_reveal_moves_ID(@sys.game, P3().address, P3().duelist_id, next_duel_id_p1, moves_b.salt, moves_b.moves);
+    tester::execute_commit_moves_ID(@sys, P1().address, P1().duelist_id, next_duel_id_p1, moves_a.hashed);
+    tester::execute_commit_moves_ID(@sys, P3().address, P3().duelist_id, next_duel_id_p1, moves_b.hashed);
+    tester::execute_reveal_moves_ID(@sys, P1().address, P1().duelist_id, next_duel_id_p1, moves_a.salt, moves_a.moves);
+    tester::execute_reveal_moves_ID(@sys, P3().address, P3().duelist_id, next_duel_id_p1, moves_b.salt, moves_b.moves);
     //
     // end tournament!
     tester::impersonate(P3().address);
@@ -1062,7 +1062,7 @@ fn test_next_round_join_next_incompleted_collect() {
     let duel_id_p1: u128 = *duel_ids[0];
     let (mocked, moves_a, _moves_b) = prefabs::get_moves_crit_a();
     sys.rng.mock_values(mocked);
-    tester::execute_commit_moves_ID(@sys.game, P1().address, P1().duelist_id, duel_id_p1, moves_a.hashed);
+    tester::execute_commit_moves_ID(@sys, P1().address, P1().duelist_id, duel_id_p1, moves_a.hashed);
     //
     // current state
     let round: TournamentRound = sys.store.get_tournament_round(tournament_id, 1);
@@ -1083,7 +1083,7 @@ fn test_next_round_join_next_incompleted_collect() {
     // P1 collects previous challenge...
     tester::impersonate(P1().address); // needed for assertion
     assert!(sys.game.can_collect_duel(duel_id_p1), "can_collect()");
-    tester::execute_collect_duel(@sys.game, P1().address, duel_id_p1);
+    tester::execute_collect_duel(@sys, P1().address, duel_id_p1);
     assert!(!sys.game.can_collect_duel(duel_id_p1), "!can_collect()_after");
     let ch_1: Challenge = sys.store.get_challenge(duel_id_p1);
     assert_eq!(ch_1.state, ChallengeState::Resolved, "ch_1.state_RESOLVED");
@@ -1124,7 +1124,7 @@ fn test_next_round_join_next_incompleted_join_auto() {
     let duel_id_p1: u128 = *duel_ids[0];
     let (mocked, moves_a, _moves_b) = prefabs::get_moves_crit_a();
     sys.rng.mock_values(mocked);
-    tester::execute_commit_moves_ID(@sys.game, P1().address, P1().duelist_id, duel_id_p1, moves_a.hashed);
+    tester::execute_commit_moves_ID(@sys, P1().address, P1().duelist_id, duel_id_p1, moves_a.hashed);
     //
     // current state
     let round: TournamentRound = sys.store.get_tournament_round(tournament_id, 1);
@@ -1171,10 +1171,10 @@ fn test_next_round_join_next_incompleted_join_auto() {
     // P3 wins...
     let (mocked, moves_a, moves_b) = prefabs::get_moves_crit_b();
     sys.rng.mock_values(mocked);
-    tester::execute_commit_moves_ID(@sys.game, P1().address, P1().duelist_id, next_duel_id_p1, moves_a.hashed);
-    tester::execute_commit_moves_ID(@sys.game, P3().address, P3().duelist_id, next_duel_id_p1, moves_b.hashed);
-    tester::execute_reveal_moves_ID(@sys.game, P1().address, P1().duelist_id, next_duel_id_p1, moves_a.salt, moves_a.moves);
-    tester::execute_reveal_moves_ID(@sys.game, P3().address, P3().duelist_id, next_duel_id_p1, moves_b.salt, moves_b.moves);
+    tester::execute_commit_moves_ID(@sys, P1().address, P1().duelist_id, next_duel_id_p1, moves_a.hashed);
+    tester::execute_commit_moves_ID(@sys, P3().address, P3().duelist_id, next_duel_id_p1, moves_b.hashed);
+    tester::execute_reveal_moves_ID(@sys, P1().address, P1().duelist_id, next_duel_id_p1, moves_a.salt, moves_a.moves);
+    tester::execute_reveal_moves_ID(@sys, P3().address, P3().duelist_id, next_duel_id_p1, moves_b.salt, moves_b.moves);
     //
     // end tournament!
     tester::impersonate(P3().address);
