@@ -1,6 +1,7 @@
 use starknet::{ContractAddress};
 use dojo::world::IWorldDispatcher;
 use pistols::models::challenge::{Challenge};
+use pistols::models::pool::{PoolType};
 use pistols::types::duelist_profile::{DuelistProfile};
 use pistols::types::rules::{RewardValues, DuelBonus};
 
@@ -88,7 +89,14 @@ pub trait IDuelistTokenPublic<TState> {
 // Exposed to world
 #[starknet::interface]
 pub trait IDuelistTokenProtected<TState> {
-    fn mint_duelists(ref self: TState, recipient: ContractAddress, quantity: usize, profile_type: DuelistProfile, seed: felt252) -> Span<u128>;
+    fn mint_duelists(ref self: TState,
+        recipient: ContractAddress,
+        quantity: usize,
+        profile_type: DuelistProfile,
+        seed: felt252,
+        pool_type: PoolType,
+        lords_amount: u128,
+    ) -> Span<u128>;
     fn get_validated_active_duelist_id(ref self: TState, address: ContractAddress, duelist_id: u128, lives_staked: u8) -> u128;
     fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u64, bonus: DuelBonus) -> (RewardValues, RewardValues);
 }
@@ -330,6 +338,8 @@ pub mod duelist_token {
             quantity: usize,
             profile_type: DuelistProfile,
             seed: felt252,
+            pool_type: PoolType,
+            lords_amount: u128,
         ) -> Span<u128>{
             let mut store: Store = StoreTrait::new(self.world_default());
             assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
@@ -355,6 +365,9 @@ pub mod duelist_token {
                 seed /= 0x100;
                 i += 1;
             };
+
+            // minted fame, peg to paid LORDS
+            store.world.bank_protected_dispatcher().peg_minted_fame_to_lords(recipient, lords_amount.into(), pool_type);
 
             PlayerTrait::append_alive_duelist(ref store, recipient, quantity.try_into().unwrap());
 

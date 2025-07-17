@@ -396,10 +396,6 @@ pub mod pack_token {
             pack.is_open = true;
             store.set_pack(@pack);
 
-            // minted fame, peg to paid LORDS
-            let from_pool_type: PoolType = pack.pack_type.deposited_pool_type();
-            store.world.bank_protected_dispatcher().peg_minted_fame_to_lords(recipient, pack.lords_amount.into(), from_pool_type);
-
             // burn!
             self.erc721.burn(pack_id.into());
 
@@ -424,7 +420,9 @@ pub mod pack_token {
             assert(starknet::get_caller_address() == bot_address, Errors::INVALID_CALLER);
 
             let token_ids: Span<u128> = store.world.duelist_token_protected_dispatcher().mint_duelists(
-                bot_address, 1, duelist_profile, 0
+                bot_address, 1, duelist_profile, 0,
+                PoolType::Claimable,
+                PackType::BotDuelist.mint_fee(),
             );
 
             (*token_ids[0])
@@ -470,15 +468,23 @@ pub mod pack_token {
             pack: Pack,
             recipient: ContractAddress,
         ) -> Span<u128> {
+            // pack data
+            let quantity: usize = pack.pack_type.descriptor().quantity;
+            let pool_type: PoolType = pack.pack_type.deposited_pool_type();
+            let lords_amount: u128 = pack.lords_amount;
+            // mint...
             let token_ids: Span<u128> = match pack.pack_type {
+                PackType::BotDuelist |
                 PackType::Unknown => { [].span() },
                 PackType::StarterPack => {
                     (store.world.duelist_token_protected_dispatcher()
                         .mint_duelists(
                             recipient,
-                            pack.pack_type.descriptor().quantity,
+                            quantity,
                             DuelistProfile::Genesis(GenesisKey::Unknown),
                             0x0100, // fake seed: Ser Walker (0x__00) + Lady Vengeance (0x01__)
+                            pool_type,
+                            lords_amount,
                         )
                     )
                 },
@@ -487,9 +493,11 @@ pub mod pack_token {
                     (store.world.duelist_token_protected_dispatcher()
                         .mint_duelists(
                             recipient,
-                            pack.pack_type.descriptor().quantity,
+                            quantity,
                             DuelistProfile::Genesis(GenesisKey::Unknown),
                             pack.seed,
+                            pool_type,
+                            lords_amount,
                         )
                     )
                 },
@@ -499,9 +507,11 @@ pub mod pack_token {
                     (store.world.duelist_token_protected_dispatcher()
                         .mint_duelists(
                             recipient,
-                            pack.pack_type.descriptor().quantity,
+                            quantity,
                             duelist_profile,
                             0,
+                            pool_type,
+                            lords_amount,
                         )
                     )
                 },

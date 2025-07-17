@@ -217,7 +217,7 @@ fn test_claim_purchase() {
 }
 
 #[test]
-#[should_panic(expected: ('BANK: insufficient LORDS pool', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
+#[should_panic(expected: ('BANK: insufficient LORDS pool', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
 fn test_claim_not_sponsored() {
     let mut sys: TestSystems = setup(0);
     assert!(sys.pack.can_claim_starter_pack(OWNER()), "can_claim_starter_pack_OWNER");
@@ -322,7 +322,7 @@ fn test_claim_gift() {
 }
 
 #[test]
-#[should_panic(expected: ('BANK: insufficient LORDS pool', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
+#[should_panic(expected: ('BANK: insufficient LORDS pool', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
 fn test_claim_gift_not_sponsored() {
     let mut sys: TestSystems = setup(0);
     // 1: claim starter pack -- DRAIN ALL LORDS

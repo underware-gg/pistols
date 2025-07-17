@@ -116,6 +116,12 @@ pub mod tester {
     pub fn OWNED_BY_OWNER() -> u128 { 0xeeee }
     pub fn OWNED_BY_OTHER() -> u128 { 0xdddd }
 
+    #[inline(always)]
+    pub fn ID(address: ContractAddress) -> u128 {
+        let as_u256: u256 = address.into();
+        (as_u256.low)
+    }
+
     pub fn MESSAGE() -> ByteArray {("For honour!!!")}
 
     pub const SEASON_ID_1: u32 = 1;
@@ -133,12 +139,6 @@ pub mod tester {
     #[inline(always)]
     pub fn ETH(value: u128) -> u128 {
         (value / CONST::ETH_TO_WEI.low)
-    }
-
-    #[inline(always)]
-    pub fn ID(address: ContractAddress) -> u128 {
-        let as_u256: u256 = address.into();
-        (as_u256.low)
     }
 
     // set_contract_address : to define the address of the calling contract,
