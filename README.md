@@ -132,7 +132,8 @@ curl -L https://install.dojoengine.org | bash
 # install each toolchain component...
 dojoup component add sozo v1.6.0
 dojoup component add katana v1.6.3
-dojoup component add torii v1.6.0-alpha.7
+dojoup component add torii v1.5.9
+# dojoup component add torii v1.6.0-alpha.7
 
 # test dojo
 cd dojo

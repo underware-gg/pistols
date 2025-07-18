@@ -61,6 +61,9 @@ export const getTournamentTokenAddress = (networkId: NetworkId): string => (getC
 // contracts
 export const getWorldAddress = (networkId: NetworkId): string => (manifests_per_network[networkId]?.world?.address ?? '0x0')
 export const getGameAddress = (networkId: NetworkId): string => (getContractByName(manifests_per_network[networkId], NAMESPACE, 'game')?.address ?? '0x0')
+export const getGameLoopAddress = (networkId: NetworkId): string => (getContractByName(manifests_per_network[networkId], NAMESPACE, 'game_loop')?.address ?? '0x0')
+export const getBotPlayerAddress = (networkId: NetworkId): string => (getContractByName(manifests_per_network[networkId], NAMESPACE, 'bot_player')?.address ?? '0x0')
+export const getTutorialAddress = (networkId: NetworkId): string => (getContractByName(manifests_per_network[networkId], NAMESPACE, 'tutorial')?.address ?? '0x0')
 export const getBankAddress = (networkId: NetworkId): string => (getContractByName(manifests_per_network[networkId], NAMESPACE, 'bank')?.address ?? '0x0')
 export const getAdminAddress = (networkId: NetworkId): string => (getContractByName(manifests_per_network[networkId], NAMESPACE, 'admin')?.address ?? '0x0')
 export const getVrfAddress = (networkId: NetworkId): string => (getNetworkConfig(networkId).vrfAddress || (getContractByName(manifests_per_network[networkId], NAMESPACE, 'vrf_mock')?.address ?? '0x0'))

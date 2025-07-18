@@ -70,6 +70,7 @@ build-external-contracts = [
 [tool.voyager]
 game = { path = "src/systems/game.cairo" }
 game_loop = { path = "src/systems/game_loop.cairo" }
+bot_player = { path = "src/systems/bot_player.cairo" }
 tutorial = { path = "src/systems/tutorial.cairo" }
 admin = { path = "src/systems/admin.cairo" }
 bank = { path = "src/systems/bank.cairo" }
@@ -78,4 +79,5 @@ fools_coin = { path = "src/tokens/fools_coin.cairo" }
 duel_token = { path = "src/tokens/duel_token.cairo" }
 duelist_token = { path = "src/tokens/duelist_token.cairo" }
 pack_token = { path = "src/tokens/pack_token.cairo" }
+ring_token = { path = "src/tokens/ring_token.cairo" }
 # tournament_token = { path = "src/tokens/tournament_token.cairo" }

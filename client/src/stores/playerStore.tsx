@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
@@ -10,13 +10,14 @@ import { useAllStoreModels, useStoreModelsByKeys } from '@underware/pistols-sdk/
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { useDuelistTokenStore } from '/src/stores/tokenStore'
 import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
-import { useMyChallenges } from '/src/stores/challengeStore'
 import { useRingIdsOfAccount } from '/src/hooks/useTokenRings'
+import { parseEnumVariant } from '@underware/pistols-sdk/starknet'
+import { getBotPlayerAddress, NetworkId } from '@underware/pistols-sdk/pistols/config'
+import { models, constants } from '@underware/pistols-sdk/pistols/gen'
 import { SortDirection } from '/src/stores/queryParamsStore'
 import { PlayerColumn } from '/src/stores/queryParamsStore'
 import { useTotals } from '/src/stores/duelistStore'
-import { models, constants } from '@underware/pistols-sdk/pistols/gen'
-import { parseEnumVariant } from '@underware/pistols-sdk/starknet'
+import * as ENV from '/src/utils/env'
 
 interface NamesByAddress {
   [address: string]: string
@@ -51,7 +52,8 @@ const createStore = () => {
   return create<State>()(immer((set, get) => ({
     players_names: {
       [_playerKey('0x04D92577856263bDe8E7601Ee189b6dbe52aCb879462489B92c0789f6c157E6c')]: '[Pistols Deployer]',
-      [_playerKey('0x0569d6f6080a3aB8678738De7Da68097796b11ECE78b21fD7FAe2Fd7505AB0Ba')]: 'The Bartender',
+      [_playerKey('0x0569d6f6080a3aB8678738De7Da68097796b11ECE78b21fD7FAe2Fd7505AB0Ba')]: 'The Bartender', // asset server / auto revealer
+      [_playerKey(getBotPlayerAddress(ENV.DEFAULT_NETWORK_ID as NetworkId))]: 'House Bots', // bot players
     },
     players_online: {},
     player_bookmarks: {},

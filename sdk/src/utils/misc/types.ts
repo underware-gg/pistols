@@ -49,7 +49,7 @@ export const isPositiveBigint = (v: BigNumberish | null): boolean => {
 export const isNumeric = (v: string | null): boolean => (v != null && /^\d+$/.test(v))
 
 export const shortAddress = (address: bigint | string | null) => {
-  const _address = (typeof address === 'bigint') ? bigintToHex(address) : address
+  const _address = (typeof address === 'bigint' || isBigint(address)) ? bigintToHex(address) : address
   const addresLength = 12
   const sliceStart = 6
   const sliceEnd = 4

@@ -6,7 +6,6 @@ import { usePool, useSeasonPool, UsePoolResult, useFundedStarterPackCount, usePu
 import { useFameBalance, useLordsBalance } from '/src/stores/coinStore'
 import { useERC20TotalSupply } from '@underware/pistols-sdk/utils/hooks'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
-import { usePackType } from '/src/stores/packStore'
 import { useConfig } from '/src/stores/configStore'
 import { ethToWei, weiToEth } from '@underware/pistols-sdk/starknet'
 import { bigintToDecimal, isBigint } from '@underware/pistols-sdk/utils'
@@ -227,8 +226,8 @@ function Pools() {
   const diffLords = useMemo(() => (bankLordsBalance - poolTotalLords), [bankLordsBalance, poolTotalLords])
   const diffFame = useMemo(() => (bankFameBalance - poolTotalFame), [bankFameBalance, poolTotalFame])
 
-  console.log("bank: diffLords", _formatWei(diffLords))
-  console.log("bank: diffFame", _formatWei(diffFame))
+  // console.log("bank: diffLords", _formatWei(diffLords))
+  // console.log("bank: diffFame", _formatWei(diffFame))
 
   return (
     <Table celled striped size='small' color='green'>
@@ -393,7 +392,7 @@ const useFameIntoLords = (balanceFame: bigint) => {
     (isBigint(balanceFame) && isBigint(fameSupply)) ? Math.floor((Number(weiToEth(balanceFame)) / Number(weiToEth(fameSupply))) * precision) : 0
   ), [balanceFame, fameSupply]);
   const result = useMemo(() => (BigInt(percentage) * peggedLords) / BigInt(precision), [percentage, peggedLords]);
-  console.log('useFameIntoLords', weiToEth(balanceFame), weiToEth(fameSupply), weiToEth(peggedLords), percentage, '>', weiToEth(result));
+  // console.log('useFameIntoLords', weiToEth(balanceFame), weiToEth(fameSupply), weiToEth(peggedLords), percentage, '>', weiToEth(result));
   return {
     fame: result,
     percentage: (percentage / precision) * 100,

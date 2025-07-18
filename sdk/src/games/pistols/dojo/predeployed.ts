@@ -1,4 +1,4 @@
-import { Account, AccountInterface, RpcProvider } from 'starknet'
+import { Account, AccountInterface, RpcProvider, constants } from 'starknet'
 import { Connector } from '@starknet-react/core'
 import { stringToFelt } from 'src/starknet/starknet'
 import { ExternalWallet } from "@cartridge/controller";
@@ -27,6 +27,7 @@ export class PredeployedConnector extends Connector {
       account.address,
       account.privateKey,
       '1',
+      constants.TRANSACTION_VERSION.V3,
     )
   }
 
