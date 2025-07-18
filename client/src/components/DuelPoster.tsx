@@ -34,6 +34,7 @@ import { useTransactionHandler } from '/src/hooks/useTransaction'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { showElementPopupNotification } from '/src/components/ui/ElementPopupNotification'
 import { SceneName } from '/src/data/assets'
+import { StampImage } from './ui/StampImage'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -74,26 +75,26 @@ const useDuelPosterData = (duelId?: bigint) => {
   } = useChallenge(duelId)
   const isCallToAction = useDuelCallToAction(duelId)
   
-  const { name: playerNameA, isBlocked: isBlockedA } = usePlayer(duelistAddressA)
-  const { name: playerNameB, isBlocked: isBlockedB } = usePlayer(duelistAddressB)
+  const { name: playerNameA } = usePlayer(duelistAddressA)
+  const { name: playerNameB } = usePlayer(duelistAddressB)
   const { isMyAccount: isYouA } = useIsMyAccount(duelistAddressA)
   const { isMyAccount: isYouB } = useIsMyAccount(duelistAddressB)
   const { avatarUrl: avatarUrlA, isLinked: isLinkedA } = useDiscordSocialLink(duelistAddressA)
   const { avatarUrl: avatarUrlB, isLinked: isLinkedB } = useDiscordSocialLink(duelistAddressB)
   
-  const [leftDuelistId, leftDuelistAddress, leftPlayerName, leftIsBlocked, leftIsLinked, leftAvatarUrl] = useMemo(() => {
+  const [leftDuelistId, leftDuelistAddress, leftPlayerName, leftIsLinked, leftAvatarUrl] = useMemo(() => {
     if (isYouB) {
-      return [duelistIdB, duelistAddressB, playerNameB, isBlockedB, isLinkedB, avatarUrlB]
+      return [duelistIdB, duelistAddressB, playerNameB, isLinkedB, avatarUrlB]
     }
-    return [duelistIdA, duelistAddressA, playerNameA, isBlockedA, isLinkedA, avatarUrlA]
-  }, [isYouB, duelistIdA, duelistIdB, duelistAddressA, duelistAddressB, playerNameA, playerNameB, isBlockedA, isBlockedB, isLinkedA, isLinkedB, avatarUrlA, avatarUrlB])
+    return [duelistIdA, duelistAddressA, playerNameA, isLinkedA, avatarUrlA]
+  }, [isYouB, duelistIdA, duelistIdB, duelistAddressA, duelistAddressB, playerNameA, playerNameB, isLinkedA, isLinkedB, avatarUrlA, avatarUrlB])
   
-  const [rightDuelistId, rightDuelistAddress, rightPlayerName, rightIsBlocked, rightIsLinked, rightAvatarUrl] = useMemo(() => {
+  const [rightDuelistId, rightDuelistAddress, rightPlayerName, rightIsLinked, rightAvatarUrl] = useMemo(() => {
     if (isYouB) {
-      return [duelistIdA, duelistAddressA, playerNameA, isBlockedA, isLinkedA, avatarUrlA]
+      return [duelistIdA, duelistAddressA, playerNameA, isLinkedA, avatarUrlA]
     }
-    return [duelistIdB, duelistAddressB, playerNameB, isBlockedB, isLinkedB, avatarUrlB]
-  }, [isYouB, duelistIdA, duelistIdB, duelistAddressA, duelistAddressB, playerNameA, playerNameB, isBlockedA, isBlockedB, isLinkedA, isLinkedB, avatarUrlA, avatarUrlB])
+    return [duelistIdB, duelistAddressB, playerNameB, isLinkedB, avatarUrlB]
+  }, [isYouB, duelistIdA, duelistIdB, duelistAddressA, duelistAddressB, playerNameA, playerNameB, isLinkedA, isLinkedB, avatarUrlA, avatarUrlB])
 
   const isDead = (duelistId: number) => {
     return duelistId !== Number(winnerDuelistId) && isFinished && !isCallToAction
@@ -103,13 +104,11 @@ const useDuelPosterData = (duelId?: bigint) => {
     leftDuelistId,
     leftDuelistAddress,
     leftPlayerName,
-    leftIsBlocked,
     leftIsLinked,
     leftAvatarUrl,
     rightDuelistId,
     rightDuelistAddress,
     rightPlayerName,
-    rightIsBlocked,
     rightIsLinked,
     rightAvatarUrl,
     isDead,
@@ -122,7 +121,7 @@ const useDuelPosterData = (duelId?: bigint) => {
 // Small version of the DuelPoster
 const DuelPosterSmall = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref) => {
   const { aspectWidth, aspectHeight } = useGameAspect()
-  const { leftDuelistId, rightDuelistId, leftPlayerName, rightPlayerName, isDead, isYouA, isYouB, leftIsBlocked, rightIsBlocked, isCallToAction, leftIsLinked, rightIsLinked, leftAvatarUrl, rightAvatarUrl } = useDuelPosterData(props.duelId)
+  const { leftDuelistId, leftDuelistAddress, rightDuelistId, rightDuelistAddress, leftPlayerName, rightPlayerName, isDead, isYouA, isYouB, isCallToAction, leftIsLinked, rightIsLinked, leftAvatarUrl, rightAvatarUrl } = useDuelPosterData(props.duelId)
   const { turnA, turnB } = useDuel(props.duelId)
   const { seasonName, isFinished } = useChallenge(props.duelId)
   const { seasonName: currentSeasonName } = useCurrentSeason()
@@ -206,7 +205,7 @@ const DuelPosterSmall = forwardRef<DuelPosterHandle, DuelPosterProps>((props, re
               />
               <img id='DefeatedOverlay' className={`Left ${isDead(Number(leftDuelistId)) ? 'visible' : ''}`} src='/textures/cards/card_disabled.png' />
             </div>
-            {leftIsBlocked && <div className='BlockedOverlay DuelSmall Left' />}
+            <StampImage playerAddress={leftDuelistAddress} size="DuelSmall" position="Left" />
             <div className='ProfilePicChallengeContainer Right Small'>
               <ProfilePic 
                 profilePic={rightIsLinked ? undefined : 0} 
@@ -219,7 +218,7 @@ const DuelPosterSmall = forwardRef<DuelPosterHandle, DuelPosterProps>((props, re
               />
               <img id='DefeatedOverlay' className={`Right ${isDead(Number(rightDuelistId)) ? 'visible' : ''}`} src='/textures/cards/card_disabled.png' />
             </div>
-            {rightIsBlocked && <div className='BlockedOverlay DuelSmall Right' />}
+            <StampImage playerAddress={rightDuelistAddress} size="DuelSmall" position="Right" />
           </div>
           <div className='PlayerNameA'>
             <p className='NoMargin Overflow NoBreak Bold Black'>{leftPlayerName}</p>
@@ -244,7 +243,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
   const { duel_token, game } = useDojoSystemCalls()
   const { account } = useAccount()
   const { duelistSelectOpener } = usePistolsContext()
-  const { leftDuelistId, rightDuelistId, leftDuelistAddress, rightDuelistAddress, leftPlayerName, rightPlayerName, isDead, isYouA, isYouB, leftIsBlocked, rightIsBlocked, isCallToAction, leftIsLinked, rightIsLinked, leftAvatarUrl, rightAvatarUrl } = useDuelPosterData(props.duelId)
+  const { leftDuelistId, rightDuelistId, leftDuelistAddress, rightDuelistAddress, leftPlayerName, rightPlayerName, isDead, isYouA, isYouB, isCallToAction, leftIsLinked, rightIsLinked, leftAvatarUrl, rightAvatarUrl } = useDuelPosterData(props.duelId)
   const { fameBefore: fameBeforeA, fameAfter: fameAfterA } = useDuelistFameOnDuel(props.duelId, leftDuelistId)
   const { fameBefore: fameBeforeB, fameAfter: fameAfterB } = useDuelistFameOnDuel(props.duelId, rightDuelistId)
 
@@ -410,7 +409,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
                 removeBorder removeCorners className='ProfilePicChallenge Left' onClick={() => dispatchSelectPlayerAddress(leftDuelistAddress)} />
               <img id='DefeatedOverlay' className={`NoMouse NoDrag Left ${isDead(Number(leftDuelistId)) ? 'visible' : ''}`} src='/textures/cards/card_disabled.png' />
             </div>
-            {leftIsBlocked && <div className='BlockedOverlay DuelLarge Left' />}
+            <StampImage playerAddress={leftDuelistAddress} size="DuelLarge" position="Left" />
             <div className='VS'>
               VS
             </div>
@@ -424,7 +423,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
                 removeBorder removeCorners className='ProfilePicChallenge Right' onClick={() => dispatchSelectPlayerAddress(rightDuelistAddress)} />
               <img id='DefeatedOverlay' className={`NoMouse NoDrag Right ${isDead(Number(rightDuelistId)) ? 'visible' : ''}`} src='/textures/cards/card_disabled.png' />
             </div>
-            {rightIsBlocked && <div className='BlockedOverlay DuelLarge Right' />}
+            <StampImage playerAddress={rightDuelistAddress} size="DuelLarge" position="Right" />
           </div>
           <div className='PlayerNameA Large'>
             <p className='NoMargin Overflow NoBreak Bold Black'>{leftPlayerName}</p>

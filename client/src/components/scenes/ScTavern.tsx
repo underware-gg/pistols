@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react'
-import { usePistolsScene } from '/src/hooks/PistolsContext'
+import { usePistolsScene, usePistolsContext } from '/src/hooks/PistolsContext'
 import { SceneName, TextureName } from '/src/data/assets'
 import { useGameEvent } from '/src/hooks/useGameEvent'
 import { DojoSetupErrorDetector } from '/src/components/account/DojoSetupErrorDetector'
@@ -13,9 +13,13 @@ import { useGameAspect } from '/src/hooks/useGameAspect'
 import { useNotifications } from '/src/stores/notificationStore'
 import * as TWEEN from '@tweenjs/tween.js'
 import { emitter } from '/src/three/game'
+import { useAccount } from '@starknet-react/core'
+import { useDuelIdsForClaimingRings } from '/src/queries/useDuelIdsForClaimingRings'
+import { useHasClaimedRing } from '/src/hooks/usePistolsContractCalls'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 export default function ScTavern() {
-
+  
   useEffect(() => {
     if (!open && _currentScene && _currentScene instanceof InteractibleScene) {
       (_currentScene as InteractibleScene)?.toggleBlur?.(false);
@@ -29,12 +33,58 @@ export default function ScTavern() {
   return (
     <div>
       <NotificationExclamation />
+      <TavernRingsChecker />
 
       <ActivityPanel />
 
       <DojoSetupErrorDetector />
     </div>
   )
+}
+
+function TavernRingsChecker() {
+  const { address, isConnected } = useAccount()
+  const { tavernRingsOpener } = usePistolsContext()
+  const { goldRingDuelIds, silverRingDuelIds, leadRingDuelIds } = useDuelIdsForClaimingRings()
+  const { hasClaimed: hasClaimedGold } = useHasClaimedRing(address, constants.RingType.GoldSignetRing)
+  const { hasClaimed: hasClaimedSilver } = useHasClaimedRing(address, constants.RingType.SilverSignetRing)
+  const { hasClaimed: hasClaimedLead } = useHasClaimedRing(address, constants.RingType.LeadSignetRing)
+  
+  const [hasCheckedSession, setHasCheckedSession] = useState(false)
+  
+  // Check for claimable rings and open modal if available 💍
+  useEffect(() => {
+    if (!isConnected || !address || hasCheckedSession) return
+    
+    const hasClaimableRings = (
+      (goldRingDuelIds.length > 0 && !hasClaimedGold) ||
+      (silverRingDuelIds.length > 0 && !hasClaimedSilver) ||
+      (leadRingDuelIds.length > 0 && !hasClaimedLead)
+    )
+    
+    if (hasClaimableRings) {
+      // Small delay for a more natural feel, like the grumpy bartender noticing you 🍺
+      setTimeout(() => {
+        tavernRingsOpener.open()
+      }, 2000)
+    }
+    
+    setHasCheckedSession(true)
+  }, [
+    isConnected, address, hasCheckedSession,
+    goldRingDuelIds.length, silverRingDuelIds.length, leadRingDuelIds.length,
+    hasClaimedGold, hasClaimedSilver, hasClaimedLead,
+    tavernRingsOpener
+  ])
+  
+  // Reset check when user disconnects (tentacle cleanup! 🐙)
+  useEffect(() => {
+    if (!isConnected) {
+      setHasCheckedSession(false)
+    }
+  }, [isConnected])
+  
+  return null // This component only handles logic, no UI
 }
 
 //
