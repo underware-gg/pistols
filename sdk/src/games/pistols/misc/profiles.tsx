@@ -204,7 +204,8 @@ const genesisQuotes: Record<GenesisKey, string> = {
 };
 const legendsQuotes: Record<LegendsKey, string> = {
   [LegendsKey.Unknown]: "...",
-  [LegendsKey.TGC1]: "The Golden Company legend.",
+  [LegendsKey.TGC1]: "Gold buys lead, lead buys death, death buys gold, so give me your gold, or die.",
+  [LegendsKey.TGC2]: "Whether by grape or grapeshot, the soil will drink its fill of red this angry morn.",
 };
 
 export const getProfileQuote = (profileType: DuelistProfile, profileKey: DuelistProfileKey): string => {
@@ -310,6 +311,7 @@ const genesisGenders: Record<GenesisKey, DuelistGender> = {
 const legendsGenders: Record<LegendsKey, DuelistGender> = {
   [LegendsKey.Unknown]: 'Male',
   [LegendsKey.TGC1]: 'Male',
+  [LegendsKey.TGC2]: 'Male',
 };
 
 export const getProfileGender = (profileType: DuelistProfile, profileKey: DuelistProfileKey): DuelistGender => {

@@ -110,6 +110,7 @@ pub enum GenesisKey {
 pub enum LegendsKey {
     Unknown,
     TGC1,
+    TGC2,
 }
 
 
@@ -161,7 +162,7 @@ mod COLLECTIONS {
     pub const Legends: CollectionDescriptor = CollectionDescriptor {
         name: 'Legends Collection',
         folder_name: 'legends',
-        profile_count: 1,
+        profile_count: 2,
         is_playable: true,
         duelist_id_base: 0, // playable characters do not convert to duelist_id
     };
@@ -438,7 +439,10 @@ mod LEGENDS_PROFILES {
         name: 'Unknown',
     };
     pub const TGC1: ProfileDescriptor = ProfileDescriptor { // 1
-        name: 'TGC1',
+        name: 'Dread Corsair Rick',
+    };
+    pub const TGC2: ProfileDescriptor = ProfileDescriptor { // 1
+        name: 'King Angre the Crimson',
     };
 }
 
@@ -706,6 +710,7 @@ impl LegendsKeyIntoDescriptor of core::traits::Into<LegendsKey, ProfileDescripto
         match self {
             LegendsKey::Unknown =>          LEGENDS_PROFILES::Unknown,
             LegendsKey::TGC1 =>             LEGENDS_PROFILES::TGC1,             // 1
+            LegendsKey::TGC2 =>             LEGENDS_PROFILES::TGC2,             // 2
         }
     }
 }
@@ -909,12 +914,14 @@ impl LegendsKeyIntoU8 of core::traits::Into<LegendsKey, u8> {
         match self {
             LegendsKey::Unknown =>         0,
             LegendsKey::TGC1 =>            1,
+            LegendsKey::TGC2 =>            2,
         }
     }
 }
 impl U8IntoLegendsKey of core::traits::Into<u8, LegendsKey> {
     fn into(self: u8) -> LegendsKey {
         if self == 1        { LegendsKey::TGC1 }
+        else if self == 2   { LegendsKey::TGC2 }
         else                { LegendsKey::Unknown }
     }
 }
