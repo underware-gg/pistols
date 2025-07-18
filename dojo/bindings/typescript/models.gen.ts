@@ -151,6 +151,7 @@ export interface Player {
 	timestamps: PlayerTimestamps;
 	totals: Totals;
 	alive_duelist_count: BigNumberish;
+	active_signet_ring: RingTypeEnum;
 }
 
 // Type definition for `pistols::models::player::PlayerDuelistStack` struct
@@ -920,6 +921,11 @@ export const schema: SchemaType = {
 		timestamps: { registered: 0, claimed_gift: 0, claimed_starter_pack: false, },
 		totals: { total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour: 0, honour_log: 0, },
 			alive_duelist_count: 0,
+		active_signet_ring: new CairoCustomEnum({ 
+					Unknown: "",
+				GoldSignetRing: undefined,
+				SilverSignetRing: undefined,
+				LeadSignetRing: undefined, }),
 		},
 		PlayerDuelistStack: {
 			player_address: "",
