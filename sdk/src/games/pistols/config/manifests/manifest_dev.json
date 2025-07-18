@@ -1,7 +1,7 @@
 {
   "world": {
-    "class_hash": "0x7746f30d2b8494780387ed469797ecb5c62c7b6f49f4939a5e60e0f7ae5f99e",
-    "address": "0x6dee289c31fe8daef42ad5450afa2f698f0010230ec47dc8abb867662dca46a",
+    "class_hash": "0x685ed02eefa98fe7e208aa295042e9bbad8029b0d3d6f0ba2b32546efe0a1f9",
+    "address": "0x58ca23990489e8dda5ed6320d84b059841aef493373bbdc25c01bd87a3aac64",
     "seed": "pistols",
     "name": "Pistols at Dawn",
     "entrypoints": [
@@ -1328,8 +1328,8 @@
   },
   "contracts": [
     {
-      "address": "0x5f0f00afc60a86059c9f9d4e28cabb93f4bee4d6f06ceb9cab64253e70267a0",
-      "class_hash": "0x3c3c569bd2f47c18846b07aad736fc85e232f0686515efa565ba4d3cc9efb38",
+      "address": "0x2d7d8605e603735957c596cb576cc60b74d168ee96d1809e691547c5c466dee",
+      "class_hash": "0x7fa1a64b492c18ebd782e5c9afabd5d0a0b43b9155dafb7cfcb944aca85494",
       "abi": [
         {
           "type": "impl",
@@ -1706,8 +1706,8 @@
       ]
     },
     {
-      "address": "0x7b4fecfec1b2783b65babf6d6cae2d4625ee747ba4f4410266a20c5ed634a13",
-      "class_hash": "0x7c25af4f3251acc7a476408dbdb7c2f075a5411fb1bd0bf321c7ce8b33b410b",
+      "address": "0x10a6a286f4bcd7607e9ba2ace28ff6458369dece48fad605d7662f98892aad3",
+      "class_hash": "0x7fd5f7e3fbf86d5f7ae46f41e366d747d898d4f35cb4d94ff362dc42447b9df",
       "abi": [
         {
           "type": "impl",
@@ -2184,8 +2184,282 @@
       ]
     },
     {
-      "address": "0x60c2a1f2624ff6ce36a6dc65b8155d6dfcd7f3845d4fc7e894f0b1341d50678",
-      "class_hash": "0x3586723bf3d0ec975eb1f30a18abb7f146135998fa85967c777fd05ab3cf607",
+      "address": "0x327f305007c6fb883f22f8ba94dbd04d96c09a049b4d660fd208f45ea560814",
+      "class_hash": "0x67763ef8b4d3eaa8aa875db2de356585544a73feaf8e3d21abdca530762f4bc",
+      "abi": [
+        {
+          "type": "impl",
+          "name": "bot_player__ContractImpl",
+          "interface_name": "dojo::contract::interface::IContract"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::interface::IContract",
+          "items": []
+        },
+        {
+          "type": "impl",
+          "name": "bot_player__DeployedContractImpl",
+          "interface_name": "dojo::meta::interface::IDeployedResource"
+        },
+        {
+          "type": "struct",
+          "name": "core::byte_array::ByteArray",
+          "members": [
+            {
+              "name": "data",
+              "type": "core::array::Array::<core::bytes_31::bytes31>"
+            },
+            {
+              "name": "pending_word",
+              "type": "core::felt252"
+            },
+            {
+              "name": "pending_word_len",
+              "type": "core::integer::u32"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "dojo::meta::interface::IDeployedResource",
+          "items": [
+            {
+              "type": "function",
+              "name": "dojo_name",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "BotPlayerImpl",
+          "interface_name": "pistols::systems::bot_player::IBotPlayer"
+        },
+        {
+          "type": "interface",
+          "name": "pistols::systems::bot_player::IBotPlayer",
+          "items": [
+            {
+              "type": "function",
+              "name": "make_salt",
+              "inputs": [
+                {
+                  "name": "duel_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::felt252"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "reveal_moves",
+              "inputs": [
+                {
+                  "name": "duel_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "IBotPlayerProtectedImpl",
+          "interface_name": "pistols::systems::bot_player::IBotPlayerProtected"
+        },
+        {
+          "type": "interface",
+          "name": "pistols::systems::bot_player::IBotPlayerProtected",
+          "items": [
+            {
+              "type": "function",
+              "name": "reply_duel",
+              "inputs": [
+                {
+                  "name": "duel_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "commit_moves",
+              "inputs": [
+                {
+                  "name": "duel_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "transfer_to_winner",
+              "inputs": [
+                {
+                  "name": "duel_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "duelist_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "recipient",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "function",
+          "name": "dojo_init",
+          "inputs": [],
+          "outputs": [],
+          "state_mutability": "view"
+        },
+        {
+          "type": "impl",
+          "name": "WorldProviderImpl",
+          "interface_name": "dojo::contract::components::world_provider::IWorldProvider"
+        },
+        {
+          "type": "struct",
+          "name": "dojo::world::iworld::IWorldDispatcher",
+          "members": [
+            {
+              "name": "contract_address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::components::world_provider::IWorldProvider",
+          "items": [
+            {
+              "type": "function",
+              "name": "world_dispatcher",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "dojo::world::iworld::IWorldDispatcher"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "UpgradeableImpl",
+          "interface_name": "dojo::contract::components::upgradeable::IUpgradeable"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::components::upgradeable::IUpgradeable",
+          "items": [
+            {
+              "type": "function",
+              "name": "upgrade",
+              "inputs": [
+                {
+                  "name": "new_class_hash",
+                  "type": "core::starknet::class_hash::ClassHash"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "constructor",
+          "name": "constructor",
+          "inputs": []
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "class_hash",
+              "type": "core::starknet::class_hash::ClassHash",
+              "kind": "data"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "Upgraded",
+              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
+              "kind": "nested"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::world_provider::world_provider_cpt::Event",
+          "kind": "enum",
+          "variants": []
+        },
+        {
+          "type": "event",
+          "name": "pistols::systems::bot_player::bot_player::Event",
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "UpgradeableEvent",
+              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
+              "kind": "nested"
+            },
+            {
+              "name": "WorldProviderEvent",
+              "type": "dojo::contract::components::world_provider::world_provider_cpt::Event",
+              "kind": "nested"
+            }
+          ]
+        }
+      ],
+      "init_calldata": [],
+      "tag": "pistols-bot_player",
+      "selector": "0x22366a4c25ee7406d1d3bd13fab733b310945461fda8a7c721412ac7c01de53",
+      "systems": [
+        "reveal_moves",
+        "reply_duel",
+        "commit_moves",
+        "transfer_to_winner",
+        "upgrade"
+      ]
+    },
+    {
+      "address": "0x5ce766cba4af7cee1213c4a5e282958a6ee5517f876a9311197acddaa7a801a",
+      "class_hash": "0x70a0d456257de966caa841c6cd5659430fffe6e3f9fce957d22316a424a855c",
       "abi": [
         {
           "type": "impl",
@@ -2280,6 +2554,10 @@
             },
             {
               "name": "Practice",
+              "type": "()"
+            },
+            {
+              "name": "BotPlayer",
               "type": "()"
             }
           ]
@@ -3494,8 +3772,8 @@
       ]
     },
     {
-      "address": "0x28948a59b0366849699f3a626e693831cc1810f97a0b6b7b22914b1c09ad1e7",
-      "class_hash": "0x5d351b7a1f70110a33e8babeb8d67994e16e5aab6e99fac9dbad104cad44979",
+      "address": "0x551ca22142e2519a86bf13e1570888c0cdf5eff2308d55c9dcfd498a9531f96",
+      "class_hash": "0x32b4852e7372e499097835bdfe4918603525b49bcd032c46a0fcac921045acc",
       "abi": [
         {
           "type": "impl",
@@ -4100,6 +4378,40 @@
           ]
         },
         {
+          "type": "enum",
+          "name": "pistols::models::pool::PoolType",
+          "variants": [
+            {
+              "name": "Undefined",
+              "type": "()"
+            },
+            {
+              "name": "Purchases",
+              "type": "()"
+            },
+            {
+              "name": "FamePeg",
+              "type": "()"
+            },
+            {
+              "name": "Season",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "Tournament",
+              "type": "core::integer::u64"
+            },
+            {
+              "name": "Sacrifice",
+              "type": "()"
+            },
+            {
+              "name": "Claimable",
+              "type": "()"
+            }
+          ]
+        },
+        {
           "type": "struct",
           "name": "core::array::Span::<core::integer::u128>",
           "members": [
@@ -4131,6 +4443,10 @@
             },
             {
               "name": "Practice",
+              "type": "()"
+            },
+            {
+              "name": "BotPlayer",
               "type": "()"
             }
           ]
@@ -4384,6 +4700,14 @@
                 {
                   "name": "seed",
                   "type": "core::felt252"
+                },
+                {
+                  "name": "pool_type",
+                  "type": "pistols::models::pool::PoolType"
+                },
+                {
+                  "name": "lords_amount",
+                  "type": "core::integer::u128"
                 }
               ],
               "outputs": [
@@ -5412,7 +5736,7 @@
       ]
     },
     {
-      "address": "0x56a06cbeae8a77770ea5fceb6b5e8113cfaf000f2b372e6aef350c080c3c4a1",
+      "address": "0x221241d8cc8f9ad073b99333fc3f46ea32f589ec72c57467d06b6b3992c2471",
       "class_hash": "0xe5a1abdb44ab2cf2c91936249d5629d9eabe01aa6912e936dcb1a463724f2",
       "abi": [
         {
@@ -6115,7 +6439,7 @@
       ]
     },
     {
-      "address": "0x465bda029eb6a3dc8299de70354f62a7ad0a64e0181f164ed1335b36d21793d",
+      "address": "0x1b2f0e35ee7187ceb191575c5eaf9b5a19a193007c2668c7a11d32862d6251",
       "class_hash": "0x45f4a9d3c0c961034721bdbb0a545b505508482c09c44e7c7525ec2cfb74c7e",
       "abi": [
         {
@@ -6635,8 +6959,8 @@
       ]
     },
     {
-      "address": "0x4dcb787b207271e01715ba454119eb3264162445331ea256899102ec0a057e9",
-      "class_hash": "0x416f8d28b3c67dbd8be425a40fc94d88b1108f5636992c9ce6fb2923b6e75e5",
+      "address": "0x7d4d16581c907e6cbdab1a3d8d3d17f76bfe2ad17157174ea1e0d2e6f3b253a",
+      "class_hash": "0x655538f5df24a386e5bfe87bd8235d97402d1947df1bad2931b99acc2459ea0",
       "abi": [
         {
           "type": "impl",
@@ -7616,7 +7940,7 @@
       ]
     },
     {
-      "address": "0x312dee156e9d952180f44e780daa7322d908da1532e0209c5f118fc8aa7a491",
+      "address": "0x776ce09bfb163a31036653bf3a9849393ef8ef8a9bbf578387305e501ed5d84",
       "class_hash": "0x35b3a7047b92ddb5d2deaf1b3db751bf36c879b6251713c9418c822c9a08e1c",
       "abi": [
         {
@@ -8375,7 +8699,7 @@
       ]
     },
     {
-      "address": "0x4923f087d9fa182cf2ebed9bc7f89adb6b4c8bfda1dcacc8044c697515c0586",
+      "address": "0x2e7b95c0f4b42eb68e359b1c8d00da3bacda9f9c2bc579035a841543cc5b08",
       "class_hash": "0x1588ed91063d3b1c8d0c8121f9a0f99209cda8c4faee0beca20bc3e24aa7238",
       "abi": [
         {
@@ -8915,8 +9239,8 @@
       ]
     },
     {
-      "address": "0x12c304caf724d7875cf6ed7a7c3fd9c1220b02ffc47af3ad48f4af00183c70e",
-      "class_hash": "0x773c45fb8f2ecb1d54bad3bec8311022f2b2f75fe8b2fa0a20dde2292f9bf20",
+      "address": "0x4033a5c37362598411f35caa0da068b3a7cbd7b8190a071434e5ef2dafab727",
+      "class_hash": "0x3c626d06174e1c11eea46e96ae39ffc4e2b97b6d08ce54265bab464c6d6e03",
       "abi": [
         {
           "type": "impl",
@@ -9021,6 +9345,10 @@
             },
             {
               "name": "SingleDuelist",
+              "type": "()"
+            },
+            {
+              "name": "BotDuelist",
               "type": "()"
             }
           ]
@@ -9573,6 +9901,33 @@
               "outputs": [
                 {
                   "type": "core::array::Span::<core::integer::u128>"
+                }
+              ],
+              "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "PackTokenProtectedImpl",
+          "interface_name": "pistols::systems::tokens::pack_token::IPackTokenProtected"
+        },
+        {
+          "type": "interface",
+          "name": "pistols::systems::tokens::pack_token::IPackTokenProtected",
+          "items": [
+            {
+              "type": "function",
+              "name": "mint_bot_duelist",
+              "inputs": [
+                {
+                  "name": "duelist_profile",
+                  "type": "pistols::types::duelist_profile::DuelistProfile"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u128"
                 }
               ],
               "state_mutability": "external"
@@ -10533,6 +10888,7 @@
         "purchase",
         "airdrop",
         "open",
+        "mint_bot_duelist",
         "upgrade",
         "safe_transfer_from",
         "transfer_from",
@@ -10547,8 +10903,8 @@
       ]
     },
     {
-      "address": "0x7756bf0018a433dcf37e1d1d4d32eed0e4041a7f09624c828740e0e7d0ecd8e",
-      "class_hash": "0x395dbb8d410dc89ebaab2065e95fb8ab00ceb944e085c6f803cbf3f32cc4fa4",
+      "address": "0x44426b148e4ea09fa50f70fba5cc768fa463be397cffe96c82c9e05296a030d",
+      "class_hash": "0x7761787e514315f04239ed7d17ae3919c17571332683fdbab3400c5216972ce",
       "abi": [
         {
           "type": "impl",
@@ -11738,7 +12094,7 @@
       ]
     },
     {
-      "address": "0xf058259a3dd52088485a1f9eed2af2b1c3deaf6aab04321f65dd0820e82c46",
+      "address": "0x7541d34cda72c58a2c802e49d516f5371dcb09af4c2deff446957c46bc517d0",
       "class_hash": "0x441b500039f5f95100d43f94d4290c39a1a85ad16e9314151f2bbbd3ed68688",
       "abi": [
         {
@@ -12007,7 +12363,7 @@
       ]
     },
     {
-      "address": "0x5c640117116405523f46593bf564269beb84a398e47f5d29e1206b3ea38bf77",
+      "address": "0x49cd913386dcaf0aa2a85cf929e6bf73851b0e3dde7205c5742d0dea6f296a5",
       "class_hash": "0x1e59282be83ac9b2cd0e293fd23186df616fa1ac69a6733f9d42f717b3c276a",
       "abi": [
         {
@@ -12300,8 +12656,8 @@
       ]
     },
     {
-      "address": "0x2ea0f769d27da04cdae64a4d6a76c06a5f24398816ca69da26215e103a1001a",
-      "class_hash": "0x7ebafb74874f915eaa34e2288da578f14155d891ff7dcf27f5b2f680e48c759",
+      "address": "0x1be1010e604a87f3e0aed632b61f151925b369f3c6a8f1637ed721db9a90612",
+      "class_hash": "0x7be932b8f3fcce60ab603eb86ac49396b9a3f828024ab2191c6c54a06c83347",
       "abi": [
         {
           "type": "impl",
@@ -12945,8 +13301,8 @@
       ]
     },
     {
-      "address": "0x2d8fb12e049008c7f2be0668566a8455dd75261431c0f7f753c8c4e532ef3dd",
-      "class_hash": "0x2828fcd69654e1c959fe4b7d3429cb6eaa432a1a4a20e6e35e3ca878630746d",
+      "address": "0x30e50a1ebedd084d643dd0bca56aaece02ac69535b22ccff1b1159ad03bcbaf",
+      "class_hash": "0x1a0f6f6d260f10c898b3d7c8a9d7914d9fba7658330624b6ac6f6466369774a",
       "abi": [
         {
           "type": "impl",
@@ -13183,7 +13539,7 @@
   "models": [
     {
       "members": [],
-      "class_hash": "0x441550e8b41c7026e0c1c42c86bc3426caca725d6e1d33e8b7f923b9c25cef4",
+      "class_hash": "0x74fac4fe0182e88af5bb65e4b13270f249fcc5e23a762483e2d0fe8a3855b16",
       "tag": "pistols-Challenge",
       "selector": "0x673267b69d74c703ea86d97b041278944b49f62b52867345a95d3047b11378a"
     },
@@ -13237,13 +13593,13 @@
     },
     {
       "members": [],
-      "class_hash": "0x37decd52ee24a3ed37ff2b66e7b428cda5cce5774f6b59569fb4ae4ec1ae5b5",
+      "class_hash": "0x7291ead400d7af540c3ed38027f0cd462c26ea5b34ee674885601515ae9299b",
       "tag": "pistols-Pack",
       "selector": "0x64159b4947adcdc7a87b41f7889ba33495ac8e3a3a333305c7712806763fa2d"
     },
     {
       "members": [],
-      "class_hash": "0x7dc4ac6d434c583dfb188db5a9b65334cae6ed9f8de2ae60cfbe4b0383602f1",
+      "class_hash": "0x6aa6d89c2a43b93d164bc5c4b41afb9b89f53fe3e812d0bd325a9e771ee401b",
       "tag": "pistols-Pact",
       "selector": "0x72a33a6586ae24471fdae1c6f3cc9da6629f3fd3dce300a48324617dd511617"
     },
@@ -13303,7 +13659,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x216e39bf21ec08bef2e84224564408dbbba1b081b9e45760529d552d90319b3",
+      "class_hash": "0x14e87e626c23c0b6d25b1ac16c89ec9f85c90e342a984caa7dd3af6e2ed582e",
       "tag": "pistols-SeasonConfig",
       "selector": "0x407b92d935dd7193931243082059cb7180309a73de27eea948ffa0649f6ebf3"
     },

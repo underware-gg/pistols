@@ -90,6 +90,7 @@ export enum DuelType {
   Tournament = 'Tournament', // 2
   Tutorial = 'Tutorial', // 3
   Practice = 'Practice', // 4
+  BotPlayer = 'BotPlayer', // 5
 };
 export const getDuelTypeValue = (name: DuelType): number | undefined => _indexOrUndefined(Object.keys(DuelType).indexOf(name));
 export const getDuelTypeFromValue = (value: number): DuelType | undefined => Object.keys(DuelType)[value] as DuelType;
@@ -193,6 +194,7 @@ export enum PackType {
   GenesisDuelists5x = 'GenesisDuelists5x', // 2
   FreeDuelist = 'FreeDuelist', // 3
   SingleDuelist = 'SingleDuelist', // 4
+  BotDuelist = 'BotDuelist', // 5
 };
 export const getPackTypeValue = (name: PackType): number | undefined => _indexOrUndefined(Object.keys(PackType).indexOf(name));
 export const getPackTypeFromValue = (value: number): PackType | undefined => Object.keys(PackType)[value] as PackType;
@@ -550,6 +552,7 @@ export const getRoundStateMap = (): Record<RoundState, number> => Object.keys(Ro
 export enum Rules {
   Undefined = 'Undefined', // 0
   Season = 'Season', // 1
+  Unranked = 'Unranked', // 2
 };
 export const getRulesValue = (name: Rules): number | undefined => _indexOrUndefined(Object.keys(Rules).indexOf(name));
 export const getRulesFromValue = (value: number): Rules | undefined => Object.keys(Rules)[value] as Rules;
@@ -762,6 +765,7 @@ type type_SELECTORS = {
   BANK: bigint, // cairo: felt252
   GAME: bigint, // cairo: felt252
   GAME_LOOP: bigint, // cairo: felt252
+  BOT_PLAYER: bigint, // cairo: felt252
   RNG: bigint, // cairo: felt252
   RNG_MOCK: bigint, // cairo: felt252
   DUEL_TOKEN: bigint, // cairo: felt252
@@ -779,6 +783,7 @@ export const SELECTORS: type_SELECTORS = {
   BANK: BigInt('0x07a683ab68bc70300995da8de5781002e781f22ba246fe239ebeff02b2230375'), // selector_from_tag!("pistols-bank")
   GAME: BigInt('0x032c102830cbffaddecbdce7ef85735e6f08da08ee762a2d7b09304b6533dd57'), // selector_from_tag!("pistols-game")
   GAME_LOOP: BigInt('0x01bf3dd2b828d461e19dc794352723ae8d8a1760c61b936a916cf3b4de8d5b9f'), // selector_from_tag!("pistols-game_loop")
+  BOT_PLAYER: BigInt('0x022366a4c25ee7406d1d3bd13fab733b310945461fda8a7c721412ac7c01de53'), // selector_from_tag!("pistols-bot_player")
   RNG: BigInt('0x013f1a6a9ae118440a997d6624230b59f43516220a1208526c3f66e202910504'), // selector_from_tag!("pistols-rng")
   RNG_MOCK: BigInt('0x00fbd28ccd9cffb9b1783a0bf7cdf42a9b88c49d4568116cd1f7ee70ba415705'), // selector_from_tag!("pistols-rng_mock")
   DUEL_TOKEN: BigInt('0x0670a5c673ac776e00e61c279cf7dc0efbe282787f4d719498e55643c5116063'), // selector_from_tag!("pistols-duel_token")
@@ -807,6 +812,7 @@ type type_PACK_TYPES = {
   GenesisDuelists5x: PackDescriptor, // cairo: PackDescriptor
   FreeDuelist: PackDescriptor, // cairo: PackDescriptor
   SingleDuelist: PackDescriptor, // cairo: PackDescriptor
+  BotDuelist: PackDescriptor, // cairo: PackDescriptor
 };
 export const PACK_TYPES: type_PACK_TYPES = {
   Unknown: {
@@ -858,6 +864,16 @@ export const PACK_TYPES: type_PACK_TYPES = {
     price_lords: (10n * CONST.ETH_TO_WEI),
     quantity: 1,
     contents: 'One Special Duelist',
+  },
+  BotDuelist: {
+    id: 'BotDuelist',
+    name: 'Bot Duelist',
+    image_file_closed: 'Unknown.jpg',
+    image_file_open: 'Unknown.jpg',
+    can_purchase: false,
+    price_lords: (10n * CONST.ETH_TO_WEI),
+    quantity: 1,
+    contents: 'One Bot Duelist',
   },
 };
 
