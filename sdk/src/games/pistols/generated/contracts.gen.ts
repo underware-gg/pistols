@@ -374,6 +374,107 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
+	const build_bot_player_commitMoves_calldata = (duelId: BigNumberish): DojoCall => {
+		return {
+			contractName: "bot_player",
+			entrypoint: "commit_moves",
+			calldata: [duelId],
+		};
+	};
+
+	const bot_player_commitMoves = async (snAccount: Account | AccountInterface, duelId: BigNumberish) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_bot_player_commitMoves_calldata(duelId),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_bot_player_makeSalt_calldata = (duelId: BigNumberish): DojoCall => {
+		return {
+			contractName: "bot_player",
+			entrypoint: "make_salt",
+			calldata: [duelId],
+		};
+	};
+
+	const bot_player_makeSalt = async (duelId: BigNumberish) => {
+		try {
+			return await provider.call("pistols", build_bot_player_makeSalt_calldata(duelId));
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_bot_player_replyDuel_calldata = (duelId: BigNumberish): DojoCall => {
+		return {
+			contractName: "bot_player",
+			entrypoint: "reply_duel",
+			calldata: [duelId],
+		};
+	};
+
+	const bot_player_replyDuel = async (snAccount: Account | AccountInterface, duelId: BigNumberish) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_bot_player_replyDuel_calldata(duelId),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_bot_player_revealMoves_calldata = (duelId: BigNumberish): DojoCall => {
+		return {
+			contractName: "bot_player",
+			entrypoint: "reveal_moves",
+			calldata: [duelId],
+		};
+	};
+
+	const bot_player_revealMoves = async (snAccount: Account | AccountInterface, duelId: BigNumberish) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_bot_player_revealMoves_calldata(duelId),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_bot_player_transferToWinner_calldata = (duelId: BigNumberish, duelistId: BigNumberish, recipient: string): DojoCall => {
+		return {
+			contractName: "bot_player",
+			entrypoint: "transfer_to_winner",
+			calldata: [duelId, duelistId, recipient],
+		};
+	};
+
+	const bot_player_transferToWinner = async (snAccount: Account | AccountInterface, duelId: BigNumberish, duelistId: BigNumberish, recipient: string) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_bot_player_transferToWinner_calldata(duelId, duelistId, recipient),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 	const build_duel_token_approve_calldata = (to: string, tokenId: BigNumberish): DojoCall => {
 		return {
 			contractName: "duel_token",
@@ -1276,19 +1377,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_duelist_token_mintDuelists_calldata = (recipient: string, quantity: BigNumberish, profileType: CairoCustomEnum, seed: BigNumberish): DojoCall => {
+	const build_duelist_token_mintDuelists_calldata = (recipient: string, quantity: BigNumberish, profileType: CairoCustomEnum, seed: BigNumberish, poolType: CairoCustomEnum, lordsAmount: BigNumberish): DojoCall => {
 		return {
 			contractName: "duelist_token",
 			entrypoint: "mint_duelists",
-			calldata: [recipient, quantity, profileType, seed],
+			calldata: [recipient, quantity, profileType, seed, poolType, lordsAmount],
 		};
 	};
 
-	const duelist_token_mintDuelists = async (snAccount: Account | AccountInterface, recipient: string, quantity: BigNumberish, profileType: CairoCustomEnum, seed: BigNumberish) => {
+	const duelist_token_mintDuelists = async (snAccount: Account | AccountInterface, recipient: string, quantity: BigNumberish, profileType: CairoCustomEnum, seed: BigNumberish, poolType: CairoCustomEnum, lordsAmount: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_duelist_token_mintDuelists_calldata(recipient, quantity, profileType, seed),
+				build_duelist_token_mintDuelists_calldata(recipient, quantity, profileType, seed, poolType, lordsAmount),
 				"pistols",
 			);
 		} catch (error) {
@@ -3042,6 +3143,27 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
+	const build_pack_token_mintBotDuelist_calldata = (duelistProfile: CairoCustomEnum): DojoCall => {
+		return {
+			contractName: "pack_token",
+			entrypoint: "mint_bot_duelist",
+			calldata: [duelistProfile],
+		};
+	};
+
+	const pack_token_mintBotDuelist = async (snAccount: Account | AccountInterface, duelistProfile: CairoCustomEnum) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_pack_token_mintBotDuelist_calldata(duelistProfile),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 	const build_pack_token_name_calldata = (): DojoCall => {
 		return {
 			contractName: "pack_token",
@@ -4193,6 +4315,18 @@ export function setupWorld(provider: DojoProvider) {
 			sponsorTournament: bank_sponsorTournament,
 			buildSponsorTournamentCalldata: build_bank_sponsorTournament_calldata,
 		},
+		bot_player: {
+			commitMoves: bot_player_commitMoves,
+			buildCommitMovesCalldata: build_bot_player_commitMoves_calldata,
+			makeSalt: bot_player_makeSalt,
+			buildMakeSaltCalldata: build_bot_player_makeSalt_calldata,
+			replyDuel: bot_player_replyDuel,
+			buildReplyDuelCalldata: build_bot_player_replyDuel_calldata,
+			revealMoves: bot_player_revealMoves,
+			buildRevealMovesCalldata: build_bot_player_revealMoves_calldata,
+			transferToWinner: bot_player_transferToWinner,
+			buildTransferToWinnerCalldata: build_bot_player_transferToWinner_calldata,
+		},
 		duel_token: {
 			approve: duel_token_approve,
 			buildApproveCalldata: build_duel_token_approve_calldata,
@@ -4496,6 +4630,8 @@ export function setupWorld(provider: DojoProvider) {
 			buildLastTokenIdCalldata: build_pack_token_lastTokenId_calldata,
 			maxSupply: pack_token_maxSupply,
 			buildMaxSupplyCalldata: build_pack_token_maxSupply_calldata,
+			mintBotDuelist: pack_token_mintBotDuelist,
+			buildMintBotDuelistCalldata: build_pack_token_mintBotDuelist_calldata,
 			name: pack_token_name,
 			buildNameCalldata: build_pack_token_name_calldata,
 			open: pack_token_open,

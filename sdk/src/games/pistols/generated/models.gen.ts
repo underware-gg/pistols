@@ -354,6 +354,7 @@ export const duelType = [
 	'Tournament',
 	'Tutorial',
 	'Practice',
+	'BotPlayer',
 ] as const;
 export type DuelType = { [key in typeof duelType[number]]: string };
 export type DuelTypeEnum = CairoCustomEnum;
@@ -376,6 +377,7 @@ export const packType = [
 	'GenesisDuelists5x',
 	'FreeDuelist',
 	'SingleDuelist',
+	'BotDuelist',
 ] as const;
 export type PackType = { [key in typeof packType[number]]: string };
 export type PackTypeEnum = CairoCustomEnum;
@@ -589,6 +591,7 @@ export type GenesisKeyEnum = CairoCustomEnum;
 export const legendsKey = [
 	'Unknown',
 	'TGC1',
+	'TGC2',
 ] as const;
 export type LegendsKey = { [key in typeof legendsKey[number]]: string };
 export type LegendsKeyEnum = CairoCustomEnum;
@@ -624,6 +627,7 @@ export type RoundStateEnum = CairoCustomEnum;
 export const rules = [
 	'Undefined',
 	'Season',
+	'Unranked',
 ] as const;
 export type Rules = { [key in typeof rules[number]]: string };
 export type RulesEnum = CairoCustomEnum;
@@ -759,7 +763,8 @@ export const schema: SchemaType = {
 				Seasonal: undefined,
 				Tournament: undefined,
 				Tutorial: undefined,
-				Practice: undefined, }),
+				Practice: undefined,
+				BotPlayer: undefined, }),
 		premise: new CairoCustomEnum({ 
 					Undefined: "",
 				Matter: undefined,
@@ -900,7 +905,8 @@ export const schema: SchemaType = {
 				StarterPack: undefined,
 				GenesisDuelists5x: undefined,
 				FreeDuelist: undefined,
-				SingleDuelist: undefined, }),
+				SingleDuelist: undefined,
+				BotDuelist: undefined, }),
 			seed: 0,
 			lords_amount: 0,
 			is_open: false,
@@ -912,7 +918,8 @@ export const schema: SchemaType = {
 				Seasonal: undefined,
 				Tournament: undefined,
 				Tutorial: undefined,
-				Practice: undefined, }),
+				Practice: undefined,
+				BotPlayer: undefined, }),
 			pair: 0,
 			duel_id: 0,
 		},
@@ -987,7 +994,8 @@ export const schema: SchemaType = {
 			season_id: 0,
 		rules: new CairoCustomEnum({ 
 					Undefined: "",
-				Season: undefined, }),
+				Season: undefined,
+				Unranked: undefined, }),
 		phase: new CairoCustomEnum({ 
 					Undefined: "",
 				InProgress: undefined,

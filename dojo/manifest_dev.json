@@ -2184,8 +2184,8 @@
       ]
     },
     {
-      "address": "0x327f305007c6fb883f22f8ba94dbd04d96c09a049b4d660fd208f45ea560814",
-      "class_hash": "0x67763ef8b4d3eaa8aa875db2de356585544a73feaf8e3d21abdca530762f4bc",
+      "address": "0x7c0da5217952f160306a9b60a2d60fd0a893b8749de789cb0678246c42e0d46",
+      "class_hash": "0x1396c9a55f6427e4078605d1580c4e166c9d1555cff2b7fe360871322893935",
       "abi": [
         {
           "type": "impl",
@@ -2458,8 +2458,8 @@
       ]
     },
     {
-      "address": "0x5ce766cba4af7cee1213c4a5e282958a6ee5517f876a9311197acddaa7a801a",
-      "class_hash": "0x70a0d456257de966caa841c6cd5659430fffe6e3f9fce957d22316a424a855c",
+      "address": "0x367990e328c46500ad499415f2946e2d45213365f14e575c2306c0b13468cf9",
+      "class_hash": "0x58577de392d8cee2c5f97339828909919499154c5d652d7164c012e55d12a40",
       "abi": [
         {
           "type": "impl",
@@ -3772,8 +3772,8 @@
       ]
     },
     {
-      "address": "0x551ca22142e2519a86bf13e1570888c0cdf5eff2308d55c9dcfd498a9531f96",
-      "class_hash": "0x32b4852e7372e499097835bdfe4918603525b49bcd032c46a0fcac921045acc",
+      "address": "0xbf9e1097be510267d4760b8b2cbb888715d343572cbb19b7f939041905209a",
+      "class_hash": "0x5bfcbe5f2135677ed5cda3179bedc6e1d46414e3dbf1ff73ef64bb9eaee723b",
       "abi": [
         {
           "type": "impl",
@@ -4347,6 +4347,10 @@
             },
             {
               "name": "TGC1",
+              "type": "()"
+            },
+            {
+              "name": "TGC2",
               "type": "()"
             }
           ]
@@ -6959,8 +6963,8 @@
       ]
     },
     {
-      "address": "0x7d4d16581c907e6cbdab1a3d8d3d17f76bfe2ad17157174ea1e0d2e6f3b253a",
-      "class_hash": "0x655538f5df24a386e5bfe87bd8235d97402d1947df1bad2931b99acc2459ea0",
+      "address": "0x55cee0e45b6f5e91fa58cc8d35281fe064cade124420ad294fdd48457b0d40a",
+      "class_hash": "0x6d49e6c6d4de24852f58103ebf917dd29e22abe4ef30f9bfd85356debb114e1",
       "abi": [
         {
           "type": "impl",
@@ -9239,8 +9243,8 @@
       ]
     },
     {
-      "address": "0x4033a5c37362598411f35caa0da068b3a7cbd7b8190a071434e5ef2dafab727",
-      "class_hash": "0x3c626d06174e1c11eea46e96ae39ffc4e2b97b6d08ce54265bab464c6d6e03",
+      "address": "0x1ba8bc24a3c91180c7678de7eb26f17ca7431c162263e24af6f5fba230b7b49",
+      "class_hash": "0x10470f76b8d2b5a16a27723127b1e5406575a172d8423baf24226bc74aa1e97",
       "abi": [
         {
           "type": "impl",
@@ -9707,6 +9711,10 @@
             },
             {
               "name": "TGC1",
+              "type": "()"
+            },
+            {
+              "name": "TGC2",
               "type": "()"
             }
           ]
@@ -12656,8 +12664,8 @@
       ]
     },
     {
-      "address": "0x1be1010e604a87f3e0aed632b61f151925b369f3c6a8f1637ed721db9a90612",
-      "class_hash": "0x7be932b8f3fcce60ab603eb86ac49396b9a3f828024ab2191c6c54a06c83347",
+      "address": "0x7791a683813f7b6e80a7772aad49de360afde7971bf1d813d0af8a035162fcc",
+      "class_hash": "0x488047e96caba751be050210a9b12022500fda25bee02303b7dd5b8c6ba4cb1",
       "abi": [
         {
           "type": "impl",
@@ -13563,7 +13571,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x3a867ced78f0cc937683ea9b8a9fb0e5f070301f560d8e266ce4624b818a617",
+      "class_hash": "0x36008ffb123c791490765e4cda585c9ea7b2243e3604fa0e5b89b639bea4321",
       "tag": "pistols-Duelist",
       "selector": "0x1ec34ce9ccaa39b540179d85e0dd0d46c1c1ae712f4cb40a9cd7f8c21ebaa46"
     },
@@ -13593,7 +13601,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x7291ead400d7af540c3ed38027f0cd462c26ea5b34ee674885601515ae9299b",
+      "class_hash": "0x2734411118d88cbb767868895829ab7dd6ffebd973f1ee321f34189f5b06031",
       "tag": "pistols-Pack",
       "selector": "0x64159b4947adcdc7a87b41f7889ba33495ac8e3a3a333305c7712806763fa2d"
     },
@@ -13611,7 +13619,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x4ae5a0a10af6ae3f94a9e629f319d595459e1c83fb05bfdb4a5eb0cc2ae7820",
+      "class_hash": "0x18c633e20943c1f8da83ac54de3037e90fba9829135adcb6fc63597ff05a770",
       "tag": "pistols-PlayerDuelistStack",
       "selector": "0xb47a4ea3849ae004ed3d0ba58070c0eb3cdca2bed8c9a6ab6bfe01210effc6"
     },
