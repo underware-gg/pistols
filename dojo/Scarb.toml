@@ -1,6 +1,6 @@
 [package]
 name = "pistols"
-version = "1.0.28"
+version = "1.0.29"
 cairo-version = "2.10.1"
 edition = "2024_07"
 license = "CC0-1.0"
@@ -51,6 +51,8 @@ build-external-contracts = [
 
 # debug contract size issues
 # needed by `sozo build --stats.by-tag`
+# https://docs.starknet.io/resources/chain-info/
+# max felts = 81,920 felts
 # casm = true
 
 
