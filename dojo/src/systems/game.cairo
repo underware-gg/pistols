@@ -96,6 +96,7 @@ pub mod game {
         duelist::{DuelistTrait, Totals, TotalsTrait},
         leaderboard::{Leaderboard, LeaderboardTrait, LeaderboardPosition},
         pact::{PactTrait},
+        ring::{RingType},
         season::{SeasonScoreboard, SeasonScoreboardTrait},
         events::{Activity, ActivityTrait, ChallengeAction, SocialPlatform, PlayerSetting, PlayerSettingValue},
         // tournament::{TournamentRound, TournamentRoundTrait, TournamentDuelKeys},
@@ -481,9 +482,10 @@ pub mod game {
         ) -> RewardValues {
             let mut store: Store = StoreTrait::new(self.world_default());
             let rules: Rules = store.get_current_season_rules();
+            let signet_ring: RingType = store.get_player_active_signet_ring(starknet::get_caller_address());
             let fame_balance: u128 = store.world.duelist_token_dispatcher().fame_balance(duelist_id);
-            let rewards_loss: RewardValues = rules.calc_rewards(fame_balance, lives_staked, false, @Default::default());
-            let rewards_win: RewardValues = rules.calc_rewards(fame_balance, lives_staked, true, @Default::default());
+            let rewards_loss: RewardValues = rules.calc_rewards(fame_balance, lives_staked, false, signet_ring, @Default::default());
+            let rewards_win: RewardValues = rules.calc_rewards(fame_balance, lives_staked, true, signet_ring, @Default::default());
             let mut leaderboard: Leaderboard = store.get_leaderboard(season_id);
             let position: u8 = leaderboard.insert_score(duelist_id, rewards_win.points_scored);
             (RewardValues{

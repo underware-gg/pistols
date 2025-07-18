@@ -135,6 +135,7 @@ pub mod ring_token {
             RingBalance, RingBalanceValue,
             RingType, RingTypeTrait,
         },
+        player::{Player},
         events::{Activity, ActivityTrait},
     };
     use pistols::interfaces::dns::{
@@ -276,10 +277,23 @@ pub mod ring_token {
             ring_balance.balance += 1;
             store.set_ring_balance(@ring_balance);
 
+            // update active ring
+            self._update_active_ring(ref store, recipient, ring_type);
+
             // events
             Activity::ClaimedRing.emit(ref store.world, recipient, ring_id.into());
 
             (ring_id)
+        }
+
+        fn _update_active_ring(ref self: ContractState, ref store: Store, recipient: ContractAddress, ring_type: RingType) {
+            // add to player profile, if higher ring
+            let mut player: Player = store.get_player(recipient);
+            if (ring_type > player.active_signet_ring) {
+                // replace with next higher ring
+                player.active_signet_ring = ring_type;
+                store.set_player(@player);
+            }
         }
     }
 
@@ -293,7 +307,6 @@ pub mod ring_token {
             let mut erc721 = ERC721Component::HasComponent::get_component_mut(ref self);
             let from: ContractAddress = erc721._owner_of(token_id);
             // change ring type balances on transfers only
-            // mints are handled in _mint_ring()
             if (from.is_non_zero()) {
                 // get ring type
                 let mut store: Store = StoreTrait::new(self.world_default());
@@ -302,11 +315,22 @@ pub mod ring_token {
                 let mut ring_balance_from: RingBalance = store.get_ring_balance(from, ring_type);
                 ring_balance_from.balance.subi(1);
                 store.set_ring_balance(@ring_balance_from);
+                // if balance is zero and it was active, remove/replace from profile
+                if (ring_balance_from.balance.is_zero()) {
+                    let mut player: Player = store.get_player(from);
+                    if (ring_type == player.active_signet_ring) {
+                        // replace with next higher ring
+                        player.active_signet_ring = RingTypeTrait::get_player_highest_ring(@store, from);
+                        store.set_player(@player);
+                    }
+                }
                 // add to new owner balance
+                // mints are handled in _mint_ring()
                 if (to.is_non_zero()) {
                     let mut ring_balance_to: RingBalance = store.get_ring_balance(to, ring_type);
                     ring_balance_to.balance += 1;
                     store.set_ring_balance(@ring_balance_to);
+                    self._update_active_ring(ref store, to, ring_type);
                 }
             }
         }

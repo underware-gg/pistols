@@ -174,6 +174,7 @@ pub mod duelist_token {
         },
         player::{PlayerTrait, PlayerDuelistStack, PlayerDuelistStackTrait},
         pool::{PoolType, PoolTypeTrait, LordsReleaseBill, ReleaseReason},
+        ring::{RingType},
         events::{Activity, ActivityTrait},
     };
     use pistols::types::{
@@ -426,8 +427,10 @@ pub mod duelist_token {
             let balance_b: u128 = self._fame_balance(@fame_dispatcher, challenge.duelist_id_b);
 
             // calculate fees
-            let mut rewards_a: RewardValues = rules.calc_rewards(balance_a, challenge.lives_staked, challenge.winner == 1, @bonus.duelist_a);
-            let mut rewards_b: RewardValues = rules.calc_rewards(balance_b, challenge.lives_staked, challenge.winner == 2, @bonus.duelist_b);
+            let signet_ring_a: RingType = if (challenge.winner == 1) {store.get_player_active_signet_ring(challenge.address_a)} else {RingType::Unknown};
+            let signet_ring_b: RingType = if (challenge.winner == 2) {store.get_player_active_signet_ring(challenge.address_b)} else {RingType::Unknown};
+            let mut rewards_a: RewardValues = rules.calc_rewards(balance_a, challenge.lives_staked, challenge.winner == 1, signet_ring_a, @bonus.duelist_a);
+            let mut rewards_b: RewardValues = rules.calc_rewards(balance_b, challenge.lives_staked, challenge.winner == 2, signet_ring_b, @bonus.duelist_b);
 
             // transfer gains
             let treasury_address: ContractAddress = store.get_config_treasury_address();

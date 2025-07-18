@@ -54,8 +54,10 @@ pub struct DuelistBonus {
 // Traits
 //
 use core::num::traits::Zero;
+use pistols::models::ring::{RingType};
 use pistols::types::timestamp::{TIMESTAMP};
 use pistols::types::constants::{CONST, FAME};
+use pistols::utils::math::{MathU128};
 use pistols::utils::misc::{ZERO};
 
 #[generate_trait]
@@ -94,7 +96,13 @@ pub impl RulesImpl of RulesTrait {
         (@result)
     }
     // end game calculations
-    fn calc_rewards(self: @Rules, fame_balance: u128, lives_staked: u8, is_winner: bool, bonus: @DuelistBonus) -> RewardValues {
+    fn calc_rewards(self: @Rules,
+        fame_balance: u128,
+        lives_staked: u8,
+        is_winner: bool,
+        signet_ring: RingType,
+        bonus: @DuelistBonus,
+    ) -> RewardValues {
         let one_life: u128 = FAME::ONE_LIFE.low;
         let mut result: RewardValues = Default::default();
         match self {
@@ -118,6 +126,16 @@ pub impl RulesImpl of RulesTrait {
                     result.fools_gained *= lives_staked.into();
                     // calc score
                     result.points_scored = 100 + ((*bonus.kill_pace).into() * 2);
+                    // ring bonus
+                    let ring_bonus: u8 = (match signet_ring {
+                        RingType::GoldSignetRing => {40},
+                        RingType::SilverSignetRing => {20},
+                        RingType::LeadSignetRing => {10},
+                        RingType::Unknown => {0},
+                    });
+                    if (ring_bonus.is_non_zero()) {
+                        result.fools_gained += MathU128::percentage(result.fools_gained, ring_bonus);
+                    }
                 } else {
                     result.fame_lost = one_life * lives_staked.into();
                     result.points_scored = 10;
@@ -238,6 +256,7 @@ mod unit {
         Rules, RulesTrait,
         RewardDistribution, RewardValues,
         DuelistBonus,
+        RingType,
     };
     use pistols::models::leaderboard::{LeaderboardTrait};
     use pistols::utils::misc::{WEI};
@@ -272,11 +291,11 @@ mod unit {
 
     #[test]
     fn test_calc_rewards() {
-        let winner_1_1: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, true, @Default::default());
-        let winner_2_1: RewardValues = Rules::Season.calc_rewards(WEI(5_000).low, 1, true, @Default::default());
-        let winner_1_2: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 2, true, @Default::default());
-        let winner_2_2: RewardValues = Rules::Season.calc_rewards(WEI(5_000).low, 2, true, @Default::default());
-        let loser_1_1: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, false, @Default::default());
+        let winner_1_1: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, true, RingType::Unknown, @Default::default());
+        let winner_2_1: RewardValues = Rules::Season.calc_rewards(WEI(5_000).low, 1, true, RingType::Unknown, @Default::default());
+        let winner_1_2: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 2, true, RingType::Unknown, @Default::default());
+        let winner_2_2: RewardValues = Rules::Season.calc_rewards(WEI(5_000).low, 2, true, RingType::Unknown, @Default::default());
+        let loser_1_1: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, false, RingType::Unknown, @Default::default());
         // greater balances win less FAME
         assert_gt!(winner_1_1.fame_gained, winner_2_1.fame_gained, "balance_fame_gained");
         assert_gt!(winner_1_2.fame_gained, winner_2_2.fame_gained, "balance_fame_gained");
@@ -325,9 +344,9 @@ mod unit {
             hit: false,
             dodge: true,
         };
-        let winner_paces_1: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, true, @bonus_paces_1);
-        let winner_paces_10: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, true, @bonus_paces_10);
-        let winner_paces_10_dodge: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, true, @bonus_paces_10_dodge);
+        let winner_paces_1: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, true, RingType::Unknown, @bonus_paces_1);
+        let winner_paces_10: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, true, RingType::Unknown, @bonus_paces_10);
+        let winner_paces_10_dodge: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, true, RingType::Unknown, @bonus_paces_10_dodge);
         // always same points
         assert_lt!(winner_paces_1.points_scored, winner_paces_10.points_scored, "paces_1 < paces_10");
         assert_lt!(winner_paces_10.points_scored, winner_paces_10_dodge.points_scored, "paces_10 < paces_10_dodge");
@@ -342,9 +361,9 @@ mod unit {
             hit: false,
             dodge: true,
         };
-        let loser_default: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, false, @Default::default());
-        let loser_hit: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, false, @bonus_hit);
-        let loser_dodge: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, false, @bonus_dodge);
+        let loser_default: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, false, RingType::Unknown, @Default::default());
+        let loser_hit: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, false, RingType::Unknown, @bonus_hit);
+        let loser_dodge: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, false, RingType::Unknown, @bonus_dodge);
         assert_lt!(loser_default.points_scored, loser_hit.points_scored, "LOSER: default < hit");
         assert_lt!(loser_hit.points_scored, loser_dodge.points_scored, "LOSER: hit < dodge");
     }

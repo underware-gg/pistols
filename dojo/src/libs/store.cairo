@@ -558,6 +558,14 @@ pub impl StoreImpl of StoreTrait {
         (self.world.read_member(Model::<Player>::ptr_from_keys(address), selector!("alive_duelist_count")))
     }
     #[inline(always)]
+    fn get_player_active_signet_ring(self: @Store, address: ContractAddress) -> RingType {
+        (self.world.read_member(Model::<Player>::ptr_from_keys(address), selector!("active_signet_ring")))
+    }
+    fn get_player_has_signet_ring(self: @Store, player_address: ContractAddress, ring_type: RingType) -> bool {
+        let ring_balance: u128 = (self.world.read_member(Model::<RingBalance>::ptr_from_keys((player_address, ring_type),), selector!("balance")));
+        (ring_balance > 0)
+    }
+    #[inline(always)]
     fn get_active_duelist_id(self: @Store, address: ContractAddress, duelist_id: u128) -> u128 {
         (self.world.read_member(Model::<PlayerDuelistStack>::ptr_from_keys((
             address,

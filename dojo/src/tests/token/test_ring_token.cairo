@@ -121,6 +121,9 @@ fn test_claim_ok() {
     assert_eq!(sys.rings.balance_of_ring(OWNER(), RingType::SilverSignetRing), 0, "balance_of_ring(OWNER, SilverSignetRing) 0");
     assert_eq!(sys.rings.balance_of_ring(OTHER(), RingType::SilverSignetRing), 0, "balance_of_ring(OTHER, SilverSignetRing) 0");
     assert_eq!(sys.rings.balance_of_ring(BUMMER(), RingType::SilverSignetRing), 0, "balance_of_ring(BUMMER, SilverSignetRing) 0");
+    assert_eq!(sys.store.get_player_active_signet_ring(OWNER()), RingType::Unknown, "get_player_active_signet_ring(OWNER) 0");
+    assert_eq!(sys.store.get_player_active_signet_ring(OTHER()), RingType::Unknown, "get_player_active_signet_ring(OTHER) 0");
+    assert_eq!(sys.store.get_player_active_signet_ring(BUMMER()), RingType::Unknown, "get_player_active_signet_ring(BUMMER) 0");
     //
     // Season 1
     assert!(!sys.rings.has_claimed(OWNER(), RingType::GoldSignetRing), "has_claimed(OWNER, GoldSignetRing, S1) init");
@@ -142,6 +145,9 @@ fn test_claim_ok() {
     assert!(sys.rings.get_claimable_season_ring_type(OWNER(), duel_id).is_none(), "get_claimable_season_ring_type(OWNER, S1) > None");
     assert!(sys.rings.get_claimable_season_ring_type(OTHER(), duel_id).is_none(), "get_claimable_season_ring_type(OTHER, S1) > None");
     assert!(sys.rings.get_claimable_season_ring_type(BUMMER(), duel_id).is_none(), "get_claimable_season_ring_type(BUMMER, S1) > None");
+    assert_eq!(sys.store.get_player_active_signet_ring(OWNER()), RingType::GoldSignetRing, "get_player_active_signet_ring(OWNER, S1)");
+    assert_eq!(sys.store.get_player_active_signet_ring(OTHER()), RingType::GoldSignetRing, "get_player_active_signet_ring(OTHER, S1)");
+    assert_eq!(sys.store.get_player_active_signet_ring(BUMMER()), RingType::Unknown, "get_player_active_signet_ring(BUMMER, S1)");
     // balances
     assert_eq!(sys.rings.total_supply(), 2, "S1: total_supply");
     assert_eq!(sys.rings.balance_of(OWNER()), 1, "S1: balance_of(OWNER)");
@@ -181,6 +187,9 @@ fn test_claim_ok() {
     assert_eq!(sys.rings.balance_of_ring(OWNER(), RingType::SilverSignetRing), 1, "balance_of_ring(OWNER, SilverSignetRing, S2) 1");
     assert_eq!(sys.rings.balance_of_ring(OTHER(), RingType::SilverSignetRing), 0, "balance_of_ring(OTHER, SilverSignetRing, S2) 0");
     assert_eq!(sys.rings.balance_of_ring(BUMMER(), RingType::SilverSignetRing), 1, "balance_of_ring(BUMMER, SilverSignetRing, S2) 1");
+    assert_eq!(sys.store.get_player_active_signet_ring(OWNER()), RingType::GoldSignetRing, "get_player_active_signet_ring(OWNER, S2)");
+    assert_eq!(sys.store.get_player_active_signet_ring(OTHER()), RingType::GoldSignetRing, "get_player_active_signet_ring(OTHER, S2)");
+    assert_eq!(sys.store.get_player_active_signet_ring(BUMMER()), RingType::SilverSignetRing, "get_player_active_signet_ring(BUMMER, S2)");
     //
     // Season 3
     let duel_id: u128 = _make_challenge(ref sys, OWNER(), OTHER(), SEASON_ID_3);
@@ -205,6 +214,9 @@ fn test_claim_ok() {
     assert_eq!(sys.rings.balance_of_ring(OWNER(), RingType::SilverSignetRing), 1, "balance_of_ring(OWNER, SilverSignetRing, S3)");
     assert_eq!(sys.rings.balance_of_ring(OTHER(), RingType::SilverSignetRing), 1, "balance_of_ring(OTHER, SilverSignetRing, S3)");
     assert_eq!(sys.rings.balance_of_ring(BUMMER(), RingType::SilverSignetRing), 1, "balance_of_ring(BUMMER, SilverSignetRing, S3)");
+    assert_eq!(sys.store.get_player_active_signet_ring(OWNER()), RingType::GoldSignetRing, "get_player_active_signet_ring(OWNER, S3)");
+    assert_eq!(sys.store.get_player_active_signet_ring(OTHER()), RingType::GoldSignetRing, "get_player_active_signet_ring(OTHER, S3)");
+    assert_eq!(sys.store.get_player_active_signet_ring(BUMMER()), RingType::SilverSignetRing, "get_player_active_signet_ring(BUMMER, S3)");
     //
     // Season 5
     assert!(!sys.rings.has_claimed(OWNER(), RingType::LeadSignetRing), "has_claimed(OWNER, LeadSignetRing, S5) init");
@@ -237,6 +249,9 @@ fn test_claim_ok() {
     assert_eq!(sys.rings.balance_of_ring(OWNER(), RingType::LeadSignetRing), 1, "balance_of_ring(OWNER, LeadSignetRing, S5)");
     assert_eq!(sys.rings.balance_of_ring(OTHER(), RingType::LeadSignetRing), 1, "balance_of_ring(OTHER, LeadSignetRing, S5)");
     assert_eq!(sys.rings.balance_of_ring(BUMMER(), RingType::LeadSignetRing), 0, "balance_of_ring(BUMMER, LeadSignetRing, S5)");
+    assert_eq!(sys.store.get_player_active_signet_ring(OWNER()), RingType::GoldSignetRing, "get_player_active_signet_ring(OWNER, S5)");
+    assert_eq!(sys.store.get_player_active_signet_ring(OTHER()), RingType::GoldSignetRing, "get_player_active_signet_ring(OTHER, S5)");
+    assert_eq!(sys.store.get_player_active_signet_ring(BUMMER()), RingType::SilverSignetRing, "get_player_active_signet_ring(BUMMER, S5)");
     //
     // Season 9
     let duel_id: u128 = _make_challenge(ref sys, OWNER(), SPENDER(), 9);
@@ -256,6 +271,9 @@ fn test_claim_ok() {
     assert_eq!(sys.rings.balance_of(BUMMER()), 1, "S9: balance_of(BUMMER)");
     assert_eq!(sys.rings.balance_of(SPENDER()), 1, "S9: balance_of(SPENDER)");
     assert_eq!(sys.rings.total_supply(), 8, "S9: total_supply");
+    assert_eq!(sys.store.get_player_active_signet_ring(OWNER()), RingType::GoldSignetRing, "get_player_active_signet_ring(OWNER, S9)");
+    assert_eq!(sys.store.get_player_active_signet_ring(OTHER()), RingType::GoldSignetRing, "get_player_active_signet_ring(OTHER, S9)");
+    assert_eq!(sys.store.get_player_active_signet_ring(BUMMER()), RingType::SilverSignetRing, "get_player_active_signet_ring(BUMMER, S9)");
     //
     // Season 10
     let duel_id: u128 = _make_challenge(ref sys, OWNER(), BUMMER(), 10);
@@ -337,6 +355,41 @@ fn test_airdrop_admin() {
     assert!(sys.admin.am_i_admin(OTHER()), "admin_am_i_admin_3");
     assert!(sys.store.get_player_is_admin(OTHER()), "store_am_i_admin_3");
     tester::execute_airdrop_ring(@sys, OTHER(), OTHER(), RingType::GoldSignetRing);
+}
+
+
+//---------------------------------
+// active ring
+//
+
+#[test]
+fn test_active_ring() {
+    let mut sys: TestSystems = setup(FLAGS::RINGS | FLAGS::ADMIN);
+    let player_1: ContractAddress = OTHER();
+    let player_2: ContractAddress = BUMMER();
+    assert_eq!(sys.store.get_player_active_signet_ring(player_1), RingType::Unknown, "[1] RingType::Unknown");
+    // set as active
+    let ring_id_silver: u128 =tester::execute_airdrop_ring(@sys, OWNER(), player_1, RingType::SilverSignetRing);
+    assert_eq!(sys.store.get_player_active_signet_ring(player_1), RingType::SilverSignetRing, "[1] RingType::SilverSignetRing");
+    // lesser, not active
+    let ring_id_lead: u128 = tester::execute_airdrop_ring(@sys, OWNER(), player_1, RingType::LeadSignetRing);
+    assert_eq!(sys.store.get_player_active_signet_ring(player_1), RingType::SilverSignetRing, "[1] RingType::SilverSignetRing still");
+    // new active
+    let ring_id_gold: u128 = tester::execute_airdrop_ring(@sys, OWNER(), player_1, RingType::GoldSignetRing);
+    assert_eq!(sys.store.get_player_active_signet_ring(player_1), RingType::GoldSignetRing, "[1] RingType::GoldSignetRing");
+    //
+    // transfer...
+    assert_eq!(sys.store.get_player_active_signet_ring(player_2), RingType::Unknown, "[2] RingType::Unknown");
+    tester::impersonate(player_1);
+    sys.rings.transfer_from(player_1, player_2, ring_id_silver.into());
+    assert_eq!(sys.store.get_player_active_signet_ring(player_1), RingType::GoldSignetRing, "[1] RingType::GoldSignetRing >>");
+    assert_eq!(sys.store.get_player_active_signet_ring(player_2), RingType::SilverSignetRing, "[1] RingType::SilverSignetRing >>");
+    sys.rings.transfer_from(player_1, player_2, ring_id_gold.into());
+    assert_eq!(sys.store.get_player_active_signet_ring(player_1), RingType::LeadSignetRing, "[1] RingType::LeadSignetRing >>");
+    assert_eq!(sys.store.get_player_active_signet_ring(player_2), RingType::GoldSignetRing, "[1] RingType::GoldSignetRing >>");
+    sys.rings.transfer_from(player_1, player_2, ring_id_lead.into());
+    assert_eq!(sys.store.get_player_active_signet_ring(player_1), RingType::Unknown, "[1] RingType::Unknown >>");
+    assert_eq!(sys.store.get_player_active_signet_ring(player_2), RingType::GoldSignetRing, "[1] RingType::GoldSignetRing >>");
 }
 
 

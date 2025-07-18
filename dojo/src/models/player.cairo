@@ -1,5 +1,6 @@
 use starknet::{ContractAddress};
 use pistols::models::duelist::{Totals};
+use pistols::models::ring::{RingType};
 pub use pistols::types::duelist_profile::{DuelistProfile};
 
 
@@ -12,6 +13,7 @@ pub struct Player {
     pub timestamps: PlayerTimestamps,
     pub totals: Totals,
     pub alive_duelist_count: u16,
+    pub active_signet_ring: RingType,
     // pub referral_code: felt252,
 }
 

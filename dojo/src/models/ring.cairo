@@ -139,6 +139,23 @@ pub impl RingTypeImpl of RingTypeTrait {
     fn image_url(self: @RingType) -> ByteArray {
         ((*self).descriptor().image_url.to_string())
     }
+    // higher weight, higher value/importance
+    fn weight(self: @RingType) -> u8 {
+        match self {
+            RingType::Unknown           => 0,
+            RingType::LeadSignetRing    => 1,
+            RingType::SilverSignetRing  => 2,
+            RingType::GoldSignetRing    => 3,
+        }
+    }
+    fn get_player_highest_ring(store: @Store, player_address: ContractAddress) -> RingType {
+        (
+            if (store.get_player_has_signet_ring(player_address, RingType::GoldSignetRing)) {RingType::GoldSignetRing}
+            else if (store.get_player_has_signet_ring(player_address, RingType::SilverSignetRing)) {RingType::SilverSignetRing}
+            else if (store.get_player_has_signet_ring(player_address, RingType::LeadSignetRing)) {RingType::LeadSignetRing}
+            else {RingType::Unknown}
+        )
+    }
 }
 
 
@@ -146,10 +163,59 @@ pub impl RingTypeImpl of RingTypeTrait {
 //---------------------------
 // Converters
 //
-// for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
 pub impl RingTypeDebug of core::fmt::Debug<RingType> {
     fn fmt(self: @RingType, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
         f.buffer.append(@(*self).name());
         Result::Ok(())
+    }
+}
+pub impl RingTypeDisplay of core::fmt::Display<RingType> {
+    fn fmt(self: @RingType, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        f.buffer.append(@(*self).name());
+        Result::Ok(())
+    }
+}
+
+impl RingTypePartialOrd of PartialOrd<RingType> {
+    fn le(lhs: RingType, rhs: RingType) -> bool {
+        (!Self::gt(lhs, rhs))
+    }
+    fn ge(lhs: RingType, rhs: RingType) -> bool {
+        (Self::gt(lhs, rhs) || lhs == rhs)
+    }
+    fn lt(lhs: RingType, rhs: RingType) -> bool {
+        (!Self::gt(lhs, rhs) && lhs != rhs)
+    }
+    fn gt(lhs: RingType, rhs: RingType) -> bool {
+        let l: u8 = lhs.weight();
+        let r: u8 = rhs.weight();
+        (l > r)
+    }
+}
+
+
+//----------------------------------------
+// Unit  tests
+//
+#[cfg(test)]
+mod unit {
+    use super::{RingType};
+
+    #[test]
+    fn test_ring_type_partial_ord() {
+        // gt >
+        assert!(RingType::GoldSignetRing > RingType::SilverSignetRing, "bad ring gt");
+        assert!(RingType::GoldSignetRing > RingType::LeadSignetRing, "bad ring gt");
+        assert!(RingType::GoldSignetRing > RingType::Unknown, "bad ring gt");
+        assert!(RingType::SilverSignetRing > RingType::LeadSignetRing, "bad ring gt");
+        assert!(RingType::SilverSignetRing > RingType::Unknown, "bad ring gt");
+        assert!(RingType::LeadSignetRing > RingType::Unknown, "bad ring gt");
+        // lt <
+        assert!(RingType::Unknown < RingType::LeadSignetRing, "bad ring lt");
+        assert!(RingType::Unknown < RingType::SilverSignetRing, "bad ring lt");
+        assert!(RingType::Unknown < RingType::GoldSignetRing, "bad ring lt");
+        assert!(RingType::LeadSignetRing < RingType::SilverSignetRing, "bad ring lt");
+        assert!(RingType::LeadSignetRing < RingType::GoldSignetRing, "bad ring lt");
+        assert!(RingType::SilverSignetRing < RingType::GoldSignetRing, "bad ring lt");
     }
 }

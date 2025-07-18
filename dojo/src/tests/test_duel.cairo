@@ -8,6 +8,7 @@ pub mod tests {
         leaderboard::{Leaderboard, LeaderboardTrait, LeaderboardPosition},
         season::{SeasonScoreboard},
         player::{PlayerDuelistStack},
+        ring::{RingType},
     };
     use pistols::types::{
         cards::hand::{PacesCard, BladesCard, FinalBlow, DeckType},
@@ -1665,6 +1666,49 @@ pub mod tests {
         let score_b: SeasonScoreboard = sys.store.get_scoreboard(SEASON_ID_1, ID(OTHER()).into());
         assert_gt!(score_a.points, 0, "score_a.points > 0");
         assert_eq!(score_b.points, 0, "score_b.points ZERO");
+    }
+
+    #[test]
+    fn test_score_bonus_rings() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::MOCK_RNG | FLAGS::RINGS);
+        tester::fund_duelists_pool(@sys, 2);
+        tester::execute_claim_starter_pack(@sys, OWNER());
+        tester::execute_claim_starter_pack(@sys, OTHER());
+        //
+        // Duel 1 (no rings)
+        assert_eq!(sys.store.get_player_active_signet_ring(OWNER()), RingType::Unknown, "get_player_active_signet_ring(OWNER) Unknown");
+        let (mocked, moves_a, moves_b) = prefabs::get_moves_crit_a();
+        sys.rng.mock_values(mocked);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
+        let (challenge, _round) = prefabs::commit_reveal_get(@sys, duel_id, OWNER(), OTHER(), mocked, moves_a, moves_b);
+        assert_eq!(challenge.winner, 1, "challenge.winner 1");
+        let fools_balance_1: u256 = sys.fools.balance_of(OWNER());
+        let fools_gained_1: u256 = fools_balance_1;
+        assert_gt!(fools_balance_1, 0, "fools_balance_1");
+        //
+        // Silver ring
+        tester::execute_airdrop_ring(@sys, OWNER(), OWNER(), RingType::SilverSignetRing);
+        assert_eq!(sys.store.get_player_active_signet_ring(OWNER()), RingType::SilverSignetRing, "get_player_active_signet_ring(OWNER) Silver");
+        sys.rng.mock_values(mocked);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
+        let (challenge, _round) = prefabs::commit_reveal_get(@sys, duel_id, OWNER(), OTHER(), mocked, moves_a, moves_b);
+        assert_eq!(challenge.winner, 1, "challenge.winner 1");
+        let fools_balance_2: u256 = sys.fools.balance_of(OWNER());
+        let fools_gained_2: u256 = (fools_balance_2 - fools_balance_1);
+        assert_gt!(fools_balance_2, fools_balance_1, "fools_balance_2");
+        assert_gt!(fools_gained_2, fools_gained_1, "fools_gained_2");
+        //
+        // Golden ring
+        tester::execute_airdrop_ring(@sys, OWNER(), OWNER(), RingType::GoldSignetRing);
+        assert_eq!(sys.store.get_player_active_signet_ring(OWNER()), RingType::GoldSignetRing, "get_player_active_signet_ring(OWNER) Gold");
+        sys.rng.mock_values(mocked);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
+        let (challenge, _round) = prefabs::commit_reveal_get(@sys, duel_id, OWNER(), OTHER(), mocked, moves_a, moves_b);
+        assert_eq!(challenge.winner, 1, "challenge.winner 1");
+        let fools_balance_3: u256 = sys.fools.balance_of(OWNER());
+        let fools_gained_3: u256 = (fools_balance_3 - fools_balance_2);
+        assert_gt!(fools_balance_3, fools_balance_2, "fools_balance_3");
+        assert_gt!(fools_gained_3, fools_gained_2, "fools_gained_3");
     }
 
 
