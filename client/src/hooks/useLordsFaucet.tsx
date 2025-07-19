@@ -1,18 +1,14 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Account, AccountInterface } from 'starknet'
+import { useCallback, useEffect, useMemo } from 'react'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSetup } from '@underware/pistols-sdk/dojo'
-import { bigintToU256, ethToWei, execute } from '@underware/pistols-sdk/starknet'
+import { bigintToU256, ethToWei } from '@underware/pistols-sdk/starknet'
 import { bigintToHex } from '@underware/pistols-sdk/utils'
 import { useLordsContract } from './useTokenContracts'
 import { useLordsBalance } from '/src/stores/coinStore'
-
-export interface FaucetExecuteResult {
-  transaction_hash: string
-}
+import { useContractWrite } from '@underware/pistols-sdk/utils/hooks'
 
 export interface FaucetInterface {
-  mintLords: (recipientAccount?: Account | AccountInterface) => Promise<FaucetExecuteResult> | null
+  mintLords: () => Promise<boolean | null>
   faucetUrl: string | null
   hasFaucet: boolean
   isMinting: boolean
@@ -20,71 +16,49 @@ export interface FaucetInterface {
 }
 
 export const useLordsFaucet = (): FaucetInterface => {
-  const { account } = useAccount()
+  const { account, address } = useAccount()
   const { selectedNetworkConfig } = useDojoSetup()
   const { lordsContractAddress, abi } = useLordsContract()
   const faucetUrl = useMemo(() => (typeof selectedNetworkConfig.lordsFaucet === 'string' ? selectedNetworkConfig.lordsFaucet : null), [selectedNetworkConfig])
   const hasFaucet = useMemo(() => (selectedNetworkConfig.lordsFaucet === true), [selectedNetworkConfig])
 
-  const [isMinting, setIsMinting] = useState(false)
-  const [error, setError] = useState<string | undefined>(undefined)
+  const amount = useMemo(() => bigintToU256(ethToWei(10_000)), [])
+
+  const { write, transactionHash, isLoading, isError, error } = useContractWrite(
+    lordsContractAddress,
+    abi,
+    'mint',
+    [bigintToHex(address), bigintToHex(amount.low), bigintToHex(amount.high)],
+  )
 
   const mintLords = useCallback(
-    async (recipientAccount?: Account | AccountInterface): Promise<FaucetExecuteResult> => {
+    async (): Promise<boolean | null> => {
 
       if (faucetUrl) {
         window?.open(faucetUrl, '_blank')
         return null
       }
       
-      if (!hasFaucet || isMinting) {
+      if (!hasFaucet || isLoading || !write) {
         return null
       }
       
-      setError(undefined)
-      setIsMinting(true)
-
-      const _signerAccount = (recipientAccount ?? account)
-      const amount = bigintToU256(ethToWei(10_000))
-
-      let transaction_hash, receipt
       try {
-        const tx = await execute(
-          _signerAccount!,
-          bigintToHex(lordsContractAddress),
-          abi!,
-          'mint',
-          [bigintToHex(_signerAccount.address), bigintToHex(amount.low), bigintToHex(amount.high)],
-          // 'faucet',
-          // [],
-        )
-        transaction_hash = tx.transaction_hash
-        receipt = await _signerAccount!.waitForTransaction(transaction_hash, {
-          retryInterval: 500,
-        })
-        console.log(`mintLords(${_signerAccount.address}) receipt:`, receipt)
+        console.log(`mintLords(${bigintToHex(address)})...`)
+        await write();
       } catch (e: any) {
-        setError(e.toString())
-        console.error(`mintLords(${_signerAccount.address}) error:`, e)
-        // toast({
-        //   message: e.toString(),
-        //   duration: 20_000,
-        //   isError: true
-        // })
+        console.error(`mintLords(${bigintToHex(address)}) error:`, e);
+        return false;
       }
-      setIsMinting(false)
-      return {
-        transaction_hash,
-      }
-    }, [account, lordsContractAddress, hasFaucet, faucetUrl],
+      return true;
+    }, [write, hasFaucet, faucetUrl, faucetUrl],
   )
 
   return {
     mintLords,
     faucetUrl,
     hasFaucet,
-    isMinting,
-    error,
+    isMinting: isLoading,
   }
 }
 
@@ -100,8 +74,8 @@ export const useMintMockLords = () => {
 
   useEffect(() => {
     // minted new! go to Game...
-    if (account && isLoading === false && balance === 0n && hasFaucet && mintLords) {
-      mintLords(account)
+    if (isLoading === false && balance === 0n && hasFaucet && mintLords) {
+      mintLords()
     }
   }, [account, isLoading, balance, hasFaucet, mintLords])
 

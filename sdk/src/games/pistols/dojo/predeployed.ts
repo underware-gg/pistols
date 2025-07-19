@@ -1,4 +1,5 @@
-import { Account, AccountInterface, RpcProvider, constants } from 'starknet'
+import { Account, AccountInterface, RpcProvider, constants, Call } from 'starknet'
+import { AddInvokeTransactionParameters } from '@starknet-io/types-js'
 import { Connector } from '@starknet-react/core'
 import { stringToFelt } from 'src/starknet/starknet'
 import { ExternalWallet } from "@cartridge/controller";
@@ -26,7 +27,7 @@ export class PredeployedConnector extends Connector {
       new RpcProvider({ nodeUrl: rpcUrl }),
       account.address,
       account.privateKey,
-      '1',
+      undefined,
       constants.TRANSACTION_VERSION.V3,
     )
   }
@@ -89,8 +90,17 @@ export class PredeployedConnector extends Connector {
       // }
       // case 'wallet_getPermissions': {
       // }
-      // case 'wallet_addInvokeTransaction': {
-      // }
+      case 'wallet_addInvokeTransaction': {
+        let params = call.params as AddInvokeTransactionParameters;
+        console.log(`PredeployedConnector: wallet_addInvokeTransaction()...`, this._account, params);
+        return await this._account.execute(
+          params.calls.map((call) => ({
+            contractAddress: call.contract_address,
+            entrypoint: call.entry_point,
+            calldata: call.calldata,
+          })),
+        );
+      }
       // case 'wallet_requestChainId': {
       // }
       // case 'wallet_addStarknetChain': {

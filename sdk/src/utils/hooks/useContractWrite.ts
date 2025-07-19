@@ -1,39 +1,31 @@
-import { useCallback, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { BigNumberish, Abi, Account } from 'starknet'
-import { useAccount, useTransactionReceipt } from '@starknet-react/core'
-import { execute } from 'src/starknet/starknet'
-import { bigintToHex } from 'src/utils/misc/types'
+import { useAccount, useContract, useSendTransaction } from '@starknet-react/core'
+import { bigintToHex, isPositiveBigint } from 'src/utils/misc/types'
+import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
 
-export function useContractWrite(contractAddress: BigNumberish, abi: Abi, functionName: string, callData: BigNumberish[], fromAccount: Account = null) {
+export function useContractWrite(contractAddress: BigNumberish, abi: Abi, functionName: string, callData: BigNumberish[]) {
   const { account } = useAccount()
+  const { dojoProvider } = useDojoSetup()
   const [transactionHash, setTransactionHash] = useState<string>(null)
-  const [isPending, setIsPending] = useState(false)
-  const [isError, setIsError] = useState(false)
 
-  const write = useCallback(async () => {
-    setTransactionHash(null)
-    setIsPending(true)
-    setIsError(false)
-    const { transaction_hash } = await execute(
-      fromAccount ?? account,
-      bigintToHex(contractAddress),
-      abi,
-      functionName,
-      callData,
-    )
-    setTransactionHash(transaction_hash)
-    setIsPending(false)
-    setIsError(!transaction_hash)
-  }, [account, fromAccount, contractAddress, functionName, callData])
+  const { contract } = useContract({
+    abi,
+    address: isPositiveBigint(contractAddress) ? bigintToHex(contractAddress) : null,
+    provider: dojoProvider.provider,
+  });
 
-  const { isLoading, isError: isReverted, error, data: receipt } = useTransactionReceipt({ hash: transactionHash, watch: true })
+  const { sendAsync: write, data, isError, error, isPending } = useSendTransaction({
+    calls: (account && contract) ? [contract.populate(functionName, callData)] : undefined,
+  });
+
+  // const { isLoading, isError: isReverted, error, data: receipt } = useTransactionReceipt({ hash: transactionHash, watch: true })
 
   return {
     write,
     transactionHash,
-    receipt,
-    isLoading: (isPending || isLoading),
-    isError: (isError || isReverted),
+    isLoading: isPending,
+    isError,
     error,
   }
 }

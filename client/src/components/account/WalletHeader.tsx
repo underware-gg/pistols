@@ -23,7 +23,7 @@ const Col = Grid.Column
 export default function WalletHeader({
 }) {
   const { disconnect } = useDisconnect()
-  const { account, address, isConnected, connector } = useAccount()
+  const { address, isConnected, connector } = useAccount()
   const { selectedNetworkConfig } = useDojoSetup()
   const { lordsContractAddress } = useTokenContracts()
   const { dispatchSetScene } = usePistolsScene()
@@ -79,7 +79,7 @@ export default function WalletHeader({
         <Row columns={'equal'}>
           {lordsContractAddress &&
             <Col verticalAlign='middle'>
-              <LordsFaucet fill account={account} />
+              <LordsFaucet fill />
             </Col>
           }
           <Col verticalAlign='middle'>
