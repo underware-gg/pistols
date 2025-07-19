@@ -1,5 +1,5 @@
 import { Account, AccountInterface, RpcProvider, constants, Call } from 'starknet'
-import { AddInvokeTransactionParameters } from '@starknet-io/types-js'
+import { AddInvokeTransactionParameters, RequestFn } from '@starknet-io/types-js'
 import { Connector } from '@starknet-react/core'
 import { stringToFelt } from 'src/starknet/starknet'
 import { ExternalWallet } from "@cartridge/controller";
@@ -81,7 +81,7 @@ export class PredeployedConnector extends Connector {
 
   // example:
   // https://github.com/argentlabs/starknetkit/blob/develop/src/connectors/webwallet/starknetWindowObject/argentStarknetWindowObject.ts#L56
-  async request(call: any) {
+  request: RequestFn = async (call) => {
     switch (call.type) {
       case 'wallet_requestAccounts': {
         return [this._account.address]
@@ -101,8 +101,9 @@ export class PredeployedConnector extends Connector {
           })),
         );
       }
-      // case 'wallet_requestChainId': {
-      // }
+      case 'wallet_requestChainId': {
+        return await this._account.getChainId();
+      }
       // case 'wallet_addStarknetChain': {
       // }
       // case 'wallet_switchStarknetChain': {
