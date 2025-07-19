@@ -1,6 +1,6 @@
 
 import { useCallback } from 'react'
-import { SwitchStarknetChainParameters, AddStarknetChainParameters } from 'get-starknet-core'
+import { SwitchStarknetChainParameters, AddStarknetChainParameters } from '@starknet-io/get-starknet-core'
 
 // TODO: use this...
 // import { useSwitchChain } from "@starknet-react/core";

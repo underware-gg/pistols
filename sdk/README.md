@@ -16,21 +16,21 @@
 
 ## Dependencies (sort of...)
 
-|                          | `/utils` | `/abis`  | `/dojo` | `/dojo/graphql` | `/pistols/config` | `/pistols` |
-|--------------------------|:--------:|:--------:|:-------:|:---------------:|:-----------------:|:----------:|
-| `starknet`               | ✅       | ✅        | ✅      | ✅             |  ✅               |  ✅        |
-| `starknetid.js`          | ✅       |           |         |                |                   |            |
-| `get-starknet-core`      | ✅       |           | ✅      |                |                   |            |
-| `react`                  | ✅       |           | ✅      | ✅             |                   |            |
-| `@starknet-react/chains` |          |           | ✅      |                | ✅                |            |
-| `@starknet-react/core`   | ✅       |           | ✅      | ✅             |                   |            |
-| `@cartridge/controller`  |          |           | ✅      |                |                   | ✅         |
-| `@cartridge/connector`   |          |           | ✅      |                |                   |            |
-| `@dojoengine/core`       |          |           | ✅      |                | ✅                | ✅         |
-| `@dojoengine/sdk`        |          |           | ✅      |                |                   | ✅         |
-| `@dojoengine/utils`      | ✅       |           |         |                |                   |            |
-| `@apollo/client`         |          |           |         | ✅             |                   |            |
-| `universal-cookie`       |          |           |         |                |                   | ✅         |
+|                                  | `/utils` | `/abis`  | `/dojo` | `/dojo/graphql` | `/pistols/config` | `/pistols` |
+|----------------------------------|:--------:|:--------:|:-------:|:---------------:|:-----------------:|:----------:|
+| `starknet`                       | ✅       | ✅        | ✅      | ✅             |  ✅               |  ✅        |
+| `starknetid.js`                  | ✅       |           |         |                |                   |            |
+| `@starknet-io/get-starknet-core` | ✅       |           | ✅      |                |                   |            |
+| `react`                          | ✅       |           | ✅      | ✅             |                   |            |
+| `@starknet-react/chains`         |          |           | ✅      |                | ✅                |            |
+| `@starknet-react/core`           | ✅       |           | ✅      | ✅             |                   |            |
+| `@cartridge/controller`          |          |           | ✅      |                |                   | ✅         |
+| `@cartridge/connector`           |          |           | ✅      |                |                   |            |
+| `@dojoengine/core`               |          |           | ✅      |                | ✅                | ✅         |
+| `@dojoengine/sdk`                |          |           | ✅      |                |                   | ✅         |
+| `@dojoengine/utils`              | ✅       |           |         |                |                   |            |
+| `@apollo/client`                 |          |           |         | ✅             |                   |            |
+| `universal-cookie`               |          |           |         |                |                   | ✅         |
 
 
 ## Installation

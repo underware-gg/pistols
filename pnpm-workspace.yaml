@@ -8,10 +8,10 @@ catalog:
   #--------------------------------
   # dojo.js
   #
-  "@dojoengine/core": 1.5.16
-  "@dojoengine/sdk": 1.5.16
-  "@dojoengine/torii-client": 1.5.16
-  "@dojoengine/utils": 1.5.16
+  "@dojoengine/core": 1.6.0
+  "@dojoengine/sdk": 1.6.0
+  "@dojoengine/torii-client": 1.6.0
+  "@dojoengine/utils": 1.6.0
   # "@dojoengine/core": ../../dojo.js/packages/core
   # "@dojoengine/sdk": ../../dojo.js/packages/sdk
   # "@dojoengine/torii-client": ../../dojo.js/packages/torii-client
@@ -21,11 +21,11 @@ catalog:
   # same as dojo.js
   # https://github.com/dojoengine/dojo.js/blob/main/pnpm-workspace.yaml
   #
-  "@starknet-react/core": ^3.6.2
-  "@starknet-react/chains": ^3.1.0
+  "@starknet-react/core": ^4.0.1-beta.4
+  "@starknet-react/chains": ^4.0.1-beta.3
   "@tanstack/react-query": ^5.62.16
-  get-starknet-core: ^4.0.0
-  starknet: 6.23.1
+  "@starknet-io/get-starknet-core": 4.0.7
+  starknet: ^7.6.2
   immer: ^10.1.1
   zustand: ^4.5.5
   "@types/react": ^18.3.1
@@ -36,12 +36,12 @@ catalog:
   #--------------------------------
   # misc
   #
-  "@cartridge/connector": 0.8.0
-  "@cartridge/controller": 0.8.0
+  "@cartridge/connector": 0.9.2
+  "@cartridge/controller": 0.9.2
   "@cartridge/presets": 0.5.4
   "@apollo/client": ^3.11.8
   "@types/node": "^22.10.2"
-  starknetid.js: ^4.0.0
+  starknetid.js: ^4.0.3
   typescript: ^5.5.4
   tsup: ^8.3.5
   universal-cookie: "^8.0.1"
