@@ -45,7 +45,7 @@
     "dexie": "^4.0.11",
     "dexie-react-hooks": "^1.1.7",
     "event-emitter": "^0.3.5",
-    "get-starknet-core": "catalog:",
+    "@starknet-io/get-starknet-core": "catalog:",
     "immer": "catalog:",
     "lil-gui": "^0.19.2",
     "react": "catalog:",

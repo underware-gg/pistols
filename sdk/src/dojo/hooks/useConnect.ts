@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Connector, useAccount, useConnect, useNetwork } from '@starknet-react/core'
-import { SwitchStarknetChainParameters, AddStarknetChainParameters } from 'get-starknet-core'
+import { SwitchStarknetChainParameters, AddStarknetChainParameters } from '@starknet-io/get-starknet-core'
 import { useAddStarknetChain, useSwitchStarknetChain } from 'src/utils/hooks/useWalletRequest'
 import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
 import { feltToString } from 'src/starknet/starknet'

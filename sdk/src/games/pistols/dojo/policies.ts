@@ -1,4 +1,4 @@
-import type { SessionPolicies } from '@cartridge/presets'
+import type { SessionPolicies } from '@cartridge/controller'
 import type { DojoAppConfig, ContractPolicyDescriptions, SignedMessagePolicyDescriptions } from 'src/dojo/contexts/Dojo'
 import { makeControllerPolicies } from 'src/games/pistols/dojo/controller_connector'
 import { makeStarknetDomain } from 'src/games/pistols/config/typed_data'

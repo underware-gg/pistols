@@ -112,9 +112,9 @@ export const useSdkTokenBalancesSub = ({
 
   useEffect(() => {
     let _subscription: torii.Subscription = undefined;
-    const _subscribe = () => {
+    const _subscribe = async () => {
       debug.log(`useSdkTokenBalancesSub() SUBSCRIBE......`, contracts)
-      _subscription = sdk.onTokenBalanceUpdated({
+      _subscription = await sdk.onTokenBalanceUpdated({
         contractAddresses: contracts.map(c => bigintToHex(c)),
         accountAddresses: [],
         tokenIds: [],

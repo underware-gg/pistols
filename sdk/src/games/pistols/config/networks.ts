@@ -389,6 +389,7 @@ export const getNetworkConfig = (networkId: NetworkId, env?: DojoNetworkEnv): Do
         public: { http: [] },
       },
       explorers: result.explorers,
+      paymasterRpcUrls: {},
     } as Chain
   }
 
