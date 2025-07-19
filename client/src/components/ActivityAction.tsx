@@ -105,11 +105,25 @@ const ActionItem = ({
   }
 
   // in a duel, required to play
-  if (action === constants.ChallengeAction.Commit || action === constants.ChallengeAction.Reveal) {
+  if (action === constants.ChallengeAction.Commit) {
     return (
       <>
         <Icon name='circle' className='Positive' />
         {'Shoot at '}
+        <DuelOpponentNameLink duelId={duelId} />
+        {' in '}
+        <ChallengeLink duelId={duelId} />
+        <br />
+      </>
+    )
+  }
+
+  // in a duel, required to play
+  if (action === constants.ChallengeAction.Reveal) {
+    return (
+      <>
+        <Icon name='circle' className='Positive' />
+        {'Confront '}
         <DuelOpponentNameLink duelId={duelId} />
         {' in '}
         <ChallengeLink duelId={duelId} />
