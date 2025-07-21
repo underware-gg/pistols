@@ -474,6 +474,7 @@ export const CardPackAnimationWrapper = forwardRef<CardPackAnimationWrapperHandl
         optionalTitle={props.optionalTitle}
         customButtonLabel={props.customButtonLabel}
         atTutorialEnding={props.atTutorialEnding}
+        displayPackName={true}
       />
     </div>
   )

@@ -28,6 +28,8 @@ const PACK_BASE_Z_INDEX = 10
 const PACKS_PER_ROW = 10
 const MAX_VISIBLE_PACKS = PACKS_PER_ROW * 2
 
+const availablePackTypes = Object.keys(constants.PACK_TYPES).filter(key => constants.PACK_TYPES[key].can_purchase).map(key => constants.PACK_TYPES[key].id as constants.PackType)
+
 export default function ScCardPacks() {
   const { dispatchSetScene } = usePistolsScene()
   const { aspectWidth } = useGameAspect()
@@ -60,8 +62,6 @@ export default function ScCardPacks() {
     
     return refsMap
   }, [visiblePacks, selectedCardPack])
-  
-  const availablePackTypes = [constants.PackType.GenesisDuelists5x]
   
   const handlePurchasePack = () => {
     if (isConnected && account) {
@@ -161,7 +161,7 @@ export default function ScCardPacks() {
     else if (selectedCardPack !== null) {
       if (!fromPack) {
         const packRef = packRefsMap.get(selectedCardPack)?.current;
-        
+
         if (packRef) {
           if (!packRef.isInProcessOfClaiming()) {
             packRef.toggleFullscreen(false, 700, TWEEN.Easing.Quadratic.Out);
@@ -231,7 +231,6 @@ export default function ScCardPacks() {
     return (
       <CardPackAnimationWrapper
         key={packId}
-        packType={constants.PackType.GenesisDuelists5x}
         ref={packRefsMap.get(packId)}
         startPosition={position}
         startRotation={0}

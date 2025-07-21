@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import TWEEN from '@tweenjs/tween.js'
 import { DuelistCard, DuelistCardHandle } from '/src/components/cards/DuelistCard';
 import { useGameAspect } from '/src/hooks/useGameAspect';
@@ -24,7 +24,7 @@ import {
 import { useAccount } from '@starknet-react/core';
 import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists';
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo';
-import { usePackType } from '/src/stores/packStore';
+import { usePack, usePackType } from '/src/stores/packStore';
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { useFundedStarterPackCount } from '/src/stores/bankStore';
 import { Button } from 'semantic-ui-react';
@@ -43,7 +43,8 @@ interface CardPack {
   optionalTitle?: string,
   customButtonLabel?: string,
   atTutorialEnding?: boolean,
-  cardPackOnly?: boolean
+  cardPackOnly?: boolean,
+  displayPackName?: boolean
 }
 
 // Add this interface to expose methods
@@ -51,11 +52,14 @@ export interface CardPackHandle {
   isInProcessOfClaiming: () => boolean;
 }
 
-export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType, packId, onComplete, onClick, onHover, isOpen = false, clickable = true, cardPackSize, maxTilt, optionalTitle, customButtonLabel, atTutorialEnding = false, cardPackOnly = false }: CardPack, ref) => {
+export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType: packTypeFromProps, packId, onComplete, onClick, onHover, isOpen = false, clickable = true, cardPackSize, maxTilt, optionalTitle, customButtonLabel, atTutorialEnding = false, cardPackOnly = false, displayPackName = false }: CardPack, ref) => {
   const { account } = useAccount()
   const { pack_token } = useDojoSystemCalls()
   const { duelistIds } = useDuelistsOfPlayer()
-  const { quantity } = usePackType(packType)
+
+  const { packType: packTypeFromId } = usePack(packId)
+  const packType = useMemo(() => (packTypeFromProps ?? packTypeFromId), [packTypeFromProps, packTypeFromId])
+  const { quantity, name: packName } = usePackType(packType)
   const { fundedCount } = useFundedStarterPackCount()
   
   const [isNoFundsModalOpen, setIsNoFundsModalOpen] = useState(false)
@@ -80,7 +84,7 @@ export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType, packId
       e.stopPropagation();
       return;
     }
-    
+
     onClick?.(e, fromInternalElement);
   }
   
@@ -98,7 +102,7 @@ export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType, packId
       } else {
         setIsNoFundsModalOpen(true)
       }
-    } else if (packType === constants.PackType.GenesisDuelists5x && packId) {
+    } else if (packId) {
       setIsClaiming(true)
       await pack_token.open(account, packId)
     }
@@ -466,7 +470,16 @@ export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType, packId
               <div className="front-bag-layer-4" />
             </>
           )}
+
+          {displayPackName && (
+            <div className="pack-name">
+              #{packId}
+              <br />
+              {packName ?? '...'}
+            </div>
+          )}
         </div>
+
 
         {/* Flip container */}
         <div className={`flip-container YesMouse ${isOpening ? 'opening' : ''}`} onClick={e => handleCardPackClick(e, true)} ref={flipContainerRef}>

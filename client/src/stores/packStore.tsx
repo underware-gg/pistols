@@ -16,7 +16,7 @@ export const usePackStore = createDojoStore<PistolsSchemaType>();
 
 export const usePackType = (packType: constants.PackType) => {
   const descriptor = useMemo(() => constants.PACK_TYPES[packType], [packType])
-  const name = useMemo(() => (descriptor?.name ?? 'Pack'), [descriptor])
+  const name = useMemo(() => (descriptor?.name ?? null), [descriptor])
   const canPurchase = useMemo(() => (descriptor?.can_purchase ?? false), [descriptor])
   const priceLords = useMemo(() => (descriptor?.price_lords ?? null), [descriptor])
   const quantity = useMemo(() => (descriptor?.quantity ?? null), [descriptor])
@@ -48,7 +48,7 @@ export const usePack = (pack_id: BigNumberish) => {
 
   const packExists = useMemo(() => Boolean(pack), [pack])
   const isOpen = useMemo(() => pack?.is_open ?? false, [pack])
-  const packType = useMemo(() => parseEnumVariant<constants.PackType>(pack?.pack_type), [pack])
+  const packType = useMemo(() => pack ? parseEnumVariant<constants.PackType>(pack.pack_type) : null, [pack])
   const descriptor = usePackType(packType)
 
   const packIdDisplay = useMemo(() => (
