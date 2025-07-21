@@ -10,20 +10,24 @@ import {
   getDuelTokenAddress,
   getRingTokenAddress,
   getTournamentTokenAddress,
+  getBotPlayerAddress,
 } from '@underware/pistols-sdk/pistols/config'
 
 export const useTokenContracts = () => {
   const { selectedNetworkId } = useDojoSetup()
   // erc-20
-  const lordsContractAddress = getLordsAddress(selectedNetworkId)
-  const fameContractAddress = getFameAddress(selectedNetworkId)
-  const foolsContractAddress = getFoolsAddress(selectedNetworkId)
+  const lordsContractAddress = useMemo(() => getLordsAddress(selectedNetworkId), [selectedNetworkId])
+  const fameContractAddress = useMemo(() => getFameAddress(selectedNetworkId), [selectedNetworkId])
+  const foolsContractAddress = useMemo(() => getFoolsAddress(selectedNetworkId), [selectedNetworkId])
   // erc-721
-  const packContractAddress = getPackTokenAddress(selectedNetworkId)
-  const duelistContractAddress = getDuelistTokenAddress(selectedNetworkId)
-  const duelContractAddress = getDuelTokenAddress(selectedNetworkId)
-  const ringContractAddress = getRingTokenAddress(selectedNetworkId)
-  const tournamentContractAddress = getTournamentTokenAddress(selectedNetworkId)
+  const packContractAddress = useMemo(() => getPackTokenAddress(selectedNetworkId), [selectedNetworkId])
+  const duelistContractAddress = useMemo(() => getDuelistTokenAddress(selectedNetworkId), [selectedNetworkId])
+  const duelContractAddress = useMemo(() => getDuelTokenAddress(selectedNetworkId), [selectedNetworkId])
+  const ringContractAddress = useMemo(() => getRingTokenAddress(selectedNetworkId), [selectedNetworkId])
+  const tournamentContractAddress = useMemo(() => getTournamentTokenAddress(selectedNetworkId), [selectedNetworkId])
+  // misc
+  const botPlayerContractAddress = useMemo(() => getBotPlayerAddress(selectedNetworkId), [selectedNetworkId])
+  
   return {
     lordsContractAddress,
     fameContractAddress,
@@ -33,6 +37,7 @@ export const useTokenContracts = () => {
     duelContractAddress,
     ringContractAddress,
     tournamentContractAddress,
+    botPlayerContractAddress,
   }
 }
 

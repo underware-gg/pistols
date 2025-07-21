@@ -69,6 +69,8 @@ enum TextureName {
   bg_duelists_pistol_mask = 'bg_duelists_pistol_mask',
   bg_duelists_matchmaking = 'bg_duelists_matchmaking',
   bg_duelists_matchmaking_mask = 'bg_duelists_matchmaking_mask',
+  bg_duelists_singleplayer = 'bg_duelists_singleplayer',
+  bg_duelists_singleplayer_mask = 'bg_duelists_singleplayer_mask',
   bg_duelists_tutorial = 'bg_duelists_tutorial',
   bg_duelists_tutorial_mask = 'bg_duelists_tutorial_mask',
 
@@ -169,6 +171,8 @@ const TEXTURES: Record<TextureName, TextureAttributes> = {
   [TextureName.bg_duelists_pistol_mask]: { path: '/images/scenes/duelists/bg_duelists_pistol_mask.png' },
   [TextureName.bg_duelists_matchmaking]: { path: '/images/scenes/duelists/bg_duelists_matchmaking.png' },
   [TextureName.bg_duelists_matchmaking_mask]: { path: '/images/scenes/duelists/bg_duelists_matchmaking_mask.png' },
+  [TextureName.bg_duelists_singleplayer]: { path: '/images/scenes/duelists/bg_duelists_singleplayer.png' },
+  [TextureName.bg_duelists_singleplayer_mask]: { path: '/images/scenes/duelists/bg_duelists_singleplayer_mask.png' },
   [TextureName.bg_duelists_tutorial]: { path: '/images/scenes/duelists/bg_duelists_tutorial.png' },
   [TextureName.bg_duelists_tutorial_mask]: { path: '/images/scenes/duelists/bg_duelists_tutorial_mask.png' },
 
@@ -357,14 +361,16 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
       { texture: TextureName.bg_duelists_background, shiftMultiplier: 0, renderOrder: 0 },
       { texture: TextureName.bg_duelists_items, shiftMultiplier: 0, renderOrder: 1 },
       { texture: TextureName.bg_duelists_pistol, shiftMultiplier: 0, renderOrder: 2 },
-      { texture: TextureName.bg_duelists_matchmaking, shiftMultiplier: 0, renderOrder: 3 },
+      // { texture: TextureName.bg_duelists_matchmaking, shiftMultiplier: 0, renderOrder: 3 },
+      { texture: TextureName.bg_duelists_singleplayer, shiftMultiplier: 0, renderOrder: 3 },
       { texture: TextureName.bg_duelists_tutorial, shiftMultiplier: 0, renderOrder: 3 },
     ],
     items: [
       { name: 'left arrow', color: '00ff00', description: 'Previous Page', mask: TextureName.bg_duelists_items_mask, renderOrder: 1 },
       { name: 'right arrow', color: 'ff0000', description: 'Next Page', mask: TextureName.bg_duelists_items_mask, renderOrder: 1 },
       { name: 'pistol', color: '0000ff', description: 'Your Duels', mask: TextureName.bg_duelists_pistol_mask, renderOrder: 2 },
-      { name: 'matchmaking', color: 'ffff00', description: 'Matchmaking', mask: TextureName.bg_duelists_matchmaking_mask, renderOrder: 3 },
+      // { name: 'matchmaking', color: 'ffff00', description: 'Matchmaking', mask: TextureName.bg_duelists_matchmaking_mask, renderOrder: 3 },
+      { name: 'singleplayer', color: 'ffff00', description: 'Single Player Duel', mask: TextureName.bg_duelists_singleplayer_mask, renderOrder: 3 },
       { name: 'tutorial', color: 'ff00ff', description: 'Tutorial', mask: TextureName.bg_duelists_tutorial_mask, renderOrder: 3 },
     ]
   },

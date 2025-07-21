@@ -1,18 +1,21 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import * as TWEEN from '@tweenjs/tween.js'
-import { SortDirection, PlayerColumn, useQueryParams, ChallengeColumn } from '/src/stores/queryParamsStore'
+import { useAccount } from '@starknet-react/core'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { useGameEvent } from '/src/hooks/useGameEvent'
 import { useQueryPlayerIds } from '/src/stores/playerStore'
 import { useGameAspect } from '/src/hooks/useGameAspect'
+import { useFetchChallengeIdsByPlayer, useQueryChallengesByPlayer } from '/src/stores/challengeStore'
+import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { DojoSetupErrorDetector } from '/src/components/account/DojoSetupErrorDetector'
 import { POSTER_HEIGHT_SMALL, POSTER_WIDTH_SMALL, ProfilePoster, ProfilePosterHandle } from '/src/components/ui/ProfilePoster'
+import { SortDirection, PlayerColumn, useQueryParams, ChallengeColumn } from '/src/stores/queryParamsStore'
 import { SceneName } from '/src/data/assets'
-import { useFetchChallengeIdsByPlayer, useQueryChallengesByPlayer } from '/src/stores/challengeStore'
-import { useAccount } from '@starknet-react/core'
 import { LiveChallengeStates } from '/src/utils/pistols'
 import DuelTutorialOverlay from '/src/components/ui/duel/DuelTutorialOverlay'
 import { bigintEquals } from '@underware/pistols-sdk/utils'
+import { usePactGet } from '/src/queries/usePact'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 export default function ScDuelists() {
   const { filterPlayerName, filterPlayerOnline, filterPlayerBookmarked, filterPlayerSortColumn, filterPlayerSortDirection } = useQueryParams()
@@ -25,8 +28,10 @@ export default function ScDuelists() {
   const { challenges: currentChallenges } = useQueryChallengesByPlayer(address, LiveChallengeStates)
 
   const { aspectWidth, aspectHeight } = useGameAspect()
-  const { dispatchSelectPlayerAddress, tutorialOpener } = usePistolsContext()
+  const { dispatchSelectPlayerAddress, tutorialOpener, duelistSelectOpener, dispatchChallengingPlayerAddress, dispatchSelectDuel } = usePistolsContext()
   const { dispatchSetScene} = usePistolsScene()
+  const { botPlayerContractAddress } = useTokenContracts()
+  const { hasPact, pactDuelId } = usePactGet(constants.DuelType.BotPlayer, address, botPlayerContractAddress)
 
   const availableMatchmakingPlayers = useMemo(() => {
     return matchmakingPlayerAddresses.filter(address => (
@@ -62,7 +67,17 @@ export default function ScDuelists() {
             const randomPlayer = availableMatchmakingPlayers[randomIndex]
             dispatchSelectPlayerAddress(randomPlayer)
           } else {
-            console.log("No players available for matchmaking")             
+            console.log("No players available for matchmaking")
+          }
+          break
+        case 'singleplayer':
+          if (!hasPact) {
+            // pick duelist and create a new duel
+            dispatchChallengingPlayerAddress(botPlayerContractAddress);
+            duelistSelectOpener.open();
+          } else {
+            // go to existing duel
+            dispatchSelectDuel(pactDuelId);
           }
           break
         case 'tutorial':

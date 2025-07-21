@@ -5,7 +5,7 @@ import { useAccount } from '@starknet-react/core'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
 import { useLordsBalance } from '/src/stores/coinStore'
-import { usePact } from '/src/queries/usePact'
+import { usePactSubscription } from '/src/queries/usePact'
 import { useIsMyAccount } from '/src/hooks/useIsYou'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { CustomIcon, IconClick, IconSizeProp } from '/src/components/ui/Icons'
@@ -364,7 +364,7 @@ export function ChallengeButton({
   const { address } = useAccount()
 
   const { isMyAccount } = useIsMyAccount(challengedPlayerAddress)
-  const { hasPact, pactDuelId } = usePact(constants.DuelType.Seasonal, address, challengedPlayerAddress, true)
+  const { hasPact, pactDuelId } = usePactSubscription(constants.DuelType.Seasonal, address, challengedPlayerAddress, true)
   const canChallenge = (!hasPact && !isMyAccount)
 
   const { isLoading, isWaitingForIndexer } = useTransactionObserver({ key: `create_duel${challengedPlayerAddress}`, indexerCheck: hasPact })

@@ -4,10 +4,11 @@ import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
-import { usePact } from '/src/queries/usePact'
+import { usePactSubscription } from '/src/queries/usePact'
 import { useCalcSeasonReward, useCanJoin } from '/src/hooks/usePistolsContractCalls'
+import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { ActionButton } from '/src/components/ui/Buttons'
-import { formatOrdinalNumber, isPositiveBigint } from '@underware/pistols-sdk/utils'
+import { bigintEquals, formatOrdinalNumber, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { POSTER_HEIGHT_SMALL, POSTER_WIDTH_SMALL, ProfilePoster } from '/src/components/ui/ProfilePoster'
 import { DuelistCard } from '/src/components/cards/DuelistCard';
 import { FormInput } from '/src/components/ui/Form'
@@ -31,18 +32,18 @@ export default function NewChallengeModal() {
   const isOpen = useMemo(() => (challengingAddress > 0n && challengingDuelistId > 0n), [challengingDuelistId, challengingDuelistId])
 
   useEffect(() => {
-  const handleKeyDown = (e: KeyboardEvent) => {
-    if (isOpen) {
-      e.stopPropagation();
-    }
-  };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (isOpen) {
+        e.stopPropagation();
+      }
+    };
 
-  document.addEventListener("keydown", handleKeyDown, true);
+    document.addEventListener("keydown", handleKeyDown, true);
 
-  return () => {
-    document.removeEventListener("keydown", handleKeyDown, true);
-  };
-}, [isOpen]);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown, true);
+    };
+  }, [isOpen]);
 
   return (<>{isOpen && <_NewChallengeModal isOpen={isOpen} />}</>)
 }
@@ -55,31 +56,35 @@ function _NewChallengeModal({
   const { duel_token } = useDojoSystemCalls()
   const { account, address } = useAccount()
   const { aspectWidth, aspectHeight, boxH, boxW } = useGameAspect()
-  
+
   const buttonRef = useRef<HTMLDivElement>(null)
-  
-  const { 
-    duelistSelectOpener, 
-    challengingAddress, 
-    challengingDuelistId, 
-    dispatchChallengingPlayerAddress, 
-    dispatchChallengingDuelistId, 
-    dispatchSelectPlayerAddress, 
-    dispatchSelectDuel 
+
+  const {
+    duelistSelectOpener,
+    challengingAddress,
+    challengingDuelistId,
+    dispatchChallengingPlayerAddress,
+    dispatchChallengingDuelistId,
+    dispatchSelectPlayerAddress,
+    dispatchSelectDuel
   } = usePistolsContext()
+
+  const { botPlayerContractAddress } = useTokenContracts()
+  const isSinglePlayer = useMemo(() => bigintEquals(challengingAddress, botPlayerContractAddress), [challengingAddress, botPlayerContractAddress])
+  const duelType = useMemo(() => isSinglePlayer ? constants.DuelType.BotPlayer : constants.DuelType.Seasonal, [isSinglePlayer])
 
   const addressA = address
   const addressB = challengingAddress
 
-  const _close = () => { 
-    dispatchChallengingPlayerAddress(0n) 
+  const _close = () => {
+    dispatchChallengingPlayerAddress(0n)
     dispatchChallengingDuelistId(0n)
     duelistSelectOpener.close()
   }
 
-  const { hasPact, pactDuelId } = usePact(constants.DuelType.Seasonal, addressA, addressB, isOpen)
+  const { hasPact, pactDuelId } = usePactSubscription(duelType, addressA, addressB, isOpen)
   const { seasonName } = useCurrentSeason()
-  const { currentSeasonId } = useConfig() 
+  const { currentSeasonId } = useConfig()
 
   const [args, setArgs] = useState<any>(null)
 
@@ -88,7 +93,7 @@ function _NewChallengeModal({
 
   const { call: createDuel, isLoading, isWaitingForIndexer, meta } = useTransactionHandler<boolean, [constants.DuelType, BigNumberish, BigNumberish, number, number, constants.Premise, string]>({
     key: `create_duel${challengingAddress}`,
-    transactionCall: (duelType, duelistId, challengedAddr, livesStaked, expireHours, premise, message, key) => 
+    transactionCall: (duelType, duelistId, challengedAddr, livesStaked, expireHours, premise, message, key) =>
       duel_token.create_duel(account, duelType, duelistId, challengedAddr, livesStaked, expireHours, premise, message, key),
     indexerCheck: hasPact,
   })
@@ -108,7 +113,7 @@ function _NewChallengeModal({
   const _create_duel = () => {
     if (args?.canSubmit) {
       createDuel(
-        constants.DuelType.Seasonal,
+        duelType,
         challengingDuelistId,
         challengingAddress,
         args.lives_staked,
@@ -148,11 +153,11 @@ function _NewChallengeModal({
         <Modal.Content>
           <Grid>
             <Row>
-              <Col width={4} style={{  }}>
+              <Col width={4} style={{}}>
                 <div style={{ width: '100%', height: aspectHeight(POSTER_HEIGHT_SMALL), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <ProfilePoster
                     playerAddress={addressA}
-                    _close={() => {}}
+                    _close={() => { }}
                     isSmall={true}
                     isVisible={true}
                     instantVisible={true}
@@ -161,31 +166,32 @@ function _NewChallengeModal({
                   />
                 </div>
                 <div style={{ position: 'absolute', left: 0, top: aspectHeight(POSTER_HEIGHT_SMALL * 0.9) }}>
-                  <DuelistCard 
+                  <DuelistCard
                     width={DUELIST_CARD_WIDTH}
                     height={DUELIST_CARD_HEIGHT}
                     isSmall isLeft
-                    isVisible instantVisible 
+                    isVisible instantVisible
                     isFlipped instantFlip
                     isHanging shouldSwing isHangingLeft
-                    isHighlightable 
+                    isHighlightable
                     duelistId={Number(challengingDuelistId)}
                     onClick={() => !isLoading && duelistSelectOpener.open()}
                   />
                 </div>
               </Col>
-              
-              <Col width={8}>
+
+              <Col width={8} style={{ minHeight: '400px' }}>
                 <div className='TextDivider bright NewChallengeDivider'>
                   Terms of Combat
                 </div>
                 <div className='Spacer5' />
 
-                <NewChallengeForm 
-                  duelistId={challengingDuelistId} 
-                  setArgs={setArgs} 
+                <NewChallengeForm
+                  duelistId={challengingDuelistId}
+                  setArgs={setArgs}
                   isLoading={isLoading}
                   meta={meta}
+                  isSinglePlayer={isSinglePlayer}
                 />
 
                 <div className='Spacer20' />
@@ -232,11 +238,11 @@ function _NewChallengeModal({
                             height: '1px',
                             background: 'rgba(255,255,255,0.2)',
                             margin: `${aspectHeight(1)} 0`
-                          }}/>
+                          }} />
                           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <div style={{ textAlign: 'center', width: '100%' }}>
                               <span style={{ color: rewards?.win?.position > 0 ? '#00ff00' : rewards?.win?.position < 0 ? '#ff4444' : '#ffa500' }}>
-                                {rewards?.win?.position > 0 ? '↑' : rewards?.win?.position < 0 ? '↓' : '−'} 
+                                {rewards?.win?.position > 0 ? '↑' : rewards?.win?.position < 0 ? '↓' : '−'}
                                 {formatOrdinalNumber(rewards?.win?.position)} Place
                               </span>
                             </div>
@@ -273,7 +279,7 @@ function _NewChallengeModal({
                             height: '1px',
                             background: 'rgba(255,255,255,0.2)',
                             margin: `${aspectHeight(1)} 0`
-                          }}/>
+                          }} />
                           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <div style={{ textAlign: 'center', width: '100%' }}>
                               <span style={{ color: rewards?.lose?.survived ? '#ffa500' : '#ff4444' }}>
@@ -302,7 +308,7 @@ function _NewChallengeModal({
                 <div style={{ width: '100%', height: aspectHeight(POSTER_HEIGHT_SMALL), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <ProfilePoster
                     playerAddress={challengingAddress}
-                    _close={() => {}}
+                    _close={() => { }}
                     isSmall={true}
                     isVisible={true}
                     instantVisible={true}
@@ -311,11 +317,11 @@ function _NewChallengeModal({
                   />
                 </div>
                 <div style={{ position: 'absolute', left: aspectWidth(POSTER_WIDTH_SMALL * 0.5), top: aspectHeight(POSTER_HEIGHT_SMALL * 0.9) }} >
-                  <DuelistCard 
+                  <DuelistCard
                     width={DUELIST_CARD_WIDTH}
                     height={DUELIST_CARD_HEIGHT}
                     isSmall isLeft={false}
-                    isVisible instantVisible 
+                    isVisible instantVisible
                     isFlipped={false}
                     isHanging shouldSwing isHangingLeft
                     showBack
@@ -360,18 +366,20 @@ function NewChallengeForm({
   setArgs,
   isLoading,
   meta,
+  isSinglePlayer,
 }: {
   duelistId: BigNumberish
   setArgs: (args: any) => void
   isLoading: boolean
   meta: any
+  isSinglePlayer: boolean
 }) {
   const { lives } = useDuelistFameBalance(duelistId)
   const { dispatchChallengingDuelistId } = usePistolsContext()
 
   const { aspectWidth, aspectHeight } = useGameAspect()
-  
-  const [premise, setPremise] = useState(constants.Premise.Honour)
+
+  const [premise, setPremise] = useState(isSinglePlayer ? constants.Premise.Nothing : constants.Premise.Honour)
   const [message, setMessage] = useState('')
   const [days, setDays] = useState(7)
   const [hours, setHours] = useState(0)
@@ -383,7 +391,7 @@ function NewChallengeForm({
     if (!meta || !Array.isArray(meta) || meta.every(item => item === undefined)) return null
     return {
       duelType: meta[0] as constants.DuelType,
-      duelistId: meta[1] as BigNumberish, 
+      duelistId: meta[1] as BigNumberish,
       challengedAddr: meta[2] as BigNumberish,
       livesStaked: meta[3] as number,
       expireHours: meta[4] as number,
@@ -435,7 +443,7 @@ function NewChallengeForm({
           placeholder={null}
           selection
           fluid
-          disabled={isLoading}
+          disabled={isLoading || isSinglePlayer}
           value={constants.PREMISES[premise].name}
           onChange={(e, { value }) => !isLoading && setPremise(value as constants.Premise)}
         />
@@ -449,74 +457,75 @@ function NewChallengeForm({
           fluid
           setValue={(value) => !isLoading && setMessage(value)}
           code={true}
-          disabled={isLoading}
+          disabled={isLoading || isSinglePlayer}
           maxLength={128}
         />
       </Form.Field>
-      
-      <div className={`NewChallengeDivider Small VerticalSpacing Centered`} style={{ marginTop: aspectHeight(2) }}>STAKES</div>
-      
-      <div 
-        className={`${!hasEnoughLives ? 'Canceled' : highStakes ? 'Important' : ''}`}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginTop: aspectHeight(1),
-          marginBottom: aspectHeight(1),
-          position: 'relative',
-          cursor: hasEnoughLives && !isLoading ? 'pointer' : 'not-allowed',
-        }}
-        onClick={handleHighStakesToggle}
-        tabIndex={hasEnoughLives && !isLoading ? 0 : -1}
-        onKeyDown={(e) => e.key === 'Enter' && handleHighStakesToggle()}
-        aria-label="Toggle high stakes"
-      >
-        <div 
+
+      {!isSinglePlayer && (<>
+        <div className={`NewChallengeDivider Small VerticalSpacing Centered`} style={{ marginTop: aspectHeight(2) }}>STAKES</div>
+        <div
+          className={`${!hasEnoughLives ? 'Canceled' : highStakes ? 'Important' : ''}`}
           style={{
-            width: aspectWidth(2),
-            height: aspectWidth(2),
-            border: `2px solid ${highStakes ? COLORS.MEDIUM : COLORS.BRIGHTEST}`,
-            borderRadius: aspectWidth(0.4),
-            marginRight: aspectWidth(1.2),
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: highStakes ? 'rgba(239, 151, 88, 0.2)' : 'transparent',
-            boxShadow: highStakes ? '0 0 10px rgba(239, 151, 88, 0.3)' : 'none',
-            transition: 'all 0.15s ease'
+            marginTop: aspectHeight(1),
+            marginBottom: aspectHeight(1),
+            position: 'relative',
+            cursor: hasEnoughLives && !isLoading ? 'pointer' : 'not-allowed',
           }}
+          onClick={handleHighStakesToggle}
+          tabIndex={hasEnoughLives && !isLoading ? 0 : -1}
+          onKeyDown={(e) => e.key === 'Enter' && handleHighStakesToggle()}
+          aria-label="Toggle high stakes"
         >
-          {highStakes && <div style={{
-            width: '60%',
-            height: '60%',
-            backgroundColor: COLORS.MEDIUM,
-            borderRadius: aspectWidth(0.2)
-          }} />}
-        </div>
-        
-        <div style={{ 
-          fontWeight: '600', 
-          fontSize: aspectWidth(1),
-          textTransform: 'uppercase',
-          letterSpacing: '0.5px'
-        }}>
-          HIGH STAKES (3 LIVES AT RISK)
-        </div>
-        
-        {!hasEnoughLives && (
+          <div
+            style={{
+              width: aspectWidth(2),
+              height: aspectWidth(2),
+              border: `2px solid ${highStakes ? COLORS.MEDIUM : COLORS.BRIGHTEST}`,
+              borderRadius: aspectWidth(0.4),
+              marginRight: aspectWidth(1.2),
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: highStakes ? 'rgba(239, 151, 88, 0.2)' : 'transparent',
+              boxShadow: highStakes ? '0 0 10px rgba(239, 151, 88, 0.3)' : 'none',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            {highStakes && <div style={{
+              width: '60%',
+              height: '60%',
+              backgroundColor: COLORS.MEDIUM,
+              borderRadius: aspectWidth(0.2)
+            }} />}
+          </div>
+
           <div style={{
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            top: '50%',
-            height: '2px',
-            background: 'linear-gradient(to right, transparent 5%, #e34a4a 15%, #e34a4a 85%, transparent 95%)',
-            boxShadow: '0 0 8px #e34a4a',
-            transform: 'translateY(-50%)'
-          }} />
-        )}
-      </div>
+            fontWeight: '600',
+            fontSize: aspectWidth(1),
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px'
+          }}>
+            HIGH STAKES (3 LIVES AT RISK)
+          </div>
+
+          {!hasEnoughLives && (
+            <div style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: '50%',
+              height: '2px',
+              background: 'linear-gradient(to right, transparent 5%, #e34a4a 15%, #e34a4a 85%, transparent 95%)',
+              boxShadow: '0 0 8px #e34a4a',
+              transform: 'translateY(-50%)'
+            }} />
+          )}
+        </div>
+      </>)}
     </Form>
   )
 }
