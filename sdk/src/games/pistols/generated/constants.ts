@@ -514,7 +514,6 @@ export const getGenesisKeyMap = (): Record<GenesisKey, number> => Object.keys(Ge
 export enum LegendsKey {
   Unknown = 'Unknown', // 0
   TGC1 = 'TGC1', // 1
-  TGC2 = 'TGC2', // 2
 };
 export const getLegendsKeyValue = (name: LegendsKey): number | undefined => _indexOrUndefined(Object.keys(LegendsKey).indexOf(name));
 export const getLegendsKeyFromValue = (value: number): LegendsKey | undefined => Object.keys(LegendsKey)[value] as LegendsKey;
@@ -1213,7 +1212,7 @@ export const COLLECTIONS: type_COLLECTIONS = {
   Legends: {
     name: 'Legends Collection',
     folder_name: 'legends',
-    profile_count: 2,
+    profile_count: 1,
     is_playable: true,
     duelist_id_base: 0n,
   },
@@ -1557,7 +1556,6 @@ export const GENESIS_PROFILES: type_GENESIS_PROFILES = {
 type type_LEGENDS_PROFILES = {
   Unknown: ProfileDescriptor, // cairo: ProfileDescriptor
   TGC1: ProfileDescriptor, // cairo: ProfileDescriptor
-  TGC2: ProfileDescriptor, // cairo: ProfileDescriptor
 };
 export const LEGENDS_PROFILES: type_LEGENDS_PROFILES = {
   Unknown: {
@@ -1565,9 +1563,6 @@ export const LEGENDS_PROFILES: type_LEGENDS_PROFILES = {
   },
   TGC1: {
     name: 'Dread Corsair Rick',
-  },
-  TGC2: {
-    name: 'King Angre the Crimson',
   },
 };
 
