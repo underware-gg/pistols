@@ -30,11 +30,11 @@ export const useDuelIdsForClaimingRings = () => {
   const query = useMemo(() => {
     const _address = bigintToAddress(address);
     let queries = [
-      `select "${constants.RingType.GoldSignetRing}" as ring_type, duel_id, season_id from "pistols-Challenge" where season_id=1 and (address_a="${_address}" or address_b="${_address}")`,
+      `select "${constants.RingType.GoldSignetRing}" as ring_type, duel_id, season_id from "pistols-Challenge" where season_id=1 and (state="Resolved" or state="Draw") and (address_a="${_address}" or address_b="${_address}")`,
       `union all`,
-      `select "${constants.RingType.SilverSignetRing}" as ring_type, duel_id, season_id from "pistols-Challenge" where season_id>=2 and season_id<=4 and (address_a="${_address}" or address_b="${_address}")`,
+      `select "${constants.RingType.SilverSignetRing}" as ring_type, duel_id, season_id from "pistols-Challenge" where season_id>=2 and season_id<=4 and (state="Resolved" or state="Draw") and (address_a="${_address}" or address_b="${_address}")`,
       `union all`,
-      `select "${constants.RingType.LeadSignetRing}" as ring_type, duel_id, season_id from "pistols-Challenge" where season_id>=5 and season_id<=9 and (address_a="${_address}" or address_b="${_address}")`,
+      `select "${constants.RingType.LeadSignetRing}" as ring_type, duel_id, season_id from "pistols-Challenge" where season_id>=5 and season_id<=9 and (state="Resolved" or state="Draw") and (address_a="${_address}" or address_b="${_address}")`,
       `order by 3, 2`,
     ];
     return queries.join(' ');
