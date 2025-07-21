@@ -13,7 +13,7 @@
     "test": "cd sdk && pnpm test"
   },
   "devDependencies": {
-    "turbo": "^2.5.0"
+    "turbo": "^2.5.5"
   },
   "packageManager": "pnpm@10.10.0"
 }
