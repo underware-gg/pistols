@@ -6,7 +6,7 @@ import { useGameAspect } from '/src/hooks/useGameAspect'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { ProfilePic } from '/src/components/account/ProfilePic'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
-import { usePlayer, useRingsOfOwner } from '/src/stores/playerStore'
+import { usePlayer } from '/src/stores/playerStore'
 import { useDiscordSocialLink } from '/src/stores/eventsModelStore'
 import { StampImage } from '/src/components/ui/StampImage'
 
@@ -21,8 +21,7 @@ export default function DuelProfile({
   floated: SemanticFLOATS,
   isTutorial: boolean
 }) {
-  const { name, isBlocked, isTeamMember } = usePlayer(playerAddress)
-  const { topRingType } = useRingsOfOwner(playerAddress)
+  const { name, isBlocked, isTeamMember, activeSignetRing } = usePlayer(playerAddress)
   const { aspectWidth } = useGameAspect()
   const { dispatchSelectPlayerAddress } = usePistolsContext()
   const { avatarUrl, isLinked } = useDiscordSocialLink(playerAddress)
@@ -32,7 +31,7 @@ export default function DuelProfile({
   const contentLength = useMemo(() => Math.floor(name.length/10), [name])
   const duelistContentLength = useMemo(() => Math.floor(duelistName.length/10), [duelistName])
 
-  const hasStamp = useMemo(() => isBlocked || isTeamMember || topRingType !== null, [isBlocked, isTeamMember, topRingType])
+  const hasStamp = useMemo(() => isBlocked || isTeamMember || activeSignetRing !== null, [isBlocked, isTeamMember, activeSignetRing])
 
   return (
     <>

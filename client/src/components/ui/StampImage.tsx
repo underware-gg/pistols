@@ -27,7 +27,8 @@ const getStampClass = (isBlocked: boolean, isTeamMember: boolean, topRingType: c
   if (isTeamMember) return 'Team'
   if (topRingType === constants.RingType.GoldSignetRing) return 'Gold'
   if (topRingType === constants.RingType.SilverSignetRing) return 'Silver'
-  return 'Lead'
+  if (topRingType === constants.RingType.LeadSignetRing) return 'Lead'
+  return undefined
 }
 
 export const StampImage: React.FC<StampImageProps> = ({
@@ -39,18 +40,17 @@ export const StampImage: React.FC<StampImageProps> = ({
   style = {},
   forceShow = false,
 }) => {
-  const { isBlocked, isTeamMember } = usePlayer(playerAddress)
-  const { topRingType } = useRingsOfOwner(playerAddress)
+  const { isBlocked, isTeamMember, activeSignetRing } = usePlayer(playerAddress)
   
   const hasStamp = useMemo(() => {
     if (forceShow || stampType) return true
-    return isBlocked || isTeamMember || topRingType !== null
-  }, [forceShow, stampType, isBlocked, isTeamMember, topRingType])
+    return isBlocked || isTeamMember || activeSignetRing !== null
+  }, [forceShow, stampType, isBlocked, isTeamMember, activeSignetRing])
   
   const stampClass = useMemo(() => {
     if (stampType) return stampType
-    return getStampClass(isBlocked, isTeamMember, topRingType)
-  }, [stampType, isBlocked, isTeamMember, topRingType])
+    return getStampClass(isBlocked, isTeamMember, activeSignetRing)
+  }, [stampType, isBlocked, isTeamMember, activeSignetRing])
   
   const cssClasses = useMemo(() => {
     const classes = [
@@ -83,23 +83,21 @@ export const StampImage: React.FC<StampImageProps> = ({
 
 // Helper hook to check if a player has a stamp (useful for conditional rendering)
 export const useHasStamp = (playerAddress: BigNumberish) => {
-  const { isBlocked, isTeamMember } = usePlayer(playerAddress)
-  const { topRingType } = useRingsOfOwner(playerAddress)
+  const { isBlocked, isTeamMember, activeSignetRing } = usePlayer(playerAddress)
   
   return useMemo(() => {
-    return isBlocked || isTeamMember || topRingType !== null
-  }, [isBlocked, isTeamMember, topRingType])
+    return isBlocked || isTeamMember || activeSignetRing !== null
+  }, [isBlocked, isTeamMember, activeSignetRing])
 }
 
 // Helper hook to get stamp type for a player
 export const useStampType = (playerAddress: BigNumberish): StampType | null => {
-  const { isBlocked, isTeamMember } = usePlayer(playerAddress)
-  const { topRingType } = useRingsOfOwner(playerAddress)
+  const { isBlocked, isTeamMember, activeSignetRing } = usePlayer(playerAddress)
   
   return useMemo(() => {
-    if (!isBlocked && !isTeamMember && topRingType === null) return null
-    return getStampClass(isBlocked, isTeamMember, topRingType)
-  }, [isBlocked, isTeamMember, topRingType])
+    if (!isBlocked && !isTeamMember && activeSignetRing === null) return null
+    return getStampClass(isBlocked, isTeamMember, activeSignetRing)
+  }, [isBlocked, isTeamMember, activeSignetRing])
 }
 
 export default StampImage

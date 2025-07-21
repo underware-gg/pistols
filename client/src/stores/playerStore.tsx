@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
@@ -142,6 +142,7 @@ export const usePlayer = (address: BigNumberish) => {
 
   const timestampRegistered = useMemo(() => Number(player?.timestamps.registered ?? 0), [player])
   const aliveDuelistCount = useMemo(() => Number(player?.alive_duelist_count ?? 0), [player])
+  const activeSignetRing = useMemo(() => (player ? parseEnumVariant<constants.RingType>(player.active_signet_ring) : null), [player])
   const isBlocked = useMemo(() => (flags?.is_blocked ?? false), [flags])
   const isTeamMember = useMemo(() => (teamFlags?.is_team_member ?? false), [teamFlags])
   const isAdmin = useMemo(() => (teamFlags?.is_admin ?? false), [teamFlags])
@@ -167,7 +168,7 @@ export const usePlayer = (address: BigNumberish) => {
   const hasFinishedTutorial = false
   const isAvailable = false
 
-  // useEffect(() => console.log("usePlayer() =>", username, key, player), [player, username])
+  // useEffect(() => console.log("usePlayer() =>", username, activeSignetRing), [player, username, playerKey])
 
   return {
     address,
@@ -175,6 +176,7 @@ export const usePlayer = (address: BigNumberish) => {
     name,
     timestampRegistered,
     aliveDuelistCount,
+    activeSignetRing,
     isTeamMember,
     isAdmin,
     isBlocked,
@@ -333,11 +335,12 @@ export const useQueryPlayerIds = (
 // Signet rings
 //
 
+// INTERNAL USE ONLY, to get the active ring...
+// const { activeSignetRing } = usePlayer(playerAddress)
 export const useRingsOfPlayer = () => {
   const { address } = useAccount()
   return useRingsOfOwner(address)
 }
-
 export const useRingsOfOwner = (address: BigNumberish) => {
   const entities = usePlayerEntityStore((state) => state.entities);
   const ringModels = useAllStoreModels<models.Ring>(entities, 'Ring')
@@ -346,6 +349,7 @@ export const useRingsOfOwner = (address: BigNumberish) => {
     ringIds
       // ids to models
       .map((ringId) => ringModels.find((m) => bigintEquals(m.ring_id, ringId)))
+      .filter(Boolean)
       // models to ring types
       .map((m) => parseEnumVariant<constants.RingType>(m.ring_type))
   ), [ringIds, ringModels])
