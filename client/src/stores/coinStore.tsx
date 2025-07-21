@@ -6,7 +6,7 @@ import { useERC20Balance } from '@underware/pistols-sdk/utils/hooks'
 import { useSdkTokenBalancesGet, useDojoSetup } from '@underware/pistols-sdk/dojo'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { useDuelistTokenBoundAddress } from '/src/hooks/useTokenBound'
-import { makeTokenBoundAddress } from '@underware/pistols-sdk/pistols'
+import { make_token_bound_address } from '@underware/pistols-sdk/pistols'
 import { bigintEquals, bigintToHex, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { weiToEth } from '@underware/pistols-sdk/starknet'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
@@ -193,7 +193,7 @@ const _useCalcFee = (
 
 export const useFetchTokenboundAccountsBalances = (coinAddress: BigNumberish, tokenAddress: BigNumberish, tokenIds: bigint[], enabled: boolean) => {
   const tokenBoundAddresses = useMemo(() => (
-    tokenIds.map((tokenId) => makeTokenBoundAddress(tokenAddress, tokenId))
+    tokenIds.map((tokenId) => make_token_bound_address(tokenAddress, tokenId))
   ), [tokenAddress, tokenIds]);
   return useFetchAccountsBalances(coinAddress, tokenBoundAddresses, enabled)
 }

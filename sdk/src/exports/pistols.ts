@@ -4,6 +4,7 @@ export * from '../games/pistols/misc/profiles'
 export * from '../games/pistols/misc/salt'
 export * from '../games/pistols/misc/debug'
 // in sync with cairo sources
+export * from '../games/pistols/cairo/bot'
 export * from '../games/pistols/cairo/pact'
 export * from '../games/pistols/cairo/moves_hash'
 export * from '../games/pistols/cairo/rules'

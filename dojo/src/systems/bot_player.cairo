@@ -43,7 +43,6 @@ pub mod bot_player {
         bot::{BotPlayerMovesTrait},
         moves_hash::{MovesHashTrait},
     };
-    use pistols::utils::hash::{hash_values};
 
     pub mod Errors {
         pub const INVALID_CALLER: felt252           = 'BOT_PLAYER: Invalid caller';
@@ -61,7 +60,7 @@ pub mod bot_player {
     impl BotPlayerImpl of super::IBotPlayer<ContractState> {
         fn make_salt(self: @ContractState, duel_id: u128) -> felt252 {
             // salt is always the duel_id for permissionless reveal
-            (hash_values([duel_id.into()].span()))
+            (BotPlayerMovesTrait::make_salt(duel_id))
         }
 
         fn reveal_moves(ref self: ContractState, duel_id: u128) {

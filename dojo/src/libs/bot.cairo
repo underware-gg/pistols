@@ -13,9 +13,15 @@ use pistols::types::cards::{
 };
 use pistols::types::duelist_profile::{DuelistProfile, DuelistProfileTrait};
 use pistols::systems::rng::{Dice, DiceTrait};
+use pistols::utils::hash::{hash_values};
 
 #[generate_trait]
 pub impl BotPlayetMovesImpl of BotPlayerMovesTrait {
+    #[inline(always)]
+    fn make_salt(duel_id: u128) -> felt252 {
+        // salt is always the duel_id for permissionless reveal
+        (hash_values([duel_id.into()].span()))
+    }
     fn make_moves(self: @DuelistProfile, challenge: @Challenge, ref dice: Dice) -> Span<u8> {
         let deck: Deck = challenge.get_deck();
         let archetype: Archetype = self.get_archetype();
