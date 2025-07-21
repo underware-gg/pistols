@@ -19,7 +19,7 @@ interface BarkeepModalProps {
 
 export default function BarkeepModal({ open, setOpen, initialStage = 'intro' }: BarkeepModalProps) {  
   const { dispatchSetScene } = usePistolsScene()
-  const { tutorialOpener, dispatchSelectDuel } = usePistolsContext()
+  const { tutorialOpener, tavernRingsOpener, dispatchSelectDuel } = usePistolsContext()
   
   const { notifications, hasUnreadNotifications, markAllAsRead } = useNotifications()
   
@@ -89,6 +89,15 @@ export default function BarkeepModal({ open, setOpen, initialStage = 'intro' }: 
                   tutorialOpener.open()
                 }}
                 index={3}
+              />
+              <BarkeepMenuItem
+                id="rings"
+                label="Got anything for me?"
+                onClick={() => {
+                  tavernRingsOpener.open()
+                  setOpen(false)
+                }}
+                index={4}
               />
             </div>
           )}

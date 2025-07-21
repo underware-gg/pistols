@@ -1477,7 +1477,7 @@ $logo-url: '/logos/logo_avante.svg';
 // For backwards compatibility
 .TempBarkeepTalkBalloon {
   @extend .DialogBalloon;
-  top: 38%;
+  bottom: 5%;
   left: 22%;
   width: aspect-width(30);
   --bg-color: #{$color-bright};
