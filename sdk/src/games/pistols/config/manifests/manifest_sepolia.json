@@ -1,6 +1,6 @@
 {
   "world": {
-    "class_hash": "0x7746f30d2b8494780387ed469797ecb5c62c7b6f49f4939a5e60e0f7ae5f99e",
+    "class_hash": "0x685ed02eefa98fe7e208aa295042e9bbad8029b0d3d6f0ba2b32546efe0a1f9",
     "address": "0x8b4838140a3cbd36ebe64d4b5aaf56a30cc3753c928a79338bf56c53f506c5",
     "seed": "pistols_v1_0_0",
     "name": "Pistols at Dawn",
@@ -1329,7 +1329,7 @@
   "contracts": [
     {
       "address": "0x610423526de7adfd8c18bd027111fcb7d1bc0de329f28fb651a34752273328a",
-      "class_hash": "0x3c3c569bd2f47c18846b07aad736fc85e232f0686515efa565ba4d3cc9efb38",
+      "class_hash": "0x7fa1a64b492c18ebd782e5c9afabd5d0a0b43b9155dafb7cfcb944aca85494",
       "abi": [
         {
           "type": "impl",
@@ -1707,7 +1707,7 @@
     },
     {
       "address": "0x426c16fe76f12586718c07e47c8e4312e9fee5e7dc849a75f3c587ad9e70b4f",
-      "class_hash": "0x7c25af4f3251acc7a476408dbdb7c2f075a5411fb1bd0bf321c7ce8b33b410b",
+      "class_hash": "0x7fd5f7e3fbf86d5f7ae46f41e366d747d898d4f35cb4d94ff362dc42447b9df",
       "abi": [
         {
           "type": "impl",
@@ -2184,8 +2184,282 @@
       ]
     },
     {
+      "address": "0x5d9c9168e6bf86f250a813d38ad5a95c67cb3ca42ab93411a184c9c731fa69a",
+      "class_hash": "0x67763ef8b4d3eaa8aa875db2de356585544a73feaf8e3d21abdca530762f4bc",
+      "abi": [
+        {
+          "type": "impl",
+          "name": "bot_player__ContractImpl",
+          "interface_name": "dojo::contract::interface::IContract"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::interface::IContract",
+          "items": []
+        },
+        {
+          "type": "impl",
+          "name": "bot_player__DeployedContractImpl",
+          "interface_name": "dojo::meta::interface::IDeployedResource"
+        },
+        {
+          "type": "struct",
+          "name": "core::byte_array::ByteArray",
+          "members": [
+            {
+              "name": "data",
+              "type": "core::array::Array::<core::bytes_31::bytes31>"
+            },
+            {
+              "name": "pending_word",
+              "type": "core::felt252"
+            },
+            {
+              "name": "pending_word_len",
+              "type": "core::integer::u32"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "dojo::meta::interface::IDeployedResource",
+          "items": [
+            {
+              "type": "function",
+              "name": "dojo_name",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "BotPlayerImpl",
+          "interface_name": "pistols::systems::bot_player::IBotPlayer"
+        },
+        {
+          "type": "interface",
+          "name": "pistols::systems::bot_player::IBotPlayer",
+          "items": [
+            {
+              "type": "function",
+              "name": "make_salt",
+              "inputs": [
+                {
+                  "name": "duel_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::felt252"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "reveal_moves",
+              "inputs": [
+                {
+                  "name": "duel_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "IBotPlayerProtectedImpl",
+          "interface_name": "pistols::systems::bot_player::IBotPlayerProtected"
+        },
+        {
+          "type": "interface",
+          "name": "pistols::systems::bot_player::IBotPlayerProtected",
+          "items": [
+            {
+              "type": "function",
+              "name": "reply_duel",
+              "inputs": [
+                {
+                  "name": "duel_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "commit_moves",
+              "inputs": [
+                {
+                  "name": "duel_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "transfer_to_winner",
+              "inputs": [
+                {
+                  "name": "duel_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "duelist_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "recipient",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "function",
+          "name": "dojo_init",
+          "inputs": [],
+          "outputs": [],
+          "state_mutability": "view"
+        },
+        {
+          "type": "impl",
+          "name": "WorldProviderImpl",
+          "interface_name": "dojo::contract::components::world_provider::IWorldProvider"
+        },
+        {
+          "type": "struct",
+          "name": "dojo::world::iworld::IWorldDispatcher",
+          "members": [
+            {
+              "name": "contract_address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::components::world_provider::IWorldProvider",
+          "items": [
+            {
+              "type": "function",
+              "name": "world_dispatcher",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "dojo::world::iworld::IWorldDispatcher"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "UpgradeableImpl",
+          "interface_name": "dojo::contract::components::upgradeable::IUpgradeable"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::components::upgradeable::IUpgradeable",
+          "items": [
+            {
+              "type": "function",
+              "name": "upgrade",
+              "inputs": [
+                {
+                  "name": "new_class_hash",
+                  "type": "core::starknet::class_hash::ClassHash"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "constructor",
+          "name": "constructor",
+          "inputs": []
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "class_hash",
+              "type": "core::starknet::class_hash::ClassHash",
+              "kind": "data"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "Upgraded",
+              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
+              "kind": "nested"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::world_provider::world_provider_cpt::Event",
+          "kind": "enum",
+          "variants": []
+        },
+        {
+          "type": "event",
+          "name": "pistols::systems::bot_player::bot_player::Event",
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "UpgradeableEvent",
+              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
+              "kind": "nested"
+            },
+            {
+              "name": "WorldProviderEvent",
+              "type": "dojo::contract::components::world_provider::world_provider_cpt::Event",
+              "kind": "nested"
+            }
+          ]
+        }
+      ],
+      "init_calldata": [],
+      "tag": "pistols-bot_player",
+      "selector": "0x22366a4c25ee7406d1d3bd13fab733b310945461fda8a7c721412ac7c01de53",
+      "systems": [
+        "reveal_moves",
+        "reply_duel",
+        "commit_moves",
+        "transfer_to_winner",
+        "upgrade"
+      ]
+    },
+    {
       "address": "0x2e9c711b1a7e2784570b1bda5082a92606044e836ba392d2b977d280fb74b3c",
-      "class_hash": "0x3586723bf3d0ec975eb1f30a18abb7f146135998fa85967c777fd05ab3cf607",
+      "class_hash": "0x3216d6abdc8061f6e5bfc6310d55fb1f61994694ded0fa5005f9fef11e2c468",
       "abi": [
         {
           "type": "impl",
@@ -2280,6 +2554,10 @@
             },
             {
               "name": "Practice",
+              "type": "()"
+            },
+            {
+              "name": "BotPlayer",
               "type": "()"
             }
           ]
@@ -3495,7 +3773,7 @@
     },
     {
       "address": "0x7aaa9866750a0db82a54ba8674c38620fa2f967d2fbb31133def48e0527c87f",
-      "class_hash": "0x5d351b7a1f70110a33e8babeb8d67994e16e5aab6e99fac9dbad104cad44979",
+      "class_hash": "0x4d2adf5338e200bbe7c3d23d15d3f09837254f9509a272d76aab50c58589f24",
       "abi": [
         {
           "type": "impl",
@@ -4100,6 +4378,40 @@
           ]
         },
         {
+          "type": "enum",
+          "name": "pistols::models::pool::PoolType",
+          "variants": [
+            {
+              "name": "Undefined",
+              "type": "()"
+            },
+            {
+              "name": "Purchases",
+              "type": "()"
+            },
+            {
+              "name": "FamePeg",
+              "type": "()"
+            },
+            {
+              "name": "Season",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "Tournament",
+              "type": "core::integer::u64"
+            },
+            {
+              "name": "Sacrifice",
+              "type": "()"
+            },
+            {
+              "name": "Claimable",
+              "type": "()"
+            }
+          ]
+        },
+        {
           "type": "struct",
           "name": "core::array::Span::<core::integer::u128>",
           "members": [
@@ -4131,6 +4443,10 @@
             },
             {
               "name": "Practice",
+              "type": "()"
+            },
+            {
+              "name": "BotPlayer",
               "type": "()"
             }
           ]
@@ -4384,6 +4700,14 @@
                 {
                   "name": "seed",
                   "type": "core::felt252"
+                },
+                {
+                  "name": "pool_type",
+                  "type": "pistols::models::pool::PoolType"
+                },
+                {
+                  "name": "lords_amount",
+                  "type": "core::integer::u128"
                 }
               ],
               "outputs": [
@@ -6636,7 +6960,7 @@
     },
     {
       "address": "0x2c6a7c98a9dea8322b51018eef7be99ebedd209cebdaacb9f4c5bbf661c1cc9",
-      "class_hash": "0x416f8d28b3c67dbd8be425a40fc94d88b1108f5636992c9ce6fb2923b6e75e5",
+      "class_hash": "0x41d2cee08aa2bcbc056533e74c473aff2940d10df6c16acae694150249716e2",
       "abi": [
         {
           "type": "impl",
@@ -8376,7 +8700,7 @@
     },
     {
       "address": "0x71333ac75b7d5ba89a2d0c2b67d5b955258a4d46eb42f3428da6137bbbfdfd9",
-      "class_hash": "0x773c45fb8f2ecb1d54bad3bec8311022f2b2f75fe8b2fa0a20dde2292f9bf20",
+      "class_hash": "0x4fd2d1510032c340f16833b088f0da510505fec3aee753564b5b91ca586736d",
       "abi": [
         {
           "type": "impl",
@@ -8481,6 +8805,10 @@
             },
             {
               "name": "SingleDuelist",
+              "type": "()"
+            },
+            {
+              "name": "BotDuelist",
               "type": "()"
             }
           ]
@@ -9033,6 +9361,33 @@
               "outputs": [
                 {
                   "type": "core::array::Span::<core::integer::u128>"
+                }
+              ],
+              "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "PackTokenProtectedImpl",
+          "interface_name": "pistols::systems::tokens::pack_token::IPackTokenProtected"
+        },
+        {
+          "type": "interface",
+          "name": "pistols::systems::tokens::pack_token::IPackTokenProtected",
+          "items": [
+            {
+              "type": "function",
+              "name": "mint_bot_duelist",
+              "inputs": [
+                {
+                  "name": "duelist_profile",
+                  "type": "pistols::types::duelist_profile::DuelistProfile"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u128"
                 }
               ],
               "state_mutability": "external"
@@ -9993,6 +10348,7 @@
         "purchase",
         "airdrop",
         "open",
+        "mint_bot_duelist",
         "upgrade",
         "safe_transfer_from",
         "transfer_from",
@@ -10008,7 +10364,7 @@
     },
     {
       "address": "0x14aa76e6c6f11e3f657ee2c213a62006c78ff2c6f8ed40b92c42fd554c246f2",
-      "class_hash": "0x395dbb8d410dc89ebaab2065e95fb8ab00ceb944e085c6f803cbf3f32cc4fa4",
+      "class_hash": "0x746fba4bc34fc30de71faedf5f379c841d3e30cec435596162c374beadd524d",
       "abi": [
         {
           "type": "impl",
@@ -11761,7 +12117,7 @@
     },
     {
       "address": "0x3c77186b8e509085ec66e1a5d1dbcf9dc1f212852b4c1f461a48901d290fc9b",
-      "class_hash": "0x7ebafb74874f915eaa34e2288da578f14155d891ff7dcf27f5b2f680e48c759",
+      "class_hash": "0x7be932b8f3fcce60ab603eb86ac49396b9a3f828024ab2191c6c54a06c83347",
       "abi": [
         {
           "type": "impl",
@@ -12409,7 +12765,7 @@
   "models": [
     {
       "members": [],
-      "class_hash": "0x441550e8b41c7026e0c1c42c86bc3426caca725d6e1d33e8b7f923b9c25cef4",
+      "class_hash": "0x74fac4fe0182e88af5bb65e4b13270f249fcc5e23a762483e2d0fe8a3855b16",
       "tag": "pistols-Challenge",
       "selector": "0x673267b69d74c703ea86d97b041278944b49f62b52867345a95d3047b11378a"
     },
@@ -12463,19 +12819,19 @@
     },
     {
       "members": [],
-      "class_hash": "0x37decd52ee24a3ed37ff2b66e7b428cda5cce5774f6b59569fb4ae4ec1ae5b5",
+      "class_hash": "0x7291ead400d7af540c3ed38027f0cd462c26ea5b34ee674885601515ae9299b",
       "tag": "pistols-Pack",
       "selector": "0x64159b4947adcdc7a87b41f7889ba33495ac8e3a3a333305c7712806763fa2d"
     },
     {
       "members": [],
-      "class_hash": "0x7dc4ac6d434c583dfb188db5a9b65334cae6ed9f8de2ae60cfbe4b0383602f1",
+      "class_hash": "0x6aa6d89c2a43b93d164bc5c4b41afb9b89f53fe3e812d0bd325a9e771ee401b",
       "tag": "pistols-Pact",
       "selector": "0x72a33a6586ae24471fdae1c6f3cc9da6629f3fd3dce300a48324617dd511617"
     },
     {
       "members": [],
-      "class_hash": "0x5cd73dff8a9f5a247fd711e8d0a04fa8838fff99dc0d3af54bb6e80dc3165cc",
+      "class_hash": "0xcb51faf59c9c97028878391e88d82cd2ac215ee469e8d1d7617f3f49d0ba92",
       "tag": "pistols-Player",
       "selector": "0x4fc7ed2304172cd24d40e2b967bf3642228eec13547b09e0ffdfb85469f6f86"
     },
@@ -12529,7 +12885,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x216e39bf21ec08bef2e84224564408dbbba1b081b9e45760529d552d90319b3",
+      "class_hash": "0x14e87e626c23c0b6d25b1ac16c89ec9f85c90e342a984caa7dd3af6e2ed582e",
       "tag": "pistols-SeasonConfig",
       "selector": "0x407b92d935dd7193931243082059cb7180309a73de27eea948ffa0649f6ebf3"
     },
