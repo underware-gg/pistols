@@ -7,7 +7,7 @@ import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { ProfilePic } from '/src/components/account/ProfilePic'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { usePlayer } from '/src/stores/playerStore'
-import { useDiscordSocialLink } from '/src/stores/eventsModelStore'
+import { usePlayerAvatar } from '/src/stores/playerStore'
 import { StampImage } from '/src/components/ui/StampImage'
 
 export default function DuelProfile({
@@ -24,7 +24,7 @@ export default function DuelProfile({
   const { name, isBlocked, isTeamMember, activeSignetRing } = usePlayer(playerAddress)
   const { aspectWidth } = useGameAspect()
   const { dispatchSelectPlayerAddress } = usePistolsContext()
-  const { avatarUrl, isLinked } = useDiscordSocialLink(playerAddress)
+  const { avatarUrl } = usePlayerAvatar(playerAddress)
 
   const { profilePic, profileType, nameAndId: duelistName } = useDuelist(duelistId)
 
@@ -40,8 +40,8 @@ export default function DuelProfile({
           <div className='YesMouse NoDrag' onClick={() => dispatchSelectPlayerAddress(playerAddress)} >
           <ProfilePic 
             circle 
-            profilePic={isTutorial ? profilePic : (isLinked ? undefined : 0)} 
-            profilePicUrl={isTutorial ? undefined : (isLinked ? avatarUrl : undefined)} 
+            profilePic={isTutorial ? profilePic : (avatarUrl ? undefined : 0)} 
+            profilePicUrl={isTutorial ? undefined : avatarUrl} 
             profileType={isTutorial ? profileType : constants.DuelistProfile.Character} 
             className='NoMouse NoDrag' 
           />

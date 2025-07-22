@@ -12,13 +12,12 @@ import { useDuelistTokenStore } from '/src/stores/tokenStore'
 import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
 import { useRingIdsOfAccount } from '/src/hooks/useTokenRings'
 import { parseEnumVariant } from '@underware/pistols-sdk/starknet'
-import { getBotPlayerAddress, NetworkId } from '@underware/pistols-sdk/pistols/config'
 import { models, constants } from '@underware/pistols-sdk/pistols/gen'
 import { SortDirection } from '/src/stores/queryParamsStore'
 import { PlayerColumn } from '/src/stores/queryParamsStore'
 import { useTotals } from '/src/stores/duelistStore'
-import * as ENV from '/src/utils/env'
 import { CHARACTER_NAMES, CHARACTER_AVATARS } from '@underware/pistols-sdk/pistols/constants'
+import { useDiscordSocialLink } from './eventsModelStore'
 
 interface NamesByAddress {
   [address: string]: string
@@ -260,6 +259,15 @@ export const usePlayersOnline = () => {
   const playersOnline = useMemo(() => sortObjectByValue(players_online, (a, b) => (b - a)), [players_online])
   return {
     playersOnline,
+  }
+}
+
+export const usePlayerAvatar = (address: BigNumberish) => {
+  const players_avatars = usePlayerDataStore((state) => state.players_avatars)
+  const avatarUrl = useMemo(() => (players_avatars[_playerKey(address)] ?? null), [players_avatars, address])
+  const { avatarUrl: discordAvatarUrl } = useDiscordSocialLink(address)
+  return {
+    avatarUrl: (discordAvatarUrl || avatarUrl),
   }
 }
 

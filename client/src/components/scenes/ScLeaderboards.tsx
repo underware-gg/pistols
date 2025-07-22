@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useMemo, useCallback, memo } from '
 import { Grid, Header, Pagination } from 'semantic-ui-react';
 import { POSTER_HEIGHT_SMALL, POSTER_WIDTH_SMALL, ProfilePoster, ProfilePosterHandle } from '/src/components/ui/ProfilePoster';
 import { useGameAspect } from '/src/hooks/useGameAspect';
-import { usePlayer } from '/src/stores/playerStore';
+import { usePlayer, usePlayerAvatar } from '/src/stores/playerStore';
 import { useDuelist, useFetchDuelistIds } from '/src/stores/duelistStore';
 import { ProfilePic } from '/src/components/account/ProfilePic';
 import { constants } from '@underware/pistols-sdk/pistols/gen';
@@ -21,7 +21,6 @@ import { useSeason, useAllSeasonIds, useFullLeaderboard, useLeaderboard } from '
 import { useSeasonsTotals, SeasonTotals } from '/src/queries/useSeasonsTotals';
 import { useSeasonsLeaderboardRewards, SeasonLeaderboardPrizes } from '/src/queries/useSeasonsLeaderboardRewards';
 import { useSeasonDuelistsStats, SeasonDuelistsStats } from '/src/queries/useSeasonDuelistsStats';
-import { useDiscordSocialLink } from '/src/stores/eventsModelStore';
 import { LoadingIcon } from '/src/components/ui/Icons';
 
 const calculateReward = (rank: number, totalPrizePool: bigint): bigint => {
@@ -154,7 +153,7 @@ const PlayerRow = memo(({
   const { name: playerName } = usePlayer(owner);
   const { isMyAccount: isMe } = useIsMyAccount(owner);
   const { isActive } = useSeason(selectedSeasonId || 0);
-  const { isLinked, avatarUrl } = useDiscordSocialLink(owner);
+  const { avatarUrl } = usePlayerAvatar(owner);
 
   const poolSeason = useSeasonPool(selectedSeasonId || 0);
   const reward = useMemo(() => {
@@ -189,7 +188,7 @@ const PlayerRow = memo(({
         </Grid.Column>
         
         <Grid.Column width={4} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => dispatchSelectPlayerAddress(owner)}>
-          <ProfilePic profilePic={isLinked ? undefined : 0} profilePicUrl={isLinked ? avatarUrl : undefined} width={2.5} removeBorder circle />
+          <ProfilePic profilePic={avatarUrl ? undefined : 0} profilePicUrl={avatarUrl} width={2.5} removeBorder circle />
           <div style={{ marginLeft: aspectWidth(1), fontSize: aspectWidth(1.2), color: isMe ? '#00ff00' : 'lightskyblue', overflow: 'hidden', textOverflow: 'ellipsis' }}>{playerName}</div>
         </Grid.Column>
 

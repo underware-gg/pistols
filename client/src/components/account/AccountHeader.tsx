@@ -5,14 +5,14 @@ import { usePistolsScene } from '/src/hooks/PistolsContext'
 import { ProfilePic } from '/src/components/account/ProfilePic'
 import { SceneName } from '/src/data/assets'
 import { FoolsBalance } from '/src/components/account/LordsBalance'
-import { useDiscordSocialLink } from '/src/stores/eventsModelStore'
+import { usePlayerAvatar } from '/src/stores/playerStore'
 
 export default function AccountHeader() {
   const { isConnected } = useAccount()
   const { dispatchSetScene } = usePistolsScene()
   const { address } = useAccount()
   const { username } = useConnectedController()
-  const { avatarUrl, isLinked } = useDiscordSocialLink(address)
+  const { avatarUrl } = usePlayerAvatar(address)
 
   const handleClick = () => {
     dispatchSetScene(SceneName.Profile)
@@ -42,8 +42,8 @@ export default function AccountHeader() {
       
       <div className="ProfileContainer">
         <ProfilePic 
-          profilePic={isLinked ? undefined : 0} 
-          profilePicUrl={isLinked ? avatarUrl : undefined} 
+          profilePic={avatarUrl ? undefined : 0} 
+          profilePicUrl={avatarUrl} 
           medium 
           borderColor="rgba(120, 60, 190, 0.8)"
           borderWidth={0.15}
