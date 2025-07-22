@@ -222,7 +222,18 @@ cd client
 pnpm i
 ```
 
-Configure default [NetworkId](/sdk/src/dojo/setup/networks.ts) in your `.env` file:
+Configure default [NetworkId](/sdk/src/dojo/setup/networks.ts) in your `.env` file.
+Minimal configuration:
+
+```sh
+# Main network
+# VITE_NETWORK_ID=KATANA_LOCAL
+#VITE_NETWORK_ID=STAGING
+#VITE_NETWORK_ID=SEPOLIA
+VITE_NETWORK_ID=MAINNET
+```
+
+All available options...
 
 ```sh
 # enable debug options
@@ -250,22 +261,22 @@ VITE_ACADEMY_NETWORK_ID=ACADEMY
 
 # Socials config
 VITE_DISCORD_CLIENT_ID=<OAUTH2_CLIENT_ID>
-VITE_DISCORD_REDIRECT_URL=https://assets.underware.gg/api/oauth/discord
+VITE_DISCORD_REDIRECT_URL=<OAUTH2_REDIRECT_URL>
 ```
 
 Start the client
 
 ```sh
-# http server
-# http://localhost:5173
-cd pistols
-turbo dev
-
-# https server (required for Catridge Controller)
+# https server (preferred)
 # https://localhost:5173
 cd pistols
 turbo devs
+
+# http server (not compatible with Cartrige Controller)
+# http://localhost:5173
+cd pistols
+turbo dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173) or [https://localhost:5173](https://localhost:5173)
+Open [https://localhost:5173](https://localhost:5173) (or [http://localhost:5173](http://localhost:5173))
 

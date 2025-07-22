@@ -62,7 +62,7 @@ export const useTokenBalancesQuery = () => {
   });
 
   // useEffect(() => console.log('SQL BALANCES query', query), [query])
-  useEffect(() => console.log('SQL BALANCES data', data), [data])
+  // useEffect(() => console.log('SQL BALANCES data', data), [data])
 
   return {
     initialTokenBalances: data,
