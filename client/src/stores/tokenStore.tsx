@@ -36,11 +36,13 @@ const createStore = (tokenName: string) => {
     const _tokenId = BigInt(balance?.token_id ?? 0)
     if (_tokenId > 0n) {
       const _key = _tokenKey(_tokenId);
-      if (isPositiveBigint(balance.balance) && isPositiveBigint(balance.account_address)) {
+      const _balance = BigInt(balance.balance ?? 0);
+      const _account = BigInt(balance.account_address ?? 0);
+      if (_balance > 0n && _account > 0n) {
         state.tokens[_key] = {
-          owner: BigInt(balance.account_address),
+          owner: _account,
         }
-      } else if (state.tokens[_key]) {
+      } else if (state.tokens[_key]?.owner == _account) {
         state.tokens[_key] = undefined;
       }
     }
