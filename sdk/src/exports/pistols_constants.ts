@@ -1,4 +1,5 @@
 export * from '../games/pistols/constants/cards'
+export * from '../games/pistols/constants/characters'
 export * from '../games/pistols/constants/colors'
 export * from '../games/pistols/constants/emojis'
 export * from '../games/pistols/constants/tutorials'

@@ -18,6 +18,7 @@ import { SortDirection } from '/src/stores/queryParamsStore'
 import { PlayerColumn } from '/src/stores/queryParamsStore'
 import { useTotals } from '/src/stores/duelistStore'
 import * as ENV from '/src/utils/env'
+import { CHARACTER_NAMES, CHARACTER_AVATARS } from '@underware/pistols-sdk/pistols/constants'
 
 interface NamesByAddress {
   [address: string]: string
@@ -35,6 +36,7 @@ interface TokenBookmarksByAddress {
 }
 interface State {
   players_names: NamesByAddress,
+  players_avatars: NamesByAddress,
   players_online: TimestampByAddress,
   player_bookmarks: PlayerBookmarksByAddress,
   token_bookmarks: TokenBookmarksByAddress,
@@ -50,11 +52,14 @@ const _playerKey = (address: BigNumberish | undefined): string | null => (
 
 const createStore = () => {
   return create<State>()(immer((set, get) => ({
-    players_names: {
-      [_playerKey('0x04D92577856263bDe8E7601Ee189b6dbe52aCb879462489B92c0789f6c157E6c')]: '[Pistols Deployer]',
-      [_playerKey('0x0569d6f6080a3aB8678738De7Da68097796b11ECE78b21fD7FAe2Fd7505AB0Ba')]: 'The Bartender', // asset server / auto revealer
-      [_playerKey(getBotPlayerAddress(ENV.DEFAULT_NETWORK_ID as NetworkId))]: 'House Bots', // bot players
-    },
+    players_names: Object.keys(CHARACTER_NAMES).reduce((acc, key) => {
+      acc[_playerKey(key)] = CHARACTER_NAMES[key]
+      return acc
+    }, {} as Record<string, string>),
+    players_avatars: Object.keys(CHARACTER_AVATARS).reduce((acc, key) => {
+      acc[_playerKey(key)] = CHARACTER_AVATARS[key]
+      return acc
+    }, {} as Record<string, string>),
     players_online: {},
     player_bookmarks: {},
     token_bookmarks: {},
