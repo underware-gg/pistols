@@ -485,7 +485,7 @@ export const useFetchDuelistIdsByPlayerAddresses = (addresses: BigNumberish[]) =
   // mark players as fetched...
   useEffect(() => {
     if (isFinished) {
-      debug.log(`useFetchDuelistIdsByPlayerAddresses() GOT`, newAddresses.map(bigintToHex));
+      debug.log(`useFetchDuelistIdsByPlayerAddresses() FETCHED`, newAddresses.map(bigintToHex));
       fetchState.setFetchedAddresses(newAddresses.map(BigInt));
     }
   }, [isFinished])

@@ -94,26 +94,21 @@ export const useRingTokenStore = createStore('ring');
 export const useTournamentTokenStore = createStore('tournament');
 
 export function useTokenStore(contractAddress: BigNumberish) {
-  const {
-    duelistContractAddress,
-    duelContractAddress,
-    packContractAddress,
-    ringContractAddress,
-    tournamentContractAddress,
-  } = useTokenContracts()
+  const { allErc721 } = useTokenContracts()
   const store = useMemo(() => {
-    if (bigintEquals(contractAddress, duelistContractAddress)) {
+    if (bigintEquals(contractAddress, allErc721.duelistContractAddress)) {
       return useDuelistTokenStore
-    } else if (bigintEquals(contractAddress, duelContractAddress)) {
+    } else if (bigintEquals(contractAddress, allErc721.duelContractAddress)) {
       return useDuelTokenStore
-    } else if (bigintEquals(contractAddress, packContractAddress)) {
+    } else if (bigintEquals(contractAddress, allErc721.packContractAddress)) {
       return usePackTokenStore
-    } else if (bigintEquals(contractAddress, ringContractAddress)) {
+    } else if (bigintEquals(contractAddress, allErc721.ringContractAddress)) {
       return useRingTokenStore
-    } else if (bigintEquals(contractAddress, tournamentContractAddress)) {
+    } else if (bigintEquals(contractAddress, allErc721.tournamentContractAddress)) {
       return useTournamentTokenStore
     }
-  }, [duelistContractAddress, duelContractAddress, packContractAddress, ringContractAddress, tournamentContractAddress, contractAddress])
+    return null
+  }, [allErc721, contractAddress])
   return store
 }
 

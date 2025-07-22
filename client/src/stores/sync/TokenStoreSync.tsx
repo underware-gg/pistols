@@ -1,14 +1,14 @@
-import { useMemo } from 'react'
-import { useAccount } from '@starknet-react/core'
+import { useEffect, useMemo } from 'react'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
-import { useSdkTokenBalancesGet, useSdkTokenBalancesSub } from '@underware/pistols-sdk/dojo'
+import { useSdkTokenBalancesSub } from '@underware/pistols-sdk/dojo'
 import { useDuelistTokenStore, useDuelTokenStore, usePackTokenStore, useRingTokenStore, useTournamentTokenStore } from '/src/stores/tokenStore'
-import { bigintToHex, isPositiveBigint } from '@underware/pistols-sdk/utils'
-import { useFameCoinStore, useLordsCoinStore, useFoolsCoinStore, useFetchAccountsBalances } from '/src/stores/coinStore'
+import { bigintToHex } from '@underware/pistols-sdk/utils'
+import { useFameCoinStore, useLordsCoinStore, useFoolsCoinStore } from '/src/stores/coinStore'
+import { useTokenBalancesQuery } from '/src/queries/useTokenBalancesQuery'
 import { useProgressStore } from '/src/stores/progressStore'
-import { debug } from '@underware/pistols-sdk/pistols'
 import * as torii from '@dojoengine/torii-client'
+import { debug } from '@underware/pistols-sdk/pistols'
 
 
 export function TokenStoreSync() {
@@ -25,27 +25,7 @@ export function TokenStoreSync() {
   const fame_state = useFameCoinStore((state) => state)
   const fools_state = useFoolsCoinStore((state) => state)
 
-  const {
-    lordsContractAddress,
-    fameContractAddress,
-    foolsContractAddress,
-    duelistContractAddress,
-    duelContractAddress,
-    packContractAddress,
-    ringContractAddress,
-    tournamentContractAddress,
-  } = useTokenContracts()
-  
-  const contracts = useMemo(() => [
-    bigintToHex(lordsContractAddress),
-    bigintToHex(fameContractAddress),
-    bigintToHex(foolsContractAddress),
-    bigintToHex(duelistContractAddress),
-    bigintToHex(packContractAddress),
-    bigintToHex(ringContractAddress),
-    // bigintToHex(tournamentContractAddress),  // not implemented yet
-  ], [lordsContractAddress, fameContractAddress, foolsContractAddress, duelistContractAddress, packContractAddress, ringContractAddress, tournamentContractAddress])
-
+  const { allTokens } = useTokenContracts()
 
   //----------------------------------------
   // reset store (network change)
@@ -64,84 +44,67 @@ export function TokenStoreSync() {
   //----------------------------------------
   // get initial state
   //
-  const mounted = useMounted()
-  const { address } = useAccount()
-  const accounts = useMemo(() => [address], [address])
+  const { initialTokenBalances } = useTokenBalancesQuery();
 
-  // cache player tokens
-  useFetchAccountsBalances(foolsContractAddress, accounts, true)
-  useFetchAccountsBalances(lordsContractAddress, accounts, true)
-
-  // cache all duelists
-  useSdkTokenBalancesGet({
-    contract: duelistContractAddress,
-    setBalances: duelist_state.setBalances,
-    enabled: (mounted && isPositiveBigint(duelistContractAddress)),
-    updateProgress: (currentPage: number, finished?: boolean) => {
-      updateProgress('token_duelists', currentPage, finished)
-    },
-  })
-
-  // cache all FAME
-  useSdkTokenBalancesGet({
-    contract: fameContractAddress,
-    setBalances: fame_state.setBalances,
-    enabled: (mounted && isPositiveBigint(fameContractAddress)),
-    updateProgress: (currentPage: number, finished?: boolean) => {
-      updateProgress('token_fame', currentPage, finished)
-    },
-  })
-
-  // cache all RINGS
-  useSdkTokenBalancesGet({
-    contract: ringContractAddress,
-    setBalances: ring_state.setBalances,
-    enabled: (mounted && isPositiveBigint(ringContractAddress)),
-    updateProgress: (currentPage: number, finished?: boolean) => {
-      updateProgress('token_rings', currentPage, finished)
-    },
-  })
-
-  // cache PACKS of player only (not all)
-  useSdkTokenBalancesGet({
-    contract: packContractAddress,
-    accounts,
-    setBalances: pack_state.setBalances,
-    enabled: (mounted && isPositiveBigint(packContractAddress)),
-    updateProgress: (currentPage: number, finished?: boolean) => {
-      updateProgress('token_packs', currentPage, finished)
-    },
-  })
-
-
+  useEffect(() => {
+    const pageNumber = (initialTokenBalances.length == 0 ? 0 : 1)
+    updateProgress('token_balances', pageNumber, pageNumber > 0)
+    initialTokenBalances.forEach(balance => {
+      const toriiBalance: torii.TokenBalance = {
+        contract_address: bigintToHex(balance.contractAddress),
+        account_address: bigintToHex(balance.accountAddress),
+        balance: bigintToHex(balance.balance),
+        token_id: bigintToHex(balance.tokenId),
+      }
+      if (toriiBalance.contract_address === allTokens.lordsContractAddress) {
+        lords_state.updateBalance(toriiBalance)
+      } else if (toriiBalance.contract_address === allTokens.fameContractAddress) {
+        fame_state.updateBalance(toriiBalance)
+      } else if (toriiBalance.contract_address == allTokens.foolsContractAddress) {
+        fools_state.updateBalance(toriiBalance)
+      } else if (toriiBalance.contract_address == allTokens.duelistContractAddress) {
+        duelist_state.updateBalance(toriiBalance)
+      } else if (toriiBalance.contract_address == allTokens.packContractAddress) {
+        pack_state.updateBalance(toriiBalance)
+      } else if (toriiBalance.contract_address == allTokens.ringContractAddress) {
+        ring_state.updateBalance(toriiBalance)
+      } else if (toriiBalance.contract_address == allTokens.duelContractAddress) {
+        duel_state.updateBalance(toriiBalance)
+      } else if (toriiBalance.contract_address == allTokens.tournamentContractAddress) {
+        tournament_state.updateBalance(toriiBalance)
+      }
+    })
+  }, [initialTokenBalances])
 
   //----------------------------------------
   // subscribe for updates
   //
+  const mounted = useMounted()
+  const contracts = useMemo(() => Object.values(allTokens).map(bigintToHex), [allTokens])
   useSdkTokenBalancesSub({
     contracts,
     updateBalance: (balance: torii.TokenBalance) => {
       const _contract = bigintToHex(balance.contract_address)
       // debug.log("TOKENS SUB >>>", balance, token_contracts.includes(_contract), coin_contracts.includes(_contract))
-      if (_contract == lordsContractAddress) {
+      if (_contract == allTokens.lordsContractAddress) {
         lords_state.updateBalance(balance)
-      } else if (_contract == fameContractAddress) {
+      } else if (_contract == allTokens.fameContractAddress) {
         fame_state.updateBalance(balance)
-      } else if (_contract == foolsContractAddress) {
+      } else if (_contract == allTokens.foolsContractAddress) {
         fools_state.updateBalance(balance)
-      } else if (_contract == duelistContractAddress) {
+      } else if (_contract == allTokens.duelistContractAddress) {
         duelist_state.updateBalance(balance)
-      } else if (_contract == packContractAddress) {
+      } else if (_contract == allTokens.packContractAddress) {
         pack_state.updateBalance(balance)
-      } else if (_contract == ringContractAddress) {
+      } else if (_contract == allTokens.ringContractAddress) {
         ring_state.updateBalance(balance)
-      } else if (_contract == duelContractAddress) {
+      } else if (_contract == allTokens.duelContractAddress) {
         duel_state.updateBalance(balance)
-      } else if (_contract == tournamentContractAddress) {
+      } else if (_contract == allTokens.tournamentContractAddress) {
         tournament_state.updateBalance(balance)
       }
     },
-    enabled: (mounted),
+    enabled: (mounted && initialTokenBalances.length > 0),
   })
 
   // useEffect(() => debug.log("TokenStoreSync() token_state =>", token_state.contracts), [token_state.contracts])

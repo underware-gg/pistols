@@ -27,16 +27,39 @@ export const useTokenContracts = () => {
   const tournamentContractAddress = useMemo(() => getTournamentTokenAddress(selectedNetworkId), [selectedNetworkId])
   // misc
   const botPlayerContractAddress = useMemo(() => getBotPlayerAddress(selectedNetworkId), [selectedNetworkId])
-  
-  return {
+
+  const allErc20 = useMemo(() => ({
     lordsContractAddress,
     fameContractAddress,
     foolsContractAddress,
+  }), [lordsContractAddress, fameContractAddress, foolsContractAddress])
+  const allErc721 = useMemo(() => ({
     packContractAddress,
     duelistContractAddress,
     duelContractAddress,
     ringContractAddress,
     tournamentContractAddress,
+}), [packContractAddress, duelistContractAddress, duelContractAddress, ringContractAddress, tournamentContractAddress])
+  const allTokens = useMemo(() => ({
+    ...allErc20,
+    ...allErc721,
+  }), [allErc20, allErc721])
+  
+  return {
+    // erc20
+    lordsContractAddress,
+    fameContractAddress,
+    foolsContractAddress,
+    allErc20,
+    // erc721
+    packContractAddress,
+    duelistContractAddress,
+    duelContractAddress,
+    ringContractAddress,
+    tournamentContractAddress,
+    allErc721,
+    // misc
+    allTokens,
     botPlayerContractAddress,
   }
 }

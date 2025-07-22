@@ -28,6 +28,7 @@ export const useDuelIdsForClaimingRings = () => {
   const { address } = useAccount();
 
   const query = useMemo(() => {
+    if (!address) return '';
     const _address = bigintToAddress(address);
     let queries = [
       `select "${constants.RingType.GoldSignetRing}" as ring_type, duel_id, season_id from "pistols-Challenge" where season_id=1 and (state="Resolved" or state="Draw") and (address_a="${_address}" or address_b="${_address}")`,

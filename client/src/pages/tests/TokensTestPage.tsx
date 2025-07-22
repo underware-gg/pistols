@@ -133,27 +133,22 @@ function RingsClaimButton({
 
 
 function Tokens() {
-  const {
-    packContractAddress,
-    ringContractAddress,
-    duelistContractAddress,
-    duelContractAddress,
-  } = useTokenContracts()
+  const { allErc721 } = useTokenContracts()
   const { isConnected } = useAccount()
   if (!isConnected) return <></>
   return (
     <>
       <hr />
       <h1>Tokens</h1>
-      <TokenContract contractAddress={packContractAddress} tokenName='Packs' attributes={['Is Open']} />
+      <TokenContract contractAddress={allErc721.packContractAddress} tokenName='Packs' attributes={['Is Open']} />
       <br />
-      <TokenContract contractAddress={ringContractAddress} tokenName='Rings' />
+      <TokenContract contractAddress={allErc721.ringContractAddress} tokenName='Rings' />
       <br />
-      <TokenContract contractAddress={duelistContractAddress} tokenName='Duelists' hasFame
+      <TokenContract contractAddress={allErc721.duelistContractAddress} tokenName='Duelists' hasFame
         renderer={(tokenId: bigint) => <DuelistTokenArt duelistId={tokenId} style={_style} />}
       />
       <br />
-      <TokenContract contractAddress={duelContractAddress} tokenName='Duels'
+      <TokenContract contractAddress={allErc721.duelContractAddress} tokenName='Duels'
         renderer={(tokenId: bigint) => <DuelTokenArt duelId={tokenId} style={_style} />}
       />
     </>

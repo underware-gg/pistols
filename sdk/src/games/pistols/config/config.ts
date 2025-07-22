@@ -5,6 +5,7 @@ import pistols_manifest_academy from './manifests/manifest_academy.json'
 import pistols_manifest_staging from './manifests/manifest_staging.json'
 import pistols_manifest_sepolia from './manifests/manifest_sepolia.json'
 import pistols_manifest_mainnet from './manifests/manifest_mainnet.json'
+import { bigintToHex } from 'src/utils/misc/types'
 
 export const NAMESPACE = 'pistols'
 
@@ -48,23 +49,25 @@ export const getManifest = ({
 //----------------------------------------
 // contract addresses
 //
+const _getContractAddress = (networkId: NetworkId, contractName: string): string => (
+  getContractByName(manifests_per_network[networkId], NAMESPACE, contractName)?.address ?? '0x0'
+);
 // erc-20
-export const getLordsAddress = (networkId: NetworkId): string => (getNetworkConfig(networkId).lordsAddress || (getContractByName(manifests_per_network[networkId], NAMESPACE, 'lords_mock')?.address ?? '0x0'))
-export const getFameAddress = (networkId: NetworkId): string => (getContractByName(manifests_per_network[networkId], NAMESPACE, 'fame_coin')?.address ?? '0x0')
-export const getFoolsAddress = (networkId: NetworkId): string => (getContractByName(manifests_per_network[networkId], NAMESPACE, 'fools_coin')?.address ?? '0x0')
+export const getLordsAddress = (networkId: NetworkId): string => bigintToHex(getNetworkConfig(networkId).lordsAddress || _getContractAddress(networkId, 'lords_mock'))
+export const getFameAddress = (networkId: NetworkId): string => bigintToHex(_getContractAddress(networkId, 'fame_coin'));
+export const getFoolsAddress = (networkId: NetworkId): string => bigintToHex(_getContractAddress(networkId, 'fools_coin'));
 // erc-721
-export const getDuelistTokenAddress = (networkId: NetworkId): string => (getContractByName(manifests_per_network[networkId], NAMESPACE, 'duelist_token')?.address ?? '0x0')
-export const getDuelTokenAddress = (networkId: NetworkId): string => (getContractByName(manifests_per_network[networkId], NAMESPACE, 'duel_token')?.address ?? '0x0')
-export const getPackTokenAddress = (networkId: NetworkId): string => (getContractByName(manifests_per_network[networkId], NAMESPACE, 'pack_token')?.address ?? '0x0')
-export const getRingTokenAddress = (networkId: NetworkId): string => (getContractByName(manifests_per_network[networkId], NAMESPACE, 'ring_token')?.address ?? '0x0')
-export const getTournamentTokenAddress = (networkId: NetworkId): string => (getContractByName(manifests_per_network[networkId], NAMESPACE, 'tournament_token')?.address ?? '0x0')
+export const getDuelistTokenAddress = (networkId: NetworkId): string => bigintToHex(_getContractAddress(networkId, 'duelist_token'));
+export const getDuelTokenAddress = (networkId: NetworkId): string => bigintToHex(_getContractAddress(networkId, 'duel_token'));
+export const getPackTokenAddress = (networkId: NetworkId): string => bigintToHex(_getContractAddress(networkId, 'pack_token'));
+export const getRingTokenAddress = (networkId: NetworkId): string => bigintToHex(_getContractAddress(networkId, 'ring_token'));
+export const getTournamentTokenAddress = (networkId: NetworkId): string => bigintToHex(_getContractAddress(networkId, 'tournament_token'));
 // contracts
-export const getWorldAddress = (networkId: NetworkId): string => (manifests_per_network[networkId]?.world?.address ?? '0x0')
-export const getGameAddress = (networkId: NetworkId): string => (getContractByName(manifests_per_network[networkId], NAMESPACE, 'game')?.address ?? '0x0')
-export const getGameLoopAddress = (networkId: NetworkId): string => (getContractByName(manifests_per_network[networkId], NAMESPACE, 'game_loop')?.address ?? '0x0')
-export const getBotPlayerAddress = (networkId: NetworkId): string => (getContractByName(manifests_per_network[networkId], NAMESPACE, 'bot_player')?.address ?? '0x0')
-export const getTutorialAddress = (networkId: NetworkId): string => (getContractByName(manifests_per_network[networkId], NAMESPACE, 'tutorial')?.address ?? '0x0')
-export const getBankAddress = (networkId: NetworkId): string => (getContractByName(manifests_per_network[networkId], NAMESPACE, 'bank')?.address ?? '0x0')
-export const getAdminAddress = (networkId: NetworkId): string => (getContractByName(manifests_per_network[networkId], NAMESPACE, 'admin')?.address ?? '0x0')
-export const getVrfAddress = (networkId: NetworkId): string => (getNetworkConfig(networkId).vrfAddress || (getContractByName(manifests_per_network[networkId], NAMESPACE, 'vrf_mock')?.address ?? '0x0'))
-
+export const getWorldAddress = (networkId: NetworkId): string => bigintToHex(manifests_per_network[networkId]?.world?.address ?? 0);
+export const getGameAddress = (networkId: NetworkId): string => bigintToHex(_getContractAddress(networkId, 'game'));
+export const getGameLoopAddress = (networkId: NetworkId): string => bigintToHex(_getContractAddress(networkId, 'game_loop'));
+export const getBotPlayerAddress = (networkId: NetworkId): string => bigintToHex(_getContractAddress(networkId, 'bot_player'));
+export const getTutorialAddress = (networkId: NetworkId): string => bigintToHex(_getContractAddress(networkId, 'tutorial'));
+export const getBankAddress = (networkId: NetworkId): string => bigintToHex(_getContractAddress(networkId, 'bank'));
+export const getAdminAddress = (networkId: NetworkId): string => bigintToHex(_getContractAddress(networkId, 'admin'));
+export const getVrfAddress = (networkId: NetworkId): string => bigintToHex(getNetworkConfig(networkId).vrfAddress || _getContractAddress(networkId, 'vrf_mock'));
