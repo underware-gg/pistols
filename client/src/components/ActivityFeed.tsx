@@ -96,7 +96,7 @@ const ActivityItemPackStarter = ({
     <>
       <PlayerLink address={activity.player_address} />
       {' entered the game! '}
-      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} />
+      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} avoidLargeDelta={true} />
       <br />
     </>
   )
@@ -112,7 +112,7 @@ const ActivityItemDuelistSpawned = ({
       {' spawned '}
       <DuelistLink duelistId={activity.identifier} />
       {' '}
-      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} />
+      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} avoidLargeDelta={true} />
       <br />
     </>
   )
@@ -126,7 +126,7 @@ const ActivityItemDuelistDied = ({
     <>
       <DuelistLink duelistId={activity.identifier} />
       {' is dead! '}
-      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} />
+      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} avoidLargeDelta={true} />
       <br />
     </>
   )
@@ -145,7 +145,7 @@ const ActivityItemChallengeCreated = ({
       {' for '}
       <ChallengeLink duelId={activity.identifier} />
       {' '}
-      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} />
+      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} avoidLargeDelta={true} />
       <br />
     </>
   )
@@ -164,7 +164,7 @@ const ActivityItemChallengeReplied = ({
       {' '}
       <ChallengeLink duelId={activity.identifier} />
       {' '}
-      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} />
+      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} avoidLargeDelta={true} />
       <br />
     </>
   )
@@ -180,7 +180,7 @@ const ActivityItemMovesCommitted = ({
       {' moved in '}
       <ChallengeLink duelId={activity.identifier} />
       {' '}
-      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} />
+      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} avoidLargeDelta={true} />
       <br />
     </>
   )
@@ -196,7 +196,7 @@ const ActivityItemMovesRevealed = ({
       {' revealed in '}
       <ChallengeLink duelId={activity.identifier} />
       {' '}
-      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} />
+      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} avoidLargeDelta={true} />
       <br />
     </>
   )
@@ -210,7 +210,7 @@ const ActivityItemChallengeEnded = ({
     <>
       <ChallengeLink duelId={activity.identifier} />
       {' has ended... '}
-      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} />
+      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} avoidLargeDelta={true} />
       <br />
     </>
   )
@@ -226,7 +226,7 @@ const ActivityItemChallengeResolved = ({
       {' won '}
       <ChallengeLink duelId={activity.identifier} />
       {'! '}
-      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} />
+      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} avoidLargeDelta={true} />
       <br />
     </>
   )
@@ -240,7 +240,7 @@ const ActivityItemChallengeDraw = ({
     <>
       <ChallengeLink duelId={activity.identifier} />
       {' ended in a draw! '}
-      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} />
+      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} avoidLargeDelta={true} />
       <br />
     </>
   )
@@ -260,7 +260,7 @@ const ActivityItemChallengeCanceled = ({
             : state == constants.ChallengeState.Refused ? ' refused '
               : ' canceled '
       }
-      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} />
+      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} avoidLargeDelta={true} />
       <br />
     </>
   )
@@ -276,7 +276,7 @@ const ActivityItemPlayerTimedOut = ({
       {' abandoned '}
       <ChallengeLink duelId={activity.identifier} />
       {' '}
-      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} />
+      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} avoidLargeDelta={true} />
       <br />
     </>
   )

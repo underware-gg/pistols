@@ -119,14 +119,21 @@ export const TimestampDeltaElapsed = ({
   timestamp,
   clientSeconds,
   className = 'Inactive',
+  avoidLargeDelta,
 }: {
   timestamp: number
   clientSeconds: number
   className?: string
+  avoidLargeDelta?: boolean
 }) => {
+  const formatted = useMemo(() => {
+    const result = formatTimestampDeltaElapsed(timestamp, clientSeconds).result;
+    return (avoidLargeDelta && result.endsWith('years')) ? '...' : result;
+  }, [timestamp, clientSeconds])
+
   return (
     <span className={className}>
-      {formatTimestampDeltaElapsed(timestamp, clientSeconds).result}
+      {formatted}
     </span>
   )
 }
