@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useAccount } from '@starknet-react/core'
 import { useFetchChallengeIdsByPlayer } from '/src/stores/challengeStore'
-import { useFetchDuelistIdsByPlayer } from '/src/stores/duelistStore'
+import { useFetchDuelistsByIdsByPlayer } from '/src/stores/duelistStore'
 import { useFetchPacksOfPlayer } from '/src/stores/packStore'
 import { useProgressStore } from '/src/stores/progressStore'
 
@@ -12,7 +12,7 @@ import { useProgressStore } from '/src/stores/progressStore'
 export function PlayerSync() {  
   const { address } = useAccount()
   const { isFinished: isFinishedChallenges } = useFetchChallengeIdsByPlayer(address)
-  const { isFinished: isFinishedDuelists } = useFetchDuelistIdsByPlayer(address)
+  const { isFinished: isFinishedDuelists } = useFetchDuelistsByIdsByPlayer(address)
   const { isFinished: isFinishedPacks } = useFetchPacksOfPlayer()
 
   // update progress

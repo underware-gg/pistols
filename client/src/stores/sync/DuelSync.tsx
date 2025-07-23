@@ -1,5 +1,5 @@
 import { useGetChallenge } from '/src/stores/challengeStore'
-import { useFetchDuelistIds } from '/src/stores/duelistStore'
+import { useFetchDuelistsByIds } from '/src/stores/duelistStore'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 
 //------------------------------------------------------
@@ -10,6 +10,6 @@ export function DuelSync() {
   const { atDuel } = usePistolsScene()
   const { currentDuel } = usePistolsContext()
   const { duelistIdA, duelistIdB } = useGetChallenge(atDuel ? currentDuel : undefined)
-  const { isLoading } = useFetchDuelistIds(atDuel ? [duelistIdA, duelistIdB] : [])
+  const { isLoading } = useFetchDuelistsByIds(atDuel ? [duelistIdA, duelistIdB] : [])
   return (<></>)
 }

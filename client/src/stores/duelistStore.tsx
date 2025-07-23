@@ -395,10 +395,10 @@ export const usePlayerDuelistsOrganized = () => {
 //
 export const useFetchDuelist = (duelist_id: BigNumberish, retryInterval?: number) => {
   const duelistIds = useMemo(() => [duelist_id], [duelist_id])
-  return useFetchDuelistIds(duelistIds, retryInterval)
+  return useFetchDuelistsByIds(duelistIds, retryInterval)
 }
 
-export const useFetchDuelistIds = (duelistIds: BigNumberish[], retryInterval?: number) => {
+export const useFetchDuelistsByIds = (duelistIds: BigNumberish[], retryInterval?: number) => {
   // always fetch rewards for new duelists
   useFetchChallengeRewardsByDuelistIds(duelistIds)
 
@@ -436,18 +436,18 @@ export const useFetchDuelistIds = (duelistIds: BigNumberish[], retryInterval?: n
     query,
     retryInterval,
     setEntities: (entities: PistolsEntity[]) => {
-      debug.log(`useFetchDuelistIds() GOT`, newDuelistIds, entities);
+      // debug.log(`useFetchDuelistsByIds() GOT`, newDuelistIds, entities);
       setEntities(entities);
     },
   })
 
   // useEffect(() => {
-  //   console.log(`::useFetchDuelistIds...`, newDuelIds, query)
-  // }, [newDuelIds, query])
+  //   console.log(`::useFetchDuelistsByIds...`, newDuelistIds, query)
+  // }, [newDuelistIds, query])
 
-  // const entities = useChallengeStore((state) => state.entities);
+  // const entities = useDuelistStore((state) => state.entities);
   // useEffect(() => {
-  //   console.log(`::useFetchDuelistIds... entities:`, entities)
+  //   console.log(`::useFetchDuelistsByIds... entities:`, entities)
   // }, [entities])
 
   return {
@@ -464,7 +464,7 @@ export const useFetchDuelistIds = (duelistIds: BigNumberish[], retryInterval?: n
 // new and fetched duelists will be updated automatically with the entity subscription
 //
 
-export const useFetchDuelistIdsByPlayer = (address: BigNumberish) => {
+export const useFetchDuelistsByIdsByPlayer = (address: BigNumberish) => {
   const addresses = useMemo(() => [address], [address])
   return useFetchDuelistIdsByPlayerAddresses(addresses)
 }
@@ -478,7 +478,7 @@ export const useFetchDuelistIdsByPlayerAddresses = (addresses: BigNumberish[]) =
 
   // fetch duelists...
   const { duelistIds } = useDuelistIdsOfOwners(newAddresses)
-  const { isLoading, isFinished } = useFetchDuelistIds(duelistIds)
+  const { isLoading, isFinished } = useFetchDuelistsByIds(duelistIds)
   // fetch player stacks...
   useFetchPlayerDuelistStacks(addresses)
   

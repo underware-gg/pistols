@@ -14,7 +14,7 @@ import { InternalPageMenu, InternalPageWrapper } from '/src/pages/internal/Inter
 import { usePlayer, useRingsOfOwner } from '/src/stores/playerStore'
 import { useDuelistIdsOfOwner } from '/src/hooks/useTokenDuelists'
 import { useFetchPacksByPlayer, usePack } from '/src/stores/packStore'
-import { useDuelist, useFetchDuelistIdsByPlayer } from '/src/stores/duelistStore'
+import { useDuelist, useFetchDuelistsByIdsByPlayer } from '/src/stores/duelistStore'
 import { useHasClaimedRing } from '/src/hooks/usePistolsContractCalls'
 import { usePacksOfOwner } from '/src/hooks/useTokenPacks'
 import { PlayerNameSync } from '/src/stores/sync/PlayerNameSync'
@@ -215,7 +215,7 @@ function PlayerTokens({
 }: {
   address: BigNumberish
 }) {
-  useFetchDuelistIdsByPlayer(address)
+  useFetchDuelistsByIdsByPlayer(address)
   useFetchPacksByPlayer(address)
   const { duelistIds } = useDuelistIdsOfOwner(address)
   const { packIds } = usePacksOfOwner(address)

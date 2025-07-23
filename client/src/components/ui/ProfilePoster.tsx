@@ -18,7 +18,7 @@ import { useDuelistIdsOfOwner } from '/src/hooks/useTokenDuelists'
 import { useExecuteEmitPlayerBookmark } from '/src/hooks/usePistolsSystemCalls'
 import { Address } from './Address'
 import { ChallengeButton } from '/src/components/ui/Buttons'
-import { useFetchDuelistIdsByPlayer } from '/src/stores/duelistStore'
+import { useFetchDuelistsByIdsByPlayer } from '/src/stores/duelistStore'
 import { COLORS } from '@underware/pistols-sdk/pistols/constants'
 import { StampImage } from './StampImage'
 
@@ -152,7 +152,7 @@ const ProfilePosterFull = forwardRef<ProfilePosterHandle, ProfilePosterProps>((p
   const { name, isMyAccount, isOnline, avatarUrl } = useProfilePosterData(props.playerAddress)
   
   // Full-specific data
-  useFetchDuelistIdsByPlayer(props.playerAddress) // fetch duelists in the store, if not already fetched
+  useFetchDuelistsByIdsByPlayer(props.playerAddress) // fetch duelists in the store, if not already fetched
   const { duelistIds, isLoading } = useDuelistIdsOfOwner(props.playerAddress)
   const { isBookmarked } = useIsBookmarked(props.playerAddress)
   const { emit_player_bookmark, isDisabled: emitIsDisabled } = useExecuteEmitPlayerBookmark(props.playerAddress, 0, !isBookmarked)
