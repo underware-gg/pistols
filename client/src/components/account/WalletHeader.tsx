@@ -83,10 +83,10 @@ export default function WalletHeader({
             </Col>
           }
           <Col verticalAlign='middle'>
-            <ActionButton fill onClick={() => dispatchSelectPlayerAddress(address)} label='Profile' />
+            <ActionButton fill onClick={() => dispatchSelectPlayerAddress(address)} label='Profile Poster' />
           </Col>
           <Col verticalAlign='middle'>
-            <ActionButton fill disabled={!openProfile} onClick={() => openProfile()} label='Account' />
+            <ActionButton fill disabled={!openProfile} onClick={() => openProfile()} label='Inventory' />
           </Col>
           <Col verticalAlign='middle'>
             <ActionButton fill onClick={() => {
