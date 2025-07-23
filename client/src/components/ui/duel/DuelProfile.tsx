@@ -61,7 +61,13 @@ export default function DuelProfile({
             <div className={`ProfileName DuelistName`} data-contentlength={duelistContentLength} style={ isTutorial ? { marginTop: aspectWidth(0.4) } : undefined }>{duelistName}</div>
           </div>
           <div className='YesMouse NoDrag' onClick={() => dispatchSelectPlayerAddress(playerAddress)}>
-          <ProfilePic circle profilePic={isTutorial ? profilePic : 0} profileType={isTutorial ? profileType : constants.DuelistProfile.Character} className='NoMouse NoDrag' />
+          <ProfilePic
+            circle
+            profilePic={isTutorial ? profilePic : (avatarUrl ? undefined : 0)}
+            profilePicUrl={isTutorial ? undefined : avatarUrl} 
+            profileType={isTutorial ? profileType : constants.DuelistProfile.Character}
+            className='NoMouse NoDrag'
+          />
           </div>
           <Image className='FlipHorizontal NoMouse NoDrag' src={hasStamp ? '/images/ui/duel/player_profile_stamp.png' : '/images/ui/duel/player_profile.png'} style={{ position: 'absolute' }} />
           <StampImage playerAddress={playerAddress} size="DuelProfile" position="Right" />
