@@ -4,6 +4,7 @@ import { useMounted } from '@underware/pistols-sdk/utils/hooks';
 import { useSdkSqlQuery } from '@underware/pistols-sdk/dojo/sql';
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { bigintToAddress, bigintToHex } from '@underware/pistols-sdk/utils';
+import { debug } from '@underware/pistols-sdk/pistols'
 
 // format returned by sql query
 type QueryResponseRaw = Array<{
@@ -35,34 +36,36 @@ function formatFn(rows: QueryResponseRaw): QueryResponse[] {
 export const useTokenBalancesQuery = () => {
   const mounted = useMounted()
   const { address } = useAccount();
-  const { allErc20, allErc721 } = useTokenContracts()
+  const { erc20Tokens, erc721Tokens } = useTokenContracts()
 
   const query = useMemo(() => {
     if (!mounted || !address) return '';
     const _getAlllBalances = [
-      ...Object.values(allErc721),
-      allErc20.fameContractAddress,
+      erc721Tokens.duelistContractAddress,
+      erc20Tokens.fameContractAddress,
     ].map(a => `'${bigintToHex(a)}'`);
     const _getPlayerBalances = [
-      allErc20.foolsContractAddress,
-      allErc20.lordsContractAddress,
+      erc721Tokens.packContractAddress,
+      erc20Tokens.foolsContractAddress,
+      erc20Tokens.lordsContractAddress,
     ].map(a => `'${bigintToHex(a)}'`);
     let queries = [
-      `select contract_address, account_address, balance, token_id from token_balances where contract_address in (${Object.values(_getAlllBalances).join(',')}) and balance != '${bigintToAddress(0n)}'`,
+      `select contract_address, account_address, balance, token_id from token_balances where contract_address in (${Object.values(_getAlllBalances).join(',')}) and balance!='${bigintToAddress(0n)}'`,
       `union all`,
       `select contract_address, account_address, balance, token_id from token_balances where contract_address in (${Object.values(_getPlayerBalances).join(',')}) and account_address='${bigintToHex(address)}'`,
       // `order by 3, 2`,
     ];
     return queries.join(' ');
-  }, [mounted, address, allErc20, allErc721])
+  }, [mounted, address, erc20Tokens, erc721Tokens])
 
   const { data, isLoading } = useSdkSqlQuery({
     query,
     formatFn,
   });
 
-  // useEffect(() => console.log('SQL BALANCES query', query), [query])
-  // useEffect(() => console.log('SQL BALANCES data', data), [data])
+  // useEffect(() => debug.log('SQL BALANCES query', query), [query])
+  // useEffect(() => debug.log('SQL BALANCES data', data), [data])
+  useEffect(() => debug.log('SQL BALANCES:', data.length, query), [data])
 
   return {
     initialTokenBalances: data,
