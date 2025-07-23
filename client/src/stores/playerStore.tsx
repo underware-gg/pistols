@@ -372,7 +372,7 @@ export const useRingsOfOwner = (address: BigNumberish) => {
         ringTypes.includes(constants.RingType.LeadSignetRing) ? constants.RingType.LeadSignetRing :
           null
   ), [ringTypes])
-  // console.log(`rings => [${topRingType}]`, ringIds, ringTypes)
+  // console.log(`rings =>`, topRingType, ringIds, ringTypes)
   return {
     ringIds,
     ringTypes,

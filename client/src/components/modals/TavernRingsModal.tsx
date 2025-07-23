@@ -77,6 +77,10 @@ function RingClaimItem({ ring, onClaimComplete, isVisible }: RingClaimItemProps)
     claimRing(ring.duelIds[0], ring.ringType)
   }, [isLoading, ring.duelIds, claimRing, ring.ringType])
 
+  // handle claimed ring
+  const { ringTypes } = useRingsOfPlayer()
+  const ringClaimed = useMemo(() => (ringTypes.includes(ring.ringType)), [ring, ringTypes])
+
   if (!isVisible) return null
 
   return (
@@ -123,7 +127,7 @@ function RingClaimItem({ ring, onClaimComplete, isVisible }: RingClaimItemProps)
       <div ref={buttonRef}>
         <button
           onClick={handleClaimClick}
-          disabled={isLoading}
+          disabled={isLoading || ringClaimed}
           className="BarkeepDialogButton"
           style={{
             fontSize: aspectWidth(1.2),
@@ -132,7 +136,7 @@ function RingClaimItem({ ring, onClaimComplete, isVisible }: RingClaimItemProps)
             opacity: isLoading ? 0.7 : 1
           }}
         >
-          {isLoading ? 'Claiming...' : 'Claim'}
+          {ringClaimed ? 'Claimed!' : isLoading ? 'Claiming...' : 'Claim'}
         </button>
       </div>
     </div>
@@ -144,7 +148,6 @@ function _TavernRingsModal({ opener }: TavernRingsModalProps) {
   const { aspectWidth, aspectHeight } = useGameAspect()
   
   const { goldRingDuelIds, silverRingDuelIds, leadRingDuelIds } = useDuelIdsForClaimingRings()
-  const { ringTypes } = useRingsOfPlayer()
   
   const { hasClaimed: hasClaimedGold } = useHasClaimedRing(address, constants.RingType.GoldSignetRing)
   const { hasClaimed: hasClaimedSilver } = useHasClaimedRing(address, constants.RingType.SilverSignetRing)

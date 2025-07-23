@@ -115,6 +115,8 @@ export function EntityStoreSync() {
       // debug.log("EntityStoreSync() SET =======> [Leaderboard]:", filterEntitiesByModels(entities, ['Leaderboard']))
       // debug.log("EntityStoreSync() SET PLAYERS =======> [Player]:", filterEntitiesByModels(entities, ['Player']))
       // debug.log("EntityStoreSync() SET PLAYERS =======> [PlayerOnline]:", filterEntitiesByModels(entities, ['PlayerOnline']))
+      // debug.log("EntityStoreSync() SET PLAYERS =======> [Ring]:", filterEntitiesByModels(entities, ['Ring']))
+      // debug.log("EntityStoreSync() SET PLAYERS =======> [RingBalance]:", filterEntitiesByModels(entities, ['RingBalance']))
       configState.setEntities(filterEntitiesByModels(entities, ['Config']))
       tokenState.setEntities(filterEntitiesByModels(entities, ['TokenConfig']))
       bankState.setEntities(filterEntitiesByModels(entities, ['Pool']))
@@ -141,7 +143,7 @@ export function EntityStoreSync() {
       if (entityContainsModels(entity, ['SeasonConfig', 'Leaderboard'])) {
         seasonState.updateEntity(entity)
       }
-      if (entityContainsModels(entity, ['Player', 'PlayerFlags', 'PlayerTeamFlags'])) {
+      if (entityContainsModels(entity, ['Player', 'PlayerFlags', 'PlayerTeamFlags', 'Ring', 'RingBalance'])) {
         playerState.updateEntity(entity)
       }
       if (entityContainsModels(entity, ['PlayerOnline'])) {

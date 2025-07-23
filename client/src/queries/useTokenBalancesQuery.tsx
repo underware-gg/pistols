@@ -42,6 +42,7 @@ export const useTokenBalancesQuery = () => {
     if (!mounted || !address) return '';
     const _getAlllBalances = [
       erc721Tokens.duelistContractAddress,
+      erc721Tokens.ringContractAddress,
       erc20Tokens.fameContractAddress,
     ].map(a => `'${bigintToHex(a)}'`);
     const _getPlayerBalances = [
