@@ -30,7 +30,7 @@ const HeaderCell = Table.HeaderCell
 
 export default function PoolsPage() {
   return (
-    <AppDojo networkId={ENV.DEFAULT_NETWORK_ID} autoConnect>
+    <AppDojo autoConnect>
       <Container>
         <InternalPageMenu />
         <CurrentChainHint />

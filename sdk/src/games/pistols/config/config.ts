@@ -1,7 +1,7 @@
 import { Manifest, getContractByName } from '@dojoengine/core'
 import { ChainId, getNetworkConfig, NetworkId } from './networks'
 import pistols_manifest_dev from './manifests/manifest_dev.json'
-import pistols_manifest_academy from './manifests/manifest_academy.json'
+import pistols_manifest_slot from './manifests/manifest_slot.json'
 import pistols_manifest_staging from './manifests/manifest_staging.json'
 import pistols_manifest_sepolia from './manifests/manifest_sepolia.json'
 import pistols_manifest_mainnet from './manifests/manifest_mainnet.json'
@@ -18,18 +18,17 @@ export type DojoManifest = Manifest & any
 // import { createSystemCalls } from './createSystemCalls'
 
 const manifests_per_network: Record<NetworkId, DojoManifest> = {
-  [NetworkId.KATANA_LOCAL]: pistols_manifest_dev as DojoManifest,
-  [NetworkId.ACADEMY]: pistols_manifest_academy as DojoManifest,
-  [NetworkId.STAGING]: pistols_manifest_staging as DojoManifest,
-  [NetworkId.SEPOLIA]: pistols_manifest_sepolia as DojoManifest,
   [NetworkId.MAINNET]: pistols_manifest_mainnet as DojoManifest,
+  [NetworkId.SEPOLIA]: pistols_manifest_sepolia as DojoManifest,
+  [NetworkId.STAGING]: pistols_manifest_staging as DojoManifest,
+  [NetworkId.KATANA_SLOT]: pistols_manifest_slot as DojoManifest,
+  [NetworkId.KATANA_LOCAL]: pistols_manifest_dev as DojoManifest,
 }
 const manifests_per_chain: Record<ChainId, DojoManifest> = {
-  [ChainId.KATANA_LOCAL]: pistols_manifest_dev as DojoManifest,
-  [ChainId.PISTOLS_ACADEMY]: pistols_manifest_academy as DojoManifest,
-  [ChainId.PISTOLS_STAGING]: pistols_manifest_staging as DojoManifest,
-  [ChainId.SN_SEPOLIA]: pistols_manifest_sepolia as DojoManifest,
   [ChainId.SN_MAIN]: pistols_manifest_mainnet as DojoManifest,
+  [ChainId.SN_SEPOLIA]: pistols_manifest_sepolia as DojoManifest,
+  [ChainId.KATANA_SLOT]: pistols_manifest_slot as DojoManifest,
+  [ChainId.KATANA_LOCAL]: pistols_manifest_dev as DojoManifest,
 }
 
 export const getManifest = ({

@@ -31,7 +31,7 @@ const HeaderCell = Table.HeaderCell
 
 export default function SignTestPage() {
   const location = useLocation()
-  const [networkId, setNetworkId] = useState<NetworkId>(location.search.split('=')[1] as NetworkId ?? NetworkId.ACADEMY)
+  const [networkId, setNetworkId] = useState<NetworkId>(location.search.split('=')[1] as NetworkId ?? NetworkId.KATANA_LOCAL)
 
   let navigate = useNavigate();
   const _click = (networkId: NetworkId) => {
@@ -45,7 +45,7 @@ export default function SignTestPage() {
   if (!networkId) return <div>Loading...</div>
 
   return (
-    <AppDojo networkId={networkId} autoConnect={networkId === NetworkId.ACADEMY}>
+    <AppDojo autoConnect={networkId === NetworkId.KATANA_LOCAL}>
       <TestPageMenu />
       <CurrentChainHint />
 
@@ -53,7 +53,7 @@ export default function SignTestPage() {
         <Menu size='small' inverted fluid widths={3}>
           <MenuItem name='mainnet' active={networkId === NetworkId.MAINNET} onClick={() => _click(NetworkId.MAINNET)} />
           <MenuItem name='sepolia' active={networkId === NetworkId.SEPOLIA} onClick={() => _click(NetworkId.SEPOLIA)} />
-          <MenuItem name='academy' active={networkId === NetworkId.ACADEMY} onClick={() => _click(NetworkId.ACADEMY)} />
+          <MenuItem name='localhost' active={networkId === NetworkId.KATANA_LOCAL} onClick={() => _click(NetworkId.KATANA_LOCAL)} />
         </Menu>
         <Connect />
 

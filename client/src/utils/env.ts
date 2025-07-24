@@ -10,7 +10,6 @@ const _env = (name: string) => (
 // required
 export const CLIENT_URL = _env('VITE_CLIENT_URL') || 'https://play.pistols.gg';
 export const DEFAULT_NETWORK_ID = _env('VITE_NETWORK_ID') || _env('VITE_DEFAULT_NETWORK_ID') ||  'MAINNET';
-export const ACADEMY_NETWORK_ID = _env('VITE_ACADEMY_NETWORK_ID') || _env('ACADEMY_NETWORK_ID') || 'ACADEMY';
 export const ASSETS_SERVER_URL = _env('VITE_ASSETS_SERVER_URL') || 'https://assets.underware.gg';
 // dojo config overrides
 export const SLOT_NAME = _env('VITE_SLOT_NAME') || null;

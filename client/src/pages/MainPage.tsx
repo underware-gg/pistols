@@ -4,6 +4,8 @@ import { usePistolsContext, usePistolsScene, usePistolsSceneFromRoute, useSyncRo
 import { useSetPageTitle } from '/src/hooks/useSetPageTitle'
 import { useEffectOnce } from '@underware/pistols-sdk/utils/hooks'
 import { useQuality } from '/src/hooks/useQuality'
+import { useGameAspect } from '/src/hooks/useGameAspect'
+import { useCheckPendingTransactions } from '/src/stores/transactionStore'
 import { DojoStatus, emitter } from '@underware/pistols-sdk/dojo'
 import { MouseToolTip } from '/src/components/ui/MouseToolTip'
 import { SCENE_CHANGE_ANIMATION_DURATION } from '/src/three/game'
@@ -36,17 +38,15 @@ import Gate from '/src/components/scenes/ScGate'
 import Door from '/src/components/scenes/ScDoor'
 import Duel from '/src/components/scenes/Duel'
 import { Header } from '/src/components/Header'
-import NotificationSystem from '/src/components/notifications/NotificationSystem'
+import { CustomIcon } from '/src/components/ui/Icons'
 import { NotificationProvider } from '/src/stores/notificationStore'
+import NotificationSystem from '/src/components/notifications/NotificationSystem'
 import ElementPopupNotification, { ElementPopupNotificationRef } from '/src/components/ui/ElementPopupNotification'
 
 // test sdk
 import { helloPistols } from '@underware/pistols-sdk'
-import { CustomIcon } from '/src/components/ui/Icons'
-import { useGameAspect } from '/src/hooks/useGameAspect'
-import { useCheckPendingTransactions } from '/src/stores/transactionStore'
-
 helloPistols();
+
 export default function MainPage({
   tutorial = false,
 }) {
@@ -107,7 +107,7 @@ export default function MainPage({
   useEffectOnce(() => console.log(`---------------- MAIN PAGE MOUNTED`), [])
 
   return (
-    <AppGame backgroundImage={null} networkId={showTutorial ? ENV.ACADEMY_NETWORK_ID : undefined} autoConnect={showTutorial}>
+    <AppGame backgroundImage={null} networkId={undefined} autoConnect={false}>
         <Background className={null}>
           <NotificationProvider>
             <GameContainer isVisible={true} />

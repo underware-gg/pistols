@@ -695,8 +695,9 @@ pub mod duelist_token {
                 let mut store: Store = StoreTrait::new(self.world_default());
                 let duelist_profile: DuelistProfile = store.get_duelist_profile(token_id.low);
                 let mut stack: PlayerDuelistStack = store.get_player_duelist_stack(from, duelist_profile);
+                // try to removed from stack...
                 if (stack.remove(token_id.low)) {
-                    // removed from stack (duelist is alive)
+                    // DUELIST IS ALIVE!
                     store.set_player_duelist_stack(@stack);
                     PlayerTrait::remove_alive_duelist(ref store, from, 1);
                     // append to new owner stack

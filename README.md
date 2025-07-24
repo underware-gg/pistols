@@ -245,9 +245,6 @@ VITE_NETWORK_ID=KATANA_LOCAL
 #VITE_NETWORK_ID=SEPOLIA
 #VITE_NETWORK_ID=MAINNET
 
-# Academy chain (tutorials)
-VITE_ACADEMY_NETWORK_ID=ACADEMY
-
 # optional/alternative service urls
 # VITE_CLIENT_URL=https://play.pistols.gg
 # VITE_ASSETS_SERVER_URL=https://assets.underware.gg

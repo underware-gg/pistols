@@ -60,7 +60,7 @@ build-external-contracts = [
 # Dojo profiles declaration
 #
 [profile.dev]
-[profile.academy]
+[profile.slot]
 [profile.staging]
 [profile.sepolia]
 [profile.mainnet]

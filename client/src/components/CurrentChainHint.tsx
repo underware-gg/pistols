@@ -17,7 +17,7 @@ export default function CurrentChainHint() {
         {'/'}
         {selectedNetworkConfig.slotName}
         {'/'}
-        {connector?.id ?? 'off'}
+        {connector?.id ?? 'disconnected'}
       </div>
     </>
   )

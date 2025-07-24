@@ -17,8 +17,8 @@ import { stringToFelt } from 'src/starknet/starknet'
 export enum NetworkId {
   MAINNET = 'MAINNET',
   SEPOLIA = 'SEPOLIA',
-  ACADEMY = 'ACADEMY',
   STAGING = 'STAGING',
+  KATANA_SLOT = 'KATANA_SLOT',
   KATANA_LOCAL = 'KATANA_LOCAL',
 }
 
@@ -28,8 +28,7 @@ export enum NetworkId {
 export enum ChainId {
   SN_MAIN = 'SN_MAIN',
   SN_SEPOLIA = 'SN_SEPOLIA',
-  PISTOLS_ACADEMY = 'WP_PISTOLS_ACADEMY',
-  PISTOLS_STAGING = 'WP_PISTOLS_STAGING',
+  KATANA_SLOT = 'WP_KATANA_SLOT',
   KATANA_LOCAL = 'KATANA_LOCAL',
 }
 
@@ -197,15 +196,15 @@ const localKatanaConfig: DojoNetworkConfig = {
 //--------------------------------
 // Slot Katana
 //
-const academySlotConfig: DojoNetworkConfig = {
+const katanaSlotConfig: DojoNetworkConfig = {
   networkId: undefined, // derive from NETWORKS
   chain: undefined,     // derive from this
-  chainId: ChainId.PISTOLS_ACADEMY,
-  name: 'Katana Academy',
+  chainId: ChainId.KATANA_SLOT,
+  name: 'Katana Slot',
   clientUrl: undefined,
   assetsServerUrl: 'https://assets.underware.gg',
-  slotName: 'pistols-academy',
-  rpcUrl: 'https://api.cartridge.gg/x/pistols-academy/katana',
+  slotName: 'pistols-slot',
+  rpcUrl: 'https://api.cartridge.gg/x/pistols-slot/katana',
   toriiUrl: undefined,    // derive from slotName
   graphqlUrl: undefined,  // derive from slotName
   sqlUrl: undefined,      // derive from slotName
@@ -332,8 +331,8 @@ const snMainnetConfig: DojoNetworkConfig = {
 const NETWORKS: Record<NetworkId, DojoNetworkConfig> = {
   [NetworkId.MAINNET]: snMainnetConfig,
   [NetworkId.SEPOLIA]: snSepoliaConfig,
-  [NetworkId.ACADEMY]: academySlotConfig,
   [NetworkId.STAGING]: pistolsStagingConfig,
+  [NetworkId.KATANA_SLOT]: katanaSlotConfig,
   [NetworkId.KATANA_LOCAL]: localKatanaConfig,
 }
 

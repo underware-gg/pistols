@@ -20,7 +20,7 @@ const Body = Table.Body
 
 export default function TutorialTestPage() {
   return (
-    <AppDojo networkId={ENV.ACADEMY_NETWORK_ID} autoConnect>
+    <AppDojo autoConnect>
       <Container>
         <TestPageMenu />
         <CurrentChainHint />
