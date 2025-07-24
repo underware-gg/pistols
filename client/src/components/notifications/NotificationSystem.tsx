@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { Image } from 'semantic-ui-react'
 import { useNotifications, type Notification } from '/src/stores/notificationStore'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import * as TWEEN from '@tweenjs/tween.js'
 import { BannerButton } from '../Header'
-import { Image } from 'semantic-ui-react'
 import { emitter, playAudio } from '/src/three/game'
 import { DuelNotificationItem } from './DuelNotificationItem'
 import { PushNotification } from './PushNotification'
@@ -16,7 +16,7 @@ const NOTIFICATION_SOUND_COOLDOWN = 15000
 export default function NotificationSystem() {
   const { notifications, markAsRead, markAsDisplayed } = useNotifications()
   const { dispatchSelectDuel, currentDuel, selectedDuelId } = usePistolsContext()
-  const { atDuel } = usePistolsScene()
+  const { atDuel, atGate, atDoor } = usePistolsScene()
   
   const [currentNotification, setCurrentNotification] = useState<Notification | null>(null)
   const [isVisible, setIsVisible] = useState(false)
@@ -34,6 +34,13 @@ export default function NotificationSystem() {
   const hasDisplayedNotificationRef = useRef(false)
   const swRegistrationRef = useRef<ServiceWorkerRegistration | null>(null)
   const lastSoundTimeRef = useRef<number>(0)
+
+  // never display at gate or door (after disconnect)
+  useEffect(() => {
+    if (atGate || atDoor) {
+      setIsVisible(false)
+    }
+  }, [atGate, atDoor])
 
   // Track tab focus state
   useEffect(() => {
