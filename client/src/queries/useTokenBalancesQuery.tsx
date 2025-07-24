@@ -80,7 +80,7 @@ export const useFetchInitialTokenBalancesQuery = () => {
 // Get token balances of an account
 // (admin/internal use only)
 //
-export const useFetchTokenBalancesOfAccount = (accountAddress: BigNumberish) => {
+export const useFetchTokenBalancesOwnedByAccount = (accountAddress: BigNumberish) => {
   const query = useMemo(() => {
     if (!isPositiveBigint(accountAddress)) return '';
     return `select contract_address, account_address, balance, token_id from token_balances where account_address='${bigintToHex(accountAddress)}'`;

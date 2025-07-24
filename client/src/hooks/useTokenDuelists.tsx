@@ -24,23 +24,23 @@ export const useOwnerOfDuelist = (token_id: BigNumberish) => {
   }
 }
 
-export const useDuelistsOfPlayer = () => {
+export const useDuelistsOwnedByPlayer = () => {
   const { address } = useAccount()
-  return useDuelistIdsOfOwner(address)
+  return useDuelistIdsOwnedByAccount(address)
 }
 
-export const useDuelistIdsOfOwner = (owner: BigNumberish) => {
+export const useDuelistIdsOwnedByAccount = (owner: BigNumberish) => {
   const state = useDuelistTokenStore((state) => state)
-  const tokenIds = useMemo(() => state.getTokenIdsOfOwner(owner), [state.tokens, owner])
+  const tokenIds = useMemo(() => state.getTokenIdsOwnedByAccount(owner), [state.tokens, owner])
   return {
     duelistIds: tokenIds,
     isLoading: (state.tokens === null),
   }
 }
 
-export const useDuelistIdsOfOwners = (owners: BigNumberish[]) => {
+export const useDuelistIdsOwnedByAccounts = (owners: BigNumberish[]) => {
   const state = useDuelistTokenStore((state) => state)
-  const tokenIds = useMemo(() => state.getTokenIdsOfOwners(owners), [state.tokens, owners])
+  const tokenIds = useMemo(() => state.getTokenIdsOwnedByAccounts(owners), [state.tokens, owners])
   return {
     duelistIds: tokenIds,
     isLoading: (state.tokens === null),

@@ -5,7 +5,7 @@ import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { useGameEvent } from '/src/hooks/useGameEvent'
 import { useQueryPlayerIds } from '/src/stores/playerStore'
 import { useGameAspect } from '/src/hooks/useGameAspect'
-import { useFetchChallengeIdsByPlayer, useQueryChallengesByPlayer } from '/src/stores/challengeStore'
+import { useFetchChallengeIdsOwnedByAccount, useQueryChallengesOwnedByAccount } from '/src/stores/challengeStore'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { DojoSetupErrorDetector } from '/src/components/account/DojoSetupErrorDetector'
 import { POSTER_HEIGHT_SMALL, POSTER_WIDTH_SMALL, ProfilePoster, ProfilePosterHandle } from '/src/components/ui/ProfilePoster'
@@ -24,8 +24,8 @@ export default function ScDuelists() {
   
   // get the players current challenges
   const { address } = useAccount()
-  useFetchChallengeIdsByPlayer(address)
-  const { challenges: currentChallenges } = useQueryChallengesByPlayer(address, LiveChallengeStates)
+  useFetchChallengeIdsOwnedByAccount(address)
+  const { challenges: currentChallenges } = useQueryChallengesOwnedByAccount(address, LiveChallengeStates)
 
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSelectPlayerAddress, tutorialOpener, duelistSelectOpener, dispatchChallengingPlayerAddress, dispatchSelectDuel } = usePistolsContext()

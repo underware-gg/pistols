@@ -11,13 +11,13 @@ import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
 import { TokenStoreSync } from '/src/stores/sync/TokenStoreSync'
 import { InternalPageMenu, InternalPageWrapper } from '/src/pages/internal/InternalPageIndex'
-import { usePlayer, useRingsOfOwner } from '/src/stores/playerStore'
-import { useDuelistIdsOfOwner } from '/src/hooks/useTokenDuelists'
-import { useFetchPacksByPlayer, usePack } from '/src/stores/packStore'
-import { useFetchTokenBalancesOfAccount } from '/src/queries/useTokenBalancesQuery'
-import { useDuelist, useFetchDuelistsByIdsByPlayer } from '/src/stores/duelistStore'
+import { usePlayer, useRingsOwnedByAccount } from '/src/stores/playerStore'
+import { useDuelistIdsOwnedByAccount } from '/src/hooks/useTokenDuelists'
+import { useFetchPacksOwnedByAccount, usePack } from '/src/stores/packStore'
+import { useFetchTokenBalancesOwnedByAccount } from '/src/queries/useTokenBalancesQuery'
+import { useDuelist, useFetchDuelistIdsOwnedByAccount } from '/src/stores/duelistStore'
 import { useHasClaimedRing } from '/src/hooks/usePistolsContractCalls'
-import { usePacksOfOwner } from '/src/hooks/useTokenPacks'
+import { usePacksOwnedByAccount } from '/src/hooks/useTokenPacks'
 import { PlayerNameSync } from '/src/stores/sync/PlayerNameSync'
 import { StoreProgressBar } from '/src/stores/sync/StoreProgressBar'
 import { WalletAddressRow } from './AdminPage'
@@ -218,13 +218,13 @@ function PlayerTokens({
 }: {
   address: BigNumberish
 }) {
-  useFetchTokenBalancesOfAccount(address); // get all tokens of an account
-  useFetchPacksByPlayer(address)
-  useFetchDuelistsByIdsByPlayer(address);
+  useFetchTokenBalancesOwnedByAccount(address); // get all tokens of an account
+  useFetchPacksOwnedByAccount(address)
+  useFetchDuelistIdsOwnedByAccount(address);
 
-  const { duelistIds } = useDuelistIdsOfOwner(address)
-  const { packIds } = usePacksOfOwner(address)
-  const { ringIds, ringTypes } = useRingsOfOwner(address)
+  const { duelistIds } = useDuelistIdsOwnedByAccount(address)
+  const { packIds } = usePacksOwnedByAccount(address)
+  const { ringIds, ringTypes } = useRingsOwnedByAccount(address)
   return (
     <Table celled striped size='small'>
       <Header>

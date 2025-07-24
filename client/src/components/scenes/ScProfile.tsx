@@ -10,7 +10,7 @@ import { useGameEvent } from '/src/hooks/useGameEvent'
 import { _currentScene, emitter } from '/src/three/game'
 import { InteractibleScene } from '/src/three/InteractibleScene'
 import { useCanClaimStarterPack } from '/src/hooks/usePistolsContractCalls'
-import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
+import { useDuelistsOwnedByPlayer } from '/src/hooks/useTokenDuelists'
 import { MAX_TILT } from '/src/data/cardConstants'
 import { CardPack } from '/src/components/ui/CardPack'
 import { CARD_PACK_SIZE } from '/src/data/cardConstants'
@@ -24,7 +24,7 @@ export default function ScProfile() {
   const { value: itemHovered } = useGameEvent('hover_item', null)
   const { dispatchSetScene } = usePistolsScene()
 
-  const { duelistIds } = useDuelistsOfPlayer()
+  const { duelistIds } = useDuelistsOwnedByPlayer()
   const { canClaimStarterPack } = useCanClaimStarterPack(duelistIds.length)
 
   const [showCardPack, setShowCardPack] = useState(false)

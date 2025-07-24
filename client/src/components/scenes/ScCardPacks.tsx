@@ -4,7 +4,7 @@ import { useGameAspect } from '/src/hooks/useGameAspect'
 import { useCalcFeePack, useCanClaimStarterPack } from '/src/hooks/usePistolsContractCalls'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
-import { usePacksOfPlayer } from '/src/hooks/useTokenPacks'
+import { usePacksOwnedByPlayer } from '/src/hooks/useTokenPacks'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { CardPackAnimationWrapper, CardPackAnimationWrapperHandle } from '/src/components/ui/CardPackAnimationWrapper'
 import { ActionButton, BalanceRequiredButton } from '/src/components/ui/Buttons'
@@ -35,7 +35,7 @@ export default function ScCardPacks() {
   const { aspectWidth } = useGameAspect()
   const { account, isConnected } = useAccount()
   const { pack_token } = useDojoSystemCalls()
-  const { packIds } = usePacksOfPlayer()
+  const { packIds } = usePacksOwnedByPlayer()
   const { canClaimStarterPack } = useCanClaimStarterPack()
   
   const [visiblePacks, setVisiblePacks] = useState<number[]>([])

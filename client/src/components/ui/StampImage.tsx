@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
-import { usePlayer, useRingsOfOwner } from '/src/stores/playerStore'
+import { usePlayer, useRingsOwnedByAccount } from '/src/stores/playerStore'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 // Stamp types based on current implementation

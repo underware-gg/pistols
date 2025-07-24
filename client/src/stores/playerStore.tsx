@@ -10,7 +10,7 @@ import { useAllStoreModels, useStoreModelsByKeys } from '@underware/pistols-sdk/
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { useDuelistTokenStore } from '/src/stores/tokenStore'
 import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
-import { useRingIdsOfAccount } from '/src/hooks/useTokenRings'
+import { useRingIdsOwnedByAccount } from '/src/hooks/useTokenRings'
 import { parseEnumVariant } from '@underware/pistols-sdk/starknet'
 import { models, constants } from '@underware/pistols-sdk/pistols/gen'
 import { SortDirection } from '/src/stores/queryParamsStore'
@@ -19,26 +19,26 @@ import { useTotals } from '/src/stores/duelistStore'
 import { CHARACTER_NAMES, CHARACTER_AVATARS } from '@underware/pistols-sdk/pistols/constants'
 import { useDiscordSocialLink } from './eventsModelStore'
 
-interface NamesByAddress {
+interface NamesByAccount {
   [address: string]: string
 }
-interface TimestampByAddress {
+interface TimestampByAccount {
   [address: string]: number
 }
-interface PlayerBookmarksByAddress {
+interface PlayerBookmarksByAccount {
   [address: string]: bigint[]
 }
-interface TokenBookmarksByAddress {
+interface TokenBookmarksByAccount {
   [address: string]: {
     [address: string]: bigint[]
   }
 }
 interface State {
-  players_names: NamesByAddress,
-  players_avatars: NamesByAddress,
-  players_online: TimestampByAddress,
-  player_bookmarks: PlayerBookmarksByAddress,
-  token_bookmarks: TokenBookmarksByAddress,
+  players_names: NamesByAccount,
+  players_avatars: NamesByAccount,
+  players_online: TimestampByAccount,
+  player_bookmarks: PlayerBookmarksByAccount,
+  token_bookmarks: TokenBookmarksByAccount,
   updateUsernames: (usernames: Map<string, string>) => void;
   getPlayernameFromAddress: (address: BigNumberish) => string | undefined;
   getAddressFromPlayername: (name: string) => BigNumberish | undefined;
@@ -230,10 +230,10 @@ export const useBlockedPlayersAccounts = () => {
 export const useBlockedPlayersDuelistIds = () => {
   const { blockedPlayersAccounts } = useBlockedPlayersAccounts()
   const tokens = useDuelistTokenStore((state) => state.tokens)
-  const getTokenIdsOfOwner = useDuelistTokenStore((state) => state.getTokenIdsOfOwner)
+  const getTokenIdsOwnedByAccount = useDuelistTokenStore((state) => state.getTokenIdsOwnedByAccount)
 
   const blockedPlayersDuelistIds = useMemo(() => (
-    blockedPlayersAccounts.reduce((acc, account) => [...acc, ...getTokenIdsOfOwner(account)], [] as bigint[])
+    blockedPlayersAccounts.reduce((acc, account) => [...acc, ...getTokenIdsOwnedByAccount(account)], [] as bigint[])
   ), [blockedPlayersAccounts, tokens])
 
   return {
@@ -350,14 +350,14 @@ export const useQueryPlayerIds = (
 
 // INTERNAL USE ONLY, to get the active ring...
 // const { activeSignetRing } = usePlayer(playerAddress)
-export const useRingsOfPlayer = () => {
+export const useRingsOwnedByPlayer = () => {
   const { address } = useAccount()
-  return useRingsOfOwner(address)
+  return useRingsOwnedByAccount(address)
 }
-export const useRingsOfOwner = (address: BigNumberish) => {
+export const useRingsOwnedByAccount = (address: BigNumberish) => {
   const entities = usePlayerEntityStore((state) => state.entities);
   const ringModels = useAllStoreModels<models.Ring>(entities, 'Ring')
-  const { ringIds } = useRingIdsOfAccount(address)
+  const { ringIds } = useRingIdsOwnedByAccount(address)
   const ringTypes = useMemo(() => (
     ringIds
       // ids to models

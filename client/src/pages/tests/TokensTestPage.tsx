@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { Button, Container, Icon, Table } from 'semantic-ui-react'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
-import { useTokenIdsOfPlayer } from '/src/stores/tokenStore'
+import { useTokenIdsOwnedByPlayer } from '/src/stores/tokenStore'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
 import { TokenStoreSync } from '/src/stores/sync/TokenStoreSync'
 import { SeasonChallengeStoreSync, SeasonScoreboardStoreSync } from '/src/stores/sync/SeasonEntityStoreSync'
@@ -19,10 +19,10 @@ import { useAccount } from '@starknet-react/core'
 import { useCanClaimStarterPack, useHasClaimedRing } from '/src/hooks/usePistolsContractCalls'
 import { LordsFaucet } from '/src/components/account/LordsFaucet'
 import { FameBalanceDuelist, FameLivesDuelist, LordsBalance } from '/src/components/account/LordsBalance'
-import { usePacksOfPlayer } from '/src/hooks/useTokenPacks'
-import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
+import { usePacksOwnedByPlayer } from '/src/hooks/useTokenPacks'
+import { useDuelistsOwnedByPlayer } from '/src/hooks/useTokenDuelists'
 import { useDuelIdsForClaimingRings } from '/src/queries/useDuelIdsForClaimingRings'
-import { useRingsOfPlayer } from '/src/stores/playerStore'
+import { useRingsOwnedByPlayer } from '/src/stores/playerStore'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppDojo from '/src/components/AppDojo'
 
@@ -65,8 +65,8 @@ const _style = {
 function Purchases() {
   const { account, address, isConnected } = useAccount()
   const { pack_token } = useDojoSystemCalls()
-  const { packIds } = usePacksOfPlayer()
-  const { duelistIds } = useDuelistsOfPlayer()
+  const { packIds } = usePacksOwnedByPlayer()
+  const { duelistIds } = useDuelistsOwnedByPlayer()
   const { canClaimStarterPack } = useCanClaimStarterPack(Math.min(duelistIds.length, 1))
   if (!isConnected) return <></>
   return (
@@ -91,7 +91,7 @@ function Purchases() {
 function Rings() {
   const { isConnected } = useAccount()
   const { goldRingDuelIds, silverRingDuelIds, leadRingDuelIds } = useDuelIdsForClaimingRings()
-  const { ringTypes } = useRingsOfPlayer()
+  const { ringTypes } = useRingsOwnedByPlayer()
   if (!isConnected) return <></>
   return (
     <>
@@ -169,8 +169,8 @@ function TokenContract({
   hasFame?: boolean,
 }) {
   // const { address } = useAccount()
-  // const { tokens } = useTokenIdsByAccount(contractAddress, address) // direct get
-  const { tokenIds } = useTokenIdsOfPlayer(contractAddress) // from the store
+  // const { tokens } = useTokenIdsOwnedByAccount(contractAddress, address) // direct get
+  const { tokenIds } = useTokenIdsOwnedByPlayer(contractAddress) // from the store
 
   const rows = useMemo(() => {
     return tokenIds.sort((a, b) => Number(a - b)).map((tokenId) => {

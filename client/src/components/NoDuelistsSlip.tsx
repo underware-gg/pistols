@@ -1,5 +1,5 @@
 import React, { forwardRef, useImperativeHandle, useRef } from 'react'
-import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
+import { useDuelistsOwnedByPlayer } from '/src/hooks/useTokenDuelists'
 import { InteractibleComponent, InteractibleComponentHandle, InteractibleComponentProps } from '/src/components/InteractibleComponent'
 import { CardColor } from '@underware/pistols-sdk/pistols/constants'
 import { useGameAspect } from '/src/hooks/useGameAspect'
@@ -13,7 +13,7 @@ export interface NoDuelistsSlipHandle extends InteractibleComponentHandle {}
 export const NoDuelistsSlip = forwardRef<NoDuelistsSlipHandle, NoDuelistsSlipProps>((props: NoDuelistsSlipProps, ref: React.Ref<NoDuelistsSlipHandle>) => {
   const { aspectWidth, aspectHeight } = useGameAspect()
 
-  const { duelistIds } = useDuelistsOfPlayer()
+  const { duelistIds } = useDuelistsOwnedByPlayer()
   const { canClaimStarterPack } = useCanClaimStarterPack(duelistIds.length)
 
   const baseRef = useRef<InteractibleComponentHandle>(null)

@@ -3,7 +3,7 @@ import { Modal, Grid, ButtonGroup, Button } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { useCalcFeePack, useCanPurchase } from '/src/hooks/usePistolsContractCalls'
-import { usePacksOfPlayer } from '/src/hooks/useTokenPacks'
+import { usePacksOwnedByPlayer } from '/src/hooks/useTokenPacks'
 import { ActionButton, BalanceRequiredButton } from '/src/components/ui/Buttons'
 import { FeesToPay } from '/src/components/account/LordsBalance'
 import { Opener } from '/src/hooks/useOpener'
@@ -130,7 +130,7 @@ export function PacksList({
   selectedPackId: number
   setSelectedPackId: (packId: number) => void
 }) {
-  const { packIds } = usePacksOfPlayer()
+  const { packIds } = usePacksOwnedByPlayer()
   return (
     <ButtonGroup vertical className='FillWidth Padded'>
       {packIds.map(packId => (

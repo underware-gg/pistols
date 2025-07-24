@@ -14,7 +14,7 @@ import { CharacterType } from '/src/data/assets'
 import { ArchetypeNames } from '/src/utils/pistols'
 import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
 import { useAccount } from '@starknet-react/core'
-import { useDuelistIdsOfOwners, useDuelistsOfPlayer, useOwnerOfDuelist } from '/src/hooks/useTokenDuelists'
+import { useDuelistIdsOwnedByAccounts, useDuelistsOwnedByPlayer, useOwnerOfDuelist } from '/src/hooks/useTokenDuelists'
 import { useDuelistFetchStore, useDuelistStackFetchStore } from '/src/stores/fetchStore'
 import { useFetchChallengeRewardsByDuelistIds } from '/src/stores/challengeRewardsStore'
 import { debug } from '@underware/pistols-sdk/pistols'
@@ -45,7 +45,7 @@ export const useDuelistIdsStore = createStore();
 // consumer hooks
 //
 
-export const useAllDuelistsIds = () => {
+export const useAllDuelistIds = () => {
   const entities = useDuelistStore((state) => state.entities)
   const duelistIds = useMemo(() => Object.values(entities).map(e => BigInt(e.models.pistols.Duelist.duelist_id)), [entities])
   return {
@@ -327,7 +327,7 @@ export function useDuelistStacks(player_address: BigNumberish) {
 export const usePlayerDuelistsOrganized = () => {
   const { address } = useAccount();
   const { stacks } = useDuelistStacks(address)
-  const { duelistIds } = useDuelistsOfPlayer()
+  const { duelistIds } = useDuelistsOwnedByPlayer()
   const entities = useDuelistStore((state) => state.entities)
 
   const organizedDuelists = useMemo(() => {
@@ -464,12 +464,12 @@ export const useFetchDuelistsByIds = (duelistIds: BigNumberish[], retryInterval?
 // new and fetched duelists will be updated automatically with the entity subscription
 //
 
-export const useFetchDuelistsByIdsByPlayer = (address: BigNumberish) => {
+export const useFetchDuelistIdsOwnedByAccount = (address: BigNumberish) => {
   const addresses = useMemo(() => [address], [address])
-  return useFetchDuelistIdsByPlayerAddresses(addresses)
+  return useFetchDuelistIdsOwnedByAccounts(addresses)
 }
 
-export const useFetchDuelistIdsByPlayerAddresses = (addresses: BigNumberish[]) => {
+export const useFetchDuelistIdsOwnedByAccounts = (addresses: BigNumberish[]) => {
   // dont even try for players already fetched...
   const fetchState = useDuelistFetchStore((state) => state);
   const newAddresses = useMemo(() => (
@@ -477,7 +477,7 @@ export const useFetchDuelistIdsByPlayerAddresses = (addresses: BigNumberish[]) =
   ), [addresses, fetchState.addresses])
 
   // fetch duelists...
-  const { duelistIds } = useDuelistIdsOfOwners(newAddresses)
+  const { duelistIds } = useDuelistIdsOwnedByAccounts(newAddresses)
   const { isLoading, isFinished } = useFetchDuelistsByIds(duelistIds)
   // fetch player stacks...
   useFetchPlayerDuelistStacks(addresses)
@@ -485,7 +485,7 @@ export const useFetchDuelistIdsByPlayerAddresses = (addresses: BigNumberish[]) =
   // mark players as fetched...
   useEffect(() => {
     if (isFinished) {
-      debug.log(`useFetchDuelistIdsByPlayerAddresses() FETCHED`, newAddresses.map(bigintToHex));
+      debug.log(`useFetchDuelistIdsOwnedByAccounts() FETCHED`, newAddresses.map(bigintToHex));
       fetchState.setFetchedAddresses(newAddresses.map(BigInt));
     }
   }, [isFinished])

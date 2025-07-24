@@ -162,7 +162,7 @@ function useToriiTokenBalancesQL(variables: any, enabled: boolean, watch: boolea
 // Queries
 //
 
-export function useToriiTokensByOwnerQL(contractAddress: BigNumberish, owner: BigNumberish, watch: boolean) {
+export function useToriiTokensOwnedByAccountQL(contractAddress: BigNumberish, owner: BigNumberish, watch: boolean) {
   const variables = useMemo(() => ({
     address: owner ? bigintToHex(owner).toLowerCase() : undefined,
   }), [owner]);

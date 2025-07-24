@@ -19,7 +19,7 @@ import { makeDuelDataUrl, makeDuelTweetUrl } from '/src/utils/pistols'
 import { BookmarkIcon, IconClick } from '/src/components/ui/Icons'
 import { ChallengeTime } from '/src/components/ChallengeTime'
 import { ActionButton, BalanceRequiredButton } from '/src/components/ui/Buttons'
-import { useDuelist, useFetchDuelistIdsByPlayerAddresses } from '/src/stores/duelistStore'
+import { useDuelist, useFetchDuelistIdsOwnedByAccounts } from '/src/stores/duelistStore'
 import { usePistolsScene } from '/src/hooks/PistolsContext'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { useAccount } from '@starknet-react/core'
@@ -245,7 +245,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
   const { fameBefore: fameBeforeA, fameAfter: fameAfterA } = useDuelistFameOnDuel(props.duelId, leftDuelistId)
   const { fameBefore: fameBeforeB, fameAfter: fameAfterB } = useDuelistFameOnDuel(props.duelId, rightDuelistId)
 
-  useFetchDuelistIdsByPlayerAddresses([leftDuelistAddress, rightDuelistAddress]) // fetch duelists in the store, if not already fetched
+  useFetchDuelistIdsOwnedByAccounts([leftDuelistAddress, rightDuelistAddress]) // fetch duelists in the store, if not already fetched
 
   const {
     state,

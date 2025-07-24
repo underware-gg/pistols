@@ -23,8 +23,8 @@ interface State {
   resetStore: () => void;
   setBalances: (balances: torii.TokenBalance[]) => void;
   updateBalance: (balance: torii.TokenBalance) => void;
-  getTokenIdsOfOwner: (accountAddress: BigNumberish) => bigint[] | undefined | null;
-  getTokenIdsOfOwners: (accountAddresses: BigNumberish[]) => bigint[] | undefined | null;
+  getTokenIdsOwnedByAccount: (accountAddress: BigNumberish) => bigint[] | undefined | null;
+  getTokenIdsOwnedByAccounts: (accountAddresses: BigNumberish[]) => bigint[] | undefined | null;
   getOwnerOfTokenId: (tokenId: BigNumberish) => bigint | undefined | null;
 }
 
@@ -69,16 +69,16 @@ const createStore = (tokenName: string) => {
         _processBalance(state, balance);
       });
     },
-    getTokenIdsOfOwner: (accountAddress: BigNumberish | undefined): bigint[] => {
+    getTokenIdsOwnedByAccount: (accountAddress: BigNumberish | undefined): bigint[] => {
       const _owner = BigInt(accountAddress ?? 0n);
       return !_owner ? []
         : Object.entries(get().tokens)
           .filter(([key, value]) => value?.owner === _owner)
           .map(([key, value]) => BigInt(key))
     },
-    getTokenIdsOfOwners: (accountAddresses: BigNumberish[]): bigint[] => {
+    getTokenIdsOwnedByAccounts: (accountAddresses: BigNumberish[]): bigint[] => {
       return accountAddresses.reduce((acc, address) => (
-        acc.concat(get().getTokenIdsOfOwner(address))
+        acc.concat(get().getTokenIdsOwnedByAccount(address))
       ), [] as bigint[])
     },
     getOwnerOfTokenId: (tokenId: BigNumberish | undefined): bigint | undefined => {
@@ -118,15 +118,15 @@ export function useTokenStore(contractAddress: BigNumberish) {
 //
 
 // get current players tokens from the store
-export function useTokenIdsOfPlayer(contractAddress: BigNumberish) {
+export function useTokenIdsOwnedByPlayer(contractAddress: BigNumberish) {
   const { address } = useAccount()
-  return useTokenIdsByAccount(contractAddress, address)
+  return useTokenIdsOwnedByAccount(contractAddress, address)
 }
 
 // get initial tokens of an account
-export function useTokenIdsByAccount(contractAddress: BigNumberish, accountAddress: BigNumberish) {
+export function useTokenIdsOwnedByAccount(contractAddress: BigNumberish, accountAddress: BigNumberish) {
   const state = useTokenStore(contractAddress)((state) => state)
-  const tokenIds = useMemo(() => state.getTokenIdsOfOwner(accountAddress), [state.tokens, accountAddress])
+  const tokenIds = useMemo(() => state.getTokenIdsOwnedByAccount(accountAddress), [state.tokens, accountAddress])
   const tokenIdsAscending = useMemo(() => ([...tokenIds].sort((a, b) => Number(a - b))), [tokenIds])
   const tokenIdsDescending = useMemo(() => ([...tokenIds].sort((a, b) => Number(b - a))), [tokenIds])
   return {

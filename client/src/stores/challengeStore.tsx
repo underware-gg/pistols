@@ -409,12 +409,12 @@ export const useFetchChallengeIdsByDuelistIds = (duelistIds: BigNumberish[]) => 
 //
 // Fetch NEW Challenges by player address
 //
-export const useFetchChallengeIdsByPlayer = (address: BigNumberish) => {
+export const useFetchChallengeIdsOwnedByAccount = (address: BigNumberish) => {
   const addresses = useMemo(() => [address], [address])
-  return useFetchChallengeIdsByPlayerAddresses(addresses)
+  return useFetchChallengeIdsOwnedByAccounts(addresses)
 }
 
-export const useFetchChallengeIdsByPlayerAddresses = (addresses: BigNumberish[]) => {
+export const useFetchChallengeIdsOwnedByAccounts = (addresses: BigNumberish[]) => {
   const setEntities = useChallengeStore((state) => state.setEntities);
   const fetchState = useChallengeFetchStore((state) => state);
 
@@ -445,14 +445,14 @@ export const useFetchChallengeIdsByPlayerAddresses = (addresses: BigNumberish[])
     query,
     // enabled: !result.challengeExists,
     setEntities: (entities: PistolsEntity[]) => {
-      debug.log(`useFetchChallengeIdsByPlayerAddresses() GOT`, newAddresses.map(bigintToHex), entities);
+      debug.log(`useFetchChallengeIdsOwnedByAccounts() GOT`, newAddresses.map(bigintToHex), entities);
       fetchState.setFetchedAddresses(newAddresses.map(BigInt));
       setEntities(entities);
     },
   })
 
   // useEffect(() => {
-  //   console.log(`::useFetchChallengeIdsByPlayerAddresses...`, newAddresses, query)
+  //   console.log(`::useFetchChallengeIdsOwnedByAccounts...`, newAddresses, query)
   // }, [newAddresses, query])
 
   return {
@@ -494,18 +494,18 @@ const _sortChallenges = (challenges: models.Challenge[], sortColumn: ChallengeCo
       }) : challenges
 );
 
-export const useQueryChallengesByPlayer = (
-  playerAddress: BigNumberish,
+export const useQueryChallengesOwnedByAccount = (
+  address: BigNumberish,
   filterStates?: constants.ChallengeState[],
 ) => {
   const entities = useChallengeStore((state) => state.entities);
   const challenges = useAllStoreModels<models.Challenge>(entities, 'Challenge')
 
   const { result, challengeIds } = useMemo(() => {
-    let _playerAddress = BigInt(playerAddress ?? 0)
-    let result = _playerAddress > 0n ? challenges.filter((ch) => (
-      bigintEquals(ch.address_a, _playerAddress) ||
-      bigintEquals(ch.address_b, _playerAddress)
+    let _address = BigInt(address ?? 0)
+    let result = _address > 0n ? challenges.filter((ch) => (
+      bigintEquals(ch.address_a, _address) ||
+      bigintEquals(ch.address_b, _address)
     )) : []
 
     // filter by states, with special handling for required action duels
@@ -523,7 +523,7 @@ export const useQueryChallengesByPlayer = (
       result,
       challengeIds,
     }
-  }, [challenges, filterStates, playerAddress])
+  }, [challenges, filterStates, address])
 
   return {
     challenges: result,

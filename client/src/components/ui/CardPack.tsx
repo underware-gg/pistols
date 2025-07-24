@@ -22,7 +22,7 @@ import {
   CARD_PACK_REVEAL_DELAY,
 } from '/src/data/cardConstants';
 import { useAccount } from '@starknet-react/core';
-import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists';
+import { useDuelistsOwnedByPlayer } from '/src/hooks/useTokenDuelists';
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo';
 import { usePack, usePackType } from '/src/stores/packStore';
 import { constants } from '@underware/pistols-sdk/pistols/gen'
@@ -55,7 +55,7 @@ export interface CardPackHandle {
 export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType: packTypeFromProps, packId, onComplete, onClick, onHover, isOpen = false, clickable = true, cardPackSize, maxTilt, optionalTitle, customButtonLabel, atTutorialEnding = false, cardPackOnly = false, displayPackName = false }: CardPack, ref) => {
   const { account } = useAccount()
   const { pack_token } = useDojoSystemCalls()
-  const { duelistIds } = useDuelistsOfPlayer()
+  const { duelistIds } = useDuelistsOwnedByPlayer()
 
   const { packType: packTypeFromId } = usePack(packId)
   const packType = useMemo(() => (packTypeFromProps ?? packTypeFromId), [packTypeFromProps, packTypeFromId])

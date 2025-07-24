@@ -14,14 +14,14 @@ export const useRingTokenCount = () => {
   }
 }
 
-export const useRingIdsOfPlayer = () => {
+export const useRingIdsOwnedByPlayer = () => {
   const { address } = useAccount()
-  return useRingIdsOfAccount(address)
+  return useRingIdsOwnedByAccount(address)
 }
 
-export const useRingIdsOfAccount = (address: BigNumberish) => {
+export const useRingIdsOwnedByAccount = (address: BigNumberish) => {
   const state = useRingTokenStore((state) => state)
-  const ringIds = useMemo(() => state.getTokenIdsOfOwner(address).map(id => Number(id)), [state.tokens, address])
+  const ringIds = useMemo(() => state.getTokenIdsOwnedByAccount(address).map(id => Number(id)), [state.tokens, address])
   return {
     ringIds,
     isLoading: (state.tokens === null),

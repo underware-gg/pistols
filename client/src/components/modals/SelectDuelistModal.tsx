@@ -47,7 +47,7 @@ function _SelectDuelistModal({
   const { dispatchChallengingPlayerAddress, dispatchChallengingDuelistId, challengingAddress, challengingDuelistId } = usePistolsContext()
   const { dispatchSetScene } = usePistolsScene()
   
-  // const { duelistIds } = useDuelistsOfPlayer()
+  // const { duelistIds } = useDuelistsOwnedByPlayer()
   const { activeDuelists: duelistIds } = usePlayerDuelistsOrganized()
 
   const { notDuelingIds: availableDuelists } = useDuellingDuelists(duelistIds);

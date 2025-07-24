@@ -59,7 +59,7 @@ export default function AccountHeader() {
 //   children: ReactNode,
 // }) {
 //   const { dispatchSetScene } = usePistolsScene()
-//   const { duelistIds } = useDuelistsOfPlayer()
+//   const { duelistIds } = useDuelistsOwnedByPlayer()
 //   const { duelistId: selectedDuelistId } = useSettings()
 //   const { dispatchDuelistId } = useSettings()
 //   const { aspectWidth } = useGameAspect()

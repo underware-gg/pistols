@@ -5,7 +5,7 @@ import { usePlayerDuelistsOrganized } from '/src/stores/duelistStore';
 import { DUELIST_CARD_HEIGHT, DUELIST_CARD_WIDTH } from '/src/data/cardConstants';
 import { usePistolsContext } from '/src/hooks/PistolsContext';
 import { CardColor } from '@underware/pistols-sdk/pistols/constants'
-import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists';
+import { useDuelistsOwnedByPlayer } from '/src/hooks/useTokenDuelists';
 
 interface DuelistsBookAlwaysOpenProps {
   width: number;

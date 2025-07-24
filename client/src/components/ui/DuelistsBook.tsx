@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import * as TWEEN from '@tweenjs/tween.js';
 import { useGameAspect } from '/src/hooks/useGameAspect';
 import { DuelistCard } from '/src/components/cards/DuelistCard';
-import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists';
+import { useDuelistsOwnedByPlayer } from '/src/hooks/useTokenDuelists';
 import { DUELIST_CARD_HEIGHT, DUELIST_CARD_WIDTH } from '/src/data/cardConstants';
 import { Opener } from '/src/hooks/useOpener';
 import { CardColor } from '@underware/pistols-sdk/pistols/constants';
@@ -290,7 +290,7 @@ function BookCoverLayer({
 
 function BookSheets({ isOpen, width, height }: { isOpen: boolean; width?: number; height?: number }) {
   const { aspectWidth } = useGameAspect();
-  const { duelistIds } = useDuelistsOfPlayer();
+  const { duelistIds } = useDuelistsOwnedByPlayer();
   const { selectedDuelistId, dispatchSelectDuelistId } = usePistolsContext()
 
   const sheetsRef = useRef<HTMLDivElement>(null);

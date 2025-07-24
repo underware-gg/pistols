@@ -9,7 +9,7 @@ import { ActionButton } from '/src/components/ui/Buttons'
 import { Divider } from '/src/components/ui/Divider'
 import { PACKAGE_VERSION } from '/src/utils/constants'
 import { useAccount } from '@starknet-react/core'
-import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
+import { useDuelistsOwnedByPlayer } from '/src/hooks/useTokenDuelists'
 import { sceneBackgrounds, SceneName, TextureName } from '/src/data/assets'
 import Logo from '/src/components/Logo'
 import { Modal } from 'semantic-ui-react'
@@ -263,7 +263,7 @@ export function ConnectButton({
   const { isLoading, isError } = useDojoStatus()
   const { connect } = useConnectToSelectedNetwork()
   
-  const { duelistIds } = useDuelistsOfPlayer()
+  const { duelistIds } = useDuelistsOwnedByPlayer()
   const { canClaimStarterPack } = useCanClaimStarterPack(duelistIds.length)
   const { dispatchSetScene } = usePistolsScene()
   const [showTutorialPrompt, setShowTutorialPrompt] = useState(false)

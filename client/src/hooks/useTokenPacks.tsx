@@ -14,14 +14,14 @@ export const usePackTokenCount = () => {
   }
 }
 
-export const usePacksOfPlayer = () => {
+export const usePacksOwnedByPlayer = () => {
   const { address } = useAccount()
-  return usePacksOfOwner(address);
+  return usePacksOwnedByAccount(address);
 }
 
-export const usePacksOfOwner = (address: BigNumberish) => {
+export const usePacksOwnedByAccount = (address: BigNumberish) => {
   const state = usePackTokenStore((state) => state)
-  const packIds = useMemo(() => state.getTokenIdsOfOwner(address).map(id => Number(id)), [state.tokens, address])
+  const packIds = useMemo(() => state.getTokenIdsOwnedByAccount(address).map(id => Number(id)), [state.tokens, address])
   return {
     packIds,
     isLoading: (state.tokens === null),

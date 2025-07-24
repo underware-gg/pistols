@@ -6,7 +6,7 @@ import { parseEnumVariant } from '@underware/pistols-sdk/starknet'
 import { formatQueryValue, useEntitiesModel, useSdkEntitiesGet, useStoreModelsByKeys } from '@underware/pistols-sdk/dojo'
 import { PistolsSchemaType, PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols/sdk'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
-import { usePacksOfOwner } from '/src/hooks/useTokenPacks'
+import { usePacksOwnedByAccount } from '/src/hooks/useTokenPacks'
 import { debug } from '@underware/pistols-sdk/pistols'
 import { bigintToDecimal } from '@underware/pistols-sdk/utils'
 import { useDuelistProfile } from './duelistStore'
@@ -77,14 +77,14 @@ export const usePack = (pack_id: BigNumberish) => {
 // (for non default challenges, like tutorials)
 //
 
-export const useFetchPacksOfPlayer = () => {
+export const useFetchPacksOwnedByPlayer = () => {
   const { address } = useAccount()
-  return useFetchPacksByPlayer(address)
+  return useFetchPacksOwnedByAccount(address)
 }
 
-export const useFetchPacksByPlayer = (address: BigNumberish) => {
+export const useFetchPacksOwnedByAccount = (address: BigNumberish) => {
   const packState = usePackStore((state) => state)
-  const { packIds } = usePacksOfOwner(address)
+  const { packIds } = usePacksOwnedByAccount(address)
 
   const entities = useMemo(() => Object.values(packState.entities), [packState.entities])
   const packs = useEntitiesModel<models.Pack>(entities, 'Pack')
@@ -110,7 +110,7 @@ export const useFetchPacksByPlayer = (address: BigNumberish) => {
   const { isLoading, isFinished } = useSdkEntitiesGet({
     query,
     setEntities: (entities: PistolsEntity[]) => {
-      debug.log(`useFetchPacksOfPlayer() SET =======> [entities]:`, entities)
+      debug.log(`useFetchPacksOwnedByAccount() SET =======> [entities]:`, entities)
       entities.forEach(e => {
         packState.updateEntity(e)
       })

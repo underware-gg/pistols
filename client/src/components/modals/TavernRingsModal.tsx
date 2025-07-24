@@ -7,7 +7,7 @@ import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { useDuelIdsForClaimingRings } from '/src/queries/useDuelIdsForClaimingRings'
 import { useHasClaimedRing } from '/src/hooks/usePistolsContractCalls'
-import { useRingsOfPlayer } from '/src/stores/playerStore'
+import { useRingsOwnedByPlayer } from '/src/stores/playerStore'
 import AnimatedText from '/src/components/ui/AnimatedText'
 import { showElementPopupNotification } from '/src/components/ui/ElementPopupNotification'
 
@@ -78,7 +78,7 @@ function RingClaimItem({ ring, onClaimComplete, isVisible }: RingClaimItemProps)
   }, [isLoading, ring.duelIds, claimRing, ring.ringType])
 
   // handle claimed ring
-  const { ringTypes } = useRingsOfPlayer()
+  const { ringTypes } = useRingsOwnedByPlayer()
   const ringClaimed = useMemo(() => (ringTypes.includes(ring.ringType)), [ring, ringTypes])
 
   if (!isVisible) return null

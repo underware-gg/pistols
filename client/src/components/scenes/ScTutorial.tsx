@@ -15,7 +15,7 @@ import { CardPack } from '/src/components/ui/CardPack'
 import DuelTutorialOverlay from '/src/components/ui/duel/DuelTutorialOverlay'
 import { CARD_PACK_SIZE, MAX_TILT } from '/src/data/cardConstants'
 import { useCanClaimStarterPack } from '/src/hooks/usePistolsContractCalls'
-import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
+import { useDuelistsOwnedByPlayer } from '/src/hooks/useTokenDuelists'
 import { SettingsActions, useSettings } from '/src/hooks/SettingsContext'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
@@ -41,7 +41,7 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
   const { tutorial } = useDojoSystemCalls()
 
   // CardPack Data
-  const { duelistIds } = useDuelistsOfPlayer()
+  const { duelistIds } = useDuelistsOwnedByPlayer()
   const { canClaimStarterPack } = useCanClaimStarterPack(duelistIds.length)
 
 

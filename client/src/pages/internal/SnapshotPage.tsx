@@ -4,7 +4,7 @@ import { immer } from 'zustand/middleware/immer'
 import { Grid, Button, Container, Divider, TextArea } from 'semantic-ui-react'
 import { bigintToDecimal, bigintToHex } from '@underware/pistols-sdk/utils'
 import { useAllChallengesIds, useChallenge } from '/src/stores/challengeStore'
-import { useDuelist, useAllDuelistsIds } from '/src/stores/duelistStore'
+import { useDuelist, useAllDuelistIds } from '/src/stores/duelistStore'
 import { useGetSeasonScoreboard, DuelistScore } from '/src/stores/scoreboardStore'
 import { useDuelistFameBalance } from '/src/stores/coinStore'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
@@ -82,7 +82,7 @@ export function Snapshots() {
   const seasonDuelIds = [] // TODO... make query per season
   const seasonDuelistIds = [] // TODO... make query per season
   const { duelIds: allDuelIds } = useAllChallengesIds()
-  const { duelistIds: allDuelistIds } = useAllDuelistsIds()
+  const { duelistIds: allDuelistIds } = useAllDuelistIds()
   const { seasonScoreboard } = useGetSeasonScoreboard(seasonId)
   // console.log("______________Snapshots:", seasonId, leaderboardScores)
 

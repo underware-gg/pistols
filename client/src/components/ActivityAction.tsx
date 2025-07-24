@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from 'react'
 import { useAccount } from '@starknet-react/core'
 import { BigNumberish } from 'starknet'
 import { useCallToChallenges } from '/src/stores/eventsModelStore'
-import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
+import { useDuelistsOwnedByPlayer } from '/src/hooks/useTokenDuelists'
 import { usePlayerDuelistsOrganized } from '/src/stores/duelistStore'
 import { DuelOpponentNameLink, ChallengeLink } from '/src/components/Links'
 import { bigintToDecimal } from '@underware/pistols-sdk/utils'
@@ -12,7 +12,7 @@ import { Icon } from '/src/components/ui/Icons'
 
 export function usePlayersActions() {
   const { activeChallenges } = useCallToChallenges()
-  const { duelistIds } = useDuelistsOfPlayer()
+  const { duelistIds } = useDuelistsOwnedByPlayer()
 
   const replyCount = useMemo(() => activeChallenges.filter((ch) => ch.action === constants.ChallengeAction.Reply).length, [activeChallenges])
   const waitingCount = useMemo(() => activeChallenges.filter((ch) => ch.action === constants.ChallengeAction.Waiting).length, [activeChallenges])
