@@ -12,7 +12,7 @@ import { FoolsBalance, LordsBalance } from '/src/components/account/LordsBalance
 import { LordsFaucet } from '/src/components/account/LordsFaucet'
 import { ActionButton } from '/src/components/ui/Buttons'
 import { Address } from '/src/components/ui/Address'
-import { ConnectButton, PlayGameButton } from '/src/components/scenes/ScDoor'
+import { ConnectButton } from '/src/components/scenes/ScDoor'
 import { SceneName } from '/src/data/assets'
 import { usePlayerAvatar } from '/src/stores/playerStore'
 import { emitter } from '/src/three/game'
@@ -98,18 +98,16 @@ export default function WalletHeader({
         </Row>
       }
 
-      {!isConnected &&
-        <Row columns={'equal'}>
-          {!hasFinishedTutorial &&
-            <Col verticalAlign='middle'>
-              <PlayGameButton large={false} />
-            </Col>
-          }
+      <Row columns={'equal'} style={{ display: isConnected ? 'none' : undefined }}>
+        {!hasFinishedTutorial &&
           <Col verticalAlign='middle'>
-            <ConnectButton large={false} label='Connect' />
+            <ConnectButton large={false} label='Play Tutorial' enterScene={SceneName.Tutorial} />
           </Col>
-        </Row>
-      }
+        }
+        <Col verticalAlign='middle'>
+          <ConnectButton large={false} label='Connect' />
+        </Col>
+      </Row>
     </Grid>
   )
 }

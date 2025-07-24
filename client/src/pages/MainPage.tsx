@@ -9,7 +9,6 @@ import { useCheckPendingTransactions } from '/src/stores/transactionStore'
 import { DojoStatus, emitter } from '@underware/pistols-sdk/dojo'
 import { MouseToolTip } from '/src/components/ui/MouseToolTip'
 import { SCENE_CHANGE_ANIMATION_DURATION } from '/src/three/game'
-import * as ENV from '/src/utils/env'
 import * as TWEEN from '@tweenjs/tween.js'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppGame from '/src/components/AppGame'
@@ -34,8 +33,8 @@ import ScCardPacks from '/src/components/scenes/ScCardPacks'
 import ScDuelistBook from '/src/components/scenes/ScDuelistBook'
 import StoreSync from '/src/stores/sync/StoreSync'
 import ScLeaderboards from '/src/components/scenes/ScLeaderboards'
-import Gate from '/src/components/scenes/ScGate'
-import Door from '/src/components/scenes/ScDoor'
+import ScGate from '/src/components/scenes/ScGate'
+import ScDoor from '/src/components/scenes/ScDoor'
 import Duel from '/src/components/scenes/Duel'
 import { Header } from '/src/components/Header'
 import { CustomIcon } from '/src/components/ui/Icons'
@@ -59,20 +58,20 @@ export default function MainPage({
   const globalNotificationRef = useRef<ElementPopupNotificationRef>(null)
 
   const overlay = useMemo(() => (
-    <div 
+    <div
       ref={overlayRef}
-      id="game-black-overlay" 
-      className='NoMouse NoDrag' 
-      style={{ 
-        position: 'absolute', 
-        top: 0, 
-        left: 0, 
-        width: '100%', 
-        height: '100%', 
-        backgroundColor: 'black', 
-        opacity: 1, 
-        pointerEvents: 'none', 
-        zIndex: 981 
+      id="game-black-overlay"
+      className='NoMouse NoDrag'
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'black',
+        opacity: 1,
+        pointerEvents: 'none',
+        zIndex: 981
       }}
     />
   ), [])
@@ -82,7 +81,7 @@ export default function MainPage({
       // Fade to black
       new TWEEN.Tween({ opacity: 0 })
         .to({ opacity: 1 }, SCENE_CHANGE_ANIMATION_DURATION)
-        .onUpdate(({opacity}) => {
+        .onUpdate(({ opacity }) => {
           if (overlayRef.current) {
             overlayRef.current.style.opacity = opacity.toString()
           }
@@ -103,26 +102,26 @@ export default function MainPage({
     emitter.on('show_notification', handleShowNotification)
     return () => emitter.off('show_notification', handleShowNotification)
   }, [])
-  
+
   useEffectOnce(() => console.log(`---------------- MAIN PAGE MOUNTED`), [])
 
   return (
     <AppGame backgroundImage={null} networkId={undefined} autoConnect={false}>
-        <Background className={null}>
-          <NotificationProvider>
-            <GameContainer isVisible={true} />
-            <MainUI />
-            <Modals />
-            {overlay}
-            <Header />
-            <CurrentChainHint />
-            <MouseToolTip />
-            <TavernAudios />
-            <NotificationSystem />
-            <ElementPopupNotification ref={globalNotificationRef} />
-          </NotificationProvider>
-        </Background>
-      </AppGame>
+      <Background className={null}>
+        <NotificationProvider>
+          <GameContainer isVisible={true} />
+          <MainUI />
+          <Modals />
+          {overlay}
+          <Header />
+          <CurrentChainHint />
+          <MouseToolTip />
+          <TavernAudios />
+          <NotificationSystem />
+          <ElementPopupNotification ref={globalNotificationRef} />
+        </NotificationProvider>
+      </Background>
+    </AppGame>
   );
 }
 
@@ -138,29 +137,29 @@ function MainUI() {
 
   useEffect(() => {
     if (!gameImpl) return;
-    
+
     // Apply each quality setting
     gameImpl.updateShadows(
       qualityConfig.shadowMapEnabled,
       qualityConfig.shadowMapType,
       qualityConfig.shadowMapSize
     );
-    
+
     gameImpl.updateResolution(qualityConfig.resolutionScale);
-    
+
     gameImpl.updateGrass(
       qualityConfig.grassCount,
       qualityConfig.grassSegments
     );
-    
+
     gameImpl.updateWater(
       qualityConfig.reflectionsEnabled,
       qualityConfig.reflectionQuality,
       qualityConfig.waterEffects
     );
-    
+
     gameImpl.updateParticles(qualityConfig.particlesMultiplier);
-    
+
     gameImpl.updateInteractibeSceneSettings(
       qualityConfig.sceneShiftEnabled,
       qualityConfig.blurEnabled
@@ -170,8 +169,8 @@ function MainUI() {
   const [currentScene, setCurrentScene] = useState<JSX.Element | null>(null);
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (atGate) setCurrentScene(<Gate />);
-      else if (atDoor) setCurrentScene(<Door />);
+      if (atGate) setCurrentScene(<ScGate />);
+      else if (atDoor) setCurrentScene(<ScDoor />);
       else if (atDuel && currentDuel > 0n) setCurrentScene(<Duel duelId={currentDuel} tutorial={tutorialLevel} />);
       else if (atTutorial) setCurrentScene(<TutorialUI />);
       else if (atProfile) setCurrentScene(<ScProfile />);
@@ -215,7 +214,7 @@ function TutorialUI({
         setCurrentTutorialScene(currentScene);
       }, SCENE_CHANGE_ANIMATION_DURATION);
     }
-    
+
     return () => clearTimeout(timer);
   }, [atTutorial, currentScene]);
 
@@ -267,36 +266,36 @@ function ModalNavigator() {
   if (!hasSelectionHistory) return <></>
 
   return (
-    <div 
-      className='NoMouse NoDrag' 
-      style={{ 
-        position: 'absolute', 
-        top: 0, 
-        left: 0, 
-        width: aspectWidth(100), 
-        height: aspectHeight(10), 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'top', 
+    <div
+      className='NoMouse NoDrag'
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: aspectWidth(100),
+        height: aspectHeight(10),
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'top',
         zIndex: 1001,
         paddingTop: aspectWidth(1),
         paddingLeft: aspectWidth(2),
         paddingRight: aspectWidth(2)
       }}
     >
-      <CustomIcon icon png raw 
-        name={'back_arrow'} 
-        onClick={() => dispatchPopSelection()} 
+      <CustomIcon icon png raw
+        name={'back_arrow'}
+        onClick={() => dispatchPopSelection()}
         tooltip='Navigate Back'
-        size={'huge'} 
-        disabled={false} 
+        size={'huge'}
+        disabled={false}
       />
-      <CustomIcon icon png raw 
-        name={'close'} 
-        onClick={() => dispatchClearSelectionHistory()} 
+      <CustomIcon icon png raw
+        name={'close'}
+        onClick={() => dispatchClearSelectionHistory()}
         tooltip='Clear All'
-        size={'huge'} 
-        disabled={false} 
+        size={'huge'}
+        disabled={false}
       />
     </div>
   )

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef, useMemo } from 'react'
 import { VStack } from '/src/components/ui/Stack'
 import { useEffectOnce } from '@underware/pistols-sdk/utils/hooks'
 import { useDojoStatus, useConnectToSelectedNetwork } from '@underware/pistols-sdk/dojo'
@@ -20,11 +20,12 @@ import { AudioName } from '/src/data/audioAssets'
 import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
 
 export default function ScDoor() {
-  const { isReady } = useDojoStatus()
   const { hasFinishedTutorial } = useSettings()
+  const { isLoading: dojoIsLoading, isReady } = useDojoStatus()
+  const { isConnecting } = useAccount()
+  const isLoading = useMemo(() => (dojoIsLoading || isConnecting), [dojoIsLoading, isConnecting])
 
   const [visibleChars, setVisibleChars] = useState<string[]>([])
-  const [isLoading, setIsLoading] = useState(false)
   const { gameImpl } = useThreeJsContext()
   const soundTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
@@ -33,7 +34,6 @@ export default function ScDoor() {
 
   // clear tavern state
   useEffectOnce(() => {
-    setIsLoading(false)
     setTimeout(() => {
       const scene = (_currentScene as InteractibleScene);
       if (scene) {
@@ -44,7 +44,7 @@ export default function ScDoor() {
 
   useEffectOnce(() => {
     const message = "Identify yourself!"
-    
+
     const addCharacter = (index: number) => {
       if (index < message.length) {
         setVisibleChars(prev => [...prev, message[index]])
@@ -74,13 +74,13 @@ export default function ScDoor() {
     if (soundTimeoutRef.current) {
       clearTimeout(soundTimeoutRef.current)
     }
-    
+
     // Stop any currently playing grunt sounds
     gameImpl?.stopAudio(AudioName.DOORKEEP_GRUNTING_1, 0.2)
     gameImpl?.stopAudio(AudioName.DOORKEEP_GRUNTING_2, 0.2)
     gameImpl?.stopAudio(AudioName.DOORKEEP_GRUNTING_3, 0.2)
     gameImpl?.stopAudio(AudioName.DOORKEEP_GRUNTING_4, 0.2)
-    
+
     // Defer playing the new sound by 100ms
     soundTimeoutRef.current = setTimeout(() => {
       gameImpl?.playAudio(soundType)
@@ -94,20 +94,19 @@ export default function ScDoor() {
   return (
     <div id='Door'>
       <div className='UIContainer' >
-        <div className={`UIPage ${!isLoading ? '' : 'NoMouse NoDrag'}`} style={{ opacity: !isLoading ? 1 : 0, transition: 'opacity 0.5s', position: 'absolute', transform: `translate(${uiShiftX}px, ${uiShiftY}px)` }}>
+        <div className={`UIPage ${isLoading ? 'NoMouse NoDrag' : ''}`} style={{ opacity: isLoading ? 0 : 1, transition: 'opacity 0.5s', position: 'absolute', transform: `translate(${uiShiftX}px, ${uiShiftY}px)` }}>
           <DoorHeader />
           <VStack className='NoPadding'>
 
             {isReady && <>
               {hasFinishedTutorial ? <>
                 <div className='Spacer10' />
-                <ConnectButton 
-                  setLoading={setIsLoading} 
+                <ConnectButton
                   onButtonHover={() => playButtonHoverSound(AudioName.DOORKEEP_GRUNTING_1)}
                   onDoorCreak={playDoorCreakingSound}
                 />
-                <Divider content='OR' />  
-                <EnterAsGuestButton 
+                <Divider content='OR' />
+                <EnterAsGuestButton
                   onButtonHover={() => playButtonHoverSound(AudioName.DOORKEEP_GRUNTING_4)}
                   onDoorCreak={playDoorCreakingSound}
                 />
@@ -115,20 +114,19 @@ export default function ScDoor() {
               </> : <>
                 <Divider content='EXISTING PLAYERS:' />
                 <div className='Spacer10' />
-                <ConnectButton 
-                  setLoading={setIsLoading} 
+                <ConnectButton enterScene={SceneName.Tavern}
                   onButtonHover={() => playButtonHoverSound(AudioName.DOORKEEP_GRUNTING_1)}
                   onDoorCreak={playDoorCreakingSound}
                 />
                 <div className='Spacer20' />
                 <Divider content='NEW PLAYERS:' />
                 <div className='Spacer10' />
-                <PlayGameButton 
+                <ConnectButton enterScene={SceneName.Tutorial}
                   onButtonHover={() => playButtonHoverSound(AudioName.DOORKEEP_GRUNTING_3)}
                   onDoorCreak={playDoorCreakingSound}
                 />
-                <Divider content='OR' as='h5' className='DividerSmall'/>
-                <EnterAsGuestButton 
+                <Divider content='OR' as='h5' className='DividerSmall' />
+                <EnterAsGuestButton
                   onButtonHover={() => {
                     playButtonHoverSound(AudioName.DOORKEEP_GRUNTING_4);
                     (_currentScene as InteractibleScene)?.hideItem(TextureName.bg_door_face_angry, true)
@@ -145,7 +143,7 @@ export default function ScDoor() {
         <div className={`UIPage ${isLoading ? '' : 'NoMouse NoDrag'}`} style={{ opacity: isLoading ? 1 : 0, transition: 'opacity 0.5s', position: 'absolute' }}>
           <ConnectStatus />
         </div>
-        
+
       </div>
 
       <div
@@ -158,8 +156,8 @@ export default function ScDoor() {
           transform: `translate(${bubbleShiftX}px, ${bubbleShiftY}px)`
         }}
       >
-        <img src="/images/ui/tavern/bubble_door.png" style={{ width: '100%' }}/>
-        <div className='SpeechContainer'> 
+        <img src="/images/ui/tavern/bubble_door.png" style={{ width: '100%' }} />
+        <div className='SpeechContainer'>
           {visibleChars.map((char, i) => (
             <span key={i}>{char}</span>
           ))}
@@ -173,7 +171,7 @@ export default function ScDoor() {
 function DoorHeader() {
   return (
     <VStack>
-      <Logo showName vertical/>
+      <Logo showName vertical />
 
       <div className='Spacer10' />
       <div className='H5 TitleCase'>
@@ -205,64 +203,36 @@ export function EnterAsGuestButton({
     onDoorCreak?.()
     dispatchSetScene(SceneName.Tavern)
   }
-  
+
   return (
-    <ActionButton 
-      large 
-      fill 
-      onClick={() => _enterAsGuest()} 
-      label='Enter as Guest' 
+    <ActionButton
+      large
+      fill
+      onClick={() => _enterAsGuest()}
+      label='Enter as Guest'
       onMouseEnter={onButtonHover}
       onMouseLeave={onButtonLeave}
     />
   )
 }
 
-export function PlayGameButton({
-  large = true,
-  onButtonHover,
-  onDoorCreak
-}: {
-  large?: boolean,
-  onButtonHover?: () => void,
-  onDoorCreak?: () => void
-}) {
-  const { dispatchSetScene } = usePistolsScene()
-
-  const _playGame = () => {
-    onDoorCreak?.()
-    dispatchSetScene(SceneName.Tutorial)
-  }
-  
-  return (
-    <ActionButton 
-      large={large} 
-      fill 
-      important 
-      onClick={() => _playGame()} 
-      label='Start Tutorial' 
-      onMouseEnter={onButtonHover}
-    />
-  )
-}
-
 export function ConnectButton({
-  setLoading,
   large = true,
   label = 'Enter Tavern',
+  enterScene,
   onButtonHover,
   onDoorCreak
 }: {
-  setLoading?: (loading: boolean) => void,
   large?: boolean,
   label?: string,
+  enterScene?: SceneName,
   onButtonHover?: () => void,
   onDoorCreak?: () => void
 }) {
   const { isConnected, isConnecting } = useAccount()
   const { isLoading, isError } = useDojoStatus()
   const { connect } = useConnectToSelectedNetwork()
-  
+
   const { duelistIds } = useDuelistsOwnedByPlayer()
   const { canClaimStarterPack } = useCanClaimStarterPack(duelistIds.length)
   const { dispatchSetScene } = usePistolsScene()
@@ -271,13 +241,14 @@ export function ConnectButton({
   const canConnect = (!isLoading && !isError && !isConnecting && connect != null)
   // const switchChain = (isConnected && !isCorrectChain)
 
+  const [askedToConnect, setAskedToConnect] = useState(false)
   const _connect = () => {
     if (canConnect) {
-      connect()
-      setLoading?.(true)
+      connect();
+      setAskedToConnect(true); // avoid the displaying the button and triggering scene change
     }
   }
-  
+
   const handleMouseEnter = () => {
     if (canConnect) {
       onButtonHover?.()
@@ -295,41 +266,28 @@ export function ConnectButton({
   }
 
   useEffect(() => {
-    let timeoutId;
-
-    if (isConnected && !isError) {
-      timeoutId = setTimeout(() => {
-        if (canClaimStarterPack) {
-          setShowTutorialPrompt(true)
-        } else {
-          onDoorCreak?.()
-          dispatchSetScene(SceneName.Tavern)
-        }
-      }, 1000)
-    } else {
-      setLoading?.(false)
-    }
-
-    return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId)
+    if (askedToConnect && isConnected && !isError) {
+      if (canClaimStarterPack) {
+        setShowTutorialPrompt(true)
+      } else if (enterScene) {
+        onDoorCreak?.()
+        dispatchSetScene(enterScene)
       }
     }
-
-  }, [isConnected, isError, canClaimStarterPack])
+  }, [askedToConnect, isConnected, isError, canClaimStarterPack])
 
   return (
     <>
-      <ActionButton 
-        fill 
-        large={large} 
-        important 
-        disabled={!canConnect} 
-        onClick={() => _connect()} 
-        label={label} 
+      <ActionButton
+        fill
+        large={large}
+        important
+        disabled={!canConnect}
+        onClick={() => _connect()}
+        label={label}
         onMouseEnter={handleMouseEnter}
       />
-      
+
       <Modal
         size="small"
         open={showTutorialPrompt}
@@ -338,8 +296,8 @@ export function ConnectButton({
           <h2 className="Important" style={{ textAlign: 'center', margin: '0.5rem 0' }}>Welcome, Duelist!</h2>
         </Modal.Header>
         <Modal.Content style={{ padding: '1rem 2rem' }}>
-          <div style={{ 
-            textAlign: 'center', 
+          <div style={{
+            textAlign: 'center',
             margin: '1.5rem 0',
             lineHeight: '1.6',
             fontSize: '1.4rem'
@@ -350,7 +308,7 @@ export function ConnectButton({
           </div>
         </Modal.Content>
         <Modal.Actions style={{ display: 'flex' }}>
-          <ActionButton 
+          <ActionButton
             fill
             dimmed
             onClick={() => handleTutorialChoice(false)}
