@@ -12,6 +12,7 @@ export const assets: AssetFolder = {
   _profiles_characters_02_jpg: async () => (await import('./encoded/_profiles_characters_02_jpg')).default,
   _profiles_characters_03_jpg: async () => (await import('./encoded/_profiles_characters_03_jpg')).default,
   _profiles_characters_04_jpg: async () => (await import('./encoded/_profiles_characters_04_jpg')).default,
+  _profiles_characters_05_jpg: async () => (await import('./encoded/_profiles_characters_05_jpg')).default,
   _profiles_genesis_00_jpg: async () => (await import('./encoded/_profiles_genesis_00_jpg')).default,
   _profiles_genesis_01_jpg: async () => (await import('./encoded/_profiles_genesis_01_jpg')).default,
   _profiles_genesis_02_jpg: async () => (await import('./encoded/_profiles_genesis_02_jpg')).default,

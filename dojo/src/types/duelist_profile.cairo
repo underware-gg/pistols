@@ -206,13 +206,13 @@ mod BOT_PROFILES {
         name: 'Unknown',
     };
     pub const TinMan: ProfileDescriptor = ProfileDescriptor {
-        name: 'Tin Man',
+        name: 'Nasty Imp',          // Villainous
     };
     pub const Scarecrow: ProfileDescriptor = ProfileDescriptor {
-        name: 'Scarecrow',
+        name: 'Mischievous Imp',    // Trickster
     };
     pub const Leon: ProfileDescriptor = ProfileDescriptor {
-        name: 'Leon',
+        name: 'Kind Imp',           // Honourable
     };
 }
 

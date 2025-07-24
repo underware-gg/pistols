@@ -1256,13 +1256,13 @@ export const BOT_PROFILES: type_BOT_PROFILES = {
     name: 'Unknown',
   },
   TinMan: {
-    name: 'Tin Man',
+    name: 'Nasty Imp',
   },
   Scarecrow: {
-    name: 'Scarecrow',
+    name: 'Mischievous Imp',
   },
   Leon: {
-    name: 'Leon',
+    name: 'Kind Imp',
   },
 };
 
