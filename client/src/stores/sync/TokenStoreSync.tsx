@@ -3,12 +3,12 @@ import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { useSdkTokenBalancesSub } from '@underware/pistols-sdk/dojo'
 import { useDuelistTokenStore, useDuelTokenStore, usePackTokenStore, useRingTokenStore, useTournamentTokenStore } from '/src/stores/tokenStore'
-import { bigintToHex } from '@underware/pistols-sdk/utils'
 import { useFameCoinStore, useLordsCoinStore, useFoolsCoinStore } from '/src/stores/coinStore'
-import { useTokenBalancesQuery } from '/src/queries/useTokenBalancesQuery'
+import { useFetchInitialTokenBalancesQuery } from '/src/queries/useTokenBalancesQuery'
 import { useProgressStore } from '/src/stores/progressStore'
-import * as torii from '@dojoengine/torii-client'
+import { bigintToHex } from '@underware/pistols-sdk/utils'
 import { debug } from '@underware/pistols-sdk/pistols'
+import * as torii from '@dojoengine/torii-client'
 
 
 export function TokenStoreSync() {
@@ -44,36 +44,11 @@ export function TokenStoreSync() {
   //----------------------------------------
   // get initial state
   //
-  const { initialTokenBalances } = useTokenBalancesQuery();
+  const { initialTokenBalances } = useFetchInitialTokenBalancesQuery();
 
   useEffect(() => {
     const pageNumber = (initialTokenBalances.length == 0 ? 0 : 1)
     updateProgress('token_balances', pageNumber, pageNumber > 0)
-    initialTokenBalances.forEach(balance => {
-      const toriiBalance: torii.TokenBalance = {
-        contract_address: bigintToHex(balance.contractAddress),
-        account_address: bigintToHex(balance.accountAddress),
-        balance: bigintToHex(balance.balance),
-        token_id: bigintToHex(balance.tokenId),
-      }
-      if (toriiBalance.contract_address === allTokens.lordsContractAddress) {
-        lords_state.updateBalance(toriiBalance)
-      } else if (toriiBalance.contract_address === allTokens.fameContractAddress) {
-        fame_state.updateBalance(toriiBalance)
-      } else if (toriiBalance.contract_address == allTokens.foolsContractAddress) {
-        fools_state.updateBalance(toriiBalance)
-      } else if (toriiBalance.contract_address == allTokens.duelistContractAddress) {
-        duelist_state.updateBalance(toriiBalance)
-      } else if (toriiBalance.contract_address == allTokens.packContractAddress) {
-        pack_state.updateBalance(toriiBalance)
-      } else if (toriiBalance.contract_address == allTokens.ringContractAddress) {
-        ring_state.updateBalance(toriiBalance)
-      } else if (toriiBalance.contract_address == allTokens.duelContractAddress) {
-        duel_state.updateBalance(toriiBalance)
-      } else if (toriiBalance.contract_address == allTokens.tournamentContractAddress) {
-        tournament_state.updateBalance(toriiBalance)
-      }
-    })
   }, [initialTokenBalances])
 
   //----------------------------------------

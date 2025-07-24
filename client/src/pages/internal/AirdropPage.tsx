@@ -14,10 +14,12 @@ import { InternalPageMenu, InternalPageWrapper } from '/src/pages/internal/Inter
 import { usePlayer, useRingsOfOwner } from '/src/stores/playerStore'
 import { useDuelistIdsOfOwner } from '/src/hooks/useTokenDuelists'
 import { useFetchPacksByPlayer, usePack } from '/src/stores/packStore'
+import { useFetchTokenBalancesOfAccount } from '/src/queries/useTokenBalancesQuery'
 import { useDuelist, useFetchDuelistsByIdsByPlayer } from '/src/stores/duelistStore'
 import { useHasClaimedRing } from '/src/hooks/usePistolsContractCalls'
 import { usePacksOfOwner } from '/src/hooks/useTokenPacks'
 import { PlayerNameSync } from '/src/stores/sync/PlayerNameSync'
+import { StoreProgressBar } from '/src/stores/sync/StoreProgressBar'
 import { WalletAddressRow } from './AdminPage'
 import { Address } from '/src/components/ui/Address'
 import { Connect } from '/src/pages/tests/ConnectTestPage'
@@ -49,6 +51,7 @@ export default function AirdropPage() {
         <EntityStoreSync />
         <PlayerNameSync />
         <TokenStoreSync />
+        <StoreProgressBar />
       </Container>
     </AppDojo>
   );
@@ -215,8 +218,10 @@ function PlayerTokens({
 }: {
   address: BigNumberish
 }) {
-  useFetchDuelistsByIdsByPlayer(address)
+  useFetchTokenBalancesOfAccount(address); // get all tokens of an account
   useFetchPacksByPlayer(address)
+  useFetchDuelistsByIdsByPlayer(address);
+
   const { duelistIds } = useDuelistIdsOfOwner(address)
   const { packIds } = usePacksOfOwner(address)
   const { ringIds, ringTypes } = useRingsOfOwner(address)

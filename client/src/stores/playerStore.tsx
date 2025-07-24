@@ -361,7 +361,7 @@ export const useRingsOfOwner = (address: BigNumberish) => {
   const ringTypes = useMemo(() => (
     ringIds
       // ids to models
-      .map((ringId) => ringModels.find((m) => bigintEquals(m.ring_id, ringId)))
+      .map((ringId) => ringModels.find((m) => bigintEquals(m?.ring_id, ringId)))
       .filter(Boolean)
       // models to ring types
       .map((m) => parseEnumVariant<constants.RingType>(m.ring_type))
