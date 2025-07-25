@@ -277,7 +277,7 @@ export function createSystemCalls(
         const calls: DojoCalls = [];
         // random packs need VRF
         if (pack_type == constants.PackType.GenesisDuelists5x || pack_type == constants.PackType.FreeDuelist) {
-          calls.push(vrf_request_call('pack_token', recipient));
+          calls.push(vrf_request_call('pack_token', signer.address));
         }
         // airdrop call
         const pack_type_enum = makeCustomEnum(pack_type)

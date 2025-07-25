@@ -347,8 +347,16 @@ pub mod pack_token {
                 }
             }
 
-            // all free duelists must have a claimable balance
+            // need vrf seed if duelist_profile is not provided
             let mut store: Store = StoreTrait::new(self.world_default());
+            let seed: felt252 = match (duelist_profile) {
+                Option::None => {
+                    (store.vrf_dispatcher().consume_random(Source::Nonce(starknet::get_caller_address())))
+                },
+                Option::Some(_) => {(0)},
+            };
+
+            // all free duelists must have a claimable balance
             let mut pool_claimable: Pool = store.get_pool(PoolType::Claimable);
             let lords_amount: u128 = self.calc_mint_fee(recipient, pack_type);
             assert(pool_claimable.balance_lords >= lords_amount, Errors::INSUFFICIENT_LORDS);
@@ -361,12 +369,6 @@ pub mod pack_token {
                 store.set_pool(@pool_claimable);
                 store.set_pool(@pool_purchases);
             }
-
-            // need vrf seed if duelist_profile is not provided
-            let seed: felt252 = match (duelist_profile) {
-                Option::None => {(store.vrf_dispatcher().consume_random(Source::Nonce(recipient)))},
-                Option::Some(_) => {(0)},
-            };
 
             // mint
             let pack: Pack = self._mint_pack(ref store, pack_type, recipient, seed, lords_amount, duelist_profile);
