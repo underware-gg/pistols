@@ -57,15 +57,15 @@
             "methods": [
               {
                 "entrypoint": "create_tutorial",
-                "description": "Initializes a turorial level"
+                "description": "Initializes a tutorial level"
               },
               {
                 "entrypoint": "commit_moves",
-                "description": "Commit moves of a Duelist in a tutorial level"
+                "description": "Commit your moves in a tutorial level"
               },
               {
                 "entrypoint": "reveal_moves",
-                "description": "Reveal moves of a Duelist in a tutorial level"
+                "description": "Reveal your moves in a tutorial level"
               }
             ]
           },
@@ -334,15 +334,15 @@
             "methods": [
               {
                 "entrypoint": "create_tutorial",
-                "description": "Initializes a turorial level"
+                "description": "Initializes a tutorial level"
               },
               {
                 "entrypoint": "commit_moves",
-                "description": "Commit moves of a Duelist in a tutorial level"
+                "description": "Commit your moves in a tutorial level"
               },
               {
                 "entrypoint": "reveal_moves",
-                "description": "Reveal moves of a Duelist in a tutorial level"
+                "description": "Reveal your moves in a tutorial level"
               }
             ]
           },
