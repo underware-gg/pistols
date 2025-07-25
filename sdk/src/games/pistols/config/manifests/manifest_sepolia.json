@@ -1,6 +1,6 @@
 {
   "world": {
-    "class_hash": "0x685ed02eefa98fe7e208aa295042e9bbad8029b0d3d6f0ba2b32546efe0a1f9",
+    "class_hash": "0x13d92333361bb7049c1232c0a5404e2c19082ededc3a73d75cb33fa952adec7",
     "address": "0x8b4838140a3cbd36ebe64d4b5aaf56a30cc3753c928a79338bf56c53f506c5",
     "seed": "pistols_v1_0_0",
     "name": "Pistols at Dawn",
@@ -2185,7 +2185,7 @@
     },
     {
       "address": "0x5d9c9168e6bf86f250a813d38ad5a95c67cb3ca42ab93411a184c9c731fa69a",
-      "class_hash": "0x67763ef8b4d3eaa8aa875db2de356585544a73feaf8e3d21abdca530762f4bc",
+      "class_hash": "0x1396c9a55f6427e4078605d1580c4e166c9d1555cff2b7fe360871322893935",
       "abi": [
         {
           "type": "impl",
@@ -2459,7 +2459,7 @@
     },
     {
       "address": "0x2e9c711b1a7e2784570b1bda5082a92606044e836ba392d2b977d280fb74b3c",
-      "class_hash": "0x3216d6abdc8061f6e5bfc6310d55fb1f61994694ded0fa5005f9fef11e2c468",
+      "class_hash": "0x65d5fd819f858104232ba0c77259a2de0c6e368a257bcc1e1a940504d1c89b9",
       "abi": [
         {
           "type": "impl",
@@ -3773,7 +3773,7 @@
     },
     {
       "address": "0x7aaa9866750a0db82a54ba8674c38620fa2f967d2fbb31133def48e0527c87f",
-      "class_hash": "0x4d2adf5338e200bbe7c3d23d15d3f09837254f9509a272d76aab50c58589f24",
+      "class_hash": "0x12ff48b9375b98518131fa767ec436a28238acda57187fff41718ee9a4ed225",
       "abi": [
         {
           "type": "impl",
@@ -4347,6 +4347,10 @@
             },
             {
               "name": "TGC1",
+              "type": "()"
+            },
+            {
+              "name": "TGC2",
               "type": "()"
             }
           ]
@@ -6960,7 +6964,7 @@
     },
     {
       "address": "0x2c6a7c98a9dea8322b51018eef7be99ebedd209cebdaacb9f4c5bbf661c1cc9",
-      "class_hash": "0x41d2cee08aa2bcbc056533e74c473aff2940d10df6c16acae694150249716e2",
+      "class_hash": "0x55b3f3fda7773c155914cd247993108b353c31d4c623e4206884c65c7885e25",
       "abi": [
         {
           "type": "impl",
@@ -8700,7 +8704,7 @@
     },
     {
       "address": "0x71333ac75b7d5ba89a2d0c2b67d5b955258a4d46eb42f3428da6137bbbfdfd9",
-      "class_hash": "0x4fd2d1510032c340f16833b088f0da510505fec3aee753564b5b91ca586736d",
+      "class_hash": "0x5fed0925d0c5d07d1e6fb166e8ca995b53aaab51a91faa4314737b8528811ea",
       "abi": [
         {
           "type": "impl",
@@ -9167,6 +9171,10 @@
             },
             {
               "name": "TGC1",
+              "type": "()"
+            },
+            {
+              "name": "TGC2",
               "type": "()"
             }
           ]
@@ -12117,7 +12125,7 @@
     },
     {
       "address": "0x3c77186b8e509085ec66e1a5d1dbcf9dc1f212852b4c1f461a48901d290fc9b",
-      "class_hash": "0x7be932b8f3fcce60ab603eb86ac49396b9a3f828024ab2191c6c54a06c83347",
+      "class_hash": "0x488047e96caba751be050210a9b12022500fda25bee02303b7dd5b8c6ba4cb1",
       "abi": [
         {
           "type": "impl",
@@ -12789,7 +12797,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x3a867ced78f0cc937683ea9b8a9fb0e5f070301f560d8e266ce4624b818a617",
+      "class_hash": "0x36008ffb123c791490765e4cda585c9ea7b2243e3604fa0e5b89b639bea4321",
       "tag": "pistols-Duelist",
       "selector": "0x1ec34ce9ccaa39b540179d85e0dd0d46c1c1ae712f4cb40a9cd7f8c21ebaa46"
     },
@@ -12819,7 +12827,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x7291ead400d7af540c3ed38027f0cd462c26ea5b34ee674885601515ae9299b",
+      "class_hash": "0x2734411118d88cbb767868895829ab7dd6ffebd973f1ee321f34189f5b06031",
       "tag": "pistols-Pack",
       "selector": "0x64159b4947adcdc7a87b41f7889ba33495ac8e3a3a333305c7712806763fa2d"
     },
@@ -12837,7 +12845,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x4ae5a0a10af6ae3f94a9e629f319d595459e1c83fb05bfdb4a5eb0cc2ae7820",
+      "class_hash": "0x18c633e20943c1f8da83ac54de3037e90fba9829135adcb6fc63597ff05a770",
       "tag": "pistols-PlayerDuelistStack",
       "selector": "0xb47a4ea3849ae004ed3d0ba58070c0eb3cdca2bed8c9a6ab6bfe01210effc6"
     },
