@@ -98,14 +98,14 @@ export function createSystemCalls(
   }
 
   // https://docs.cartridge.gg/vrf/overview#executing-vrf-transactions
-  const vrf_request_call = (signer: AccountInterface, contractName: string): Call => {
+  const vrf_request_call = (contractName: string, nonceAddress: BigNumberish): Call => {
     const contract_address = getContractByName(manifest, NAMESPACE, contractName).address
     return {
       contractAddress: getVrfAddress(selectedNetworkConfig.networkId),
       entrypoint: 'request_random',
       calldata: CallData.compile({
         caller: contract_address,
-        source: { type: 0, address: signer.address },
+        source: { type: 0, address: nonceAddress },
       }),
     }
   }
@@ -266,7 +266,7 @@ export function createSystemCalls(
         const approved_value = await contractCalls.pack_token.calcMintFee(signer.address, pack_type_enum) as BigNumberish
         const calls: DojoCalls = [
           approve_call(approved_value),
-          vrf_request_call(signer, 'pack_token'),
+          vrf_request_call('pack_token', signer.address),
           contractCalls.pack_token.buildPurchaseCalldata(
             pack_type_enum,
           ),
@@ -277,7 +277,7 @@ export function createSystemCalls(
         const calls: DojoCalls = [];
         // random packs need VRF
         if (pack_type == constants.PackType.GenesisDuelists5x || pack_type == constants.PackType.FreeDuelist) {
-          calls.push(vrf_request_call(signer, 'pack_token'));
+          calls.push(vrf_request_call('pack_token', recipient));
         }
         // airdrop call
         const pack_type_enum = makeCustomEnum(pack_type)
