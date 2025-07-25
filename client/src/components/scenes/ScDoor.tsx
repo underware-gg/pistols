@@ -101,7 +101,7 @@ export default function ScDoor() {
             {isReady && <>
               {hasFinishedTutorial ? <>
                 <div className='Spacer10' />
-                <ConnectButton
+                <ConnectButton enterScene={SceneName.Tavern}
                   onButtonHover={() => playButtonHoverSound(AudioName.DOORKEEP_GRUNTING_1)}
                   onDoorCreak={playDoorCreakingSound}
                 />
