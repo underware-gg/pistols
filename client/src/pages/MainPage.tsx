@@ -9,7 +9,6 @@ import { useCheckPendingTransactions } from '/src/stores/transactionStore'
 import { DojoStatus, emitter } from '@underware/pistols-sdk/dojo'
 import { MouseToolTip } from '/src/components/ui/MouseToolTip'
 import { SCENE_CHANGE_ANIMATION_DURATION } from '/src/three/game'
-import * as TWEEN from '@tweenjs/tween.js'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppGame from '/src/components/AppGame'
 import GameContainer, { TavernAudios } from '/src/components/GameContainer'
@@ -46,14 +45,11 @@ import ElementPopupNotification, { ElementPopupNotificationRef } from '/src/comp
 import { helloPistols } from '@underware/pistols-sdk'
 helloPistols();
 
-export default function MainPage({
-  tutorial = false,
-}) {
+export default function MainPage() {
   // this hook will parse slugs and manage the current scene
   usePistolsSceneFromRoute()
   useSetPageTitle()
 
-  const [showTutorial, setShowTutorial] = useState(tutorial)
   const overlayRef = useRef<HTMLDivElement>(null)
   const globalNotificationRef = useRef<ElementPopupNotificationRef>(null)
 
@@ -75,23 +71,6 @@ export default function MainPage({
       }}
     />
   ), [])
-
-  useEffect(() => {
-    if (tutorial !== showTutorial) {
-      // Fade to black
-      new TWEEN.Tween({ opacity: 0 })
-        .to({ opacity: 1 }, SCENE_CHANGE_ANIMATION_DURATION)
-        .onUpdate(({ opacity }) => {
-          if (overlayRef.current) {
-            overlayRef.current.style.opacity = opacity.toString()
-          }
-        })
-        .onComplete(() => {
-          setShowTutorial(tutorial)
-        })
-        .start()
-    }
-  }, [tutorial])
 
   // Listen for global notification events
   useEffect(() => {

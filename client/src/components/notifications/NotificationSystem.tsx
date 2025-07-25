@@ -8,6 +8,7 @@ import { emitter, playAudio } from '/src/three/game'
 import { DuelNotificationItem } from './DuelNotificationItem'
 import { PushNotification } from './PushNotification'
 import { AudioName } from '/src/data/audioAssets'
+import { tutorialScenes } from '/src/data/tutorialConstants'
 
 const NOTIFICATION_DISPLAY_DURATION = 4000
 const NOTIFICATION_ANIMATION_DURATION = 500
@@ -16,7 +17,7 @@ const NOTIFICATION_SOUND_COOLDOWN = 15000
 export default function NotificationSystem() {
   const { notifications, markAsRead, markAsDisplayed } = useNotifications()
   const { dispatchSelectDuel, currentDuel, selectedDuelId } = usePistolsContext()
-  const { atDuel, atGate, atDoor } = usePistolsScene()
+  const { atDuel, atGate, atDoor, atTutorial, currentScene } = usePistolsScene()
   
   const [currentNotification, setCurrentNotification] = useState<Notification | null>(null)
   const [isVisible, setIsVisible] = useState(false)
@@ -36,11 +37,12 @@ export default function NotificationSystem() {
   const lastSoundTimeRef = useRef<number>(0)
 
   // never display at gate or door (after disconnect)
+  const wongScene = useMemo(() => (atDuel || atGate || atDoor || atTutorial), [atDuel, atGate, atDoor, atTutorial])
   useEffect(() => {
-    if (atGate || atDoor) {
+    if (wongScene) {
       setIsVisible(false)
     }
-  }, [atGate, atDoor])
+  }, [wongScene])
 
   // Track tab focus state
   useEffect(() => {
@@ -178,6 +180,7 @@ export default function NotificationSystem() {
     
     if (!bubbleRef.current || !notificationRef.current) return
     if (hasDisplayedNotificationRef.current) return
+    if (wongScene) return
 
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current)
