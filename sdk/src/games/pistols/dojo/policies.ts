@@ -28,10 +28,12 @@ export const contractPolicyDescriptions_pistols: ContractPolicyDescriptions = {
   game_loop: {
     name: 'Game loop',
     description: 'Game loop contract',
+    // interfaces: ['IGameLoop'],
   },
   tutorial: {
     name: 'Tutorial',
     description: 'Tutorial game contract',
+    interfaces: ['ITutorial'],
   },
   bank: {
     name: 'Bank',
@@ -41,6 +43,7 @@ export const contractPolicyDescriptions_pistols: ContractPolicyDescriptions = {
   admin: {
     name: 'Admin',
     description: 'Admin contract',
+    // interfaces: ['IAdmin'],
   },
   //
   // ERC-721
