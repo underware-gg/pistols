@@ -72,6 +72,7 @@ export const useFetchInitialTokenBalancesQuery = () => {
   return {
     initialTokenBalances: data,
     isLoading,
+    address,
   }
 }
 

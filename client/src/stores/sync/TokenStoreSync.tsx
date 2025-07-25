@@ -44,12 +44,15 @@ export function TokenStoreSync() {
   //----------------------------------------
   // get initial state
   //
-  const { initialTokenBalances } = useFetchInitialTokenBalancesQuery();
+  const { initialTokenBalances, isLoading, address } = useFetchInitialTokenBalancesQuery();
 
   useEffect(() => {
-    const pageNumber = (initialTokenBalances.length == 0 ? 0 : 1)
-    updateProgress('token_balances', pageNumber, pageNumber > 0)
-  }, [initialTokenBalances])
+    if (address) {
+      const pageNumber = (isLoading ? 0 : 1);
+      const finished = !isLoading;
+      updateProgress('token_balances', pageNumber, finished);
+    }
+  }, [address, isLoading])
 
   //----------------------------------------
   // subscribe for updates
