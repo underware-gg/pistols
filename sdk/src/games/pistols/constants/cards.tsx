@@ -96,7 +96,7 @@ const EnvironmentCardsTextures: Record<constants.EnvCard, CardData> = {
     color: CardColor.BLUE,
     title: 'All Hit',
     rarity: constants.Rarity.Special,
-    description: `Every shot taken from this point forward will ${getTextSpan(CardColor.BLUE, 'KILL')} the opponent`,
+    description: `Every shot taken from this point forward will ${getTextSpan(CardColor.BLUE, 'HIT')} the opponent`,
     cardAmount: 1
   },
   [constants.EnvCard.SpecialAllShotsMiss]: {
@@ -248,8 +248,8 @@ const DodgeCardsTextures: Record<constants.PacesCard, CardData> = {
     color: CardColor.WHITE,
     title: 'Dodge at x',
     rarity: constants.Rarity.None,
-    description: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.BROWN, 'x')}`,
-    descriptionDark: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.WHITE, 'x')}`,
+    description: `You try to dodge the opponent's shot at step number ${getTextSpan(CardColor.BROWN, 'x')}`,
+    descriptionDark: `You try to dodge the opponent's shot at step number ${getTextSpan(CardColor.WHITE, 'x')}`,
     titleShort: 'x'
   },
   [constants.PacesCard.Paces1]: {
@@ -258,8 +258,8 @@ const DodgeCardsTextures: Record<constants.PacesCard, CardData> = {
     color: CardColor.WHITE,
     title: 'Dodge at 1',
     rarity: constants.Rarity.None,
-    description: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.BROWN, '1')}`,
-    descriptionDark: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.WHITE, '1')}`,
+    description: `You try to dodge the opponent's shot at step number ${getTextSpan(CardColor.BROWN, '1')}`,
+    descriptionDark: `You try to dodge the opponent's shot at step number ${getTextSpan(CardColor.WHITE, '1')}`,
     titleShort: '1'
   },
   [constants.PacesCard.Paces2]: {
@@ -268,8 +268,8 @@ const DodgeCardsTextures: Record<constants.PacesCard, CardData> = {
     color: CardColor.WHITE,
     title: 'Dodge at 2',
     rarity: constants.Rarity.None,
-    description: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.BROWN, '2')}`,
-    descriptionDark: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.WHITE, '2')}`,
+    description: `You try to dodge the opponent's shot at step number ${getTextSpan(CardColor.BROWN, '2')}`,
+    descriptionDark: `You try to dodge the opponent's shot at step number ${getTextSpan(CardColor.WHITE, '2')}`,
     titleShort: '2'
   },
   [constants.PacesCard.Paces3]: {
@@ -278,8 +278,8 @@ const DodgeCardsTextures: Record<constants.PacesCard, CardData> = {
     color: CardColor.WHITE,
     title: 'Dodge at 3',
     rarity: constants.Rarity.None,
-    description: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.BROWN, '3')}`,
-    descriptionDark: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.WHITE, '3')}`,
+    description: `You try to dodge the opponent's shot at step number ${getTextSpan(CardColor.BROWN, '3')}`,
+    descriptionDark: `You try to dodge the opponent's shot at step number ${getTextSpan(CardColor.WHITE, '3')}`,
     titleShort: '3'
   },
   [constants.PacesCard.Paces4]: {
@@ -288,8 +288,8 @@ const DodgeCardsTextures: Record<constants.PacesCard, CardData> = {
     color: CardColor.WHITE,
     title: 'Dodge at 4',
     rarity: constants.Rarity.None,
-    description: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.BROWN, '4')}`,
-    descriptionDark: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.WHITE, '4')}`,
+    description: `You try to dodge the opponent's shot at step number ${getTextSpan(CardColor.BROWN, '4')}`,
+    descriptionDark: `You try to dodge the opponent's shot at step number ${getTextSpan(CardColor.WHITE, '4')}`,
     titleShort: '4'
   },
   [constants.PacesCard.Paces5]: {
@@ -298,8 +298,8 @@ const DodgeCardsTextures: Record<constants.PacesCard, CardData> = {
     color: CardColor.WHITE,
     title: 'Dodge at 5',
     rarity: constants.Rarity.None,
-    description: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.BROWN, '5')}`,
-    descriptionDark: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.WHITE, '5')}`,
+    description: `You try to dodge the opponent's shot at step number ${getTextSpan(CardColor.BROWN, '5')}`,
+    descriptionDark: `You try to dodge the opponent's shot at step number ${getTextSpan(CardColor.WHITE, '5')}`,
     titleShort: '5'
   },
   [constants.PacesCard.Paces6]: {
@@ -308,8 +308,8 @@ const DodgeCardsTextures: Record<constants.PacesCard, CardData> = {
     color: CardColor.WHITE,
     title: 'Dodge at 6',
     rarity: constants.Rarity.None,
-    description: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.BROWN, '6')}`,
-    descriptionDark: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.WHITE, '6')}`,
+    description: `You try to dodge the opponent's shot at step number ${getTextSpan(CardColor.BROWN, '6')}`,
+    descriptionDark: `You try to dodge the opponent's shot at step number ${getTextSpan(CardColor.WHITE, '6')}`,
     titleShort: '6'
   },
   [constants.PacesCard.Paces7]: {
@@ -318,8 +318,8 @@ const DodgeCardsTextures: Record<constants.PacesCard, CardData> = {
     color: CardColor.WHITE,
     title: 'Dodge at 7',
     rarity: constants.Rarity.None,
-    description: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.BROWN, '7')}`,
-    descriptionDark: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.WHITE, '7')}`,
+    description: `You try to dodge the opponent's shot at step number ${getTextSpan(CardColor.BROWN, '7')}`,
+    descriptionDark: `You try to dodge the opponent's shot at step number ${getTextSpan(CardColor.WHITE, '7')}`,
     titleShort: '7'
   },
   [constants.PacesCard.Paces8]: {
@@ -328,8 +328,8 @@ const DodgeCardsTextures: Record<constants.PacesCard, CardData> = {
     color: CardColor.WHITE,
     title: 'Dodge at 8',
     rarity: constants.Rarity.None,
-    description: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.BROWN, '8')}`,
-    descriptionDark: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.WHITE, '8')}`,
+    description: `You try to dodge the opponent's shot at step number ${getTextSpan(CardColor.BROWN, '8')}`,
+    descriptionDark: `You try to dodge the opponent's shot at step number ${getTextSpan(CardColor.WHITE, '8')}`,
     titleShort: '8'
   },
   [constants.PacesCard.Paces9]: {
@@ -338,8 +338,8 @@ const DodgeCardsTextures: Record<constants.PacesCard, CardData> = {
     color: CardColor.WHITE,
     title: 'Dodge at 9',
     rarity: constants.Rarity.None,
-    description: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.BROWN, '9')}`,
-    descriptionDark: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.WHITE, '9')}`,
+    description: `You try to dodge the opponent's shot at step number ${getTextSpan(CardColor.BROWN, '9')}`,
+    descriptionDark: `You try to dodge the opponent's shot at step number ${getTextSpan(CardColor.WHITE, '9')}`,
     titleShort: '9'
   },
   [constants.PacesCard.Paces10]: {
@@ -348,8 +348,8 @@ const DodgeCardsTextures: Record<constants.PacesCard, CardData> = {
     color: CardColor.WHITE,
     title: 'Dodge at 10',
     rarity: constants.Rarity.None,
-    description: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.BROWN, '10')}`,
-    descriptionDark: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.WHITE, '10')}`,
+    description: `You try to dodge the opponent's shot at step number ${getTextSpan(CardColor.BROWN, '10')}`,
+    descriptionDark: `You try to dodge the opponent's shot at step number ${getTextSpan(CardColor.WHITE, '10')}`,
     titleShort: '10'
   },
 }
@@ -369,7 +369,7 @@ const TacticsCardsTextures: Record<constants.TacticsCard, CardData> = {
     color: CardColor.WHITE,
     title: 'Insult',
     rarity: constants.Rarity.None,
-    description: `Increase your opponents damage by ${getTextSpan(CardColor.RED, '+1')} and decrease your opponents hit chance by ${getTextSpan(CardColor.YELLOW, '-10%')}`
+    description: `Increase your opponent's damage by ${getTextSpan(CardColor.RED, '+1')} and decrease your opponent's hit chance by ${getTextSpan(CardColor.YELLOW, '-10%')}`
   },
   [constants.TacticsCard.CoinToss]: {
     path: '/textures/cards/illustrations/Coin_Flip.png',
@@ -393,7 +393,7 @@ const TacticsCardsTextures: Record<constants.TacticsCard, CardData> = {
     color: CardColor.WHITE,
     title: 'Thick coat',
     rarity: constants.Rarity.None,
-    description: `Reduce opponents damage by ${getTextSpan(CardColor.RED, '-1')}`
+    description: `Reduce opponent's damage by ${getTextSpan(CardColor.RED, '-1')}`
   },
   [constants.TacticsCard.Reversal]: {
     path: '/textures/cards/illustrations/Reversal.png',
@@ -436,7 +436,7 @@ const BladesCardsTextures: Record<constants.BladesCard, CardData> = {
     color: CardColor.WHITE,
     title: 'Pocket Pistol',
     rarity: constants.Rarity.None,
-    description: `Decrease opponents hit chance by ${getTextSpan(CardColor.YELLOW, '-10%')}`
+    description: `Decrease opponent's hit chance by ${getTextSpan(CardColor.YELLOW, '-10%')}`
   },
   [constants.BladesCard.Behead]: {
     path: '/textures/cards/illustrations/Behead.png',
@@ -452,7 +452,7 @@ const BladesCardsTextures: Record<constants.BladesCard, CardData> = {
     color: CardColor.WHITE,
     title: 'Grapple',
     rarity: constants.Rarity.None,
-    description: `Decrease opponents damage by ${getTextSpan(CardColor.RED, '-1')}`
+    description: `Decrease opponent's damage by ${getTextSpan(CardColor.RED, '-1')}`
   }
 }
 

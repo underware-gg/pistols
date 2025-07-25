@@ -127,7 +127,7 @@ const characterQuotes: Record<CharacterKey, string> = {
 const botQuotes: Record<BotKey, string> = {
   [BotKey.Unknown]: "...",
   [BotKey.TinMan]: "I don't wanna hurt you, I just wanna know what you sound like when you scream!",
-  [BotKey.Scarecrow]: "If you make 'em laugh it's a joke, else, deceit.",
+  [BotKey.Scarecrow]: "It's deceit unless you make 'em laugh, then it's a joke.",
   [BotKey.Leon]: "Being kind ain't never hurt anyone, milord.",
 };
 const genesisQuotes: Record<GenesisKey, string> = {
