@@ -26,7 +26,9 @@ export const apiGenerateControllerSalt = async (
   }
 
   try {
-    const resp = await fetch(`${serverUrl}/api/controller/salt`,
+    const url = `${serverUrl}/api/controller/salt`;
+    console.log(`apiGenerateControllerSalt() URL:`, url, params)
+    const resp = await fetch(url,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -34,6 +36,7 @@ export const apiGenerateControllerSalt = async (
       }
     );
     const response: SaltGeneratorResponse = await resp.json();
+    console.log(`apiGenerateControllerSalt() data:`, response)
     if (response.salt) {
       result = BigInt(response.salt)
     } else if (response.error) {

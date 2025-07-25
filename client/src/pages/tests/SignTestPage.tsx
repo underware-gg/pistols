@@ -149,6 +149,15 @@ function Sign({
 
           <Row columns={'equal'} verticalAlign='top'>
             <Cell>
+              Account
+            </Cell>
+            <Cell className='Code'>
+              {bigintToHex(fromAccount ? fromAccount : (account?.address ?? 0))}
+            </Cell>
+          </Row>
+
+          <Row columns={'equal'} verticalAlign='top'>
+            <Cell>
               Verified (on-chain)
             </Cell>
             <Cell className={`Code ${isValid === true ? 'Darkest BgPositive' : isValid === false ? 'BgNegative' : ''}`}>

@@ -8,6 +8,7 @@ import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
 import { KATANA_CLASS_HASH } from '@dojoengine/core'
 import { supportedConnetorIds } from 'src/games/pistols/config/networks'
 import { bigintEquals, bigintToHex, isPositiveBigint } from 'src/utils/misc/types'
+import { feltToString } from 'src/starknet/starknet'
 
 // sync from here:
 // https://github.com/cartridge-gg/controller/blob/main/packages/account-wasm/src/constants.rs
@@ -101,7 +102,7 @@ export const useControllerAccount = (contractAddress: BigNumberish) => {
 // https://github.com/cartridge-gg/controller/blob/main/examples/next/src/components/SignMessage.tsx
 //
 export const useVerifyControllerSignature = (messageHash: BigNumberish, signature: BigNumberish[]) => {
-  const { address, account } = useAccount();
+  const { address, account, chainId } = useAccount();
   const [isLoading, setIsLoading] = useState<boolean>();
   const [isValid, setIsValid] = useState<boolean>();
 
@@ -110,6 +111,7 @@ export const useVerifyControllerSignature = (messageHash: BigNumberish, signatur
     const _verify = async () => {
       setIsLoading(true);
       try {
+        console.log(`useVerifyControllerSignature() chainId:`, feltToString(chainId), address);
         const res = await account.callContract(
           {
             contractAddress: address,
