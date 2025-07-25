@@ -592,6 +592,7 @@ export type GenesisKeyEnum = CairoCustomEnum;
 export const legendsKey = [
 	'Unknown',
 	'TGC1',
+	'TGC2',
 ] as const;
 export type LegendsKey = { [key in typeof legendsKey[number]]: string };
 export type LegendsKeyEnum = CairoCustomEnum;
