@@ -52,6 +52,23 @@
               }
             ]
           },
+          "0x03c77186b8e509085ec66e1a5d1dbcf9dc1f212852b4c1f461a48901d290fc9b": {
+            "description": "Tutorial game contract",
+            "methods": [
+              {
+                "entrypoint": "create_tutorial",
+                "description": "Initializes a turorial level"
+              },
+              {
+                "entrypoint": "commit_moves",
+                "description": "Commit moves of a Duelist in a tutorial level"
+              },
+              {
+                "entrypoint": "reveal_moves",
+                "description": "Reveal moves of a Duelist in a tutorial level"
+              }
+            ]
+          },
           "0x0426c16fe76f12586718c07e47c8e4312e9fee5e7dc849a75f3c587ad9e70b4f": {
             "description": "Bank contract",
             "methods": [
@@ -309,6 +326,23 @@
               {
                 "entrypoint": "emit_player_setting",
                 "description": "Store player settings"
+              }
+            ]
+          },
+          "0x03c77186b8e509085ec66e1a5d1dbcf9dc1f212852b4c1f461a48901d290fc9b": {
+            "description": "Tutorial game contract",
+            "methods": [
+              {
+                "entrypoint": "create_tutorial",
+                "description": "Initializes a turorial level"
+              },
+              {
+                "entrypoint": "commit_moves",
+                "description": "Commit moves of a Duelist in a tutorial level"
+              },
+              {
+                "entrypoint": "reveal_moves",
+                "description": "Reveal moves of a Duelist in a tutorial level"
               }
             ]
           },
