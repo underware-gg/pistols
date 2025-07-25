@@ -130,11 +130,10 @@ Install the [Cairo 1.0](https://marketplace.visualstudio.com/items?itemName=star
 curl -L https://install.dojoengine.org | bash
 # open new terminal to update PATH
 # install each toolchain component...
-dojoup install v1.6.0
-dojoup component add sozo v1.6.0
+dojoup install v1.6.1
+dojoup component add sozo v1.6.1
 dojoup component add katana v1.6.3
-dojoup component add torii v1.5.9
-# dojoup component add torii v1.6.0-alpha.7
+dojoup component add torii v1.6.0
 
 # test dojo
 cd dojo
