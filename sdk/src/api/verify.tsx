@@ -30,7 +30,9 @@ export const apiVerifyControllerSignature = async (
   }
 
   try {
-    const resp = await fetch(`${serverUrl}/api/controller/verify`,
+    const url = `${serverUrl}/api/controller/verify`;
+    console.log(`apiVerifyControllerSignature() URL:`, url, params)
+    const resp = await fetch(url,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -38,7 +40,7 @@ export const apiVerifyControllerSignature = async (
       }
     );
     const response: VerifyResponse = await resp.json();
-    // console.log(`apiVerifyControllerSignature() data:`, response)
+    console.log(`apiVerifyControllerSignature() data:`, response)
     if (response.verified === true || response.verified === false) {
       result = response.verified;
       if (response.error) {
