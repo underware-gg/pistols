@@ -123,12 +123,14 @@ const characterQuotes: Record<CharacterKey, string> = {
   [CharacterKey.Drunkard]: "...",
   [CharacterKey.Devil]: "...",
   [CharacterKey.Player]: "...",
+  [CharacterKey.ImpMaster]: "...",
 };
 const botQuotes: Record<BotKey, string> = {
   [BotKey.Unknown]: "...",
   [BotKey.TinMan]: "I don't wanna hurt you, I just wanna know what you sound like when you scream!",
   [BotKey.Scarecrow]: "It's deceit unless you make 'em laugh, then it's a joke.",
   [BotKey.Leon]: "Being kind ain't never hurt anyone, milord.",
+  [BotKey.Pro]: "...",
 };
 const genesisQuotes: Record<GenesisKey, string> = {
   [GenesisKey.Unknown]: "...",
@@ -229,12 +231,14 @@ const characterGenders: Record<CharacterKey, DuelistGender> = {
   [CharacterKey.Drunkard]: 'Male',
   [CharacterKey.Devil]: 'Male',
   [CharacterKey.Player]: 'Male',
+  [CharacterKey.ImpMaster]: 'Male',
 };
 const botGenders: Record<BotKey, DuelistGender> = {
   [BotKey.Unknown]: 'Male',
   [BotKey.TinMan]: 'Male',
   [BotKey.Scarecrow]: 'Female',
   [BotKey.Leon]: 'Male',
+  [BotKey.Pro]: 'Male',
 };
 const genesisGenders: Record<GenesisKey, DuelistGender> = {
   [GenesisKey.Unknown]: 'Male',
