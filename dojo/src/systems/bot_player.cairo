@@ -30,7 +30,7 @@ pub mod bot_player {
     };
     use pistols::systems::rng::{RngWrap, RngWrapTrait, Dice, DiceTrait};
     use pistols::models::{
-        challenge::{Challenge, ChallengeTrait, RoundValue},
+        challenge::{Challenge, ChallengeTrait, RoundValue, DuelTypeTrait},
         player::{PlayerDuelistStack, PlayerDuelistStackTrait},
     };
     use pistols::types::{
@@ -89,10 +89,16 @@ pub mod bot_player {
             let mut store: Store = StoreTrait::new(self.world_default());
             assert(store.world.caller_is_duel_contract(), Errors::INVALID_CALLER);
 
-            // randomize a bot profile
-            let mut dice: Dice = self._make_dice(@store, duel_id);
-            let duelist_seed: u8 = dice.throw('bot_archetype', 255);
-            let duelist_profile: DuelistProfile = ProfileManagerTrait::randomize_profile(DuelistProfile::Bot(BotKey::Unknown), duelist_seed.into());
+            // pick a duelist profile...
+            let duelist_profile: DuelistProfile = if (store.get_challenge_duel_type(duel_id).is_unranked(@store)) {
+                // unranked: randomize a bot profile
+                let mut dice: Dice = self._make_dice(@store, duel_id);
+                let duelist_seed: u8 = dice.throw('bot_archetype', 255);
+                (ProfileManagerTrait::randomize_profile(DuelistProfile::Bot(BotKey::Unknown), duelist_seed.into()))
+            } else {
+                // ranked: always use the Pro bot
+                (DuelistProfile::Bot(BotKey::Pro))
+            };
 
             // get or mint a duelist
             let bot_address: ContractAddress = starknet::get_contract_address();

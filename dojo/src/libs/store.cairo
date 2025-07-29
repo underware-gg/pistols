@@ -502,6 +502,11 @@ pub impl StoreImpl of StoreTrait {
         (self.world.read_member(Model::<SeasonConfig>::ptr_from_keys(season_id), selector!("rules")))
     }
 
+    #[inline(always)]
+    fn get_challenge_duel_type(self: @Store, duel_id: u128) -> DuelType {
+        (self.world.read_member(Model::<Challenge>::ptr_from_keys(duel_id), selector!("duel_type")))
+    }
+
     // #[inline(always)]
     // fn get_tournament_settings_rules(self: @Store, settings_id: u32) -> TournamentRules {
     //     let tournament_type: TournamentType = self.world.read_member(Model::<TournamentSettings>::ptr_from_keys(settings_id), selector!("tournament_type"));
