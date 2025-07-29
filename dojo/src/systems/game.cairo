@@ -250,7 +250,7 @@ pub mod game {
             store.set_round(@round);
 
             // bot player responds immediately
-            if (challenge.is_against_bot_player() && duelist_number == 1) {
+            if (challenge.is_against_bot_player(@store) && duelist_number == 1) {
                 store.world.bot_player_protected_dispatcher().commit_moves(duel_id);
             }
         }
@@ -675,7 +675,7 @@ pub mod game {
                     // send duel token to winner
                     store.world.duel_token_protected_dispatcher().transfer_to_winner(challenge.duel_id);
                     // send bot token to winner
-                    if (challenge.is_against_bot_player() && challenge.winner == 1) {
+                    if (challenge.is_against_bot_player(@store) && challenge.winner == 1) {
                         store.world.bot_player_protected_dispatcher().transfer_to_winner(challenge.duel_id, challenge.duelist_id_b, challenge.address_a);
                     }
                     // emit events

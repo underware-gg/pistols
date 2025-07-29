@@ -1069,7 +1069,7 @@ mod unit {
     };
 
     #[test]
-    fn test_profile_counts() {
+    fn validate_profile_counts() {
         let profiles: Span<DuelistProfile> = ProfileManagerTrait::_get_all_profiles_by_type(DuelistProfile::Undefined);
         let descriptors: Span<ProfileDescriptor> = ProfileManagerTrait::_get_all_descriptors_by_type(DuelistProfile::Undefined);
         assert_eq!(profiles.len(), 0, "Undefined.profiles");
@@ -1103,7 +1103,7 @@ mod unit {
     }
 
     #[test]
-    fn test_descriptors_character() {
+    fn validate_descriptors_character() {
         // invalid
         let invalid_profile: DuelistProfile = DuelistProfile::Character(0_u8.into());
         _test_invalid_profile(invalid_profile);
@@ -1127,7 +1127,7 @@ mod unit {
     }
 
     #[test]
-    fn test_descriptors_bot() {
+    fn validate_descriptors_bot() {
         // invalid
         let invalid_profile: DuelistProfile = DuelistProfile::Bot(0_u8.into());
         _test_invalid_profile(invalid_profile);
@@ -1151,7 +1151,7 @@ mod unit {
     }
 
     #[test]
-    fn test_descriptors_genesis() {
+    fn validate_descriptors_genesis() {
         // invalid
         let invalid_profile: DuelistProfile = DuelistProfile::Genesis(0_u8.into());
         _test_invalid_profile(invalid_profile);
@@ -1176,7 +1176,7 @@ mod unit {
     }
 
     #[test]
-    fn test_descriptors_legends() {
+    fn validate_descriptors_legends() {
         // invalid
         let invalid_profile: DuelistProfile = DuelistProfile::Legends(0_u8.into());
         _test_invalid_profile(invalid_profile);
@@ -1200,7 +1200,7 @@ mod unit {
     }
 
     #[test]
-    fn test_profile_duelist_ids_character() {
+    fn validate_profile_duelist_ids_character() {
         let duelist_id_base: u128 = COLLECTIONS::Character.duelist_id_base;
         assert_gt!(duelist_id_base, 0, "bad base id");
         let mut p: u8 = 1;
@@ -1215,7 +1215,7 @@ mod unit {
     }
 
     #[test]
-    fn test_profile_duelist_ids_bot() {
+    fn validate_profile_duelist_ids_bot() {
         let duelist_id_base: u128 = COLLECTIONS::Bot.duelist_id_base;
         assert_gt!(duelist_id_base, 0, "bad base id");
         let mut p: u8 = 1;
@@ -1230,7 +1230,7 @@ mod unit {
     }
 
     #[test]
-    fn test_profile_duelist_ids_genesis() {
+    fn validate_profile_duelist_ids_genesis() {
         let duelist_id_base: u128 = COLLECTIONS::Genesis.duelist_id_base;
         assert_eq!(duelist_id_base, 0, "bad base id");
         let mut p: u8 = 1;
@@ -1242,7 +1242,7 @@ mod unit {
     }
 
     #[test]
-    fn test_profile_duelist_ids_legends() {
+    fn validate_profile_duelist_ids_legends() {
         assert_eq!(COLLECTIONS::Legends.duelist_id_base, 0, "bad base id");
         let mut p: u8 = 1;
         while (p <= COLLECTIONS::Legends.profile_count.into()) {
