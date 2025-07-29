@@ -173,6 +173,7 @@ export interface PlayerFlags {
 export interface PlayerOnline {
 	identity: string;
 	timestamp: BigNumberish;
+	available: boolean;
 }
 
 // Type definition for `pistols::models::player::PlayerTeamFlags` struct
@@ -480,6 +481,7 @@ export const botKey = [
 	'TinMan',
 	'Scarecrow',
 	'Leon',
+	'Pro',
 ] as const;
 export type BotKey = { [key in typeof botKey[number]]: string };
 export type BotKeyEnum = CairoCustomEnum;
@@ -491,6 +493,7 @@ export const characterKey = [
 	'Drunkard',
 	'Devil',
 	'Player',
+	'ImpMaster',
 ] as const;
 export type CharacterKey = { [key in typeof characterKey[number]]: string };
 export type CharacterKeyEnum = CairoCustomEnum;
@@ -954,6 +957,7 @@ export const schema: SchemaType = {
 		PlayerOnline: {
 			identity: "",
 			timestamp: 0,
+			available: false,
 		},
 		PlayerTeamFlags: {
 			player_address: "",

@@ -2184,8 +2184,8 @@
       ]
     },
     {
-      "address": "0x4a06449df6dd5ca7e150d74e0db7bbe05f96002098907d3207e4159cd0a618b",
-      "class_hash": "0x1396c9a55f6427e4078605d1580c4e166c9d1555cff2b7fe360871322893935",
+      "address": "0x69b8ee9d707ebaabb4a518a08b880f66365a07f47fbfdb4fab7da376b328c55",
+      "class_hash": "0x6da1e8c7c137d9d318542cbc287e5f651cec2e463087de24eb6e907595b71ae",
       "abi": [
         {
           "type": "impl",
@@ -2458,8 +2458,8 @@
       ]
     },
     {
-      "address": "0x710fa5693feb77cb245411517865cc7c4a1c596f23db027872a2622f1af1d34",
-      "class_hash": "0x65d5fd819f858104232ba0c77259a2de0c6e368a257bcc1e1a940504d1c89b9",
+      "address": "0x200066f8243d2417d4a692a6f0e0d7563ad871a879ab2f88b25f6cb4129d3b9",
+      "class_hash": "0x554a16eeabaaaef1c59f5f0f0243b736d143baacaa2039227f5b78b07e244eb",
       "abi": [
         {
           "type": "impl",
@@ -3772,8 +3772,8 @@
       ]
     },
     {
-      "address": "0x48925ae098423db5c803c653bdb5b9668d8f87fc8e53d6f4b31c1da114aa987",
-      "class_hash": "0x12ff48b9375b98518131fa767ec436a28238acda57187fff41718ee9a4ed225",
+      "address": "0x542cf08abb69cbec8ccc2af7e40d6eb5aa709fb6ee4c3cb79dbc7698823fd90",
+      "class_hash": "0x5d1d2384288052083677caacca6bc1e2eaa8aea9a26c9cdf7df48238e0abd70",
       "abi": [
         {
           "type": "impl",
@@ -4026,6 +4026,10 @@
             {
               "name": "Player",
               "type": "()"
+            },
+            {
+              "name": "ImpMaster",
+              "type": "()"
             }
           ]
         },
@@ -4047,6 +4051,10 @@
             },
             {
               "name": "Leon",
+              "type": "()"
+            },
+            {
+              "name": "Pro",
               "type": "()"
             }
           ]
@@ -6963,8 +6971,8 @@
       ]
     },
     {
-      "address": "0x2bf9ec462f87263b398a928a78b35b7edc0775dba9a4d6da665a37b4878439",
-      "class_hash": "0x55b3f3fda7773c155914cd247993108b353c31d4c623e4206884c65c7885e25",
+      "address": "0x2aeda53cbfdac4b00be91d5f243a8e30157102c3afa302dc6dc0cc36d19d0d8",
+      "class_hash": "0x1dc6e8fa129174513773886194b7ea456c2d68bdda2dbd9c21d79464f4bad8d",
       "abi": [
         {
           "type": "impl",
@@ -9243,8 +9251,8 @@
       ]
     },
     {
-      "address": "0x3213623460645042af168a5e21d790a3ec5ffc001a6e68e1248bddf5a9c0141",
-      "class_hash": "0x5fed0925d0c5d07d1e6fb166e8ca995b53aaab51a91faa4314737b8528811ea",
+      "address": "0x210fa7f9987259964b97417bc370c67ece8330f44c2bf5fcc6e7e8efd4ee1b9",
+      "class_hash": "0xe382254cd5be3528821117e783f2d981c624057ce625d8eabd19ff205dca8",
       "abi": [
         {
           "type": "impl",
@@ -9390,6 +9398,10 @@
             {
               "name": "Player",
               "type": "()"
+            },
+            {
+              "name": "ImpMaster",
+              "type": "()"
             }
           ]
         },
@@ -9411,6 +9423,10 @@
             },
             {
               "name": "Leon",
+              "type": "()"
+            },
+            {
+              "name": "Pro",
               "type": "()"
             }
           ]
@@ -12664,8 +12680,8 @@
       ]
     },
     {
-      "address": "0x404721c05e3b7f5f92726ac013e8b681f35bfabaf616d0579b741f10d187507",
-      "class_hash": "0x488047e96caba751be050210a9b12022500fda25bee02303b7dd5b8c6ba4cb1",
+      "address": "0x2908bd80b9016e96f69e2fb48ef2c5c149e212ff37bcf9acaa54ed919fb64c1",
+      "class_hash": "0x4c1e980f389d2ace474a819fee5e2e87161ddd418eadb732556212a536b8d24",
       "abi": [
         {
           "type": "impl",
@@ -13571,7 +13587,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x36008ffb123c791490765e4cda585c9ea7b2243e3604fa0e5b89b639bea4321",
+      "class_hash": "0x4413d46ccf25658dd83beb3630e4d34a92dd9678d311b54a294898b823c47db",
       "tag": "pistols-Duelist",
       "selector": "0x1ec34ce9ccaa39b540179d85e0dd0d46c1c1ae712f4cb40a9cd7f8c21ebaa46"
     },
@@ -13601,7 +13617,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x2734411118d88cbb767868895829ab7dd6ffebd973f1ee321f34189f5b06031",
+      "class_hash": "0x7c04cf5dab74384eefd397d2288716c8dc29896b0c4c4da56fef9001bdb0d45",
       "tag": "pistols-Pack",
       "selector": "0x64159b4947adcdc7a87b41f7889ba33495ac8e3a3a333305c7712806763fa2d"
     },
@@ -13619,7 +13635,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x18c633e20943c1f8da83ac54de3037e90fba9829135adcb6fc63597ff05a770",
+      "class_hash": "0x59719e51e7c5ebb309313f968958e7d37a1b997c77b8a826dbb6c40c3a37cd3",
       "tag": "pistols-PlayerDuelistStack",
       "selector": "0xb47a4ea3849ae004ed3d0ba58070c0eb3cdca2bed8c9a6ab6bfe01210effc6"
     },
@@ -13631,7 +13647,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x5dc82b316b374bbe4e0c8ac5e29a9166679350afc68ba5039f175438c96ecb",
+      "class_hash": "0x42616c87e5a616960bb886857ac93b1f2081a4a35466f2302120c7d1998d151",
       "tag": "pistols-PlayerOnline",
       "selector": "0x6f3391bc3684ea92009be25543fc6cc734c1f756253523354efdf10e2a57dff"
     },

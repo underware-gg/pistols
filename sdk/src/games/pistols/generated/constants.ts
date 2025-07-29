@@ -417,6 +417,7 @@ export enum CharacterKey {
   Drunkard = 'Drunkard', // 2
   Devil = 'Devil', // 3
   Player = 'Player', // 4
+  ImpMaster = 'ImpMaster', // 5
 };
 export const getCharacterKeyValue = (name: CharacterKey): number | undefined => _indexOrUndefined(Object.keys(CharacterKey).indexOf(name));
 export const getCharacterKeyFromValue = (value: number): CharacterKey | undefined => Object.keys(CharacterKey)[value] as CharacterKey;
@@ -428,6 +429,7 @@ export enum BotKey {
   TinMan = 'TinMan', // 1
   Scarecrow = 'Scarecrow', // 2
   Leon = 'Leon', // 3
+  Pro = 'Pro', // 4
 };
 export const getBotKeyValue = (name: BotKey): number | undefined => _indexOrUndefined(Object.keys(BotKey).indexOf(name));
 export const getBotKeyFromValue = (value: number): BotKey | undefined => Object.keys(BotKey)[value] as BotKey;
@@ -1192,14 +1194,14 @@ export const COLLECTIONS: type_COLLECTIONS = {
   Character: {
     name: 'Tavern Characters',
     folder_name: 'characters',
-    profile_count: 4,
+    profile_count: 5,
     is_playable: false,
     duelist_id_base: BigInt('0x100000000'),
   },
   Bot: {
     name: 'Practice bots',
     folder_name: 'bots',
-    profile_count: 3,
+    profile_count: 4,
     is_playable: false,
     duelist_id_base: BigInt('0x200000000'),
   },
@@ -1226,6 +1228,7 @@ type type_CHARACTER_PROFILES = {
   Drunkard: ProfileDescriptor, // cairo: ProfileDescriptor
   Devil: ProfileDescriptor, // cairo: ProfileDescriptor
   Player: ProfileDescriptor, // cairo: ProfileDescriptor
+  ImpMaster: ProfileDescriptor, // cairo: ProfileDescriptor
 };
 export const CHARACTER_PROFILES: type_CHARACTER_PROFILES = {
   Unknown: {
@@ -1243,6 +1246,9 @@ export const CHARACTER_PROFILES: type_CHARACTER_PROFILES = {
   Player: {
     name: 'Stranger',
   },
+  ImpMaster: {
+    name: 'Imp Master',
+  },
 };
 
 // from: ../dojo/src/types/duelist_profile.cairo
@@ -1251,6 +1257,7 @@ type type_BOT_PROFILES = {
   TinMan: ProfileDescriptor, // cairo: ProfileDescriptor
   Scarecrow: ProfileDescriptor, // cairo: ProfileDescriptor
   Leon: ProfileDescriptor, // cairo: ProfileDescriptor
+  Pro: ProfileDescriptor, // cairo: ProfileDescriptor
 };
 export const BOT_PROFILES: type_BOT_PROFILES = {
   Unknown: {
@@ -1264,6 +1271,9 @@ export const BOT_PROFILES: type_BOT_PROFILES = {
   },
   Leon: {
     name: 'Kind Imp',
+  },
+  Pro: {
+    name: 'Pro Imp',
   },
 };
 
