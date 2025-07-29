@@ -45,10 +45,12 @@ export function make_typed_data_PlayerOnline({
   networkId,
   identity,
   timestamp,
+  available,
 }: {
   networkId: NetworkId,
   identity: BigNumberish,
   timestamp: number,
+  available: boolean,
 }) {
   return generateTypedData<PistolsSchemaType, OmitFieldOrder<models.PlayerOnline>>(
     makeStarknetDomain({ networkId }),
@@ -56,10 +58,12 @@ export function make_typed_data_PlayerOnline({
     {
       identity: bigintToHex(identity),
       timestamp,
+      available,
     },
     {
       identity: 'ContractAddress',
       timestamp: 'felt',
+      available: 'felt',
     },
   )
 }
