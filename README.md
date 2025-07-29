@@ -226,31 +226,31 @@ Configure default [NetworkId](/sdk/src/dojo/setup/networks.ts) in your `.env` fi
 Minimal configuration:
 
 ```sh
-# Main network
+# default network
 # VITE_NETWORK_ID=KATANA_LOCAL
-#VITE_NETWORK_ID=STAGING
-#VITE_NETWORK_ID=SEPOLIA
+# VITE_NETWORK_ID=STAGING
+# VITE_NETWORK_ID=SEPOLIA
 VITE_NETWORK_ID=MAINNET
 ```
 
 All available options...
 
 ```sh
-# enable debug options
-VITE_DEBUG=1
-
-# Main network
+# default network
 VITE_NETWORK_ID=KATANA_LOCAL
-#VITE_NETWORK_ID=STAGING
-#VITE_NETWORK_ID=SEPOLIA
-#VITE_NETWORK_ID=MAINNET
+# VITE_NETWORK_ID=STAGING
+# VITE_NETWORK_ID=SEPOLIA
+# VITE_NETWORK_ID=MAINNET
+
+# online status (matchmaking)
+VITE_PUBLISH_ONLINE_STATUS=true
 
 # optional/alternative service urls
-# VITE_CLIENT_URL=https://play.pistols.gg
-# VITE_ASSETS_SERVER_URL=https://assets.underware.gg
+VITE_CLIENT_URL=https://play.pistols.gg
+VITE_ASSETS_SERVER_URL=https://assets.underware.gg
 
 # optional/alternative dojo urls
-# VITE_SLOT_NAME=pistols-mainnet-2
+VITE_SLOT_NAME=pistols-mainnet-2
 # VITE_RPC_URL=https://api.cartridge.gg/x/starknet/mainnet
 # VITE_TORII_URL=https://api.cartridge.gg/x/pistols-mainnet-2/torii
 # VITE_TORII_GRAPHQL_URL=https://api.cartridge.gg/x/pistols-mainnet-2/torii/graphql
@@ -259,6 +259,9 @@ VITE_NETWORK_ID=KATANA_LOCAL
 # Socials config
 VITE_DISCORD_CLIENT_ID=<OAUTH2_CLIENT_ID>
 VITE_DISCORD_REDIRECT_URL=<OAUTH2_REDIRECT_URL>
+
+# enables additional Vite debug features and info in console
+VITE_DEBUG=1
 ```
 
 Start the client

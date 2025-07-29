@@ -11,6 +11,7 @@ const _env = (name: string) => (
 export const CLIENT_URL = _env('VITE_CLIENT_URL') || 'https://play.pistols.gg';
 export const DEFAULT_NETWORK_ID = _env('VITE_NETWORK_ID') || _env('VITE_DEFAULT_NETWORK_ID') ||  'MAINNET';
 export const ASSETS_SERVER_URL = _env('VITE_ASSETS_SERVER_URL') || 'https://assets.underware.gg';
+export const PUBLISH_ONLINE_STATUS = _env('VITE_PUBLISH_ONLINE_STATUS') === 'true';
 // dojo config overrides
 export const SLOT_NAME = _env('VITE_SLOT_NAME') || null;
 export const RPC_URL = _env('VITE_RPC_URL') || null;
