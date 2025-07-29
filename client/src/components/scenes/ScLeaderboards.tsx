@@ -136,6 +136,7 @@ const PlayerRow = memo(({
   selectedSeasonId,
   seasonRewards,
   stats,
+  secretLeaderboard = false,
 }: { 
   duelistId: BigNumberish, 
   rank: number, 
@@ -144,6 +145,7 @@ const PlayerRow = memo(({
   seasonRewards?: SeasonLeaderboardPrizes,
   seasonTotals?: SeasonTotals,
   stats: SeasonDuelistsStats,
+  secretLeaderboard?: boolean,
 }) => {
   const { aspectWidth } = useGameAspect();
   const { dispatchSelectPlayerAddress, dispatchSelectDuelistId } = usePistolsContext();
@@ -220,7 +222,7 @@ const PlayerRow = memo(({
             {isActive ? 'Reward' : 'Rewarded'}:
           </div>
           <div style={{ fontSize: aspectWidth(1.3), fontWeight: 'bold', color: 'gold' }}>
-            {rank <= 10 ? (
+            {rank <= 10 && !secretLeaderboard ? (
               <>
                 <Balance lords wei={reward} />
               </>
@@ -245,6 +247,7 @@ const LeaderboardPodium = memo(({
   selectedSeasonId,
   seasonRewards,
   stats,
+  secretLeaderboard = false,
 }: {
   rank: 1 | 2 | 3,
   color: string,
@@ -256,6 +259,7 @@ const LeaderboardPodium = memo(({
   seasonRewards?: SeasonLeaderboardPrizes,
   seasonTotals?: SeasonTotals,
   stats: SeasonDuelistsStats,
+  secretLeaderboard?: boolean,
 }) => {
   const { aspectWidth, aspectHeight } = useGameAspect();
   const { dispatchSelectPlayerAddress, dispatchSelectDuelistId } = usePistolsContext();
@@ -428,8 +432,8 @@ const LeaderboardPodium = memo(({
               textShadow: '0 0 15px rgba(255,215,0,0.7)',
               marginTop: aspectHeight(0.2)
             }}>
-              <Balance lords wei={reward} />
-              {isActive && <span style={{ fontSize: aspectWidth(0.8), color: '#888', marginLeft: aspectWidth(0.5) }}>(potential)</span>}
+              <Balance lords wei={secretLeaderboard ? 0n : reward} />
+              {isActive && !secretLeaderboard && <span style={{ fontSize: aspectWidth(0.8), color: '#888', marginLeft: aspectWidth(0.5) }}>(potential)</span>}
             </div>
           </div>
         </div>
@@ -641,6 +645,7 @@ export default function ScLeaderboards() {
                         selectedSeasonId={selectedSeasonId}
                         seasonRewards={rewardsPerSeason[selectedSeasonId]}
                         stats={duelistsStats[bigintToDecimal(scores[1].duelistId)]}
+                        secretLeaderboard={secretLeaderboard}
                       />
                     ) : (
                       <EmptyPodium rank={2} color="silver" height={67} />
@@ -656,6 +661,7 @@ export default function ScLeaderboards() {
                         selectedSeasonId={selectedSeasonId}
                         seasonRewards={rewardsPerSeason[selectedSeasonId]}
                         stats={duelistsStats[bigintToDecimal(scores[0].duelistId)]}
+                        secretLeaderboard={secretLeaderboard}
                       />
                     ) : (
                       <EmptyPodium rank={1} color="gold" height={69} />
@@ -671,6 +677,7 @@ export default function ScLeaderboards() {
                         selectedSeasonId={selectedSeasonId}
                         seasonRewards={rewardsPerSeason[selectedSeasonId]}
                         stats={duelistsStats[bigintToDecimal(scores[2].duelistId)]}
+                        secretLeaderboard={secretLeaderboard}
                       />
                     ) : (
                       <EmptyPodium rank={3} color="#cd7f32" height={65} />
@@ -689,6 +696,7 @@ export default function ScLeaderboards() {
                         selectedSeasonId={selectedSeasonId}
                         seasonRewards={rewardsPerSeason[selectedSeasonId]}
                         stats={duelistsStats[bigintToDecimal(entry.duelistId)]}
+                        secretLeaderboard={secretLeaderboard}
                       />
                     ))}
                   </div>
