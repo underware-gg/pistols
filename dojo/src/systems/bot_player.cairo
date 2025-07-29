@@ -91,7 +91,7 @@ pub mod bot_player {
 
             // randomize a bot profile
             let mut dice: Dice = self._make_dice(@store, duel_id);
-            let duelist_seed: u8 = dice.throw('archetype', 255);
+            let duelist_seed: u8 = dice.throw('bot_archetype', 255);
             let duelist_profile: DuelistProfile = ProfileManagerTrait::randomize_profile(DuelistProfile::Bot(BotKey::Unknown), duelist_seed.into());
 
             // get or mint a duelist
