@@ -3,7 +3,7 @@ import { Button } from 'semantic-ui-react'
 import { usePlayerOnlineSignedMessage } from '/src/hooks/useSignedMessages'
 import { useClientTimestamp, useUserHasInteracted } from '@underware/pistols-sdk/utils/hooks'
 import { useStoreLoadingProgress } from '/src/stores/progressStore'
-
+import * as ENV from '/src/utils/env'
 
 //------------------------------------------------------
 // Add only once to a top level component
@@ -22,8 +22,8 @@ export function PlayerOnlineSync() {
   const { publish, isPublishing } = usePlayerOnlineSignedMessage(finished ? clientSeconds : 0, false)
 
   useEffect(() => {
-    if (publish && clientSeconds > 0 && userHasInteracted && finished && !isPublishing) {
-      // publish()
+    if (publish && clientSeconds > 0 && userHasInteracted && finished && !isPublishing && ENV.PUBLISH_ONLINE_STATUS) {
+      publish()
     }
   }, [publish, clientSeconds, userHasInteracted, finished])
 
