@@ -229,12 +229,14 @@ export const useBlockedPlayersAccounts = () => {
 
 export const useBlockedPlayersDuelistIds = () => {
   const { blockedPlayersAccounts } = useBlockedPlayersAccounts()
+  const { teamMembersAccounts } = useTeamMembersAccounts()
   const tokens = useDuelistTokenStore((state) => state.tokens)
   const getTokenIdsOwnedByAccount = useDuelistTokenStore((state) => state.getTokenIdsOwnedByAccount)
 
-  const blockedPlayersDuelistIds = useMemo(() => (
-    blockedPlayersAccounts.reduce((acc, account) => [...acc, ...getTokenIdsOwnedByAccount(account)], [] as bigint[])
-  ), [blockedPlayersAccounts, tokens])
+  const blockedPlayersDuelistIds = useMemo(() => {
+    const allAccounts = [...blockedPlayersAccounts, ...teamMembersAccounts]
+    return allAccounts.reduce((acc, account) => [...acc, ...getTokenIdsOwnedByAccount(account)], [] as bigint[])
+  }, [blockedPlayersAccounts, teamMembersAccounts, tokens])
 
   return {
     blockedPlayersDuelistIds,

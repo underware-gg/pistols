@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback, memo } from 'react';
-import { Grid, Header, Pagination } from 'semantic-ui-react';
+import { Grid, Header, Image, Pagination } from 'semantic-ui-react';
 import { POSTER_HEIGHT_SMALL, POSTER_WIDTH_SMALL, ProfilePoster, ProfilePosterHandle } from '/src/components/ui/ProfilePoster';
 import { useGameAspect } from '/src/hooks/useGameAspect';
 import { usePlayer, usePlayerAvatar } from '/src/stores/playerStore';
@@ -522,6 +522,7 @@ const EmptyPodium = memo(({
 export default function ScLeaderboards() {
   const { aspectWidth, aspectHeight } = useGameAspect();
   const [activePage, setActivePage] = useState(1);
+  const [secretLeaderboard, setSecretLeaderboard] = useState(false);
   
   const { seasonIdsDescending: seasonIds } = useAllSeasonIds();
   const [selectedSeasonId, setSelectedSeasonId] = useState<number | null>(null);
@@ -542,7 +543,7 @@ export default function ScLeaderboards() {
   const totalsPerSeason = useSeasonsTotals();
   const duelistsStats = useSeasonDuelistsStats(selectedSeasonId || 0);
 
-  const { scores } = useFullLeaderboard(selectedSeasonId || 0);
+  const { scores } = useFullLeaderboard(selectedSeasonId || 0, secretLeaderboard);
   useFetchDuelistsByIds(scores.map(s => s.duelistId))
 
   const { itemsPerPage, startIndex, totalPages } = useMemo(() => {
@@ -576,168 +577,184 @@ export default function ScLeaderboards() {
   }, [seasonIds, selectedSeasonId, totalsPerSeason, rewardsPerSeason, handleSeasonSelect]);
 
   return (
-    <div style={{ position: 'absolute', bottom: 0, left: 0, width: aspectWidth(100), height: aspectHeight(87), display: 'flex' }}>
-      {/* Left Side - Seasons */}
-      <div style={{ flex: '1', paddingTop: aspectWidth(3), paddingBottom: aspectWidth(3), paddingLeft: aspectWidth(3), paddingRight: aspectWidth(1) }}>
-        <div style={{ height: '100%', display: 'flex', flexDirection: 'column', backgroundImage: 'url("/images/ui/leaderboards/seasons_board.png")', backgroundSize: '100% 100%', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', paddingTop: aspectWidth(1.4), paddingBottom: aspectWidth(1.4), paddingLeft: aspectWidth(1.4), paddingRight: aspectWidth(1.4) }}>
-          <Header as="h3" style={{ color: 'white', textAlign: 'center', marginBottom: '20px' }}>SEASONS</Header>
-          
-          <div className='TextDivider bright LeaderboardsDivider EqualMargin'>Current Season</div>
-          
-          {seasonIds.length > 0 && (
-            <SeasonRow
-              key={seasonIds[0]}
-              season={seasonIds[0]}
-              isSelected={selectedSeasonId === seasonIds[0]}
-              onClick={() => handleSeasonSelect(seasonIds[0])}
-              seasonTotals={totalsPerSeason[seasonIds[0]]}
-            />
-          )}
-          
-          <div className='TextDivider bright LeaderboardsDivider EqualMargin'>Past Seasons</div>
-          
-          {seasonIds.length > 1 ? (
-            <div style={{ overflow: 'auto', flex: 1 }}>
-              {seasonRows}
-            </div>
-          ) : (
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888', fontSize: aspectWidth(2), textAlign: 'center', padding: aspectWidth(2) }}>
-              No seasons available yet
-            </div>
-          )}
+    <>
+      <div className='Absolute NoMouse NoDrag' style={{ top: 0, left: aspectWidth(35.5), width: aspectWidth(26), height: aspectHeight(10), zIndex: 200 }}>
+        <Image
+          className='YesMouse NoDrag'
+          src={
+            secretLeaderboard
+              ? "/images/scenes/leaderboards/bg_leaderboards_sign_forbidden.png"
+              : "/images/scenes/leaderboards/bg_leaderboards_sign.png"
+          }
+          alt="Leaderboard Overlay"
+          style={{ width: '100%', height: '100%', objectFit: 'contain', cursor: 'pointer' }}
+          onClick={() => setSecretLeaderboard(!secretLeaderboard)}
+        />
+      </div>
+      {secretLeaderboard && <div className='Absolute FillParent NoMouse NoDrag' style={{ background: 'rgba(0,0,0,0.5)' }} />}
+      <div style={{ position: 'absolute', bottom: 0, left: 0, width: aspectWidth(100), height: aspectHeight(87), display: 'flex' }}>
+        {/* Left Side - Seasons */}
+        <div style={{ flex: '1', paddingTop: aspectWidth(3), paddingBottom: aspectWidth(3), paddingLeft: aspectWidth(3), paddingRight: aspectWidth(1) }}>
+          <div style={{ height: '100%', display: 'flex', flexDirection: 'column', backgroundImage: 'url("/images/ui/leaderboards/seasons_board.png")', backgroundSize: '100% 100%', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', paddingTop: aspectWidth(1.4), paddingBottom: aspectWidth(1.4), paddingLeft: aspectWidth(1.4), paddingRight: aspectWidth(1.4) }}>
+            <Header as="h3" style={{ color: 'white', textAlign: 'center', marginBottom: '20px' }}>SEASONS</Header>
+            
+            <div className='TextDivider bright LeaderboardsDivider EqualMargin'>Current Season</div>
+            
+            {seasonIds.length > 0 && (
+              <SeasonRow
+                key={seasonIds[0]}
+                season={seasonIds[0]}
+                isSelected={selectedSeasonId === seasonIds[0]}
+                onClick={() => handleSeasonSelect(seasonIds[0])}
+                seasonTotals={totalsPerSeason[seasonIds[0]]}
+              />
+            )}
+            
+            <div className='TextDivider bright LeaderboardsDivider EqualMargin'>Past Seasons</div>
+            
+            {seasonIds.length > 1 ? (
+              <div style={{ overflow: 'auto', flex: 1 }}>
+                {seasonRows}
+              </div>
+            ) : (
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888', fontSize: aspectWidth(2), textAlign: 'center', padding: aspectWidth(2) }}>
+                No seasons available yet
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Right Side - Leaderboard */}
+        <div style={{ flex: '1.5', paddingTop: aspectWidth(3), paddingBottom: aspectWidth(3), paddingRight: aspectWidth(4), paddingLeft: aspectWidth(0) }}>
+          <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            {selectedSeasonId ? (
+              <>
+                {activePage === 1 && (
+                  <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: aspectWidth(1), marginBottom: aspectHeight(7) }}>
+                    {scores.length > 1 ? (
+                      <LeaderboardPodium
+                        rank={2}
+                        color="silver"
+                        height={67}
+                        duelistId={Number(scores[1].duelistId)}
+                        score={scores[1].points}
+                        selectedSeasonId={selectedSeasonId}
+                        seasonRewards={rewardsPerSeason[selectedSeasonId]}
+                        stats={duelistsStats[bigintToDecimal(scores[1].duelistId)]}
+                      />
+                    ) : (
+                      <EmptyPodium rank={2} color="silver" height={67} />
+                    )}
+
+                    {scores.length > 0 ? (
+                      <LeaderboardPodium
+                        rank={1}
+                        color="gold"
+                        height={69}
+                        duelistId={Number(scores[0].duelistId)}
+                        score={scores[0].points}
+                        selectedSeasonId={selectedSeasonId}
+                        seasonRewards={rewardsPerSeason[selectedSeasonId]}
+                        stats={duelistsStats[bigintToDecimal(scores[0].duelistId)]}
+                      />
+                    ) : (
+                      <EmptyPodium rank={1} color="gold" height={69} />
+                    )}
+
+                    {scores.length > 2 ? (
+                      <LeaderboardPodium
+                        rank={3}
+                        color="#cd7f32"
+                        height={65}
+                        duelistId={Number(scores[2].duelistId)}
+                        score={scores[2].points}
+                        selectedSeasonId={selectedSeasonId}
+                        seasonRewards={rewardsPerSeason[selectedSeasonId]}
+                        stats={duelistsStats[bigintToDecimal(scores[2].duelistId)]}
+                      />
+                    ) : (
+                      <EmptyPodium rank={3} color="#cd7f32" height={65} />
+                    )}
+                  </div>
+                )}
+
+                {activePage > 1 && paginatedScores.length > 0 && (
+                  <div style={{ flex: 1 }}>
+                    {paginatedScores.map((entry, index) => (
+                      <PlayerRow 
+                        key={entry.duelistId.toString()} 
+                        duelistId={entry.duelistId}
+                        rank={startIndex + index + 1}
+                        score={entry.points}
+                        selectedSeasonId={selectedSeasonId}
+                        seasonRewards={rewardsPerSeason[selectedSeasonId]}
+                        stats={duelistsStats[bigintToDecimal(entry.duelistId)]}
+                      />
+                    ))}
+                  </div>
+                )}
+
+                {(activePage > 1 && paginatedScores.length === 0) && (
+                  <div style={{ 
+                    flex: 1, 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    color: '#888',
+                    fontSize: aspectWidth(2)
+                  }}>
+                    No more duelists to display
+                  </div>
+                )}
+
+                {scores.length === 0 && (
+                  <div style={{ 
+                    position: 'absolute', 
+                    bottom: aspectHeight(-1), 
+                    left: 0, 
+                    right: 0, 
+                    textAlign: 'center',
+                    color: '#a37349',
+                    fontSize: aspectWidth(2)
+                  }}>
+                    No leaderboard data available for this season
+                  </div>
+                )}
+
+                {scores.length > 0 && (
+                  <div style={{ position: 'absolute', bottom: aspectHeight(-3), left: 0, right: 0, textAlign: 'center' }}>
+                    <Pagination
+                      activePage={activePage}
+                      totalPages={Math.max(1, totalPages)}
+                      firstItem={{ content: '<<', key: 'first' }}
+                      lastItem={{ content: '>>', key: 'last' }}
+                      prevItem={{ content: '<', key: 'prev' }}
+                      nextItem={{ content: '>', key: 'next' }}
+                      onPageChange={handlePageChange}
+                      size="large"
+                      boundaryRange={0}
+                      siblingRange={1}
+                      ellipsisItem={null}
+                      className="PaginationWood"
+                    />
+                  </div>
+                )}
+              </>
+            ) : (
+              <div style={{ 
+                flex: 1, 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                color: '#888',
+                fontSize: aspectWidth(2)
+              }}>
+                Select a season to view leaderboard
+              </div>
+            )}
+          </div>
         </div>
       </div>
-
-      {/* Right Side - Leaderboard */}
-      <div style={{ flex: '1.5', paddingTop: aspectWidth(3), paddingBottom: aspectWidth(3), paddingRight: aspectWidth(4), paddingLeft: aspectWidth(0) }}>
-        <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column' }}>
-          {selectedSeasonId ? (
-            <>
-              {activePage === 1 && (
-                <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: aspectWidth(1), marginBottom: aspectHeight(7) }}>
-                  {scores.length > 1 ? (
-                    <LeaderboardPodium
-                      rank={2}
-                      color="silver"
-                      height={67}
-                      duelistId={Number(scores[1].duelistId)}
-                      score={scores[1].points}
-                      selectedSeasonId={selectedSeasonId}
-                      seasonRewards={rewardsPerSeason[selectedSeasonId]}
-                      stats={duelistsStats[bigintToDecimal(scores[1].duelistId)]}
-                    />
-                  ) : (
-                    <EmptyPodium rank={2} color="silver" height={67} />
-                  )}
-
-                  {scores.length > 0 ? (
-                    <LeaderboardPodium
-                      rank={1}
-                      color="gold"
-                      height={69}
-                      duelistId={Number(scores[0].duelistId)}
-                      score={scores[0].points}
-                      selectedSeasonId={selectedSeasonId}
-                      seasonRewards={rewardsPerSeason[selectedSeasonId]}
-                      stats={duelistsStats[bigintToDecimal(scores[0].duelistId)]}
-                    />
-                  ) : (
-                    <EmptyPodium rank={1} color="gold" height={69} />
-                  )}
-
-                  {scores.length > 2 ? (
-                    <LeaderboardPodium
-                      rank={3}
-                      color="#cd7f32"
-                      height={65}
-                      duelistId={Number(scores[2].duelistId)}
-                      score={scores[2].points}
-                      selectedSeasonId={selectedSeasonId}
-                      seasonRewards={rewardsPerSeason[selectedSeasonId]}
-                      stats={duelistsStats[bigintToDecimal(scores[2].duelistId)]}
-                    />
-                  ) : (
-                    <EmptyPodium rank={3} color="#cd7f32" height={65} />
-                  )}
-                </div>
-              )}
-
-              {activePage > 1 && paginatedScores.length > 0 && (
-                <div style={{ flex: 1 }}>
-                  {paginatedScores.map((entry, index) => (
-                    <PlayerRow 
-                      key={entry.duelistId.toString()} 
-                      duelistId={entry.duelistId}
-                      rank={startIndex + index + 1}
-                      score={entry.points}
-                      selectedSeasonId={selectedSeasonId}
-                      seasonRewards={rewardsPerSeason[selectedSeasonId]}
-                      stats={duelistsStats[bigintToDecimal(entry.duelistId)]}
-                    />
-                  ))}
-                </div>
-              )}
-
-              {(activePage > 1 && paginatedScores.length === 0) && (
-                <div style={{ 
-                  flex: 1, 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  color: '#888',
-                  fontSize: aspectWidth(2)
-                }}>
-                  No more duelists to display
-                </div>
-              )}
-
-              {scores.length === 0 && (
-                <div style={{ 
-                  position: 'absolute', 
-                  bottom: aspectHeight(-1), 
-                  left: 0, 
-                  right: 0, 
-                  textAlign: 'center',
-                  color: '#a37349',
-                  fontSize: aspectWidth(2)
-                }}>
-                  No leaderboard data available for this season
-                </div>
-              )}
-
-              {scores.length > 0 && (
-                <div style={{ position: 'absolute', bottom: aspectHeight(-3), left: 0, right: 0, textAlign: 'center' }}>
-                  <Pagination
-                    activePage={activePage}
-                    totalPages={Math.max(1, totalPages)}
-                    firstItem={{ content: '<<', key: 'first' }}
-                    lastItem={{ content: '>>', key: 'last' }}
-                    prevItem={{ content: '<', key: 'prev' }}
-                    nextItem={{ content: '>', key: 'next' }}
-                    onPageChange={handlePageChange}
-                    size="large"
-                    boundaryRange={0}
-                    siblingRange={1}
-                    ellipsisItem={null}
-                    className="PaginationWood"
-                  />
-                </div>
-              )}
-            </>
-          ) : (
-            <div style={{ 
-              flex: 1, 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center',
-              color: '#888',
-              fontSize: aspectWidth(2)
-            }}>
-              Select a season to view leaderboard
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
+    </>
   );
 }
