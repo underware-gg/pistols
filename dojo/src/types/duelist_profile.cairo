@@ -28,9 +28,10 @@ pub enum CharacterKey {
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
 pub enum BotKey {
     Unknown,
-    TinMan,
-    Scarecrow,
-    Leon,
+    TinMan,     // Villainous
+    Scarecrow,  // Trickster
+    Leon,       // Honourable
+    Pro,        // Unpredictable
 }
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
@@ -149,7 +150,7 @@ mod COLLECTIONS {
     pub const Bot: CollectionDescriptor = CollectionDescriptor {
         name: 'Practice bots',
         folder_name: 'bots',
-        profile_count: 3,
+        profile_count: 4,
         is_playable: false,
         duelist_id_base: 0x200000000,
     };
@@ -216,6 +217,9 @@ mod BOT_PROFILES {
     };
     pub const Leon: ProfileDescriptor = ProfileDescriptor {
         name: 'Kind Imp',           // Honourable
+    };
+    pub const Pro: ProfileDescriptor = ProfileDescriptor {
+        name: 'Pro Imp',            // Unpredictable
     };
 }
 
@@ -604,6 +608,7 @@ pub impl DuelistProfileImpl of DuelistProfileTrait {
                     BotKey::TinMan =>       Archetype::Villainous,
                     BotKey::Scarecrow =>    Archetype::Trickster,
                     BotKey::Leon =>         Archetype::Honourable,
+                    BotKey::Pro =>          Archetype::Undefined,
                 })
             },
             _ => Archetype::Undefined,
@@ -645,6 +650,7 @@ impl BotKeyIntoDescriptor of core::traits::Into<BotKey, ProfileDescriptor> {
             BotKey::TinMan =>       BOT_PROFILES::TinMan,
             BotKey::Scarecrow =>    BOT_PROFILES::Scarecrow,
             BotKey::Leon =>         BOT_PROFILES::Leon,
+            BotKey::Pro =>          BOT_PROFILES::Pro,
         }
     }
 }
@@ -768,6 +774,7 @@ impl BotKeyIntoU8 of core::traits::Into<BotKey, u8> {
             BotKey::TinMan =>       1,
             BotKey::Scarecrow =>    2,
             BotKey::Leon =>         3,
+            BotKey::Pro =>          4,
         }
     }
 }
@@ -776,6 +783,7 @@ impl U8IntoBotKey of core::traits::Into<u8, BotKey> {
         if self == 1        { BotKey::TinMan }
         else if self == 2   { BotKey::Scarecrow }
         else if self == 3   { BotKey::Leon }
+        else if self == 4   { BotKey::Pro }
         else                { BotKey::Unknown }
     }
 }
