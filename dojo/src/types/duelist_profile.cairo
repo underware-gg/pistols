@@ -22,6 +22,7 @@ pub enum CharacterKey {
     Drunkard,
     Devil,
     Player,
+    ImpMaster,
 }
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
@@ -141,7 +142,7 @@ mod COLLECTIONS {
     pub const Character: CollectionDescriptor = CollectionDescriptor {
         name: 'Tavern Characters',
         folder_name: 'characters',
-        profile_count: 4,
+        profile_count: 5,
         is_playable: false,
         duelist_id_base: 0x100000000,
     };
@@ -195,6 +196,9 @@ mod CHARACTER_PROFILES {
     };
     pub const Player: ProfileDescriptor = ProfileDescriptor {
         name: 'Stranger',
+    };
+    pub const ImpMaster: ProfileDescriptor = ProfileDescriptor {
+        name: 'Imp Master',
     };
 }
 
@@ -630,6 +634,7 @@ impl CharacterKeyIntoDescriptor of core::traits::Into<CharacterKey, ProfileDescr
             CharacterKey::Drunkard =>       CHARACTER_PROFILES::Drunkard,
             CharacterKey::Devil =>          CHARACTER_PROFILES::Devil,
             CharacterKey::Player =>         CHARACTER_PROFILES::Player,
+            CharacterKey::ImpMaster =>      CHARACTER_PROFILES::ImpMaster,
         }
     }
 }
@@ -741,6 +746,7 @@ impl CharacterKeyIntoU8 of core::traits::Into<CharacterKey, u8> {
             CharacterKey::Drunkard =>   2,
             CharacterKey::Devil =>      3,
             CharacterKey::Player =>     4,
+            CharacterKey::ImpMaster =>  5,
         }
     }
 }
@@ -750,6 +756,7 @@ impl U8IntoCharacterKey of core::traits::Into<u8, CharacterKey> {
         else if self == 2   { CharacterKey::Drunkard }
         else if self == 3   { CharacterKey::Devil }
         else if self == 4   { CharacterKey::Player }
+        else if self == 5   { CharacterKey::ImpMaster }
         else                { CharacterKey::Unknown }
     }
 }
