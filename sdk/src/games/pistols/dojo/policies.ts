@@ -135,6 +135,7 @@ export const makePistolsPolicies = (networkId: NetworkId, mock: boolean, admin: 
         networkId: networkId,
         identity: '0x0',
         timestamp: 0,
+        available: false,
       }),
     },
   ]

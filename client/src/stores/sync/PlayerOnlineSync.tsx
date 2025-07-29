@@ -19,7 +19,7 @@ export function PlayerOnlineSync() {
   }, [])
 
   // publisher
-  const { publish, isPublishing } = usePlayerOnlineSignedMessage(finished ? clientSeconds : 0)
+  const { publish, isPublishing } = usePlayerOnlineSignedMessage(finished ? clientSeconds : 0, false)
 
   useEffect(() => {
     if (publish && clientSeconds > 0 && userHasInteracted && finished && !isPublishing) {
@@ -32,6 +32,6 @@ export function PlayerOnlineSync() {
 
 export function PublishOnlineStatusButton() {
   const { clientSeconds } = useClientTimestamp(true)
-  const { publish, isPublishing } = usePlayerOnlineSignedMessage(clientSeconds)
+  const { publish, isPublishing } = usePlayerOnlineSignedMessage(clientSeconds, false)
   return (<Button className='AbsoluteBottom' disabled={isPublishing} style={{ zIndex: 1000 }} onClick={publish}>Publish Online Status</Button>)
 }
