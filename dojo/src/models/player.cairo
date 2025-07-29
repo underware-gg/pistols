@@ -76,6 +76,7 @@ pub struct PlayerOnline {
     pub identity: ContractAddress,          // controller wallet
     //-----------------------
     pub timestamp: u64,                     // seconds since epoch
+    pub available: bool,                    // available for matchmaking
 }
 // #[derive(Copy, Drop, Serde)]
 // #[dojo::model]
