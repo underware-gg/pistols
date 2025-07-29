@@ -24,10 +24,21 @@ pub impl BotPlayetMovesImpl of BotPlayerMovesTrait {
     }
     fn make_moves(self: @DuelistProfile, challenge: @Challenge, ref dice: Dice) -> Span<u8> {
         let deck: Deck = challenge.get_deck();
-        let archetype: Archetype = self.get_archetype();
+        // randomize pace
+        let mut archetype: Archetype = self.get_archetype();
+        let card_fire: PacesCard = dice.throw_weighted_dice('bot_fire', deck.fire_cards, archetype._get_weights_fire()).into();
+        let card_dodge: PacesCard = dice.throw_weighted_dice('bot_dodge', deck.dodge_cards, archetype._get_weights_dodge()).into();
+        // if archetpe is undefined, set by pace
+        if (archetype == Archetype::Undefined) {
+            archetype =
+                if (card_fire <= PacesCard::Paces3) {Archetype::Villainous}
+                else if (card_fire >= PacesCard::Paces8) {Archetype::Honourable}
+                else {Archetype::Trickster};
+        }
+        // randomize other cards
         let mut hand = DuelistHand {
-            card_fire:    dice.throw_weighted_dice('bot_fire',    deck.fire_cards,    archetype._get_weights_fire()).into(),
-            card_dodge:   dice.throw_weighted_dice('bot_dodge',   deck.dodge_cards,   archetype._get_weights_dodge()).into(),
+            card_fire,
+            card_dodge,
             card_tactics: dice.throw_weighted_dice('bot_tactics', deck.tactics_cards, archetype._get_weights_tactics()).into(),
             card_blades:  dice.throw_weighted_dice('bot_blades',  deck.blades_cards,  archetype._get_weights_blades()).into(),
         };
@@ -41,33 +52,33 @@ pub impl BotPlayetMovesImpl of BotPlayerMovesTrait {
     fn _get_weights_fire(self: @Archetype) -> Span<u8> {
         (match self {
             Archetype::Villainous => ([10, 8, 6, 4, 2, 0, 0, 0, 0, 0].span()),
-            Archetype::Trickster => ([4, 2, 2, 6, 10, 10, 6, 2, 2, 4].span()),
+            Archetype::Trickster =>  ([4, 2, 2, 6, 10, 10, 6, 2, 2, 4].span()),
             Archetype::Honourable => ([0, 0, 0, 0, 0, 2, 4, 6, 8, 10].span()),
-            Archetype::Undefined => ([1, 1, 1, 1, 1, 1, 1, 1, 1, 1].span()), // random
+            Archetype::Undefined =>  ([1, 1, 1, 1, 1, 1, 1, 1, 1, 1].span()), // random
         })
     }
     fn _get_weights_dodge(self: @Archetype) -> Span<u8> {
         (match self {
             Archetype::Villainous => ([10, 8, 5, 2, 0, 0, 0, 0, 0, 0].span()),
-            Archetype::Trickster => ([10, 10, 10, 10, 10, 10, 10, 10, 10, 10].span()),
+            Archetype::Trickster =>  ([10, 10, 10, 10, 10, 10, 10, 10, 10, 10].span()),
             Archetype::Honourable => ([5, 5, 5, 5, 5, 10, 10, 10, 10, 10].span()),
-            Archetype::Undefined => ([1, 1, 1, 1, 1, 1, 1, 1, 1, 1].span()), // random
+            Archetype::Undefined =>  ([1, 1, 1, 1, 1, 1, 1, 1, 1, 1].span()), // random
         })
     }
     fn _get_weights_tactics(self: @Archetype) -> Span<u8> {
         (match self {
             Archetype::Villainous => ([0, 4, 10, 0, 4, 0].span()),
-            Archetype::Trickster => ([10, 10, 1, 1, 10, 10].span()),
+            Archetype::Trickster =>  ([10, 10, 1, 1, 10, 10].span()),
             Archetype::Honourable => ([0, 6, 0, 10, 6, 2].span()),
-            Archetype::Undefined => ([1, 1, 1, 1, 1, 1].span()), // random
+            Archetype::Undefined =>  ([1, 1, 1, 1, 1, 1].span()), // random
         })
     }
     fn _get_weights_blades(self: @Archetype) -> Span<u8> {
         (match self {
             Archetype::Villainous => ([10, 0, 10, 0].span()),
-            Archetype::Trickster => ([0, 10, 2, 10].span()),
+            Archetype::Trickster =>  ([0, 10, 2, 10].span()),
             Archetype::Honourable => ([0, 10, 10, 10].span()),
-            Archetype::Undefined => ([1, 1, 1, 1].span()), // random
+            Archetype::Undefined =>  ([1, 1, 1, 1].span()), // random
         })
     }
 }
