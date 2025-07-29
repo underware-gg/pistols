@@ -198,7 +198,7 @@ export const usePlayersAccounts = () => {
   const entities = usePlayerEntityStore((state) => state.entities)
   const players = useAllStoreModels<models.Player>(entities, 'Player')
   const playersAccounts = useMemo(() => (
-    players.map((p) => (p.player_address))
+    players.map((p) => _playerKey(p.player_address))
   ), [players])
   return {
     playersAccounts,

@@ -3,6 +3,7 @@ import { lookupAddresses } from '@cartridge/controller'
 import { usePlayersAccounts, usePlayerDataStore } from '/src/stores/playerStore'
 import { useDojoSetup, useConnectedController } from '@underware/pistols-sdk/dojo'
 import { supportedConnetorIds } from '@underware/pistols-sdk/pistols/config'
+import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { debug } from '@underware/pistols-sdk/pistols'
 
 
@@ -15,7 +16,10 @@ export function PlayerNameSync() {
   const { playersAccounts } = usePlayersAccounts()
 
   const newPlayerAddresses = useMemo(() => (
-    playersAccounts.filter(p => players_names[p] === undefined)
+    playersAccounts
+      .filter(p => players_names[p] === undefined)
+      .filter(isPositiveBigint)
+      .slice(0, 999) // avoid rate limiting (will fetch the rest when players_names is updated with this batch)
   ), [playersAccounts, players_names])
 
   const { connectorId, isControllerConnected } = useConnectedController()
@@ -31,10 +35,11 @@ export function PlayerNameSync() {
           return acc
         }, new Map<string, string>())
       )
-    } else {
+    } else if (isControllerConnected) {
       // fetch controller names
+      // console.log(`PlayerNameSync() =================> controllers:`, Object.keys(players_names).length, 'NEW>>', newPlayerAddresses.length)
       lookupAddresses(newPlayerAddresses).then((result) => {
-        // debug.log("PlayerNameSync() GOT:", newPlayerAddresses, result)
+        // debug.log("PlayerNameSync() GOT:", result)
         updateUsernames(result)
       })
     } 

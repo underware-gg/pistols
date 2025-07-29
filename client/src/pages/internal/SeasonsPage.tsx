@@ -469,7 +469,6 @@ function LeaderboardRow({
   index: number,
 }) {
   const { owner, isLoading: isLoadingOwner } = useOwnerOfDuelist(duelistId)
-  // const { username, isLoading: isLoadingUsername } = useControllerUsername(isLoadingOwner ? undefined : owner)
   const { username } = usePlayer(owner)
   return (
     <Row key={duelistId}>
