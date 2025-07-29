@@ -37,7 +37,7 @@ mod tests {
             ILordsMockDispatcherTrait,
             IFameCoinDispatcherTrait,
             TestSystems, FLAGS,
-            OWNER, OTHER, BUMMER, RECIPIENT, SPENDER, TREASURY,
+            OWNER, OTHER, BUMMER, RECIPIENT, SPENDER, STACKER, TREASURY,
             ZERO, ID, MESSAGE, ETH, SEASON_ID_1,
         }
     };
@@ -45,9 +45,10 @@ mod tests {
 
     const TOKEN_ID_1: u128 = 1;
 
-    const MOCKED_VILLAIN: felt252 = 3;
+    const MOCKED_VILLAIN: felt252 = 4;      // mod(profile_keys_count) = zero
     const MOCKED_TRICKSTER: felt252 = 1;
     const MOCKED_LORD: felt252 = 2;
+    const MOCKED_PRO: felt252 = 3;
 
     pub fn _protected(sys: @TestSystems) -> IBotPlayerProtectedDispatcher {
         (IBotPlayerProtectedDispatcher{contract_address: (*sys.bot_player).contract_address})
@@ -100,41 +101,47 @@ mod tests {
     fn test_mint_bot_duelists() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER | FLAGS::MOCK_RNG);
         // mint players
-        tester::fund_duelists_pool(@sys, 8);
+        tester::fund_duelists_pool(@sys, 10);
         let duelist_id_1: u128 = *tester::execute_claim_starter_pack(@sys, OWNER())[0];
         let duelist_id_2: u128 = *tester::execute_claim_starter_pack(@sys, OTHER())[0];
         let duelist_id_3: u128 = *tester::execute_claim_starter_pack(@sys, BUMMER())[0];
         let duelist_id_4: u128 = *tester::execute_claim_starter_pack(@sys, RECIPIENT())[0];
         let duelist_id_5: u128 = *tester::execute_claim_starter_pack(@sys, SPENDER())[0];
+        let duelist_id_6: u128 = *tester::execute_claim_starter_pack(@sys, STACKER())[0];
         // store initial pool balances
         let pool_peg_init: Pool = sys.store.get_pool(PoolType::FamePeg);
         let claimable_init: Pool = sys.store.get_pool(PoolType::Claimable);
         let fame_supply_init: u256 = sys.fame.total_supply();
         // 1
-        sys.rng.mock_values([MockedValueTrait::new('archetype', MOCKED_VILLAIN)].span());
+        sys.rng.mock_values([MockedValueTrait::new('bot_archetype', MOCKED_VILLAIN)].span());
         let bot_id_1: u128 = sys.store.get_challenge_value(tester::execute_create_duel_ID(@sys, OWNER(), duelist_id_1, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 1)).duelist_id_b;
         _assert_bot_duelist(@sys, bot_id_1, "bot_1", Option::Some(BotKey::TinMan), 1);
         let (pool_peg_1, claimable_1, fame_supply_1) = _assert_mint_pools_after_mint(@sys, pool_peg_init, claimable_init, fame_supply_init, "pools_1");
         // 2
-        sys.rng.mock_values([MockedValueTrait::new('archetype', MOCKED_TRICKSTER)].span());
+        sys.rng.mock_values([MockedValueTrait::new('bot_archetype', MOCKED_TRICKSTER)].span());
         let bot_id_2: u128 = sys.store.get_challenge_value(tester::execute_create_duel_ID(@sys, OTHER(), duelist_id_2, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 1)).duelist_id_b;
         _assert_bot_duelist(@sys, bot_id_2, "bot_2", Option::Some(BotKey::Scarecrow), 1);
         let (pool_peg_2, claimable_2, fame_supply_2) = _assert_mint_pools_after_mint(@sys, pool_peg_1, claimable_1, fame_supply_1, "pools_2");
         // 3
-        sys.rng.mock_values([MockedValueTrait::new('archetype', MOCKED_LORD)].span());
+        sys.rng.mock_values([MockedValueTrait::new('bot_archetype', MOCKED_LORD)].span());
         let bot_id_3: u128 = sys.store.get_challenge_value(tester::execute_create_duel_ID(@sys, BUMMER(), duelist_id_3, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 1)).duelist_id_b;
         _assert_bot_duelist(@sys, bot_id_3, "bot_3", Option::Some(BotKey::Leon), 1);
         let (pool_peg_3, claimable_3, fame_supply_3) = _assert_mint_pools_after_mint(@sys, pool_peg_2, claimable_2, fame_supply_2, "pools_3");
         // 4
-        sys.rng.mock_values([MockedValueTrait::new('archetype', MOCKED_VILLAIN)].span());
+        sys.rng.mock_values([MockedValueTrait::new('bot_archetype', MOCKED_VILLAIN)].span());
         let bot_id_4: u128 = sys.store.get_challenge_value(tester::execute_create_duel_ID(@sys, RECIPIENT(), duelist_id_4, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 1)).duelist_id_b;
         _assert_bot_duelist(@sys, bot_id_4, "bot_4", Option::Some(BotKey::TinMan), 2);
         let (pool_peg_4, claimable_4, fame_supply_4) = _assert_mint_pools_after_mint(@sys, pool_peg_3, claimable_3, fame_supply_3, "pools_4");
         // 5
-        sys.rng.mock_values([MockedValueTrait::new('archetype', MOCKED_TRICKSTER)].span());
+        sys.rng.mock_values([MockedValueTrait::new('bot_archetype', MOCKED_TRICKSTER)].span());
         let bot_id_5: u128 = sys.store.get_challenge_value(tester::execute_create_duel_ID(@sys, SPENDER(), duelist_id_5, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 1)).duelist_id_b;
         _assert_bot_duelist(@sys, bot_id_5, "bot_5", Option::Some(BotKey::Scarecrow), 2);
-        let (_pool_peg_5, _claimable_5, _fame_supply_5) = _assert_mint_pools_after_mint(@sys, pool_peg_4, claimable_4, fame_supply_4, "pools_5");
+        let (pool_peg_5, claimable_5, fame_supply_5) = _assert_mint_pools_after_mint(@sys, pool_peg_4, claimable_4, fame_supply_4, "pools_5");
+        // 6
+        sys.rng.mock_values([MockedValueTrait::new('bot_archetype', MOCKED_PRO)].span());
+        let bot_id_6: u128 = sys.store.get_challenge_value(tester::execute_create_duel_ID(@sys, STACKER(), duelist_id_6, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 1)).duelist_id_b;
+        _assert_bot_duelist(@sys, bot_id_6, "bot_6", Option::Some(BotKey::Pro), 1);
+        let (_pool_peg_6, _claimable_6, _fame_supply_6) = _assert_mint_pools_after_mint(@sys, pool_peg_5, claimable_5, fame_supply_5, "pools_6");
     }
 
 
@@ -260,10 +267,10 @@ mod tests {
         mocked.extend_from_span(prefabs_mocked);
         // select archetype
         match archetype {
-            Archetype::Trickster => mocked.append(MockedValueTrait::new('archetype', MOCKED_TRICKSTER)),
-            Archetype::Villainous => mocked.append(MockedValueTrait::new('archetype', MOCKED_VILLAIN)),
-            Archetype::Honourable => mocked.append(MockedValueTrait::new('archetype', MOCKED_LORD)),
-            _ => {}
+            Archetype::Trickster => mocked.append(MockedValueTrait::new('bot_archetype', MOCKED_TRICKSTER)),
+            Archetype::Villainous => mocked.append(MockedValueTrait::new('bot_archetype', MOCKED_VILLAIN)),
+            Archetype::Honourable => mocked.append(MockedValueTrait::new('bot_archetype', MOCKED_LORD)),
+            Archetype::Undefined => mocked.append(MockedValueTrait::new('bot_archetype', MOCKED_PRO)),
         };
         // mock moves_b to bot
         let mut i: usize = 0;
