@@ -102,7 +102,7 @@ mod unit {
     }
 
     #[test]
-    fn test_archetype_weights() {
+    fn validate_archetype_weights() {
         // make sure all weights have the same length as the deck
         let deck: Deck = DeckType::Classic.build_deck();
         _assert_archetype_weights(Archetype::Villainous, @deck, "Villainous");

@@ -288,13 +288,15 @@ pub mod duel_token {
 
             // validate duel type
             match duel_type {
-                DuelType::Seasonal | 
-                DuelType::Practice => {}, // ok!
+                DuelType::Seasonal |
+                DuelType::Practice => {
+                    // ok!
+                },
                 DuelType::BotPlayer => {
                     address_b = store.world.bot_player_address();
                     lives_staked = 1; // bot practice always stakes 1 life
                 },
-                DuelType::Undefined | 
+                DuelType::Undefined |
                 DuelType::Tournament |
                 DuelType::Tutorial => {
                     // create tutorials with the tutorial contact only
@@ -376,7 +378,7 @@ pub mod duel_token {
             PlayerTrait::check_in(ref store, Activity::ChallengeCreated, address_a, duel_id.into());
 
             // bot player reply
-            if (challenge.is_against_bot_player()) {
+            if (challenge.is_against_bot_player(@store)) {
                 store.world.bot_player_protected_dispatcher().reply_duel(duel_id);
             }
 
@@ -415,7 +417,7 @@ pub mod duel_token {
 
                 // Challenged is accepting...
                 if (accepted) {
-                    challenge.duelist_id_b = if (challenge.is_against_bot_player()) {
+                    challenge.duelist_id_b = if (challenge.is_against_bot_player(@store)) {
                         // bot duelist is already validated (active in stack concept does not apply)
                         (duelist_id)
                     } else {

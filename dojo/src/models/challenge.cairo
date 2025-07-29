@@ -108,6 +108,7 @@ use pistols::types::{
     timestamp::{TimestampTrait},
     constants::{CONST},
 };
+use pistols::interfaces::dns::{DnsTrait};
 use pistols::libs::store::{Store, StoreTrait};
 use pistols::utils::arrays::{SpanUtilsTrait};
 use pistols::utils::bitwise::{BitwiseU32, BitwiseU128};
@@ -155,8 +156,11 @@ pub impl ChallengeImpl of ChallengeTrait {
         (*self.duel_type == DuelType::Tournament)
     }
     #[inline(always)]
-    fn is_against_bot_player(self: @Challenge) -> bool {
-        (*self.duel_type == DuelType::BotPlayer)
+    fn is_against_bot_player(self: @Challenge, store: @Store) -> bool {
+        (
+            *self.duel_type == DuelType::BotPlayer ||
+            (*store.world).is_bot_player_contract(*self.address_b)
+        )
     }
     fn get_deck_type(self: @Challenge) -> DeckType {
         if (
@@ -188,6 +192,9 @@ pub impl DuelTypeImpl of DuelTypeTrait {
             DuelType::Tutorial |
             DuelType::Practice => Rules::Undefined,
         })
+    }
+    fn is_unranked(self: @DuelType, store: @Store) -> bool {
+        (self.get_rules(store) == Rules::Unranked)
     }
 }
 
