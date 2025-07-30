@@ -226,14 +226,14 @@ export function createSystemCalls(
     // duel_token
     //
     duel_token: {
-      create_duel: async (signer: AccountInterface, duel_type: constants.DuelType, duelist_id: BigNumberish, challenged_address: BigNumberish, lives_staked: number, expire_hours: number, premise: constants.Premise, message: string, key?: string): Promise<boolean> => {
+      create_duel: async (signer: AccountInterface, duel_type: constants.DuelType, duelist_id: BigNumberish, challenged_address: BigNumberish, lives_staked: number, expire_minutes: number, premise: constants.Premise, message: string, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
           contractCalls.duel_token.buildCreateDuelCalldata(
             makeCustomEnum(duel_type),
             duelist_id,
             bigintToHex(challenged_address),
             lives_staked,
-            expire_hours,
+            expire_minutes,
             makeCustomEnum(premise),
             message,
           ),

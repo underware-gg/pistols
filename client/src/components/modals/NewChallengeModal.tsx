@@ -93,8 +93,8 @@ function _NewChallengeModal({
 
   const { call: createDuel, isLoading, isWaitingForIndexer, meta } = useTransactionHandler<boolean, [constants.DuelType, BigNumberish, BigNumberish, number, number, constants.Premise, string]>({
     key: `create_duel${challengingAddress}`,
-    transactionCall: (duelType, duelistId, challengedAddr, livesStaked, expireHours, premise, message, key) =>
-      duel_token.create_duel(account, duelType, duelistId, challengedAddr, livesStaked, expireHours, premise, message, key),
+    transactionCall: (duelType, duelistId, challengedAddr, livesStaked, expireMinutes, premise, message, key) =>
+      duel_token.create_duel(account, duelType, duelistId, challengedAddr, livesStaked, expireMinutes, premise, message, key),
     indexerCheck: hasPact,
   })
 
@@ -117,7 +117,7 @@ function _NewChallengeModal({
         challengingDuelistId,
         challengingAddress,
         args.lives_staked,
-        args.expire_hours,
+        args.expire_minutes,
         args.premise,
         args.message
       )
@@ -394,7 +394,7 @@ function NewChallengeForm({
       duelistId: meta[1] as BigNumberish,
       challengedAddr: meta[2] as BigNumberish,
       livesStaked: meta[3] as number,
-      expireHours: meta[4] as number,
+      expireMinutes: meta[4] as number,
       premise: meta[5] as constants.Premise,
       message: meta[6] as string,
     }
@@ -415,7 +415,7 @@ function NewChallengeForm({
     setArgs({
       premise,
       message,
-      expire_hours: ((7 * 24) + 0), //DEFAULT TO 7 DAYS FOR NOW
+      expire_minutes: (7 * 24 * 60), //DEFAULT TO 7 DAYS FOR NOW
       lives_staked: highStakes ? 3 : 1,
       canSubmit: true,
     })

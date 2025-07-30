@@ -826,10 +826,10 @@ pub mod tester {
         // premise: Premise,
         message: ByteArray,
         duel_type: DuelType,
-        expire_hours: u64,
+        expire_minutes: u64,
         lives_staked: u8,
     ) -> u128 {
-        (execute_create_duel_ID(sys, sender, ID(sender), challenged, message, duel_type, expire_hours, lives_staked))
+        (execute_create_duel_ID(sys, sender, ID(sender), challenged, message, duel_type, expire_minutes, lives_staked))
     }
     pub fn execute_create_duel_ID(sys: @TestSystems, sender: ContractAddress,
         duelist_id: u128,
@@ -837,11 +837,11 @@ pub mod tester {
         // premise: Premise,
         message: ByteArray,
         duel_type: DuelType,
-        expire_hours: u64,
+        expire_minutes: u64,
         lives_staked: u8,
     ) -> u128 {
         impersonate(sender);
-        let duel_id: u128 = (*sys.duels).create_duel(duel_type, duelist_id, challenged, lives_staked, expire_hours, Premise::Nothing, message);
+        let duel_id: u128 = (*sys.duels).create_duel(duel_type, duelist_id, challenged, lives_staked, expire_minutes, Premise::Nothing, message);
         _next_block();
         (duel_id)
     }
