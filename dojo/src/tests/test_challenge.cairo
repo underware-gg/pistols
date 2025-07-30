@@ -144,12 +144,12 @@ mod tests {
     #[test]
     fn test_challenge_expire_ok() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        let expire_hours: u64 = 24;
+        let expire_minutes: u64 = (24 * 60);
         let timestamp: u64 = tester::get_block_timestamp();
-        let duel_id: u128 = tester::execute_create_duel(@sys, OWNER(), OTHER(), MESSAGE(), DuelType::Seasonal, expire_hours, 1);
+        let duel_id: u128 = tester::execute_create_duel(@sys, OWNER(), OTHER(), MESSAGE(), DuelType::Seasonal, expire_minutes, 1);
         let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.timestamps.start, timestamp, "timestamps.start");
-        assert_eq!(ch.timestamps.end, ch.timestamps.start + TimestampTrait::from_hours(expire_hours), "timestamps.end");
+        assert_eq!(ch.timestamps.end, ch.timestamps.start + TimestampTrait::from_minutes(expire_minutes), "timestamps.end");
         _assert_empty_progress(@sys, duel_id);
     }
 
@@ -183,9 +183,9 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
         let A = OWNER();
         let B = OTHER();
-        let expire_hours: u64 = 48;
-        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Seasonal, expire_hours, 1);
-        tester::elapse_block_timestamp(TimestampTrait::from_hours(expire_hours - 1));
+        let expire_minutes: u64 = (48 * 60);
+        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Seasonal, expire_minutes, 1);
+        tester::elapse_block_timestamp(TimestampTrait::from_minutes(expire_minutes - 1));
         tester::execute_reply_duel(@sys, A, ID(A), duel_id + 1, true);
     }
 
@@ -195,10 +195,10 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
         let A = OWNER();
         let B = OTHER();
-        let expire_hours: u64 = 48;
-        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Seasonal, expire_hours, 1);
+        let expire_minutes: u64 = (48 * 60);
+        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Seasonal, expire_minutes, 1);
         // let _ch = sys.store.get_challenge_value(duel_id);
-        let (_block_number, _timestamp) = tester::elapse_block_timestamp(TimestampTrait::from_hours(expire_hours + 1));
+        let (_block_number, _timestamp) = tester::elapse_block_timestamp(TimestampTrait::from_minutes(expire_minutes + 1));
         let new_state: ChallengeState = tester::execute_reply_duel(@sys, B, ID(B), duel_id, false);
         assert_ne!(new_state, ChallengeState::Awaiting, "!awaiting");
         tester::execute_reply_duel(@sys, B, ID(B), duel_id, true);
@@ -209,13 +209,13 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let A = OWNER();
         let B = OTHER();
-        let expire_hours: u64 = 24;
-        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Practice, expire_hours, 1);
+        let expire_minutes: u64 = (24 * 60);
+        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Practice, expire_minutes, 1);
         let ch = sys.store.get_challenge_value(duel_id);
         tester::assert_pact(@sys, duel_id, ch, true, false, "created");
         assert!(!sys.game.can_collect_duel(duel_id), "!can_collect_duel");
         // expire
-        let (_block_number, _timestamp) = tester::elapse_block_timestamp(TimestampTrait::from_hours(expire_hours));
+        let (_block_number, _timestamp) = tester::elapse_block_timestamp(TimestampTrait::from_minutes(expire_minutes));
         assert!(sys.game.can_collect_duel(duel_id), "can_collect_duel");
         // reply expired
         let new_state: ChallengeState = tester::execute_reply_duel(@sys, B, ID(B), duel_id, true);
@@ -229,13 +229,13 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let A = OWNER();
         let B = OTHER();
-        let expire_hours: u64 = 24;
-        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Practice, expire_hours, 1);
+        let expire_minutes: u64 = (24 * 60);
+        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Practice, expire_minutes, 1);
         let ch = sys.store.get_challenge_value(duel_id);
 
         tester::assert_pact(@sys, duel_id, ch, true, false, "created");
         assert!(!sys.game.can_collect_duel(duel_id), "!can_collect_duel");
-        let (_block_number, timestamp) = tester::elapse_block_timestamp(TimestampTrait::from_hours(expire_hours));
+        let (_block_number, timestamp) = tester::elapse_block_timestamp(TimestampTrait::from_minutes(expire_minutes));
         assert!(sys.game.can_collect_duel(duel_id), "can_collect_duel");
 
         tester::execute_collect_duel(@sys, A, duel_id);
@@ -257,12 +257,12 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let A = OWNER();
         let B = OTHER();
-        let expire_hours: u64 = 24;
-        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Practice, expire_hours, 1);
+        let expire_minutes: u64 = (24 * 60);
+        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Practice, expire_minutes, 1);
         let ch = sys.store.get_challenge_value(duel_id);
 
         tester::assert_pact(@sys, duel_id, ch, true, false, "created");
-        let (_block_number, _timestamp) = tester::elapse_block_timestamp(TimestampTrait::from_hours(expire_hours) - 1);
+        let (_block_number, _timestamp) = tester::elapse_block_timestamp(TimestampTrait::from_minutes(expire_minutes) - 1);
         assert!(!sys.game.can_collect_duel(duel_id), "!can_collect_duel");
 
         tester::execute_collect_duel(@sys, A, duel_id);
@@ -274,11 +274,11 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
         let A = OWNER();
         let B = OTHER();
-        let expire_hours: u64 = 48;
-        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Practice, expire_hours, 1);
+        let expire_minutes: u64 = (48 * 60);
+        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Practice, expire_minutes, 1);
         // let _ch: ChallengeValue = sys.store.get_challenge_value(duel_id);
 
-        tester::elapse_block_timestamp(TimestampTrait::from_hours(expire_hours - 1));
+        tester::elapse_block_timestamp(TimestampTrait::from_minutes(expire_minutes - 1));
         tester::execute_reply_duel(@sys, A, ID(A), duel_id, true);
     }
 
@@ -287,10 +287,10 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
         let A = OWNER();
         let B = OTHER();
-        let expire_hours: u64 = 48;
-        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Seasonal, expire_hours, 1);
+        let expire_minutes: u64 = (48 * 60);
+        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Seasonal, expire_minutes, 1);
         let ch = sys.store.get_challenge_value(duel_id);
-        let (_block_number, timestamp) = tester::elapse_block_timestamp(TimestampTrait::from_hours(expire_hours - 1));
+        let (_block_number, timestamp) = tester::elapse_block_timestamp(TimestampTrait::from_minutes(expire_minutes - 1));
 
         tester::assert_pact(@sys, duel_id, ch, true, false, "created");
         let new_state: ChallengeState = tester::execute_reply_duel(@sys, A, 0, duel_id, false);
@@ -313,10 +313,10 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
         let A = OWNER();
         let B = OTHER();
-        let expire_hours: u64 = 48;
-        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Seasonal, expire_hours, 1);
+        let expire_minutes: u64 = (48 * 60);
+        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Seasonal, expire_minutes, 1);
         // let _ch = sys.store.get_challenge_value(duel_id);
-        let (_block_number, _timestamp) = tester::elapse_block_timestamp(TimestampTrait::from_hours(expire_hours - 1));
+        let (_block_number, _timestamp) = tester::elapse_block_timestamp(TimestampTrait::from_minutes(expire_minutes - 1));
         tester::execute_reply_duel(@sys, BUMMER(), ID(BUMMER()), duel_id, false);
     }
 
@@ -325,8 +325,8 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let A = OWNER();
         let B = OTHER();
-        let expire_hours: u64 = 48;
-        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Practice, expire_hours, 1);
+        let expire_minutes: u64 = (48 * 60);
+        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Practice, expire_minutes, 1);
 
         let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.state, ChallengeState::Awaiting, "state");
@@ -336,7 +336,7 @@ mod tests {
         assert_eq!(ch.duelist_id_b, 0, "challenged_id"); // challenged an address, id is empty
         tester::assert_pact(@sys, duel_id, ch, true, false, "created");
 
-        let (_block_number, timestamp) = tester::elapse_block_timestamp(TimestampTrait::from_hours(expire_hours - 1));
+        let (_block_number, timestamp) = tester::elapse_block_timestamp(TimestampTrait::from_minutes(expire_minutes - 1));
         let new_state: ChallengeState = tester::execute_reply_duel(@sys, B, ID(B), duel_id, false);
         assert_eq!(new_state, ChallengeState::Refused, "refused");
         let ch = sys.store.get_challenge_value(duel_id);
@@ -368,8 +368,8 @@ mod tests {
         assert!(!player_a.exists(), "player_a.exists NOT");
         assert!(!player_b.exists(), "player_b.exists NOT");
 
-        let expire_hours: u64 = 48;
-        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Practice, expire_hours, 1);
+        let expire_minutes: u64 = (48 * 60);
+        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Practice, expire_minutes, 1);
         let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.state, ChallengeState::Awaiting, "state");
         assert_eq!(ch.address_a, A, "challenger");
@@ -404,8 +404,8 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::LORDS | FLAGS::APPROVE);
         let A = OWNER();
         let B = OTHER();
-        let expire_hours: u64 = 48;
-        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Seasonal, expire_hours, 1);
+        let expire_minutes: u64 = (48 * 60);
+        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Seasonal, expire_minutes, 1);
         // reply with different TOKEN ID
         // panic!
         tester::execute_reply_duel(@sys, B, 0xaaa, duel_id, true);
@@ -417,8 +417,8 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::LORDS | FLAGS::APPROVE);
         let A = OWNER();
         let B = OTHER();
-        let expire_hours: u64 = 48;
-        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Seasonal, expire_hours, 1);
+        let expire_minutes: u64 = (48 * 60);
+        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Seasonal, expire_minutes, 1);
         // reply with different TOKEN ID
         // panic!
         tester::execute_reply_duel(@sys, BUMMER(), ID(BUMMER()), duel_id, true);

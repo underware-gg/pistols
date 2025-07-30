@@ -51,7 +51,7 @@ Use these to call functions with graphql
         - challenged_address: The challenged player's wallet address
         - premise: The premise of the challenge see <PREMISE_VALUES>. Always use the "Training" code
         - message: The message of the challenge, from Challenger to Challenged
-        - expire_hours: The number of hours before the challenge expires, from 1 to 24
+        - expire_minutes: The number of minutes before the challenge expires, from 5 to 1440 (one day)
       </PARAMETERS>
       <EXAMPLE>
           {
