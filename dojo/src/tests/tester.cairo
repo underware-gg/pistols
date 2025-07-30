@@ -107,6 +107,7 @@ pub mod tester {
     pub fn RECIPIENT() -> ContractAddress { starknet::contract_address_const::<0x222>() }
     pub fn SPENDER()   -> ContractAddress { starknet::contract_address_const::<0x333>() }
     pub fn TREASURY()  -> ContractAddress { starknet::contract_address_const::<0x444>() }
+    pub fn DELEGATEE() -> ContractAddress { starknet::contract_address_const::<0x555>() }
     pub fn STACKER()   -> ContractAddress { starknet::contract_address_const::<0x0101>() } // owns 2 stacked duelists
     pub fn STACKER2()  -> ContractAddress { starknet::contract_address_const::<0x0202>() } // owns 2 stacked duelists
     // low part is owned token, but different address
@@ -292,6 +293,7 @@ pub mod tester {
             TestResource::Model(pistols::models::player::m_PlayerDuelistStack::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::player::m_PlayerTeamFlags::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::player::m_PlayerFlags::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::player::m_PlayerDelegation::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::season::m_SeasonScoreboard::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::season::m_SeasonConfig::TEST_CLASS_HASH),
             // TestResource::Model(pistols::models::tournament::m_TournamentPass::TEST_CLASS_HASH),
@@ -946,6 +948,11 @@ pub mod tester {
     pub fn execute_collect_duel(sys: @TestSystems, sender: ContractAddress, duel_id: u128) {
         impersonate(sender);
         (*sys.game).collect_duel(duel_id);
+        _next_block();
+    }
+    pub fn execute_delegate_game_actions(sys: @TestSystems, sender: ContractAddress, delegatee: ContractAddress, enabled: bool) {
+        impersonate(sender);
+        (*sys.game).delegate_game_actions(delegatee, enabled);
         _next_block();
     }
 
