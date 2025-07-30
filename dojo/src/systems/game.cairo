@@ -22,6 +22,7 @@ pub trait IGame<TState> {
         moves: Span<u8>,
     );
     fn collect_duel(ref self: TState, duel_id: u128) -> u8; //@description: Close expired duels
+    fn delegate_game_actions(ref self: TState, delegatee_address: ContractAddress, enabled: bool); // @description: Delegate game actions to another account
     // event emitters
     fn clear_call_to_challenge(ref self: TState, duel_id: u128); // @description: Clear call to action for a player
     fn emit_player_bookmark(ref self: TState, target_address: ContractAddress, target_id: u128, enabled: bool); //@description: Bookmarks an address or token
@@ -86,7 +87,7 @@ pub mod game {
     };
     use pistols::systems::rng::{RngWrap, RngWrapTrait};
     use pistols::models::{
-        player::{PlayerTrait},
+        player::{PlayerTrait, PlayerDelegation, PlayerDelegationTrait},
         challenge::{
             Challenge, ChallengeTrait,
             DuelType, DuelTypeTrait,
@@ -112,6 +113,7 @@ pub mod game {
         constants::{FAME},
     };
     use pistols::types::trophies::{Trophy, TrophyTrait, TrophyProgressTrait, TROPHY_ID};
+    use pistols::utils::misc::{ZERO};
     use pistols::libs::{
         store::{Store, StoreTrait},
         game_loop::{GameLoopContractTrait},
@@ -127,6 +129,7 @@ pub mod game {
         pub const NOT_ACCEPTED: felt252              = 'PISTOLS: Accept challenge first';
         pub const NOT_YOUR_DUEL: felt252             = 'PISTOLS: Not your duel';
         pub const NOT_YOUR_DUELIST: felt252          = 'PISTOLS: Not your duelist';
+        pub const CROSS_DELEGATION: felt252          = 'PISTOLS: Cross delegation';
         pub const ROUND_NOT_IN_COMMIT: felt252       = 'PISTOLS: Round not in commit';
         pub const ROUND_NOT_IN_REVEAL: felt252       = 'PISTOLS: Round not in reveal';
         pub const ALREADY_COMMITTED: felt252         = 'PISTOLS: Already committed';
@@ -176,24 +179,33 @@ pub mod game {
                 return;
             }
 
-            // validate challenge
-            let owner: ContractAddress = self._validate_ownership(@store.world, duelist_id);
+            // validate caller by duelist ownership
+            // (only the duelist owner can commit)
+            let caller: ContractAddress = starknet::get_caller_address();
+            let owner: ContractAddress = store.world.duelist_token_dispatcher().owner_of(duelist_id.into());
+            assert(PlayerDelegationTrait::can_play_game(@store, owner, caller), Errors::NOT_YOUR_DUELIST);
+
+            // validate challenge state
             let duelist_number: u8 = challenge.duelist_number(duelist_id);
             if (duelist_number == 1) {
                 // validate challenge: challenger can commit while waiting for challenged
-                assert(challenge.state.is_live(), Errors::CHALLENGE_NOT_IN_PROGRESS);
+                assert(challenge.state.player_a_can_commit(), Errors::CHALLENGE_NOT_IN_PROGRESS);
             } else if (duelist_number == 2) {
                 // validate challenge: challenged needs to accept first
-                assert(challenge.state == ChallengeState::InProgress, Errors::CHALLENGE_NOT_IN_PROGRESS);
+                assert(challenge.state.player_b_can_commit(), Errors::CHALLENGE_NOT_IN_PROGRESS);
+            } else if (owner == challenge.address_b) {
+                // need to accept first
+                assert(false, Errors::NOT_ACCEPTED);
             } else {
-                assert(false, if (starknet::get_caller_address() == challenge.address_b) {Errors::NOT_ACCEPTED} else {Errors::NOT_YOUR_DUEL});
+                assert(false, Errors::NOT_YOUR_DUEL);
             }
 
-            // validate Round
+            // validate Round state
             let mut round: Round = store.get_round(duel_id);
             assert(round.state == RoundState::Commit, Errors::ROUND_NOT_IN_COMMIT);
 
             if (duelist_number == 1) {
+                assert(caller != challenge.address_b, Errors::CROSS_DELEGATION);
                 // validate and store hash
                 assert(!round.moves_a.has_comitted(), Errors::ALREADY_COMMITTED);
                 assert(hashed > 0, Errors::INVALID_MOVES_HASH);
@@ -204,6 +216,7 @@ pub mod game {
                     store.set_challenge(@challenge);
                 }
             } else if (duelist_number == 2) {
+                assert(caller != challenge.address_a, Errors::CROSS_DELEGATION);
                 // validate and store hash
                 assert(!round.moves_b.has_comitted(), Errors::ALREADY_COMMITTED);
                 assert(hashed > 0, Errors::INVALID_MOVES_HASH);
@@ -214,7 +227,6 @@ pub mod game {
                     store.set_challenge(@challenge);
                 }
             }
-
 
             // move to reveal phase?
             let timestamp: u64 = starknet::get_block_timestamp();
@@ -245,7 +257,7 @@ pub mod game {
             store.set_duelist_timestamp_active(duelist_id, timestamp);
 
             // events
-            PlayerTrait::check_in(ref store, Activity::MovesCommitted, starknet::get_caller_address(), duel_id.into());
+            PlayerTrait::check_in(ref store, Activity::MovesCommitted, owner, duel_id.into());
 
             store.set_round(@round);
 
@@ -277,31 +289,34 @@ pub mod game {
             let mut round: Round = store.get_round( duel_id);
             assert(round.state == RoundState::Reveal, Errors::ROUND_NOT_IN_REVEAL);
 
-            // validate duelist
-            // self._validate_ownership(@store.world, duelist_id); // no need to validate, only commiter can reveal
-            let duelist_number: u8 = challenge.duelist_number(duelist_id);
-            assert(duelist_number != 0, Errors::NOT_YOUR_DUEL);
+            // reveal is permissionless, as only commiter knows the salt
+            // no need to validate caller or ownership
 
-            // validate salt
+            // validate salt and re-generate hash
             assert(salt != 0, Errors::INVALID_SALT);
+            let hashed: u128 = MovesHashTrait::hash(salt, moves);
 
-            // validate moves
             // since the hash was validated
             // we should not validate the actual moves
             // all we can do is skip if they are invalid
             // assert(moves.len() >= 2 && moves.len() <= 4, Errors::INVALID_MOVES_COUNT);
 
-            // validate hash
-            let hashed: u128 = MovesHashTrait::hash(salt, moves);
-            if (duelist_number == 1) {
+            // reveal moves
+            let duelist_number: u8 = challenge.duelist_number(duelist_id);
+            let player_address: ContractAddress = if (duelist_number == 1) {
                 assert(!round.moves_a.has_revealed(), Errors::ALREADY_REVEALED);
                 assert(round.moves_a.hashed == hashed, Errors::MOVES_HASH_MISMATCH);
                 round.moves_a.reveal_salt_and_moves(salt, moves);
-            } else {
+                (challenge.address_a)
+            } else if (duelist_number == 2) {
                 assert(!round.moves_b.has_revealed(), Errors::ALREADY_REVEALED);
                 assert(round.moves_b.hashed == hashed, Errors::MOVES_HASH_MISMATCH);
                 round.moves_b.reveal_salt_and_moves(salt, moves);
-            }
+                (challenge.address_b)
+            } else {
+                assert(false, Errors::NOT_YOUR_DUEL);
+                (ZERO())
+            };
 
             // reset timeouts
             let timestamp: u64 = starknet::get_block_timestamp();
@@ -312,8 +327,7 @@ pub mod game {
             store.set_duelist_timestamp_active(duelist_id, timestamp);
 
             // events
-            let caller: ContractAddress = starknet::get_caller_address();
-            Activity::MovesRevealed.emit(ref store.world, caller, duel_id.into());
+            Activity::MovesRevealed.emit(ref store.world, player_address, duel_id.into());
 
             // missing reveal, just update and wait for final reveal
             if (!round.moves_a.has_revealed() || !round.moves_b.has_revealed()) {
@@ -329,7 +343,7 @@ pub mod game {
             // RESOLVED!!!
             //
 
-            if (caller == challenge.self_address(duelist_number)) {
+            if (player_address == challenge.self_address(duelist_number)) {
                 // self revealed, clear action
                 store.emit_challenge_action(@challenge, duelist_number, ChallengeAction::Finished);
             } else {
@@ -391,6 +405,13 @@ pub mod game {
                 TrophyProgressTrait::collected_duel(@store.world, @starknet::get_caller_address());
             }
             (challenge.winner)
+        }
+
+        fn delegate_game_actions(ref self: ContractState, delegatee_address: ContractAddress, enabled: bool) {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let mut delegation: PlayerDelegation = store.get_player_delegation(starknet::get_caller_address(), delegatee_address);
+            delegation.can_play_game = enabled;
+            store.set_player_delegation(@delegation);
         }
 
         //------------------------------------
@@ -559,12 +580,6 @@ pub mod game {
                 );
                 trophy_id += 1;
             }
-        }
-
-        fn _validate_ownership(self: @ContractState, world: @WorldStorage, duelist_id: u128) -> ContractAddress {
-            let owner: ContractAddress = world.duelist_token_dispatcher().owner_of(duelist_id.into());
-            assert(owner == starknet::get_caller_address(), Errors::NOT_YOUR_DUELIST);
-            (owner)
         }
 
         // fn _get_tournament_round(ref self: ContractState, ref store: Store, duel_id: u128) -> Option<(TournamentDuelKeys, TournamentRound)> {

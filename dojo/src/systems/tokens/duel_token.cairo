@@ -168,7 +168,7 @@ pub mod duel_token {
         // IGameDispatcherTrait,
     };
     use pistols::models::{
-        player::{PlayerTrait},
+        player::{PlayerTrait, PlayerDelegationTrait},
         challenge::{
             Challenge, ChallengeTrait, ChallengeValue,
             ChallengeMessage, ChallengeMessageValue,
@@ -294,7 +294,6 @@ pub mod duel_token {
                 },
                 DuelType::BotPlayer => {
                     address_b = store.world.bot_player_address();
-                    lives_staked = 1; // bot practice always stakes 1 life
                 },
                 DuelType::Undefined |
                 DuelType::Tournament |
@@ -303,6 +302,11 @@ pub mod duel_token {
                     assert(false, Errors::INVALID_DUEL_TYPE);
                 },
             };
+
+            // bot games always stakes 1 life
+            if (address_b == store.world.bot_player_address()) {
+                lives_staked = 1;
+            }
 
             // get active duelist from stack
             let duelist_dispatcher: IDuelistTokenProtectedDispatcher = store.world.duelist_token_protected_dispatcher();
@@ -397,33 +401,33 @@ pub mod duel_token {
             assert(challenge.exists(), Errors::INVALID_CHALLENGE);
             assert(challenge.state == ChallengeState::Awaiting, Errors::CHALLENGE_NOT_AWAITING);
 
-            let address_b: ContractAddress = starknet::get_caller_address();
+            let caller: ContractAddress = starknet::get_caller_address();
             let timestamp: u64 = starknet::get_block_timestamp();
 
-            if (address_b == challenge.address_a) {
+            if (caller == challenge.address_a) {
                 // same duelist, can only withdraw...
                 assert(accepted == false, Errors::INVALID_REPLY_SELF);
                 challenge.state = ChallengeState::Withdrawn;
             } else {
                 // open challenge: anyone can ACCEPT
                 if (challenge.address_b.is_zero() && accepted) {
-                    challenge.address_b = address_b;
+                    challenge.address_b = caller;
                     // set the pact + assert it does not exist
                     challenge.set_pact(ref store);
                 } else {
-                    // else, only challenged can reply
-                    assert(challenge.address_b == address_b, Errors::NOT_YOUR_CHALLENGE);
+                    // else, only challenged or delegated can reply
+                    assert(PlayerDelegationTrait::can_play_game(@store, challenge.address_b, caller), Errors::NOT_YOUR_CHALLENGE);
                 }
 
                 // Challenged is accepting...
                 if (accepted) {
                     challenge.duelist_id_b = if (challenge.is_against_bot_player(@store)) {
-                        // bot duelist is already validated (active in stack concept does not apply)
+                        // bot replied with a valid duelist
                         (duelist_id)
                     } else {
                         // get active duelist from stack
                         let duelist_dispatcher: IDuelistTokenProtectedDispatcher = store.world.duelist_token_protected_dispatcher();
-                        (duelist_dispatcher.get_validated_active_duelist_id(address_b, duelist_id, challenge.lives_staked))
+                        (duelist_dispatcher.get_validated_active_duelist_id(challenge.address_b, duelist_id, challenge.lives_staked))
                     };
 
                     // validate duelist
@@ -461,9 +465,11 @@ pub mod duel_token {
                 store.exit_challenge(challenge.duelist_id_a);
                 store.emit_challenge_action(@challenge, 1, ChallengeAction::Finished);
                 store.emit_challenge_action(@challenge, 2, ChallengeAction::Finished);
-                Activity::ChallengeCanceled.emit(ref store.world, starknet::get_caller_address(), challenge.duel_id.into());
+                // emit event in behalf of the player who canceled the duel
+                let player_address: ContractAddress = if (caller == challenge.address_a) {challenge.address_a} else {challenge.address_b};
+                Activity::ChallengeCanceled.emit(ref store.world, player_address, challenge.duel_id.into());
             } else {
-                PlayerTrait::check_in(ref store, Activity::ChallengeReplied, address_b, duel_id.into());
+                PlayerTrait::check_in(ref store, Activity::ChallengeReplied, challenge.address_b, duel_id.into());
             }
             
             // update challenge

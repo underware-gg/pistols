@@ -20,6 +20,7 @@ pub use pistols::models::{
         PlayerTeamFlags,
         PlayerFlags,
         PlayerDuelistStack, PlayerDuelistStackValue,
+        PlayerDelegation,
     },
     pack::{
         Pack,
@@ -110,6 +111,10 @@ pub impl StoreImpl of StoreTrait {
     #[inline(always)]
     fn get_player_flags(self: @Store, address: ContractAddress) -> PlayerFlags {
         (self.world.read_model(address))
+    }
+    #[inline(always)]
+    fn get_player_delegation(self: @Store, player_address: ContractAddress, delegatee_address: ContractAddress) -> PlayerDelegation {
+        (self.world.read_model((player_address, delegatee_address),))
     }
 
     #[inline(always)]
@@ -340,6 +345,11 @@ pub impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
+    fn set_player_delegation(ref self: Store, model: @PlayerDelegation) {
+        self.world.write_model(model);
+    }
+
+    #[inline(always)]
     fn set_player_duelist_stack(ref self: Store, model: @PlayerDuelistStack) {
         self.world.write_model(model);
     }
@@ -566,10 +576,16 @@ pub impl StoreImpl of StoreTrait {
     fn get_player_active_signet_ring(self: @Store, address: ContractAddress) -> RingType {
         (self.world.read_member(Model::<Player>::ptr_from_keys(address), selector!("active_signet_ring")))
     }
+    #[inline(always)]
     fn get_player_has_signet_ring(self: @Store, player_address: ContractAddress, ring_type: RingType) -> bool {
         let ring_balance: u128 = (self.world.read_member(Model::<RingBalance>::ptr_from_keys((player_address, ring_type),), selector!("balance")));
         (ring_balance > 0)
     }
+    #[inline(always)]
+    fn get_player_delegation_can_play_game(self: @Store, player_address: ContractAddress, delegatee_address: ContractAddress) -> bool {
+        (self.world.read_member(Model::<PlayerDelegation>::ptr_from_keys((player_address, delegatee_address),), selector!("can_play_game")))
+    }
+
     #[inline(always)]
     fn get_active_duelist_id(self: @Store, address: ContractAddress, duelist_id: u128) -> u128 {
         (self.world.read_member(Model::<PlayerDuelistStack>::ptr_from_keys((

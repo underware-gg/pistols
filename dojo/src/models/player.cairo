@@ -25,7 +25,6 @@ pub struct PlayerTimestamps {
     pub claimed_starter_pack: bool,
 }
 
-
 #[derive(Clone, Drop, Serde)]
 #[dojo::model]
 pub struct PlayerDuelistStack {
@@ -37,6 +36,17 @@ pub struct PlayerDuelistStack {
     pub active_duelist_id: u128,            // the active dueling Duelist id
     pub level: u8,                          // current level (stack size)
     pub stacked_ids: Array<u128>,           // stacked Duelist ids
+}
+
+#[derive(Clone, Drop, Serde)]
+#[dojo::model]
+pub struct PlayerDelegation {
+    #[key]
+    pub player_address: ContractAddress,    // controller wallet
+    #[key]
+    pub delegatee_address: ContractAddress,
+    //-----------------------
+    pub can_play_game: bool,
 }
 
 
@@ -180,6 +190,16 @@ pub impl PlayerDuelistStackImpl of PlayerDuelistStackTrait {
     }
 }
 
+#[generate_trait]
+pub impl PlayerDelegationImpl of PlayerDelegationTrait {
+    fn can_play_game(store: @Store, player_address: ContractAddress, caller_address: ContractAddress) -> bool {
+        if (player_address == caller_address) {
+            (true)
+        } else {
+            (store.get_player_delegation_can_play_game(player_address, caller_address))
+        }
+    }
+}
 
 
 //------------------------------------------------------
