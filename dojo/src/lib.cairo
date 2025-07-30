@@ -107,6 +107,7 @@ mod tests {
     pub mod test_bank;
     pub mod test_cards;
     pub mod test_challenge;
+    pub mod test_delegate;
     pub mod test_dns;
     pub mod test_duel;
     pub mod test_env_cards;

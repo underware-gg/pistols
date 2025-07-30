@@ -32,18 +32,6 @@ pub impl ChallengeStateImpl of ChallengeStateTrait {
             ChallengeState::Draw        => false,
         }
     }
-    fn is_live(self: @ChallengeState) -> bool {
-        match self {
-            ChallengeState::Null        => false,
-            ChallengeState::Awaiting    => true,
-            ChallengeState::Withdrawn   => false,
-            ChallengeState::Refused     => false,
-            ChallengeState::Expired     => false,
-            ChallengeState::InProgress  => true,
-            ChallengeState::Resolved    => false,
-            ChallengeState::Draw        => false,
-        }
-    }
     fn is_concluded(self: @ChallengeState) -> bool {
         match self {
             ChallengeState::Null        => false,
@@ -54,6 +42,19 @@ pub impl ChallengeStateImpl of ChallengeStateTrait {
             ChallengeState::InProgress  => false,
             ChallengeState::Resolved    => true,
             ChallengeState::Draw        => true,
+        }
+    }
+    fn player_a_can_commit(self: @ChallengeState) -> bool {
+        match self {
+            ChallengeState::Awaiting    => true,
+            ChallengeState::InProgress  => true,
+            _                           => false,
+        }
+    }
+    fn player_b_can_commit(self: @ChallengeState) -> bool {
+        match self {
+            ChallengeState::InProgress  => true,
+            _                           => false,
         }
     }
 }

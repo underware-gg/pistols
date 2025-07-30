@@ -994,7 +994,7 @@ pub mod tests {
 
     #[test]
     #[should_panic(expected:('PISTOLS: Not your duel', 'ENTRYPOINT_FAILED'))]
-    fn test_commit_wrong_player_to_duelist() {
+    fn test_commit_wrong_player() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         // try to commmit with another account
@@ -1005,7 +1005,7 @@ pub mod tests {
 
     #[test]
     #[should_panic(expected:('PISTOLS: Not your duelist', 'ENTRYPOINT_FAILED'))]
-    fn test_commit_wrong_player_to_address() {
+    fn test_commit_wrong_duelist() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         // try to commmit with another account

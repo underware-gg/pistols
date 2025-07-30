@@ -175,7 +175,10 @@ pub impl DnsImpl of DnsTrait {
         let response: Result<ByteArray, Array<felt252>> = IDeployedResourceSafeDispatcher{contract_address}.dojo_name();
         (match response {
             // it is a dojo contract... check if it's in this world
-            Result::Ok(contract_name) => (contract_address == self.find_contract_address(@contract_name)),
+            Result::Ok(contract_name) => (
+                contract_address.is_non_zero() &&
+                contract_address == self.find_contract_address(@contract_name)
+            ),
             // failed to call dojo_name(), definitely not of this world
             Result::Err(_panic_reason) => (false),
         })
@@ -194,7 +197,7 @@ pub impl DnsImpl of DnsTrait {
     }
     #[inline(always)]
     fn is_bot_player_contract(self: @WorldStorage, address: ContractAddress) -> bool {
-        (address == self.bot_player_address())
+        (address.is_non_zero() && address == self.bot_player_address())
     }
     #[inline(always)]
     fn caller_is_bot_player_contract(self: @WorldStorage) -> bool {
