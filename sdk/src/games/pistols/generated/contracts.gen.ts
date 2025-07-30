@@ -547,19 +547,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_duel_token_createDuel_calldata = (duelType: CairoCustomEnum, duelistId: BigNumberish, challengedAddress: string, livesStaked: BigNumberish, expireHours: BigNumberish, premise: CairoCustomEnum, message: string): DojoCall => {
+	const build_duel_token_createDuel_calldata = (duelType: CairoCustomEnum, duelistId: BigNumberish, challengedAddress: string, livesStaked: BigNumberish, expireMinutes: BigNumberish, premise: CairoCustomEnum, message: string): DojoCall => {
 		return {
 			contractName: "duel_token",
 			entrypoint: "create_duel",
-			calldata: [duelType, duelistId, challengedAddress, livesStaked, expireHours, premise, message],
+      calldata: [duelType, duelistId, challengedAddress, livesStaked, expireMinutes, premise, message],
 		};
 	};
 
-	const duel_token_createDuel = async (snAccount: Account | AccountInterface, duelType: CairoCustomEnum, duelistId: BigNumberish, challengedAddress: string, livesStaked: BigNumberish, expireHours: BigNumberish, premise: CairoCustomEnum, message: string) => {
+  const duel_token_createDuel = async (snAccount: Account | AccountInterface, duelType: CairoCustomEnum, duelistId: BigNumberish, challengedAddress: string, livesStaked: BigNumberish, expireMinutes: BigNumberish, premise: CairoCustomEnum, message: string) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_duel_token_createDuel_calldata(duelType, duelistId, challengedAddress, livesStaked, expireHours, premise, message),
+        build_duel_token_createDuel_calldata(duelType, duelistId, challengedAddress, livesStaked, expireMinutes, premise, message),
 				"pistols",
 			);
 		} catch (error) {

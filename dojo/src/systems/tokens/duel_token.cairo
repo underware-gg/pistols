@@ -61,7 +61,7 @@ pub trait IDuelToken<TState> {
     // IDuelTokenPublic
     fn get_pact(self: @TState, duel_type: DuelType, address_a: ContractAddress, address_b: ContractAddress) -> u128;
     fn has_pact(self: @TState, duel_type: DuelType, address_a: ContractAddress, address_b: ContractAddress) -> bool;
-    fn create_duel(ref self: TState, duel_type: DuelType, duelist_id: u128, challenged_address: ContractAddress, lives_staked: u8, expire_hours: u64, premise: Premise, message: ByteArray) -> u128;
+    fn create_duel(ref self: TState, duel_type: DuelType, duelist_id: u128, challenged_address: ContractAddress, lives_staked: u8, expire_minutes: u64, premise: Premise, message: ByteArray) -> u128;
     fn reply_duel(ref self: TState, duel_id: u128, duelist_id: u128, accepted: bool) -> ChallengeState;
 }
 
@@ -78,7 +78,7 @@ pub trait IDuelTokenPublic<TState> {
         duelist_id: u128,
         challenged_address: ContractAddress,
         lives_staked: u8,
-        expire_hours: u64,
+        expire_minutes: u64,
         premise: Premise,
         message: ByteArray,
     ) -> u128;
@@ -275,7 +275,7 @@ pub mod duel_token {
             duelist_id: u128,
             challenged_address: ContractAddress,
             mut lives_staked: u8,
-            expire_hours: u64,
+            expire_minutes: u64,
             premise: Premise,
             message: ByteArray,
         ) -> u128 {
@@ -319,8 +319,8 @@ pub mod duel_token {
             let timestamps = Period {
                 start: timestamp,
                 end: timestamp + 
-                    if (expire_hours == 0) {TIMESTAMP::ONE_DAY}
-                    else {TimestampTrait::from_hours(expire_hours)},
+                    if (expire_minutes == 0) {TIMESTAMP::ONE_DAY}
+                    else {TimestampTrait::from_minutes(expire_minutes)},
             };
 
             // create challenge
