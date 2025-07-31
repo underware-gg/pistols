@@ -63,9 +63,10 @@ export function InternalPageMenu() {
         />
         {internalPages.map(page => (
           <MenuItem
+            style={{ padding: '0.5rem' }}
             key={page.name}
             name={page.name}
-            icon={page.connected ? 'chain' : null}
+            // icon={page.connected ? 'chain' : null}
             active={location.pathname.endsWith(page.name)}
             onClick={() => _click(page.name)}
           />
