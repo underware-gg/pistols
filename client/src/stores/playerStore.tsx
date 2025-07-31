@@ -5,7 +5,7 @@ import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { createDojoStore } from '@dojoengine/sdk/react'
 import { PistolsEntity, PistolsSchemaType } from '@underware/pistols-sdk/pistols/sdk'
-import { arrayRemoveValue, bigintEquals, bigintToHex, bigintToNumber, isPositiveBigint, sortObjectByValue } from '@underware/pistols-sdk/utils'
+import { arrayRemoveValue, bigintEquals, bigintToHex, bigintToNumber, formatTimestampDeltaElapsed, isPositiveBigint, sortObjectByValue } from '@underware/pistols-sdk/utils'
 import { useAllStoreModels, useStoreModelsByKeys } from '@underware/pistols-sdk/dojo'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { useDuelistTokenStore } from '/src/stores/tokenStore'
@@ -22,11 +22,12 @@ import { useDiscordSocialLink } from './eventsModelStore'
 interface NamesByAccount {
   [address: string]: string
 }
-interface OnlineByAccount {
-  [address: string]: {
-    timestamp: number,
-    available: boolean,
-  }
+interface OnlineState {
+  timestamp: number,
+  available: boolean,
+}
+interface OnlineStateByAccount {
+  [address: string]: OnlineState
 }
 interface PlayerBookmarksByAccount {
   [address: string]: bigint[]
@@ -39,7 +40,7 @@ interface TokenBookmarksByAccount {
 interface State {
   players_names: NamesByAccount,
   players_avatars: NamesByAccount,
-  players_online: OnlineByAccount,
+  players_online: OnlineStateByAccount,
   player_bookmarks: PlayerBookmarksByAccount,
   token_bookmarks: TokenBookmarksByAccount,
   updateUsernames: (usernames: Map<string, string>) => void;
@@ -87,7 +88,7 @@ const createStore = () => {
       // console.log("updateMessages()[Player] =>", entities)
       set((state: State) => {
         entities.forEach((e) => {
-          // PlayerOnline flags
+          // PlayerOnline status
           const playerOnline = e.models.pistols.PlayerOnline
           if (playerOnline) {
             const address = _playerKey(playerOnline.identity)
@@ -144,7 +145,7 @@ export const usePlayerDataStore = createStore();
 // 'consumer' hooks
 //
 
-export const usePlayer = (address: BigNumberish) => {
+export const usePlayer = (address: BigNumberish, onlineClientTimestamp?: number) => {
   const entities = usePlayerEntityStore((state) => state.entities);
   const player = useStoreModelsByKeys<models.Player>(entities, 'Player', [address])
   const flags = useStoreModelsByKeys<models.PlayerFlags>(entities, 'PlayerFlags', [address])
@@ -174,9 +175,15 @@ export const usePlayer = (address: BigNumberish) => {
   const bookmarkedDuels = useMemo(() => (bookmarkedTokens[duelContractAddress as string] ?? []), [bookmarkedTokens])
   const bookmarkedDuelists = useMemo(() => (bookmarkedTokens[duelistContractAddress as string] ?? []), [bookmarkedTokens])
 
+  // player online status
+  const players_online = usePlayerDataStore((state) => state.players_online);
+  const { clientTimestamp } = useClientTimestamp()
+  const { isAvailable, isOnline, isAway, formattedTime } = useMemo(() => (
+    getPlayerOnlineStatus(players_online[playerKey], onlineClientTimestamp || clientTimestamp)
+  ), [players_online, address, onlineClientTimestamp, clientTimestamp])
+
   // TODO... check if completed tutorial from Activity events
   const hasFinishedTutorial = false
-  const isAvailable = false
 
   // useEffect(() => console.log("usePlayer() =>", username, activeSignetRing), [player, username, playerKey])
 
@@ -196,6 +203,9 @@ export const usePlayer = (address: BigNumberish) => {
     bookmarkedDuelists,
     hasFinishedTutorial,
     isAvailable,
+    isOnline,
+    isAway,
+    lastSeenTime: formattedTime,
     totals,
   }
 }
@@ -262,14 +272,6 @@ export const useIsBookmarked = (target_address: BigNumberish, target_id: BigNumb
   }
 }
 
-export const usePlayersOnline = () => {
-  const players_online = usePlayerDataStore((state) => state.players_online)
-  const playersOnline = useMemo(() => sortObjectByValue(players_online, (a, b) => (b.timestamp - a.timestamp)), [players_online])
-  return {
-    playersOnline,
-  }
-}
-
 export const usePlayerAvatar = (address: BigNumberish) => {
   const players_avatars = usePlayerDataStore((state) => state.players_avatars)
   const avatarUrl = useMemo(() => (players_avatars[_playerKey(address)] ?? null), [players_avatars, address])
@@ -279,9 +281,56 @@ export const usePlayerAvatar = (address: BigNumberish) => {
   }
 }
 
+
+//--------------------------------
+// PlayerOnline status
+//
+
+// Get all players online status, old or new
+export const useAllPlayersOnlineState = () => {
+  const players_online = usePlayerDataStore((state) => state.players_online);
+  const playersOnline = useMemo(() => sortObjectByValue(players_online, (a, b) => (b.timestamp - a.timestamp)), [players_online]);
+  return {
+    playersOnline,
+  }
+}
+
+// Get all players online status, old or new
+export const usePlayersAvailableForMatchmaking = () => {
+  const players_online = usePlayerDataStore((state) => state.players_online);
+  const { clientTimestamp } = useClientTimestamp(true, 10);
+  const playerIds = useMemo(() => (
+    Object.keys(players_online).filter((playerKey) => {
+      const { isAvailable } = getPlayerOnlineStatus(players_online[playerKey], clientTimestamp);
+      return isAvailable;
+    })
+  ), [players_online, clientTimestamp]);
+  return {
+    playerIds,
+  }
+}
+
+const getPlayerOnlineStatus = (player_online: OnlineState | undefined, clientTimestamp: number) => {
+  if (!player_online) return {};
+  const { result: formattedTime, isOnline, isAway, isOffline } = formatTimestampDeltaElapsed(player_online.timestamp, clientTimestamp);
+  return {
+    formattedTime,
+    isAvailable: (isOnline && player_online.available),
+    isOnline,
+    isAway,
+    isOffline,
+  };
+}
+
+
+
+//--------------------------------
+// Player querying
+//
+
 export const useQueryPlayerIds = (
   filterName: string,
-  filterOnline: boolean,
+  filterActive: boolean,
   filterBookmarked: boolean,
   sortColumn: PlayerColumn,
   sortDirection: SortDirection,
@@ -291,19 +340,13 @@ export const useQueryPlayerIds = (
   const entities = usePlayerEntityStore((state) => state.entities);
   const players = useAllStoreModels<models.Player>(entities, 'Player')
 
-  const players_online = usePlayerDataStore((state) => state.players_online);
-
-  // consider online players who have been here for...
-  const minOnlineMinutes = 30;
   const { clientTimestamp } = useClientTimestamp()
-  const minPlayerTimestamp = useMemo(() => (clientTimestamp - (minOnlineMinutes * 60)), [clientTimestamp])
+  const players_online = usePlayerDataStore((state) => state.players_online);
 
   const playerIds = useMemo(() => {
     let result = [
       ...players,
     ];
-
-    result = result.filter((p) => !bigintEquals(p.player_address, address))
 
     // filter by name
     if (filterName) {
@@ -316,8 +359,11 @@ export const useQueryPlayerIds = (
     }
 
     // filter by active
-    if (filterOnline) {
-      result = result.filter((e) => (players_online[_playerKey(e.player_address)]?.timestamp ?? 0) >= minPlayerTimestamp)
+    if (filterActive) {
+      result = result.filter((e) => {
+        const { isOnline, isAway } = getPlayerOnlineStatus(players_online[_playerKey(e.player_address)], clientTimestamp);
+        return (isOnline || isAway);
+      })
     }
 
     // sort...
@@ -343,7 +389,7 @@ export const useQueryPlayerIds = (
 
     // return ids only
     return result.map((e) => e.player_address)
-  }, [players, filterName, filterOnline, sortColumn, sortDirection, filterBookmarked, bookmarkedDuelists, address, players_online])
+  }, [players, filterName, filterActive, sortColumn, sortDirection, filterBookmarked, bookmarkedDuelists, address, players_online])
 
   return {
     playerIds,
@@ -429,9 +475,4 @@ export const getPlayernameFromAddress = (address: BigNumberish | undefined): str
 }
 export const getAddressFromPlayername = (name: string | undefined): BigNumberish | undefined => {
   return usePlayerDataStore.getState().getAddressFromPlayername(name ?? '')
-}
-
-export const getPlayerOnlineStatus = (address: BigNumberish): boolean => {
-  const players_online = usePlayerDataStore((state) => state.players_online);
-  return players_online[_playerKey(address)] !== undefined
 }
