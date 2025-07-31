@@ -6,7 +6,7 @@ import { DuelistCard, DuelistCardHandle } from '/src/components/cards/DuelistCar
 import { InteractibleComponent, InteractibleComponentHandle } from '/src/components/InteractibleComponent'
 import { CardColor } from '@underware/pistols-sdk/pistols/constants'
 import { ProfilePic } from '/src/components/account/ProfilePic'
-import { useIsBookmarked, usePlayer, getPlayerOnlineStatus, usePlayerAvatar } from '/src/stores/playerStore'
+import { useIsBookmarked, usePlayer, usePlayerAvatar } from '/src/stores/playerStore'
 import { useIsMyAccount } from '/src/hooks/useIsYou'
 import { Grid } from 'semantic-ui-react'
 import { BookmarkIcon } from '/src/components/ui/Icons'
@@ -53,15 +53,14 @@ export interface ProfilePosterHandle extends InteractibleComponentHandle {}
 
 // Shared data hook between small and full components
 const useProfilePosterData = (playerAddress?: BigNumberish) => {
-  const { name } = usePlayer(playerAddress)
+  const { name, isOnline, isAway } = usePlayer(playerAddress)
   const { isMyAccount } = useIsMyAccount(playerAddress)
-  const isOnline = getPlayerOnlineStatus(playerAddress)
   const { avatarUrl } = usePlayerAvatar(playerAddress)
-
   return {
     name,
     isMyAccount,
     isOnline,
+    isAway,
     avatarUrl
   }
 }
@@ -69,7 +68,7 @@ const useProfilePosterData = (playerAddress?: BigNumberish) => {
 // Small version of the ProfilePoster
 const ProfilePosterSmall = forwardRef<ProfilePosterHandle, ProfilePosterProps>((props, ref) => {
   const { aspectWidth, aspectHeight } = useGameAspect()
-  const { name, isOnline, avatarUrl } = useProfilePosterData(props.playerAddress)
+  const { name, isOnline, isAway, avatarUrl } = useProfilePosterData(props.playerAddress)
 
   const baseRef = useRef<InteractibleComponentHandle>(null)
 
@@ -136,7 +135,7 @@ const ProfilePosterSmall = forwardRef<ProfilePosterHandle, ProfilePosterProps>((
           <StampImage playerAddress={props.playerAddress} size="ProfileSmall" position="Right" rotation={10} />
 
           <div className={`OnlineStatusSection ${ props.width && props.width !== POSTER_WIDTH_SMALL ? 'Smaller' : 'Small'}`}>
-            <div className={`OnlineStatus Small ${isOnline ? 'Online' : 'Offline'}`} />
+            <div className={`OnlineStatus Small ${isOnline ? 'Online' : isAway ? 'Away' : 'Offline'}`} />
           </div>
         </div>
       }
@@ -149,7 +148,7 @@ const ProfilePosterFull = forwardRef<ProfilePosterHandle, ProfilePosterProps>((p
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSetScene } = usePistolsScene()
   const { dispatchSelectDuelistId } = usePistolsContext()
-  const { name, isMyAccount, isOnline, avatarUrl } = useProfilePosterData(props.playerAddress)
+  const { name, isMyAccount, isOnline, isAway, avatarUrl } = useProfilePosterData(props.playerAddress)
   
   // Full-specific data
   useFetchDuelistIdsOwnedByAccount(props.playerAddress) // fetch duelists in the store, if not already fetched
@@ -288,7 +287,7 @@ const ProfilePosterFull = forwardRef<ProfilePosterHandle, ProfilePosterProps>((p
           <StampImage playerAddress={props.playerAddress} size="ProfileLarge" position="Right" rotation={10} />
 
           <div className='OnlineStatusSection'>
-            <div className={`OnlineStatus ${isOnline ? 'Online' : 'Offline'}`} />
+            <div className={`OnlineStatus ${isOnline ? 'Online' : isAway ? 'Away' : 'Offline'}`} />
           </div>
 
           <div className='TextDivider WantedDivider'>Duelists:</div>

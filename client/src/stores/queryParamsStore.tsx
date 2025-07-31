@@ -38,7 +38,7 @@ type State = {
   filterDuelistSortDirection: SortDirection
   // player filters
   filterPlayerName: string
-  filterPlayerOnline: boolean
+  filterPlayerActive: boolean
   filterPlayerBookmarked: boolean
   filterPlayerSortColumn: PlayerColumn
   filterPlayerSortDirection: SortDirection
@@ -60,7 +60,7 @@ type State = {
   setFilterDuelistSortSwitch: () => void
   // player setters
   setFilterPlayerName: (value: string) => void
-  setFilterPlayerOnline: (value: boolean) => void
+  setFilterPlayerActive: (value: boolean) => void
   setFilterPlayerBookmarked: (value: boolean) => void
   setFilterPlayerSortColumn: (value: PlayerColumn) => void
   setFilterPlayerSortDirection: (value: SortDirection) => void
@@ -86,7 +86,7 @@ export const useQueryParams = create<State>((set) => ({
   filterDuelistSortDirection: SortDirection.Descending,
   // player filters
   filterPlayerName: '',
-  filterPlayerOnline: false,
+  filterPlayerActive: false,
   filterPlayerBookmarked: false,
   filterPlayerSortColumn: PlayerColumn.Name,
   filterPlayerSortDirection: SortDirection.Descending,
@@ -108,7 +108,7 @@ export const useQueryParams = create<State>((set) => ({
   setFilterDuelistSortSwitch: () => set((state: State) => ({ filterDuelistSortDirection: _switchDirection(state.filterDuelistSortDirection) })),
   // player setters
   setFilterPlayerName: (value: string) => set({ filterPlayerName: value.toLowerCase() }),
-  setFilterPlayerOnline: (value: boolean) => set({ filterPlayerOnline: value }),
+  setFilterPlayerActive: (value: boolean) => set({ filterPlayerActive: value }),
   setFilterPlayerBookmarked: (value: boolean) => set({ filterPlayerBookmarked: value }),
   setFilterPlayerSortColumn: (value: PlayerColumn) => set({ filterPlayerSortColumn: value }),
   setFilterPlayerSortDirection: (value: SortDirection) => set({ filterPlayerSortDirection: value }),

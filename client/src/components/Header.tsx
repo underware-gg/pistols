@@ -418,11 +418,11 @@ const CurtainUI = memo(function CurtainUI({
     setFilterStatesLiveDuels,
     setFilterStatesPastDuels,
 
-    filterPlayerOnline,
+    filterPlayerActive,
     filterPlayerBookmarked,
     filterPlayerSortColumn,
     filterPlayerSortDirection,
-    setFilterPlayerOnline,
+    setFilterPlayerActive,
     setFilterPlayerBookmarked,
     setFilterPlayerSortColumn,
     setFilterPlayerSortDirection,
@@ -481,7 +481,7 @@ const CurtainUI = memo(function CurtainUI({
               <FilterSeason />
               <div>
                 <label style={{marginRight: '10px'}}>Filters:</label>
-                <FilterButton label='Active Only' state={filterPlayerOnline} onClick={() => setFilterPlayerOnline(!filterPlayerOnline)} />
+                <FilterButton label='Active Only' state={filterPlayerActive} onClick={() => setFilterPlayerActive(!filterPlayerActive)} />
                 <FilterButton label='Bookmarked' state={filterPlayerBookmarked} onClick={() => setFilterPlayerBookmarked(!filterPlayerBookmarked)} />
                 <FilterButton label='Player Finder' state={walletFinderOpener.isOpen} onClick={() => walletFinderOpener.open()} />
               </div>

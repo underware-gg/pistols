@@ -18,8 +18,8 @@ import { usePactGet } from '/src/queries/usePact'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 export default function ScDuelists() {
-  const { filterPlayerName, filterPlayerOnline, filterPlayerBookmarked, filterPlayerSortColumn, filterPlayerSortDirection } = useQueryParams()
-  const { playerIds } = useQueryPlayerIds(filterPlayerName, filterPlayerOnline, filterPlayerBookmarked, filterPlayerSortColumn, filterPlayerSortDirection)
+  const { filterPlayerName, filterPlayerActive, filterPlayerBookmarked, filterPlayerSortColumn, filterPlayerSortDirection } = useQueryParams()
+  const { playerIds } = useQueryPlayerIds(filterPlayerName, filterPlayerActive, filterPlayerBookmarked, filterPlayerSortColumn, filterPlayerSortDirection)
   const { playerIds: matchmakingPlayerAddresses } = useQueryPlayerIds("", true, false, PlayerColumn.Timestamp, SortDirection.Descending)
   
   // get the players current challenges

@@ -13,6 +13,7 @@ export interface TimestampResult {
   years: number
   isOnline?: boolean
   isAway?: boolean
+  isOffline?: boolean
 }
 export type FormatTimestampResult = TimestampResult & {
   result: string
@@ -81,6 +82,7 @@ export const formatTimestampDeltaTime = (s_start: number, s_end: number): Format
 
 // format timestamp delta as readable time
 // ex: now / 30 sec / 1 min / 1 hr / 1 day / 5 days
+export const MINUTES_INACTIVE = 15;
 export const formatTimestampDeltaElapsed = (s_start: number, s_end: number): FormatTimestampResult => {
   const s = Math.max(0, s_end - s_start)
   const ts = splitTimestamp(s)
@@ -97,12 +99,14 @@ export const formatTimestampDeltaElapsed = (s_start: number, s_end: number): For
                       : (ts.minutes > 0) ? `${ts.minutes}m`
                         : 'now';
   const isOnline = (result === 'now')
-  const isAway = (!isOnline && ts.hours == 0 && ts.minutes <= 15)
+  const isAway = (!isOnline && ts.hours == 0 && ts.minutes <= MINUTES_INACTIVE)
+  const isOffline = (!isAway)
   return {
     ...ts,
     result,
     isOnline,
     isAway,
+    isOffline,
   }
 }
 export const formatTimestampDeltaCountdown = (s_start: number, s_end: number): FormatTimestampResult => {

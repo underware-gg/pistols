@@ -110,11 +110,15 @@
     }
 
     &.Online {
-      background-color: green;
+      background-color: $color-positive;
+    }
+
+    &.Away {
+      background-color: $color-warning;
     }
 
     &.Offline {
-      background-color: red;
+      background-color: $color-negative;
     }
   }
   

@@ -192,15 +192,15 @@ export function BookmarkIcon(props: BookmarkIconProps) {
 // Online status
 //
 interface OnlineStatusIconProps extends IconProps {
+  isAvailable?: boolean
   isOnline?: boolean
   isAway?: boolean
-  isAvailable?: boolean
   onClick?: Function
 }
 export function OnlineStatusIcon(props: OnlineStatusIconProps) {
   return (
     <IconClick
-      name={props.isAvailable === false ? 'minus circle' : 'circle'}
+      name={props.isAvailable ? 'circle' : 'minus circle'}
       className={props.isOnline ? 'Positive' : props.isAway ? 'Warning' : 'Negative'}
       onClick={props.onClick}
     />
