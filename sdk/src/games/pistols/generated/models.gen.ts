@@ -154,6 +154,13 @@ export interface Player {
 	active_signet_ring: RingTypeEnum;
 }
 
+// Type definition for `pistols::models::player::PlayerDelegation` struct
+export interface PlayerDelegation {
+	player_address: string;
+	delegatee_address: string;
+	can_play_game: boolean;
+}
+
 // Type definition for `pistols::models::player::PlayerDuelistStack` struct
 export interface PlayerDuelistStack {
 	player_address: string;
@@ -732,6 +739,7 @@ export interface SchemaType extends ISchemaType {
 		Pack: Pack,
 		Pact: Pact,
 		Player: Player,
+		PlayerDelegation: PlayerDelegation,
 		PlayerDuelistStack: PlayerDuelistStack,
 		PlayerFlags: PlayerFlags,
 		PlayerOnline: PlayerOnline,
@@ -937,6 +945,11 @@ export const schema: SchemaType = {
 				GoldSignetRing: undefined,
 				SilverSignetRing: undefined,
 				LeadSignetRing: undefined, }),
+		},
+		PlayerDelegation: {
+			player_address: "",
+			delegatee_address: "",
+			can_play_game: false,
 		},
 		PlayerDuelistStack: {
 			player_address: "",
@@ -1177,6 +1190,7 @@ export enum ModelsMapping {
 	PackType = 'pistols-PackType',
 	Pact = 'pistols-Pact',
 	Player = 'pistols-Player',
+	PlayerDelegation = 'pistols-PlayerDelegation',
 	PlayerDuelistStack = 'pistols-PlayerDuelistStack',
 	PlayerFlags = 'pistols-PlayerFlags',
 	PlayerOnline = 'pistols-PlayerOnline',

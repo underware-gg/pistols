@@ -17,6 +17,7 @@ export const INTERFACE_DESCRIPTIONS: any = {
     commit_moves: 'Commit moves of a Duelist in a Duel',
     reveal_moves: 'Reveal moves of a Duelist in a Duel',
     collect_duel: 'Close expired duels',
+    delegate_game_actions: 'Delegate game actions to another account',
     clear_call_to_challenge: 'Clear call to action for a player',
     emit_player_bookmark: 'Bookmarks an address or token',
     emit_player_social_link: 'Link player to social platform',

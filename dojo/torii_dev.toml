@@ -22,12 +22,12 @@ transactions = true
 controllers = true
 pending = true
 contracts = [
-  "erc721:0x200066f8243d2417d4a692a6f0e0d7563ad871a879ab2f88b25f6cb4129d3b9", # duel_token
-  "erc721:0x542cf08abb69cbec8ccc2af7e40d6eb5aa709fb6ee4c3cb79dbc7698823fd90", # duelist_token
+  "erc721:0x73cf757140a2cff9dd4679ef48b177ab80b0cfd888a18f0c397ae26f7262900", # duel_token
+  "erc721:0x266af479dad5ddcb27a8672f5e122cde040a59a21cafd4b27f82506324d6c73", # duelist_token
   "erc721:0x210fa7f9987259964b97417bc370c67ece8330f44c2bf5fcc6e7e8efd4ee1b9", # pack_token
   "erc721:0x5c35892166ddd96f6ba3bc7af2ba2ba5354b6a746b00727051364a51a00bf45", # ring_token
   # "erc721:$tournament_token", # tournament_token
-  "erc20:0x142884416f5c7dc61864cbd534349dd64a2ff3319823499bb010f1efb6774cd", # fame_coin
-  "erc20:0x3a2d0b3fcb6107e83ed5469e2551b863926a50ffabbd15a9d568911e46a13ea", # fools_coin
+  "erc20:0x55d8d0ab6eacfc99d5cb593237bdeed3681da22d568b4a2cab156e4899c2959", # fame_coin
+  "erc20:0x4e37b896e4c01d42b8d191c904d015e655c2069593b7dc3d47829bafad0fdb2", # fools_coin
   "erc20:0x41f5e539b5d70ac035d3ef6fe15f5f7e6056e3e9aa247e9b4cfa1b5505822fa", # lords
 ]
