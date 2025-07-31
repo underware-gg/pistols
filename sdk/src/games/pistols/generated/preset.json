@@ -308,6 +308,10 @@
                 "description": "Close expired duels"
               },
               {
+                "entrypoint": "delegate_game_actions",
+                "description": "Delegate game actions to another account"
+              },
+              {
                 "entrypoint": "clear_call_to_challenge",
                 "description": "Clear call to action for a player"
               },
@@ -550,6 +554,10 @@
                 {
                   "name": "timestamp",
                   "type": "felt"
+                },
+                {
+                  "name": "available",
+                  "type": "bool"
                 }
               ]
             },
