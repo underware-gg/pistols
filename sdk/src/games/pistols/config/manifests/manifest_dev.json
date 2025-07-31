@@ -1706,8 +1706,8 @@
       ]
     },
     {
-      "address": "0x1de99bddcf7848eab10b5a219543db45b2da311d821d8f465e7f83024e413cd",
-      "class_hash": "0x7fd5f7e3fbf86d5f7ae46f41e366d747d898d4f35cb4d94ff362dc42447b9df",
+      "address": "0x1320b64e8d103aa23b4d40ca1317c08bb0df299483535c655912c24d43d7efb",
+      "class_hash": "0x31b2856aa9c3b77452ac6efff699499519ddade17e6fe768e07f1c29382414c",
       "abi": [
         {
           "type": "impl",
@@ -2184,8 +2184,8 @@
       ]
     },
     {
-      "address": "0x69b8ee9d707ebaabb4a518a08b880f66365a07f47fbfdb4fab7da376b328c55",
-      "class_hash": "0x6da1e8c7c137d9d318542cbc287e5f651cec2e463087de24eb6e907595b71ae",
+      "address": "0xda3a7d5ae7e01324584c0677ac0f9c6e38ca2418401ac9e8df8d9f61bb00b9",
+      "class_hash": "0x4451bd9bde0222690a0162d734847f30b637f8a18e85f972ed3871ff9431ba1",
       "abi": [
         {
           "type": "impl",
@@ -2458,8 +2458,8 @@
       ]
     },
     {
-      "address": "0x200066f8243d2417d4a692a6f0e0d7563ad871a879ab2f88b25f6cb4129d3b9",
-      "class_hash": "0x554a16eeabaaaef1c59f5f0f0243b736d143baacaa2039227f5b78b07e244eb",
+      "address": "0x73cf757140a2cff9dd4679ef48b177ab80b0cfd888a18f0c397ae26f7262900",
+      "class_hash": "0x2a8b4999d4426a554246ac3a81622256875281a03a4f6ff5e2a6c48ff9ec817",
       "abi": [
         {
           "type": "impl",
@@ -2737,7 +2737,7 @@
                   "type": "core::integer::u8"
                 },
                 {
-                  "name": "expire_hours",
+                  "name": "expire_minutes",
                   "type": "core::integer::u64"
                 },
                 {
@@ -3772,8 +3772,8 @@
       ]
     },
     {
-      "address": "0x542cf08abb69cbec8ccc2af7e40d6eb5aa709fb6ee4c3cb79dbc7698823fd90",
-      "class_hash": "0x5d1d2384288052083677caacca6bc1e2eaa8aea9a26c9cdf7df48238e0abd70",
+      "address": "0x266af479dad5ddcb27a8672f5e122cde040a59a21cafd4b27f82506324d6c73",
+      "class_hash": "0x31ca5db04cae0cf6bd612be68e08a2726396d0add0a2f3166d16fceaf9b2f1c",
       "abi": [
         {
           "type": "impl",
@@ -5748,8 +5748,8 @@
       ]
     },
     {
-      "address": "0x142884416f5c7dc61864cbd534349dd64a2ff3319823499bb010f1efb6774cd",
-      "class_hash": "0xe5a1abdb44ab2cf2c91936249d5629d9eabe01aa6912e936dcb1a463724f2",
+      "address": "0x55d8d0ab6eacfc99d5cb593237bdeed3681da22d568b4a2cab156e4899c2959",
+      "class_hash": "0x2e0f24863fbda55d9552569673d96ef8339a46212cd7e902b73b203014393b0",
       "abi": [
         {
           "type": "impl",
@@ -6451,8 +6451,8 @@
       ]
     },
     {
-      "address": "0x3a2d0b3fcb6107e83ed5469e2551b863926a50ffabbd15a9d568911e46a13ea",
-      "class_hash": "0x45f4a9d3c0c961034721bdbb0a545b505508482c09c44e7c7525ec2cfb74c7e",
+      "address": "0x4e37b896e4c01d42b8d191c904d015e655c2069593b7dc3d47829bafad0fdb2",
+      "class_hash": "0x25ec89d7633058c1c4ecf8a9888e95e0025991a7aace9d9451a6971fc2cb803",
       "abi": [
         {
           "type": "impl",
@@ -6971,8 +6971,8 @@
       ]
     },
     {
-      "address": "0x2aeda53cbfdac4b00be91d5f243a8e30157102c3afa302dc6dc0cc36d19d0d8",
-      "class_hash": "0x1dc6e8fa129174513773886194b7ea456c2d68bdda2dbd9c21d79464f4bad8d",
+      "address": "0x217eaf9e55f9618cf6eddd1326c1fd97333894809a29d74ab063916c1b79ca8",
+      "class_hash": "0x3fa1e842bb37a8cc9c690a53cc2b81fc47f64623964a10cb86996e78c943d05",
       "abi": [
         {
           "type": "impl",
@@ -7582,6 +7582,22 @@
             },
             {
               "type": "function",
+              "name": "delegate_game_actions",
+              "inputs": [
+                {
+                  "name": "delegatee_address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "enabled",
+                  "type": "core::bool"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
               "name": "clear_call_to_challenge",
               "inputs": [
                 {
@@ -7941,6 +7957,7 @@
         "commit_moves",
         "reveal_moves",
         "collect_duel",
+        "delegate_game_actions",
         "clear_call_to_challenge",
         "emit_player_bookmark",
         "emit_player_social_link",
@@ -13632,6 +13649,12 @@
       "class_hash": "0xcb51faf59c9c97028878391e88d82cd2ac215ee469e8d1d7617f3f49d0ba92",
       "tag": "pistols-Player",
       "selector": "0x4fc7ed2304172cd24d40e2b967bf3642228eec13547b09e0ffdfb85469f6f86"
+    },
+    {
+      "members": [],
+      "class_hash": "0x72274721bf23c93387459a3d59a30dd1c064a57181c165e3d3432e97ec72a0e",
+      "tag": "pistols-PlayerDelegation",
+      "selector": "0x54aec2977788969f3222b10eb58bb6560e6b364483932a454b8f95b7bcb5f8e"
     },
     {
       "members": [],
