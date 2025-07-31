@@ -26,8 +26,9 @@ import TimestampTestPage from '/src/pages/tests/TimestampTestPage'
 import TokensTestPage from '/src/pages/tests/TokensTestPage'
 import ProfilesTestPage from '/src/pages/tests/ProfilesTestPage'
 import TutorialTestPage from '/src/pages/tests/TutorialTestPage'
-import ChainSwitchPage from './pages/tests/ChainSwitchPage'
-import SocialsTestPage from './pages/tests/SocialsTestPage'
+import ChainSwitchPage from '/src/pages/tests/ChainSwitchPage'
+import SocialsTestPage from '/src/pages/tests/SocialsTestPage'
+import MatchmakingTestPage from '/src/pages/tests/MatchmakingTestPage'
 
 //
 // REF:
@@ -77,6 +78,7 @@ const router = createBrowserRouter([
       { path: "sign", element: <SignTestPage /> },
       { path: "chainswitch", element: <ChainSwitchPage /> },
       { path: "socials", element: <SocialsTestPage /> },
+      { path: "matchmaking", element: <MatchmakingTestPage /> },
     ],
   },
   // internal pages

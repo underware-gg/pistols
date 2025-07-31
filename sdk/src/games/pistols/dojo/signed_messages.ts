@@ -63,7 +63,7 @@ export function make_typed_data_PlayerOnline({
     {
       identity: 'ContractAddress',
       timestamp: 'felt',
-      available: 'felt',
+      available: 'bool',
     },
   )
 }
@@ -98,6 +98,7 @@ const generateTypedData = <T extends models.SchemaType, M extends UnionOfModelDa
   },
   primaryType,
   domain,
+  // transform message types
   message,
 })
 

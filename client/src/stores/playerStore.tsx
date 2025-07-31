@@ -22,8 +22,11 @@ import { useDiscordSocialLink } from './eventsModelStore'
 interface NamesByAccount {
   [address: string]: string
 }
-interface TimestampByAccount {
-  [address: string]: number
+interface OnlineByAccount {
+  [address: string]: {
+    timestamp: number,
+    available: boolean,
+  }
 }
 interface PlayerBookmarksByAccount {
   [address: string]: bigint[]
@@ -36,7 +39,7 @@ interface TokenBookmarksByAccount {
 interface State {
   players_names: NamesByAccount,
   players_avatars: NamesByAccount,
-  players_online: TimestampByAccount,
+  players_online: OnlineByAccount,
   player_bookmarks: PlayerBookmarksByAccount,
   token_bookmarks: TokenBookmarksByAccount,
   updateUsernames: (usernames: Map<string, string>) => void;
@@ -85,10 +88,13 @@ const createStore = () => {
       set((state: State) => {
         entities.forEach((e) => {
           // PlayerOnline flags
-          const online = e.models.pistols.PlayerOnline
-          if (online) {
-            const address = _playerKey(online.identity)
-            state.players_online[address] = bigintToNumber(online.timestamp)
+          const playerOnline = e.models.pistols.PlayerOnline
+          if (playerOnline) {
+            const address = _playerKey(playerOnline.identity)
+            state.players_online[address] = {
+              timestamp: bigintToNumber(playerOnline.timestamp),
+              available: playerOnline.available,
+            }
           }
           // Bookmarks
           const bookmark = e.models.pistols.PlayerBookmarkEvent
@@ -258,7 +264,7 @@ export const useIsBookmarked = (target_address: BigNumberish, target_id: BigNumb
 
 export const usePlayersOnline = () => {
   const players_online = usePlayerDataStore((state) => state.players_online)
-  const playersOnline = useMemo(() => sortObjectByValue(players_online, (a, b) => (b - a)), [players_online])
+  const playersOnline = useMemo(() => sortObjectByValue(players_online, (a, b) => (b.timestamp - a.timestamp)), [players_online])
   return {
     playersOnline,
   }
@@ -311,7 +317,7 @@ export const useQueryPlayerIds = (
 
     // filter by active
     if (filterOnline) {
-      result = result.filter((e) => (players_online[_playerKey(e.player_address)] ?? 0) >= minPlayerTimestamp)
+      result = result.filter((e) => (players_online[_playerKey(e.player_address)]?.timestamp ?? 0) >= minPlayerTimestamp)
     }
 
     // sort...
