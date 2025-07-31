@@ -8,7 +8,11 @@ import * as ENV from '/src/utils/env'
 //------------------------------------------------------
 // Add only once to a top level component
 //
-export function PlayerOnlineSync() {
+export function PlayerOnlineSync({
+  verbose = false,
+}: {
+  verbose?: boolean
+}) {
   const { userHasInteracted } = useUserHasInteracted()
   const { finished } = useStoreLoadingProgress()
 
@@ -30,6 +34,10 @@ export function PlayerOnlineSync() {
   return (<></>)
 }
 
+
+//
+// for testing purposes
+//
 export function PublishOnlineStatusButton({
   absolute = true,
   available = true,
@@ -39,6 +47,16 @@ export function PublishOnlineStatusButton({
 }) {
   const { clientSeconds } = useClientTimestamp(true)
   const { publish, isPublishing } = usePlayerOnlineSignedMessage(clientSeconds, available);
-  const label = (available === true ? 'Publish Online Available' : 'Online Online Unavailable');
-  return (<Button className={absolute ? 'AbsoluteBottom' : ''} disabled={isPublishing} style={{ zIndex: 1000 }} onClick={publish}>{label}</Button>);
+  const label = (available === true ? 'Publish Online (Available)' : 'Publish Online (Unavailable)');
+  return (
+    <Button
+      className={absolute ? 'AbsoluteBottom' : ''}
+      disabled={isPublishing}
+      style={{ zIndex: 1000 }}
+      onClick={publish}
+      size='small'
+    >
+      {label}
+    </Button>
+  );
 }
