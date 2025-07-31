@@ -180,7 +180,7 @@ export interface PlayerFlags {
 export interface PlayerOnline {
 	identity: string;
 	timestamp: BigNumberish;
-	available: boolean;
+	available: BigNumberish;
 }
 
 // Type definition for `pistols::models::player::PlayerTeamFlags` struct
@@ -962,7 +962,7 @@ export const schema: SchemaType = {
 		PlayerOnline: {
 			identity: "",
 			timestamp: 0,
-			available: false,
+			available: 0,
 		},
 		PlayerTeamFlags: {
 			player_address: "",

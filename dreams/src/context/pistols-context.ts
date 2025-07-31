@@ -282,6 +282,7 @@ query getPlayerOnline {
     edges {
       node {
         timestamp
+        available
       }
     }
   }

@@ -18,7 +18,8 @@ export default function ActivityOnline() {
     <ActivityItem
       key={addr}
       playerAddress={addr}
-      timestamp={playersOnline[addr]}
+      timestamp={playersOnline[addr].timestamp}
+      isAvailable={playersOnline[addr].available}
       clientSeconds={clientSeconds}
       isBookmarked={bookmarkedPlayers.includes(BigInt(addr))}
     />)
@@ -40,17 +41,17 @@ export default function ActivityOnline() {
 const ActivityItem = ({
   playerAddress,
   timestamp,
+  isAvailable,
   clientSeconds,
   isBookmarked,
 }: {
   playerAddress: BigNumberish
   timestamp: number
+  isAvailable: boolean
   clientSeconds: number
   isBookmarked: boolean
 }) => {
   const { emit_player_bookmark, isDisabled: emitIsDisabled } = useExecuteEmitPlayerBookmark(playerAddress, 0, !isBookmarked)
-
-  const { isAvailable } = usePlayer(playerAddress)
   const { result: time, isOnline, isAway } = useMemo(() => formatTimestampDeltaElapsed(timestamp, clientSeconds), [timestamp, clientSeconds])
   return (
     <>

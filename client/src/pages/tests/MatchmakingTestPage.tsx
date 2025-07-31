@@ -1,0 +1,63 @@
+import React from 'react'
+import { Container, Table } from 'semantic-ui-react'
+import { useTutorialLevel, useTutorialPlayerId, useTutorialProgress } from '/src/hooks/useTutorial'
+import { useChallenge } from '/src/stores/challengeStore'
+import { CreateTutorialChallengeButton, OpenTutorialChallengeButton } from '/src/components/TutorialButtons'
+import { Connect } from '/src/pages/tests/ConnectTestPage'
+import { bigintToDecimal, bigintToHex } from '@underware/pistols-sdk/utils'
+import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
+import CurrentChainHint from '/src/components/CurrentChainHint'
+import ChallengeModal from '/src/components/modals/ChallengeModal'
+import StoreSync from '/src/stores/sync/StoreSync'
+import AppDojo from '/src/components/AppDojo'
+import { PlayerOnlineSync, PublishOnlineStatusButton } from '/src/stores/sync/PlayerOnlineSync'
+import ActivityOnline from '/src/components/ActivityOnline'
+// import * as ENV from '/src/utils/env'
+
+// const Row = Grid.Row
+// const Col = Grid.Column
+const Row = Table.Row
+const Cell = Table.Cell
+const Body = Table.Body
+
+export default function MatchmakingTestPage() {
+  return (
+    <AppDojo autoConnect>
+      <Container>
+        <TestPageMenu />
+        <CurrentChainHint />
+
+        <Connect />
+        <br />
+        <TutorialProgress />
+
+        <ActivityOnline />
+
+        <StoreSync />
+        <ChallengeModal />
+        <PlayerOnlineSync />
+      </Container>
+    </AppDojo>
+  );
+}
+
+function TutorialProgress() {
+  const { completedTutorialLevel, hasFinishedTutorial } = useTutorialProgress()
+  const { playerId } = useTutorialPlayerId()
+  return (
+    <>
+      <Table celled striped size='small'>
+        <Body className='H5'>
+          <Row className='ModalText'>
+            <Cell>Completed Level:</Cell>
+            <Cell className='Code'>
+              <PublishOnlineStatusButton absolute={false} available={false} />
+              <PublishOnlineStatusButton absolute={false} available={true} />
+            </Cell>
+          </Row>
+        </Body>
+      </Table>
+    </>
+  )
+}
+
