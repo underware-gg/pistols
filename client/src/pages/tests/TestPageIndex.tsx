@@ -10,6 +10,7 @@ const testPages = [
   { name: 'socials', connected: true },
   { name: 'tokens', connected: true },
   { name: 'tutorial', connected: true },
+  { name: 'matchmaking', connected: true },
   { name: 'timestamp', connected: true },
   { name: 'profiles', connected: false },
   { name: 'icons', connected: false },
@@ -64,10 +65,11 @@ export function TestPageMenu() {
           onClick={() => navigate('/tests')}
         />
         {testPages.map(page => (
-          <MenuItem className=''
+          <MenuItem
+            style={{ padding: '0.5rem' }}
             key={page.name}
             name={page.name}
-            icon={page.connected ? 'chain' : null}
+            // icon={page.connected ? 'chain' : null}
             active={location.pathname.endsWith(page.name)}
             onClick={() => _click(page.name)}
           />

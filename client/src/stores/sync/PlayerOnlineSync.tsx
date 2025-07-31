@@ -30,8 +30,15 @@ export function PlayerOnlineSync() {
   return (<></>)
 }
 
-export function PublishOnlineStatusButton() {
+export function PublishOnlineStatusButton({
+  absolute = true,
+  available = true,
+}: {
+  absolute?: boolean
+  available?: boolean
+}) {
   const { clientSeconds } = useClientTimestamp(true)
-  const { publish, isPublishing } = usePlayerOnlineSignedMessage(clientSeconds, false)
-  return (<Button className='AbsoluteBottom' disabled={isPublishing} style={{ zIndex: 1000 }} onClick={publish}>Publish Online Status</Button>)
+  const { publish, isPublishing } = usePlayerOnlineSignedMessage(clientSeconds, available);
+  const label = (available === true ? 'Publish Online Available' : 'Online Online Unavailable');
+  return (<Button className={absolute ? 'AbsoluteBottom' : ''} disabled={isPublishing} style={{ zIndex: 1000 }} onClick={publish}>{label}</Button>);
 }
