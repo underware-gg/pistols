@@ -551,15 +551,15 @@ export function setupWorld(provider: DojoProvider) {
 		return {
 			contractName: "duel_token",
 			entrypoint: "create_duel",
-      calldata: [duelType, duelistId, challengedAddress, livesStaked, expireMinutes, premise, message],
+			calldata: [duelType, duelistId, challengedAddress, livesStaked, expireMinutes, premise, message],
 		};
 	};
 
-  const duel_token_createDuel = async (snAccount: Account | AccountInterface, duelType: CairoCustomEnum, duelistId: BigNumberish, challengedAddress: string, livesStaked: BigNumberish, expireMinutes: BigNumberish, premise: CairoCustomEnum, message: string) => {
+	const duel_token_createDuel = async (snAccount: Account | AccountInterface, duelType: CairoCustomEnum, duelistId: BigNumberish, challengedAddress: string, livesStaked: BigNumberish, expireMinutes: BigNumberish, premise: CairoCustomEnum, message: string) => {
 		try {
 			return await provider.execute(
 				snAccount,
-        build_duel_token_createDuel_calldata(duelType, duelistId, challengedAddress, livesStaked, expireMinutes, premise, message),
+				build_duel_token_createDuel_calldata(duelType, duelistId, challengedAddress, livesStaked, expireMinutes, premise, message),
 				"pistols",
 			);
 		} catch (error) {
@@ -2399,6 +2399,27 @@ export function setupWorld(provider: DojoProvider) {
 			return await provider.execute(
 				snAccount,
 				build_game_createTrophies_calldata(),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_game_delegateGameActions_calldata = (delegateeAddress: string, enabled: boolean): DojoCall => {
+		return {
+			contractName: "game",
+			entrypoint: "delegate_game_actions",
+			calldata: [delegateeAddress, enabled],
+		};
+	};
+
+	const game_delegateGameActions = async (snAccount: Account | AccountInterface, delegateeAddress: string, enabled: boolean) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_game_delegateGameActions_calldata(delegateeAddress, enabled),
 				"pistols",
 			);
 		} catch (error) {
@@ -4544,6 +4565,8 @@ export function setupWorld(provider: DojoProvider) {
 			buildCommitMovesCalldata: build_game_commitMoves_calldata,
 			createTrophies: game_createTrophies,
 			buildCreateTrophiesCalldata: build_game_createTrophies_calldata,
+			delegateGameActions: game_delegateGameActions,
+			buildDelegateGameActionsCalldata: build_game_delegateGameActions_calldata,
 			doThatThing: game_doThatThing,
 			buildDoThatThingCalldata: build_game_doThatThing_calldata,
 			emitPlayerBookmark: game_emitPlayerBookmark,
