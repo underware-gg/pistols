@@ -82,7 +82,7 @@ export const useChallenge = (duelId: BigNumberish) => {
   const timestampStart = useMemo(() => Number(challenge?.timestamps.start ?? 0), [challenge])
   const timestampEnd = useMemo(() => Number(challenge?.timestamps.end ?? 0), [challenge])
 
-  const { clientSeconds } = useClientTimestamp(false)
+  const { clientSeconds } = useClientTimestamp()
   let state = useMemo(() => parseEnumVariant<constants.ChallengeState>(challenge?.state), [challenge])
   let needToSyncExpired = useMemo(() => (
     state == constants.ChallengeState.Awaiting && (timestampEnd < clientSeconds)
@@ -195,7 +195,7 @@ export const useRoundTimeout = (duelId: BigNumberish, autoUpdate = false) => {
   const entities = useChallengeStore((state) => state.entities);
   const round = useStoreModelsByKeys<models.Round>(entities, 'Round', [duelId])
 
-  const { clientSeconds } = useClientTimestamp(autoUpdate)
+  const { clientSeconds } = useClientTimestamp({ autoUpdate })
   const timeoutTimestamp = useMemo(() => (
     Math.max(Number(round?.moves_a.timeout ?? 0), Number(round?.moves_b.timeout ?? 0))
   ), [round])

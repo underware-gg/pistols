@@ -17,7 +17,7 @@ export function ChallengeTime({
   } = useChallenge(duelId)
   const { timeoutTimestamp } = useRoundTimeout(duelId)
 
-  const { clientSeconds } = useClientTimestamp(isAwaiting || isLive)
+  const { clientSeconds } = useClientTimestamp({ autoUpdate: isAwaiting || isLive })
 
   const elapsed = useMemo(() => {
     return (timestampStart && isLive) ? formatTimestampDeltaElapsed(timestampStart, clientSeconds).result : null

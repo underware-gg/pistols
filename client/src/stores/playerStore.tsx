@@ -298,7 +298,7 @@ export const useAllPlayersOnlineState = () => {
 // Get all players online status, old or new
 export const usePlayersAvailableForMatchmaking = () => {
   const players_online = usePlayerDataStore((state) => state.players_online);
-  const { clientTimestamp } = useClientTimestamp(true, 10);
+  const { clientTimestamp } = useClientTimestamp({ autoUpdate: true, updateSeconds: 10 });
   const playerIds = useMemo(() => (
     Object.keys(players_online).filter((playerKey) => {
       const { isAvailable } = getPlayerOnlineStatus(players_online[playerKey], clientTimestamp);

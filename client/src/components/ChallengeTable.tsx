@@ -305,7 +305,7 @@ function DuelItem({
 }) {
   const { aspectWidth } = useGameAspect()
   const { selectedDuelistId } = usePistolsContext()
-  const { clientSeconds } = useClientTimestamp(true)
+  const { clientSeconds } = useClientTimestamp({ autoUpdate: true })
 
   const {
     challenge: { duelistIdA, duelistIdB, state, isLive, isCanceled, isExpired, isDraw, winner, duelistAddressA, duelistAddressB, timestampStart, timestampEnd },

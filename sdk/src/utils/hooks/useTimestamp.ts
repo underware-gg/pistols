@@ -2,7 +2,15 @@ import { useCallback, useEffect, useState } from 'react'
 import { formatTimestampLocal } from 'src/utils/misc/timestamp'
 import { useMounted } from 'src/utils/hooks/useMounted'
 
-export const useClientTimestamp = (autoUpdate: boolean = false, updateSeconds: number = 1) => {
+export const useClientTimestamp = ({
+  autoUpdate = false,
+  updateSeconds = 1,
+  enabled = true,
+}: {
+  autoUpdate?: boolean
+  updateSeconds?: number
+  enabled?: boolean
+} = {}) => {
   const [clientDate, setClientDate] = useState(new Date(0))
   const [clientMillis, setClientMillis] = useState(0)
   const [clientSeconds, setClientSeconds] = useState(0.0)
@@ -16,26 +24,32 @@ export const useClientTimestamp = (autoUpdate: boolean = false, updateSeconds: n
   // avoid starting timer twice on strict mode
   const mounted = useMounted()
 
-  const _update = () => {
-    const now = new Date()
-    setClientDate(now)
-    setClientMillis(Math.floor(now.getTime()))
-    setClientSeconds(now.getTime() / 1000)
+  const _update = (reset: boolean = false) => {
+    const now = reset ? new Date(0) : new Date();
+    setClientDate(now);
+    setClientMillis(Math.floor(now.getTime()));
+    setClientSeconds(now.getTime() / 1000);
   }
 
   useEffect(() => {
-    let _mounted = true
-    let _interval = undefined
+    let _mounted = true;
+    let _interval = undefined;
     // initialize
-    if (mounted) {
-      _update()
+    if (!mounted) return;
+    if (!enabled) {
+      // reset timestamp
+      _update(true);
+    } else {
+      // get current timestamp
+      _update();
       // auto updates
-      if (autoUpdate) {
+      if (autoUpdate && updateSeconds > 0) {
         _interval = setInterval(() => {
           if (_mounted) _update()
         }, (updateSeconds * 1000))
       }
     }
+    // dismount: clear auto updates, if enabled
     return () => {
       _mounted = false
       clearInterval(_interval)
