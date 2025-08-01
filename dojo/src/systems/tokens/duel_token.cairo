@@ -63,6 +63,7 @@ pub trait IDuelToken<TState> {
     fn has_pact(self: @TState, duel_type: DuelType, address_a: ContractAddress, address_b: ContractAddress) -> bool;
     fn create_duel(ref self: TState, duel_type: DuelType, duelist_id: u128, challenged_address: ContractAddress, lives_staked: u8, expire_minutes: u64, premise: Premise, message: ByteArray) -> u128;
     fn reply_duel(ref self: TState, duel_id: u128, duelist_id: u128, accepted: bool) -> ChallengeState;
+    fn match_make(ref self: TState, address_a: ContractAddress, duelist_id_a: u128, address_b: ContractAddress, duelist_id_b: u128, lives_staked: u8, expire_minutes: u64, premise: Premise, message: ByteArray) -> u128;
 }
 
 // Exposed to clients
@@ -88,6 +89,17 @@ pub trait IDuelTokenPublic<TState> {
         duelist_id: u128,
         accepted: bool,
     ) -> ChallengeState;
+    fn match_make( //@description: Create an official ranked Duel
+        ref self: TState,
+        address_a: ContractAddress,
+        duelist_id_a: u128,
+        address_b: ContractAddress,
+        duelist_id_b: u128,
+        lives_staked: u8,
+        expire_minutes: u64,
+        premise: Premise,
+        message: ByteArray,
+    ) -> u128;
 }
 
 // Exposed to world
@@ -165,6 +177,7 @@ pub mod duel_token {
         DnsTrait,
         IDuelistTokenProtectedDispatcher, IDuelistTokenProtectedDispatcherTrait,
         IBotPlayerProtectedDispatcherTrait,
+        IAdminDispatcherTrait,
         // IGameDispatcherTrait,
     };
     use pistols::models::{
@@ -186,9 +199,8 @@ pub mod duel_token {
     };
     use pistols::types::{
         challenge_state::{ChallengeState, ChallengeStateTrait},
-        round_state::{RoundState},
         premise::{Premise, PremiseTrait},
-        timestamp::{Period, TimestampTrait, TIMESTAMP},
+        timestamp::{Period, PeriodTrait, TimestampTrait, TIMESTAMP},
         constants::{METADATA},
     };
     use pistols::libs::store::{Store, StoreTrait};
@@ -203,19 +215,18 @@ pub mod duel_token {
     use graffiti::url::{UrlImpl};
 
     pub mod Errors {
+        pub const CALLER_NOT_ADMIN: felt252         = 'DUEL: Caller not admin';
         pub const INVALID_CALLER: felt252           = 'DUEL: Invalid caller';
         pub const INVALID_DUELIST_A_NULL: felt252   = 'DUEL: Duelist A null';
         pub const INVALID_DUELIST_B_NULL: felt252   = 'DUEL: Duelist B null';
-        pub const INVALID_CHALLENGED_SELF: felt252  = 'DUEL: Challenged self';
+        pub const INVALID_CHALLENGE_SELF: felt252   = 'DUEL: Invalid self challenge';
         pub const INVALID_DUEL_TYPE: felt252        = 'DUEL: Invalid duel type';
         pub const INVALID_REPLY_SELF: felt252       = 'DUEL: Reply self';
         pub const INVALID_CHALLENGE: felt252        = 'DUEL: Invalid challenge';
         pub const NOT_YOUR_CHALLENGE: felt252       = 'DUEL: Not your challenge';
-        // pub const CHALLENGER_NOT_ADMITTED: felt252  = 'DUEL: Challenger not allowed';
-        // pub const CHALLENGED_NOT_ADMITTED: felt252  = 'DUEL: Challenged not allowed';
         pub const CHALLENGE_NOT_AWAITING: felt252   = 'DUEL: Challenge not Awaiting';
-        pub const PACT_EXISTS: felt252              = 'DUEL: Pact exists';
         pub const DUELIST_IN_CHALLENGE: felt252     = 'DUEL: Duelist in a challenge';
+        pub const PACT_EXISTS: felt252              = 'DUEL: Pact exists';
     }
 
     //*******************************
@@ -284,7 +295,7 @@ pub mod duel_token {
             // validate challenged
             let address_a: ContractAddress = starknet::get_caller_address();
             let mut address_b: ContractAddress = challenged_address;
-            assert(address_b != address_a, Errors::INVALID_CHALLENGED_SELF);
+            assert(address_b != address_a, Errors::INVALID_CHALLENGE_SELF);
 
             // validate duel type
             match duel_type {
@@ -295,10 +306,10 @@ pub mod duel_token {
                 DuelType::BotPlayer => {
                     address_b = store.world.bot_player_address();
                 },
-                DuelType::Undefined |
-                DuelType::Tournament |
-                DuelType::Tutorial => {
-                    // create tutorials with the tutorial contact only
+                DuelType::Tutorial |    // created by the tutorials contact only
+                DuelType::Tournament |  // created by the tournaments contact only
+                DuelType::MatchMake |   // created by match_make() only
+                DuelType::Undefined=> {
                     assert(false, Errors::INVALID_DUEL_TYPE);
                 },
             };
@@ -319,13 +330,10 @@ pub mod duel_token {
             store.enter_challenge(duelist_id_a, duel_id);
 
             // calc expiration
-            let timestamp: u64 = starknet::get_block_timestamp();
-            let timestamps = Period {
-                start: timestamp,
-                end: timestamp + 
-                    if (expire_minutes == 0) {TIMESTAMP::ONE_DAY}
-                    else {TimestampTrait::from_minutes(expire_minutes)},
-            };
+            let timestamps: Period = PeriodTrait::new_from_now(
+                if (expire_minutes == 0) {TIMESTAMP::ONE_DAY}
+                else {TimestampTrait::from_minutes(expire_minutes)},
+            );
 
             // create challenge
             let challenge = Challenge {
@@ -346,20 +354,9 @@ pub mod duel_token {
                 timestamps,
             };
 
-            // create Round, ready for player A to commit
-            let mut round = Round {
-                duel_id: challenge.duel_id,
-                state: RoundState::Commit,
-                moves_a: Default::default(),
-                moves_b: Default::default(),
-                state_a: Default::default(),
-                state_b: Default::default(),
-                final_blow: Default::default(),
-            };
-
             // save!
             store.set_challenge(@challenge);
-            store.set_round(@round);
+            store.set_round(@RoundTrait::new(duel_id));
 
             if (message.len() > 0) {
                 store.set_challenge_message(@ChallengeMessage {
@@ -370,7 +367,7 @@ pub mod duel_token {
 
             // set the pact + assert it does not exist
             if (address_b.is_non_zero()) {
-                challenge.set_pact(ref store);
+                challenge.assert_set_pact(ref store);
             }
 
             // Duelist 1 is ready to commit
@@ -413,7 +410,7 @@ pub mod duel_token {
                 if (challenge.address_b.is_zero() && accepted) {
                     challenge.address_b = caller;
                     // set the pact + assert it does not exist
-                    challenge.set_pact(ref store);
+                    challenge.assert_set_pact(ref store);
                 } else {
                     // else, only challenged or delegated can reply
                     assert(PlayerDelegationTrait::can_play_game(@store, challenge.address_b, caller), Errors::NOT_YOUR_CHALLENGE);
@@ -431,7 +428,7 @@ pub mod duel_token {
                     };
 
                     // validate duelist
-                    assert(challenge.duelist_id_b != challenge.duelist_id_a, Errors::INVALID_CHALLENGED_SELF);
+                    assert(challenge.duelist_id_b != challenge.duelist_id_a, Errors::INVALID_CHALLENGE_SELF);
 
                     // assert duelist is not in a challenge
                     store.enter_challenge(challenge.duelist_id_b, duel_id);
@@ -479,6 +476,85 @@ pub mod duel_token {
             self.update_token_metadata(duel_id);
 
             (challenge.state)
+        }
+
+        //-----------------------------------
+        // match-making
+        // official ranked games created by team bots only
+        //
+        fn match_make(ref self: ContractState,
+            address_a: ContractAddress,
+            duelist_id_a: u128,
+            address_b: ContractAddress,
+            duelist_id_b: u128,
+            lives_staked: u8,
+            expire_minutes: u64,
+            premise: Premise,
+            message: ByteArray,
+        ) -> u128 {
+            self._assert_caller_is_admin();
+            
+            // validate players
+            assert(address_a != address_b, Errors::INVALID_CHALLENGE_SELF);
+
+            // get active duelist from stack
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let duelist_dispatcher: IDuelistTokenProtectedDispatcher = store.world.duelist_token_protected_dispatcher();
+            let duelist_id_a: u128 = duelist_dispatcher.get_validated_active_duelist_id(address_a, duelist_id_a, 1);
+            let duelist_id_b: u128 = duelist_dispatcher.get_validated_active_duelist_id(address_b, duelist_id_b, 1);
+
+            // mint to game, so it can transfer to winner
+            let duel_id: u128 = self.token.mint_next(store.world.game_address());
+
+            // assert duelist is not in a challenge, get into it
+            store.enter_challenge(duelist_id_a, duel_id);
+            store.enter_challenge(duelist_id_b, duel_id);
+
+            // calc expiration
+            let timestamps: Period = PeriodTrait::new_from_now(
+                if (expire_minutes == 0) {TIMESTAMP::ONE_MINUTE * 10}
+                else {TimestampTrait::from_minutes(expire_minutes)}
+            );
+
+            // create challenge
+            let challenge = Challenge {
+                duel_id,
+                duel_type: DuelType::MatchMake,
+                premise,
+                lives_staked: core::cmp::max(lives_staked, 1),
+                // duelists
+                address_a,
+                address_b,
+                duelist_id_a,
+                duelist_id_b,
+                // progress
+                state: ChallengeState::InProgress,
+                season_id: 0,
+                winner: 0,
+                // timestamps
+                timestamps,
+            };
+
+            // save!
+            store.set_challenge(@challenge);
+            store.set_round(@RoundTrait::new(duel_id));
+            challenge.assert_set_pact(ref store);
+
+            if (message.len() > 0) {
+                store.set_challenge_message(@ChallengeMessage {
+                    duel_id,
+                    message,
+                });
+            }
+
+            // Duelist 1 is ready to commit
+            store.emit_challenge_action(@challenge, 1, ChallengeAction::Commit);
+            store.emit_challenge_action(@challenge, 2, ChallengeAction::Commit);
+
+            // events
+            PlayerTrait::check_in(ref store, Activity::ChallengeCreated, starknet::get_caller_address(), duel_id.into());
+
+            (duel_id)
         }
     }
 
@@ -566,15 +642,7 @@ pub mod duel_token {
 // // println!("challenge.duelist_id_b: {}", challenge.duelist_id_b);
 
 //                 // create Round, ready for player A to commit
-//                 let mut round = Round {
-//                     duel_id: challenge.duel_id,
-//                     state: RoundState::Commit,
-//                     moves_a: Default::default(),
-//                     moves_b: Default::default(),
-//                     state_a: Default::default(),
-//                     state_b: Default::default(),
-//                     final_blow: Default::default(),
-//                 };
+//                 let mut round = RoundTrait::new(duel_id);
 //                 round.set_commit_timeout(challenge.duel_type.get_rules(@store), timestamp);
 
 //                 // save!
@@ -647,6 +715,18 @@ pub mod duel_token {
 
 //             (duel_id)
 //         }
+    }
+
+
+    //------------------------------------
+    // Internal calls
+    //
+    #[generate_trait]
+    impl InternalImpl of InternalTrait {
+        fn _assert_caller_is_admin(self: @ContractState) {
+            let mut world = self.world_default();
+            assert(world.admin_dispatcher().am_i_admin(starknet::get_caller_address()) == true, Errors::CALLER_NOT_ADMIN);
+        }
     }
 
 

@@ -40,7 +40,11 @@ pub mod tutorial {
     use pistols::interfaces::dns::{DnsTrait};
     use pistols::systems::rng::{RngWrapTrait, MockedValue};
     use pistols::models::{
-        challenge::{Challenge, ChallengeTrait, ChallengeMessage, DuelType, Round, MovesTrait},
+        challenge::{
+            Challenge, ChallengeTrait,
+            ChallengeMessage, DuelType, MovesTrait,
+            Round, RoundTrait,
+        },
     };
     use pistols::types::{
         premise::{Premise},
@@ -135,20 +139,9 @@ pub mod tutorial {
                 message: level.message(),
             };
 
-            // create Round
-            let mut round = Round {
-                duel_id: challenge.duel_id,
-                state: RoundState::Commit,
-                moves_a: Default::default(),
-                moves_b: Default::default(),
-                state_a: Default::default(),
-                state_b: Default::default(),
-                final_blow: Default::default(),
-            };
-
             store.set_challenge(@challenge);
             store.set_challenge_message(@message);
-            store.set_round(@round);
+            store.set_round(@RoundTrait::new(duel_id));
 
             (challenge.duel_id)
         }

@@ -41,7 +41,7 @@ pub impl PactImpl of PactTrait {
             ((*self.address_a).into(), (*self.address_b).into())
         }
     }
-    fn set_pact(self: @Challenge, ref store: Store) {
+    fn assert_set_pact(self: @Challenge, ref store: Store) {
         let (a, b): (u256, u256) = self._challenge_pair();
         assert(a.is_non_zero(), DuelErrors::INVALID_DUELIST_A_NULL);
         assert(b.is_non_zero(), DuelErrors::INVALID_DUELIST_B_NULL);
