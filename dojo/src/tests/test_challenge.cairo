@@ -42,7 +42,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('DUEL: Challenged self', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('DUEL: Invalid self challenge', 'ENTRYPOINT_FAILED'))]
     fn test_invalid_challenged_self() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
         let _duel_id: u128 = tester::execute_create_duel(@sys, OWNER(), OWNER(), MESSAGE(), DuelType::Seasonal, 0, 1);
@@ -596,23 +596,30 @@ mod tests {
 
     #[test]
     #[should_panic(expected:('DUEL: Invalid duel type', 'ENTRYPOINT_FAILED'))]
-    fn test_create_tutorial_on_production() {
+    fn test_create_invalid_duel_type_tutorial() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        let _duel_id: u128 = tester::execute_create_duel(@sys, OWNER(), OTHER(), MESSAGE(), DuelType::Tutorial, 0, 1);
+        tester::execute_create_duel(@sys, OWNER(), OTHER(), MESSAGE(), DuelType::Tutorial, 0, 1);
     }
 
     #[test]
     #[should_panic(expected:('DUEL: Invalid duel type', 'ENTRYPOINT_FAILED'))]
-    fn test_create_tournament_on_production() {
+    fn test_create_invalid_duel_type_tournament() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        let _duel_id: u128 = tester::execute_create_duel(@sys, OWNER(), OTHER(), MESSAGE(), DuelType::Tournament, 0, 1);
+        tester::execute_create_duel(@sys, OWNER(), OTHER(), MESSAGE(), DuelType::Tournament, 0, 1);
     }
 
     #[test]
     #[should_panic(expected:('DUEL: Invalid duel type', 'ENTRYPOINT_FAILED'))]
-    fn test_create_undefined_on_production() {
+    fn test_create_invalid_duel_type_matchmake() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        let _duel_id: u128 = tester::execute_create_duel(@sys, OWNER(), OTHER(), MESSAGE(), DuelType::Undefined, 0, 1);
+        tester::execute_create_duel(@sys, OWNER(), OTHER(), MESSAGE(), DuelType::MatchMake, 0, 1);
+    }
+
+    #[test]
+    #[should_panic(expected:('DUEL: Invalid duel type', 'ENTRYPOINT_FAILED'))]
+    fn test_create_invalid_duel_type_undefined() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
+        tester::execute_create_duel(@sys, OWNER(), OTHER(), MESSAGE(), DuelType::Undefined, 0, 1);
     }
 
 }

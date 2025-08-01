@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
     use pistols::systems::rng::{RngWrap, RngWrapTrait};
-    use pistols::models::challenge::{DuelType, Round, MovesTrait, DuelistState, DuelistStateTrait};
+    use pistols::models::challenge::{DuelType, Round, RoundTrait, MovesTrait, DuelistState, DuelistStateTrait};
     use pistols::types::duel_progress::{DuelProgress, DuelStep, DuelistDrawnCard};
     use pistols::types::round_state::{RoundState};
     use pistols::types::constants::{CONST};
@@ -66,15 +66,8 @@ mod tests {
                 )
             ].span());
         }
-        let mut round = Round {
-            duel_id: 0x1234,
-            state: RoundState::Reveal,
-            moves_a: Default::default(),
-            moves_b: Default::default(),
-            state_a: Default::default(),
-            state_b: Default::default(),
-            final_blow: Default::default(),
-        };
+        let mut round: Round = RoundTrait::new(0x1234);
+        round.state = RoundState::Reveal;
         let mut hand_a: DuelistHand = round.moves_a.as_hand();
         let mut hand_b: DuelistHand = round.moves_b.as_hand();
         round.moves_a.reveal_salt_and_moves(SALT_A, moves_a);
