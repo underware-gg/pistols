@@ -178,7 +178,13 @@ export const usePlayer = (address: BigNumberish, onlineClientTimestamp?: number)
   // player online status
   const players_online = usePlayerDataStore((state) => state.players_online);
   const { clientTimestamp } = useClientTimestamp()
-  const { isAvailable, isOnline, isAway, formattedTime } = useMemo(() => (
+  const {
+    isAvailable,
+    isOnline,
+    isAway,
+    formattedTime: lastSeenTime,
+    timestamp: lastSeenTimestamp,
+  } = useMemo(() => (
     getPlayerOnlineStatus(players_online[playerKey], onlineClientTimestamp || clientTimestamp)
   ), [players_online, address, onlineClientTimestamp, clientTimestamp])
 
@@ -205,7 +211,8 @@ export const usePlayer = (address: BigNumberish, onlineClientTimestamp?: number)
     isAvailable,
     isOnline,
     isAway,
-    lastSeenTime: formattedTime,
+    lastSeenTime,
+    lastSeenTimestamp,
     totals,
   }
 }
@@ -314,6 +321,7 @@ const getPlayerOnlineStatus = (player_online: OnlineState | undefined, clientTim
   if (!player_online) return {};
   const { result: formattedTime, isOnline, isAway, isOffline } = formatTimestampDeltaElapsed(player_online.timestamp, clientTimestamp);
   return {
+    timestamp: player_online.timestamp,
     formattedTime,
     isAvailable: (isOnline && player_online.available),
     isOnline,

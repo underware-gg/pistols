@@ -34,7 +34,6 @@ export default function MatchmakingTestPage() {
 
         <StoreSync />
         <ChallengeModal />
-        <PlayerOnlineSync verbose={true} />
       </Container>
     </AppDojo>
   );
