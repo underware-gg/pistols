@@ -10,7 +10,7 @@ import { constants } from '@underware/pistols-sdk/pistols/gen'
 export default function ActivityFeed() {
   const { allPlayersActivity } = useAllPlayersActivityFeed()
   const { requiredDuelIds } = useCallToChallenges()
-  const { clientSeconds, updateTimestamp } = useClientTimestamp(true, 60)
+  const { clientSeconds, updateTimestamp } = useClientTimestamp({ autoUpdate: true, updateSeconds: 60 })
   useEffect(() => {
     updateTimestamp()
   }, [allPlayersActivity])

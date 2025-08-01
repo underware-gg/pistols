@@ -46,7 +46,7 @@ const SeasonRow = memo(({
   const { aspectWidth } = useGameAspect();
   const [isHovered, setIsHovered] = useState(false);
   const { timestamp_end, isActive } = useSeason(season);
-  const { clientTimestamp } = useClientTimestamp(isActive);
+  const { clientTimestamp } = useClientTimestamp({ autoUpdate: isActive });
   const { scores } = useLeaderboard(season);
   
   const poolSeason = useSeasonPool(season);

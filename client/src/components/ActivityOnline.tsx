@@ -12,7 +12,7 @@ export default function ActivityOnline() {
   const { address } = useAccount()
   const { bookmarkedPlayers } = usePlayer(address)
   const { playersOnline } = useAllPlayersOnlineState()
-  const { clientSeconds, updateTimestamp } = useClientTimestamp(true, 15)
+  const { clientSeconds, updateTimestamp } = useClientTimestamp({ autoUpdate: true, updateSeconds: 15 })
 
   const items = useMemo(() => (Object.keys(playersOnline).map((addr) =>
     <ActivityItem

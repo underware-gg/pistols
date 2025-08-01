@@ -132,7 +132,7 @@ function SeasonRow({
   const { account } = useAccount()
   const { seasonName } = useSeason(seasonId)
   const { phase, timestamp_start, timestamp_end, isActive } = useSeason(seasonId)
-  const { clientTimestamp } = useClientTimestamp(isActive)
+  const { clientTimestamp } = useClientTimestamp({ autoUpdate: isActive })
   const { canCollectSeason } = useCanCollectSeason()
   const { bank } = useDojoSystemCalls()
   const poolSeason = useSeasonPool(seasonId)
