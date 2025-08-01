@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Button } from 'semantic-ui-react'
 import { usePlayerOnlineSignedMessage } from '/src/hooks/useSignedMessages'
 import { useClientTimestamp, useUserHasInteracted } from '@underware/pistols-sdk/utils/hooks'
@@ -13,25 +13,45 @@ export function PlayerOnlineSync({
 }: {
   verbose?: boolean
 }) {
-  const { userHasInteracted } = useUserHasInteracted()
-  const { finished } = useStoreLoadingProgress()
-
-  // get a tick periodically
-  const { clientSeconds, updateTimestamp } = useClientTimestamp({ autoUpdate: true, updateSeconds: 50 })
-  useEffect(() => {
-    updateTimestamp()
-  }, [])
+  // conditions to start publishing
+  const { userHasInteracted } = useUserHasInteracted();
+  const { finished } = useStoreLoadingProgress();
+  const canPublish = useMemo(() => (ENV.PUBLISH_ONLINE_STATUS && userHasInteracted && finished), [userHasInteracted, finished]);
 
   // publisher
-  const { publish, isPublishing } = usePlayerOnlineSignedMessage(finished ? clientSeconds : 0, false)
+  const [newTimestamp, setNewTimestamp] = useState(0);
+  const { clientTimestamp, updateTimestamp } = useClientTimestamp({ autoUpdate: true, updateSeconds: 10 });
+  const { publish, isPublishing, isError, lastTimestamp } = usePlayerOnlineSignedMessage(newTimestamp, false);
+  useEffect(() => {
+    // sync client with last timestamp
+    updateTimestamp();
+  }, [lastTimestamp])
+
+  // current player online stimestamp
+  const secondsSinceLastSeen = useMemo(() => (
+    (lastTimestamp && clientTimestamp) ? Math.max(0, Math.floor((clientTimestamp - lastTimestamp))) : 0
+  ), [clientTimestamp, lastTimestamp]);
+  useEffect(() => {
+    // isError stops auto publishing...
+    if (canPublish && !isPublishing && !isError && (lastTimestamp === undefined || secondsSinceLastSeen >= 50)) {
+      setNewTimestamp(clientTimestamp);
+    } else {
+      setNewTimestamp(0);
+    }
+  }, [canPublish, isPublishing, isError, clientTimestamp, lastTimestamp, secondsSinceLastSeen])
 
   useEffect(() => {
-    if (publish && clientSeconds > 0 && userHasInteracted && finished && !isPublishing && ENV.PUBLISH_ONLINE_STATUS) {
-      publish()
+    if (publish && newTimestamp > 0) {
+      publish();
+      setNewTimestamp(0);
     }
-  }, [publish, clientSeconds, userHasInteracted, finished])
+  }, [publish, newTimestamp])
 
-  return (<></>)
+  // useMemo(() => {
+  //   console.log(`PlayerOnlineSync(${canPublish}) =>`, newTimestamp, secondsSinceLastSeen, '>', canPublish, isPublishing, isError, lastTimestamp);
+  // }, [newTimestamp, secondsSinceLastSeen, canPublish, isPublishing, isError, lastTimestamp]);
+
+  return (<></>);
 }
 
 

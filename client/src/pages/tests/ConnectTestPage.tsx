@@ -113,7 +113,7 @@ export function Connect() {
                   <div>
                     &nbsp;&nbsp;
                     {connector.name}
-                    {username && ` (${username})`}
+                    {username && ` :: ${username}`}
                     &nbsp;&nbsp;
                     </div>
                   {Boolean(openProfile) && <Button size='tiny' onClick={() => openProfile()}>Profile</Button>}

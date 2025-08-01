@@ -35,7 +35,6 @@ export const useClientTimestamp = ({
     let _mounted = true;
     let _interval = undefined;
     // initialize
-    if (!mounted) return;
     if (!enabled) {
       // reset timestamp
       _update(true);
@@ -43,7 +42,7 @@ export const useClientTimestamp = ({
       // get current timestamp
       _update();
       // auto updates
-      if (autoUpdate && updateSeconds > 0) {
+      if (mounted && autoUpdate && updateSeconds > 0) {
         _interval = setInterval(() => {
           if (_mounted) _update()
         }, (updateSeconds * 1000))
