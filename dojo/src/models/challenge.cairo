@@ -38,6 +38,7 @@ pub enum DuelType {
     Tutorial,       // 3
     Practice,       // 4
     BotPlayer,      // 5
+    MatchMake,      // 6
 }
 
 #[derive(Clone, Drop, Serde)]
@@ -184,13 +185,14 @@ pub impl DuelTypeImpl of DuelTypeTrait {
         (match self {
             // season rules + pools
             DuelType::Seasonal |
-            DuelType::Tournament => store.get_current_season_rules(),
+            DuelType::Tournament |
+            DuelType::MatchMake => store.get_current_season_rules(),
             // no points, burns FAME
             DuelType::BotPlayer => Rules::Unranked,
             // no rules, no points, no FAME
-            DuelType::Undefined |
             DuelType::Tutorial |
-            DuelType::Practice => Rules::Undefined,
+            DuelType::Practice |
+            DuelType::Undefined => Rules::Undefined,
         })
     }
     fn is_unranked(self: @DuelType, store: @Store) -> bool {
@@ -200,6 +202,18 @@ pub impl DuelTypeImpl of DuelTypeTrait {
 
 #[generate_trait]
 pub impl RoundImpl of RoundTrait {
+    #[inline(always)]
+    fn new(duel_id: u128) -> Round {
+        (Round {
+            duel_id,
+            state: RoundState::Commit,
+            moves_a: Default::default(),
+            moves_b: Default::default(),
+            state_a: Default::default(),
+            state_b: Default::default(),
+            final_blow: Default::default(),
+        })
+    }
     #[inline(always)]
     fn make_seed(self: @Round) -> felt252 {
         (hash_values([(*self).moves_a.salt, (*self).moves_b.salt].span()))
@@ -295,6 +309,7 @@ impl DuelTypeIntoByteArray of core::traits::Into<DuelType, ByteArray> {
             DuelType::Tutorial     => "DuelType::Tutorial",
             DuelType::Practice     => "DuelType::Practice",
             DuelType::BotPlayer    => "DuelType::BotPlayer",
+            DuelType::MatchMake    => "DuelType::MatchMake",
         }
     }
 }

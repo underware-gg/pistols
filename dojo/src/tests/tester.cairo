@@ -44,7 +44,7 @@ pub mod tester {
             Challenge, ChallengeValue,
             RoundValue,
             DuelistState,
-            DuelType,
+            DuelType, DuelTypeTrait,
         },
         duelist::{
             Duelist, DuelistValue,
@@ -75,6 +75,7 @@ pub mod tester {
         duelist_profile::{DuelistProfile},
         trophies::{Trophy, TrophyTrait},
         constants::{CONST, FAME},
+        rules::{Rules, RulesTrait},
     };
     use pistols::utils::{
         byte_arrays::{BoolToString},
@@ -774,15 +775,15 @@ pub mod tester {
     // ::pack_token
     pub fn execute_claim_starter_pack(sys: @TestSystems, sender: ContractAddress) -> Span<u128> {
         impersonate(sender);
-        let token_ids: Span<u128> = (*sys.pack).claim_starter_pack();
+        let duelist_ids: Span<u128> = (*sys.pack).claim_starter_pack();
         _next_block();
-        (token_ids)
+        (duelist_ids)
     }
     pub fn execute_claim_gift(sys: @TestSystems, sender: ContractAddress) -> Span<u128> {
         impersonate(sender);
-        let token_ids: Span<u128> = (*sys.pack).claim_gift();
+        let duelist_ids: Span<u128> = (*sys.pack).claim_gift();
         _next_block();
-        (token_ids)
+        (duelist_ids)
     }
     pub fn execute_pack_purchase(sys: @TestSystems, sender: ContractAddress, pack_type: PackType) -> u128 {
         impersonate(sender);
@@ -798,9 +799,9 @@ pub mod tester {
     }
     pub fn execute_pack_open(sys: @TestSystems, sender: ContractAddress, pack_id: u128) -> Span<u128> {
         impersonate(sender);
-        let token_ids: Span<u128> = (*sys.pack).open(pack_id);
+        let duelist_ids: Span<u128> = (*sys.pack).open(pack_id);
         _next_block();
-        (token_ids)
+        (duelist_ids)
     }
 
     // ::duelist_token
@@ -856,6 +857,17 @@ pub mod tester {
         let new_state: ChallengeState = (*sys.duels).reply_duel(duel_id, duelist_id, accepted);
         _next_block();
         (new_state)
+    }
+    pub fn execute_match_make(sys: @TestSystems, sender: ContractAddress,
+        address_a: ContractAddress,
+        duelist_id_a: u128,
+        address_b: ContractAddress,
+        duelist_id_b: u128,
+    ) -> u128 {
+        impersonate(sender);
+        let duel_id: u128 = (*sys.duels).match_make(address_a, duelist_id_a, address_b, duelist_id_b, 1, 0, Premise::Nothing, "");
+        _next_block();
+        (duel_id)
     }
 
     // ::ring_token
@@ -920,12 +932,12 @@ pub mod tester {
         execute_commit_moves_ID(sys, sender, ID(sender), duel_id, hash);
     }
     pub fn execute_commit_moves_ID(sys: @TestSystems, sender: ContractAddress,
-        token_id: u128,
+        duelist_id: u128,
         duel_id: u128,
         hash: u128,
     ) {
         impersonate(sender);
-        (*sys.game).commit_moves(token_id, duel_id, hash);
+        (*sys.game).commit_moves(duelist_id, duel_id, hash);
         _next_block();
     }
     pub fn execute_reveal_moves(sys: @TestSystems, sender: ContractAddress,
@@ -936,13 +948,13 @@ pub mod tester {
         execute_reveal_moves_ID(sys, sender, ID(sender), duel_id, salt, moves);
     }
     pub fn execute_reveal_moves_ID(sys: @TestSystems, sender: ContractAddress,
-        token_id: u128,
+        duelist_id: u128,
         duel_id: u128,
         salt: felt252,
         moves: Span<u8>,
     ) {
         impersonate(sender);
-        (*sys.game).reveal_moves(token_id, duel_id, salt, moves);
+        (*sys.game).reveal_moves(duelist_id, duel_id, salt, moves);
         _next_block();
     }
     pub fn execute_collect_duel(sys: @TestSystems, sender: ContractAddress, duel_id: u128) {
@@ -1081,8 +1093,8 @@ pub mod tester {
         set_Config(ref sys.world, @config);
     }
 
-    pub fn make_duelist_inactive(sys: @TestSystems, token_id: u128, dripped_fame: u64) {
-        let timestamp_active: u64 = (*sys.store).get_duelist_timestamps(token_id).active;
+    pub fn make_duelist_inactive(sys: @TestSystems, duelist_id: u128, dripped_fame: u64) {
+        let timestamp_active: u64 = (*sys.store).get_duelist_timestamps(duelist_id).active;
         let elapsed: u64 = FAME::MAX_INACTIVE_TIMESTAMP + (FAME::TIMESTAMP_TO_DRIP_ONE_FAME * dripped_fame);
         set_block_timestamp(timestamp_active + elapsed);
     }
@@ -1215,6 +1227,41 @@ pub mod tester {
         println!("Pool::FamePeg______LORDS:{} FAME:{}", ETH(pool_peg.balance_lords), ETH(pool_peg.balance_fame));
         println!("Pool::Season_______LORDS:{} FAME:{}", ETH(pool_season.balance_lords), ETH(pool_season.balance_fame));
         println!("Pool::Sacrifice__LORDS:{} FAME:{}", ETH(pool_flame.balance_lords), ETH(pool_flame.balance_fame));
+    }
+
+    pub fn assert_ranked_duel_results(sys: @TestSystems, duel_id: u128, prefix: ByteArray) {
+        let ch: ChallengeValue = (*sys.store).get_challenge_value(duel_id);
+        assert_ne!(ch.state, ChallengeState::InProgress, "[{}] ranked state", prefix);
+        assert_ne!(ch.season_id, 0, "[{}] ranked season_id", prefix);
+        assert_ne!(ch.winner, 0, "[{}] ranked winner", prefix); // must have a winner to be a valid test
+        let rules: Rules = ch.duel_type.get_rules(sys.store);
+        assert_eq!(rules, (*sys.store).get_current_season_rules(), "[{}] ranked rules", prefix);
+        if (ch.winner == 1) {
+            assert_gt!((*sys.fools).balance_of(ch.address_a), 0, "[{}] ranked fools balance A (winner)", prefix);
+            assert_eq!((*sys.fools).balance_of(ch.address_b), 0, "[{}] ranked fools balance B (loser)", prefix);
+        } else if (ch.winner == 2) {
+            assert_eq!((*sys.fools).balance_of(ch.address_a), 0, "[{}] ranked fools balance A (loser)", prefix);
+            assert_gt!((*sys.fools).balance_of(ch.address_b), 0, "[{}] ranked fools balance B (winner)", prefix);
+        }
+        let score_a: SeasonScoreboard = (*sys.store).get_scoreboard(ch.season_id, ch.duelist_id_a.into());
+        let score_b: SeasonScoreboard = (*sys.store).get_scoreboard(ch.season_id, ch.duelist_id_b.into());
+        assert_gt!(score_a.points, 0, "[{}] ranked score_a.points", prefix);
+        assert_gt!(score_b.points, 0, "[{}] ranked score_b.points", prefix);
+    }
+
+    pub fn assert_unranked_duel_results(sys: @TestSystems, duel_id: u128, prefix: ByteArray) {
+        let ch: ChallengeValue = (*sys.store).get_challenge_value(duel_id);
+        assert_ne!(ch.state, ChallengeState::InProgress, "[{}] unranked state", prefix);
+        assert_ne!(ch.season_id, 0, "[{}] unranked season_id", prefix);
+        assert_ne!(ch.winner, 0, "[{}] unranked winner", prefix); // must have a winner to be a valid test
+        let rules: Rules = ch.duel_type.get_rules(sys.store);
+        assert_eq!(rules, Rules::Unranked, "[{}] unranked rules", prefix);
+        assert_eq!((*sys.fools).balance_of(ch.address_a), 0, "[{}] unranked fools balance A", prefix);
+        assert_eq!((*sys.fools).balance_of(ch.address_b), 0, "[{}] unranked fools balance B", prefix);
+        let score_a: SeasonScoreboard = (*sys.store).get_scoreboard(ch.season_id, ch.duelist_id_a.into());
+        let score_b: SeasonScoreboard = (*sys.store).get_scoreboard(ch.season_id, ch.duelist_id_b.into());
+        assert_eq!(score_a.points, 0, "[{}] unranked score_a.points", prefix);
+        assert_eq!(score_b.points, 0, "[{}] unranked score_b.points", prefix);
     }
 
     pub fn starts_with(input: ByteArray, prefix: ByteArray) -> bool {
