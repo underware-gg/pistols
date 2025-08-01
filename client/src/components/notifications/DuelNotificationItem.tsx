@@ -36,7 +36,7 @@ export const DuelNotificationItem: React.FC<DuelNotificationItemProps> = ({
   const { isMyAccount: isMeB } = useIsMyAccount(challenge?.duelistAddressB)
   const { markAsRead } = useNotifications()
   const [isHovered, setIsHovered] = useState(false)
-  const { clientSeconds } = useClientTimestamp(true)
+  const { clientSeconds } = useClientTimestamp({ autoUpdate: true })
 
   const { title, message } = useMemo(() => {
     if (!challenge || !notifications) return { 

@@ -33,7 +33,7 @@ export default function TimestampTestPage() {
 
 function TimestampSync() {
   const { timestamp } = useGameTimestamp()
-  const { clientTimestamp } = useClientTimestamp(true)
+  const { clientTimestamp } = useClientTimestamp({ autoUpdate: true })
 
   return (
     <Table celled striped size='small' color='green'>
@@ -53,7 +53,7 @@ function TimestampSync() {
 
 
 function TimestampFormatTable() {
-  const { clientTimestamp } = useClientTimestamp(true)
+  const { clientTimestamp } = useClientTimestamp({ autoUpdate: true })
   const start = useMemo(() => (clientTimestamp), [clientTimestamp])
   return (
     <>

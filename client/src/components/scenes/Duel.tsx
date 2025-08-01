@@ -328,7 +328,7 @@ const DuelContent: React.FC<{
 //   const { dispatchAnimated } = useGameplayContext()
 //   const { dispatchSetDuel, tutorialOpener } = usePistolsContext()
 //   const { debugMode, duelSpeedFactor } = useSettings()
-//   const { clientSeconds } = useClientTimestamp(false)
+//   const { clientSeconds } = useClientTimestamp()
 
 //   const { duelistIdA, duelistIdB, duelistAddressA, duelistAddressB, timestampStart, isTutorial, timestampEnd, isAwaiting, isInProgress, isFinished  } = useGetChallenge(duelId)
 

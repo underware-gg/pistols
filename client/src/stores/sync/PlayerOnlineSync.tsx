@@ -17,7 +17,7 @@ export function PlayerOnlineSync({
   const { finished } = useStoreLoadingProgress()
 
   // get a tick periodically
-  const { clientSeconds, updateTimestamp } = useClientTimestamp(true, 50)
+  const { clientSeconds, updateTimestamp } = useClientTimestamp({ autoUpdate: true, updateSeconds: 50 })
   useEffect(() => {
     updateTimestamp()
   }, [])
@@ -45,7 +45,7 @@ export function PublishOnlineStatusButton({
   absolute?: boolean
   available?: boolean
 }) {
-  const { clientSeconds } = useClientTimestamp(true)
+  const { clientSeconds } = useClientTimestamp({ autoUpdate: true })
   const { publish, isPublishing } = usePlayerOnlineSignedMessage(clientSeconds, available);
   const label = (available === true ? 'Publish Online (Available)' : 'Publish Online (Unavailable)');
   return (
