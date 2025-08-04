@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useAccount } from '@starknet-react/core';
 import { useMounted } from '@underware/pistols-sdk/utils/hooks';
 import { useSdkSqlQuery } from '@underware/pistols-sdk/dojo/sql';
@@ -35,9 +35,10 @@ export const useFetchInitialTokenBalancesQuery = () => {
   const mounted = useMounted()
   const { address } = useAccount();
   const { erc20Tokens, erc721Tokens } = useTokenContracts()
+  const [fetched, setFetched] = useState(false);
 
   const query = useMemo(() => {
-    if (!mounted || !address) return '';
+    if (!mounted || !address || fetched) return '';
     const _getAlllBalances = [
       erc721Tokens.duelistContractAddress,
       erc721Tokens.ringContractAddress,
@@ -55,19 +56,24 @@ export const useFetchInitialTokenBalancesQuery = () => {
       // `order by 3, 2`,
     ];
     return queries.join(' ');
-  }, [mounted, address, erc20Tokens, erc721Tokens])
+  }, [mounted, address, erc20Tokens, erc721Tokens, fetched])
 
   const { data, isLoading } = useSdkSqlQuery({
     query,
     formatFn,
   });
 
-  // useEffect(() => debug.log('SQL BALANCES query', query), [query])
-  // useEffect(() => debug.log('SQL BALANCES data', data), [data])
-  useEffect(() => debug.log('SQL BALANCES:', data.length, query), [data])
+  useEffect(() => debug.log('SQL BALANCES:', fetched, data.length, !fetched && query), [fetched, data, query])
 
   // add balances to token stores
   useAddBalancesToTokenStores(data);
+
+  // avoid running this more than once
+  useEffect(() => {
+    if (data.length > 0) {
+      setFetched(true);
+    }
+  }, [data])
 
   return {
     initialTokenBalances: data,
@@ -90,7 +96,7 @@ export const useFetchTokenBalancesOwnedByAccount = (accountAddress: BigNumberish
     query,
     formatFn,
   });
-  useEffect(() => debug.log('SQL ACCOUNT TOKENS:', data.length, query), [data])
+  useEffect(() => debug.log('SQL ACCOUNT TOKENS:', data.length, data.length > 0 && query), [data, query])
   // add balances to token stores
   useAddBalancesToTokenStores(data);
   return {

@@ -63,7 +63,7 @@ export function TokenStoreSync() {
     contracts,
     updateBalance: (balance: torii.TokenBalance) => {
       const _contract = bigintToHex(balance.contract_address)
-      // debug.log("TOKENS SUB >>>", balance, token_contracts.includes(_contract), coin_contracts.includes(_contract))
+      // debug.log("TOKENS SUB >>>", balance, contracts.includes(_contract), contracts.includes(_contract))
       if (_contract == allTokens.lordsContractAddress) {
         lords_state.updateBalance(balance)
       } else if (_contract == allTokens.fameContractAddress) {

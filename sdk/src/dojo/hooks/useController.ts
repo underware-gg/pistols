@@ -41,7 +41,7 @@ export const useConnectedController = () => {
 
   // connector
   const connectorId = useMemo(() => (connector?.id), [connector])
-  const controllerConnector = useMemo(() => (
+  const controllerConnector = useMemo<ControllerConnector>(() => (
     connectorId == supportedConnetorIds.CONTROLLER ? connector as unknown as ControllerConnector : undefined
   ), [connector, connectorId])
 

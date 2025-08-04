@@ -24,7 +24,7 @@
     "**/database.json": true,
     "**/manifest.json": true,
     "**/manifest_*.json": true,
-    "**/assets": true,
+    "/assets": true,
     "**/dist": true,
     // "**/generated/*": true,
     // "client/public/**": true,

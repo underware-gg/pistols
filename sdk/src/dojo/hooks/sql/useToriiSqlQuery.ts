@@ -28,9 +28,6 @@ export type UseSdkSqlQueryResult<Output> = {
 export const useSdkSqlQuery = <Input, Output>({
   query,
   formatFn,
-  defaultValue,
-  pageSize,
-  pageIndex,
 }: UseSdkSqlQueryProps<Input, Output>): UseSdkSqlQueryResult<Output> => {
   const { selectedNetworkConfig } = useDojoSetup()
   const {
@@ -41,7 +38,7 @@ export const useSdkSqlQuery = <Input, Output>({
   } = useToriiSQLQuery(
     query,
     formatFn,
-    defaultValue,
+    undefined,
     selectedNetworkConfig.sqlUrl,
   );
   const queryHash = useMemo(() => poseidonString(query), [query])

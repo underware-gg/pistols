@@ -6,6 +6,7 @@ import { SubscriptionCallbackArgs } from '@dojoengine/sdk'
 import { Page } from '@dojoengine/torii-client'
 import * as torii from '@dojoengine/torii-client'
 import { debug } from 'src/games/pistols/misc/debug'
+import { isIP } from 'net'
 
 
 //---------------------------------------
@@ -112,14 +113,14 @@ export const useSdkTokenBalancesSub = ({
 
   useEffect(() => {
     let _subscription: torii.Subscription = undefined;
-    const _subscribe = async () => {
-      debug.log(`useSdkTokenBalancesSub() SUBSCRIBE......`, contracts)
+    const _subscribe = async (contractAddresses: string[]) => {
+      debug.log(`useSdkTokenBalancesSub() SUBSCRIBE......`, contractAddresses)
       _subscription = await sdk.onTokenBalanceUpdated({
-        contractAddresses: contracts.map(c => bigintToHex(c)),
+        contractAddresses,
         accountAddresses: [],
         tokenIds: [],
         callback: (response: SubscriptionCallbackArgs<torii.TokenBalance>) => {
-          // debug.log("useSdkTokenBalancesSub() RESPONSE:", response);
+          debug.log("useSdkTokenBalancesSub() RESPONSE:", response);
           let balance: torii.TokenBalance = response.data ??
             // it's actually returning a torii.TokenBalance!!!
             ((response as any).contract_address ? response as unknown as torii.TokenBalance : undefined);
@@ -135,7 +136,10 @@ export const useSdkTokenBalancesSub = ({
       })
     };
     // subscribe
-    if (sdk && enabled && contracts.length > 0) _subscribe()
+    const _contractAddresses = contracts.map(c => bigintToAddress(c)).filter(isPositiveBigint);
+    if (sdk && enabled && _contractAddresses.length > 0) {
+      _subscribe(_contractAddresses);
+    }
     // unsubscribe
     return () => {
       _subscription?.cancel()
