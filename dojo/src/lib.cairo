@@ -11,6 +11,7 @@ mod systems {
     pub mod game;
     pub mod game_loop;
     pub mod bot_player;
+    pub mod matchmaker;
     pub mod rng;
     pub mod rng_mock;
     pub mod tutorial;
@@ -52,6 +53,7 @@ mod models {
     pub mod config;
     pub mod duelist;
     pub mod events;
+    pub mod matches;
     pub mod pack;
     pub mod pact;
     pub mod player;

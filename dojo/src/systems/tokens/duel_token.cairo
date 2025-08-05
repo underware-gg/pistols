@@ -177,8 +177,6 @@ pub mod duel_token {
         DnsTrait,
         IDuelistTokenProtectedDispatcher, IDuelistTokenProtectedDispatcherTrait,
         IBotPlayerProtectedDispatcherTrait,
-        IAdminDispatcherTrait,
-        // IGameDispatcherTrait,
     };
     use pistols::models::{
         player::{PlayerTrait, PlayerDelegationTrait},
@@ -486,13 +484,13 @@ pub mod duel_token {
             premise: Premise,
             message: ByteArray,
         ) -> u128 {
-            self._assert_caller_is_admin();
+            let mut store: Store = StoreTrait::new(self.world_default());
+            assert(store.world.caller_is_matchmaker_contract(), Errors::INVALID_CALLER);
             
             // validate players
             assert(address_a != address_b, Errors::INVALID_CHALLENGE_SELF);
 
             // get active duelist from stack
-            let mut store: Store = StoreTrait::new(self.world_default());
             lives_staked = core::cmp::max(lives_staked, 1);
             let duelist_dispatcher: IDuelistTokenProtectedDispatcher = store.world.duelist_token_protected_dispatcher();
             let duelist_id_a: u128 = duelist_dispatcher.get_validated_active_duelist_id(address_a, duelist_id_a, lives_staked);
@@ -710,18 +708,6 @@ pub mod duel_token {
 
 //             (duel_id)
 //         }
-    }
-
-
-    //------------------------------------
-    // Internal calls
-    //
-    #[generate_trait]
-    impl InternalImpl of InternalTrait {
-        fn _assert_caller_is_admin(self: @ContractState) {
-            let mut world = self.world_default();
-            assert(world.admin_dispatcher().am_i_admin(starknet::get_caller_address()) == true, Errors::CALLER_NOT_ADMIN);
-        }
     }
 
 

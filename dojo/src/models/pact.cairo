@@ -7,7 +7,7 @@ pub struct Pact {
     #[key]
     pub duel_type: DuelType,
     #[key]
-    pub pair: u128,     // xor'd duelists as u256(address).low
+    pub pair: u128,     // xor'd players as u256(address).low
     //------------
     pub duel_id: u128,  // current Challenge, or 0x0
 }
@@ -27,6 +27,7 @@ pub impl PactImpl of PactTrait {
     //
     // misc
     //
+    // because: (a^b) == (b^a)
     fn make_pair(a: u256, b: u256) -> u128 {
         (a.low ^ b.low)
     }
