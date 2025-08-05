@@ -12,6 +12,7 @@ pub use pistols::systems::{
     game::{IGameDispatcher, IGameDispatcherTrait},
     game_loop::{IGameLoopDispatcher, IGameLoopDispatcherTrait},
     bot_player::{IBotPlayerDispatcher, IBotPlayerDispatcherTrait, IBotPlayerProtectedDispatcher, IBotPlayerProtectedDispatcherTrait},
+    matchmaker::{IMatchMakerDispatcher, IMatchMakerDispatcherTrait},
     tutorial::{ITutorialDispatcher, ITutorialDispatcherTrait},
     rng::{IRngDispatcher, IRngDispatcherTrait},
     rng_mock::{IRngMockDispatcher, IRngMockDispatcherTrait},
@@ -43,6 +44,7 @@ pub mod SELECTORS {
     pub const GAME: felt252 = selector_from_tag!("pistols-game");
     pub const GAME_LOOP: felt252 = selector_from_tag!("pistols-game_loop");
     pub const BOT_PLAYER: felt252 = selector_from_tag!("pistols-bot_player");
+    pub const MATCHMAKER: felt252 = selector_from_tag!("pistols-matchmaker");
     pub const RNG: felt252 = selector_from_tag!("pistols-rng");
     pub const RNG_MOCK: felt252 = selector_from_tag!("pistols-rng_mock");
     // tokens
@@ -108,6 +110,10 @@ pub impl DnsImpl of DnsTrait {
     #[inline(always)]
     fn bot_player_address(self: @WorldStorage) -> ContractAddress {
         (self.find_contract_address(@"bot_player"))
+    }
+    #[inline(always)]
+    fn matchmaker_address(self: @WorldStorage) -> ContractAddress {
+        (self.find_contract_address(@"matchmaker"))
     }
     #[inline(always)]
     fn tutorial_address(self: @WorldStorage) -> ContractAddress {
@@ -203,6 +209,10 @@ pub impl DnsImpl of DnsTrait {
     fn caller_is_bot_player_contract(self: @WorldStorage) -> bool {
         (starknet::get_caller_address() == self.bot_player_address())
     }
+    #[inline(always)]
+    fn caller_is_matchmaker_contract(self: @WorldStorage) -> bool {
+        (starknet::get_caller_address() == self.matchmaker_address())
+    }
     // #[inline(always)]
     // fn caller_is_tournament_contract(self: @WorldStorage) -> bool {
     //     (starknet::get_caller_address() == self.tournament_token_address())
@@ -238,6 +248,10 @@ pub impl DnsImpl of DnsTrait {
     #[inline(always)]
     fn bot_player_protected_dispatcher(self: @WorldStorage) -> IBotPlayerProtectedDispatcher {
         (IBotPlayerProtectedDispatcher{ contract_address: self.bot_player_address() })
+    }
+    #[inline(always)]
+    fn matchmaker_dispatcher(self: @WorldStorage) -> IMatchMakerDispatcher {
+        (IMatchMakerDispatcher{ contract_address: self.matchmaker_address() })
     }
     #[inline(always)]
     fn tutorial_dispatcher(self: @WorldStorage) -> ITutorialDispatcher {
