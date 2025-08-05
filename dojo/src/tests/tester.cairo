@@ -17,6 +17,7 @@ pub mod tester {
         game::{game, IGameDispatcher, IGameDispatcherTrait},
         game_loop::{game_loop, IGameLoopDispatcher, IGameLoopDispatcherTrait},
         bot_player::{bot_player, IBotPlayerDispatcher, IBotPlayerDispatcherTrait, IBotPlayerProtectedDispatcher, IBotPlayerProtectedDispatcherTrait},
+        matchmaker::{matchmaker, IMatchMakerDispatcher, IMatchMakerDispatcherTrait},
         tutorial::{tutorial, ITutorialDispatcher, ITutorialDispatcherTrait},
         rng::{rng, IRngDispatcher, IRngDispatcherTrait},
         rng_mock::{rng_mock, IRngMockDispatcher, IRngMockDispatcherTrait},
@@ -184,6 +185,7 @@ pub mod tester {
         pub const OWNER: u16      = 0b100000000000;
         pub const RINGS: u16      = 0b1000000000000;
         pub const BOT_PLAYER: u16 = 0b10000000000000;
+        pub const MATCHMAKER: u16 = 0b100000000000000;
     }
 
     #[derive(Copy, Drop)]
@@ -193,6 +195,7 @@ pub mod tester {
         pub game: IGameDispatcher,
         pub game_loop: IGameLoopDispatcher,
         pub bot_player: IBotPlayerDispatcher,
+        pub matchmaker: IMatchMakerDispatcher,
         pub tut: ITutorialDispatcher,
         pub admin: IAdminDispatcher,
         pub bank: IBankDispatcher,
@@ -218,6 +221,7 @@ pub mod tester {
                 game: world.game_dispatcher(),
                 game_loop: world.game_loop_dispatcher(),
                 bot_player: world.bot_player_dispatcher(),
+                matchmaker: world.matchmaker_dispatcher(),
                 store: StoreTrait::new(world),
                 tut: world.tutorial_dispatcher(),
                 admin: world.admin_dispatcher(),
@@ -252,6 +256,7 @@ pub mod tester {
         let mut deploy_owner: bool = (flags & FLAGS::OWNER) != 0;
         let mut deploy_rings: bool = (flags & FLAGS::RINGS) != 0;
         let mut deploy_bot_player: bool = (flags & FLAGS::BOT_PLAYER) != 0;
+        let mut deploy_matchmaker: bool = (flags & FLAGS::MATCHMAKER) != 0;
         let mut deploy_game_loop: bool = false;
         let mut deploy_duelist_mock: bool = false;
         let mut deploy_bank: bool = false;
@@ -285,6 +290,7 @@ pub mod tester {
             TestResource::Model(pistols::models::duelist::m_DuelistAssignment::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::duelist::m_DuelistMemorial::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::leaderboard::m_Leaderboard::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::matches::m_MatchPlayer::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::pack::m_Pack::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::ring::m_Ring::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::ring::m_RingBalance::TEST_CLASS_HASH),
@@ -343,10 +349,18 @@ pub mod tester {
                 ContractDefTrait::new(@"pistols", @"game_loop")
             );
         }
+
         if (deploy_bot_player) {
             resources.append(TestResource::Contract(bot_player::TEST_CLASS_HASH));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"bot_player")
+            );
+        }
+
+        if (deploy_matchmaker) {
+            resources.append(TestResource::Contract(matchmaker::TEST_CLASS_HASH));
+            contract_defs.append(
+                ContractDefTrait::new(@"pistols", @"matchmaker")
             );
         }
 
