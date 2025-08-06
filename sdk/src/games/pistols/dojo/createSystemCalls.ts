@@ -309,23 +309,23 @@ export function createSystemCalls(
     // fn claim_season_ring(ref self: TState, duel_id: u128, ring_type: RingType) -> u128;
     // fn airdrop_ring(ref self: TState, recipient: ContractAddress, ring_type: RingType) -> u128;
     ring_token: {
-      claim_season_ring: async (signer: AccountInterface, duel_id: BigNumberish, ring_type: constants.RingType): Promise<boolean> => {
+      claim_season_ring: async (signer: AccountInterface, duel_id: BigNumberish, ring_type: constants.RingType, key?: string): Promise<boolean> => {
         let calls: DojoCalls = [
           contractCalls.ring_token.buildClaimSeasonRingCalldata(
             bigintToHex(duel_id),
             makeCustomEnum(ring_type),
           ),
         ]
-        return await _executeTransaction(signer, calls)
+        return await _executeTransaction(signer, calls, key)
       },
-      airdrop_ring: async (signer: AccountInterface, recipient: BigNumberish, ring_type: constants.RingType): Promise<boolean> => {
+      airdrop_ring: async (signer: AccountInterface, recipient: BigNumberish, ring_type: constants.RingType, key?: string): Promise<boolean> => {
         let calls: DojoCalls = [
           contractCalls.ring_token.buildAirdropRingCalldata(
             bigintToHex(recipient),
             makeCustomEnum(ring_type),
           ),
         ]
-        return await _executeTransaction(signer, calls)
+        return await _executeTransaction(signer, calls, key)
       },
     },
     //

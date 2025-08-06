@@ -21,7 +21,6 @@ import SelectDuelistModal from '/src/components/modals/SelectDuelistModal'
 import WalletFinderModal from '/src/components/modals/WalletFinderModal'
 import SettingsModal from '/src/components/modals/SettingsModal'
 import BugReportModal from '/src/components/modals/BugReportModal'
-import TavernRingsModal from '/src/components/modals/TavernRingsModal'
 import ScProfile from '/src/components/scenes/ScProfile'
 import ScTavern from '/src/components/scenes/ScTavern'
 import ScDuelsBoard from '/src/components/scenes/ScDuelsBoard'
@@ -228,7 +227,6 @@ function Modals() {
       <SelectDuelistModal opener={duelistSelectOpener} />
       <WalletFinderModal opener={walletFinderOpener} />
       <SettingsModal opener={settingsOpener} />
-      <TavernRingsModal opener={tavernRingsOpener} />
       <ModalNavigator />
     </>
   )

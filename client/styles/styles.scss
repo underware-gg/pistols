@@ -10,6 +10,7 @@
 @import 'book';
 @import 'poster';
 @import 'interactiblecomponent';
+@import 'ringClaiming';
 
 $font-family: 'EB Garamond', serif;
 $font-family-mono: 'Courier Prime', monospace;
@@ -2163,15 +2164,6 @@ a.active.step:hover,
   &::after {
     animation: expandLineFromRight 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     transform-origin: right;
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
   }
 
   @keyframes expandLineFromLeft {
