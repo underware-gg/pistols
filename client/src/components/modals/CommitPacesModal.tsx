@@ -401,6 +401,7 @@ function _CommitPacesModal({
             currentCard={firePaces}
             disabledCard={dodgePaces}
             onSelect={(value: number) => setFirePaces(value)}
+            disableInputChange={isLoadingHash || isLoadingCommit}
           />
         </div>
 
@@ -424,6 +425,7 @@ function _CommitPacesModal({
             currentCard={dodgePaces}
             disabledCard={firePaces}
             onSelect={(value: number) => setDodgePaces(value)}
+            disableInputChange={isLoadingHash || isLoadingCommit}
           />
         </div>
 
@@ -448,6 +450,7 @@ function _CommitPacesModal({
                 cards={TacticsCardsTextures}
                 currentCard={tactics}
                 onSelect={(value: number) => setTactics(value)}
+                disableInputChange={isLoadingHash || isLoadingCommit}
               />
             </div>
 
@@ -470,6 +473,7 @@ function _CommitPacesModal({
                 cards={BladesCardsTextures}
                 currentCard={blades}
                 onSelect={(value: number) => setBlades(value)}
+                disableInputChange={isLoadingHash || isLoadingCommit}
               />
             </div>
           </>
@@ -537,8 +541,9 @@ const CardSelector = React.forwardRef<CardSelectorHandles, {
   cards: Record<any, CardData>
   currentCard: number
   onSelect: (value: number) => void
-  disabledCard?: number
-}>(({ cards, currentCard, onSelect, disabledCard }, ref) => {
+  disabledCard?: number,
+  disableInputChange?: boolean
+}>(({ cards, currentCard, onSelect, disabledCard, disableInputChange }, ref) => {
   const { aspectWidth } = useGameAspect()
   
   const cardRefs = Object.values(cards).slice(1).map(() => React.createRef<CardHandle>())
@@ -627,7 +632,7 @@ const CardSelector = React.forwardRef<CardSelectorHandles, {
               }
             }}
             onClick={(e) => {
-              if (disabledCard - 1 != index) {
+              if (disabledCard - 1 != index && !disableInputChange) {
                 if (currentCard == index + 1) {
                   // If clicking the same card, unselect it
                   unselectAll()

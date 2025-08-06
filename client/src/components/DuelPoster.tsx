@@ -433,7 +433,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
                 <DuelistCard
                   duelistId={Number(leftDuelistId || challengingDuelistId)}
                   isSmall={true}
-                  overrideFame={true}
+                  overrideFame={!isAwaiting}
                   fame={isFinished && !isCallToAction ? fameAfterA : fameBeforeA}
                   isLeft={true}
                   isVisible={true}
