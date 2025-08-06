@@ -433,7 +433,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
                 <DuelistCard
                   duelistId={Number(leftDuelistId || challengingDuelistId)}
                   isSmall={true}
-                  overrideFame={true}
+                  overrideFame={!isAwaiting}
                   fame={isFinished && !isCallToAction ? fameAfterA : fameBeforeA}
                   isLeft={true}
                   isVisible={true}
@@ -570,7 +570,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
                     )
                   ))
               }
-              {((state == constants.ChallengeState.Awaiting && isChallenger) || state == constants.ChallengeState.InProgress || (isFinished && isChallenged && isCallToAction)) &&
+              {((state == constants.ChallengeState.Awaiting && isChallenger) || state == constants.ChallengeState.InProgress || (isFinished && isCallToAction)) &&
                 <Col>
                   <ActionButton large fillParent important label='Go to Live Duel!' loading={isSubmitting} onClick={() => _gotoDuel()} />
                 </Col>

@@ -229,12 +229,14 @@ export const useBlockedPlayersAccounts = () => {
 
 export const useBlockedPlayersDuelistIds = () => {
   const { blockedPlayersAccounts } = useBlockedPlayersAccounts()
+  const { teamMembersAccounts } = useTeamMembersAccounts()
   const tokens = useDuelistTokenStore((state) => state.tokens)
   const getTokenIdsOwnedByAccount = useDuelistTokenStore((state) => state.getTokenIdsOwnedByAccount)
 
-  const blockedPlayersDuelistIds = useMemo(() => (
-    blockedPlayersAccounts.reduce((acc, account) => [...acc, ...getTokenIdsOwnedByAccount(account)], [] as bigint[])
-  ), [blockedPlayersAccounts, tokens])
+  const blockedPlayersDuelistIds = useMemo(() => {
+    const allAccounts = [...blockedPlayersAccounts, ...teamMembersAccounts]
+    return allAccounts.reduce((acc, account) => [...acc, ...getTokenIdsOwnedByAccount(account)], [] as bigint[])
+  }, [blockedPlayersAccounts, teamMembersAccounts, tokens])
 
   return {
     blockedPlayersDuelistIds,
@@ -374,6 +376,36 @@ export const useRingsOwnedByAccount = (address: BigNumberish) => {
   ), [ringTypes])
   // console.log(`rings =>`, topRingType, ringIds, ringTypes)
   return {
+    ringIds,
+    ringTypes,
+    topRingType,
+  }
+}
+//TODO once dojo fixes token subscriptions remove this and use above function
+export const useRingEntityIdsOwnedByPlayer = (address: BigNumberish) => {
+  const entities = usePlayerEntityStore((state) => state.entities);
+  const ringModels = useAllStoreModels<models.Ring>(entities, 'Ring')
+  const totalRings = useMemo(() => ringModels.length, [ringModels])
+  const ringIds = useMemo(() => (
+    ringModels.filter((m) => bigintEquals(m.claimed_by, address)).map((m) => m.ring_id)
+  ), [ringModels, address])
+  const ringTypes = useMemo(() => (
+    ringIds
+      // ids to models
+      .map((ringId) => ringModels.find((m) => bigintEquals(m?.ring_id, ringId)))
+      .filter(Boolean)
+      // models to ring types
+      .map((m) => parseEnumVariant<constants.RingType>(m.ring_type))
+  ), [ringIds, ringModels])
+  const topRingType = useMemo(() => (
+    ringTypes.includes(constants.RingType.GoldSignetRing) ? constants.RingType.GoldSignetRing :
+      ringTypes.includes(constants.RingType.SilverSignetRing) ? constants.RingType.SilverSignetRing :
+        ringTypes.includes(constants.RingType.LeadSignetRing) ? constants.RingType.LeadSignetRing :
+          null
+  ), [ringTypes])
+  // console.log(`rings =>`, topRingType, ringIds, ringTypes)
+  return {
+    totalRings,
     ringIds,
     ringTypes,
     topRingType,

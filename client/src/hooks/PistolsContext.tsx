@@ -55,6 +55,8 @@ export const initialState = {
   errorModalOpener: null as Opener,
   bugReportOpener: null as Opener,
   tavernRingsOpener: null as Opener,
+  ringAnimationOpener: null as Opener,
+  tutorialPromptOpener: null as Opener,
 }
 
 const PistolsActions = {
@@ -179,6 +181,8 @@ const PistolsProvider = ({
   const errorModalOpener = useOpener()
   const bugReportOpener = useOpener()
   const tavernRingsOpener = useOpener()
+  const ringAnimationOpener = useOpener()
+  const tutorialPromptOpener = useOpener()
 
   const [hasSearchParams, setHasSearchParams] = useState(false)
 
@@ -326,6 +330,8 @@ const PistolsProvider = ({
     errorModalOpener,
     bugReportOpener,
     tavernRingsOpener,
+    ringAnimationOpener,
+    tutorialPromptOpener,
   })
 
   emitter.on('searchParams', (data) => {
@@ -343,6 +349,8 @@ const PistolsProvider = ({
                         errorModalOpener.isOpen ||
                         bugReportOpener.isOpen ||
                         tavernRingsOpener.isOpen ||
+                        ringAnimationOpener.isOpen ||
+                        tutorialPromptOpener.isOpen ||
                         hasSearchParams ||
                         (state.challengingAddress && state.challengingDuelistId)
 
@@ -358,6 +366,8 @@ const PistolsProvider = ({
     errorModalOpener.isOpen,
     bugReportOpener.isOpen,
     tavernRingsOpener.isOpen,
+    ringAnimationOpener.isOpen,
+    tutorialPromptOpener.isOpen,
     hasSearchParams,
     state.challengingAddress,
     state.challengingDuelistId
@@ -377,6 +387,8 @@ const PistolsProvider = ({
       errorModalOpener,
       bugReportOpener,
       tavernRingsOpener,
+      ringAnimationOpener,
+      tutorialPromptOpener,
     } }}>
       {children}
     </PistolsContext.Provider>

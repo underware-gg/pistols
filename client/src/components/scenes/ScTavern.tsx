@@ -17,6 +17,10 @@ import { useAccount } from '@starknet-react/core'
 import { useDuelIdsForClaimingRings } from '/src/queries/useDuelIdsForClaimingRings'
 import { useHasClaimedRing } from '/src/hooks/usePistolsContractCalls'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
+import TavernRingsModal from '../modals/TavernRingsModal'
+
+// TEMP cheat to stop the rings popup from showing multiple times in a session
+let hasShownInThisSession = false
 
 export default function ScTavern() {
   
@@ -46,45 +50,53 @@ function TavernRingsChecker() {
   const { address, isConnected } = useAccount()
   const { tavernRingsOpener } = usePistolsContext()
   const { goldRingDuelIds, silverRingDuelIds, leadRingDuelIds } = useDuelIdsForClaimingRings()
-  const { hasClaimed: hasClaimedGold } = useHasClaimedRing(address, constants.RingType.GoldSignetRing)
-  const { hasClaimed: hasClaimedSilver } = useHasClaimedRing(address, constants.RingType.SilverSignetRing)
-  const { hasClaimed: hasClaimedLead } = useHasClaimedRing(address, constants.RingType.LeadSignetRing)
+  const { hasClaimed: hasClaimedGold, isLoading: isLoadingGold } = useHasClaimedRing(address, constants.RingType.GoldSignetRing)
+  const { hasClaimed: hasClaimedSilver, isLoading: isLoadingSilver } = useHasClaimedRing(address, constants.RingType.SilverSignetRing)
+  const { hasClaimed: hasClaimedLead, isLoading: isLoadingLead } = useHasClaimedRing(address, constants.RingType.LeadSignetRing)
   
-  const [hasCheckedSession, setHasCheckedSession] = useState(false)
+  const [hasShownRings, setHasShownRings] = useState(false)
   
-  // Check for claimable rings and open modal if available 💍
   useEffect(() => {
-    if (!isConnected || !address || hasCheckedSession) return
+    if (hasShownInThisSession) return
+
+    let timeoutId: NodeJS.Timeout
+
+    if (!isConnected || !address || hasShownRings || isLoadingGold || isLoadingSilver || isLoadingLead) return
     
     const hasClaimableRings = (
       (goldRingDuelIds.length > 0 && !hasClaimedGold) ||
       (silverRingDuelIds.length > 0 && !hasClaimedSilver) ||
       (leadRingDuelIds.length > 0 && !hasClaimedLead)
     )
-    
+
     if (hasClaimableRings) {
-      // Small delay for a more natural feel, like the grumpy bartender noticing you 🍺
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
+        setHasShownRings(true)
+        hasShownInThisSession = true
         tavernRingsOpener.open()
       }, 2000)
     }
-    
-    setHasCheckedSession(true)
+
+    return () => clearTimeout(timeoutId)
   }, [
-    isConnected, address, hasCheckedSession,
+    isConnected, address, hasShownRings,
     goldRingDuelIds.length, silverRingDuelIds.length, leadRingDuelIds.length,
     hasClaimedGold, hasClaimedSilver, hasClaimedLead,
+    isLoadingGold, isLoadingSilver, isLoadingLead,
     tavernRingsOpener
   ])
   
-  // Reset check when user disconnects (tentacle cleanup! 🐙)
   useEffect(() => {
     if (!isConnected) {
-      setHasCheckedSession(false)
+      setHasShownRings(false)
     }
   }, [isConnected])
   
-  return null // This component only handles logic, no UI
+  return (
+    <>
+      <TavernRingsModal opener={tavernRingsOpener} />
+    </>
+  )
 }
 
 //
@@ -93,6 +105,7 @@ function TavernRingsChecker() {
 // 
 // 
 function NotificationExclamation({ }) {
+  const { tavernRingsOpener } = usePistolsContext()
   const { dispatchSetScene } = usePistolsScene()
   const { aspectWidth } = useGameAspect()
   const { hasUnreadNotifications } = useNotifications()

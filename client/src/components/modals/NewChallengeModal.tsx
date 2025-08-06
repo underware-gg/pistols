@@ -162,7 +162,7 @@ function _NewChallengeModal({
                     isVisible={true}
                     instantVisible={true}
                     isHighlightable={false}
-                    onClick={() => dispatchSelectPlayerAddress(challengingAddress)}
+                    onClick={() => dispatchSelectPlayerAddress(addressA)}
                   />
                 </div>
                 <div style={{ position: 'absolute', left: 0, top: aspectHeight(POSTER_HEIGHT_SMALL * 0.9) }}>

@@ -31,7 +31,12 @@ export default function DuelProfile({
   const contentLength = useMemo(() => Math.floor(name.length/10), [name])
   const duelistContentLength = useMemo(() => Math.floor(duelistName.length/10), [duelistName])
 
-  const hasStamp = useMemo(() => isBlocked || isTeamMember || activeSignetRing !== null, [isBlocked, isTeamMember, activeSignetRing])
+  const profileImage = useMemo(() => {
+    if (isBlocked || isTeamMember || (activeSignetRing !== null &&  activeSignetRing !== constants.RingType.Unknown)) {
+      return '/images/ui/duel/player_profile_stamp.png'
+    }
+    return '/images/ui/duel/player_profile.png'
+  }, [isBlocked, isTeamMember, activeSignetRing])
 
   return (
     <>
@@ -46,7 +51,7 @@ export default function DuelProfile({
             className='NoMouse NoDrag' 
           />
           </div>
-          <Image className='NoMouse NoDrag' src={hasStamp ? '/images/ui/duel/player_profile_stamp.png' : '/images/ui/duel/player_profile.png'} style={{ position: 'absolute' }} />
+          <Image className='NoMouse NoDrag' src={profileImage} style={{ position: 'absolute' }} />
           <StampImage playerAddress={playerAddress} size="DuelProfile" position="Left" />
           <div className='NoMouse NoDrag' style={{ zIndex: 10, position: 'absolute', top: aspectWidth(0.2), left: aspectWidth(8.3) }}>
             {!isTutorial && <div className='NoMargin ProfileName' data-contentlength={contentLength}>{name}</div>}
@@ -69,7 +74,7 @@ export default function DuelProfile({
             className='NoMouse NoDrag'
           />
           </div>
-          <Image className='FlipHorizontal NoMouse NoDrag' src={hasStamp ? '/images/ui/duel/player_profile_stamp.png' : '/images/ui/duel/player_profile.png'} style={{ position: 'absolute' }} />
+          <Image className='FlipHorizontal NoMouse NoDrag' src={profileImage} style={{ position: 'absolute' }} />
           <StampImage playerAddress={playerAddress} size="DuelProfile" position="Right" />
         </>
       }

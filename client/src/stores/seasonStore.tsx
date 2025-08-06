@@ -104,7 +104,7 @@ export const useLeaderboard = (season_id: number) => {
   }
 }
 
-export const useFullLeaderboard = (season_id: number) => {
+export const useFullLeaderboard = (season_id: number, secretLeaderboard: boolean = false) => {
   const { scores: leaderboardScores } = useLeaderboard(season_id || 0);
   const { seasonScoreboard } = useGetSeasonScoreboard(season_id || 0);
   const { blockedPlayersDuelistIds } = useBlockedPlayersDuelistIds()
@@ -116,8 +116,8 @@ export const useFullLeaderboard = (season_id: number) => {
         s && s.duelistId !== undefined &&
         !(leaderboardScores || []).some(l => l && l.duelistId === s.duelistId)
       ),
-    ].filter(score => !blockedPlayersDuelistIds.includes(score.duelistId))
-  ), [leaderboardScores, seasonScoreboard, blockedPlayersDuelistIds])
+    ].filter(score => secretLeaderboard ? blockedPlayersDuelistIds.includes(score.duelistId) : !blockedPlayersDuelistIds.includes(score.duelistId))
+  ), [leaderboardScores, seasonScoreboard, blockedPlayersDuelistIds, secretLeaderboard])
 
   return {
     scores,

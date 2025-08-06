@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useRef, useMemo } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { VStack } from '/src/components/ui/Stack'
 import { useEffectOnce } from '@underware/pistols-sdk/utils/hooks'
 import { useDojoStatus, useConnectToSelectedNetwork } from '@underware/pistols-sdk/dojo'
 import { useSettings } from '/src/hooks/SettingsContext'
-import { usePistolsScene } from '/src/hooks/PistolsContext'
+import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { useCanClaimStarterPack } from '/src/hooks/usePistolsContractCalls'
 import { ActionButton } from '/src/components/ui/Buttons'
 import { Divider } from '/src/components/ui/Divider'
@@ -20,12 +20,11 @@ import { AudioName } from '/src/data/audioAssets'
 import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
 
 export default function ScDoor() {
+  const { isReady } = useDojoStatus()
   const { hasFinishedTutorial } = useSettings()
-  const { isLoading: dojoIsLoading, isReady } = useDojoStatus()
-  const { isConnecting } = useAccount()
-  const isLoading = useMemo(() => (dojoIsLoading || isConnecting), [dojoIsLoading, isConnecting])
 
   const [visibleChars, setVisibleChars] = useState<string[]>([])
+  const [isLoading, setIsLoading] = useState(false)
   const { gameImpl } = useThreeJsContext()
   const soundTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
@@ -34,6 +33,7 @@ export default function ScDoor() {
 
   // clear tavern state
   useEffectOnce(() => {
+    setIsLoading(false)
     setTimeout(() => {
       const scene = (_currentScene as InteractibleScene);
       if (scene) {
@@ -101,12 +101,14 @@ export default function ScDoor() {
             {isReady && <>
               {hasFinishedTutorial ? <>
                 <div className='Spacer10' />
-                <ConnectButton enterScene={SceneName.Tavern}
+                <ConnectButton 
+                  setLoading={setIsLoading} 
+                  enterScene={SceneName.Tavern}
                   onButtonHover={() => playButtonHoverSound(AudioName.DOORKEEP_GRUNTING_1)}
                   onDoorCreak={playDoorCreakingSound}
                 />
-                <Divider content='OR' />
-                <EnterAsGuestButton
+                <Divider content='OR' />  
+                <EnterAsGuestButton 
                   onButtonHover={() => playButtonHoverSound(AudioName.DOORKEEP_GRUNTING_4)}
                   onDoorCreak={playDoorCreakingSound}
                 />
@@ -114,14 +116,18 @@ export default function ScDoor() {
               </> : <>
                 <Divider content='EXISTING PLAYERS:' />
                 <div className='Spacer10' />
-                <ConnectButton enterScene={SceneName.Tavern}
+                <ConnectButton 
+                  setLoading={setIsLoading} 
                   onButtonHover={() => playButtonHoverSound(AudioName.DOORKEEP_GRUNTING_1)}
                   onDoorCreak={playDoorCreakingSound}
                 />
                 <div className='Spacer20' />
                 <Divider content='NEW PLAYERS:' />
                 <div className='Spacer10' />
-                <ConnectButton enterScene={SceneName.Tutorial} label='Play Tutorial'
+                <ConnectButton 
+                  setLoading={setIsLoading} 
+                  enterScene={SceneName.Tutorial}
+                  label='Play Tutorial'
                   onButtonHover={() => playButtonHoverSound(AudioName.DOORKEEP_GRUNTING_3)}
                   onDoorCreak={playDoorCreakingSound}
                 />
@@ -164,6 +170,58 @@ export default function ScDoor() {
         </div>
       </div>
     </div>
+  )
+}
+
+export function TutorialPromptModal() {
+  const { tutorialPromptOpener } = usePistolsContext()
+  const { dispatchSetScene } = usePistolsScene()
+
+  const onChoice = (playTutorial: boolean) => {
+    tutorialPromptOpener.close()
+    if (playTutorial) {
+      dispatchSetScene(SceneName.Tutorial)
+    } else {
+      dispatchSetScene(SceneName.Tavern)
+    }
+  }
+
+  return (
+    <Modal
+      size="small"
+      open={tutorialPromptOpener.isOpen}
+      onClose={() => tutorialPromptOpener.close()}
+    >
+      <Modal.Header>
+        <h2 className="Important" style={{ textAlign: 'center', margin: '0.5rem 0' }}>Welcome, Duelist!</h2>
+      </Modal.Header>
+      <Modal.Content style={{ padding: '1rem 2rem' }}>
+        <div style={{ 
+          textAlign: 'center', 
+          margin: '1.5rem 0',
+          lineHeight: '1.6',
+          fontSize: '1.4rem'
+        }}>
+          This appears to be your first visit to Pistols at Dawn.
+          <br />
+          Would you like to learn the ropes?
+        </div>
+      </Modal.Content>
+      <Modal.Actions style={{ display: 'flex' }}>
+        <ActionButton 
+          fill
+          dimmed
+          onClick={() => onChoice(false)}
+          label="No, take me to the tavern"
+        />
+        <ActionButton
+          fill
+          important
+          onClick={() => onChoice(true)}
+          label="Yes, show me the tutorial"
+        />
+      </Modal.Actions>
+    </Modal>
   )
 }
 
@@ -217,12 +275,14 @@ export function EnterAsGuestButton({
 }
 
 export function ConnectButton({
+  setLoading,
   large = true,
   label = 'Enter Tavern',
   enterScene,
   onButtonHover,
   onDoorCreak
 }: {
+  setLoading?: (loading: boolean) => void,
   large?: boolean,
   label?: string,
   enterScene?: SceneName,
@@ -236,17 +296,18 @@ export function ConnectButton({
   const { duelistIds } = useDuelistsOwnedByPlayer()
   const { canClaimStarterPack } = useCanClaimStarterPack(duelistIds.length)
   const { dispatchSetScene } = usePistolsScene()
-  const [showTutorialPrompt, setShowTutorialPrompt] = useState(false)
+  const { tutorialPromptOpener } = usePistolsContext()
 
   const canConnect = (!isLoading && !isError && !isConnecting && connect != null)
-  // const switchChain = (isConnected && !isCorrectChain)
+  
+  const hasClickedButton = useRef(false)
 
-  const [askedToConnect, setAskedToConnect] = useState(false)
   const _connect = () => {
     if (canConnect) {
       connect();
-      setAskedToConnect(true); // avoid the displaying the button and triggering scene change
+      setLoading?.(true)
     }
+    hasClickedButton.current = true
   }
 
   const handleMouseEnter = () => {
@@ -255,74 +316,47 @@ export function ConnectButton({
     }
   }
 
-  const handleTutorialChoice = (playTutorial: boolean) => {
-    setShowTutorialPrompt(false)
-    onDoorCreak?.()
-    if (playTutorial) {
-      dispatchSetScene(SceneName.Tutorial)
-    } else {
-      dispatchSetScene(SceneName.Tavern)
-    }
-  }
-
   useEffect(() => {
-    if (askedToConnect && isConnected && !isError) {
-      if (canClaimStarterPack) {
-        setShowTutorialPrompt(true)
-      } else if (enterScene) {
+    let timeoutId;
+
+    console.log("🔴 hasClickedButton", hasClickedButton.current, isConnected, isError)
+
+    if (isConnected && !isError && hasClickedButton.current) {
+      if (enterScene) {
         onDoorCreak?.()
         dispatchSetScene(enterScene)
+      } else {
+        timeoutId = setTimeout(() => {
+          if (canClaimStarterPack) {
+            tutorialPromptOpener.open()
+          } else {
+            onDoorCreak?.()
+            dispatchSetScene(SceneName.Tavern)
+          }
+        }, 1000)
+      } 
+    } else {
+      setLoading?.(false)
+    }
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId)
       }
     }
-  }, [askedToConnect, isConnected, isError, canClaimStarterPack])
+
+  }, [isConnected, isError, canClaimStarterPack, hasClickedButton])
 
   return (
-    <>
-      <ActionButton
-        fill
-        large={large}
-        important
-        disabled={!canConnect}
-        onClick={() => _connect()}
-        label={label}
-        onMouseEnter={handleMouseEnter}
-      />
-
-      <Modal
-        size="small"
-        open={showTutorialPrompt}
-      >
-        <Modal.Header>
-          <h2 className="Important" style={{ textAlign: 'center', margin: '0.5rem 0' }}>Welcome, Duelist!</h2>
-        </Modal.Header>
-        <Modal.Content style={{ padding: '1rem 2rem' }}>
-          <div style={{
-            textAlign: 'center',
-            margin: '1.5rem 0',
-            lineHeight: '1.6',
-            fontSize: '1.4rem'
-          }}>
-            This appears to be your first visit to Pistols at Dawn.
-            <br />
-            Would you like to learn the ropes?
-          </div>
-        </Modal.Content>
-        <Modal.Actions style={{ display: 'flex' }}>
-          <ActionButton
-            fill
-            dimmed
-            onClick={() => handleTutorialChoice(false)}
-            label="No, take me to the tavern"
-          />
-          <ActionButton
-            fill
-            important
-            onClick={() => handleTutorialChoice(true)}
-            label="Yes, show me the tutorial"
-          />
-        </Modal.Actions>
-      </Modal>
-    </>
+    <ActionButton 
+      fill 
+      large={large} 
+      important 
+      disabled={!canConnect} 
+      onClick={() => _connect()} 
+      label={label} 
+      onMouseEnter={handleMouseEnter}
+    />
   )
 }
 
