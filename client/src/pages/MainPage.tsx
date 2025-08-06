@@ -32,7 +32,7 @@ import ScDuelistBook from '/src/components/scenes/ScDuelistBook'
 import StoreSync from '/src/stores/sync/StoreSync'
 import ScLeaderboards from '/src/components/scenes/ScLeaderboards'
 import ScGate from '/src/components/scenes/ScGate'
-import ScDoor from '/src/components/scenes/ScDoor'
+import ScDoor, { TutorialPromptModal } from '/src/components/scenes/ScDoor'
 import Duel from '/src/components/scenes/Duel'
 import { Header } from '/src/components/Header'
 import { CustomIcon } from '/src/components/ui/Icons'
@@ -227,6 +227,7 @@ function Modals() {
       <SelectDuelistModal opener={duelistSelectOpener} />
       <WalletFinderModal opener={walletFinderOpener} />
       <SettingsModal opener={settingsOpener} />
+      <TutorialPromptModal />
       <ModalNavigator />
     </>
   )
