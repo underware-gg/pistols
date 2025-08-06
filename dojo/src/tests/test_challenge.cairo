@@ -127,19 +127,18 @@ mod tests {
     }
 
     #[test]
+    #[should_panic(expected:('DUEL: Invalid stake', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_stake_0() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        let duel_id: u128 = tester::execute_create_duel(@sys, OWNER(), OTHER(), MESSAGE(), DuelType::Seasonal, 0, 0);
-        let ch = sys.store.get_challenge_value(duel_id);
-        assert_eq!(ch.lives_staked, 1, "lives_staked");
+        tester::execute_create_duel(@sys, OWNER(), OTHER(), MESSAGE(), DuelType::Seasonal, 0, 0);
     }
 
     #[test]
-    fn test_challenge_stake_2() {
+    fn test_challenge_stake_3() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        let duel_id: u128 = tester::execute_create_duel(@sys, OWNER(), OTHER(), MESSAGE(), DuelType::Seasonal, 0, 2);
+        let duel_id: u128 = tester::execute_create_duel(@sys, OWNER(), OTHER(), MESSAGE(), DuelType::Seasonal, 0, 3);
         let ch = sys.store.get_challenge_value(duel_id);
-        assert_eq!(ch.lives_staked, 2, "lives_staked");
+        assert_eq!(ch.lives_staked, 3, "lives_staked");
     }
 
     #[test]

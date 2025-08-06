@@ -30,7 +30,7 @@ pub mod bot_player {
     };
     use pistols::systems::rng::{RngWrap, RngWrapTrait, Dice, DiceTrait};
     use pistols::models::{
-        challenge::{Challenge, ChallengeTrait, RoundValue, DuelTypeTrait},
+        challenge::{Challenge, ChallengeTrait, ChallengeValue, RoundValue, DuelTypeTrait},
         player::{PlayerDuelistStack, PlayerDuelistStackTrait},
     };
     use pistols::types::{
@@ -46,6 +46,7 @@ pub mod bot_player {
 
     pub mod Errors {
         pub const INVALID_CALLER: felt252           = 'BOT_PLAYER: Invalid caller';
+        pub const INVALID_STAKE: felt252            = 'BOT_PLAYER: Invalid stake';
     }
 
     #[generate_trait]
@@ -90,7 +91,8 @@ pub mod bot_player {
             assert(store.world.caller_is_duel_contract(), Errors::INVALID_CALLER);
 
             // pick a duelist profile...
-            let duelist_profile: DuelistProfile = if (store.get_challenge_duel_type(duel_id).is_unranked(@store)) {
+            let challenge: ChallengeValue = store.get_challenge_value(duel_id);
+            let duelist_profile: DuelistProfile = if (challenge.duel_type.is_unranked(@store)) {
                 // unranked: randomize a bot profile
                 let mut dice: Dice = self._make_dice(@store, duel_id);
                 let duelist_seed: u8 = dice.throw('bot_archetype', 255);
@@ -101,9 +103,10 @@ pub mod bot_player {
             };
 
             // get or mint a duelist
+            assert(challenge.lives_staked >= 1 && challenge.lives_staked <= 3, Errors::INVALID_STAKE);
             let bot_address: ContractAddress = starknet::get_contract_address();
             let stack: PlayerDuelistStack = store.get_player_duelist_stack(bot_address, duelist_profile);
-            let mut duelist_id: u128 = stack.get_first_available_duelist_id(@store);
+            let mut duelist_id: u128 = stack.get_first_available_duelist_id(@store, challenge.lives_staked);
             if (duelist_id.is_zero()) {
                 // mint new duelist
                 duelist_id = store.world.pack_token_protected_dispatcher().mint_bot_duelist(duelist_profile);

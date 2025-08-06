@@ -223,6 +223,7 @@ pub mod duel_token {
         pub const INVALID_DUEL_TYPE: felt252        = 'DUEL: Invalid duel type';
         pub const INVALID_REPLY_SELF: felt252       = 'DUEL: Reply self';
         pub const INVALID_CHALLENGE: felt252        = 'DUEL: Invalid challenge';
+        pub const INVALID_STAKE: felt252            = 'DUEL: Invalid stake';
         pub const NOT_YOUR_CHALLENGE: felt252       = 'DUEL: Not your challenge';
         pub const CHALLENGE_NOT_AWAITING: felt252   = 'DUEL: Challenge not Awaiting';
         pub const DUELIST_IN_CHALLENGE: felt252     = 'DUEL: Duelist in a challenge';
@@ -285,7 +286,7 @@ pub mod duel_token {
             duel_type: DuelType,
             duelist_id: u128,
             challenged_address: ContractAddress,
-            mut lives_staked: u8,
+            lives_staked: u8,
             expire_minutes: u64,
             premise: Premise,
             message: ByteArray,
@@ -301,10 +302,13 @@ pub mod duel_token {
             match duel_type {
                 DuelType::Seasonal |
                 DuelType::Practice => {
-                    // ok!
+                    // at least 1 life stake
+                    assert(lives_staked > 0, Errors::INVALID_STAKE);
                 },
                 DuelType::BotPlayer => {
+                    // this is a challenge to the bot_player contract
                     address_b = store.world.bot_player_address();
+                    assert(lives_staked == 1, Errors::INVALID_STAKE);
                 },
                 DuelType::Tutorial |    // created by the tutorials contact only
                 DuelType::Tournament |  // created by the tournaments contact only
@@ -313,11 +317,6 @@ pub mod duel_token {
                     assert(false, Errors::INVALID_DUEL_TYPE);
                 },
             };
-
-            // bot games always stakes 1 life
-            if (address_b == store.world.bot_player_address()) {
-                lives_staked = 1;
-            }
 
             // get active duelist from stack
             let duelist_dispatcher: IDuelistTokenProtectedDispatcher = store.world.duelist_token_protected_dispatcher();
@@ -340,7 +339,7 @@ pub mod duel_token {
                 duel_id,
                 duel_type,
                 premise,
-                lives_staked: core::cmp::max(lives_staked, 1),
+                lives_staked,
                 // duelists
                 address_a,
                 address_b,
@@ -418,14 +417,9 @@ pub mod duel_token {
 
                 // Challenged is accepting...
                 if (accepted) {
-                    challenge.duelist_id_b = if (challenge.is_against_bot_player(@store)) {
-                        // bot replied with a valid duelist
-                        (duelist_id)
-                    } else {
-                        // get active duelist from stack
-                        let duelist_dispatcher: IDuelistTokenProtectedDispatcher = store.world.duelist_token_protected_dispatcher();
-                        (duelist_dispatcher.get_validated_active_duelist_id(challenge.address_b, duelist_id, challenge.lives_staked))
-                    };
+                    // get active duelist from stack
+                    let duelist_dispatcher: IDuelistTokenProtectedDispatcher = store.world.duelist_token_protected_dispatcher();
+                    challenge.duelist_id_b = (duelist_dispatcher.get_validated_active_duelist_id(challenge.address_b, duelist_id, challenge.lives_staked));
 
                     // validate duelist
                     assert(challenge.duelist_id_b != challenge.duelist_id_a, Errors::INVALID_CHALLENGE_SELF);
@@ -487,7 +481,7 @@ pub mod duel_token {
             duelist_id_a: u128,
             address_b: ContractAddress,
             duelist_id_b: u128,
-            lives_staked: u8,
+            mut lives_staked: u8,
             expire_minutes: u64,
             premise: Premise,
             message: ByteArray,
@@ -499,9 +493,10 @@ pub mod duel_token {
 
             // get active duelist from stack
             let mut store: Store = StoreTrait::new(self.world_default());
+            lives_staked = core::cmp::max(lives_staked, 1);
             let duelist_dispatcher: IDuelistTokenProtectedDispatcher = store.world.duelist_token_protected_dispatcher();
-            let duelist_id_a: u128 = duelist_dispatcher.get_validated_active_duelist_id(address_a, duelist_id_a, 1);
-            let duelist_id_b: u128 = duelist_dispatcher.get_validated_active_duelist_id(address_b, duelist_id_b, 1);
+            let duelist_id_a: u128 = duelist_dispatcher.get_validated_active_duelist_id(address_a, duelist_id_a, lives_staked);
+            let duelist_id_b: u128 = duelist_dispatcher.get_validated_active_duelist_id(address_b, duelist_id_b, lives_staked);
 
             // mint to game, so it can transfer to winner
             let duel_id: u128 = self.token.mint_next(store.world.game_address());
@@ -521,7 +516,7 @@ pub mod duel_token {
                 duel_id,
                 duel_type: DuelType::MatchMake,
                 premise,
-                lives_staked: core::cmp::max(lives_staked, 1),
+                lives_staked,
                 // duelists
                 address_a,
                 address_b,
@@ -552,7 +547,7 @@ pub mod duel_token {
             store.emit_challenge_action(@challenge, 2, ChallengeAction::Commit);
 
             // events
-            PlayerTrait::check_in(ref store, Activity::ChallengeCreated, starknet::get_caller_address(), duel_id.into());
+            PlayerTrait::check_in(ref store, Activity::ChallengeCreated, challenge.address_a, duel_id.into());
 
             (duel_id)
         }
