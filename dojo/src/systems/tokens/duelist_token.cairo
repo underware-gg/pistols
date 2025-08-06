@@ -381,7 +381,12 @@ pub mod duelist_token {
             // validate duelist ownership
             let mut store: Store = StoreTrait::new(self.world_default());
             assert(self.is_owner_of(address, duelist_id.into()) == true, Errors::NOT_YOUR_DUELIST);
-            
+
+            // bot duelists are always validates
+            if (store.world.is_bot_player_contract(address)) {
+                return (duelist_id);
+            }
+
             // get active duelist from stack
             let mut active_duelist_id: u128 = store.get_active_duelist_id(address, duelist_id);
             // poke inactivity (it may die!)
