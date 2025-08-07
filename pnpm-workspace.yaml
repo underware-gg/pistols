@@ -8,11 +8,11 @@ catalog:
   #--------------------------------
   # dojo.js
   #
-  "@dojoengine/core": 1.6.0
-  "@dojoengine/sdk": 1.6.0
-  "@dojoengine/torii-client": 1.6.0
-  "@dojoengine/utils": 1.6.0
-  # "@dojoengine/core": ../../dojo.js/packages/core
+  "@dojoengine/core": 1.6.3
+  "@dojoengine/sdk": 1.6.5
+  "@dojoengine/torii-client": 1.6.3
+  "@dojoengine/utils": 1.6.3
+  # "@dojoengine/core": ../../dojo4js/packages/core
   # "@dojoengine/sdk": ../../dojo.js/packages/sdk
   # "@dojoengine/torii-client": ../../dojo.js/packages/torii-client
   # "@dojoengine/utils": ../../dojo.js/packages/utils

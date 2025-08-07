@@ -1,5 +1,9 @@
 import { useEffect, useMemo } from 'react'
-import { init, SDK, SDKConfig } from '@dojoengine/sdk'
+import {
+  init,
+  SDK,
+  // SDKConfig,
+} from '@dojoengine/sdk'
 import { DojoProvider } from '@dojoengine/core'
 import { useMemoAsync } from 'src/utils/hooks/useMemoAsync'
 import { useMounted } from 'src/utils/hooks/useMounted'
@@ -9,6 +13,23 @@ import { useDeployedSystem } from 'src/dojo/hooks/useDojoSystem'
 import { createSystemCalls } from 'src/games/pistols/dojo/createSystemCalls'
 import { setupWorld } from 'src/games/pistols/generated/contracts.gen'
 import { PistolsSchemaType } from 'src/games/pistols/sdk/types_web'
+
+//----------------------------------------
+// SDK FIX
+import type { StarknetDomain } from "starknet";
+import * as torii from '@dojoengine/torii-client'
+export type SDKClientConfig = Partial<
+  Omit<torii.ClientConfig, "worldAddress">
+> & { worldAddress: torii.ClientConfig["worldAddress"] };
+export interface SDKConfig {
+  client: SDKClientConfig;
+  domain: StarknetDomain;
+  signer?: torii.SigningKey;
+  identity?: string;
+  withLogger?: boolean;
+}
+//----------------------------------------
+
 
 export type SetupResult = ReturnType<typeof useSetup> | null
 
