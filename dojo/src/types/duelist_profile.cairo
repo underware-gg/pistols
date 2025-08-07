@@ -219,7 +219,7 @@ mod BOT_PROFILES {
         name: 'Kind Imp',           // Honourable
     };
     pub const Pro: ProfileDescriptor = ProfileDescriptor {
-        name: 'Pro Imp',            // Unpredictable
+        name: 'Veteran Imp',        // Professional, unpredictable
     };
 }
 
