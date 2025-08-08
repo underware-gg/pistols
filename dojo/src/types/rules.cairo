@@ -5,9 +5,9 @@ use pistols::utils::arrays::{SpanDefault};
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
 pub enum Rules {
-    Undefined,      // 0
-    Season,         // 1
-    Unranked,       // 2
+    Undefined,      // 0 - Practice: no FAME, no FOOLS, no SCORE
+    Season,         // 1 - Ranked:   FAME+FOOLS+SCORE
+    Unranked,       // 2 - Unranked: FAME+FOOLS (no SCORE)
 }
 
 #[derive(Copy, Drop, Serde, Introspect, Default)]
@@ -54,9 +54,8 @@ pub struct DuelistBonus {
 // Traits
 //
 use core::num::traits::Zero;
-use pistols::models::ring::{RingType};
+use pistols::models::ring::{RingType, RingTypeTrait};
 use pistols::types::timestamp::{TIMESTAMP};
-use pistols::utils::math::{MathU128};
 use pistols::types::constants::{CONST, FAME::{ONE_LIFE}};
 use pistols::utils::misc::{ZERO};
 
@@ -67,35 +66,9 @@ pub impl RulesImpl of RulesTrait {
             _ => TIMESTAMP::ONE_DAY,
         })
     }
+    //-------------------------------
+    // End-duel rewards
     //
-    // Duel rewards
-    //
-    fn get_rewards_distribution(self: @Rules, season_id: u32, tournament_id: u64) -> @PoolDistribution {
-        let mut result: PoolDistribution = match self {
-            Rules::Undefined => Default::default(),
-            Rules::Season => PoolDistribution {
-                underware_percent: 30,
-                creator_percent: 30,
-                creator_address: ZERO(), // TODO: find from tournament_id
-                pool_percent: 40,
-                pool_id: PoolType::Season(season_id),
-            },
-            Rules::Unranked => PoolDistribution {
-                underware_percent: 100,
-                creator_percent: 0,
-                creator_address: ZERO(),
-                pool_percent: 0,
-                pool_id: PoolType::Undefined,
-            },
-        };
-        // not a tournament, creator is underware
-        if (result.creator_percent != 0 && result.creator_address.is_zero()) {
-            result.underware_percent += result.creator_percent;
-            result.creator_percent = 0;
-        }
-        (@result)
-    }
-    // end game calculations
     fn calc_rewards(self: @Rules,
         fame_balance: u128,
         lives_staked: u8,
@@ -104,39 +77,39 @@ pub impl RulesImpl of RulesTrait {
         bonus: @DuelistBonus,
     ) -> RewardValues {
         let mut result: RewardValues = Default::default();
+        //
+        // survival flag
+        result.survived = is_winner;
+        //
+        // process FAME+FOOLS
         match self {
-            Rules::Undefined => {},
+            Rules::Season |
             Rules::Unranked => {
                 if (is_winner) {
-                    result.survived = true;
+                    // +FAME
+                    let k_fame: u128 = 1;
+                    result.fame_gained = (ONE_LIFE / (((fame_balance / ONE_LIFE) + 1) / k_fame));
+                    // +FOOLS
+                    let k_fools: u128 = 10;
+                    result.fools_gained = (k_fools * ((ONE_LIFE / 2) / result.fame_gained)) * CONST::ETH_TO_WEI.low;
+                    // stake multiplier
+                    result.fame_gained *= lives_staked.into();
+                    result.fools_gained *= lives_staked.into();
+                    // ring bonus
+                    signet_ring.apply_ring_bonus(ref result.fools_gained);
                 } else {
                     result.fame_lost = ONE_LIFE * lives_staked.into();
                 }
             },
+            Rules::Undefined => {},
+        };
+        //
+        // process SCORE
+        match self {
             Rules::Season => {
                 if (is_winner) {
-                    result.survived = true;
-                    let k_fame: u128 = 1;
-                    result.fame_gained = (ONE_LIFE / (((fame_balance / ONE_LIFE) + 1) / k_fame));
-                    let k_fools: u128 = 10;
-                    result.fools_gained = (k_fools * ((ONE_LIFE / 2) / result.fame_gained)) * CONST::ETH_TO_WEI.low;
-                    // apply staked lives
-                    result.fame_gained *= lives_staked.into();
-                    result.fools_gained *= lives_staked.into();
-                    // calc score
                     result.points_scored = 100 + ((*bonus.kill_pace).into() * 2);
-                    // ring bonus
-                    let ring_bonus: u8 = (match signet_ring {
-                        RingType::GoldSignetRing => {40},
-                        RingType::SilverSignetRing => {20},
-                        RingType::LeadSignetRing => {10},
-                        RingType::Unknown => {0},
-                    });
-                    if (ring_bonus.is_non_zero()) {
-                        result.fools_gained += MathU128::percentage(result.fools_gained, ring_bonus);
-                    }
                 } else {
-                    result.fame_lost = ONE_LIFE * lives_staked.into();
                     result.points_scored = 10;
                 }
                 // apply bonus
@@ -151,11 +124,34 @@ pub impl RulesImpl of RulesTrait {
                 }
                 //--------------------------------
             },
+            Rules::Unranked |
+            Rules::Undefined => {},
         };
         (result)
     }
     //
-    // Season rewards
+    // Duel distribution of LORDS
+    fn get_rewards_distribution(self: @Rules, season_id: u32, tournament_id: u64) -> @PoolDistribution {
+        let mut result: PoolDistribution = match self {
+            Rules::Season |
+            Rules::Unranked => PoolDistribution {
+                underware_percent: 30,
+                creator_percent: 30,
+                creator_address: ZERO(), // TODO: find from tournament_id
+                pool_percent: 40,
+                pool_id: PoolType::Season(season_id),
+            },
+            Rules::Undefined => Default::default(),
+        };
+        // not a tournament, creator is underware
+        if (result.creator_percent != 0 && result.creator_address.is_zero()) {
+            result.underware_percent += result.creator_percent;
+            result.creator_percent = 0;
+        }
+        (@result)
+    }
+    //
+    // End-season rewards
     //
     fn get_season_distribution(self: @Rules, recipient_count: usize) -> @RewardDistribution {
         let mut percents: Array<u8> = array![];
@@ -291,31 +287,31 @@ mod unit {
     #[test]
     fn test_calc_rewards() {
         let winner_1_1: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, true, RingType::Unknown, @Default::default());
-        let winner_2_1: RewardValues = Rules::Season.calc_rewards(WEI(5_000).low, 1, true, RingType::Unknown, @Default::default());
-        let winner_1_2: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 2, true, RingType::Unknown, @Default::default());
+        let winner_1_2: RewardValues = Rules::Season.calc_rewards(WEI(5_000).low, 1, true, RingType::Unknown, @Default::default());
+        let winner_2_1: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 2, true, RingType::Unknown, @Default::default());
         let winner_2_2: RewardValues = Rules::Season.calc_rewards(WEI(5_000).low, 2, true, RingType::Unknown, @Default::default());
         let loser_1_1: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, false, RingType::Unknown, @Default::default());
         // greater balances win less FAME
-        assert_gt!(winner_1_1.fame_gained, winner_2_1.fame_gained, "balance_fame_gained");
-        assert_gt!(winner_1_2.fame_gained, winner_2_2.fame_gained, "balance_fame_gained");
+        assert_gt!(winner_1_1.fame_gained, winner_1_2.fame_gained, "balance_fame_gained");
+        assert_gt!(winner_2_1.fame_gained, winner_2_2.fame_gained, "balance_fame_gained");
         // greater balances win more FOOLS
-        assert_lt!(winner_1_1.fools_gained, winner_2_1.fools_gained, "balance_fools_gained");
-        assert_lt!(winner_1_2.fools_gained, winner_2_2.fools_gained, "balance_fools_gained");
+        assert_lt!(winner_1_1.fools_gained, winner_1_2.fools_gained, "balance_fools_gained");
+        assert_lt!(winner_2_1.fools_gained, winner_2_2.fools_gained, "balance_fools_gained");
         // always same points
-        assert_eq!(winner_1_1.points_scored, winner_2_1.points_scored, "balance_points_scored");
-        assert_eq!(winner_1_2.points_scored, winner_2_2.points_scored, "balance_points_scored");
-        assert_eq!(winner_1_2.points_scored, winner_1_1.points_scored, "lives_points_scored_1");
-        assert_eq!(winner_2_2.points_scored, winner_2_1.points_scored, "lives_points_scored_2");
+        assert_eq!(winner_1_1.points_scored, winner_1_2.points_scored, "balance_points_scored");
+        assert_eq!(winner_2_1.points_scored, winner_2_2.points_scored, "balance_points_scored");
+        assert_eq!(winner_2_1.points_scored, winner_1_1.points_scored, "lives_points_scored_1");
+        assert_eq!(winner_2_2.points_scored, winner_1_2.points_scored, "lives_points_scored_2");
         // lost fame always zero
         assert_eq!(winner_1_1.fame_lost, 0, "lives_fame_lost_1");
-        assert_eq!(winner_2_1.fame_lost, 0, "lives_fame_lost_2");
-        assert_eq!(winner_1_2.fame_lost, 0, "lives_fame_lost_1");
+        assert_eq!(winner_1_2.fame_lost, 0, "lives_fame_lost_2");
+        assert_eq!(winner_2_1.fame_lost, 0, "lives_fame_lost_1");
         assert_eq!(winner_2_2.fame_lost, 0, "lives_fame_lost_2");
         // more lives gets everything higher
-        assert_gt!(winner_1_2.fame_gained, winner_1_1.fame_gained, "lives_fame_gained_1");
-        assert_gt!(winner_1_2.fools_gained, winner_1_1.fools_gained, "lives_fools_gained_1");
-        assert_gt!(winner_2_2.fame_gained, winner_2_1.fame_gained, "lives_fame_gained_2");
-        assert_gt!(winner_2_2.fools_gained, winner_2_1.fools_gained, "lives_fools_gained_2");
+        assert_gt!(winner_2_1.fame_gained, winner_1_1.fame_gained, "lives_fame_gained_1");
+        assert_gt!(winner_2_1.fools_gained, winner_1_1.fools_gained, "lives_fools_gained_1");
+        assert_gt!(winner_2_2.fame_gained, winner_1_2.fame_gained, "lives_fame_gained_2");
+        assert_gt!(winner_2_2.fools_gained, winner_1_2.fools_gained, "lives_fools_gained_2");
         // losers
         assert_eq!(loser_1_1.fame_gained, 0, "loser_1_1.fame_gained");
         assert_eq!(loser_1_1.fools_gained, 0, "loser_1_1.fools_gained");
@@ -365,5 +361,36 @@ mod unit {
         let loser_dodge: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, false, RingType::Unknown, @bonus_dodge);
         assert_lt!(loser_default.points_scored, loser_hit.points_scored, "LOSER: default < hit");
         assert_lt!(loser_hit.points_scored, loser_dodge.points_scored, "LOSER: hit < dodge");
+    }
+
+    #[test]
+    fn test_calc_rewards_ring_bonus() {
+        // winners
+        let winner_no_ring: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, true, RingType::Unknown, @Default::default());
+        let winner_gold_ring: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, true, RingType::GoldSignetRing, @Default::default());
+        let winner_silver_ring: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, true, RingType::SilverSignetRing, @Default::default());
+        let winner_lead_ring: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, true, RingType::LeadSignetRing, @Default::default());
+        // increasing fools
+        assert_lt!(winner_no_ring.fools_gained, winner_lead_ring.fools_gained, "winner_fools");
+        assert_lt!(winner_lead_ring.fools_gained, winner_silver_ring.fools_gained, "winner_fools");
+        assert_lt!(winner_silver_ring.fools_gained, winner_gold_ring.fools_gained, "winner_fools");
+        // same scores
+        assert_eq!(winner_no_ring.points_scored, winner_gold_ring.points_scored, "winner_points");
+        assert_eq!(winner_gold_ring.points_scored, winner_silver_ring.points_scored, "winner_points");
+        assert_eq!(winner_silver_ring.points_scored, winner_lead_ring.points_scored, "winner_points");
+        // losers
+        let loser_no_ring: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, false, RingType::Unknown, @Default::default());
+        let loser_gold_ring: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, false, RingType::GoldSignetRing, @Default::default());
+        let loser_silver_ring: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, false, RingType::SilverSignetRing, @Default::default());
+        let loser_lead_ring: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, false, RingType::LeadSignetRing, @Default::default());
+        // same scores
+        assert_eq!(loser_no_ring.points_scored, loser_gold_ring.points_scored, "loser_points");
+        assert_eq!(loser_gold_ring.points_scored, loser_silver_ring.points_scored, "loser_points");
+        assert_eq!(loser_silver_ring.points_scored, loser_lead_ring.points_scored, "loser_points");
+        // less than winners
+        assert_eq!(loser_no_ring.fools_gained, 0, "losers_fools");
+        assert_eq!(loser_gold_ring.fools_gained, 0, "losers_fools");
+        assert_eq!(loser_silver_ring.fools_gained, 0, "losers_fools");
+        assert_eq!(loser_lead_ring.fools_gained, 0, "losers_fools");
     }
 }

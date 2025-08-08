@@ -1929,7 +1929,7 @@ export function setupWorld(provider: DojoProvider) {
 	const build_fame_coin_rewardDuelist_calldata = (duelistId: BigNumberish, amount: BigNumberish): DojoCall => {
 		return {
 			contractName: "fame_coin",
-			entrypoint: "reward_duelist",
+			entrypoint: "reward_duelist_fame",
 			calldata: [duelistId, amount],
 		};
 	};
@@ -2174,7 +2174,7 @@ export function setupWorld(provider: DojoProvider) {
 	const build_fools_coin_rewardPlayer_calldata = (recipient: string, amount: BigNumberish): DojoCall => {
 		return {
 			contractName: "fools_coin",
-			entrypoint: "reward_player",
+			entrypoint: "reward_player_fools",
 			calldata: [recipient, amount],
 		};
 	};

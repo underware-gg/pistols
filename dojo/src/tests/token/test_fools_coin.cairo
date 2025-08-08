@@ -52,8 +52,8 @@ pub fn _protected(sys: @TestSystems) -> IFoolsCoinProtectedDispatcher {
 
 #[test]
 #[should_panic(expected:('FOOLS: Invalid caller', 'ENTRYPOINT_FAILED'))]
-fn test_reward_player_invalid_caller() {
+fn test_reward_player_fools_invalid_caller() {
     let mut sys: TestSystems = setup(0);
-    _protected(@sys).reward_player(OWNER(), 1_000);
+    _protected(@sys).reward_player_fools(OWNER(), 1_000);
 }
 

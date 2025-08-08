@@ -86,6 +86,7 @@ use pistols::models::challenge::{ChallengeValue};
 use pistols::types::challenge_state::{ChallengeStateTrait};
 use pistols::utils::short_string::{ShortStringTrait};
 use pistols::libs::store::{Store, StoreTrait};
+use pistols::utils::math::{MathU128};
 
 #[generate_trait]
 pub impl RingTypeImpl of RingTypeTrait {
@@ -155,6 +156,21 @@ pub impl RingTypeImpl of RingTypeTrait {
             else if (store.get_player_has_signet_ring(player_address, RingType::LeadSignetRing)) {RingType::LeadSignetRing}
             else {RingType::Unknown}
         )
+    }
+    //
+    // Ring bonus
+    fn apply_ring_bonus(self: @RingType, ref fools_gained: u128) {
+        if (fools_gained.is_non_zero()) {
+            let ring_bonus: u8 = (match self {
+                RingType::GoldSignetRing => {40},
+                RingType::SilverSignetRing => {20},
+                RingType::LeadSignetRing => {10},
+                RingType::Unknown => {0},
+            });
+            if (ring_bonus.is_non_zero()) {
+                fools_gained += MathU128::percentage(fools_gained, ring_bonus);
+            }
+        }
     }
 }
 

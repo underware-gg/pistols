@@ -111,7 +111,7 @@ fn test_fame_mint_already_registered() {
 #[should_panic(expected: ('COIN: caller is not minter', 'ENTRYPOINT_FAILED'))]
 fn test_fame_reward_not_minter() {
     let mut sys: TestSystems = setup(0);
-    _protected(@sys).reward_duelist(123, 0);
+    _protected(@sys).reward_duelist_fame(123, 0);
 }
 
 #[test]
@@ -123,9 +123,9 @@ fn test_minted_duelist_not_allowed() {
 
 #[test]
 #[should_panic(expected:('COIN: caller is not minter', 'ENTRYPOINT_FAILED'))]
-fn test_reward_duelist_not_allowed() {
+fn test_reward_duelist_fame_not_allowed() {
     let mut sys: TestSystems = setup(0);
-    _protected(@sys).reward_duelist(1, AMOUNT);
+    _protected(@sys).reward_duelist_fame(1, AMOUNT);
 }
 
 #[test]

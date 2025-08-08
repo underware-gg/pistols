@@ -1006,10 +1006,10 @@ pub impl DuelistProfileDisplay of core::fmt::Display<DuelistProfile> {
     fn fmt(self: @DuelistProfile, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
         let result = match self {
             DuelistProfile::Undefined =>        format!("Undefined"),
-            DuelistProfile::Character(key) =>   { let id: u8 = (*key).into(); format!("Character::{}({})", self.name(), id) },
-            DuelistProfile::Bot(key) =>         { let id: u8 = (*key).into(); format!("Bot::{}({})", self.name(), id) },
-            DuelistProfile::Genesis(key) =>     { let id: u8 = (*key).into(); format!("Genesis::{}({})", self.name(), id) },
-            DuelistProfile::Legends(key) =>     { let id: u8 = (*key).into(); format!("Legends::{}({})", self.name(), id) },
+            DuelistProfile::Character(key) =>   { let id: u8 = (*key).into(); format!("Character::({})[{}]", self.name(), id) },
+            DuelistProfile::Bot(key) =>         { let id: u8 = (*key).into(); format!("Bot::({})[{}]", self.name(), id) },
+            DuelistProfile::Genesis(key) =>     { let id: u8 = (*key).into(); format!("Genesis::({})[{}]", self.name(), id) },
+            DuelistProfile::Legends(key) =>     { let id: u8 = (*key).into(); format!("Legends::({})[{}]", self.name(), id) },
         };
         f.buffer.append(@result);
         Result::Ok(())

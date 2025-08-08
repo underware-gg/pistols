@@ -298,20 +298,24 @@ pub mod duel_token {
 
             // validate duel type
             match duel_type {
-                DuelType::Seasonal |
-                DuelType::Practice => {
+                DuelType::Seasonal => {
                     // at least 1 life stake
                     assert(lives_staked > 0, Errors::INVALID_STAKE);
                 },
                 DuelType::BotPlayer => {
                     // this is a challenge to the bot_player contract
                     address_b = store.world.bot_player_address();
-                    assert(lives_staked == 1, Errors::INVALID_STAKE);
+                    assert(lives_staked == 0, Errors::INVALID_STAKE);
+                },
+                DuelType::Practice => {
+                    // at least 1 life stake
+                    assert(lives_staked == 0, Errors::INVALID_STAKE);
                 },
                 DuelType::Tutorial |    // created by the tutorials contact only
                 DuelType::Tournament |  // created by the tournaments contact only
-                DuelType::MatchMake |   // created by match_make() only
-                DuelType::Undefined=> {
+                DuelType::MatchMake |   // created by matchmaker contract only
+                DuelType::Unranked |    // created by matchmaker contract only
+                DuelType::Undefined => {
                     assert(false, Errors::INVALID_DUEL_TYPE);
                 },
             };
