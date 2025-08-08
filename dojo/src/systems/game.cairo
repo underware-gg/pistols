@@ -519,7 +519,7 @@ pub mod game {
                 fame_lost: rewards_loss.fame_lost,
                 lords_unlocked: 0,
                 fame_burned: 0,
-                survived: (fame_balance - rewards_loss.fame_lost) >= FAME::ONE_LIFE.low,
+                survived: (fame_balance - rewards_loss.fame_lost) >= FAME::ONE_LIFE,
             })
         }
 

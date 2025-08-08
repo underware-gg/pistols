@@ -143,7 +143,7 @@ pub mod fame_coin {
             self.erc20._approve(token_address, world.bank_address(), Bounded::MAX);
 
             // mint FAME to token
-            self.coin.mint(token_address, FAME::MINT_GRANT_AMOUNT);
+            self.coin.mint(token_address, FAME::MINT_GRANT_AMOUNT.into());
         }
 
         fn reward_duelist(ref self: ContractState,

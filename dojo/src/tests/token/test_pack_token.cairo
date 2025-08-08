@@ -547,7 +547,7 @@ pub fn _airdrop_open(sys: @TestSystems, recipient: ContractAddress, pack_type: P
     assert_eq!(duelist_balance_after, duelist_balance_before + pack_type.descriptor().quantity.into(), "{}:: duelist_balance_after(recipient)", prefix);
     // falidate duelist FAME
     let duelist_fame_balance: u128 = (*sys.duelists).fame_balance(duelist_id_0.into());
-    assert_eq!(duelist_fame_balance, FAME::MINT_GRANT_AMOUNT.low, "{}:: duelist_fame_balance", prefix);
+    assert_eq!(duelist_fame_balance, FAME::MINT_GRANT_AMOUNT, "{}:: duelist_fame_balance", prefix);
     (duelist_id_0)
 }
 

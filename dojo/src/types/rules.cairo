@@ -56,8 +56,8 @@ pub struct DuelistBonus {
 use core::num::traits::Zero;
 use pistols::models::ring::{RingType};
 use pistols::types::timestamp::{TIMESTAMP};
-use pistols::types::constants::{CONST, FAME};
 use pistols::utils::math::{MathU128};
+use pistols::types::constants::{CONST, FAME::{ONE_LIFE}};
 use pistols::utils::misc::{ZERO};
 
 #[generate_trait]
@@ -103,7 +103,6 @@ pub impl RulesImpl of RulesTrait {
         signet_ring: RingType,
         bonus: @DuelistBonus,
     ) -> RewardValues {
-        let one_life: u128 = FAME::ONE_LIFE.low;
         let mut result: RewardValues = Default::default();
         match self {
             Rules::Undefined => {},
@@ -111,16 +110,16 @@ pub impl RulesImpl of RulesTrait {
                 if (is_winner) {
                     result.survived = true;
                 } else {
-                    result.fame_lost = one_life * lives_staked.into();
+                    result.fame_lost = ONE_LIFE * lives_staked.into();
                 }
             },
             Rules::Season => {
                 if (is_winner) {
                     result.survived = true;
                     let k_fame: u128 = 1;
-                    result.fame_gained = (one_life / (((fame_balance / one_life) + 1) / k_fame));
+                    result.fame_gained = (ONE_LIFE / (((fame_balance / ONE_LIFE) + 1) / k_fame));
                     let k_fools: u128 = 10;
-                    result.fools_gained = (k_fools * ((one_life / 2) / result.fame_gained)) * CONST::ETH_TO_WEI.low;
+                    result.fools_gained = (k_fools * ((ONE_LIFE / 2) / result.fame_gained)) * CONST::ETH_TO_WEI.low;
                     // apply staked lives
                     result.fame_gained *= lives_staked.into();
                     result.fools_gained *= lives_staked.into();
@@ -137,7 +136,7 @@ pub impl RulesImpl of RulesTrait {
                         result.fools_gained += MathU128::percentage(result.fools_gained, ring_bonus);
                     }
                 } else {
-                    result.fame_lost = one_life * lives_staked.into();
+                    result.fame_lost = ONE_LIFE * lives_staked.into();
                     result.points_scored = 10;
                 }
                 // apply bonus
