@@ -92,7 +92,7 @@ pub mod bot_player {
 
             // pick a duelist profile...
             let challenge: ChallengeValue = store.get_challenge_value(duel_id);
-            let duelist_profile: DuelistProfile = if (challenge.duel_type.is_unranked(@store)) {
+            let duelist_profile: DuelistProfile = if (challenge.duel_type.is_practice(@store)) {
                 // unranked: randomize a bot profile
                 let mut dice: Dice = self._make_dice(@store, duel_id);
                 let duelist_seed: u8 = dice.throw('bot_archetype', 255);
@@ -103,7 +103,6 @@ pub mod bot_player {
             };
 
             // get or mint a duelist
-            assert(challenge.lives_staked >= 1 && challenge.lives_staked <= 3, Errors::INVALID_STAKE);
             let bot_address: ContractAddress = starknet::get_contract_address();
             let stack: PlayerDuelistStack = store.get_player_duelist_stack(bot_address, duelist_profile);
             let mut duelist_id: u128 = stack.get_first_available_duelist_id(@store, challenge.lives_staked);

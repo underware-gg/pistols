@@ -439,8 +439,8 @@ pub mod duelist_token {
 
             // transfer gains
             let treasury_address: ContractAddress = store.get_config_treasury_address();
-            self._process_rewards(@fame_protected_dispatcher, @fools_protected_dispatcher, challenge.duelist_id_a, rewards_a);
-            self._process_rewards(@fame_protected_dispatcher, @fools_protected_dispatcher, challenge.duelist_id_b, rewards_b);
+            self._process_fame_fools_rewards(@fame_protected_dispatcher, @fools_protected_dispatcher, challenge.duelist_id_a, @rewards_a);
+            self._process_fame_fools_rewards(@fame_protected_dispatcher, @fools_protected_dispatcher, challenge.duelist_id_b, @rewards_b);
             self._process_lost_fame(@fame_protected_dispatcher, @bank_protected_dispatcher, treasury_address, distribution, balance_a, challenge.duel_id, challenge.duelist_id_a, ref rewards_a, rewards_b.fame_gained);
             self._process_lost_fame(@fame_protected_dispatcher, @bank_protected_dispatcher, treasury_address, distribution, balance_b, challenge.duel_id, challenge.duelist_id_b, ref rewards_b, rewards_a.fame_gained);
 
@@ -502,21 +502,21 @@ pub mod duelist_token {
             (*fame_dispatcher).balance_of_token(starknet::get_contract_address(), duelist_id).low
         }
 
-        fn _process_rewards(ref self: ContractState,
+        fn _process_fame_fools_rewards(ref self: ContractState,
             fame_protected_dispatcher: @IFameCoinProtectedDispatcher,
             fools_protected_dispatcher: @IFoolsCoinProtectedDispatcher,
             duelist_id: u128,
-            values: RewardValues,
+            values: @RewardValues,
         ) {
             // reward 100% FAME to duelist
-            if (values.fame_gained != 0) {
+            if (*values.fame_gained != 0) {
 // println!("++ values.fame_gained: {}", values.fame_gained);
-                (*fame_protected_dispatcher).reward_duelist(duelist_id, values.fame_gained);
+                (*fame_protected_dispatcher).reward_duelist_fame(duelist_id, *values.fame_gained);
             }
             // reward 100% FOOLS to owner
-            if (values.fools_gained != 0) {
+            if (*values.fools_gained != 0) {
                 let owner: ContractAddress = self.owner_of(duelist_id.into());
-                (*fools_protected_dispatcher).reward_player(owner, values.fools_gained);
+                (*fools_protected_dispatcher).reward_player_fools(owner, *values.fools_gained);
             }
         }
         

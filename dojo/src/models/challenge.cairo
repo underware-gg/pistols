@@ -33,12 +33,13 @@ pub struct Challenge {
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
 pub enum DuelType {
     Undefined,      // 0
-    Seasonal,       // 1
-    Tournament,     // 2
-    Tutorial,       // 3
-    Practice,       // 4
-    BotPlayer,      // 5
-    MatchMake,      // 6
+    Seasonal,       // 1 - PvP
+    Tournament,     // 2 - Budokan
+    Tutorial,       // 3 - Tutorial
+    Practice,       // 4 - Practice
+    BotPlayer,      // 5 - Single Player Imps
+    MatchMake,      // 6 - Matchmaking Ranked
+    Unranked,       // 7 - Matchmaking Unranked
 }
 
 #[derive(Clone, Drop, Serde)]
@@ -183,20 +184,21 @@ pub impl ChallengeImpl of ChallengeTrait {
 pub impl DuelTypeImpl of DuelTypeTrait {
     fn get_rules(self: @DuelType, store: @Store) -> Rules {
         (match self {
-            // season rules + pools
-            DuelType::Seasonal |
+            // Ranked
             DuelType::Tournament |
             DuelType::MatchMake => store.get_current_season_rules(),
-            // no points, burns FAME
-            DuelType::BotPlayer => Rules::Unranked,
-            // no rules, no points, no FAME
+            // Unranked
+            DuelType::Seasonal |
+            DuelType::Unranked => Rules::Unranked,
+            // Practice
             DuelType::Tutorial |
             DuelType::Practice |
+            DuelType::BotPlayer |
             DuelType::Undefined => Rules::Undefined,
         })
     }
-    fn is_unranked(self: @DuelType, store: @Store) -> bool {
-        (self.get_rules(store) == Rules::Unranked)
+    fn is_practice(self: @DuelType, store: @Store) -> bool {
+        (self.get_rules(store) == Rules::Undefined)
     }
 }
 
@@ -310,6 +312,7 @@ impl DuelTypeIntoByteArray of core::traits::Into<DuelType, ByteArray> {
             DuelType::Practice     => "DuelType::Practice",
             DuelType::BotPlayer    => "DuelType::BotPlayer",
             DuelType::MatchMake    => "DuelType::MatchMake",
+            DuelType::Unranked     => "DuelType::Unranked",
         }
     }
 }

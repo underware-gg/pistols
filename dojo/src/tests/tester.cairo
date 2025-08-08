@@ -722,7 +722,26 @@ pub mod tester {
             _ => {},
         }
     }
-    
+
+    //--------------------------
+    // helpers
+    //
+    pub fn starts_with(input: ByteArray, prefix: ByteArray) -> bool {
+        (if (input.len() < prefix.len()) {
+            (false)
+        } else {
+            let mut result = true;
+            let mut i = 0;
+            while (i < prefix.len()) {
+                if (input[i] != prefix[i]) {
+                    result = false;
+                    break;
+                }
+                i += 1;
+            };
+            (result)
+        })
+    }    
 
     //--------------------------
     // mock account contract
@@ -1243,55 +1262,79 @@ pub mod tester {
         println!("Pool::Sacrifice__LORDS:{} FAME:{}", ETH(pool_flame.balance_lords), ETH(pool_flame.balance_fame));
     }
 
-    pub fn assert_ranked_duel_results(sys: @TestSystems, duel_id: u128, prefix: ByteArray) {
-        let ch: ChallengeValue = (*sys.store).get_challenge_value(duel_id);
-        assert_ne!(ch.state, ChallengeState::InProgress, "[{}] ranked state", prefix);
-        assert_ne!(ch.season_id, 0, "[{}] ranked season_id", prefix);
-        assert_ne!(ch.winner, 0, "[{}] ranked winner", prefix); // must have a winner to be a valid test
-        let rules: Rules = ch.duel_type.get_rules(sys.store);
-        assert_eq!(rules, (*sys.store).get_current_season_rules(), "[{}] ranked rules", prefix);
+    //------------------------------------
+    // assert results by Rules
+    //
+
+    fn _assert_ranked_balances(sys: @TestSystems, ch: ChallengeValue, prefix: ByteArray) {
+        assert_ne!(ch.state, ChallengeState::InProgress, "[{}] state", prefix);
+        assert_ne!(ch.season_id, 0, "[{}] season_id", prefix);
+        assert_gt!(ch.lives_staked, 0, "[{}] lives_staked", prefix); // must have stakes
+        let winner_fame: u128 = FAME::MINT_GRANT_AMOUNT.into();
+        let loser_fame: u128 = (FAME::MINT_GRANT_AMOUNT - (ch.lives_staked.into() * FAME::ONE_LIFE)).into();
         if (ch.winner == 1) {
-            assert_gt!((*sys.fools).balance_of(ch.address_a), 0, "[{}] ranked fools balance A (winner)", prefix);
-            assert_eq!((*sys.fools).balance_of(ch.address_b), 0, "[{}] ranked fools balance B (loser)", prefix);
+            assert_gt!((*sys.fools).balance_of(ch.address_a), 0, "[{}] fools A (winner)", prefix);
+            assert_eq!((*sys.fools).balance_of(ch.address_b), 0, "[{}] fools B (loser)", prefix);
+            assert_gt!((*sys.duelists).fame_balance(ch.duelist_id_a), winner_fame, "[{}] fame A (winner)", prefix);
+            assert_eq!((*sys.duelists).fame_balance(ch.duelist_id_b), loser_fame, "[{}] fame B (loser)", prefix);
         } else if (ch.winner == 2) {
-            assert_eq!((*sys.fools).balance_of(ch.address_a), 0, "[{}] ranked fools balance A (loser)", prefix);
-            assert_gt!((*sys.fools).balance_of(ch.address_b), 0, "[{}] ranked fools balance B (winner)", prefix);
+            assert_eq!((*sys.fools).balance_of(ch.address_a), 0, "[{}] fools A (loser)", prefix);
+            assert_gt!((*sys.fools).balance_of(ch.address_b), 0, "[{}] fools B (winner)", prefix);
+            assert_eq!((*sys.duelists).fame_balance(ch.duelist_id_a), loser_fame, "[{}] fame A (loser)", prefix);
+            assert_gt!((*sys.duelists).fame_balance(ch.duelist_id_b), winner_fame, "[{}] fame B (winner)", prefix);
+        } else {
+            assert_eq!((*sys.fools).balance_of(ch.address_a), 0, "[{}] fools A (draw)", prefix);
+            assert_eq!((*sys.fools).balance_of(ch.address_b), 0, "[{}] fools B (draw)", prefix);
+            assert_eq!((*sys.duelists).fame_balance(ch.duelist_id_a), loser_fame, "[{}] fame A (draw)", prefix);
+            assert_eq!((*sys.duelists).fame_balance(ch.duelist_id_b), loser_fame, "[{}] fame B (draw)", prefix);
         }
+    }
+    fn _assert_practice_balances(sys: @TestSystems, ch: ChallengeValue, prefix: ByteArray) {
+        assert_ne!(ch.state, ChallengeState::InProgress, "[{}] state", prefix);
+        assert_ne!(ch.season_id, 0, "[{}] season_id", prefix);
+        assert_ne!(ch.winner, 0, "[{}] winner", prefix); // must have a winner to be a valid test
+        assert_eq!((*sys.fools).balance_of(ch.address_a), 0, "[{}] fools A", prefix);
+        assert_eq!((*sys.fools).balance_of(ch.address_b), 0, "[{}] fools B", prefix);
+        assert_eq!((*sys.duelists).fame_balance(ch.duelist_id_a), FAME::MINT_GRANT_AMOUNT.into(), "[{}] fame A (loser)", prefix);
+        assert_eq!((*sys.duelists).fame_balance(ch.duelist_id_b), FAME::MINT_GRANT_AMOUNT.into(), "[{}] fame B (winner)", prefix);
+    }
+    fn _assert_ranked_scores(sys: @TestSystems, ch: ChallengeValue, prefix: ByteArray) {
         let score_a: SeasonScoreboard = (*sys.store).get_scoreboard(ch.season_id, ch.duelist_id_a.into());
         let score_b: SeasonScoreboard = (*sys.store).get_scoreboard(ch.season_id, ch.duelist_id_b.into());
-        assert_gt!(score_a.points, 0, "[{}] ranked score_a.points", prefix);
-        assert_gt!(score_b.points, 0, "[{}] ranked score_b.points", prefix);
+        assert_gt!(score_a.points, 0, "[{}] score_a.points", prefix);
+        assert_gt!(score_b.points, 0, "[{}] score_b.points", prefix);
+    }
+    fn _assert_unranked_scores(sys: @TestSystems, ch: ChallengeValue, prefix: ByteArray) {
+        let score_a: SeasonScoreboard = (*sys.store).get_scoreboard(ch.season_id, ch.duelist_id_a.into());
+        let score_b: SeasonScoreboard = (*sys.store).get_scoreboard(ch.season_id, ch.duelist_id_b.into());
+        assert_eq!(score_a.points, 0, "[{}] score_a.points", prefix);
+        assert_eq!(score_b.points, 0, "[{}] score_b.points", prefix);
     }
 
-    pub fn assert_unranked_duel_results(sys: @TestSystems, duel_id: u128, prefix: ByteArray) {
+    pub fn assert_ranked_duel_results(sys: @TestSystems, duel_id: u128, mut prefix: ByteArray) {
+        prefix = format!("RANKED_{}", prefix);
         let ch: ChallengeValue = (*sys.store).get_challenge_value(duel_id);
-        assert_ne!(ch.state, ChallengeState::InProgress, "[{}] unranked state", prefix);
-        assert_ne!(ch.season_id, 0, "[{}] unranked season_id", prefix);
-        assert_ne!(ch.winner, 0, "[{}] unranked winner", prefix); // must have a winner to be a valid test
+        let rules: Rules = ch.duel_type.get_rules(sys.store);
+        assert_eq!(rules, Rules::Season, "[{}] Rules::Season", prefix);
+        assert_eq!(rules, (*sys.store).get_current_season_rules(), "[{}] get_current_season_rules()", prefix);
+        _assert_ranked_balances(sys, ch, prefix.clone());
+        _assert_ranked_scores(sys, ch, prefix.clone());
+    }
+    pub fn assert_unranked_duel_results(sys: @TestSystems, duel_id: u128, mut prefix: ByteArray) {
+        prefix = format!("UNRANKED_{}", prefix);
+        let ch: ChallengeValue = (*sys.store).get_challenge_value(duel_id);
         let rules: Rules = ch.duel_type.get_rules(sys.store);
         assert_eq!(rules, Rules::Unranked, "[{}] unranked rules", prefix);
-        assert_eq!((*sys.fools).balance_of(ch.address_a), 0, "[{}] unranked fools balance A", prefix);
-        assert_eq!((*sys.fools).balance_of(ch.address_b), 0, "[{}] unranked fools balance B", prefix);
-        let score_a: SeasonScoreboard = (*sys.store).get_scoreboard(ch.season_id, ch.duelist_id_a.into());
-        let score_b: SeasonScoreboard = (*sys.store).get_scoreboard(ch.season_id, ch.duelist_id_b.into());
-        assert_eq!(score_a.points, 0, "[{}] unranked score_a.points", prefix);
-        assert_eq!(score_b.points, 0, "[{}] unranked score_b.points", prefix);
+        _assert_ranked_balances(sys, ch, prefix.clone());
+        _assert_unranked_scores(sys, ch, prefix.clone());
+    }
+    pub fn assert_practice_duel_results(sys: @TestSystems, duel_id: u128, mut prefix: ByteArray) {
+        prefix = format!("PRACTICE_{}", prefix);
+        let ch: ChallengeValue = (*sys.store).get_challenge_value(duel_id);
+        let rules: Rules = ch.duel_type.get_rules(sys.store);
+        assert_eq!(rules, Rules::Undefined, "[{}] practice rules", prefix);
+        _assert_practice_balances(sys, ch, prefix.clone());
+        _assert_unranked_scores(sys, ch, prefix.clone());
     }
 
-    pub fn starts_with(input: ByteArray, prefix: ByteArray) -> bool {
-        (if (input.len() < prefix.len()) {
-            (false)
-        } else {
-            let mut result = true;
-            let mut i = 0;
-            while (i < prefix.len()) {
-                if (input[i] != prefix[i]) {
-                    result = false;
-                    break;
-                }
-                i += 1;
-            };
-            (result)
-        })
-    }
 }

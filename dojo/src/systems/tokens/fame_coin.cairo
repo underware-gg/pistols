@@ -35,7 +35,7 @@ pub trait IFameCoin<TState> {
 #[starknet::interface]
 pub trait IFameCoinProtected<TState> {
     fn minted_duelist(ref self: TState, duelist_id: u128);
-    fn reward_duelist(ref self: TState, duelist_id: u128, amount: u128);
+    fn reward_duelist_fame(ref self: TState, duelist_id: u128, amount: u128);
     fn burn(ref self: TState, amount: u128);
 }
 
@@ -146,7 +146,7 @@ pub mod fame_coin {
             self.coin.mint(token_address, FAME::MINT_GRANT_AMOUNT.into());
         }
 
-        fn reward_duelist(ref self: ContractState,
+        fn reward_duelist_fame(ref self: ContractState,
             duelist_id: u128,
             amount: u128,
         ) {

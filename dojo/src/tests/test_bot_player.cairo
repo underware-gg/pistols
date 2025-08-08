@@ -81,7 +81,7 @@ mod tests {
     fn test_mint_bot_insufficient_lords() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER);
         tester::execute_claim_starter_pack(@sys, OWNER());
-        tester::execute_create_duel_ID(@sys, OWNER(), TOKEN_ID_1, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 1);
+        tester::execute_create_duel_ID(@sys, OWNER(), TOKEN_ID_1, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 0);
     }
 
     fn _assert_mint_pools_after_mint(sys: @TestSystems, peg_before: Pool, claimable_before: Pool, fame_supply_before: u256, prefix: ByteArray) -> (Pool, Pool, u256) {
@@ -111,32 +111,32 @@ mod tests {
         let fame_supply_init: u256 = sys.fame.total_supply();
         // 1
         sys.rng.mock_values([MockedValueTrait::new('bot_archetype', MOCKED_VILLAIN)].span());
-        let bot_id_1: u128 = sys.store.get_challenge_value(tester::execute_create_duel_ID(@sys, OWNER(), duelist_id_1, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 1)).duelist_id_b;
+        let bot_id_1: u128 = sys.store.get_challenge_value(tester::execute_create_duel_ID(@sys, OWNER(), duelist_id_1, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 0)).duelist_id_b;
         _assert_bot_duelist(@sys, bot_id_1, "bot_1", Option::Some(BotKey::TinMan), 1);
         let (pool_peg_1, claimable_1, fame_supply_1) = _assert_mint_pools_after_mint(@sys, pool_peg_init, claimable_init, fame_supply_init, "pools_1");
         // 2
         sys.rng.mock_values([MockedValueTrait::new('bot_archetype', MOCKED_TRICKSTER)].span());
-        let bot_id_2: u128 = sys.store.get_challenge_value(tester::execute_create_duel_ID(@sys, OTHER(), duelist_id_2, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 1)).duelist_id_b;
+        let bot_id_2: u128 = sys.store.get_challenge_value(tester::execute_create_duel_ID(@sys, OTHER(), duelist_id_2, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 0)).duelist_id_b;
         _assert_bot_duelist(@sys, bot_id_2, "bot_2", Option::Some(BotKey::Scarecrow), 1);
         let (pool_peg_2, claimable_2, fame_supply_2) = _assert_mint_pools_after_mint(@sys, pool_peg_1, claimable_1, fame_supply_1, "pools_2");
         // 3
         sys.rng.mock_values([MockedValueTrait::new('bot_archetype', MOCKED_LORD)].span());
-        let bot_id_3: u128 = sys.store.get_challenge_value(tester::execute_create_duel_ID(@sys, BUMMER(), duelist_id_3, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 1)).duelist_id_b;
+        let bot_id_3: u128 = sys.store.get_challenge_value(tester::execute_create_duel_ID(@sys, BUMMER(), duelist_id_3, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 0)).duelist_id_b;
         _assert_bot_duelist(@sys, bot_id_3, "bot_3", Option::Some(BotKey::Leon), 1);
         let (pool_peg_3, claimable_3, fame_supply_3) = _assert_mint_pools_after_mint(@sys, pool_peg_2, claimable_2, fame_supply_2, "pools_3");
         // 4
         sys.rng.mock_values([MockedValueTrait::new('bot_archetype', MOCKED_VILLAIN)].span());
-        let bot_id_4: u128 = sys.store.get_challenge_value(tester::execute_create_duel_ID(@sys, RECIPIENT(), duelist_id_4, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 1)).duelist_id_b;
+        let bot_id_4: u128 = sys.store.get_challenge_value(tester::execute_create_duel_ID(@sys, RECIPIENT(), duelist_id_4, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 0)).duelist_id_b;
         _assert_bot_duelist(@sys, bot_id_4, "bot_4", Option::Some(BotKey::TinMan), 2);
         let (pool_peg_4, claimable_4, fame_supply_4) = _assert_mint_pools_after_mint(@sys, pool_peg_3, claimable_3, fame_supply_3, "pools_4");
         // 5
         sys.rng.mock_values([MockedValueTrait::new('bot_archetype', MOCKED_TRICKSTER)].span());
-        let bot_id_5: u128 = sys.store.get_challenge_value(tester::execute_create_duel_ID(@sys, SPENDER(), duelist_id_5, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 1)).duelist_id_b;
+        let bot_id_5: u128 = sys.store.get_challenge_value(tester::execute_create_duel_ID(@sys, SPENDER(), duelist_id_5, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 0)).duelist_id_b;
         _assert_bot_duelist(@sys, bot_id_5, "bot_5", Option::Some(BotKey::Scarecrow), 2);
         let (pool_peg_5, claimable_5, fame_supply_5) = _assert_mint_pools_after_mint(@sys, pool_peg_4, claimable_4, fame_supply_4, "pools_5");
         // 6
         sys.rng.mock_values([MockedValueTrait::new('bot_archetype', MOCKED_PRO)].span());
-        let bot_id_6: u128 = sys.store.get_challenge_value(tester::execute_create_duel_ID(@sys, STACKER(), duelist_id_6, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 1)).duelist_id_b;
+        let bot_id_6: u128 = sys.store.get_challenge_value(tester::execute_create_duel_ID(@sys, STACKER(), duelist_id_6, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 0)).duelist_id_b;
         _assert_bot_duelist(@sys, bot_id_6, "bot_6", Option::Some(BotKey::Pro), 1);
         let (_pool_peg_6, _claimable_6, _fame_supply_6) = _assert_mint_pools_after_mint(@sys, pool_peg_5, claimable_5, fame_supply_5, "pools_6");
     }
@@ -154,7 +154,7 @@ mod tests {
         tester::fund_duelists_pool(@sys, 2);
         tester::execute_claim_starter_pack(@sys, OWNER());
         assert_eq!(sys.duelists.total_supply(), 2, "total_supply 2");
-        let duel_id: u128 = tester::execute_create_duel_ID(@sys, OWNER(), TOKEN_ID_1, any_address, MESSAGE(), DuelType::BotPlayer, 0, 1);
+        let duel_id: u128 = tester::execute_create_duel_ID(@sys, OWNER(), TOKEN_ID_1, any_address, MESSAGE(), DuelType::BotPlayer, 0, 0);
         let (ch, round) = tester::get_Challenge_Round_value(@sys, duel_id);
         assert_eq!(ch.state, ChallengeState::InProgress, "challenge.state_CREATE");
         assert_eq!(round.state, RoundState::Commit, "round.state_CREATE");
@@ -193,8 +193,8 @@ mod tests {
         assert!(!sys.duels.has_pact(DuelType::BotPlayer, OWNER(), bot_address), "has_pact_no");
         let assignment: DuelistAssignment = sys.store.get_duelist_assignment(ch.duelist_id_b);
         assert_eq!(assignment.duel_id, 0, "duelist_assignment.0");
-        // UNRANKED, player has no points, no fools, no score
-        tester::assert_unranked_duel_results(@sys, duel_id, "finished");
+        // PRACTICE, player has no score, no fools, no fame
+        tester::assert_practice_duel_results(@sys, duel_id, "finished");
     }
 
     #[test]
@@ -205,7 +205,7 @@ mod tests {
         tester::fund_duelists_pool(@sys, 2);
         tester::execute_claim_starter_pack(@sys, OWNER());
         assert_eq!(sys.duelists.total_supply(), 2, "total_supply 2");
-        let duel_id: u128 = tester::execute_create_duel_ID(@sys, OWNER(), TOKEN_ID_1, any_address, MESSAGE(), DuelType::BotPlayer, 0, 1);
+        let duel_id: u128 = tester::execute_create_duel_ID(@sys, OWNER(), TOKEN_ID_1, any_address, MESSAGE(), DuelType::BotPlayer, 0, 0);
         // player commits, bot commits
         let (_mocked, moves_a, _moves_b) = prefabs::get_moves_dual_miss();
         tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
@@ -229,7 +229,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER);
         tester::fund_duelists_pool(@sys, 2);
         tester::execute_claim_starter_pack(@sys, OWNER());
-        let duel_id: u128 = tester::execute_create_duel_ID(@sys, OWNER(), TOKEN_ID_1, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 1);
+        let duel_id: u128 = tester::execute_create_duel_ID(@sys, OWNER(), TOKEN_ID_1, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 0);
         tester::impersonate(OTHER());
         _protected(@sys).reply_duel(duel_id);
     }
@@ -240,16 +240,29 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER);
         tester::fund_duelists_pool(@sys, 2);
         tester::execute_claim_starter_pack(@sys, OWNER());
-        let duel_id: u128 = tester::execute_create_duel_ID(@sys, OWNER(), TOKEN_ID_1, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 1);
+        let duel_id: u128 = tester::execute_create_duel_ID(@sys, OWNER(), TOKEN_ID_1, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 0);
         tester::impersonate(OTHER());
         _protected(@sys).commit_moves(duel_id);
     }
 
+    #[test]
+    #[should_panic(expected: ('DUEL: Invalid stake', 'ENTRYPOINT_FAILED'))]
+    fn test_bot_invalid_stake_1() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER | FLAGS::MOCK_RNG);
+        tester::execute_create_duel_ID(@sys, OWNER(), TOKEN_ID_1, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 1);
+    }
+    
+    #[test]
+    #[should_panic(expected: ('DUEL: Invalid stake', 'ENTRYPOINT_FAILED'))]
+    fn test_bot_invalid_stake_3() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER | FLAGS::MOCK_RNG);
+        tester::execute_create_duel_ID(@sys, OWNER(), TOKEN_ID_1, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 3);
+    }
 
 
 
     //------------------------------
-    // duel results
+    // duel results (Seasonal/Unranked)
     //
 
     fn _get_bot_moves_crit_a(archetype: Archetype) -> (Span<MockedValue>, PlayerMoves, PlayerMoves) {
@@ -294,10 +307,11 @@ mod tests {
     }
     
     fn _create_duel_bot_crit_a(sys: @TestSystems, challenger: ContractAddress, duelist_id: u128, lives_staked: u8) -> (u128, PlayerMoves) {
-        let (mocked, moves_a, _moves_b) = _get_bot_moves_crit_a(Archetype::Trickster);
+        let (mocked, moves_a, _moves_b) = _get_bot_moves_crit_a(Archetype::Undefined);
         (*sys.rng).mock_values(mocked);
         // challenge
-        let duel_id: u128 = tester::execute_create_duel_ID(sys, challenger, duelist_id, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, lives_staked);
+        let bot_address: ContractAddress = (*sys.bot_player).contract_address;
+        let duel_id: u128 = tester::execute_create_duel_ID(sys, challenger, duelist_id, bot_address, MESSAGE(), DuelType::Seasonal, 0, lives_staked);
         (duel_id, moves_a)
     }
 
@@ -329,7 +343,7 @@ mod tests {
         let bot_id_1: u128 = _duel_bot_crit_a(@sys, OWNER(), TOKEN_ID_1, 1, "duel_1").duelist_id_b;
         assert_eq!(sys.duelists.life_count(bot_id_1), 2, "life_count after duel 1");
         assert!(sys.duelists.is_alive(bot_id_1), "alive after duel 1");
-        _assert_bot_duelist(@sys, bot_id_1, "duel_1", Option::Some(BotKey::Scarecrow), 1);
+        _assert_bot_duelist(@sys, bot_id_1, "duel_1", Option::Some(BotKey::Pro), 1);
         // minted bot increases pool_peg
         let fame_supply_minted: u256 = sys.fame.total_supply();
         let pool_peg_minted: Pool = sys.store.get_pool(PoolType::FamePeg);
@@ -341,7 +355,7 @@ mod tests {
         assert_eq!(bot_id_2, bot_id_1, "same duelist");
         assert_eq!(sys.duelists.life_count(bot_id_2), 1, "life_count after duel 2");
         assert!(sys.duelists.is_alive(bot_id_2), "alive after duel 2");
-        _assert_bot_duelist(@sys, bot_id_2, "duel_2", Option::Some(BotKey::Scarecrow), 1);
+        _assert_bot_duelist(@sys, bot_id_2, "duel_2", Option::Some(BotKey::Pro), 1);
         // bot is still owned by contract
         assert_eq!(sys.duelists.owner_of(bot_id_2.into()), bot_address, "owner_of(bot_id) > contract");
         //
@@ -350,32 +364,26 @@ mod tests {
         assert_eq!(bot_id_3, bot_id_1, "same duelist");
         assert_eq!(sys.duelists.life_count(bot_id_3), 0, "life_count after duel 3");
         assert!(!sys.duelists.is_alive(bot_id_3), "dead after duel 3");
-        _assert_bot_duelist(@sys, bot_id_3, "duel_3", Option::Some(BotKey::Scarecrow), 0);
+        _assert_bot_duelist(@sys, bot_id_3, "duel_3", Option::Some(BotKey::Pro), 0);
+println!("____9");
         // bot was transferred to player
         assert_eq!(sys.duelists.owner_of(bot_id_3.into()), OWNER(), "owner_of(bot_id) > player");
         // pools and balances moves
         let fame_supply_dead: u256 = sys.fame.total_supply();
         let treasury_dead: u128 = sys.lords.balance_of(TREASURY()).low;
         let pool_peg_dead: Pool = sys.store.get_pool(PoolType::FamePeg);
-        assert_eq!(ETH(pool_peg_dead.balance_lords), ETH(pool_peg_init.balance_lords), "pool_peg_dead");
-        assert_eq!(fame_supply_dead, fame_supply_init, "fame_supply_dead");
+        assert_gt!(ETH(pool_peg_dead.balance_lords), ETH(pool_peg_init.balance_lords), "pool_peg_dead");
+        assert_lt!(fame_supply_dead, fame_supply_minted, "fame_supply_dead");
         assert_gt!(treasury_dead, treasury_init, "treasury_dead");
         //
         // new duelist...
+println!("____10");
         let bot_id_4: u128 = _duel_bot_crit_a(@sys, OWNER(), TOKEN_ID_1, 1, "duel_4").duelist_id_b;
-        _assert_bot_duelist(@sys, bot_id_4, "duel_4", Option::Some(BotKey::Scarecrow), 1);
+println!("____11");
+        _assert_bot_duelist(@sys, bot_id_4, "duel_4", Option::Some(BotKey::Pro), 1);
         assert_ne!(bot_id_4, bot_id_1, "new duelist minted");
         assert_eq!(sys.duelists.life_count(bot_id_4), 2, "NEW life_count after duel 1");
         assert_eq!(sys.duelists.is_alive(bot_id_4), true, "NEW alive after duel 4");
-    }
-
-    #[test]
-    #[should_panic(expected: ('DUEL: Invalid stake', 'ENTRYPOINT_FAILED'))]
-    fn test_bot_invalid_stake() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER | FLAGS::MOCK_RNG);
-        tester::fund_duelists_pool(@sys, 8);
-        tester::execute_claim_starter_pack(@sys, OWNER());
-        _create_duel_bot_crit_a(@sys, OWNER(), TOKEN_ID_1, 2);
     }
 
 
@@ -436,7 +444,7 @@ mod tests {
         let assignment: DuelistAssignment = sys.store.get_duelist_assignment(ch.duelist_id_b);
         assert_eq!(assignment.duel_id, 0, "duelist_assignment.0");
         // RANKED, player has score and fools
-        tester::assert_ranked_duel_results(@sys, duel_id, "finished");
+        tester::assert_unranked_duel_results(@sys, duel_id, "finished");
     }
 
     fn _duel_bot_ranked_crit_a(sys: @TestSystems, challenger: ContractAddress, duelist_id: u128, lives_staked: u8, prefix: ByteArray) -> ChallengeValue {
@@ -454,7 +462,7 @@ mod tests {
         let (ch, _round) = tester::get_Challenge_Round_value(sys, duel_id);
         assert_eq!(ch.state, ChallengeState::Resolved, "challenge.state_REVEAL");
         assert_eq!(ch.winner, 1, "challenge.winner_REVEAL");
-        tester::assert_ranked_duel_results(sys, duel_id, "finished");
+        tester::assert_unranked_duel_results(sys, duel_id, "finished");
         (ch)
     }
 
@@ -476,10 +484,10 @@ mod tests {
         assert_eq!(sys.duelists.owner_of(ch_1.duelist_id_b.into()), OWNER(), "owner_of(bot_id) > player");
         //
         // new duel, new bot duelist...
-        let duel_id: u128 = tester::execute_create_duel_ID(@sys, OWNER(), TOKEN_ID_1, bot_address, MESSAGE(), DuelType::Seasonal, 0, 3);
+        let duel_id: u128 = tester::execute_create_duel_ID(@sys, OWNER(), TOKEN_ID_1, bot_address, MESSAGE(), DuelType::Seasonal, 0, 1);
         let (ch_2, _round) = tester::get_Challenge_Round_value(@sys, duel_id);
         assert_ne!(ch_1.duelist_id_b, ch_2.duelist_id_b, "new duelist");
-        _assert_bot_duelist(@sys, ch_1.duelist_id_b, "duel_2", Option::Some(BotKey::Pro), 1);
+        _assert_bot_duelist(@sys, ch_2.duelist_id_b, "duel_2", Option::Some(BotKey::Pro), 1);
     }
 
     #[test]
@@ -510,13 +518,13 @@ mod tests {
         // create Duel against bot_1
         let (duel_id_1, moves_a_1) = _create_duel_bot_crit_a(@sys, OWNER(), TOKEN_ID_1, 1);
         let bot_id_1: u128 = sys.store.get_challenge(duel_id_1).duelist_id_b;
-        _assert_bot_duelist(@sys, bot_id_1, "duel_1", Option::Some(BotKey::Scarecrow), 1);
+        _assert_bot_duelist(@sys, bot_id_1, "duel_1", Option::Some(BotKey::Pro), 1);
         //
         // create Duel against bot_2
         let (duel_id_2, _moves_a_2) = _create_duel_bot_crit_a(@sys, OTHER(), ID(OTHER()), 1);
         let bot_id_2: u128 = sys.store.get_challenge(duel_id_2).duelist_id_b;
         assert_ne!(bot_id_2, bot_id_1, "different duelist as 1");
-        _assert_bot_duelist(@sys, bot_id_2, "duel_2", Option::Some(BotKey::Scarecrow), 2);
+        _assert_bot_duelist(@sys, bot_id_2, "duel_2", Option::Some(BotKey::Pro), 2);
         //
         // finish duel 1
         tester::execute_commit_moves(@sys, OWNER(), duel_id_1, moves_a_1.hashed);
@@ -527,7 +535,7 @@ mod tests {
         let (duel_id_3, _moves_a_3) = _create_duel_bot_crit_a(@sys, OWNER(), TOKEN_ID_1, 1);
         let bot_id_3: u128 = sys.store.get_challenge(duel_id_3).duelist_id_b;
         assert_eq!(bot_id_3, bot_id_1, "same duelist as 1");
-        _assert_bot_duelist(@sys, bot_id_3, "duel_3", Option::Some(BotKey::Scarecrow), 2);
+        _assert_bot_duelist(@sys, bot_id_3, "duel_3", Option::Some(BotKey::Pro), 2);
     }
 
     #[test]
@@ -639,6 +647,6 @@ mod tests {
         let assignment: DuelistAssignment = sys.store.get_duelist_assignment(ch.duelist_id_b);
         assert_eq!(assignment.duel_id, 0, "duelist_assignment.0");
         // RANKED, player has score and fools
-        tester::assert_ranked_duel_results(@sys, duel_id, "finished");
+        tester::assert_unranked_duel_results(@sys, duel_id, "finished");
     }
 }
