@@ -469,8 +469,8 @@ fn test_fame() {
     let balance_1_initial: u256 = sys.fame.balance_of_token(sys.duelists.contract_address, TOKEN_ID_1_1.low);
     let balance_2_initial: u256 = sys.fame.balance_of_token(sys.duelists.contract_address, TOKEN_ID_2_1.low);
     assert_gt!(FAME::MINT_GRANT_AMOUNT, 0, "FAME::MINT_GRANT_AMOUNT > 0");
-    assert_eq!(balance_1_initial, FAME::MINT_GRANT_AMOUNT, "balance_1_initial");
-    assert_eq!(balance_2_initial, FAME::MINT_GRANT_AMOUNT, "balance_2_initial");
+    assert_eq!(balance_1_initial, FAME::MINT_GRANT_AMOUNT.into(), "balance_1_initial");
+    assert_eq!(balance_2_initial, FAME::MINT_GRANT_AMOUNT.into(), "balance_2_initial");
 
     // transfer duelist
     tester::impersonate(OWNER());
@@ -503,7 +503,7 @@ fn test_duelist_inactive() {
     let mut sys: TestSystems = setup(0);
 
     // baseline fame
-    let intial_fame: u128 = FAME::MINT_GRANT_AMOUNT.low;
+    let intial_fame: u128 = FAME::MINT_GRANT_AMOUNT;
     assert_eq!(intial_fame, WEI(3000).low, "intial_fame");
 
     // activate to drip fame
@@ -576,7 +576,7 @@ fn _test_duelist_reactivate(ref sys: TestSystems, token_id: u128, dripped_fame: 
     let fame_balance_start: u128 = sys.fame.balance_of_token(sys.duelists.contract_address, token_id).low;
     let fame_supply_start: u128 = sys.fame.total_supply().low;
     let timestamp_active_start: u64 = sys.store.get_duelist_timestamps(token_id).active;
-    // let intial_fame: u128 = FAME::MINT_GRANT_AMOUNT.low;
+    // let intial_fame: u128 = FAME::MINT_GRANT_AMOUNT;
 // println!("[] balance     : {}", fame_balance_start/CONST::ETH_TO_WEI.low);
 // println!("[] fame_to_burn: {}", dripped_fame);
 
@@ -610,7 +610,7 @@ fn _test_duelist_reactivate(ref sys: TestSystems, token_id: u128, dripped_fame: 
     let fame_supply: u128 = sys.fame.total_supply().low;
     // Flames up?
     let pool_flame: Pool = sys.store.get_pool(PoolType::Sacrifice);
-    let pool_amount: u128 = ((FAME::ONE_LIFE.low / 10) * 6);
+    let pool_amount: u128 = ((FAME::ONE_LIFE / 10) * 6);
     if (should_survive) {
         assert_eq!(memorial.cause_of_death, CauseOfDeath::None, "AFTER_cause_of_death");
         assert_eq!(memorial.fame_before_death, 0, "AFTER_fame_before_death");
@@ -734,7 +734,7 @@ fn _test_duelist_sacrifice(sys: @TestSystems, token_id: u128, cause_of_death: Ca
     let fame_balance_start: u128 = (*sys.fame).balance_of_token((*sys.duelists).contract_address, token_id).low;
     let fame_supply_start: u128 = (*sys.fame).total_supply().low;
     let timestamp_active_start: u64 = (*sys.store).get_duelist_timestamps(token_id).active;
-    // let intial_fame: u128 = FAME::MINT_GRANT_AMOUNT.low;
+    // let intial_fame: u128 = FAME::MINT_GRANT_AMOUNT;
 // println!("[] balance     : {}", fame_balance_start/CONST::ETH_TO_WEI.low);
 // println!("[] fame_to_burn: {}", dripped_fame);
 
@@ -768,7 +768,7 @@ fn _test_duelist_sacrifice(sys: @TestSystems, token_id: u128, cause_of_death: Ca
     let fame_supply: u128 = (*sys.fame).total_supply().low;
     // Flames up?
     let pool_flame: Pool = (*sys.store).get_pool(PoolType::Sacrifice);
-    let pool_amount: u128 = ((FAME::ONE_LIFE.low / 10) * 6);
+    let pool_amount: u128 = ((FAME::ONE_LIFE / 10) * 6);
     assert_eq!(fame_balance, 0, "AFTER_fame_balance_DEAD");
     assert_eq!(fame_supply, fame_supply_start - fame_balance_start + pool_amount, "AFTER_fame_supply_DEAD");
     assert_eq!(pool_flame.balance_fame, pool_amount, "AFTER_pool_flame.balance_fame_DEAD");

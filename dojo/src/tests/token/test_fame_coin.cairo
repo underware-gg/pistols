@@ -142,7 +142,7 @@ fn test_fame_transfer_between_owners_not_allowed() {
     let mut sys: TestSystems = setup(0);
     // transfer FAME
     tester::impersonate(sys.duelists.contract_address);
-    sys.fame.transfer_from(OWNER(), OTHER(), FAME::MINT_GRANT_AMOUNT / 2);
+    sys.fame.transfer_from(OWNER(), OTHER(), FAME::MINT_GRANT_AMOUNT.into() / 2);
 }
 
 #[test]
@@ -152,5 +152,5 @@ fn test_fame_transfer_from_owner_not_allowed() {
     let mut sys: TestSystems = setup(0);
     // transfer FAME
     tester::impersonate(OWNER());
-    sys.fame.transfer(OTHER(), FAME::MINT_GRANT_AMOUNT / 2);
+    sys.fame.transfer(OTHER(), FAME::MINT_GRANT_AMOUNT.into() / 2);
 }
