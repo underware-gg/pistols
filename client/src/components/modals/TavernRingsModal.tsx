@@ -346,7 +346,7 @@ function RingClaimItem({ ring, disabled, isVisible, onClaimComplete, onClaiming 
     
     claimRing(ring.duelIds[0], ring.ringType)
     onClaiming(ring.ringType)
-  }, [isLoading, ring.duelIds, claimRing, ring.ringType])
+  }, [isLoading, ring.duelIds, claimRing, ring.ringType, onClaiming])
 
   if (!isVisible) return null
 
@@ -542,6 +542,7 @@ function _TavernRingsModal({ opener }: { opener: Opener }) {
           ringImage: ringImageMap[lastCompletedRingType].ring,
           ringName: getRingName(lastCompletedRingType, ringId)
         })
+        ringAnimationOpener.open()
         setLastCompletedRingType(null)
       }
     }

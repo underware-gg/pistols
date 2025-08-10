@@ -24,7 +24,7 @@ let hasShownInThisSession = false
 
 export default function ScTavern() {
   const { dispatchSetScene } = usePistolsScene()
-  const { barkeepModalOpener } = usePistolsContext()
+  const { barkeepModalOpener, tavernRingsOpener } = usePistolsContext()
 
   const { value: itemClicked, timestamp } = useGameEvent('scene_click', null)
 
@@ -51,14 +51,14 @@ export default function ScTavern() {
   }, [itemClicked, timestamp])
 
   useEffect(() => {
-    if (!barkeepModalOpener.isOpen && _currentScene && _currentScene instanceof InteractibleScene) {
+    if (!barkeepModalOpener.isOpen && !tavernRingsOpener.isOpen && _currentScene && _currentScene instanceof InteractibleScene) {
       (_currentScene as InteractibleScene)?.toggleBlur?.(false);
       (_currentScene as InteractibleScene)?.setClickable?.(true);
       setTimeout(() => {
         (_currentScene as InteractibleScene)?.excludeItem?.(null);
       }, 400)
     }
-  }, [barkeepModalOpener.isOpen])
+  }, [barkeepModalOpener.isOpen, tavernRingsOpener.isOpen])
 
   return (
     <div>
@@ -100,7 +100,10 @@ function TavernRingsChecker() {
     if (hasClaimableRings) {
       timeoutId = setTimeout(() => {
         setHasShownRings(true)
-        hasShownInThisSession = true
+        hasShownInThisSession = true;
+        (_currentScene as InteractibleScene)?.excludeItem(TextureName.bg_tavern_bartender_mask);
+        (_currentScene as InteractibleScene)?.toggleBlur(true);
+        (_currentScene as InteractibleScene)?.setClickable(false);
         tavernRingsOpener.open()
       }, 2000)
     }
