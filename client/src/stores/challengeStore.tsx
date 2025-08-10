@@ -231,7 +231,7 @@ export function useMyActiveDuels(notificationDuelIds: bigint[] = []) {
     const allRelevantDuelIds = new Set([...requiredDuelIds, ...notificationDuelIds])
 
     return challenges
-      .filter(ch => allRelevantDuelIds.has(BigInt(ch.duel_id)))
+      .filter(ch => allRelevantDuelIds.has(BigInt(ch.duel_id)) && (ch.address_a === address || ch.address_b === address))
       .map(ch => ({
         duel_id: BigInt(ch.duel_id),
         timestamp: Number(ch.timestamps.start),

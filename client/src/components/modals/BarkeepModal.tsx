@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { useConnectedController } from '@underware/pistols-sdk/dojo'
 import { useElizaMessage } from '/src/utils/eliza'
@@ -8,30 +8,31 @@ import { DuelNotificationItem } from '/src/components/notifications/DuelNotifica
 import { BarkeepMenuItem } from '/src/components/ui/BarkeepMenuItem'
 import { SceneName } from '/src/data/assets'
 import DuelTutorialOverlay from '../ui/duel/DuelTutorialOverlay'
+import { Opener } from '/src/hooks/useOpener'
 
 type ModalStage = 'intro' | 'menu' | 'notifications'
 
-interface BarkeepModalProps {
-  open: boolean
-  setOpen: (open: boolean) => void
-  initialStage?: ModalStage
+export default function BarkeepModal() {
+  const { barkeepModalOpener } = usePistolsContext()
+  const isOpen = useMemo(() => (barkeepModalOpener.isOpen), [barkeepModalOpener.isOpen])
+  return <>{isOpen && <_BarkeepModal opener={barkeepModalOpener} />}</>
 }
 
-export default function BarkeepModal({ open, setOpen, initialStage = 'intro' }: BarkeepModalProps) {  
+function _BarkeepModal({ opener }: { opener: Opener }) {  
   const { dispatchSetScene } = usePistolsScene()
   const { tutorialOpener, tavernRingsOpener, dispatchSelectDuel } = usePistolsContext()
   
   const { notifications, hasUnreadNotifications, markAllAsRead } = useNotifications()
   
-  const [stage, setStage] = useState<ModalStage>(initialStage)
+  const [stage, setStage] = useState<ModalStage>(opener.props.initialStage ?? 'intro')
   const [displayText, setDisplayText] = useState('')
 
   // const { username, name } = useConnectedController()
   // const { sendMessage, responses } = useElizaMessage(username, name)
 
   useEffect(() => {
-    if (open) {
-      if (initialStage === 'notifications') {
+    if (opener.isOpen) {
+      if (opener.props.initialStage === 'notifications') {
         setStage('notifications')
         setDisplayText('Here ya go, ya filthy animal. Don\'t make me regret this...')
       } else {
@@ -51,9 +52,9 @@ export default function BarkeepModal({ open, setOpen, initialStage = 'intro' }: 
       setDisplayText('')
       setStage('intro')
     }
-  }, [open, initialStage])
+  }, [opener.isOpen, opener.props.initialStage])
 
-  if (!open) return null
+  if (!opener.isOpen) return null
 
   return (
     <div className='TempBarkeepOverlay NoMouse NoDrag'>
@@ -95,7 +96,7 @@ export default function BarkeepModal({ open, setOpen, initialStage = 'intro' }: 
                 label="Got anything for me?"
                 onClick={() => {
                   tavernRingsOpener.open()
-                  setOpen(false)
+                  opener.close()
                 }}
                 index={4}
               />
@@ -110,7 +111,7 @@ export default function BarkeepModal({ open, setOpen, initialStage = 'intro' }: 
                   className="NotificationItemContainer"
                 >
                   <DuelNotificationItem
-                    notification={notification}
+                    notifications={[notification]}
                     onAction={() => {
                       dispatchSelectDuel(notification.duelId)
                     }}
@@ -140,7 +141,7 @@ export default function BarkeepModal({ open, setOpen, initialStage = 'intro' }: 
                   setStage('menu')
                   setDisplayText('What else do you want?')
                 } else {
-                  setOpen(false)
+                  opener.close()
                 }
               }}
               className="BarkeepDialogButton"

@@ -1,8 +1,20 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useRef, useCallback, ReactNode } from 'react'
+import { create } from 'zustand'
+import { immer } from 'zustand/middleware/immer'
+import Dexie, { Table } from 'dexie'
 import { useMyActiveDuels } from '/src/stores/challengeStore'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 const STORAGE_KEY = 'pistols_notifications'
+
+function debounce<T extends (...args: any[]) => void>(func: T, wait: number): T {
+  let timeout: ReturnType<typeof setTimeout> | null = null
+
+  return function(this: any, ...args: Parameters<T>) {
+    if (timeout) clearTimeout(timeout)
+    timeout = setTimeout(() => func.apply(this, args), wait)
+  } as T
+}
 
 const setsAreEqual = <T,>(a: Set<T>, b: Set<T>): boolean => {
   if (a.size !== b.size) return false
@@ -11,7 +23,7 @@ const setsAreEqual = <T,>(a: Set<T>, b: Set<T>): boolean => {
 }
 
 export type Notification = {
-  duelId: bigint
+  duelId: number
   type: 'duel' | 'system'
   timestamp: number
   isRead: boolean
@@ -20,40 +32,207 @@ export type Notification = {
   requiresAction: boolean // Whether this notification requires user action
 }
 
-const loadNotificationsFromStorage = (): Notification[] => {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY)
-    if (!stored) return []
-    const parsed = JSON.parse(stored)
-    return parsed.map((n: any) => ({
-      ...n,
-      duelId: BigInt(n.duelId)
-    }))
-  } catch (e) {
-    console.error('Failed to load notifications from storage:', e)
-    return []
+interface NotificationState {
+  [key: number]: Notification
+}
+
+interface State {
+  notifications: NotificationState
+  hasInitialized: boolean
+  markAsRead: (duelIds: number[]) => void
+  markAsDisplayed: (duelIds: number[]) => void
+  markAllAsRead: () => void
+  markAllAsDisplayed: () => void
+  getNotification: (duelId: number) => Notification | null
+  addOrUpdateNotifications: (notifications: Notification[]) => void
+  cleanupOldNotifications: () => void
+}
+
+class NotificationDatabase extends Dexie {
+  notifications!: Table<Notification>
+
+  constructor() {
+    super('NotificationDB')
+    this.version(1).stores({
+      notifications: 'duelId,timestamp,isRead,requiresAction',
+    })
   }
 }
 
-const saveNotificationsToStorage = (notifications: Notification[]) => {
+const db = new NotificationDatabase()
+
+// Clear localStorage once
+const clearLocalStorage = () => {
   try {
-    const toStore = notifications.map(n => ({
-      ...n,
-      duelId: n.duelId.toString()
-    }))
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(toStore))
+    if (localStorage.getItem(STORAGE_KEY)) {
+      localStorage.removeItem(STORAGE_KEY)
+      console.log('Cleared old localStorage notifications')
+    }
   } catch (e) {
-    console.error('Failed to save notifications to storage:', e)
+    console.error('Failed to clear localStorage:', e)
   }
 }
+
+// Create the notifications store
+const createStore = () => {
+  const store = create<State>()(immer((set, get) => ({
+    notifications: {},
+    hasInitialized: false,
+
+    markAsRead: (duelIds: number[]) => {
+      set((state: State) => {
+        duelIds.forEach(duelId => {
+          const notification = state.notifications[duelId]
+          if (notification) {
+            notification.isRead = true
+          }
+        })
+        // Update in IndexedDB
+        db.notifications.bulkUpdate(duelIds.map(duelId => ({ key: duelId, changes: { isRead: true } })))
+      })
+    },
+
+    markAsDisplayed: (duelIds: number[]) => {
+      set((state: State) => {
+        duelIds.forEach(duelId => {
+          const notification = state.notifications[duelId]
+          if (notification) {
+            notification.isDisplayed = true
+          }
+        })
+        // Update in IndexedDB
+        db.notifications.bulkUpdate(duelIds.map(duelId => ({ key: duelId, changes: { isDisplayed: true } })))
+      })
+    },
+
+    markAllAsRead: () => {
+      set((state: State) => {
+        Object.values(state.notifications).forEach(n => {
+          n.isRead = true
+        })
+        // Update all in IndexedDB
+        db.notifications.toCollection().modify({ isRead: true })
+      })
+    },
+
+    markAllAsDisplayed: () => {
+      set((state: State) => {
+        Object.values(state.notifications).forEach(n => {
+          n.isDisplayed = true
+        })
+        // Update all in IndexedDB
+        db.notifications.toCollection().modify({ isDisplayed: true })
+      })
+    },
+
+    getNotification: (duelId: number) => {
+      return get().notifications[duelId] || null
+    },
+
+    addOrUpdateNotifications: (notifications: Notification[]) => {
+      set((state: State) => {
+        let didChange = false
+        const toPut: Notification[] = []
+
+        // Update existing notifications with enhanced logic
+        const updatedNotifications = Object.values(state.notifications).map(existing => {
+          const newNotif = notifications.find(n => n.duelId === existing.duelId)
+          if (!newNotif) return existing
+
+          if (newNotif.timestamp !== existing.timestamp || newNotif.state !== existing.state ||
+            (newNotif.requiresAction !== existing.requiresAction && (newNotif.state === constants.ChallengeState.Resolved || newNotif.state === constants.ChallengeState.Draw))
+          ) {
+            const updatedNotification = {
+              ...existing,
+              timestamp: newNotif.timestamp,
+              isRead: newNotif.isRead,
+              isDisplayed: !newNotif.requiresAction && existing.isDisplayed,
+              state: newNotif.state,
+              requiresAction: newNotif.requiresAction
+            }
+            
+            state.notifications[existing.duelId] = updatedNotification
+            toPut.push(updatedNotification)
+            didChange = true
+            return updatedNotification
+          }
+          return existing
+        })
+        
+        // Handle brand new notifications
+        const existingIds = updatedNotifications.map(n => n.duelId)
+        const brandNewNotifications = notifications.filter(n => !existingIds.includes(n.duelId))
+        
+        brandNewNotifications.forEach(notification => {
+          state.notifications[notification.duelId] = notification
+          toPut.push(notification)
+          didChange = true
+        })
+
+        if (toPut.length > 0) {
+          db.notifications.bulkPut(toPut)
+        }
+
+        if (!didChange) return
+      })
+    },
+
+    cleanupOldNotifications: async () => {
+      const twentyOneDaysAgo = Math.floor(Date.now() / 1000) - 21 * 24 * 60 * 60;
+      
+      const oldKeys = await db.notifications
+        .where('timestamp')
+        .below(twentyOneDaysAgo)
+        .primaryKeys();
+
+      if (oldKeys.length === 0) return;
+      
+      // Clean up IndexedDB
+      await db.notifications.bulkDelete(oldKeys)
+    },
+  })))
+
+  // Load notifications from IndexedDB on store creation
+  const initializeStore = async () => {
+    try {
+      // Clear localStorage once
+      clearLocalStorage()
+
+      // Clean up old notifications
+      await store.getState().cleanupOldNotifications()
+      
+      // Load from IndexedDB
+      const storedNotifications = await db.notifications.toArray()
+      
+      // Update store
+      store.setState({
+        notifications: storedNotifications.reduce((acc, n) => {
+          acc[Number(n.duelId)] = n
+          return acc
+        }, {} as NotificationState),
+        hasInitialized: true,
+      })
+    } catch (error) {
+      console.error('Failed to initialize notification store:', error)
+    }
+  }
+
+  // Initialize the store
+  initializeStore()
+
+  return store
+}
+
+export const useNotificationStore = createStore()
 
 type NotificationContextType = {
   notifications: Notification[]
-  markAsRead: (duelId: bigint) => void
-  markAsDisplayed: (duelId: bigint) => void
+  markAsRead: (duelIds: number[]) => void
+  markAsDisplayed: (duelIds: number[]) => void
   markAllAsRead: () => void
+  markAllAsDisplayed: () => void
   hasUnreadNotifications: boolean
-  getNotification: (duelId: bigint) => Notification | null
+  getNotification: (duelId: number) => Notification | null
 }
 
 const NotificationContext = createContext<NotificationContextType | null>(null)
@@ -61,26 +240,38 @@ const NotificationContext = createContext<NotificationContextType | null>(null)
 export const useNotificationContext = () => useContext(NotificationContext);
 
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [notifications, setNotifications] = useState<Notification[]>(() => {
-    return loadNotificationsFromStorage()
-  })
+  const store = useNotificationStore()
+  const { notifications: dbNotifications, hasInitialized, markAsRead, markAsDisplayed, markAllAsRead, markAllAsDisplayed, getNotification, addOrUpdateNotifications } = store
+  const batchedAdd = useRef(debounce(addOrUpdateNotifications, 100)).current
 
-  const [notificationDuelIds, setNotificationDuelIds] = useState<bigint[]>(() => {
-    return notifications.map(n => n.duelId)
-  })
+  const sortedNotifications = useMemo(() => {
+    return Object.values(dbNotifications).sort((a, b) => {
+      if (a.requiresAction !== b.requiresAction) {
+        return a.requiresAction ? -1 : 1
+      }
+      return b.timestamp - a.timestamp
+    })
+  }, [dbNotifications])
 
-  const activeDuels = useMyActiveDuels(notificationDuelIds)
-  
+  const [notificationDuelIds, setNotificationDuelIds] = useState<number[]>([])
+
   useEffect(() => {
-    saveNotificationsToStorage(notifications)
-  }, [notifications])
+    const newDuelIds = new Set(sortedNotifications.map(n => n.duelId))
+    const oldDuelIds = new Set(notificationDuelIds)
+
+    if (!setsAreEqual(newDuelIds, oldDuelIds)) {
+      setNotificationDuelIds(Array.from(newDuelIds))
+    }
+  }, [sortedNotifications])
+
+  const activeDuels = useMyActiveDuels(notificationDuelIds.map(id => BigInt(id)))
 
   useEffect(() => {
-    if (activeDuels.length === 0) return
+    if (activeDuels.length === 0 || !hasInitialized) return
     
     const newNotifications = activeDuels
       .map(duel => ({
-        duelId: duel.duel_id,
+        duelId: Number(duel.duel_id),
         type: 'duel' as const,
         timestamp: duel.timestamp,
         isRead: false,
@@ -89,95 +280,22 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         requiresAction: duel.callToAction && (duel.state !== constants.ChallengeState.Withdrawn && duel.state !== constants.ChallengeState.Expired && duel.state !== constants.ChallengeState.Refused),
       }))
 
-    setNotifications(prev => {
-      const updatedNotifications = prev.map(existing => {
-        const newNotif = newNotifications.find(n => n.duelId === existing.duelId)
-        if (!newNotif) return existing
-
-        if (newNotif.timestamp !== existing.timestamp || newNotif.state !== existing.state ||
-          (newNotif.requiresAction !== existing.requiresAction && (newNotif.state === constants.ChallengeState.Resolved || newNotif.state === constants.ChallengeState.Draw))
-        ) {
-          return {
-            ...existing,
-            timestamp: newNotif.timestamp,
-            isRead: newNotif.isRead,
-            isDisplayed: !newNotif.requiresAction && existing.isDisplayed,
-            state: newNotif.state,
-            requiresAction: newNotif.requiresAction
-          }
-        }
-        return existing
-      })
-      .sort((a, b) => {
-        if (a.requiresAction !== b.requiresAction) {
-          return a.requiresAction ? -1 : 1
-        }
-        return b.timestamp - a.timestamp
-      })
-
-      const existingIds = updatedNotifications.map(n => n.duelId)
-      const brandNewNotifications = newNotifications.filter(n => !existingIds.includes(n.duelId))
-
-      const TEN_DAYS_MS = 14 * 24 * 60 * 60
-      const now = Date.now() / 1000
-      
-      const filteredNotifications = [...brandNewNotifications, ...updatedNotifications]
-      .filter(notification => {
-        if (notification.state === constants.ChallengeState.Awaiting || notification.state === constants.ChallengeState.InProgress) {
-          return true
-        }
-        
-        return (now - notification.timestamp) < TEN_DAYS_MS
-      })
-
-      // Check if the set of duel IDs has changed and update state if needed
-      const currentDuelIds = new Set(filteredNotifications.map(n => n.duelId))
-      const previousDuelIds = new Set(notificationDuelIds)
-      
-      if (!setsAreEqual(currentDuelIds, previousDuelIds)) {
-        setNotificationDuelIds(Array.from(currentDuelIds))
-      }
-
-      return filteredNotifications
-    })
-  }, [activeDuels])
-
-  const markAsRead = useCallback((duelId: bigint) => {
-    setNotifications(prev => 
-      prev.map(n => n.duelId === duelId ? { ...n, isRead: true } : n)
-    )
-  }, [])
-
-  const markAsDisplayed = useCallback((duelId: bigint) => {
-    setNotifications(prev => 
-      prev.map(n => n.duelId === duelId ? { ...n, isDisplayed: true } : n)
-    )
-  }, [])
-
-  const markAllAsRead = useCallback(() => {
-    setNotifications(prev => prev.map(n => ({ ...n, isRead: true })))
-  }, [])
+    batchedAdd(newNotifications)
+  }, [activeDuels, hasInitialized])
 
   const hasUnreadNotifications = useMemo(() => {
-    return notifications.some(n => !n.isRead)
-  }, [notifications])
-
-  const getNotification = useCallback((duelId: bigint) => {
-    const notification = notifications.find(n => 
-      n.duelId === duelId && 
-      !n.isRead
-    )
-    return notification || null
-  }, [notifications])
+    return Object.values(dbNotifications).some(n => !n.isRead)
+  }, [dbNotifications])
 
   const value = React.useMemo(() => ({
-    notifications,
+    notifications: sortedNotifications,
     markAsRead,
     markAsDisplayed,
     markAllAsRead,
+    markAllAsDisplayed,
     hasUnreadNotifications,
     getNotification
-  }), [notifications, markAsRead, markAsDisplayed, markAllAsRead, hasUnreadNotifications, getNotification])
+  }), [dbNotifications, markAsRead, markAsDisplayed, markAllAsRead, markAllAsDisplayed, hasUnreadNotifications, getNotification])
 
   return (
     <NotificationContext.Provider value={value}>

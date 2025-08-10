@@ -8,11 +8,13 @@ import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 
 export const PushNotification: React.FC<{ 
-  notification: Notification, 
+  notifications: Notification[], 
   shouldShow: boolean,
   showNotification: () => void
-}> = ({ notification, shouldShow, showNotification }) => {
+}> = ({ notifications, shouldShow, showNotification }) => {
   const { currentDuel, selectedDuelId } = usePistolsContext()
+
+  const notification = notifications?.[0]
   const { challenge, turnA, turnB, completedStagesA, completedStagesB } = useDuel(notification?.duelId)
   const { isMyAccount: isMeA } = useIsMyAccount(challenge?.duelistAddressA)
   const { isMyAccount: isMeB } = useIsMyAccount(challenge?.duelistAddressB)
@@ -21,6 +23,13 @@ export const PushNotification: React.FC<{
 
   const notificationData = useMemo(() => {
     if (!notification || !challenge || !shouldShow || (!isMeA && !isMeB)) return { title: null, message: null }
+
+    if (notifications.length > 1) {
+      return {
+        title: `You have ${notifications.length} new duel updates!`,
+        message: `There are ${notifications.length} duels with new activity. Click to view your notifications!`
+      }
+    }
 
     const myName = isMeA ? duelistNameA : duelistNameB
 
@@ -128,9 +137,9 @@ export const PushNotification: React.FC<{
 
   useEffect(() => {
     if (notification && notificationData.title && notificationData.message) {
-      if (!notification.isDisplayed && selectedDuelId !== notification.duelId && currentDuel !== notification.duelId) {
+      if (notifications.some(n => !n.isDisplayed) && Number(selectedDuelId) !== notification.duelId && Number(currentDuel) !== notification.duelId) {
         sendBrowserNotification()
-      } else if (selectedDuelId === notification.duelId || currentDuel === notification.duelId) {
+      } else if (Number(selectedDuelId) === notification.duelId || Number(currentDuel) === notification.duelId) {
         showNotification()
       }
     }
@@ -147,8 +156,10 @@ export const PushNotification: React.FC<{
     registration.showNotification(notificationData.title, {
       body: notificationData.message,
       icon: '/images/logo/logo.png',
-      tag: `duel-${notification?.duelId}`,
-      data: { duelId: notification?.duelId }
+      tag: `duels-${notifications.map(n => n.duelId).join('-')}`,
+      data: { 
+        duelIds: notifications.map(n => n.duelId)
+      }
     })
     showNotification()
   }
