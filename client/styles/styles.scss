@@ -1404,7 +1404,6 @@ $logo-url: '/logos/logo_avante.svg';
   -webkit-box-orient: vertical;
   border-radius: aspect-width(0.625);
   z-index: 999;
-  --tail-position: left;
   --tail-vertical-position: 4.8125;
   --tail-width: 1.875;
   --tail-height: 0.9375;
@@ -1436,7 +1435,7 @@ $logo-url: '/logos/logo_avante.svg';
 
   &:has([data-tail="left"]), &[data-tail="left"] {
     &:before {
-      left: calc(aspect-width(var(--tail-offset-x)) + aspect-width(var(--tail-offset-y)));
+      left: calc(aspect-width(var(--tail-offset-x)));
       clip-path: polygon(
         100% 0%, 
         100% 100%, 
@@ -1445,7 +1444,7 @@ $logo-url: '/logos/logo_avante.svg';
     }
     
     &:after {
-      left: calc(aspect-width(var(--tail-inner-offset-x)) + aspect-width(var(--tail-offset-y)));
+      left: calc(aspect-width(var(--tail-inner-offset-x)));
       clip-path: polygon(
         100% 0%, 
         100% 100%, 
@@ -1456,7 +1455,7 @@ $logo-url: '/logos/logo_avante.svg';
 
   &:has([data-tail="right"]), &[data-tail="right"], &:not([data-tail="left"]) {
     &:before {
-      right: calc(aspect-width(var(--tail-offset-x)) + aspect-width(var(--tail-offset-y)));
+      right: calc(aspect-width(var(--tail-offset-x)));
       clip-path: polygon(
         0% 0%, 
         0% 100%, 
@@ -1465,7 +1464,7 @@ $logo-url: '/logos/logo_avante.svg';
     }
     
     &:after {
-      right: calc(aspect-width(var(--tail-inner-offset-x)) + aspect-width(var(--tail-offset-y)));
+      right: calc(aspect-width(var(--tail-inner-offset-x)));
       clip-path: polygon(
         0% 0%, 
         0% 100%, 
@@ -1483,6 +1482,8 @@ $logo-url: '/logos/logo_avante.svg';
   width: aspect-width(30);
   --bg-color: #{$color-bright};
   --border-color: #{$color-dark};
+  --tail-offset-y: 11;
+  --tail-inner-offset-y: 11.17;
 }
 
 .DemonTalkBaloon {

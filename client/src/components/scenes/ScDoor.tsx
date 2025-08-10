@@ -319,8 +319,6 @@ export function ConnectButton({
   useEffect(() => {
     let timeoutId;
 
-    console.log("🔴 hasClickedButton", hasClickedButton.current, isConnected, isError)
-
     if (isConnected && !isError && hasClickedButton.current) {
       if (enterScene) {
         onDoorCreak?.()
