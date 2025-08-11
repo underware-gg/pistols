@@ -712,7 +712,7 @@ export class ProgressDialogMesh {
 
     const button = this.element.querySelector('.dialog-button') as HTMLElement
     button.textContent = this.message
-    button.dataset.contentlength = Math.floor(this.message?.length / 10).toString()
+    button.dataset.contentlength = Math.floor(this.message?.length / 5).toString()
     button.style.pointerEvents = this.isLoading ? 'none' : 'auto'
     
     const buttonLoading = this.element.querySelector('.button-loading-overlay') as HTMLElement
