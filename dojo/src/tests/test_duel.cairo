@@ -124,9 +124,10 @@ pub mod tests {
         assert_eq!(timestamp_active_a, 0, "timestamp_active_a");
         assert_eq!(timestamp_active_b, 0, "timestamp_active_b");
 
-        let (challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
+        tester::make_challenge_ranked(ref sys, duel_id);
         assert_eq!(sys.store.get_challenge(duel_id).get_deck_type(), DeckType::Classic, "challenge.deck_type");
-        tester::assert_pact(@sys, duel_id, challenge, true, true, "started");
+        // tester::assert_pact(@sys, duel_id, challenge, true, true, "started"); // cant because changed DuelType
         let timestamp_active_a: u64 = sys.store.get_duelist_timestamps(ID(OWNER())).active;
         let timestamp_active_b: u64 = sys.store.get_duelist_timestamps(ID(OTHER())).active;
         assert_gt!(timestamp_active_a, 0, "timestamp_active_a");
@@ -141,7 +142,7 @@ pub mod tests {
         tester::drop_dojo_events(@sys);
         tester::execute_reveal_moves(@sys, OTHER(), duel_id, moves_b.salt, moves_b.moves);
         let (challenge, round) = tester::get_Challenge_Round_value(@sys, duel_id);
-        tester::assert_pact(@sys, duel_id, challenge, false, false, "ended");
+        // tester::assert_pact(@sys, duel_id, challenge, false, false, "ended"); // cant because changed DuelType
 // challenge.winner.print();
 // round.state_a.health.print();
 // round.state_b.health.print();
@@ -209,7 +210,7 @@ pub mod tests {
     }
 
     #[test]
-    fn test_resolved_draw_miss() {
+    fn test_ranked_resolved_draw_miss() {
         let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_miss();
         let sys: TestSystems = _test_resolved_draw(mocked, moves_a, moves_b, CONST::FULL_HEALTH);
         tester::assert_event_trophy(@sys, Trophy::Blindfold, OTHER());
@@ -217,7 +218,7 @@ pub mod tests {
     }
 
     #[test]
-    fn test_resolved_draw_crit() {
+    fn test_ranked_resolved_draw_crit() {
         let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         let sys: TestSystems = _test_resolved_draw(mocked, moves_a, moves_b, 0);
         tester::assert_event_trophy(@sys, Trophy::BloodBath, OTHER());
@@ -239,9 +240,10 @@ pub mod tests {
 
         let season_id: u32 = SEASON_ID_1;
 
-        let (challenge, round_1, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
+        let (_challenge, round_1, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
+        tester::make_challenge_ranked(ref sys, duel_id);
         assert_eq!(sys.store.get_challenge(duel_id).get_deck_type(), DeckType::Classic, "challenge.deck_type");
-        tester::assert_pact(@sys, duel_id, challenge, true, true, "started");
+        // tester::assert_pact(@sys, duel_id, challenge, true, true, "started"); // cant because changed DuelType
 
         // duel owned by contract
         assert_eq!(sys.duels.owner_of(duel_id.into()), sys.game.contract_address, "duels.owner_of");
@@ -282,7 +284,7 @@ pub mod tests {
         // 2nd reveal > Finished
         tester::execute_reveal_moves(@sys, OTHER(), duel_id, moves_b.salt, moves_b.moves);
         let (challenge, round) = tester::get_Challenge_Round_value(@sys, duel_id);
-        tester::assert_pact(@sys, duel_id, challenge, false, false, "ended");
+        // tester::assert_pact(@sys, duel_id, challenge, false, false, "ended"); // cant because changed DuelType
 // challenge.winner.print();
 // // challenge.state.print();
 // round.state_a.health.print();
@@ -368,8 +370,12 @@ pub mod tests {
         // (to compute totals and scores)
         //
 
+        // clear pact manually because we changed to DuelType::Ranked
+        tester::clear_pact(ref sys, DuelType::Seasonal, OWNER(), OTHER());
+
         let (_challenge, round_2, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
-        tester::assert_pact(@sys, duel_id, challenge, true, true, "started_2");
+        tester::make_challenge_ranked(ref sys, duel_id);
+        // tester::assert_pact(@sys, duel_id, challenge, true, true, "started_2"); // cant because changed DuelType
         // assert(round_2.moves_a.seed != 0, "round_2.moves_a.seed");
         // assert(round_2.moves_b.seed != 0, "round_2.moves_b.seed");
         // assert(round_2.moves_a.seed != round_2.moves_b.seed, "round_2.moves_a.seed != moves_b");
@@ -389,7 +395,7 @@ pub mod tests {
         let round: RoundValue = sys.store.get_round_value(duel_id);
         assert_eq!(round.moves_b.timeout, 0, "++ timeout_reveal_b_reset");
         tester::execute_reveal_moves(@sys, OWNER(), duel_id, moves_a.salt, moves_a.moves);
-        tester::assert_pact(@sys, duel_id, challenge, false, false, "ended_2");
+        // tester::assert_pact(@sys, duel_id, challenge, false, false, "ended_2"); // cant because changed DuelType
         let (challenge, round) = tester::get_Challenge_Round_value(@sys, duel_id);
         assert_eq!(challenge.state, ChallengeState::Resolved, "challenge.state ++");
         assert_ne!(challenge.winner, 0, "challenge.winner ++");
@@ -445,17 +451,34 @@ pub mod tests {
     }
 
     #[test]
-    fn test_resolved_win_a() {
+    fn test_ranked_resolved_win_a() {
         let (mocked, moves_a, moves_b) = prefabs::get_moves_crit_a();
         _test_resolved_win(mocked, moves_a, moves_b, 1);
     }
 
     #[test]
-    fn test_resolved_win_b() {
+    fn test_ranked_resolved_win_b() {
         let (mocked, moves_a, moves_b) = prefabs::get_moves_crit_b();
         _test_resolved_win(mocked, moves_a, moves_b, 2);
     }
 
+
+    #[test]
+    fn test_unranked_duel() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        tester::fund_duelists_pool(@sys, 2);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
+        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
+        //
+        // A wins at 10 paces
+        let (mocked, moves_a, moves_b) = prefabs::get_moves_crit_b_at_10();
+        sys.rng.mock_values(mocked);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, A, B, DuelType::Seasonal, 1);
+        prefabs::commit_reveal_get(@sys, duel_id, A, B, mocked, moves_a, moves_b);
+        tester::assert_unranked_duel_results(@sys, duel_id, "unranked");
+    }
 
     //-------------------------------
     // Duelist transfer
@@ -1553,11 +1576,11 @@ pub mod tests {
 
 
     //-------------------------------
-    // score bonuses
+    // Ranked / score bonuses
     //
 
     #[test]
-    fn test_score_bonus_dodge_a() {
+    fn test_ranked_score_bonus_dodge_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         let moves_a: PlayerMoves = PlayerMovesTrait::new(SALT_A, [2, 1, 0, BladesCard::Seppuku.into()].span());
         let moves_b: PlayerMoves = PlayerMovesTrait::new(SALT_B, [1, 3, 0, BladesCard::Seppuku.into()].span());
@@ -1571,6 +1594,7 @@ pub mod tests {
         let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, OWNER())[0];
         let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, OTHER())[0];
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
+        tester::make_challenge_ranked(ref sys, duel_id);
         tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
         tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_b.hashed);
         tester::execute_reveal_moves(@sys, OWNER(), duel_id, moves_a.salt, moves_a.moves);
@@ -1585,7 +1609,7 @@ pub mod tests {
     }
 
     #[test]
-    fn test_score_bonus_dodge_b() {
+    fn test_ranked_score_bonus_dodge_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         let moves_a: PlayerMoves = PlayerMovesTrait::new(SALT_A, [1, 3, 0, BladesCard::Seppuku.into()].span());
         let moves_b: PlayerMoves = PlayerMovesTrait::new(SALT_B, [2, 1, 0, BladesCard::Seppuku.into()].span());
@@ -1599,6 +1623,7 @@ pub mod tests {
         let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, OWNER())[0];
         let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, OTHER())[0];
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
+        tester::make_challenge_ranked(ref sys, duel_id);
         tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
         tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_b.hashed);
         tester::execute_reveal_moves(@sys, OWNER(), duel_id, moves_a.salt, moves_a.moves);
@@ -1613,7 +1638,7 @@ pub mod tests {
     }
 
     #[test]
-    fn test_dodge_win_a_TEMP() {
+    fn test_ranked_dodge_win_a_TEMP() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         let moves_a: PlayerMoves = PlayerMovesTrait::new(SALT_A, [2, 1].span());
         let moves_b: PlayerMoves = PlayerMovesTrait::new(SALT_B, [1, 10].span());
@@ -1627,6 +1652,7 @@ pub mod tests {
         let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, OWNER())[0];
         let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, OTHER())[0];
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
+        tester::make_challenge_ranked(ref sys, duel_id);
         tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
         tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_b.hashed);
         tester::execute_reveal_moves(@sys, OWNER(), duel_id, moves_a.salt, moves_a.moves);
@@ -1641,7 +1667,7 @@ pub mod tests {
     }
 
     #[test]
-    fn test_dodge_win_b_TEMP() {
+    fn test_ranked_dodge_win_b_TEMP() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         let moves_a: PlayerMoves = PlayerMovesTrait::new(SALT_A, [1, 10].span());
         let moves_b: PlayerMoves = PlayerMovesTrait::new(SALT_B, [2, 1].span());
@@ -1655,6 +1681,7 @@ pub mod tests {
         let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, OWNER())[0];
         let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, OTHER())[0];
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
+        tester::make_challenge_ranked(ref sys, duel_id);
         tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
         tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_b.hashed);
         tester::execute_reveal_moves(@sys, OWNER(), duel_id, moves_a.salt, moves_a.moves);
@@ -1669,7 +1696,7 @@ pub mod tests {
     }
 
     #[test]
-    fn test_score_bonus_rings() {
+    fn test_ranked_score_bonus_rings() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::MOCK_RNG | FLAGS::RINGS);
         tester::fund_duelists_pool(@sys, 2);
         tester::execute_claim_starter_pack(@sys, OWNER());
@@ -1713,11 +1740,11 @@ pub mod tests {
 
 
     //-------------------------------
-    // leaderboard qualification
+    // Ranked / leaderboards
     //
 
     #[test]
-    fn test_leaderboard_qualify_ok() {
+    fn test_ranked_leaderboard_qualify_ok() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         // empty leaderboards
         let leaderboard: Leaderboard = sys.store.get_leaderboard(SEASON_ID_1);
@@ -1733,6 +1760,7 @@ pub mod tests {
         let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         sys.rng.mock_values(mocked);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, A, B, DuelType::Seasonal, 1);
+        tester::make_challenge_ranked(ref sys, duel_id);
         let (challenge, _round) = prefabs::commit_reveal_get(@sys, duel_id, A, B, mocked, moves_a, moves_b);
         assert_eq!(challenge.state, ChallengeState::Draw, "challenge.state");
         // filled leaderboards
@@ -1781,7 +1809,7 @@ pub mod tests {
     }
 
     #[test]
-    fn test_leaderboard_qualify_team_a() {
+    fn test_ranked_leaderboard_qualify_team_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         // block A
         let A: ContractAddress = OWNER();
@@ -1795,6 +1823,7 @@ pub mod tests {
         let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         sys.rng.mock_values(mocked);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, A, B, DuelType::Seasonal, 1);
+        tester::make_challenge_ranked(ref sys, duel_id);
         let (challenge, _round) = prefabs::commit_reveal_get(@sys, duel_id, A, B, mocked, moves_a, moves_b);
         assert_eq!(challenge.state, ChallengeState::Draw, "challenge.state");
         // filled leaderboards
@@ -1805,7 +1834,7 @@ pub mod tests {
     }
 
     #[test]
-    fn test_leaderboard_qualify_team_b() {
+    fn test_ranked_leaderboard_qualify_team_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         // block A
         let A: ContractAddress = OWNER();
@@ -1819,6 +1848,7 @@ pub mod tests {
         let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         sys.rng.mock_values(mocked);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, A, B, DuelType::Seasonal, 1);
+        tester::make_challenge_ranked(ref sys, duel_id);
         let (challenge, _round) = prefabs::commit_reveal_get(@sys, duel_id, A, B, mocked, moves_a, moves_b);
         assert_eq!(challenge.state, ChallengeState::Draw, "challenge.state");
         // filled leaderboards
@@ -1829,7 +1859,7 @@ pub mod tests {
     }
 
     #[test]
-    fn test_leaderboard_qualify_blocked_a() {
+    fn test_ranked_leaderboard_qualify_blocked_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         // block A
         let A: ContractAddress = OWNER();
@@ -1843,6 +1873,7 @@ pub mod tests {
         let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         sys.rng.mock_values(mocked);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, A, B, DuelType::Seasonal, 1);
+        tester::make_challenge_ranked(ref sys, duel_id);
         let (challenge, _round) = prefabs::commit_reveal_get(@sys, duel_id, A, B, mocked, moves_a, moves_b);
         assert_eq!(challenge.state, ChallengeState::Draw, "challenge.state");
         // filled leaderboards
@@ -1853,7 +1884,7 @@ pub mod tests {
     }
 
     #[test]
-    fn test_leaderboard_qualify_blocked_b() {
+    fn test_ranked_leaderboard_qualify_blocked_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         // block A
         let A: ContractAddress = OWNER();
@@ -1867,6 +1898,7 @@ pub mod tests {
         let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         sys.rng.mock_values(mocked);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, A, B, DuelType::Seasonal, 1);
+        tester::make_challenge_ranked(ref sys, duel_id);
         let (challenge, _round) = prefabs::commit_reveal_get(@sys, duel_id, A, B, mocked, moves_a, moves_b);
         assert_eq!(challenge.state, ChallengeState::Draw, "challenge.state");
         // filled leaderboards
@@ -1877,7 +1909,7 @@ pub mod tests {
     }
 
     #[test]
-    fn test_leaderboard_qualify_blocked_a_b() {
+    fn test_ranked_leaderboard_qualify_blocked_a_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         // block A
         let A: ContractAddress = OWNER();
@@ -1892,6 +1924,7 @@ pub mod tests {
         let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         sys.rng.mock_values(mocked);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, A, B, DuelType::Seasonal, 1);
+        tester::make_challenge_ranked(ref sys, duel_id);
         let (challenge, _round) = prefabs::commit_reveal_get(@sys, duel_id, A, B, mocked, moves_a, moves_b);
         assert_eq!(challenge.state, ChallengeState::Draw, "challenge.state");
         // filled leaderboards

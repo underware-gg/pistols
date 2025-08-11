@@ -76,7 +76,7 @@ mod tests {
     fn test_challenge_pact_over_duel_type() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
         tester::execute_create_duel(@sys, OWNER(), OTHER(), MESSAGE(), DuelType::Seasonal, 0, 1);
-        tester::execute_create_duel(@sys, OWNER(), OTHER(), MESSAGE(), DuelType::Practice, 0, 1);
+        tester::execute_create_duel(@sys, OWNER(), OTHER(), MESSAGE(), DuelType::Practice, 0, 0);
         // do not work because they are already in a duel
     }
 
@@ -217,7 +217,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let A = OWNER();
         let B = OTHER();
-        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Practice, EXPIRE_MINUTES, 1);
+        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Practice, EXPIRE_MINUTES, 0);
         let ch = sys.store.get_challenge_value(duel_id);
         tester::assert_pact(@sys, duel_id, ch, true, false, "created");
         assert!(!sys.game.can_collect_duel(duel_id), "!can_collect_duel");
@@ -236,7 +236,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let A = OWNER();
         let B = OTHER();
-        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Practice, EXPIRE_MINUTES, 1);
+        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Practice, EXPIRE_MINUTES, 0);
         let ch = sys.store.get_challenge_value(duel_id);
 
         tester::assert_pact(@sys, duel_id, ch, true, false, "created");
@@ -263,7 +263,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let A = OWNER();
         let B = OTHER();
-        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Practice, EXPIRE_MINUTES, 1);
+        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Practice, EXPIRE_MINUTES, 0);
         let ch = sys.store.get_challenge_value(duel_id);
         tester::assert_pact(@sys, duel_id, ch, true, false, "created");
         // elapse time to almost expired...
@@ -278,7 +278,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
         let A = OWNER();
         let B = OTHER();
-        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Practice, EXPIRE_MINUTES, 1);
+        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Practice, EXPIRE_MINUTES, 0);
         tester::execute_reply_duel(@sys, A, ID(A), duel_id, true);
     }
 
@@ -319,7 +319,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let A = OWNER();
         let B = OTHER();
-        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Practice, EXPIRE_MINUTES, 1);
+        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Practice, EXPIRE_MINUTES, 0);
 
         let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.state, ChallengeState::Awaiting, "state");
@@ -361,7 +361,7 @@ mod tests {
         assert!(!player_a.exists(), "player_a.exists NOT");
         assert!(!player_b.exists(), "player_b.exists NOT");
 
-        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Practice, EXPIRE_MINUTES, 1);
+        let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Practice, EXPIRE_MINUTES, 0);
         let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.state, ChallengeState::Awaiting, "state");
         assert_eq!(ch.address_a, A, "challenger");
@@ -448,7 +448,7 @@ mod tests {
         let B = STACKER2();
         let (duelist_id_a_active, duelist_id_a_inactive, duelist_id_b_active, duelist_id_b_inactive) = _mint_stacker_duelists(@sys, A, B);
         // use inactive duelist > will swich to active
-        let duel_id: u128 = tester::execute_create_duel_ID(@sys, A, duelist_id_a_inactive, B, MESSAGE(), DuelType::Practice, 48, 1);
+        let duel_id: u128 = tester::execute_create_duel_ID(@sys, A, duelist_id_a_inactive, B, MESSAGE(), DuelType::Practice, 48, 0);
         let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.state, ChallengeState::Awaiting, "state");
         assert_eq!(ch.address_a, A, "challenger");
@@ -476,7 +476,7 @@ mod tests {
         tester::make_duelist_inactive(@sys, duelist_id_a_active, 3000);
         tester::make_duelist_inactive(@sys, duelist_id_b_active, 3000);
 
-        let duel_id: u128 = tester::execute_create_duel_ID(@sys, A, duelist_id_a_inactive, B, MESSAGE(), DuelType::Practice, 48, 1);
+        let duel_id: u128 = tester::execute_create_duel_ID(@sys, A, duelist_id_a_inactive, B, MESSAGE(), DuelType::Practice, 48, 0);
         let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.state, ChallengeState::Awaiting, "state");
         assert_eq!(ch.address_a, A, "challenger");
@@ -509,7 +509,7 @@ mod tests {
         // death by inactivity
         tester::make_duelist_inactive(@sys, duelist_id_a_active, 3000);
 
-        let _duel_id: u128 = tester::execute_create_duel_ID(@sys, A, duelist_id_a_active, B, MESSAGE(), DuelType::Practice, 48, 1);
+        let _duel_id: u128 = tester::execute_create_duel_ID(@sys, A, duelist_id_a_active, B, MESSAGE(), DuelType::Practice, 48, 0);
     }
 
     #[test]
@@ -525,7 +525,7 @@ mod tests {
         // death by inactivity
         tester::make_duelist_inactive(@sys, duelist_id_b_active, 3000);
 
-        let duel_id: u128 = tester::execute_create_duel_ID(@sys, A, duelist_id_a_active, B, MESSAGE(), DuelType::Practice, 48, 1);
+        let duel_id: u128 = tester::execute_create_duel_ID(@sys, A, duelist_id_a_active, B, MESSAGE(), DuelType::Practice, 48, 0);
         // reply...
         tester::execute_reply_duel(@sys, B, duelist_id_b_active, duel_id, true);
     }
@@ -612,6 +612,13 @@ mod tests {
     fn test_create_invalid_duel_type_matchmake() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
         tester::execute_create_duel(@sys, OWNER(), OTHER(), MESSAGE(), DuelType::MatchMake, 0, 1);
+    }
+
+    #[test]
+    #[should_panic(expected:('DUEL: Invalid duel type', 'ENTRYPOINT_FAILED'))]
+    fn test_create_invalid_duel_type_unranked() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
+        tester::execute_create_duel(@sys, OWNER(), OTHER(), MESSAGE(), DuelType::Unranked, 0, 1);
     }
 
     #[test]
