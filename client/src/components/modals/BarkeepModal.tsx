@@ -9,6 +9,7 @@ import { BarkeepMenuItem } from '/src/components/ui/BarkeepMenuItem'
 import { SceneName } from '/src/data/assets'
 import DuelTutorialOverlay from '../ui/duel/DuelTutorialOverlay'
 import { Opener } from '/src/hooks/useOpener'
+import { useAccount } from '@starknet-react/core'
 
 type ModalStage = 'intro' | 'menu' | 'notifications'
 
@@ -23,7 +24,8 @@ function _BarkeepModal({ opener }: { opener: Opener }) {
   const { tutorialOpener, tavernRingsOpener, dispatchSelectDuel } = usePistolsContext()
   
   const { notifications, hasUnreadNotifications, markAllAsRead } = useNotifications()
-  
+  const { address } = useAccount()
+
   const [stage, setStage] = useState<ModalStage>(opener.props.initialStage ?? 'intro')
   const [displayText, setDisplayText] = useState('')
 
@@ -127,7 +129,7 @@ function _BarkeepModal({ opener }: { opener: Opener }) {
             {hasUnreadNotifications && stage === 'notifications' && (
               <button
                 onClick={() => {
-                  markAllAsRead()
+                  markAllAsRead(address)
                 }}
                 className="BarkeepDialogButton"
               >

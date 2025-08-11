@@ -4,6 +4,7 @@ import { immer } from 'zustand/middleware/immer'
 import Dexie, { Table } from 'dexie'
 import { useMyActiveDuels } from '/src/stores/challengeStore'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
+import { useAccount } from '@starknet-react/core'
 
 const STORAGE_KEY = 'pistols_notifications'
 
@@ -23,6 +24,7 @@ const setsAreEqual = <T,>(a: Set<T>, b: Set<T>): boolean => {
 }
 
 export type Notification = {
+  owner: string
   duelId: number
   type: 'duel' | 'system'
   timestamp: number
@@ -41,8 +43,8 @@ interface State {
   hasInitialized: boolean
   markAsRead: (duelIds: number[]) => void
   markAsDisplayed: (duelIds: number[]) => void
-  markAllAsRead: () => void
-  markAllAsDisplayed: () => void
+  markAllAsRead: (address: string) => void
+  markAllAsDisplayed: (address: string) => void
   getNotification: (duelId: number) => Notification | null
   addOrUpdateNotifications: (notifications: Notification[]) => void
   cleanupOldNotifications: () => void
@@ -54,7 +56,7 @@ class NotificationDatabase extends Dexie {
   constructor() {
     super('NotificationDB')
     this.version(1).stores({
-      notifications: 'duelId,timestamp,isRead,requiresAction',
+      notifications: 'duelId,timestamp,isRead,requiresAction,owner',
     })
   }
 }
@@ -80,6 +82,7 @@ const createStore = () => {
     hasInitialized: false,
 
     markAsRead: (duelIds: number[]) => {
+      if (duelIds.length === 0) return
       set((state: State) => {
         duelIds.forEach(duelId => {
           const notification = state.notifications[duelId]
@@ -93,6 +96,7 @@ const createStore = () => {
     },
 
     markAsDisplayed: (duelIds: number[]) => {
+      if (duelIds.length === 0) return
       set((state: State) => {
         duelIds.forEach(duelId => {
           const notification = state.notifications[duelId]
@@ -105,23 +109,25 @@ const createStore = () => {
       })
     },
 
-    markAllAsRead: () => {
+    markAllAsRead: (address: string) => {
+      if (!address) return
       set((state: State) => {
-        Object.values(state.notifications).forEach(n => {
+        Object.values(state.notifications).filter(n => n.owner === address).forEach(n => {
           n.isRead = true
         })
         // Update all in IndexedDB
-        db.notifications.toCollection().modify({ isRead: true })
+        db.notifications.where('owner').equals(address).modify({ isRead: true })
       })
     },
 
-    markAllAsDisplayed: () => {
+    markAllAsDisplayed: (address: string) => {
+      if (!address) return
       set((state: State) => {
-        Object.values(state.notifications).forEach(n => {
+        Object.values(state.notifications).filter(n => n.owner === address).forEach(n => {
           n.isDisplayed = true
         })
         // Update all in IndexedDB
-        db.notifications.toCollection().modify({ isDisplayed: true })
+        db.notifications.where('owner').equals(address).modify({ isDisplayed: true })
       })
     },
 
@@ -229,8 +235,8 @@ type NotificationContextType = {
   notifications: Notification[]
   markAsRead: (duelIds: number[]) => void
   markAsDisplayed: (duelIds: number[]) => void
-  markAllAsRead: () => void
-  markAllAsDisplayed: () => void
+  markAllAsRead: (address: string) => void
+  markAllAsDisplayed: (address: string) => void
   hasUnreadNotifications: boolean
   getNotification: (duelId: number) => Notification | null
 }
@@ -240,18 +246,20 @@ const NotificationContext = createContext<NotificationContextType | null>(null)
 export const useNotificationContext = () => useContext(NotificationContext);
 
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { address } = useAccount()
   const store = useNotificationStore()
   const { notifications: dbNotifications, hasInitialized, markAsRead, markAsDisplayed, markAllAsRead, markAllAsDisplayed, getNotification, addOrUpdateNotifications } = store
   const batchedAdd = useRef(debounce(addOrUpdateNotifications, 100)).current
 
   const sortedNotifications = useMemo(() => {
-    return Object.values(dbNotifications).sort((a, b) => {
+    if (!address) return []
+    return Object.values(dbNotifications).filter(n => n.owner === address).sort((a, b) => {
       if (a.requiresAction !== b.requiresAction) {
         return a.requiresAction ? -1 : 1
       }
       return b.timestamp - a.timestamp
     })
-  }, [dbNotifications])
+  }, [dbNotifications, address])
 
   const [notificationDuelIds, setNotificationDuelIds] = useState<number[]>([])
 
@@ -267,10 +275,11 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const activeDuels = useMyActiveDuels(notificationDuelIds.map(id => BigInt(id)))
 
   useEffect(() => {
-    if (activeDuels.length === 0 || !hasInitialized) return
+    if (activeDuels.length === 0 || !hasInitialized || !address) return
     
     const newNotifications = activeDuels
       .map(duel => ({
+        owner: address,
         duelId: Number(duel.duel_id),
         type: 'duel' as const,
         timestamp: duel.timestamp,
@@ -281,7 +290,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       }))
 
     batchedAdd(newNotifications)
-  }, [activeDuels, hasInitialized])
+  }, [activeDuels, hasInitialized, address])
 
   const hasUnreadNotifications = useMemo(() => {
     return Object.values(dbNotifications).some(n => !n.isRead)
