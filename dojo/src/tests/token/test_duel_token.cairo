@@ -67,7 +67,7 @@ fn create_duel(sys: @TestSystems, recipient: ContractAddress, challenged_address
         duel_type: DuelType::Practice,
         duelist_id: ID(recipient),
         challenged_address: challenged_address,
-        lives_staked: 1,
+        lives_staked: 0,
         expire_minutes: 60,
         premise: Premise::Honour,
         message: MESSAGE(),

@@ -53,6 +53,7 @@ pub mod tester {
             DuelistMemorial, DuelistMemorialValue,
             CauseOfDeath,
         },
+        pact::{Pact, PactTrait},
         leaderboard::{Leaderboard, LeaderboardTrait, LeaderboardPosition},
         config::{Config, TokenConfig, CoinConfig, CONFIG},
         season::{
@@ -726,6 +727,12 @@ pub mod tester {
     //--------------------------
     // helpers
     //
+    pub fn make_challenge_ranked(ref sys: TestSystems, duel_id: u128) {
+        let mut challenge: Challenge = sys.store.get_challenge(duel_id);
+        challenge.duel_type = DuelType::MatchMake;
+        set_Challenge(ref sys.world, @challenge);
+    }
+
     pub fn starts_with(input: ByteArray, prefix: ByteArray) -> bool {
         (if (input.len() < prefix.len()) {
             (false)
@@ -1100,6 +1107,10 @@ pub mod tester {
         world.write_model_test(model);
     }
     #[inline(always)]
+    pub fn set_Pact(ref world: WorldStorage, model: @Pact) {
+        world.write_model_test(model);
+    }
+    #[inline(always)]
     pub fn set_Pack(ref world: WorldStorage, model: @Pack) {
         world.write_model_test(model);
     }
@@ -1241,6 +1252,16 @@ pub mod tester {
         assert!(duelist_duel_id == expected_duel_id,
             "[{}] duelist_challenge_b: [{}] not [{}]", prefix, duelist_duel_id, expected_duel_id
         );
+    }
+
+    pub fn clear_pact(ref sys: TestSystems, duel_type: DuelType, address_a: ContractAddress, address_b: ContractAddress) {
+        let p1: felt252 = address_a.into();
+        let p2: felt252 = address_b.into();
+        set_Pact(ref sys.world, @Pact{
+            duel_type,
+            pair: PactTrait::make_pair(p1.into(), p2.into()),
+            duel_id: 0,
+        });
     }
 
     pub fn print_pools(sys: @TestSystems, season_id: u32, prefix: ByteArray) {
