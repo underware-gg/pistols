@@ -1482,8 +1482,16 @@ $logo-url: '/logos/logo_avante.svg';
   width: aspect-width(30);
   --bg-color: #{$color-bright};
   --border-color: #{$color-dark};
-  --tail-offset-y: 11;
-  --tail-inner-offset-y: 11.17;
+
+  &.Menu {
+    --tail-offset-y: 11;
+    --tail-inner-offset-y: 11.17;
+  }
+
+  &.Notifications {
+    --tail-offset-y: 2;
+    --tail-inner-offset-y: 2.17;
+  }
 }
 
 .DemonTalkBaloon {

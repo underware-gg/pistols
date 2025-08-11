@@ -60,7 +60,7 @@ function _BarkeepModal({ opener }: { opener: Opener }) {
 
   return (
     <div className='TempBarkeepOverlay NoMouse NoDrag'>
-      <div className='TempBarkeepTalkBalloon Relative'>
+      <div className={`TempBarkeepTalkBalloon Relative ${stage === 'notifications' ? 'Notifications' : 'Menu'}`}>
         <div className='BarkeepModalContainer'>
           <AnimatedText text={displayText} delayPerCharacter={30} />
           
