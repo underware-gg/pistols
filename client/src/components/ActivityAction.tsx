@@ -93,7 +93,7 @@ export default function ActivityAction() {
       {(isConnected && duelistCount > 0 && items.length == 0 && idleCount == 0) && <div className='Brightest'>Loading...</div>}
       {isConnected && duelistCount > 0 && items.length > 0 && waitingForResult.length > 0 && (
         <div className='ClearActionsButtonContainer'>
-          <ActionButton important label='Reveal Result' loading={false} loadingClassName='poster' onClick={() => revealAllResults()} />
+          <ActionButton important label={`Instant Reveal ${waitingForResult.length} Duel${waitingForResult.length > 1 ? 's' : ''}`} loading={false} loadingClassName='poster' onClick={() => revealAllResults()} />
         </div>
       )}
       

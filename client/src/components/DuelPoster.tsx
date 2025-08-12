@@ -584,7 +584,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
               }
               {(isFinished && isCallToAction) &&
                 <Col>
-                  <ActionButton large fillParent important label='Reveal Result' loading={isSubmitting} loadingClassName='poster' onClick={() => _revealResult()} />
+                  <ActionButton large fillParent important label='Instant Reveal' loading={isSubmitting} loadingClassName='poster' onClick={() => _revealResult()} />
                 </Col>
               }
               {((state == constants.ChallengeState.Awaiting && isChallenger) || state == constants.ChallengeState.InProgress || (isFinished && isCallToAction)) &&
