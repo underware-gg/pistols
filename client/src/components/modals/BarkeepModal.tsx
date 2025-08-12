@@ -23,7 +23,7 @@ function _BarkeepModal({ opener }: { opener: Opener }) {
   const { dispatchSetScene } = usePistolsScene()
   const { tutorialOpener, tavernRingsOpener, dispatchSelectDuel } = usePistolsContext()
   
-  const { notifications, hasUnreadNotifications, markAllAsRead } = useNotifications()
+  const { sortedNotifications, hasUnreadNotifications, markAllAsRead } = useNotifications()
   const { address } = useAccount()
 
   const [stage, setStage] = useState<ModalStage>(opener.props.initialStage ?? 'intro')
@@ -107,7 +107,7 @@ function _BarkeepModal({ opener }: { opener: Opener }) {
 
           {stage === 'notifications' && (
             <div className="NotificationScrollContainer">
-              {notifications.map((notification, index) => (
+              {sortedNotifications.map((notification, index) => (
                 <div 
                   key={notification.duelId.toString()}
                   className="NotificationItemContainer"

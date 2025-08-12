@@ -1221,6 +1221,16 @@ $ui-container-gap: 1em;
   background-color: $color-dark!important;
 }
 
+// Clear actions button styling - subtle and fits with ActivityPanel design
+.ClearActionsButtonContainer {
+  position: absolute;
+  bottom: aspect-width(0.5);
+  left: aspect-width(0.5);
+  right: aspect-width(0.5);
+  display: flex;
+  justify-content: center;
+  z-index: 5;
+}
 //
 // <IconXXX>
 //

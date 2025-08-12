@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import { Image } from 'semantic-ui-react'
 import { useNotifications, type Notification } from '/src/stores/notificationStore'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
@@ -15,7 +15,7 @@ const NOTIFICATION_ANIMATION_DURATION = 500
 const NOTIFICATION_SOUND_COOLDOWN = 15000
 
 export default function NotificationSystem() {
-  const { notifications, markAsRead, markAsDisplayed } = useNotifications()
+  const { sortedNotifications, markAsRead, markAsDisplayed } = useNotifications()
   const { dispatchSelectDuel, currentDuel, selectedDuelId, barkeepModalOpener } = usePistolsContext()
   const { dispatchSetScene, atDuel, atGate, atDoor, atTutorial } = usePistolsScene()
   
@@ -101,9 +101,10 @@ export default function NotificationSystem() {
   }, [isFocused])
 
   useEffect(() => {
-    const newUnread = notifications.filter(n => !n.isDisplayed)
+    if(!sortedNotifications) return
+    const newUnread = sortedNotifications.filter(n => !n.isDisplayed)
     setUnreadNotifications(newUnread)
-  }, [notifications])
+  }, [sortedNotifications])
 
   useEffect(() => {
     if (unreadNotifications.length === 0 && !isAnimating) {
@@ -143,13 +144,6 @@ export default function NotificationSystem() {
       lastSoundTimeRef.current = now
     }
   }
-
-  // Handle in-game notification sound
-  useEffect(() => {
-    if (isVisible && currentNotifications) {
-      playNotificationSound(AudioName.NOTIFICATION)
-    }
-  }, [isVisible, currentNotifications])
 
   // Handle notification clicks from service worker
   useEffect(() => {
@@ -203,6 +197,8 @@ export default function NotificationSystem() {
     onNotificationShown()
     setIsAnimating(true)
     setIsVisible(true)
+
+    playNotificationSound(AudioName.NOTIFICATION)
 
     timeoutRef.current = setTimeout(() => {
       if (notificationsRef.current) {

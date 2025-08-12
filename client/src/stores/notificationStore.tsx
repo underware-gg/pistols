@@ -82,30 +82,34 @@ const createStore = () => {
     hasInitialized: false,
 
     markAsRead: (duelIds: number[]) => {
-      if (duelIds.length === 0) return
+      if (!duelIds || duelIds.length === 0) return
       set((state: State) => {
-        duelIds.forEach(duelId => {
+        const notificationsToUpdate = duelIds.filter(duelId => state.notifications[duelId])
+        if (notificationsToUpdate.length === 0) return
+        notificationsToUpdate.forEach(duelId => {
           const notification = state.notifications[duelId]
           if (notification) {
             notification.isRead = true
           }
         })
         // Update in IndexedDB
-        db.notifications.bulkUpdate(duelIds.map(duelId => ({ key: duelId, changes: { isRead: true } })))
+        db.notifications.bulkUpdate(notificationsToUpdate.map(duelId => ({ key: duelId, changes: { isRead: true } })))
       })
     },
 
     markAsDisplayed: (duelIds: number[]) => {
-      if (duelIds.length === 0) return
+      if (!duelIds || duelIds.length === 0) return
       set((state: State) => {
-        duelIds.forEach(duelId => {
+        const notificationsToUpdate = duelIds.filter(duelId => state.notifications[duelId])
+        if (notificationsToUpdate.length === 0) return
+        notificationsToUpdate.forEach(duelId => {
           const notification = state.notifications[duelId]
           if (notification) {
             notification.isDisplayed = true
           }
         })
         // Update in IndexedDB
-        db.notifications.bulkUpdate(duelIds.map(duelId => ({ key: duelId, changes: { isDisplayed: true } })))
+        db.notifications.bulkUpdate(notificationsToUpdate.map(duelId => ({ key: duelId, changes: { isDisplayed: true } })))
       })
     },
 
@@ -232,7 +236,7 @@ const createStore = () => {
 export const useNotificationStore = createStore()
 
 type NotificationContextType = {
-  notifications: Notification[]
+  sortedNotifications: Notification[]
   markAsRead: (duelIds: number[]) => void
   markAsDisplayed: (duelIds: number[]) => void
   markAllAsRead: (address: string) => void
@@ -248,18 +252,18 @@ export const useNotificationContext = () => useContext(NotificationContext);
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { address } = useAccount()
   const store = useNotificationStore()
-  const { notifications: dbNotifications, hasInitialized, markAsRead, markAsDisplayed, markAllAsRead, markAllAsDisplayed, getNotification, addOrUpdateNotifications } = store
+  const { notifications, hasInitialized, markAsRead, markAsDisplayed, markAllAsRead, markAllAsDisplayed, getNotification, addOrUpdateNotifications } = store
   const batchedAdd = useRef(debounce(addOrUpdateNotifications, 100)).current
 
   const sortedNotifications = useMemo(() => {
     if (!address) return []
-    return Object.values(dbNotifications).filter(n => n.owner === address).sort((a, b) => {
-      if (a.requiresAction !== b.requiresAction) {
-        return a.requiresAction ? -1 : 1
-      }
-      return b.timestamp - a.timestamp
-    })
-  }, [dbNotifications, address])
+      return Object.values(notifications).filter(n => n.owner === address).sort((a, b) => {
+        if (a.requiresAction !== b.requiresAction) {
+          return a.requiresAction ? -1 : 1
+        }
+        return b.timestamp - a.timestamp
+      })
+  }, [notifications, address])
 
   const [notificationDuelIds, setNotificationDuelIds] = useState<number[]>([])
 
@@ -293,18 +297,18 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   }, [activeDuels, hasInitialized, address])
 
   const hasUnreadNotifications = useMemo(() => {
-    return Object.values(dbNotifications).some(n => !n.isRead)
-  }, [dbNotifications])
+    return sortedNotifications.some(n => !n.isRead)
+  }, [sortedNotifications])
 
   const value = React.useMemo(() => ({
-    notifications: sortedNotifications,
+    sortedNotifications,
     markAsRead,
     markAsDisplayed,
     markAllAsRead,
     markAllAsDisplayed,
     hasUnreadNotifications,
     getNotification
-  }), [dbNotifications, markAsRead, markAsDisplayed, markAllAsRead, markAllAsDisplayed, hasUnreadNotifications, getNotification])
+  }), [sortedNotifications, markAsRead, markAsDisplayed, markAllAsRead, markAllAsDisplayed, hasUnreadNotifications, getNotification])
 
   return (
     <NotificationContext.Provider value={value}>
