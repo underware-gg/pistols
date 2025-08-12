@@ -113,14 +113,6 @@ pub fn _mint(ref sys: TestSystems, recipient: ContractAddress) -> u64 {
     (token_id)
 }
 
-pub fn _protected_duel(sys: @TestSystems) -> IDuelTokenProtectedDispatcher {
-    (IDuelTokenProtectedDispatcher{contract_address: (*sys.duels).contract_address})
-}
-
-// pub fn _protected(sys: @TestSystems) -> ITournamentTokenProtectedDispatcher {
-//     (ITournamentTokenProtectedDispatcher{contract_address: (*sys.tournaments).contract_address})
-// }
-
 //--------------------------------
 // start tournament
 //
@@ -566,7 +558,7 @@ fn test_join_duel_token_invalid_caller() {
     // let rules: TournamentRules = sys.store.get_tournament_settings_rules(MOCK_SETTINGS_ID);
     let rules: TournamentRules = TournamentType::LastManStanding.rules(); // mock default
     let timestamp_end: u64 = TIMESTAMP::ONE_DAY;
-    _protected_duel(@sys).join_tournament_duel(
+    tester::_protected_duels(@sys).join_tournament_duel(
         OWNER(), ID(OWNER()),
         1, 1, 1, 2,
         rules,

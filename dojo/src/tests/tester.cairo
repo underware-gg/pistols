@@ -23,11 +23,11 @@ pub mod tester {
         rng_mock::{rng_mock, IRngMockDispatcher, IRngMockDispatcherTrait},
         vrf_mock::{vrf_mock},
         tokens::{
-            duel_token::{duel_token, IDuelTokenDispatcher, IDuelTokenDispatcherTrait},
+            duel_token::{duel_token, IDuelTokenDispatcher, IDuelTokenDispatcherTrait, IDuelTokenProtectedDispatcher, IDuelTokenProtectedDispatcherTrait},
             duelist_token::{duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
             pack_token::{pack_token, IPackTokenDispatcher, IPackTokenDispatcherTrait},
             ring_token::{ring_token, IRingTokenDispatcher, IRingTokenDispatcherTrait},
-            // tournament_token::{tournament_token, ITournamentTokenDispatcher, ITournamentTokenDispatcherTrait},
+            // tournament_token::{tournament_token, ITournamentTokenDispatcher, ITournamentTokenDispatcherTrait, ITournamentTokenProtectedDispatcher, ITournamentTokenProtectedDispatcherTrait},
             fame_coin::{fame_coin, IFameCoinDispatcher, IFameCoinDispatcherTrait},
             fools_coin::{fools_coin, IFoolsCoinDispatcher, IFoolsCoinDispatcherTrait},
             lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait},
@@ -898,14 +898,13 @@ pub mod tester {
         _next_block();
         (new_state)
     }
-    pub fn execute_match_make(sys: @TestSystems, sender: ContractAddress,
-        address_a: ContractAddress,
-        duelist_id_a: u128,
-        address_b: ContractAddress,
-        duelist_id_b: u128,
+
+    // ::matchmaker
+    pub fn execute_match_make_me(sys: @TestSystems, sender: ContractAddress,
+        duelist_id: u128,
     ) -> u128 {
         impersonate(sender);
-        let duel_id: u128 = (*sys.duels).match_make(address_a, duelist_id_a, address_b, duelist_id_b, 1, 0, Premise::Nothing, "");
+        let duel_id: u128 = (*sys.matchmaker).match_make_me(duelist_id);
         _next_block();
         (duel_id)
     }
@@ -1142,6 +1141,16 @@ pub mod tester {
         let elapsed: u64 = FAME::MAX_INACTIVE_TIMESTAMP + (FAME::TIMESTAMP_TO_DRIP_ONE_FAME * dripped_fame);
         set_block_timestamp(timestamp_active + elapsed);
     }
+
+    //
+    // Protected dispatchers
+    //
+    pub fn _protected_duels(sys: @TestSystems) -> IDuelTokenProtectedDispatcher {
+        (IDuelTokenProtectedDispatcher{contract_address: (*sys.duels).contract_address})
+    }
+    // pub fn _protected_tournaments(sys: @TestSystems) -> ITournamentTokenProtectedDispatcher {
+    //     (ITournamentTokenProtectedDispatcher{contract_address: (*sys.tournaments).contract_address})
+    // }
 
     //
     // Asserts

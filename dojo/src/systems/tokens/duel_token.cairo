@@ -63,7 +63,6 @@ pub trait IDuelToken<TState> {
     fn has_pact(self: @TState, duel_type: DuelType, address_a: ContractAddress, address_b: ContractAddress) -> bool;
     fn create_duel(ref self: TState, duel_type: DuelType, duelist_id: u128, challenged_address: ContractAddress, lives_staked: u8, expire_minutes: u64, premise: Premise, message: ByteArray) -> u128;
     fn reply_duel(ref self: TState, duel_id: u128, duelist_id: u128, accepted: bool) -> ChallengeState;
-    fn match_make(ref self: TState, address_a: ContractAddress, duelist_id_a: u128, address_b: ContractAddress, duelist_id_b: u128, lives_staked: u8, expire_minutes: u64, premise: Premise, message: ByteArray) -> u128;
 }
 
 // Exposed to clients
@@ -89,6 +88,11 @@ pub trait IDuelTokenPublic<TState> {
         duelist_id: u128,
         accepted: bool,
     ) -> ChallengeState;
+}
+
+// Exposed to world
+#[starknet::interface]
+pub trait IDuelTokenProtected<TState> {
     fn match_make( //@description: Create an official ranked Duel
         ref self: TState,
         address_a: ContractAddress,
@@ -100,11 +104,6 @@ pub trait IDuelTokenPublic<TState> {
         premise: Premise,
         message: ByteArray,
     ) -> u128;
-}
-
-// Exposed to world
-#[starknet::interface]
-pub trait IDuelTokenProtected<TState> {
     fn transfer_to_winner(ref self: TState, duel_id: u128);
     // fn join_tournament_duel(
     //     ref self: TState,
@@ -303,12 +302,13 @@ pub mod duel_token {
                     assert(lives_staked > 0, Errors::INVALID_STAKE);
                 },
                 DuelType::BotPlayer => {
-                    // this is a challenge to the bot_player contract
+                    // challenge to the bot_player contract
                     address_b = store.world.bot_player_address();
+                    // no stakes
                     assert(lives_staked == 0, Errors::INVALID_STAKE);
                 },
                 DuelType::Practice => {
-                    // at least 1 life stake
+                    // no stakes
                     assert(lives_staked == 0, Errors::INVALID_STAKE);
                 },
                 DuelType::Tutorial |    // created by the tutorials contact only
@@ -320,16 +320,6 @@ pub mod duel_token {
                 },
             };
 
-            // get active duelist from stack
-            let duelist_dispatcher: IDuelistTokenProtectedDispatcher = store.world.duelist_token_protected_dispatcher();
-            let duelist_id_a: u128 = duelist_dispatcher.get_validated_active_duelist_id(address_a, duelist_id, lives_staked);
-
-            // mint to game, so it can transfer to winner
-            let duel_id: u128 = self.token.mint_next(store.world.game_address());
-
-            // assert duelist is not in a challenge, get into it
-            store.enter_challenge(duelist_id_a, duel_id);
-
             // calc expiration
             let timestamps: Period = PeriodTrait::new_from_now(
                 if (expire_minutes == 0) {TIMESTAMP::ONE_DAY}
@@ -337,54 +327,39 @@ pub mod duel_token {
             );
 
             // create challenge
-            let challenge = Challenge {
-                duel_id,
-                duel_type,
-                premise,
-                lives_staked,
-                // duelists
-                address_a,
-                address_b,
-                duelist_id_a,
-                duelist_id_b: 0,
-                // progress
-                state: ChallengeState::Awaiting,
-                season_id: 0,
-                winner: 0,
-                // timestamps
-                timestamps,
-            };
-
-            // save!
-            store.set_challenge(@challenge);
-            store.set_round(@RoundTrait::new(duel_id));
-
-            if (message.len() > 0) {
-                store.set_challenge_message(@ChallengeMessage {
-                    duel_id,
-                    message,
-                });
-            }
-
-            // set the pact + assert it does not exist
-            if (address_b.is_non_zero()) {
-                challenge.assert_set_pact(ref store);
-            }
+            let challenge: Challenge = self._spawn_challenge(
+                ref store,
+                Challenge {
+                    duel_id: 0,
+                    duel_type,
+                    premise,
+                    lives_staked,
+                    // duelists
+                    address_a,
+                    address_b,
+                    duelist_id_a: duelist_id,
+                    duelist_id_b: 0,
+                    // progress
+                    state: ChallengeState::Awaiting,
+                    season_id: 0,
+                    winner: 0,
+                    // timestamps
+                    timestamps,
+                },
+                message,
+            );
 
             // Duelist 1 is ready to commit
             store.emit_challenge_action(@challenge, 1, ChallengeAction::Commit);
             // Duelist 2 has to reply
             store.emit_challenge_action(@challenge, 2, ChallengeAction::Reply);
 
-            // events
-            PlayerTrait::check_in(ref store, Activity::ChallengeCreated, address_a, duel_id.into());
-
             // bot player reply
             if (challenge.is_against_bot_player(@store)) {
-                store.world.bot_player_protected_dispatcher().reply_duel(duel_id);
+                store.world.bot_player_protected_dispatcher().reply_duel(challenge.duel_id);
             }
 
-            (duel_id)
+            (challenge.duel_id)
         }
         
         fn reply_duel(ref self: ContractState,
@@ -474,6 +449,15 @@ pub mod duel_token {
             (challenge.state)
         }
 
+    }
+
+    
+    //-----------------------------------
+    // Protected
+    //
+    #[abi(embed_v0)]
+    impl DuelTokenProtectedImpl of super::IDuelTokenProtected<ContractState> {
+
         //-----------------------------------
         // match-making
         // official ranked games created by team bots only
@@ -483,7 +467,7 @@ pub mod duel_token {
             duelist_id_a: u128,
             address_b: ContractAddress,
             duelist_id_b: u128,
-            mut lives_staked: u8,
+            lives_staked: u8,
             expire_minutes: u64,
             premise: Premise,
             message: ByteArray,
@@ -494,19 +478,9 @@ pub mod duel_token {
             // validate players
             assert(address_a != address_b, Errors::INVALID_CHALLENGE_SELF);
 
-            // get active duelist from stack
-            lives_staked = core::cmp::max(lives_staked, 1);
-            let duelist_dispatcher: IDuelistTokenProtectedDispatcher = store.world.duelist_token_protected_dispatcher();
-            let duelist_id_a: u128 = duelist_dispatcher.get_validated_active_duelist_id(address_a, duelist_id_a, lives_staked);
-            let duelist_id_b: u128 = duelist_dispatcher.get_validated_active_duelist_id(address_b, duelist_id_b, lives_staked);
-
-            // mint to game, so it can transfer to winner
-            let duel_id: u128 = self.token.mint_next(store.world.game_address());
-
-            // assert duelist is not in a challenge, get into it
-            store.enter_challenge(duelist_id_a, duel_id);
-            store.enter_challenge(duelist_id_b, duel_id);
-
+            // must have stakes
+            assert(lives_staked > 0, Errors::INVALID_STAKE);
+            
             // calc expiration
             let timestamps: Period = PeriodTrait::new_from_now(
                 if (expire_minutes == 0) {TIMESTAMP::ONE_MINUTE * 10}
@@ -514,53 +488,36 @@ pub mod duel_token {
             );
 
             // create challenge
-            let challenge = Challenge {
-                duel_id,
-                duel_type: DuelType::MatchMake,
-                premise,
-                lives_staked,
-                // duelists
-                address_a,
-                address_b,
-                duelist_id_a,
-                duelist_id_b,
-                // progress
-                state: ChallengeState::InProgress,
-                season_id: 0,
-                winner: 0,
-                // timestamps
-                timestamps,
-            };
+            let challenge: Challenge = self._spawn_challenge(
+                ref store,
+                Challenge {
+                    duel_id: 0,
+                    duel_type: DuelType::MatchMake,
+                    premise,
+                    lives_staked,
+                    // duelists
+                    address_a,
+                    address_b,
+                    duelist_id_a,
+                    duelist_id_b,
+                    // progress
+                    state: ChallengeState::InProgress,
+                    season_id: 0,
+                    winner: 0,
+                    // timestamps
+                    timestamps,
+                },
+                message,
+            );
 
-            // save!
-            store.set_challenge(@challenge);
-            store.set_round(@RoundTrait::new(duel_id));
-            challenge.assert_set_pact(ref store);
-
-            if (message.len() > 0) {
-                store.set_challenge_message(@ChallengeMessage {
-                    duel_id,
-                    message,
-                });
-            }
-
-            // Duelist 1 is ready to commit
+            // Both duelists are ready to commit
             store.emit_challenge_action(@challenge, 1, ChallengeAction::Commit);
             store.emit_challenge_action(@challenge, 2, ChallengeAction::Commit);
 
-            // events
-            PlayerTrait::check_in(ref store, Activity::ChallengeCreated, challenge.address_a, duel_id.into());
-
-            (duel_id)
+            (challenge.duel_id)
         }
-    }
 
-    
-    //-----------------------------------
-    // Protected
-    //
-    #[abi(embed_v0)]
-    impl DuelTokenProtectedImpl of super::IDuelTokenProtected<ContractState> {
+        // transfer duel to winner
         fn transfer_to_winner(ref self: ContractState,
             duel_id: u128,
         ) {
@@ -713,6 +670,59 @@ pub mod duel_token {
 //             (duel_id)
 //         }
     }
+
+
+
+    //-----------------------------------
+    // Internal
+    //
+    #[generate_trait]
+    impl InternalImpl of InternalTrait {
+        fn _spawn_challenge(ref self: ContractState,
+            ref store: Store,
+            mut challenge: Challenge,
+            message: ByteArray,
+        ) -> Challenge {
+            // mint to game, so it can transfer to winner
+            challenge.duel_id = self.token.mint_next(store.world.game_address());
+
+            // Validate Duelist A
+            // - get active duelist from stack
+            let duelist_dispatcher: IDuelistTokenProtectedDispatcher = store.world.duelist_token_protected_dispatcher();
+            challenge.duelist_id_a = duelist_dispatcher.get_validated_active_duelist_id(challenge.address_a, challenge.duelist_id_a, challenge.lives_staked);
+            // - assert duelist is not in a challenge, get into it
+            store.enter_challenge(challenge.duelist_id_a, challenge.duel_id);
+
+            // Validate Duelist B
+            if (challenge.duelist_id_b.is_non_zero()) {
+                challenge.duelist_id_b = duelist_dispatcher.get_validated_active_duelist_id(challenge.address_b, challenge.duelist_id_b, challenge.lives_staked);
+                store.enter_challenge(challenge.duelist_id_b, challenge.duel_id);
+            }
+
+            // save!
+            store.set_challenge(@challenge);
+            store.set_round(@RoundTrait::new(challenge.duel_id));
+
+            // set the pact + assert it does not exist
+            if (challenge.address_b.is_non_zero()) {
+                challenge.assert_set_pact(ref store);
+            }
+
+            // store message if any
+            if (message.len() > 0) {
+                store.set_challenge_message(@ChallengeMessage {
+                    duel_id: challenge.duel_id,
+                    message,
+                });
+            }
+
+            // events
+            PlayerTrait::check_in(ref store, Activity::ChallengeCreated, challenge.address_a, challenge.duel_id.into());
+
+            (challenge)
+        }
+    }
+
 
 
     //-----------------------------------

@@ -597,56 +597,56 @@ println!("____11");
     #[test]
     #[ignore] // REFACTORING...
     fn test_bot_matchmaking_ok() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER | FLAGS::MOCK_RNG);
-        let A: ContractAddress = OTHER();
-        let bot_address: ContractAddress = sys.bot_player.contract_address;
-        tester::fund_duelists_pool(@sys, 2);
-        tester::execute_claim_starter_pack(@sys, OTHER());
-        // A wins, Bot loses
-        let (mocked, moves_a, _moves_b) = _get_bot_moves_crit_a(Archetype::Undefined);
-        sys.rng.mock_values(mocked);
-        //
-        // create Seasonal duel
-        let duel_id: u128 = tester::execute_match_make(@sys, OWNER(), A, ID(A), bot_address, 0);
-        let (ch, round) = tester::get_Challenge_Round_value(@sys, duel_id);
-        assert_eq!(ch.state, ChallengeState::InProgress, "challenge.state_CREATE");
-        assert_eq!(round.state, RoundState::Commit, "round.state_CREATE");
-        assert_eq!(ch.duel_type, DuelType::Seasonal, "duel_type");
-        assert_eq!(ch.address_a, A, "challenged");
-        assert_eq!(ch.address_b, bot_address, "challenger");
-        assert_eq!(ch.duelist_id_a, ID(A), "challenger_id");
-        assert_ne!(ch.duelist_id_b, 0, "challenged_id"); // bot minted a duelist!
-        // pact and assignment set
-        assert!(sys.duels.has_pact(DuelType::Seasonal, A, bot_address), "has_pact_yes");
-        let assignment: DuelistAssignment = sys.store.get_duelist_assignment(ch.duelist_id_b);
-        assert_eq!(assignment.duel_id, duel_id, "duelist_assignment.duel_id");
-        // validate minted bot duelist
-        let bot_duelist_id: u128 = ch.duelist_id_b;
-        assert_eq!(sys.duelists.total_supply(), 3, "total_supply 3");
-        assert_eq!(sys.duelists.balance_of(bot_address), 1, "balance_of(bot_address) 1");
-        _assert_bot_duelist(@sys, bot_duelist_id, "challenged", Option::Some(BotKey::Pro), 1);
-        //
-        // player commits, bot commits
-        tester::execute_commit_moves(@sys, A, duel_id, moves_a.hashed);
-        let (ch, round) = tester::get_Challenge_Round_value(@sys, duel_id);
-        assert_eq!(ch.state, ChallengeState::InProgress, "challenge.state_COMMIT");
-        assert_eq!(round.state, RoundState::Reveal, "round.state_COMMIT");
-        assert_eq!(round.moves_a.hashed, moves_a.hashed, "round.moves_a.hashed");
-        assert_gt!(round.moves_b.hashed, 0, "round.moves_b.hashed");
-        //
-        // call bot reveal
-        tester::execute_reveal_moves_ID(@sys, A, TOKEN_ID_1, duel_id, moves_a.salt, moves_a.moves);
-        sys.bot_player.reveal_moves(duel_id);
-        let (ch, round) = tester::get_Challenge_Round_value(@sys, duel_id);
-        assert_eq!(ch.state, ChallengeState::Resolved, "challenge.state_REVEAL");
-        assert_eq!(ch.winner, 1, "challenge.winner_REVEAL");
-        assert_eq!(round.state, RoundState::Finished, "round.state_REVEAL");
-        assert_eq!(ch.season_id, SEASON_ID_1, "season_id");
-        // pact and assignment unset
-        assert!(!sys.duels.has_pact(DuelType::Seasonal, A, bot_address), "has_pact_no");
-        let assignment: DuelistAssignment = sys.store.get_duelist_assignment(ch.duelist_id_b);
-        assert_eq!(assignment.duel_id, 0, "duelist_assignment.0");
-        // RANKED, player has score and fools
-        tester::assert_unranked_duel_results(@sys, duel_id, "finished");
+        // let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER | FLAGS::MOCK_RNG);
+        // let A: ContractAddress = OTHER();
+        // let bot_address: ContractAddress = sys.bot_player.contract_address;
+        // tester::fund_duelists_pool(@sys, 2);
+        // tester::execute_claim_starter_pack(@sys, OTHER());
+        // // A wins, Bot loses
+        // let (mocked, moves_a, _moves_b) = _get_bot_moves_crit_a(Archetype::Undefined);
+        // sys.rng.mock_values(mocked);
+        // //
+        // // create Seasonal duel
+        // let duel_id: u128 = tester::execute_match_make(@sys, OWNER(), A, ID(A), bot_address, 0);
+        // let (ch, round) = tester::get_Challenge_Round_value(@sys, duel_id);
+        // assert_eq!(ch.state, ChallengeState::InProgress, "challenge.state_CREATE");
+        // assert_eq!(round.state, RoundState::Commit, "round.state_CREATE");
+        // assert_eq!(ch.duel_type, DuelType::Seasonal, "duel_type");
+        // assert_eq!(ch.address_a, A, "challenged");
+        // assert_eq!(ch.address_b, bot_address, "challenger");
+        // assert_eq!(ch.duelist_id_a, ID(A), "challenger_id");
+        // assert_ne!(ch.duelist_id_b, 0, "challenged_id"); // bot minted a duelist!
+        // // pact and assignment set
+        // assert!(sys.duels.has_pact(DuelType::Seasonal, A, bot_address), "has_pact_yes");
+        // let assignment: DuelistAssignment = sys.store.get_duelist_assignment(ch.duelist_id_b);
+        // assert_eq!(assignment.duel_id, duel_id, "duelist_assignment.duel_id");
+        // // validate minted bot duelist
+        // let bot_duelist_id: u128 = ch.duelist_id_b;
+        // assert_eq!(sys.duelists.total_supply(), 3, "total_supply 3");
+        // assert_eq!(sys.duelists.balance_of(bot_address), 1, "balance_of(bot_address) 1");
+        // _assert_bot_duelist(@sys, bot_duelist_id, "challenged", Option::Some(BotKey::Pro), 1);
+        // //
+        // // player commits, bot commits
+        // tester::execute_commit_moves(@sys, A, duel_id, moves_a.hashed);
+        // let (ch, round) = tester::get_Challenge_Round_value(@sys, duel_id);
+        // assert_eq!(ch.state, ChallengeState::InProgress, "challenge.state_COMMIT");
+        // assert_eq!(round.state, RoundState::Reveal, "round.state_COMMIT");
+        // assert_eq!(round.moves_a.hashed, moves_a.hashed, "round.moves_a.hashed");
+        // assert_gt!(round.moves_b.hashed, 0, "round.moves_b.hashed");
+        // //
+        // // call bot reveal
+        // tester::execute_reveal_moves_ID(@sys, A, TOKEN_ID_1, duel_id, moves_a.salt, moves_a.moves);
+        // sys.bot_player.reveal_moves(duel_id);
+        // let (ch, round) = tester::get_Challenge_Round_value(@sys, duel_id);
+        // assert_eq!(ch.state, ChallengeState::Resolved, "challenge.state_REVEAL");
+        // assert_eq!(ch.winner, 1, "challenge.winner_REVEAL");
+        // assert_eq!(round.state, RoundState::Finished, "round.state_REVEAL");
+        // assert_eq!(ch.season_id, SEASON_ID_1, "season_id");
+        // // pact and assignment unset
+        // assert!(!sys.duels.has_pact(DuelType::Seasonal, A, bot_address), "has_pact_no");
+        // let assignment: DuelistAssignment = sys.store.get_duelist_assignment(ch.duelist_id_b);
+        // assert_eq!(assignment.duel_id, 0, "duelist_assignment.0");
+        // // RANKED, player has score and fools
+        // tester::assert_unranked_duel_results(@sys, duel_id, "finished");
     }
 }
