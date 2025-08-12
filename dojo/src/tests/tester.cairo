@@ -53,6 +53,7 @@ pub mod tester {
             DuelistMemorial, DuelistMemorialValue,
             CauseOfDeath,
         },
+        matches::{MatchPlayer, QueueMode},
         pact::{Pact, PactTrait},
         leaderboard::{Leaderboard, LeaderboardTrait, LeaderboardPosition},
         config::{Config, TokenConfig, CoinConfig, CONFIG},
@@ -291,7 +292,9 @@ pub mod tester {
             TestResource::Model(pistols::models::duelist::m_DuelistAssignment::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::duelist::m_DuelistMemorial::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::leaderboard::m_Leaderboard::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::matches::m_MatchQueue::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::matches::m_MatchPlayer::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::matches::m_MatchCounter::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::pack::m_Pack::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::ring::m_Ring::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::ring::m_RingBalance::TEST_CLASS_HASH),
@@ -902,9 +905,10 @@ pub mod tester {
     // ::matchmaker
     pub fn execute_match_make_me(sys: @TestSystems, sender: ContractAddress,
         duelist_id: u128,
+        queue_mode: QueueMode,
     ) -> u128 {
         impersonate(sender);
-        let duel_id: u128 = (*sys.matchmaker).match_make_me(duelist_id);
+        let duel_id: u128 = (*sys.matchmaker).match_make_me(duelist_id, queue_mode);
         _next_block();
         (duel_id)
     }
@@ -1123,6 +1127,10 @@ pub mod tester {
     }
     #[inline(always)]
     pub fn set_Pool(ref world: WorldStorage, model: @Pool) {
+        world.write_model_test(model);
+    }
+    #[inline(always)]
+    pub fn set_MatchPlayer(ref world: WorldStorage, model: @MatchPlayer) {
         world.write_model_test(model);
     }
     // #[inline(always)]

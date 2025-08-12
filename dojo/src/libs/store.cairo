@@ -22,6 +22,12 @@ pub use pistols::models::{
         PlayerDuelistStack, PlayerDuelistStackValue,
         PlayerDelegation,
     },
+    matches::{
+        MatchQueue,
+        MatchPlayer,
+        MatchCounter,
+        QueueId, QueueInfo,
+    },
     pack::{
         Pack,
     },
@@ -115,6 +121,19 @@ pub impl StoreImpl of StoreTrait {
     #[inline(always)]
     fn get_player_delegation(self: @Store, player_address: ContractAddress, delegatee_address: ContractAddress) -> PlayerDelegation {
         (self.world.read_model((player_address, delegatee_address),))
+    }
+
+    #[inline(always)]
+    fn get_match_queue(self: @Store, queue_id: QueueId) -> MatchQueue {
+        (self.world.read_model(queue_id))
+    }
+    #[inline(always)]
+    fn get_match_player(self: @Store, player_address: ContractAddress) -> MatchPlayer {
+        (self.world.read_model(player_address))
+    }
+    #[inline(always)]
+    fn get_match_counter(self: @Store, pair: u128) -> MatchCounter {
+        (self.world.read_model(pair))
     }
 
     #[inline(always)]
@@ -346,6 +365,19 @@ pub impl StoreImpl of StoreTrait {
 
     #[inline(always)]
     fn set_player_delegation(ref self: Store, model: @PlayerDelegation) {
+        self.world.write_model(model);
+    }
+
+    #[inline(always)]
+    fn set_match_queue(ref self: Store, model: @MatchQueue) {
+        self.world.write_model(model);
+    }
+    #[inline(always)]
+    fn set_match_player(ref self: Store, model: @MatchPlayer) {
+        self.world.write_model(model);
+    }
+    #[inline(always)]
+    fn set_match_counter(ref self: Store, model: @MatchCounter) {
         self.world.write_model(model);
     }
 
@@ -596,6 +628,11 @@ pub impl StoreImpl of StoreTrait {
     #[inline(always)]
     fn get_ring_type(self: @Store, ring_id: u128) -> RingType {
         (self.world.read_member(Model::<Ring>::ptr_from_keys(ring_id), selector!("ring_type")))
+    }
+
+    #[inline(always)]
+    fn get_match_players_info(self: @Store, player_addresses: Span<ContractAddress>) -> Array<QueueInfo> {
+        (self.world.read_member_of_models(Model::<MatchPlayer>::ptrs_from_keys(player_addresses), selector!("queue_info")))
     }
 
     //----------------------------------
