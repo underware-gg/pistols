@@ -166,4 +166,38 @@ mod unit {
     // fn _call_no_pass() -> bool {
     //     (starknet::get_block_timestamp() > 0)
     // }
+
+    struct ts {
+        t1: u64,
+        t2: u64,
+    }
+    #[test]
+    fn test_timestamp_struct_twice() {
+        // expensive!
+        let value = ts {
+            t1: starknet::get_block_timestamp(),
+            t2: starknet::get_block_timestamp(),
+        };
+        assert_eq!(value.t1, value.t2);
+    }
+    #[test]
+    fn test_timestamp_struct_once() {
+        // cheaper!
+        let t1: u64 = starknet::get_block_timestamp();
+        let value = ts {
+            t1,
+            t2: t1,
+        };
+        assert_eq!(value.t1, value.t2);
+    }
+    #[test]
+    fn test_timestamp_struct_once_let() {
+        // cheapest!
+        let t: u64 = starknet::get_block_timestamp();
+        let value = ts {
+            t1: t,
+            t2: t,
+        };
+        assert_eq!(value.t1, value.t2);
+    }
 }
