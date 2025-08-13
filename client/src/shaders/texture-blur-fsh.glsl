@@ -98,7 +98,7 @@ vec4 applyBlur(vec2 uv, vec4 allMasks) {
   float blurStrength = 0.0;
   
   if (uSamples > 1 && !excluded) {
-    blurStrength = max(0.0, float(uSamples - 1) / 16.0);
+    blurStrength = max(0.0, float(uSamples - 1) / 20.0);
   }
   
   // Skip blur if not needed

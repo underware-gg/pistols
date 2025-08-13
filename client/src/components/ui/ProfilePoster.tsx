@@ -320,7 +320,7 @@ const ProfilePosterFull = forwardRef<ProfilePosterHandle, ProfilePosterProps>((p
               </Col>
               <Col>
                 {isMyAccount ? <ActionButton large fillParent important label='Manage Profile' onClick={() => dispatchSetScene(SceneName.Profile)} />
-                  : <ChallengeButton challengedPlayerAddress={props.playerAddress} fillParent={true} />
+                  : <ChallengeButton challengedPlayerAddress={props.playerAddress} fillParent={true} loadingClassName='poster' />
                 }
               </Col>
             </Row>

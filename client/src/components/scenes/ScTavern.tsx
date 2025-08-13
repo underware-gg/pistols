@@ -23,21 +23,49 @@ import TavernRingsModal from '../modals/TavernRingsModal'
 let hasShownInThisSession = false
 
 export default function ScTavern() {
-  
+  const { dispatchSetScene } = usePistolsScene()
+  const { barkeepModalOpener, tavernRingsOpener } = usePistolsContext()
+
+  const { value: itemClicked, timestamp } = useGameEvent('scene_click', null)
+
   useEffect(() => {
-    if (!open && _currentScene && _currentScene instanceof InteractibleScene) {
+    if (itemClicked) {
+      switch (itemClicked) {
+        case 'pistol':
+          dispatchSetScene(SceneName.Leaderboards)
+          break
+        case 'bottle':
+          dispatchSetScene(SceneName.Duelists)
+          break
+        case 'shovel':
+          dispatchSetScene(SceneName.Graveyard)
+          break
+        case 'bartender':
+          (_currentScene as InteractibleScene)?.excludeItem(TextureName.bg_tavern_bartender_mask);
+          (_currentScene as InteractibleScene)?.toggleBlur(true);
+          (_currentScene as InteractibleScene)?.setClickable(false);
+          barkeepModalOpener.open();
+          break;
+      }
+    }
+  }, [itemClicked, timestamp])
+
+  useEffect(() => {
+    if (!barkeepModalOpener.isOpen && !tavernRingsOpener.isOpen && _currentScene && _currentScene instanceof InteractibleScene) {
       (_currentScene as InteractibleScene)?.toggleBlur?.(false);
       (_currentScene as InteractibleScene)?.setClickable?.(true);
       setTimeout(() => {
         (_currentScene as InteractibleScene)?.excludeItem?.(null);
       }, 400)
     }
-  }, [open])
+  }, [barkeepModalOpener.isOpen, tavernRingsOpener.isOpen])
 
   return (
     <div>
       <NotificationExclamation />
       <TavernRingsChecker />
+      
+      <BarkeepModal />
 
       <ActivityPanel />
 
@@ -72,7 +100,10 @@ function TavernRingsChecker() {
     if (hasClaimableRings) {
       timeoutId = setTimeout(() => {
         setHasShownRings(true)
-        hasShownInThisSession = true
+        hasShownInThisSession = true;
+        (_currentScene as InteractibleScene)?.excludeItem(TextureName.bg_tavern_bartender_mask);
+        (_currentScene as InteractibleScene)?.toggleBlur(true);
+        (_currentScene as InteractibleScene)?.setClickable(false);
         tavernRingsOpener.open()
       }, 2000)
     }
@@ -104,16 +135,10 @@ function TavernRingsChecker() {
 // should be somewhere else???
 // 
 // 
-function NotificationExclamation({ }) {
-  const { tavernRingsOpener } = usePistolsContext()
-  const { dispatchSetScene } = usePistolsScene()
+function NotificationExclamation() {
   const { aspectWidth } = useGameAspect()
   const { hasUnreadNotifications } = useNotifications()
-
-  const [open, setOpen] = useState(false)
-  const [initialStage, setInitialStage] = useState<'intro' | 'menu' | 'notifications'>('intro')
-
-  const { value: itemClicked, timestamp } = useGameEvent('scene_click', null)
+  const { barkeepModalOpener } = usePistolsContext()
   const { x: notificationShiftX, y: notificationShiftY } = useTextureShift(1)
 
   const [exclamationOpacity, setExclamationOpacity] = useState(0)
@@ -126,17 +151,11 @@ function NotificationExclamation({ }) {
   const floatTweenRef = useRef<TWEEN.Tween<any> | null>(null)
 
   useEffect(() => {
-    if (!open) {
-      setInitialStage('intro')
-    }
-  }, [open])
-
-  useEffect(() => {
     if (opacityTweenRef.current) {
       opacityTweenRef.current.stop()
     }
 
-    const targetOpacity = hasUnreadNotifications && !open ? 1 : 0
+    const targetOpacity = hasUnreadNotifications && !barkeepModalOpener.isOpen ? 1 : 0
     opacityTweenRef.current = new TWEEN.Tween({ opacity: exclamationOpacity })
       .to({ opacity: targetOpacity }, 200)
       .easing(TWEEN.Easing.Quadratic.InOut)
@@ -144,7 +163,7 @@ function NotificationExclamation({ }) {
         setExclamationOpacity(opacity)
       })
       .start()
-  }, [hasUnreadNotifications, open])
+  }, [hasUnreadNotifications, barkeepModalOpener.isOpen])
 
   useEffect(() => {
     if (pulseTweenRef.current) {
@@ -154,7 +173,7 @@ function NotificationExclamation({ }) {
       floatTweenRef.current.stop()
     }
 
-    if (exclamationOpacity > 0 && !isHovered && !open) {
+    if (exclamationOpacity > 0 && !isHovered && !barkeepModalOpener.isOpen) {
       pulseTweenRef.current = new TWEEN.Tween({ intensity: pulseIntensity })
         .to({ intensity: 16 }, 800)
         .easing(TWEEN.Easing.Sinusoidal.InOut)
@@ -178,39 +197,7 @@ function NotificationExclamation({ }) {
       setPulseIntensity(isHovered ? 16 : 8)
       setVerticalShift(0)
     }
-  }, [exclamationOpacity, isHovered, open])
-
-  useEffect(() => {
-    if (itemClicked) {
-      switch (itemClicked) {
-        case 'pistol':
-          dispatchSetScene(SceneName.Leaderboards)
-          break
-        case 'bottle':
-          dispatchSetScene(SceneName.Duelists)
-          break
-        case 'shovel':
-          dispatchSetScene(SceneName.Graveyard)
-          break
-        case 'bartender':
-          setOpen(true);
-          (_currentScene as InteractibleScene)?.excludeItem(TextureName.bg_tavern_bartender_mask);
-          (_currentScene as InteractibleScene)?.toggleBlur(true);
-          (_currentScene as InteractibleScene)?.setClickable(false);
-          break;
-      }
-    }
-  }, [itemClicked, timestamp])
-
-  useEffect(() => {
-    if (!open && _currentScene && _currentScene instanceof InteractibleScene) {
-      (_currentScene as InteractibleScene)?.toggleBlur?.(false);
-      (_currentScene as InteractibleScene)?.setClickable?.(true);
-      setTimeout(() => {
-        (_currentScene as InteractibleScene)?.excludeItem?.(null);
-      }, 400)
-    }
-  }, [open])
+  }, [exclamationOpacity, isHovered, barkeepModalOpener.isOpen])
 
   const handleMouseEnter = useCallback(() => {
     setIsHovered(true)
@@ -249,11 +236,9 @@ function NotificationExclamation({ }) {
           (_currentScene as InteractibleScene)?.excludeItem(TextureName.bg_tavern_bartender_mask);
           (_currentScene as InteractibleScene)?.toggleBlur(true);
           (_currentScene as InteractibleScene)?.setClickable(false);
-          setInitialStage('notifications')
-          setOpen(true)
+          barkeepModalOpener.open({ initialStage: 'notifications' })
         }}
       />
-      <BarkeepModal open={open} setOpen={setOpen} initialStage={initialStage} />
     </>
   )
 }

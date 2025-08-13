@@ -1221,6 +1221,16 @@ $ui-container-gap: 1em;
   background-color: $color-dark!important;
 }
 
+// Clear actions button styling - subtle and fits with ActivityPanel design
+.ClearActionsButtonContainer {
+  position: absolute;
+  bottom: aspect-width(0.5);
+  left: aspect-width(0.5);
+  right: aspect-width(0.5);
+  display: flex;
+  justify-content: center;
+  z-index: 5;
+}
 //
 // <IconXXX>
 //
@@ -1404,7 +1414,6 @@ $logo-url: '/logos/logo_avante.svg';
   -webkit-box-orient: vertical;
   border-radius: aspect-width(0.625);
   z-index: 999;
-  --tail-position: left;
   --tail-vertical-position: 4.8125;
   --tail-width: 1.875;
   --tail-height: 0.9375;
@@ -1436,7 +1445,7 @@ $logo-url: '/logos/logo_avante.svg';
 
   &:has([data-tail="left"]), &[data-tail="left"] {
     &:before {
-      left: calc(aspect-width(var(--tail-offset-x)) + aspect-width(var(--tail-offset-y)));
+      left: calc(aspect-width(var(--tail-offset-x)));
       clip-path: polygon(
         100% 0%, 
         100% 100%, 
@@ -1445,7 +1454,7 @@ $logo-url: '/logos/logo_avante.svg';
     }
     
     &:after {
-      left: calc(aspect-width(var(--tail-inner-offset-x)) + aspect-width(var(--tail-offset-y)));
+      left: calc(aspect-width(var(--tail-inner-offset-x)));
       clip-path: polygon(
         100% 0%, 
         100% 100%, 
@@ -1456,7 +1465,7 @@ $logo-url: '/logos/logo_avante.svg';
 
   &:has([data-tail="right"]), &[data-tail="right"], &:not([data-tail="left"]) {
     &:before {
-      right: calc(aspect-width(var(--tail-offset-x)) + aspect-width(var(--tail-offset-y)));
+      right: calc(aspect-width(var(--tail-offset-x)));
       clip-path: polygon(
         0% 0%, 
         0% 100%, 
@@ -1465,7 +1474,7 @@ $logo-url: '/logos/logo_avante.svg';
     }
     
     &:after {
-      right: calc(aspect-width(var(--tail-inner-offset-x)) + aspect-width(var(--tail-offset-y)));
+      right: calc(aspect-width(var(--tail-inner-offset-x)));
       clip-path: polygon(
         0% 0%, 
         0% 100%, 
@@ -1483,6 +1492,16 @@ $logo-url: '/logos/logo_avante.svg';
   width: aspect-width(30);
   --bg-color: #{$color-bright};
   --border-color: #{$color-dark};
+
+  &.Menu {
+    --tail-offset-y: 11;
+    --tail-inner-offset-y: 11.17;
+  }
+
+  &.Notifications {
+    --tail-offset-y: 2;
+    --tail-inner-offset-y: 2.17;
+  }
 }
 
 .DemonTalkBaloon {
@@ -2315,13 +2334,25 @@ a.active.step:hover,
   font-size: aspect-width(1.1);
 }
 .dialog-button[data-contentlength="1"] {
-  font-size: aspect-width(0.9);
+  font-size: aspect-width(1.0);
 }
 .dialog-button[data-contentlength="2"] {
-  font-size: aspect-width(0.7);
+  font-size: aspect-width(0.9);
 }
 .dialog-button[data-contentlength="3"] {
+  font-size: aspect-width(0.8);
+}
+.dialog-button[data-contentlength="4"] {
+  font-size: aspect-width(0.7);
+}
+.dialog-button[data-contentlength="5"] {
+  font-size: aspect-width(0.6);
+}
+.dialog-button[data-contentlength="6"] {
   font-size: aspect-width(0.5);
+}
+.dialog-button[data-contentlength="7"] {
+  font-size: aspect-width(0.4);
 }
 
 .dialog-content {
@@ -2339,7 +2370,7 @@ a.active.step:hover,
   height: aspect-width(2);
   padding: aspect-width(0.3) aspect-width(0.8);
   border: none;
-  border-radius: aspect-width(0.3);
+  border-radius: inherit;
   
   // Rich duel background 🔥
   background-color: rgba(139, 69, 19, 0.95);
@@ -2490,7 +2521,7 @@ a.active.step:hover,
 .button-loading-overlay {
   position: absolute;
   top: 0;
-  left: aspect-width(0.5);
+  left: 0%;
   width: 100%;
   height: 100%;
   margin: inherit;
@@ -2500,6 +2531,20 @@ a.active.step:hover,
   align-items: center;
   justify-content: center;
   z-index: 10;
+
+  &.poster {
+    left: 1%;
+    width: 98%;
+  }
+
+  &.duel {
+    left: 3.8%;
+    width: 92.4%;
+  }
+}
+
+.button-loading-overlay:hover {
+  transform: scale(1.05) translateY(aspect-width(-0.05));
 }
 
 .dialog-spinner {

@@ -9,8 +9,8 @@ import { useIsMyAccount } from '/src/hooks/useIsYou'
 import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
 
 interface DuelNotificationItemProps {
-  notification: Notification
-  onAction?: () => void
+  notifications?: Notification[]
+  onAction: () => void
   className?: string
   style?: React.CSSProperties
   showRequiresUserAction?: boolean
@@ -19,7 +19,7 @@ interface DuelNotificationItemProps {
 }
 
 export const DuelNotificationItem: React.FC<DuelNotificationItemProps> = ({
-  notification,
+  notifications,
   onAction,
   className = '',
   style = {},
@@ -28,6 +28,8 @@ export const DuelNotificationItem: React.FC<DuelNotificationItemProps> = ({
   onShow
 }) => {
   const { aspectWidth } = useGameAspect()
+
+  const notification = notifications?.[0]
   const { duelId, requiresAction, state, type, timestamp } = notification
   const { challenge, turnA, turnB, completedStagesA, completedStagesB } = useDuel(duelId)
   const { isMyAccount: isMeA } = useIsMyAccount(challenge?.duelistAddressA)
@@ -37,7 +39,7 @@ export const DuelNotificationItem: React.FC<DuelNotificationItemProps> = ({
   const { clientSeconds } = useClientTimestamp(true)
 
   const { title, message } = useMemo(() => {
-    if (!challenge) return { 
+    if (!challenge || !notifications) return { 
       title: null, 
       message: null
     }
@@ -45,6 +47,13 @@ export const DuelNotificationItem: React.FC<DuelNotificationItemProps> = ({
     if (!isMeA && !isMeB) return {
       title: null,
       message: null
+    }
+
+    if (notifications?.length > 1) {
+      return {
+        title: `You have ${notifications.length} new duel updates!`,
+        message: `There are ${notifications.length} duels with new activity. Click to view your notifications!`
+      }
     }
 
     const duelistAddressA = challenge.duelistAddressA
@@ -154,7 +163,7 @@ export const DuelNotificationItem: React.FC<DuelNotificationItemProps> = ({
           message: <><ChallengeLink duelId={duelId} /> state updated to {state}</>
         }
     }
-  }, [challenge, state, isMeA, isMeB, duelId, turnA, turnB, completedStagesA, completedStagesB, requiresAction])
+  }, [challenge, state, isMeA, isMeB, duelId, turnA, turnB, completedStagesA, completedStagesB, requiresAction, notifications])
 
   const timeAgo = useMemo(() => {
     const secondsAgo = clientSeconds - timestamp
@@ -166,14 +175,14 @@ export const DuelNotificationItem: React.FC<DuelNotificationItemProps> = ({
 
   useEffect(() => {
     if (canShow && onShow && challenge && notification) {
-      if (!notification.isDisplayed && title && message) {
+      if (title && message && notifications?.some(n => !n.isDisplayed)) {
         onShow()
       }
     }
   }, [canShow, onShow, challenge, notification, title, message])
 
   const handleClick = (e: React.MouseEvent) => {
-    if (onAction && duelId) {
+    if (onAction && notifications) {
       e.stopPropagation()
       onAction()
     }
@@ -181,8 +190,8 @@ export const DuelNotificationItem: React.FC<DuelNotificationItemProps> = ({
 
   const handleMouseEnter = () => {
     setIsHovered(true)
-    if (!notification.isRead && showRequiresUserAction) {
-      markAsRead(notification.duelId)
+    if (!notification?.isRead && showRequiresUserAction && notifications?.length === 1) {
+      markAsRead(notifications.map(n => n.duelId))
     }
   }
 
@@ -191,11 +200,11 @@ export const DuelNotificationItem: React.FC<DuelNotificationItemProps> = ({
   }
 
   const showActionIndicator = showRequiresUserAction && requiresAction
-  const showReadIndicator = showRequiresUserAction && !notification.isRead
+  const showReadIndicator = showRequiresUserAction && !notification?.isRead && notifications?.length === 1
 
   return (
     <div 
-      className={`DuelNotificationItem ${showActionIndicator ? 'RequiresAction' : ''}`}
+      className={`DuelNotificationItem ${className} ${showActionIndicator ? 'RequiresAction' : ''}`}
       style={style}
       onClick={handleClick}
       onMouseEnter={handleMouseEnter}

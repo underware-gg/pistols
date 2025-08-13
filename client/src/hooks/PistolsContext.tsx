@@ -54,6 +54,7 @@ export const initialState = {
   settingsOpener: null as Opener,
   errorModalOpener: null as Opener,
   bugReportOpener: null as Opener,
+  barkeepModalOpener: null as Opener,
   tavernRingsOpener: null as Opener,
   ringAnimationOpener: null as Opener,
   tutorialPromptOpener: null as Opener,
@@ -180,6 +181,7 @@ const PistolsProvider = ({
   const settingsOpener = useOpener()
   const errorModalOpener = useOpener()
   const bugReportOpener = useOpener()
+  const barkeepModalOpener = useOpener()
   const tavernRingsOpener = useOpener()
   const ringAnimationOpener = useOpener()
   const tutorialPromptOpener = useOpener()
@@ -329,6 +331,7 @@ const PistolsProvider = ({
     settingsOpener,
     errorModalOpener,
     bugReportOpener,
+    barkeepModalOpener,
     tavernRingsOpener,
     ringAnimationOpener,
     tutorialPromptOpener,
@@ -348,6 +351,7 @@ const PistolsProvider = ({
                         settingsOpener.isOpen ||
                         errorModalOpener.isOpen ||
                         bugReportOpener.isOpen ||
+                        barkeepModalOpener.isOpen ||
                         tavernRingsOpener.isOpen ||
                         ringAnimationOpener.isOpen ||
                         tutorialPromptOpener.isOpen ||
@@ -365,6 +369,7 @@ const PistolsProvider = ({
     settingsOpener.isOpen,
     errorModalOpener.isOpen,
     bugReportOpener.isOpen,
+    barkeepModalOpener.isOpen,
     tavernRingsOpener.isOpen,
     ringAnimationOpener.isOpen,
     tutorialPromptOpener.isOpen,
@@ -386,6 +391,7 @@ const PistolsProvider = ({
       settingsOpener,
       errorModalOpener,
       bugReportOpener,
+      barkeepModalOpener,
       tavernRingsOpener,
       ringAnimationOpener,
       tutorialPromptOpener,

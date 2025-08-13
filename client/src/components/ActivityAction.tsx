@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 import { useAccount } from '@starknet-react/core'
 import { BigNumberish } from 'starknet'
 import { useCallToChallenges } from '/src/stores/eventsModelStore'
@@ -8,6 +8,8 @@ import { DuelOpponentNameLink, ChallengeLink } from '/src/components/Links'
 import { bigintToDecimal } from '@underware/pistols-sdk/utils'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { Icon } from '/src/components/ui/Icons'
+import { ActionButton } from './ui/Buttons'
+import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 
 
 export function usePlayersActions() {
@@ -18,6 +20,7 @@ export function usePlayersActions() {
   const waitingCount = useMemo(() => activeChallenges.filter((ch) => ch.action === constants.ChallengeAction.Waiting).length, [activeChallenges])
   const actionCount = useMemo(() => activeChallenges.filter((ch) => ch.requiresAction).length, [activeChallenges])
   const idleCount = useMemo(() => (duelistIds.length - activeChallenges.length), [duelistIds, activeChallenges])
+  const waitingForResult = useMemo(() => activeChallenges.filter((ch) => ch.requiresAction && ch.action === constants.ChallengeAction.Results), [activeChallenges])
   // console.log(`usePlayersActions() =================> activeChallenges:`, replyCount, actionCount, waitingCount, idleCount, duelistIds.length)
 
   return {
@@ -26,6 +29,7 @@ export function usePlayersActions() {
     actionCount,
     waitingCount,
     idleCount,
+    waitingForResult,
     duelistCount: duelistIds.length,
   }
 }
@@ -56,7 +60,18 @@ export const ActionIcon = ({
 
 export default function ActivityAction() {
   const { isConnected } = useAccount()
-  const { activeChallenges, idleCount, duelistCount } = usePlayersActions()
+  const { activeChallenges, idleCount, duelistCount, waitingForResult } = usePlayersActions()
+  const { game } = useDojoSystemCalls()
+  const { account } = useAccount()
+
+  const revealAllResults = useCallback(() => {
+    if (account && game) {
+      for (const duel of waitingForResult) {
+        game.clear_call_to_challenge(account, duel.duelId)
+      }
+    }
+  }, [waitingForResult, account, game])
+  
   const items = useMemo(() => (activeChallenges.map((a) => {
     return (
       <ActionItem
@@ -76,6 +91,12 @@ export default function ActivityAction() {
       </>}
       {!isConnected && <div className='Brightest'>Disconnected</div>}
       {(isConnected && duelistCount > 0 && items.length == 0 && idleCount == 0) && <div className='Brightest'>Loading...</div>}
+      {isConnected && duelistCount > 0 && items.length > 0 && waitingForResult.length > 0 && (
+        <div className='ClearActionsButtonContainer'>
+          <ActionButton important label={`Instant Reveal ${waitingForResult.length} Duel${waitingForResult.length > 1 ? 's' : ''}`} loading={false} loadingClassName='poster' onClick={() => revealAllResults()} />
+        </div>
+      )}
+      
     </div>
   );
 }

@@ -130,7 +130,7 @@ function _NewChallengeModal({
         className='NoMargin NoPadding'
         style={{
           width: aspectWidth(60),
-          height: aspectHeight(76),
+          height: aspectHeight(82.4),
           position: 'absolute',
           top: aspectHeight((100 - 76) / 2) + boxH,
           left: aspectWidth(20) + boxW,

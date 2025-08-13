@@ -199,17 +199,17 @@ export const DuelContextProvider: React.FC<{
     isExpired, isCanceled
   } = useGetChallenge(duelId);
 
-  useEffect(() => {
-    console.log('duelId', duelId,  duelistIdA, duelistIdB, 
-    duelistAddressA, duelistAddressB, 
-    timestampStart, timestampEnd, 
-    isTutorial, isAwaiting, isInProgress, isFinished,
-    isExpired, isCanceled)
-  }, [duelId, duelistIdA, duelistIdB, 
-    duelistAddressA, duelistAddressB, 
-    timestampStart, timestampEnd, 
-    isTutorial, isAwaiting, isInProgress, isFinished,
-    isExpired, isCanceled])
+  // useEffect(() => {
+  //   console.log('duelId', duelId,  duelistIdA, duelistIdB, 
+  //   duelistAddressA, duelistAddressB, 
+  //   timestampStart, timestampEnd, 
+  //   isTutorial, isAwaiting, isInProgress, isFinished,
+  //   isExpired, isCanceled)
+  // }, [duelId, duelistIdA, duelistIdB, 
+  //   duelistAddressA, duelistAddressB, 
+  //   timestampStart, timestampEnd, 
+  //   isTutorial, isAwaiting, isInProgress, isFinished,
+  //   isExpired, isCanceled])
 
   // Get duelist data
   useFetchDuelistsByIds([duelistIdA, duelistIdB])

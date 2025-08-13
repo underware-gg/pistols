@@ -34,6 +34,7 @@ type ActionButtonProps = {
   confirm?: boolean
   confirmMessage?: string
   className?: string
+  loadingClassName?: string
   loading?: boolean
   onClick: () => void
   onMouseEnter?: () => void
@@ -54,6 +55,7 @@ export const ActionButton = ({
   confirm = false,
   confirmMessage = null,
   className = null,
+  loadingClassName = null,
   loading = false,
   onClick,
   onMouseEnter,
@@ -98,7 +100,7 @@ export const ActionButton = ({
       >
         {label}
         {loading && (
-          <div className='button-loading-overlay'>
+          <div className={`button-loading-overlay ${loadingClassName}`}>
             <div className='button-dialog-spinner-container CenteredContainer'>
               <div className='dialog-spinner'></div>
             </div>
@@ -355,10 +357,12 @@ export function ChallengeButton({
   challengedPlayerAddress,
   fillParent = false,
   customLabel = null,
+  loadingClassName = null,
 }: {
   challengedPlayerAddress: BigNumberish,
   fillParent?: boolean
   customLabel?: string
+  loadingClassName?: string
 }) {
   const { dispatchChallengingPlayerAddress, dispatchSelectDuel, duelistSelectOpener } = usePistolsContext()
   const { address } = useAccount()
@@ -381,7 +385,7 @@ export function ChallengeButton({
     <>
       <div className='NoMouse NoDrag' ref={buttonRef} style={{ position: 'absolute', width: '100%', height: '100%', top: 0, left: 0 }} /> {/* popupnotification anchor element */}
       {!hasPact ? (
-        <ActionButton large fillParent={fillParent} important disabled={!canChallenge} loading={isLoading} label={customLabel ?? 'Challenge for a Duel!'} onClick={() => {
+        <ActionButton large fillParent={fillParent} important disabled={!canChallenge} loading={isLoading} loadingClassName={loadingClassName} label={customLabel ?? 'Challenge for a Duel!'} onClick={() => {
           dispatchChallengingPlayerAddress(challengedPlayerAddress)
           duelistSelectOpener.open()
         }} />

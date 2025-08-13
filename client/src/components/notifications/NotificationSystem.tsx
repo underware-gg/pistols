@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import { Image } from 'semantic-ui-react'
 import { useNotifications, type Notification } from '/src/stores/notificationStore'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
@@ -8,18 +8,18 @@ import { emitter, playAudio } from '/src/three/game'
 import { DuelNotificationItem } from './DuelNotificationItem'
 import { PushNotification } from './PushNotification'
 import { AudioName } from '/src/data/audioAssets'
-import { tutorialScenes } from '/src/data/tutorialConstants'
+import { SceneName } from '/src/data/assets'
 
 const NOTIFICATION_DISPLAY_DURATION = 4000
 const NOTIFICATION_ANIMATION_DURATION = 500
 const NOTIFICATION_SOUND_COOLDOWN = 15000
 
 export default function NotificationSystem() {
-  const { notifications, markAsRead, markAsDisplayed } = useNotifications()
-  const { dispatchSelectDuel, currentDuel, selectedDuelId } = usePistolsContext()
-  const { atDuel, atGate, atDoor, atTutorial, currentScene } = usePistolsScene()
+  const { sortedNotifications, markAsRead, markAsDisplayed } = useNotifications()
+  const { dispatchSelectDuel, currentDuel, selectedDuelId, barkeepModalOpener } = usePistolsContext()
+  const { dispatchSetScene, atDuel, atGate, atDoor, atTutorial } = usePistolsScene()
   
-  const [currentNotification, setCurrentNotification] = useState<Notification | null>(null)
+  const [currentNotifications, setCurrentNotifications] = useState<Notification[] | null>(null)
   const [isVisible, setIsVisible] = useState(false)
   const [isAnimating, setIsAnimating] = useState(false)
   const [isFocused, setIsFocused] = useState(false)
@@ -28,21 +28,21 @@ export default function NotificationSystem() {
   const bubbleRef = useRef<HTMLDivElement>(null)
   const timeoutRef = useRef<NodeJS.Timeout>()
   
-  const notificationRef = useRef<Notification | null>(null)
-  const selectedDuelIdRef = useRef<bigint | null>(null)
-  const currentDuelRef = useRef<bigint | null>(null)
+  const notificationsRef = useRef<Notification[] | null>(null)
+  const selectedDuelIdRef = useRef<number | null>(null)
+  const currentDuelRef = useRef<number | null>(null)
 
-  const hasDisplayedNotificationRef = useRef(false)
+  const hasDisplayedNotificationsRef = useRef(false)
   const swRegistrationRef = useRef<ServiceWorkerRegistration | null>(null)
   const lastSoundTimeRef = useRef<number>(0)
 
   // never display at gate or door (after disconnect)
-  const wongScene = useMemo(() => (atDuel || atGate || atDoor || atTutorial), [atDuel, atGate, atDoor, atTutorial])
+  const wrongScene = useMemo(() => (atDuel || atGate || atDoor || atTutorial), [atDuel, atGate, atDoor, atTutorial])
   useEffect(() => {
-    if (wongScene) {
+    if (wrongScene) {
       setIsVisible(false)
     }
-  }, [wongScene])
+  }, [wrongScene])
 
   // Track tab focus state
   useEffect(() => {
@@ -101,9 +101,10 @@ export default function NotificationSystem() {
   }, [isFocused])
 
   useEffect(() => {
-    const newUnread = notifications.filter(n => !n.isDisplayed)
+    if(!sortedNotifications) return
+    const newUnread = sortedNotifications.filter(n => !n.isDisplayed)
     setUnreadNotifications(newUnread)
-  }, [notifications])
+  }, [sortedNotifications])
 
   useEffect(() => {
     if (unreadNotifications.length === 0 && !isAnimating) {
@@ -111,22 +112,28 @@ export default function NotificationSystem() {
       return
     }
 
-    if (!currentNotification && !isAnimating) {
-      const nextNotification = unreadNotifications[0]
-      notificationRef.current = nextNotification
-      setCurrentNotification(nextNotification)
+    if (!currentNotifications && !isAnimating) {
+      if (unreadNotifications.length > 2) {
+        const nextNotifications = [...unreadNotifications]
+        notificationsRef.current = nextNotifications
+        setCurrentNotifications(nextNotifications)
+      } else {
+        const nextNotification = unreadNotifications[0]
+        notificationsRef.current = [nextNotification]
+        setCurrentNotifications([nextNotification])
+      }
     }
-  }, [unreadNotifications, currentNotification, isAnimating])
+  }, [unreadNotifications, currentNotifications, isAnimating])
 
   useEffect(() => {
     if (selectedDuelId) {
-      markAsRead(selectedDuelId)
+      markAsRead([Number(selectedDuelId)])
     }
     if (currentDuel) {
-      markAsRead(currentDuel)
+      markAsRead([Number(currentDuel)])
     }
-    selectedDuelIdRef.current = selectedDuelId
-    currentDuelRef.current = currentDuel
+    selectedDuelIdRef.current = Number(selectedDuelId)
+    currentDuelRef.current = Number(currentDuel)
   }, [selectedDuelId, currentDuel])
 
   // Helper function to play notification sound with cooldown
@@ -138,29 +145,30 @@ export default function NotificationSystem() {
     }
   }
 
-  // Handle in-game notification sound
-  useEffect(() => {
-    if (isVisible && currentNotification) {
-      playNotificationSound(AudioName.NOTIFICATION)
-    }
-  }, [isVisible, currentNotification])
-
   // Handle notification clicks from service worker
   useEffect(() => {
     if (!navigator.serviceWorker) return
 
     const handleMessage = (event: MessageEvent) => {
       if (event.data?.type === 'DUEL_NOTIFICATION_CLICK') {
-        const duelId = event.data.duelId
-        if (!duelId) return
+        const duelIds = event.data.duelIds
+        if (!duelIds) return
         
         if (timeoutRef.current) {
           clearTimeout(timeoutRef.current)
           timeoutRef.current = undefined
         }
-        
-        dispatchSelectDuel(duelId)
-        onNotificationDismissed(true, duelId)
+
+        if (duelIds.length > 1) {
+          dispatchSetScene(SceneName.Tavern)
+          setTimeout(() => {
+            barkeepModalOpener.open({ initialStage: 'notifications' })
+          }, 200)
+          onNotificationDismissed(false, duelIds)
+        } else {
+          dispatchSelectDuel(duelIds[0])
+          onNotificationDismissed(true, duelIds)
+        }
       }
     }
 
@@ -172,15 +180,15 @@ export default function NotificationSystem() {
   }, [])
 
   const showNotification = () => {
-    if (selectedDuelIdRef.current === notificationRef.current?.duelId || currentDuelRef.current === notificationRef.current?.duelId) {
+    if (notificationsRef.current && notificationsRef.current.length === 1 && (selectedDuelIdRef.current === notificationsRef.current[0]?.duelId || currentDuelRef.current === notificationsRef.current[0]?.duelId)) {
       onNotificationShown()
-      onNotificationDismissed(true, notificationRef.current?.duelId)
+      onNotificationDismissed(true, notificationsRef.current)
       return
     }
     
-    if (!bubbleRef.current || !notificationRef.current) return
-    if (hasDisplayedNotificationRef.current) return
-    if (wongScene) return
+    if (!bubbleRef.current || !notificationsRef.current) return
+    if (hasDisplayedNotificationsRef.current) return
+    if (wrongScene) return
 
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current)
@@ -190,8 +198,10 @@ export default function NotificationSystem() {
     setIsAnimating(true)
     setIsVisible(true)
 
+    playNotificationSound(AudioName.NOTIFICATION)
+
     timeoutRef.current = setTimeout(() => {
-      if (notificationRef.current) {
+      if (notificationsRef.current) {
         hideNotification(false)
       }
     }, NOTIFICATION_DISPLAY_DURATION + (NOTIFICATION_ANIMATION_DURATION * 2))
@@ -209,13 +219,13 @@ export default function NotificationSystem() {
   }
 
   const showPushNotification = () => {
-    if (selectedDuelIdRef.current === notificationRef.current?.duelId || currentDuelRef.current === notificationRef.current?.duelId) {
+    if (notificationsRef.current && notificationsRef.current.length === 1 && (selectedDuelIdRef.current === notificationsRef.current[0]?.duelId || currentDuelRef.current === notificationsRef.current[0]?.duelId)) {
       onNotificationShown()
-      onNotificationDismissed(true, notificationRef.current?.duelId)
+      onNotificationDismissed(true, notificationsRef.current)
       return
     }
 
-    if (hasDisplayedNotificationRef.current) return
+    if (hasDisplayedNotificationsRef.current) return
 
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current)
@@ -226,15 +236,15 @@ export default function NotificationSystem() {
     onNotificationShown()
 
     timeoutRef.current = setTimeout(() => {
-      if (notificationRef.current) {
-        onNotificationDismissed(false, notificationRef.current?.duelId)
+      if (notificationsRef.current) {
+        onNotificationDismissed(false, notificationsRef.current)
       }
     }, NOTIFICATION_DISPLAY_DURATION)
   }
 
   const onNotificationShown = () => {
-    hasDisplayedNotificationRef.current = true
-    markAsDisplayed(notificationRef.current?.duelId)
+    hasDisplayedNotificationsRef.current = true
+    markAsDisplayed(notificationsRef.current?.map(n => n.duelId))
   }
 
   const hideNotification = (hasSeen: boolean = false) => {
@@ -247,7 +257,7 @@ export default function NotificationSystem() {
 
     setTimeout(() => {
       setIsAnimating(false)
-      onNotificationDismissed(hasSeen, notificationRef.current?.duelId)
+      onNotificationDismissed(hasSeen, notificationsRef.current)
     }, NOTIFICATION_ANIMATION_DURATION)
 
     new TWEEN.Tween({ opacity: 1 })
@@ -261,28 +271,37 @@ export default function NotificationSystem() {
       .start()
   }
 
-  const onNotificationDismissed = (hasSeen: boolean, duelId?: bigint) => {
-    if (hasSeen && duelId) {
-      markAsRead(duelId)
+  const onNotificationDismissed = (hasSeen: boolean, notifications?: Notification[]) => {
+    if (hasSeen && notifications) {
+      markAsRead(notifications.map(n => n.duelId))
     }
-    notificationRef.current = null
-    hasDisplayedNotificationRef.current = false
-    setCurrentNotification(null)
+    notificationsRef.current = null
+    hasDisplayedNotificationsRef.current = false
+    setCurrentNotifications(null)
 
     emitter.emit('hover_description', null)
   }
 
   const handleClick = (e?: React.MouseEvent) => {
-    const notification = notificationRef.current
-    if (!notification?.duelId) return
+    const notifications = notificationsRef.current
+    if (!notifications) return
     
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current)
       timeoutRef.current = undefined
     }
+
+    if (notifications.length > 1) {
+      dispatchSetScene(SceneName.Tavern)
+      setTimeout(() => {
+        barkeepModalOpener.open({ initialStage: 'notifications' })
+      }, 200)
+      hideNotification(false)
+    } else {
+      dispatchSelectDuel(notifications[0].duelId)
+      hideNotification(true)
+    }
     
-    dispatchSelectDuel(notification.duelId)
-    hideNotification(true)
   }
 
   const handleDismiss = (e: React.MouseEvent) => {
@@ -314,9 +333,9 @@ export default function NotificationSystem() {
       />
 
       <PushNotification 
-        key={`push-${currentNotification?.duelId}`} 
-        notification={currentNotification} 
-        shouldShow={!isFocused && !hasDisplayedNotificationRef.current} 
+        key={`push-${notificationsRef.current?.[0]?.duelId}`} 
+        notifications={notificationsRef.current} 
+        shouldShow={!isFocused && !hasDisplayedNotificationsRef.current} 
         showNotification={showPushNotification}
       />
 
@@ -330,7 +349,7 @@ export default function NotificationSystem() {
         data-tail="left"
         onClick={handleClick}
       >
-        {currentNotification && (
+        {currentNotifications && (
           <div className="Relative">
             <div 
               onClick={handleDismiss}
@@ -348,9 +367,9 @@ export default function NotificationSystem() {
             </div>
 
             <DuelNotificationItem
-              notification={currentNotification}
+              notifications={currentNotifications}
               onAction={handleClick}
-              canShow={!isAnimating && isFocused && !hasDisplayedNotificationRef.current}
+              canShow={!isAnimating && isFocused && !hasDisplayedNotificationsRef.current}
               onShow={showNotification}
               className="NotificationItemWrapper"
             />

@@ -138,7 +138,7 @@ export default function DuelProgress({
           <div className='dialog-content'>
             <div className='moves-button-container'>
               <button className='dialog-button'></button>
-              <div className='button-loading-overlay'>
+              <div className='button-loading-overlay duel'>
                 <div className='duel-button-spinner-container'>
                   <div id='dialog-spinner-button' className='dialog-spinner'></div>
                 </div>
