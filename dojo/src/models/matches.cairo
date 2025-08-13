@@ -1,5 +1,10 @@
 use starknet::{ContractAddress};
 
+// constants
+pub mod MATCHMAKER {
+    pub const INITIAL_SLOT_SIZE: u8 = 5;
+}
+
 
 //------------------------
 // MatckMaker models
@@ -8,7 +13,8 @@ use starknet::{ContractAddress};
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
 pub enum QueueId {
     Undefined,  // 0
-    Main,       // 1
+    Ranked,     // 1
+    Unranked,   // 2
 }
 
 //
@@ -68,19 +74,25 @@ pub struct MatchCounter {
 //----------------------------------
 // Traits
 //
-use pistols::utils::arrays::{ArrayUtilsTrait};
-use pistols::utils::misc::{FeltToLossyTrait};
+use pistols::libs::store::{Store};
+use pistols::interfaces::dns::{DnsTrait};
+use pistols::systems::rng::{RngWrap, RngWrapTrait, Dice, DiceTrait};
 use pistols::types::timestamp::{TIMESTAMP};
+use pistols::utils::arrays::{ArrayUtilsTrait};
+use pistols::utils::misc::{FeltToLossy};
 
 #[generate_trait]
 pub impl MatchQueueImpl of MatchQueueTrait {
     // assign slot to new player
-    fn assign_slot(ref self: MatchQueue, seed: felt252) -> u8 {
-        // randomize slot
+    fn assign_slot(ref self: MatchQueue, store: @Store, seed: felt252) -> u8 {
+        // initialize queue
         if (self.slot_size == 0) {
-            self.slot_size = 5; // initialize with 5 slots
+            self.slot_size = MATCHMAKER::INITIAL_SLOT_SIZE;
         }
-        (seed.to_u8_lossy() % self.slot_size)
+        // randomize slot
+        let wrapped: @RngWrap = RngWrapTrait::new(store.world.rng_address());
+        let mut dice: Dice = DiceTrait::new(wrapped, seed);
+        (dice.throw('queue_slot', self.slot_size))
     }
     #[inline(always)]
     fn append_player(ref self: MatchQueue, player_address: ContractAddress) {
@@ -108,7 +120,7 @@ pub impl MatchPlayerImpl of MatchPlayerTrait {
     }
     fn enter_duel(ref self: MatchPlayer, duel_id: u128) {
         self.duel_id = duel_id;
-        self.queue_info.slot = 0;
+        // self.queue_info.slot = 0; // no need to reset, and we can test it
     }
 }
 
@@ -154,7 +166,6 @@ pub impl QueueModeDebug of core::fmt::Debug<QueueMode> {
 //
 #[cfg(test)]
 mod unit {
-    use pistols::utils::misc::{FeltToLossyTrait};
     use super::{
         MatchPlayer,
         QueueInfo, QueueMode,

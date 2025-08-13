@@ -1,10 +1,10 @@
 // use starknet::{ContractAddress};
-use pistols::models::matches::{QueueMode};
+use pistols::models::matches::{QueueId, QueueMode};
 
 // Exposed to clients
 #[starknet::interface]
 pub trait IMatchMaker<TState> {
-    fn match_make_me(ref self: TState, duelist_id: u128, queue_mode: QueueMode) -> u128;
+    fn match_make_me(ref self: TState, duelist_id: u128, queue_id: QueueId, queue_mode: QueueMode) -> u128;
     // fn ping_me(ref self: TState) -> u128;
 }
 
@@ -14,16 +14,12 @@ pub mod matchmaker {
     use starknet::{ContractAddress};
     use dojo::world::{WorldStorage};
 
-    use pistols::interfaces::dns::{
-        // DnsTrait,
-        // SELECTORS,
-    };
     use pistols::models::{
         matches::{
+            QueueId, QueueMode,
             MatchQueue, MatchQueueTrait,
             MatchPlayer, MatchPlayerTrait,
             QueueInfo, QueueInfoTrait,
-            QueueId, QueueMode,
         },
     };
     use pistols::types::{
@@ -40,7 +36,8 @@ pub mod matchmaker {
     // use pistols::utils::misc::{ZERO};
 
     pub mod Errors {
-        pub const INVALID_MODE: felt252             = 'MATCHMAKER: Invalid mode';
+        pub const INVALID_QUEUE: felt252        = 'MATCHMAKER: Invalid queue';
+        pub const INVALID_MODE: felt252         = 'MATCHMAKER: Invalid mode';
     }
 
     fn dojo_init(ref self: ContractState) {
@@ -59,8 +56,10 @@ pub mod matchmaker {
 
         fn match_make_me(ref self: ContractState,
             duelist_id: u128,
+            queue_id: QueueId,
             queue_mode: QueueMode,
         ) -> u128 {
+            assert(queue_id != QueueId::Undefined, Errors::INVALID_QUEUE);
             assert(queue_mode != QueueMode::Undefined, Errors::INVALID_MODE);
 
             let caller: ContractAddress = starknet::get_caller_address();
@@ -68,7 +67,7 @@ pub mod matchmaker {
             // get player entry in queue
             let mut store: Store = StoreTrait::new(self.world_default());
             let mut matching_player: MatchPlayer = store.get_match_player(caller);
-            let mut queue: MatchQueue = store.get_match_queue(QueueId::Main);
+            let mut queue: MatchQueue = store.get_match_queue(queue_id);
 
             // player is already in a duel...
             if (matching_player.duel_id.is_non_zero()) {
@@ -79,7 +78,7 @@ pub mod matchmaker {
             if (matching_player.queue_info.slot.is_zero()) {
                 // randomize slot
                 let seed: felt252 = store.vrf_dispatcher().consume_random(Source::Nonce(caller));
-                let slot: u8 = queue.assign_slot(seed);
+                let slot: u8 = queue.assign_slot(@store, seed);
                 // enter queue
                 matching_player.enter_queue(
                     duelist_id,
@@ -141,6 +140,7 @@ pub mod matchmaker {
                         player_is_in_queue = true;
                     } else {
                         let mut queue_info: QueueInfo = *players_info[i];
+// println!("____slot:{}<{}", queue_info.slot, player_slot);
                         // expired player, need to be removed...
                         if (queue_info.has_expired(timestamp)) {
                             // expire player
@@ -169,7 +169,6 @@ pub mod matchmaker {
                 Option::Some(address) => {
                     // get matched player queue
                     let mut matched_player: MatchPlayer = store.get_match_player(address);
-
                     // create duel
                     let duel_id: u128 = self._create_duel(
                         @store,

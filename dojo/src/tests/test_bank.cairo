@@ -47,10 +47,7 @@ mod tests {
     // Challenge results
     //
     fn _test_bank_resolved(ref sys: TestSystems, address_a: ContractAddress, address_b: ContractAddress, winner: u8) {
-        let (mocked, moves_a, moves_b): (Span<MockedValue>, PlayerMoves, PlayerMoves) = 
-            if (winner == 1) {prefabs::get_moves_crit_a()}
-            else if (winner == 2) {prefabs::get_moves_crit_b()}
-            else  {prefabs::get_moves_dual_miss()};
+        let (mocked, moves_a, moves_b): (Span<MockedValue>, PlayerMoves, PlayerMoves) = prefabs::get_moves_for_winner(winner);
         (sys.rng).mock_values(mocked);
 
         let duelist_id_a: u128 = ID(address_a);

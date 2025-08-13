@@ -546,7 +546,7 @@ pub mod tests {
     // lives staked / death
     //
     pub fn _duel_until_death(sys: @TestSystems, winner: u8, challenge_count: u8, lives_staked: u8) {
-        let (mocked, moves_a, moves_b) = if (winner == 1) {prefabs::get_moves_crit_a()} else {prefabs::get_moves_crit_b()};
+        let (mocked, moves_a, moves_b) = prefabs::get_moves_for_winner(winner);
         (*sys).rng.mock_values(mocked);
 
         let to_death: bool = (challenge_count * lives_staked == MAX_LIVES);
