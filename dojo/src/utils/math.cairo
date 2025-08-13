@@ -576,6 +576,7 @@ pub impl MathU256 of MathTrait<u256, u256> {
 //
 #[cfg(test)]
 mod unit {
+    use core::num::traits::Zero;
     use super::{
         MathU8,MathU16,MathU32,MathU128,MathU256,
         MAX_SHORT_STRING_NUMBER,
@@ -822,5 +823,45 @@ mod unit {
     fn test_to_short_string_overflow_u256() {
         let v: u256 = (MAX_SHORT_STRING_NUMBER + 1).into();
         v.to_short_string(); // panic!
+    }
+
+    //
+    // core::num::traits::Zero gas test
+    //
+    // test pistols::models::matches::unit::test_non_zero_trait ... ok (gas usage est.: 1040)
+    // test pistols::models::matches::unit::test_zero ... ok (gas usage est.: 300)
+    // test pistols::models::matches::unit::test_gt_zero2 ... ok (gas usage est.: 300)
+    // test pistols::models::matches::unit::test_non_zero ... ok (gas usage est.: 1040)
+    // test pistols::models::matches::unit::test_gt_zero ... ok (gas usage est.: 300)
+    // test pistols::models::matches::unit::test_zero_trait ... ok (gas usage est.: 300)
+    #[test]
+    fn test_zero() {
+        let value: felt252 = 0;
+        let is_zero: bool = (value == 0); // BEST
+        assert!(is_zero);
+    }
+    #[test]
+    fn test_zero_trait() {
+        let value: felt252 = 0;
+        let is_zero: bool = (value.is_zero()); // BEST
+        assert!(is_zero);
+    }
+    #[test]
+    fn test_non_zero() {
+        let value: felt252 = 1;
+        let non_zero: bool = (value != 0); // BAD!!!!
+        assert!(non_zero);
+    }
+    #[test]
+    fn test_non_zero_trait() {
+        let value: felt252 = 1;
+        let non_zero: bool = (value.is_non_zero()); // BAD!!!!
+        assert!(non_zero);
+    }
+    #[test]
+    fn test_gt_zero() {
+        let value: u8 = 1;
+        let gt_zero: bool = (value > 0); // BEST
+        assert!(gt_zero);
     }
 }
