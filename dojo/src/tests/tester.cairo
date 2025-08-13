@@ -53,7 +53,7 @@ pub mod tester {
             DuelistMemorial, DuelistMemorialValue,
             CauseOfDeath,
         },
-        matches::{MatchPlayer, QueueMode},
+        matches::{MatchPlayer, QueueId, QueueMode},
         pact::{Pact, PactTrait},
         leaderboard::{Leaderboard, LeaderboardTrait, LeaderboardPosition},
         config::{Config, TokenConfig, CoinConfig, CONFIG},
@@ -270,16 +270,18 @@ pub mod tester {
         deploy_duelist      = deploy_duelist || deploy_bot_player;
         deploy_game_loop    = deploy_game_loop || deploy_game || deploy_tutorial;
         deploy_lords        = deploy_lords || deploy_game || deploy_duelist || approve;
-        deploy_admin        = deploy_admin || deploy_game || deploy_lords || deploy_tournament;
-        deploy_duel         = deploy_duel || deploy_game || deploy_bot_player;
+        deploy_duel         = deploy_duel || deploy_game || deploy_bot_player || deploy_matchmaker;
         deploy_pack         = deploy_pack || deploy_duelist || deploy_bot_player;
         deploy_fame         = deploy_fame || deploy_game || deploy_duelist;
         deploy_fools        = deploy_fools || deploy_game;
         deploy_rng_mock     = deploy_rng_mock || deploy_tutorial;
         deploy_bank         = deploy_bank || deploy_fame || deploy_lords || deploy_duelist;
-        deploy_vrf          = deploy_vrf || deploy_game || deploy_pack || deploy_tournament;
-        deploy_duelist_mock = !deploy_duelist && (deploy_game || deploy_tournament);
-        
+        deploy_vrf          = deploy_vrf || deploy_game || deploy_pack || deploy_tournament || deploy_matchmaker;
+        deploy_duelist_mock = !deploy_duelist && (deploy_game || deploy_duel || deploy_tournament);
+        deploy_admin        = deploy_admin || deploy_game || deploy_lords || deploy_tournament || deploy_vrf;
+        // if duels only, need game address to mint token to...
+        deploy_game         = deploy_game || deploy_duel;
+
         let mut resources: Array<TestResource> = array![
             // pistols models
             TestResource::Model(pistols::models::config::m_Config::TEST_CLASS_HASH),
@@ -365,6 +367,7 @@ pub mod tester {
             resources.append(TestResource::Contract(matchmaker::TEST_CLASS_HASH));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"matchmaker")
+                    .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
             );
         }
 
@@ -905,10 +908,11 @@ pub mod tester {
     // ::matchmaker
     pub fn execute_match_make_me(sys: @TestSystems, sender: ContractAddress,
         duelist_id: u128,
+        queue_id: QueueId,
         queue_mode: QueueMode,
     ) -> u128 {
         impersonate(sender);
-        let duel_id: u128 = (*sys.matchmaker).match_make_me(duelist_id, queue_mode);
+        let duel_id: u128 = (*sys.matchmaker).match_make_me(duelist_id, queue_id, queue_mode);
         _next_block();
         (duel_id)
     }

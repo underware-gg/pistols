@@ -16,7 +16,7 @@ pub mod prefabs {
         }
     };
     use pistols::libs::moves_hash::{MovesHashTrait};
-    use pistols::systems::rng_mock::{IRngMockDispatcherTrait, MockedValue, MockedValueTrait};
+    pub use pistols::systems::rng_mock::{IRngMockDispatcherTrait, MockedValue, MockedValueTrait};
     use pistols::types::cards::env::{ENV_DICES};
 
     pub const NAME_A: felt252 = 'Sensei';
@@ -73,6 +73,15 @@ pub mod prefabs {
         (challenge, round)
     }
 
+    pub fn get_moves_for_winner(winner: u8) -> (Span<MockedValue>, PlayerMoves, PlayerMoves) {
+        (if (winner == 1) {
+            get_moves_crit_a()
+        } else if (winner == 2) {
+            get_moves_crit_b()
+        } else {
+            get_moves_dual_miss()
+        })
+    }
 
     pub fn get_moves_custom(moves_a: Span<u8>, moves_b: Span<u8>) -> (Span<MockedValue>, PlayerMoves, PlayerMoves) {
         (
