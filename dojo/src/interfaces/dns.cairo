@@ -34,7 +34,7 @@ pub use pistols::interfaces::{
 };
 pub use pistols::libs::store::{Store, StoreTrait};
 pub use pistols::models::config::{CONFIG, Config};
-pub use pistols::utils::misc::{ZERO};
+pub use pistols::utils::address::{ZERO};
 // pub use tournaments::components::tournament::{ITournamentDispatcher, ITournamentDispatcherTrait};
 
 pub mod SELECTORS {

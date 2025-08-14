@@ -115,7 +115,8 @@ use pistols::libs::store::{Store, StoreTrait};
 use pistols::utils::arrays::{SpanUtilsTrait};
 use pistols::utils::bitwise::{BitwiseU32, BitwiseU128};
 use pistols::utils::hash::{hash_values};
-use pistols::utils::misc::{FeltToLossy, ZERO};
+use pistols::utils::address::{ZERO};
+use pistols::utils::misc::{FeltToLossy};
 use pistols::utils::math::{MathTrait};
 
 

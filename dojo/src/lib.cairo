@@ -88,6 +88,7 @@ mod types {
 }
 
 mod utils {
+    pub mod address;
     pub mod arrays;
     pub mod byte_arrays;
     pub mod bitwise;

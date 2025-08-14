@@ -33,7 +33,7 @@ pub mod matchmaker {
     use pistols::libs::{
         store::{Store, StoreTrait},
     };
-    // use pistols::utils::misc::{ZERO};
+    // use pistols::utils::address::{ZERO};
 
     pub mod Errors {
         pub const INVALID_QUEUE: felt252        = 'MATCHMAKER: Invalid queue';
