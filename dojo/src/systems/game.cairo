@@ -113,7 +113,7 @@ pub mod game {
         constants::{FAME},
     };
     use pistols::types::trophies::{Trophy, TrophyTrait, TrophyProgressTrait, TROPHY_ID};
-    use pistols::utils::misc::{ZERO};
+    use pistols::utils::address::{ZERO};
     use pistols::libs::{
         store::{Store, StoreTrait},
         game_loop::{GameLoopContractTrait},

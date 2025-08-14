@@ -1,6 +1,6 @@
 use starknet::{ContractAddress};
 use pistols::models::pool::{PoolType};
-use pistols::utils::misc::{ContractAddressDefault};
+use pistols::utils::address::{ContractAddressDefault};
 use pistols::utils::arrays::{SpanDefault};
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
@@ -57,7 +57,7 @@ use core::num::traits::Zero;
 use pistols::models::ring::{RingType, RingTypeTrait};
 use pistols::types::timestamp::{TIMESTAMP};
 use pistols::types::constants::{CONST, FAME::{ONE_LIFE}};
-use pistols::utils::misc::{ZERO};
+use pistols::utils::address::{ZERO};
 
 #[generate_trait]
 pub impl RulesImpl of RulesTrait {

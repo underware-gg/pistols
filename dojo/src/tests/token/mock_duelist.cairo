@@ -38,7 +38,7 @@ pub mod duelist_token {
     use super::{MockDuelistOwners};
     use pistols::models::challenge::{Challenge};
     use pistols::types::rules::{RewardValues, DuelBonus};
-    use pistols::utils::misc::{ZERO};
+    use pistols::utils::address::{ZERO};
     use pistols::tests::tester::tester::{
         OWNER, OWNED_BY_OWNER,
         OTHER, OWNED_BY_OTHER,

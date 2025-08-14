@@ -41,7 +41,7 @@ pub struct CoinConfig {
 //---------------------------
 // Traits
 //
-use pistols::utils::misc::{ZERO};
+use pistols::utils::address::{ZERO};
 
 #[generate_trait]
 pub impl ConfigManagerImpl of ConfigManagerTrait {

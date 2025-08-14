@@ -83,7 +83,7 @@ pub mod tester {
     use pistols::utils::{
         byte_arrays::{BoolToString},
         arrays::{ArrayTestUtilsTrait},
-        misc::{ContractAddressIntoU256},
+        address::{ContractAddressIntoU256},
         short_string::{ShortString},
         serde::{SerializedAppend},
     };

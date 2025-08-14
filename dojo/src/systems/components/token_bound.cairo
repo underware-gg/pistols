@@ -1,6 +1,6 @@
 use starknet::{ContractAddress};
 use pistols::utils::hash::{hash_values};
-use pistols::utils::misc::{ZERO};
+use pistols::utils::address::{ZERO};
 
 #[starknet::interface]
 pub trait ITokenBoundPublic<TState> {

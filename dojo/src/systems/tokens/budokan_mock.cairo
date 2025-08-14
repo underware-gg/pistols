@@ -155,7 +155,7 @@ pub mod budokan_mock {
         TournamentType, TournamentTypeTrait,
     };
     use pistols::systems::rng_mock::{MockedValue, MockedValueTrait};
-    // use pistols::utils::misc::{ZERO};
+    // use pistols::utils::address::{ZERO};
 
     pub const TOURNAMENT_OF_1: u64 = 1001;   // 1 entry
     pub const TOURNAMENT_OF_2: u64 = 1002;   // 2 entries

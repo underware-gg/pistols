@@ -145,7 +145,7 @@ pub mod ring_token {
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::short_string::{ShortStringTrait};
     use pistols::utils::math::{MathU128};
-    use pistols::utils::misc::{ZERO};
+    use pistols::utils::address::{ZERO};
     use pistols::types::constants::{METADATA};
 
     pub mod Errors {

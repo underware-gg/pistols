@@ -19,7 +19,7 @@ pub struct Pact {
 use core::num::traits::Zero;
 use pistols::systems::tokens::duel_token::duel_token::{Errors as DuelErrors};
 use pistols::models::challenge::{Challenge};
-use pistols::utils::misc::{ContractAddressIntoU256};
+use pistols::utils::address::{ContractAddressIntoU256};
 use pistols::libs::store::{Store, StoreTrait};
 
 #[generate_trait]
@@ -69,7 +69,7 @@ pub impl PactImpl of PactTrait {
 mod unit {
     use starknet::{ContractAddress};
     use super::{PactTrait};
-    use pistols::utils::misc::{ContractAddressIntoU256};
+    use pistols::utils::address::{ContractAddressIntoU256};
 
     #[test]
     fn test_pact_pair() {

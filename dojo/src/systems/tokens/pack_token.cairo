@@ -164,7 +164,7 @@ pub mod pack_token {
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::short_string::{ShortStringTrait};
     use pistols::utils::byte_arrays::{BoolToStringTrait};
-    use pistols::utils::misc::{ZERO};
+    use pistols::utils::address::{ZERO};
 
     pub mod Errors {
         pub const INVALID_CALLER: felt252       = 'PACK: Invalid caller';
