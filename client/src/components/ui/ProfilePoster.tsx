@@ -133,7 +133,7 @@ const ProfilePosterSmall = forwardRef<ProfilePosterHandle, ProfilePosterProps>((
             <div className='PlayerName Small'>{name}</div>
           </div>
 
-          <StampImage playerAddress={props.playerAddress} size="ProfileSmall" position="Right" />
+          <StampImage playerAddress={props.playerAddress} size="ProfileSmall" position="Right" rotation={10} />
 
           <div className={`OnlineStatusSection ${ props.width && props.width !== POSTER_WIDTH_SMALL ? 'Smaller' : 'Small'}`}>
             <div className={`OnlineStatus Small ${isOnline ? 'Online' : 'Offline'}`} />
@@ -285,7 +285,7 @@ const ProfilePosterFull = forwardRef<ProfilePosterHandle, ProfilePosterProps>((p
             <BookmarkIcon isBookmarked={isBookmarked} size='big' fitted disabled={emitIsDisabled} onClick={emit_player_bookmark} />
           </div>
 
-          <StampImage playerAddress={props.playerAddress} size="ProfileLarge" position="Right" />
+          <StampImage playerAddress={props.playerAddress} size="ProfileLarge" position="Right" rotation={10} />
 
           <div className='OnlineStatusSection'>
             <div className={`OnlineStatus ${isOnline ? 'Online' : 'Offline'}`} />

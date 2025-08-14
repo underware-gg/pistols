@@ -17,6 +17,7 @@ interface StampImageProps {
   stampType?: StampType
   size: StampSize
   position: StampPosition
+  rotation?: number
   className?: string
   style?: React.CSSProperties
   forceShow?: boolean
@@ -36,6 +37,7 @@ export const StampImage: React.FC<StampImageProps> = ({
   stampType,
   size,
   position,
+  rotation,
   className = '',
   style = {},
   forceShow = false,
@@ -55,8 +57,8 @@ export const StampImage: React.FC<StampImageProps> = ({
   const cssClasses = useMemo(() => {
     const classes = [
       'StampOverlay',
-      position,
       size,
+      position,
       stampClass,
       'NoMouse',
       'NoDrag',
@@ -68,8 +70,9 @@ export const StampImage: React.FC<StampImageProps> = ({
   
   const finalStyle = useMemo(() => ({
     position: 'absolute' as const,
+    transform: `rotate(${position === 'Left' ? -rotation : rotation}deg)`,
     ...style,
-  }), [style])
+  }), [style, rotation, position])
 
   if (!hasStamp) return null
   

@@ -433,17 +433,17 @@
   }
 
   &.DuelLarge {
-    width: aspect-width(4.2);
-    height: aspect-width(4.2);
+    width: aspect-width(4.4);
+    height: aspect-width(4.4);
 
     &.Left {
-      top: aspect-width(-0.8);
-      left: aspect-width(-0.4);
+      top: aspect-width(-1.2);
+      left: aspect-width(-0.8);
     }
 
     &.Right {
-      bottom: aspect-width(-0.8);
-      right: aspect-width(-0.4);
+      bottom: aspect-width(-1.2);
+      right: aspect-width(-0.8);
     }
   }
 

@@ -203,7 +203,7 @@ const DuelPosterSmall = forwardRef<DuelPosterHandle, DuelPosterProps>((props, re
               />
               <img id='DefeatedOverlay' className={`Left ${isDead(Number(leftDuelistId)) ? 'visible' : ''}`} src='/textures/cards/card_disabled.png' />
             </div>
-            <StampImage playerAddress={leftDuelistAddress} size="DuelSmall" position="Left" />
+            <StampImage playerAddress={leftDuelistAddress} size="DuelSmall" position="Left" rotation={10} />
             <div className='ProfilePicChallengeContainer Right Small'>
               <ProfilePic 
                 profilePic={rightAvatarUrl ? undefined : 0} 
@@ -216,7 +216,7 @@ const DuelPosterSmall = forwardRef<DuelPosterHandle, DuelPosterProps>((props, re
               />
               <img id='DefeatedOverlay' className={`Right ${isDead(Number(rightDuelistId)) ? 'visible' : ''}`} src='/textures/cards/card_disabled.png' />
             </div>
-            <StampImage playerAddress={rightDuelistAddress} size="DuelSmall" position="Right" />
+            <StampImage playerAddress={rightDuelistAddress} size="DuelSmall" position="Right" rotation={10} />
           </div>
           <div className='PlayerNameA'>
             <p className='NoMargin Overflow NoBreak Bold Black'>{leftPlayerName}</p>
@@ -419,7 +419,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
                 removeBorder removeCorners className='ProfilePicChallenge Left' onClick={() => dispatchSelectPlayerAddress(leftDuelistAddress)} />
               <img id='DefeatedOverlay' className={`NoMouse NoDrag Left ${isDead(Number(leftDuelistId)) ? 'visible' : ''}`} src='/textures/cards/card_disabled.png' />
             </div>
-            <StampImage playerAddress={leftDuelistAddress} size="DuelLarge" position="Left" />
+            <StampImage playerAddress={leftDuelistAddress} size="DuelLarge" position="Left" rotation={10} />
             <div className='VS'>
               VS
             </div>
@@ -433,7 +433,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
                 removeBorder removeCorners className='ProfilePicChallenge Right' onClick={() => dispatchSelectPlayerAddress(rightDuelistAddress)} />
               <img id='DefeatedOverlay' className={`NoMouse NoDrag Right ${isDead(Number(rightDuelistId)) ? 'visible' : ''}`} src='/textures/cards/card_disabled.png' />
             </div>
-            <StampImage playerAddress={rightDuelistAddress} size="DuelLarge" position="Right" />
+            <StampImage playerAddress={rightDuelistAddress} size="DuelLarge" position="Right" rotation={10} />
           </div>
           <div className='PlayerNameA Large'>
             <p className='NoMargin Overflow NoBreak Bold Black'>{leftPlayerName}</p>
@@ -445,7 +445,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
                 <DuelistCard
                   duelistId={Number(leftDuelistId || challengingDuelistId)}
                   isSmall={true}
-                  overrideFame={!isAwaiting}
+                  overrideFame={!isLive}
                   fame={isFinished && !isCallToAction ? fameAfterA : fameBeforeA}
                   isLeft={true}
                   isVisible={true}
@@ -526,7 +526,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
                 <DuelistCard
                   duelistId={Number(rightDuelistId)}
                   isSmall={true}
-                  overrideFame={!isAwaiting}
+                  overrideFame={!isLive}
                   fame={isFinished && !isCallToAction ? fameAfterB : fameBeforeB}
                   isLeft={false}
                   isVisible={true}
