@@ -3,18 +3,20 @@ mod tests {
     use starknet::{ContractAddress};
     // use core::num::traits::Zero;
     use pistols::models::{
-        challenge::{ChallengeValue, DuelType},
+        challenge::{ChallengeValue, DuelType, Round},
         duelist::{Archetype},
         matches::{
             QueueId, QueueMode,
             MatchQueue,
             MatchPlayer,
+            MATCHMAKER,
         },
     };
     use pistols::types::{
         challenge_state::{ChallengeState},
         round_state::{RoundState},
         duelist_profile::{DuelistProfile, BotKey},
+        timestamp::{TIMESTAMP},
     };
     use pistols::tests::tester::{tester,
         tester::{
@@ -47,7 +49,7 @@ mod tests {
     }
 
     fn _assert_matchmaking_duel_started(sys: @TestSystems,
-        duel_id: u128, queue_id: QueueId, queue_mode: QueueMode,
+        duel_id: u128, queue_id: QueueId,
         address_a: ContractAddress, duelist_id_a: u128,
         address_b: ContractAddress, duelist_id_b: u128,
         prefix: ByteArray,
@@ -75,15 +77,14 @@ mod tests {
         let match_player_a: MatchPlayer = sys.store.get_match_player(address_a);
         assert_eq!(match_player_a.duel_id, duel_id, "[{}] match_player_a.duel_id", prefix);
         assert_eq!(match_player_a.duelist_id, duelist_id_a, "[{}] match_player_a.duelist_id", prefix);
-        assert_eq!(match_player_a.queue_info.queue_mode, queue_mode, "[{}] match_player_a.queue_info.queue_mode", prefix);
         assert_gt!(match_player_a.queue_info.slot, 0, "[{}] match_player_a.queue_info.slot", prefix);
         let match_player_b: MatchPlayer = sys.store.get_match_player(address_b);
         if (!is_bot) {
             assert_eq!(match_player_b.duel_id, duel_id, "[{}] match_player_b.duel_id", prefix);
             assert_eq!(match_player_b.duelist_id, duelist_id_b, "[{}] match_player_b.duelist_id", prefix);
-            assert_eq!(match_player_b.queue_info.queue_mode, queue_mode, "[{}] match_player_b.queue_info.queue_mode", prefix);
             assert_gt!(match_player_b.queue_info.slot, 0, "[{}] match_player_b.queue_info.slot", prefix);
         } else {
+            // bot_player never has a MatchPlayer
             assert_eq!(match_player_b.duel_id, 0, "[{}] match_player_b.duel_id_BOT", prefix);
             assert_eq!(match_player_b.duelist_id, 0, "[{}] match_player_b.duelist_id_BOT", prefix);
             assert_eq!(match_player_b.queue_info.slot, 0, "[{}] match_player_b.queue_info.slot_BOT", prefix);
@@ -129,6 +130,32 @@ mod tests {
         assert_eq!(match_player_b.queue_info.slot, 0, "[{}] match_player_b.queue_info.slot_ENDED", prefix);
     }
 
+    // just make sure rng mocked values are working
+    #[test]
+    fn test_match_rng_ok() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::DUEL);
+        // player 1
+        _mock_slot(@sys, 5);
+        tester::execute_match_make_me(@sys, OWNER(), ID(OWNER()), QueueId::Ranked, QueueMode::Fast);
+        assert_eq!(sys.store.get_match_player(OWNER()).queue_info.slot, 5);
+        // player 2
+        _mock_slot(@sys, 4);
+        tester::execute_match_make_me(@sys, OTHER(), ID(OTHER()), QueueId::Ranked, QueueMode::Fast);
+        assert_eq!(sys.store.get_match_player(OTHER()).queue_info.slot, 4);
+        // player 3
+        _mock_slot(@sys, 3);
+        tester::execute_match_make_me(@sys, BUMMER(), ID(BUMMER()), QueueId::Ranked, QueueMode::Fast);
+        assert_eq!(sys.store.get_match_player(BUMMER()).queue_info.slot, 3);
+        // player 2
+        _mock_slot(@sys, 2);
+        tester::execute_match_make_me(@sys, SPENDER(), ID(SPENDER()), QueueId::Ranked, QueueMode::Fast);
+        assert_eq!(sys.store.get_match_player(SPENDER()).queue_info.slot, 2);
+        // player 1
+        _mock_slot(@sys, 1);
+        tester::execute_match_make_me(@sys, TREASURY(), ID(TREASURY()), QueueId::Ranked, QueueMode::Fast);
+        assert_eq!(sys.store.get_match_player(TREASURY()).queue_info.slot, 1);
+    }
+
 
     //------------------------------
     // duel flow
@@ -157,32 +184,6 @@ mod tests {
         tester::execute_match_make_me(@sys, OWNER(), ID(OWNER()), QueueId::Ranked, QueueMode::Undefined);
     }
     
-    // just make sure rng mocked values are working
-    #[test]
-    fn test_match_rng_ok() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::DUEL);
-        // player 1
-        _mock_slot(@sys, 5);
-        tester::execute_match_make_me(@sys, OWNER(), ID(OWNER()), QueueId::Ranked, QueueMode::Fast);
-        assert_eq!(sys.store.get_match_player(OWNER()).queue_info.slot, 5);
-        // player 2
-        _mock_slot(@sys, 4);
-        tester::execute_match_make_me(@sys, OTHER(), ID(OTHER()), QueueId::Ranked, QueueMode::Fast);
-        assert_eq!(sys.store.get_match_player(OTHER()).queue_info.slot, 4);
-        // player 3
-        _mock_slot(@sys, 3);
-        tester::execute_match_make_me(@sys, BUMMER(), ID(BUMMER()), QueueId::Ranked, QueueMode::Fast);
-        assert_eq!(sys.store.get_match_player(BUMMER()).queue_info.slot, 3);
-        // player 2
-        _mock_slot(@sys, 2);
-        tester::execute_match_make_me(@sys, SPENDER(), ID(SPENDER()), QueueId::Ranked, QueueMode::Fast);
-        assert_eq!(sys.store.get_match_player(SPENDER()).queue_info.slot, 2);
-        // player 1
-        _mock_slot(@sys, 1);
-        tester::execute_match_make_me(@sys, TREASURY(), ID(TREASURY()), QueueId::Ranked, QueueMode::Fast);
-        assert_eq!(sys.store.get_match_player(TREASURY()).queue_info.slot, 1);
-    }
-    
     #[test]
     fn test_matchmaker_ranked_ok() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
@@ -192,19 +193,18 @@ mod tests {
         let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
         let ID_B: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
         let queue_id = QueueId::Ranked;
-        let queue_mode = QueueMode::Fast;
         //
         // matchmake player A
         _mock_slot(@sys, 5);
-        let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, queue_mode);
-        _assert_match_queue(@sys, queue_id, [A].span(), "match_A");
+        let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, QueueMode::Fast);
         assert_eq!(duel_id, 0, "duel_id_A");
+        _assert_match_queue(@sys, queue_id, [A].span(), "match_A");
         //
-        // matchmake player B
-        let duel_id: u128 = tester::execute_match_make_me(@sys, B, ID_B, queue_id, queue_mode);
-        _assert_match_queue(@sys, queue_id, [].span(), "match_B");
+        // matchmake player B > MATCH!
+        let duel_id: u128 = tester::execute_match_make_me(@sys, B, ID_B, queue_id, QueueMode::Fast);
         assert_eq!(duel_id, 1, "duel_id_B");
-        _assert_matchmaking_duel_started(@sys, duel_id, queue_id, queue_mode, B, ID_B, A, ID_A, "execute_match_make_me");
+        _assert_match_queue(@sys, queue_id, [].span(), "match_B");
+        _assert_matchmaking_duel_started(@sys, duel_id, queue_id, B, ID_B, A, ID_A, "match_made");
         //
         // duel...
         _finish_duel(@sys, duel_id, 1, "finished");
@@ -221,19 +221,18 @@ mod tests {
         let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
         let ID_B: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
         let queue_id = QueueId::Unranked;
-        let queue_mode = QueueMode::Fast;
         //
         // matchmake player A
         _mock_slot(@sys, 5);
-        let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, queue_mode);
-        _assert_match_queue(@sys, queue_id, [A].span(), "match_A");
+        let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, QueueMode::Fast);
         assert_eq!(duel_id, 0, "duel_id_A");
+        _assert_match_queue(@sys, queue_id, [A].span(), "match_A");
         //
-        // matchmake player B
-        let duel_id: u128 = tester::execute_match_make_me(@sys, B, ID_B, queue_id, queue_mode);
-        _assert_match_queue(@sys, queue_id, [].span(), "match_B");
+        // matchmake player B > MATCH!
+        let duel_id: u128 = tester::execute_match_make_me(@sys, B, ID_B, queue_id, QueueMode::Fast);
         assert_eq!(duel_id, 1, "duel_id_B");
-        _assert_matchmaking_duel_started(@sys, duel_id, queue_id, queue_mode, B, ID_B, A, ID_A, "execute_match_make_me");
+        _assert_match_queue(@sys, queue_id, [].span(), "match_B");
+        _assert_matchmaking_duel_started(@sys, duel_id, queue_id, B, ID_B, A, ID_A, "match_made");
         //
         // duel...
         _finish_duel(@sys, duel_id, 1, "finished");
@@ -242,7 +241,7 @@ mod tests {
     }
 
     #[test]
-    fn test_matchmaker_slot_skip() {
+    fn test_matchmaker_slot_skip_low_slot() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
@@ -252,26 +251,25 @@ mod tests {
         let ID_B: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
         let ID_C: u128 = *tester::execute_claim_starter_pack(@sys, C)[0];
         let queue_id = QueueId::Unranked;
-        let queue_mode = QueueMode::Fast;
         //
         // matchmake player A
         _mock_slot(@sys, 5);
-        let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, queue_mode);
-        _assert_match_queue(@sys, queue_id, [A].span(), "match_A");
+        let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, QueueMode::Fast);
         assert_eq!(duel_id, 0, "duel_id_A");
+        _assert_match_queue(@sys, queue_id, [A].span(), "match_A");
         //
-        // matchmake player B (not match for low slot)
+        // matchmake player B > NO MATCH (lower slot)
         _mock_slot(@sys, 1);
-        let duel_id: u128 = tester::execute_match_make_me(@sys, B, ID_B, queue_id, queue_mode);
-        _assert_match_queue(@sys, queue_id, [A, B].span(), "match_B");
+        let duel_id: u128 = tester::execute_match_make_me(@sys, B, ID_B, queue_id, QueueMode::Fast);
         assert_eq!(duel_id, 0, "duel_id_B");
+        _assert_match_queue(@sys, queue_id, [A, B].span(), "match_B");
         //
-        // matchmake player C -- MATCH!
+        // matchmake player C > MATCH!
         _mock_slot(@sys, 5);
-        let duel_id: u128 = tester::execute_match_make_me(@sys, C, ID_C, queue_id, queue_mode);
-        _assert_match_queue(@sys, queue_id, [B].span(), "match_C");
+        let duel_id: u128 = tester::execute_match_make_me(@sys, C, ID_C, queue_id, QueueMode::Fast);
         assert_eq!(duel_id, 1, "duel_id_C");
-        _assert_matchmaking_duel_started(@sys, duel_id, queue_id, queue_mode, C, ID_C, A, ID_A, "execute_match_make_me");
+        _assert_match_queue(@sys, queue_id, [B].span(), "match_C");
+        _assert_matchmaking_duel_started(@sys, duel_id, queue_id, C, ID_C, A, ID_A, "match_made");
         //
         // duel...
         _finish_duel(@sys, duel_id, 1, "finished");
@@ -280,35 +278,175 @@ mod tests {
     }
 
     #[test]
-    fn test_matchmaker_ping_expire_imp() {
+    #[should_panic(expected: ('MATCHMAKER: Wrong queue', 'ENTRYPOINT_FAILED'))]
+    fn test_matchmaker_wrong_queue() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
+        let A: ContractAddress = OWNER();
+        tester::fund_duelists_pool(@sys, 1);
+        let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
+        // matchmake player A
+        tester::execute_match_make_me(@sys, A, ID_A, QueueId::Unranked, QueueMode::Fast);
+        // ping wrong queue...
+        tester::execute_match_make_me(@sys, A, ID_A, QueueId::Ranked, QueueMode::Fast);
+    }
+
+
+    //--------------------------------
+    // timeouts
+    //
+
+    #[test]
+    fn test_matchmaker_fast_timeout_ping_match() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        tester::fund_duelists_pool(@sys, 3);
+        let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
+        let ID_B: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
+        let queue_id = QueueId::Ranked;
+        //
+        // matchmake player A
+        _mock_slot(@sys, 5);
+        let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, QueueMode::Fast);
+        assert_eq!(duel_id, 0, "duel_id_A");
+        assert_eq!(sys.store.get_match_player(A).queue_info.expired, false, "expired_A");
+        _assert_match_queue(@sys, queue_id, [A].span(), "match_A");
+        // expire...
+        tester::elapse_block_timestamp(MATCHMAKER::QUEUE_TIMEOUT_FAST);
+        //
+        // matchmake player B > NO MATCH (lower slot)
+        let duel_id: u128 = tester::execute_match_make_me(@sys, B, ID_B, queue_id, QueueMode::Fast);
+        assert_eq!(duel_id, 0, "duel_id_B");
+        assert_eq!(sys.store.get_match_player(B).queue_info.expired, false, "expired_B");
+        // A was kicked out of queue...
+        assert_eq!(sys.store.get_match_player(A).queue_info.expired, true, "expired_A");
+        _assert_match_queue(@sys, queue_id, [B].span(), "match_B");
+        //
+        // matchmake player A > MATCH!
+        let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, QueueMode::Fast);
+        assert_eq!(duel_id, 1, "duel_id_matched");
+        _assert_match_queue(@sys, queue_id, [].span(), "matched");
+        _assert_matchmaking_duel_started(@sys, duel_id, queue_id, A, ID_A, B, ID_B, "match_made");
+    }
+
+
+    #[test]
+    fn test_matchmaker_fast_slow_switch_match() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        tester::fund_duelists_pool(@sys, 3);
+        let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
+        let ID_B: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
+        let queue_id = QueueId::Ranked;
+        //
+        // matchmake player A
+        _mock_slot(@sys, 5);
+        let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, QueueMode::Fast);
+        assert_eq!(duel_id, 0, "duel_id_A");
+        assert_eq!(sys.store.get_match_player(A).queue_info.queue_mode, QueueMode::Fast, "QueueMode_A");
+        _assert_match_queue(@sys, queue_id, [A].span(), "match_A");
+        //
+        // matchmake player B > NO MATCH (different mode)
+        let duel_id: u128 = tester::execute_match_make_me(@sys, B, ID_B, queue_id, QueueMode::Slow);
+        assert_eq!(duel_id, 0, "duel_id_B");
+        assert_eq!(sys.store.get_match_player(B).queue_info.queue_mode, QueueMode::Slow, "QueueMode_B");
+        _assert_match_queue(@sys, queue_id, [A, B].span(), "match_B");
+        //
+        // switched to FAST > match!
+        let duel_id: u128 = tester::execute_match_make_me(@sys, B, ID_B, queue_id, QueueMode::Fast);
+        assert_eq!(duel_id, 1, "duel_id_matched");
+        assert_eq!(sys.store.get_match_player(B).queue_info.queue_mode, QueueMode::Fast, "QueueMode_B");
+        _assert_match_queue(@sys, queue_id, [].span(), "matched");
+        _assert_matchmaking_duel_started(@sys, duel_id, queue_id, B, ID_B, A, ID_A, "match_made");
+        // check commit timeouts
+        let round: Round = sys.store.get_round(duel_id);
+        let timeout_a = round.moves_a.timeout;
+        let timeout_b = round.moves_b.timeout;
+        assert_eq!(timeout_a, timeout_b, "timeout_a == timeout_b");
+        assert_lt!(timeout_a, tester::get_block_timestamp() + TIMESTAMP::ONE_MINUTE * 11, "timeout_time");
+    }
+
+    #[test]
+    fn test_matchmaker_slow_fast_switch_match() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        tester::fund_duelists_pool(@sys, 3);
+        let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
+        let ID_B: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
+        let queue_id = QueueId::Ranked;
+        //
+        // matchmake player A
+        _mock_slot(@sys, 5);
+        let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, QueueMode::Slow);
+        assert_eq!(duel_id, 0, "duel_id_A");
+        assert_eq!(sys.store.get_match_player(A).queue_info.queue_mode, QueueMode::Slow, "QueueMode_A");
+        _assert_match_queue(@sys, queue_id, [A].span(), "match_A");
+        // try again... no match yet
+        tester::elapse_block_timestamp(MATCHMAKER::QUEUE_TIMEOUT_SLOW / 2);
+        let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, QueueMode::Slow);
+        assert_eq!(duel_id, 0, "duel_id_A");
+        assert_eq!(sys.store.get_match_player(A).queue_info.queue_mode, QueueMode::Slow, "QueueMode_A");
+        assert_eq!(sys.store.get_match_player(A).queue_info.expired, false, "expired_A");
+        _assert_match_queue(@sys, queue_id, [A].span(), "match_A");
+        //
+        // matchmake player B > NO MATCH (different mode)
+        let duel_id: u128 = tester::execute_match_make_me(@sys, B, ID_B, queue_id, QueueMode::Fast);
+        assert_eq!(duel_id, 0, "duel_id_B");
+        assert_eq!(sys.store.get_match_player(B).queue_info.queue_mode, QueueMode::Fast, "QueueMode_B");
+        _assert_match_queue(@sys, queue_id, [A, B].span(), "match_B");
+        // can expire...
+        tester::elapse_block_timestamp(MATCHMAKER::QUEUE_TIMEOUT_FAST + 1);
+        //
+        // switched to FAST > match!
+        let duel_id: u128 = tester::execute_match_make_me(@sys, B, ID_B, queue_id, QueueMode::Slow);
+        assert_eq!(duel_id, 1, "duel_id_matched");
+        assert_eq!(sys.store.get_match_player(B).queue_info.queue_mode, QueueMode::Slow, "QueueMode_B");
+        _assert_match_queue(@sys, queue_id, [].span(), "matched");
+        _assert_matchmaking_duel_started(@sys, duel_id, queue_id, B, ID_B, A, ID_A, "match_made");
+        // check commit timeouts
+        let round: Round = sys.store.get_round(duel_id);
+        let timeout_a = round.moves_a.timeout;
+        let timeout_b = round.moves_b.timeout;
+        assert_eq!(timeout_a, timeout_b, "timeout_a == timeout_b");
+        assert_gt!(timeout_a, tester::get_block_timestamp() + TIMESTAMP::ONE_HOUR * 23, "timeout_time");
+    }
+
+
+    //--------------------------------
+    // bot_player IMP
+    //
+
+    #[test]
+    fn test_matchmaker_ping_expire_bot_player() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER);
         tester::fund_duelists_pool(@sys, 2);
         let A: ContractAddress = OWNER();
         let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
         let queue_id = QueueId::Unranked;
-        let queue_mode = QueueMode::Fast;
         //
         // matchmake player A
         _mock_slot(@sys, 5);
-        let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, queue_mode);
-        _assert_match_queue(@sys, queue_id, [A].span(), "match_A");
+        let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, QueueMode::Fast);
         assert_eq!(duel_id, 0, "match_A");
+        _assert_match_queue(@sys, queue_id, [A].span(), "match_A");
         //
         // ping once...
-        tester::elapse_block_timestamp(30);
-        let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, queue_mode);
+        tester::elapse_block_timestamp(MATCHMAKER::QUEUE_TIMEOUT_FAST / 2);
+        let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, QueueMode::Fast);
         assert_eq!(duel_id, 0, "ping_1");
         //
         // ping once...
-        tester::elapse_block_timestamp(20);
-        let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, queue_mode);
+        tester::elapse_block_timestamp(MATCHMAKER::QUEUE_TIMEOUT_FAST / 4);
+        let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, QueueMode::Fast);
         assert_eq!(duel_id, 0, "ping_2");
         //
-        // ping to match...
-        tester::elapse_block_timestamp(10);
-        let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, queue_mode);
+        // ping to match a bot...
+        tester::elapse_block_timestamp(MATCHMAKER::QUEUE_TIMEOUT_FAST / 4);
+        let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, QueueMode::Fast);
         assert_eq!(duel_id, 1, "ping_match");
-        _assert_matchmaking_duel_started(@sys, duel_id, queue_id, queue_mode, A, ID_A, sys.bot_player.contract_address, 0, "execute_match_make_me");
+        _assert_matchmaking_duel_started(@sys, duel_id, queue_id, A, ID_A, sys.bot_player.contract_address, 0, "match_made");
         //
         // duel...
         _finish_duel(@sys, duel_id, 1, "finished");
@@ -316,8 +454,45 @@ mod tests {
         tester::assert_unranked_duel_results(@sys, duel_id, "finished");
     }
 
-
-    // TEST: fast/slow on ranked/unranked
+    #[test]
+    fn test_matchmaker_bot_player_multiple_matches() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER);
+        tester::fund_duelists_pool(@sys, 3);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
+        let ID_B: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
+        let queue_id = QueueId::Unranked;
+        //
+        // matchmake player A
+        let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, QueueMode::Fast);
+        assert_eq!(duel_id, 0, "match_A");
+        _assert_match_queue(@sys, queue_id, [A].span(), "match_A");
+        //
+        // ping to match a bot...
+        tester::elapse_block_timestamp(MATCHMAKER::QUEUE_TIMEOUT_FAST + 1);
+        let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, QueueMode::Fast);
+        assert_eq!(duel_id, 1, "ping_match");
+        _assert_match_queue(@sys, queue_id, [].span(), "matched_A");
+        _assert_matchmaking_duel_started(@sys, duel_id, queue_id, A, ID_A, sys.bot_player.contract_address, 0, "match_made");
+        let ch_1: ChallengeValue = sys.store.get_challenge_value(duel_id);
+        //
+        // matchmake player B
+        let duel_id: u128 = tester::execute_match_make_me(@sys, B, ID_B, queue_id, QueueMode::Fast);
+        assert_eq!(duel_id, 0, "match_B");
+        _assert_match_queue(@sys, queue_id, [B].span(), "match_B");
+        //
+        // ping to match a bot...
+        tester::elapse_block_timestamp(MATCHMAKER::QUEUE_TIMEOUT_FAST + 1);
+        let duel_id: u128 = tester::execute_match_make_me(@sys, B, ID_B, queue_id, QueueMode::Fast);
+        assert_eq!(duel_id, 2, "ping_match");
+        _assert_match_queue(@sys, queue_id, [].span(), "matched_B");
+        _assert_matchmaking_duel_started(@sys, duel_id, queue_id, B, ID_B, sys.bot_player.contract_address, 0, "match_made");
+        let ch_2: ChallengeValue = sys.store.get_challenge_value(duel_id);
+        // different duelist bots
+        assert_eq!(ch_1.address_b, ch_2.address_b, "address_b");
+        assert_ne!(ch_1.duelist_id_a, ch_2.duelist_id_b, "duelist_id_a");
+    }
 
 
 
