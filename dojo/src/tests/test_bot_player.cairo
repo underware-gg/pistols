@@ -373,7 +373,6 @@ pub mod tests {
         assert_eq!(sys.duelists.life_count(bot_id_3), 0, "life_count after duel 3");
         assert!(!sys.duelists.is_alive(bot_id_3), "dead after duel 3");
         _assert_bot_duelist(@sys, bot_id_3, "duel_3", Option::Some(BotKey::Pro), 0);
-println!("____9");
         // bot was transferred to player
         assert_eq!(sys.duelists.owner_of(bot_id_3.into()), OWNER(), "owner_of(bot_id) > player");
         // pools and balances moves
@@ -385,9 +384,7 @@ println!("____9");
         assert_gt!(treasury_dead, treasury_init, "treasury_dead");
         //
         // new duelist...
-println!("____10");
         let bot_id_4: u128 = _duel_bot_crit_a(@sys, OWNER(), TOKEN_ID_1, 1, "duel_4").duelist_id_b;
-println!("____11");
         _assert_bot_duelist(@sys, bot_id_4, "duel_4", Option::Some(BotKey::Pro), 1);
         assert_ne!(bot_id_4, bot_id_1, "new duelist minted");
         assert_eq!(sys.duelists.life_count(bot_id_4), 2, "NEW life_count after duel 1");
