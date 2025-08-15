@@ -135,46 +135,63 @@ pub mod matchmaker {
         ) -> u128 {
             let mut matched_player_address: Option<ContractAddress> = Option::None;
             let mut expired_players: Array<ContractAddress> = array![];
-            let mut player_is_in_queue: bool = false;
+            let player_position: Option<usize> = queue.player_position(@matching_player.player_address);
 
             // update ping timestamp
             let timestamp: u64 = starknet::get_block_timestamp();
             matching_player.queue_info.timestamp_ping = timestamp;
-// println!("__match...:{}/{}/{}", matching_player.player_address, matching_player.queue_info.slot, matching_player.queue_info.queue_mode);
 
             // queue is not empty, try to match...
             if (queue.players.len().is_non_zero()) {
                 // get all players in queue
                 let players_info: Span<QueueInfo> = store.get_match_players_info(queue.players.span()).span();
 
-                let mut candidates: Array<ContractAddress> = array![];
-                let player_slot: u8 = matching_player.queue_info.slot + (players_info.len() & 0xff).try_into().unwrap();
+                let player_slot: u8 = matching_player.queue_info.slot + 
+                    (match player_position {
+                        // not in the queue yet
+                        Option::None => {(players_info.len())},
+                        // in the queue, compose slot with its position
+                        Option::Some(position) => {(position)},
+                    }).try_into().unwrap();
 
+                // find candidates in queue
+                let mut candidates: Array<ContractAddress> = array![];
                 let mut i: usize = 0;
                 while (i < players_info.len()) {
                     let candidate_address: ContractAddress = *queue.players[i];
-                    if (candidate_address == matching_player.player_address) {
-                        // player being matched
-                        player_is_in_queue = true;
-                    } else {
-                        let mut queue_info: QueueInfo = *players_info[i];
-// println!("_____slot:{}/{} slot {}<{}", candidate_address, queue_info.queue_mode, queue_info.slot, player_slot);
+                    if (candidate_address != matching_player.player_address) {
+                        // get candidate queue info
+                        let mut candidate_info: QueueInfo = *players_info[i];
                         // expired player, need to be removed...
-                        if (queue_info.has_expired(timestamp)) {
-// println!("_____expired:{}", candidate_address);
+                        if (candidate_info.has_expired(timestamp)) {
                             // expire player
-                            queue_info.expired = true;
-                            store.set_match_player_queue_info(candidate_address, queue_info);
+                            candidate_info.expired = true;
+                            store.set_match_player_queue_info(candidate_address, candidate_info);
                             // mark for removal
                             expired_players.append(candidate_address);
                         }
-                        // player is within slot AND same speed...
-                        else if (
-                            queue_info.slot < player_slot &&
-                            queue_info.queue_mode == matching_player.queue_info.queue_mode
-                        ) {
-// println!("___candidate:{}", candidate_address);
-                            candidates.append(candidate_address);
+                        // player has the same speed...
+                        else if (candidate_info.queue_mode == matching_player.queue_info.queue_mode) {
+                            // compare slots...
+                            match player_position {
+                                // player not in the queue yet
+                                Option::None => {
+                                    if (candidate_info.slot < player_slot) {
+                                        candidates.append(candidate_address);
+                                    }
+                                },
+                                // player already in the queue, running again....
+                                Option::Some(position) => {
+                                    if (
+                                        // candidate is BEFORE the player
+                                        (i < position && candidate_info.slot < player_slot) ||
+                                        // candidate is AFTER the player
+                                        (i > position && player_slot < (candidate_info.slot + i.try_into().unwrap()))
+                                    ) {
+                                        candidates.append(candidate_address);
+                                    }
+                                }, // in the queue, compose slot with its position
+                            };
                         }
                     }
                     i += 1;
@@ -234,12 +251,12 @@ pub mod matchmaker {
             if (duel_id.is_non_zero()) {
                 matching_player.enter_duel(duel_id);
                 // remove from queue...
-                if (player_is_in_queue) {
+                if (player_position.is_some()) {
                     queue.remove_player(@matching_player.player_address);
                 }
             }
             // player is new, add to queue...
-            else if (!player_is_in_queue) {
+            else if (player_position.is_none()) {
                 queue.append_player(matching_player.player_address);
             }
 
