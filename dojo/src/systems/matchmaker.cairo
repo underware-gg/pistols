@@ -40,6 +40,7 @@ pub mod matchmaker {
     pub mod Errors {
         pub const INVALID_QUEUE: felt252        = 'MATCHMAKER: Invalid queue';
         pub const INVALID_MODE: felt252         = 'MATCHMAKER: Invalid mode';
+        pub const WRONG_QUEUE: felt252          = 'MATCHMAKER: Wrong queue';
     }
 
     fn dojo_init(ref self: ContractState) {
@@ -59,7 +60,7 @@ pub mod matchmaker {
         fn match_make_me(ref self: ContractState,
             duelist_id: u128,
             queue_id: QueueId,      // only used to enter queue, not to match
-            queue_mode: QueueMode,  // only used to enter queue, not to match
+            queue_mode: QueueMode,  // only used to enter queue, can change to to match
         ) -> u128 {
             let mut store: Store = StoreTrait::new(self.world_default());
 
@@ -72,12 +73,15 @@ pub mod matchmaker {
                 return (matching_player.duel_id);
             }
 
+            // validate mode
+            assert(queue_mode != QueueMode::Undefined, Errors::INVALID_MODE);
+            
+            // get the queue
             let mut queue: MatchQueue =
-                // new player (not in queue)
+                // new player... (not in queue)
                 if (matching_player.queue_info.slot.is_zero()) {
-                    // validate input and get the queue
+                    // get queue and assign slot
                     assert(queue_id != QueueId::Undefined, Errors::INVALID_QUEUE);
-                    assert(queue_mode != QueueMode::Undefined, Errors::INVALID_MODE);
                     let mut queue: MatchQueue = store.get_match_queue(queue_id);
                     // randomize slot
                     let seed: felt252 = store.vrf_dispatcher().consume_random(Source::Nonce(caller));
@@ -91,6 +95,10 @@ pub mod matchmaker {
                     );
                     (queue)
                 } else {
+                    // already in queue, must ping to same queue...
+                    assert(queue_id == matching_player.queue_id, Errors::WRONG_QUEUE);
+                    // update queue mode (players can change)
+                    matching_player.queue_info.queue_mode = queue_mode;
                     // get the player's queue, ignore input
                     (store.get_match_queue(matching_player.queue_id))
                 };
@@ -132,6 +140,7 @@ pub mod matchmaker {
             // update ping timestamp
             let timestamp: u64 = starknet::get_block_timestamp();
             matching_player.queue_info.timestamp_ping = timestamp;
+// println!("__match...:{}/{}/{}", matching_player.player_address, matching_player.queue_info.slot, matching_player.queue_info.queue_mode);
 
             // queue is not empty, try to match...
             if (queue.players.len().is_non_zero()) {
@@ -149,17 +158,22 @@ pub mod matchmaker {
                         player_is_in_queue = true;
                     } else {
                         let mut queue_info: QueueInfo = *players_info[i];
-// println!("____slot:{}<{}", queue_info.slot, player_slot);
+// println!("_____slot:{}/{} slot {}<{}", candidate_address, queue_info.queue_mode, queue_info.slot, player_slot);
                         // expired player, need to be removed...
                         if (queue_info.has_expired(timestamp)) {
+// println!("_____expired:{}", candidate_address);
                             // expire player
                             queue_info.expired = true;
                             store.set_match_player_queue_info(candidate_address, queue_info);
                             // mark for removal
                             expired_players.append(candidate_address);
                         }
-                        // player is within slot...
-                        else if (queue_info.slot < player_slot) {
+                        // player is within slot AND same speed...
+                        else if (
+                            queue_info.slot < player_slot &&
+                            queue_info.queue_mode == matching_player.queue_info.queue_mode
+                        ) {
+// println!("___candidate:{}", candidate_address);
                             candidates.append(candidate_address);
                         }
                     }
@@ -196,7 +210,7 @@ pub mod matchmaker {
                     (duel_id)
                 },
                 Option::None => {
-                    // no tmatching player... if expired get an Imp!
+                    // no matching player... if expired get an Imp!
                     (if (
                         matching_player.queue_info.expired || // was expired during other players matching
                         matching_player.queue_info.has_expired(timestamp) // in queue, and expired

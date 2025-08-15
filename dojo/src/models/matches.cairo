@@ -2,7 +2,12 @@ use starknet::{ContractAddress};
 
 // constants
 pub mod MATCHMAKER {
+    use pistols::types::timestamp::{TIMESTAMP};
     pub const INITIAL_SLOT_SIZE: u8 = 5;
+    pub const QUEUE_TIMEOUT_FAST: u64 = (TIMESTAMP::ONE_MINUTE);
+    pub const QUEUE_TIMEOUT_SLOW: u64 = (TIMESTAMP::ONE_DAY);
+    pub const COMMIT_TIMEOUT_FAST: u64 = (TIMESTAMP::ONE_MINUTE * 10);
+    pub const COMMIT_TIMEOUT_SLOW: u64 = (TIMESTAMP::ONE_DAY);
 }
 
 
@@ -82,7 +87,6 @@ use pistols::libs::store::{Store};
 use pistols::utils::arrays::{ArrayUtilsTrait};
 use pistols::utils::misc::{FeltToLossy};
 use pistols::types::premise::{Premise};
-use pistols::types::timestamp::{TIMESTAMP};
 
 #[generate_trait]
 pub impl QueueIdImpl of QueueIdTrait {
@@ -113,9 +117,9 @@ pub impl QueueIdImpl of QueueIdTrait {
 pub impl QueueModeImpl of QueueModeTrait {
     fn get_commit_timeout(self: @QueueMode) -> u64 {
         match self {
-            QueueMode::Fast => (TIMESTAMP::ONE_MINUTE * 10),
+            QueueMode::Fast => (MATCHMAKER::COMMIT_TIMEOUT_FAST),
             QueueMode::Slow |
-            QueueMode::Undefined => (TIMESTAMP::ONE_DAY),
+            QueueMode::Undefined => (MATCHMAKER::COMMIT_TIMEOUT_SLOW),
         }
     }
 }
@@ -172,8 +176,8 @@ pub impl QueueInfoImpl of QueueInfoTrait {
     fn has_expired(self: @QueueInfo, current_timestamp: u64) -> bool {
         let elapsed_seconds: u64 = (current_timestamp - *self.timestamp_enter);
         (match self.queue_mode {
-            QueueMode::Fast => {(elapsed_seconds > 60)},
-            QueueMode::Slow => {(elapsed_seconds > TIMESTAMP::ONE_DAY)},
+            QueueMode::Fast => {(elapsed_seconds > MATCHMAKER::QUEUE_TIMEOUT_FAST)},
+            QueueMode::Slow => {(elapsed_seconds > MATCHMAKER::QUEUE_TIMEOUT_SLOW)},
             QueueMode::Undefined => {(false)},
         })
     }
@@ -193,7 +197,6 @@ impl QueueIdIntoByteArray of core::traits::Into<QueueId, ByteArray> {
         }
     }
 }
-#[cfg(test)]
 impl QueueModeIntoByteArray of core::traits::Into<QueueMode, ByteArray> {
     fn into(self: QueueMode) -> ByteArray {
         match self {
@@ -212,7 +215,13 @@ pub impl QueueIdDebug of core::fmt::Debug<QueueId> {
         Result::Ok(())
     }
 }
-// for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
+pub impl QueueModeDisplay of core::fmt::Display<QueueMode> {
+    fn fmt(self: @QueueMode, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        let result: ByteArray = (*self).into();
+        f.buffer.append(@result);
+        Result::Ok(())
+    }
+}
 #[cfg(test)]
 pub impl QueueModeDebug of core::fmt::Debug<QueueMode> {
     fn fmt(self: @QueueMode, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
