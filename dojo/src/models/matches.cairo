@@ -37,6 +37,7 @@ pub struct MatchPlayer {
     #[key]
     pub player_address: ContractAddress,
     //-----------------------
+    pub queue_id: QueueId,
     pub queue_info: QueueInfo,
     // player assignments
     pub duelist_id: u128,
@@ -74,12 +75,50 @@ pub struct MatchCounter {
 //----------------------------------
 // Traits
 //
-use pistols::libs::store::{Store};
-use pistols::interfaces::dns::{DnsTrait};
+use pistols::models::challenge::{DuelType};
 use pistols::systems::rng::{RngWrap, RngWrapTrait, Dice, DiceTrait};
-use pistols::types::timestamp::{TIMESTAMP};
+use pistols::interfaces::dns::{DnsTrait};
+use pistols::libs::store::{Store};
 use pistols::utils::arrays::{ArrayUtilsTrait};
 use pistols::utils::misc::{FeltToLossy};
+use pistols::types::premise::{Premise};
+use pistols::types::timestamp::{TIMESTAMP};
+
+#[generate_trait]
+pub impl QueueIdImpl of QueueIdTrait {
+    fn get_duel_type(self: @QueueId) -> DuelType {
+        match self {
+            QueueId::Undefined => DuelType::Undefined,
+            QueueId::Ranked => DuelType::MatchMake,
+            QueueId::Unranked => DuelType::Unranked,
+        }
+    }
+    fn get_lives_staked(self: @QueueId) -> u8 {
+        match self {
+            QueueId::Undefined => 0,
+            QueueId::Ranked => 1,
+            QueueId::Unranked => 1,
+        }
+    }
+    fn get_premise(self: @QueueId) -> Premise {
+        match self {
+            QueueId::Undefined => Premise::Undefined,
+            QueueId::Ranked => Premise::Honour,
+            QueueId::Unranked => Premise::Honour,
+        }
+    }
+}
+
+#[generate_trait]
+pub impl QueueModeImpl of QueueModeTrait {
+    fn get_commit_timeout(self: @QueueMode) -> u64 {
+        match self {
+            QueueMode::Fast => (TIMESTAMP::ONE_MINUTE * 10),
+            QueueMode::Slow |
+            QueueMode::Undefined => (TIMESTAMP::ONE_DAY),
+        }
+    }
+}
 
 #[generate_trait]
 pub impl MatchQueueImpl of MatchQueueTrait {
@@ -100,22 +139,26 @@ pub impl MatchQueueImpl of MatchQueueTrait {
     }
     #[inline(always)]
     fn remove_player(ref self: MatchQueue, player_address: @ContractAddress) {
-        self.players.remove(player_address);
+        self.players = self.players.remove(player_address);
     }
 }
 
 #[generate_trait]
 pub impl MatchPlayerImpl of MatchPlayerTrait {
-    fn enter_queue(ref self: MatchPlayer, duelist_id: u128, queue_mode: QueueMode, slot: u8) {
+    fn enter_queue(ref self: MatchPlayer, queue_id: QueueId, queue_mode: QueueMode, slot: u8, duelist_id: u128) {
         let timestamp: u64 = starknet::get_block_timestamp();
-        self.duelist_id = duelist_id;
-        self.duel_id = 0;
-        self.queue_info = QueueInfo{
-            queue_mode,
-            slot,
-            timestamp_enter: timestamp,
-            timestamp_ping: timestamp,
-            expired: false,
+        self = MatchPlayer {
+            player_address: self.player_address,
+            queue_id,
+            duelist_id,
+            duel_id: 0,
+            queue_info: QueueInfo{
+                queue_mode,
+                slot,
+                timestamp_enter: timestamp,
+                timestamp_ping: timestamp,
+                expired: false,
+            }
         };
     }
     fn enter_duel(ref self: MatchPlayer, duel_id: u128) {
@@ -140,6 +183,17 @@ pub impl QueueInfoImpl of QueueInfoTrait {
 //---------------------------
 // Converters
 //
+#[cfg(test)]
+impl QueueIdIntoByteArray of core::traits::Into<QueueId, ByteArray> {
+    fn into(self: QueueId) -> ByteArray {
+        match self {
+            QueueId::Undefined      =>  "Undefined",
+            QueueId::Ranked         =>  "Ranked",
+            QueueId::Unranked       =>  "Unranked",
+        }
+    }
+}
+#[cfg(test)]
 impl QueueModeIntoByteArray of core::traits::Into<QueueMode, ByteArray> {
     fn into(self: QueueMode) -> ByteArray {
         match self {
@@ -150,6 +204,16 @@ impl QueueModeIntoByteArray of core::traits::Into<QueueMode, ByteArray> {
     }
 }
 // for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
+#[cfg(test)]
+pub impl QueueIdDebug of core::fmt::Debug<QueueId> {
+    fn fmt(self: @QueueId, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        let result: ByteArray = (*self).into();
+        f.buffer.append(@result);
+        Result::Ok(())
+    }
+}
+// for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
+#[cfg(test)]
 pub impl QueueModeDebug of core::fmt::Debug<QueueMode> {
     fn fmt(self: @QueueMode, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
         let result: ByteArray = (*self).into();
@@ -167,8 +231,8 @@ pub impl QueueModeDebug of core::fmt::Debug<QueueMode> {
 #[cfg(test)]
 mod unit {
     use super::{
-        MatchPlayer,
-        QueueInfo, QueueMode,
+        MatchPlayer, QueueInfo,
+        QueueId, QueueMode,
     };
     use pistols::tests::tester::{tester,
         tester::{
@@ -183,6 +247,9 @@ mod unit {
         // create players
         let player_1: MatchPlayer = MatchPlayer {
             player_address: OWNER(),
+            queue_id: QueueId::Ranked,
+            duelist_id: 1,
+            duel_id: 1,
             queue_info: QueueInfo {
                 queue_mode: QueueMode::Slow,
                 slot: 11,
@@ -190,11 +257,12 @@ mod unit {
                 timestamp_ping: 1300,
                 expired: false,
             },
-            duelist_id: 1,
-            duel_id: 1,
         };
         let player_2: MatchPlayer = MatchPlayer {
             player_address: OTHER(),
+            queue_id: QueueId::Ranked,
+            duelist_id: 2,
+            duel_id: 2,
             queue_info: QueueInfo {
                 queue_mode: QueueMode::Fast,
                 slot: 101,
@@ -202,8 +270,6 @@ mod unit {
                 timestamp_ping: 5100,
                 expired: true,
             },
-            duelist_id: 2,
-            duel_id: 2,
         };
         // store players
         tester::set_MatchPlayer(ref sys.world, @player_1);

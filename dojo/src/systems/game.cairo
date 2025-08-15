@@ -90,7 +90,7 @@ pub mod game {
         player::{PlayerTrait, PlayerDelegation, PlayerDelegationTrait},
         challenge::{
             Challenge, ChallengeTrait,
-            DuelType, DuelTypeTrait,
+            DuelType,
             Round, RoundTrait,
             MovesTrait,
         },
@@ -230,17 +230,16 @@ pub mod game {
 
             // move to reveal phase?
             let timestamp: u64 = starknet::get_block_timestamp();
-            let rules: Rules = challenge.duel_type.get_rules(@store);
             if (round.moves_a.has_comitted() && round.moves_b.has_comitted()) {
                 round.state = RoundState::Reveal;
-                round.set_reveal_timeout(rules, timestamp);
+                round.set_reveal_timeout(challenge.duel_type, timestamp);
                 // call for reveal
                 store.emit_challenge_action(@challenge, 1, ChallengeAction::Reveal);
                 store.emit_challenge_action(@challenge, 2, ChallengeAction::Reveal);
             } else {
                 // reset timeout for other player (not if Awaiting, under Challenge timeouts)
                 if (challenge.state == ChallengeState::InProgress) {
-                    round.set_commit_timeout(rules, timestamp);
+                    round.set_commit_timeout(challenge.duel_type, timestamp, Option::None);
                 }
                 // One duelist comitted, wait for the other...
                 if (round.moves_a.has_comitted()) {
@@ -320,8 +319,7 @@ pub mod game {
 
             // reset timeouts
             let timestamp: u64 = starknet::get_block_timestamp();
-            let rules: Rules = challenge.duel_type.get_rules(@store);
-            round.set_reveal_timeout(rules, timestamp);
+            round.set_reveal_timeout(challenge.duel_type, timestamp);
             
             // update duelist timestamps
             store.set_duelist_timestamp_active(duelist_id, timestamp);
@@ -665,6 +663,15 @@ pub mod game {
             // exit challenge
             store.exit_challenge(challenge.duelist_id_a);
             store.exit_challenge(challenge.duelist_id_b);
+            // clear matchmaker
+            match challenge.duel_type {
+                DuelType::MatchMake |
+                DuelType::Unranked => {
+                    store.delete_match_player(challenge.address_a);
+                    store.delete_match_player(challenge.address_b);
+                },
+                _ => {}
+            }
             // distributions
             if (challenge.state.is_concluded()) {
                 // deliver trophies

@@ -16,24 +16,26 @@ pub mod matchmaker {
 
     use pistols::models::{
         matches::{
-            QueueId, QueueMode,
+            QueueId, QueueIdTrait, QueueMode,
             MatchQueue, MatchQueueTrait,
             MatchPlayer, MatchPlayerTrait,
             QueueInfo, QueueInfoTrait,
         },
     };
     use pistols::types::{
-        premise::{Premise},
+        duelist_profile::{DuelistProfile, BotKey},
     };
     use pistols::interfaces::dns::{
         DnsTrait,
         IVrfProviderDispatcherTrait, Source,
         IDuelTokenProtectedDispatcherTrait,
+        IBotPlayerProtectedDispatcher, IBotPlayerProtectedDispatcherTrait,
     };
     use pistols::libs::{
         store::{Store, StoreTrait},
     };
     // use pistols::utils::address::{ZERO};
+    use pistols::utils::address::{ContractAddressDisplay};
 
     pub mod Errors {
         pub const INVALID_QUEUE: felt252        = 'MATCHMAKER: Invalid queue';
@@ -56,43 +58,50 @@ pub mod matchmaker {
 
         fn match_make_me(ref self: ContractState,
             duelist_id: u128,
-            queue_id: QueueId,
-            queue_mode: QueueMode,
+            queue_id: QueueId,      // only used to enter queue, not to match
+            queue_mode: QueueMode,  // only used to enter queue, not to match
         ) -> u128 {
-            assert(queue_id != QueueId::Undefined, Errors::INVALID_QUEUE);
-            assert(queue_mode != QueueMode::Undefined, Errors::INVALID_MODE);
-
-            let caller: ContractAddress = starknet::get_caller_address();
+            let mut store: Store = StoreTrait::new(self.world_default());
 
             // get player entry in queue
-            let mut store: Store = StoreTrait::new(self.world_default());
+            let caller: ContractAddress = starknet::get_caller_address();
             let mut matching_player: MatchPlayer = store.get_match_player(caller);
-            let mut queue: MatchQueue = store.get_match_queue(queue_id);
 
             // player is already in a duel...
             if (matching_player.duel_id.is_non_zero()) {
                 return (matching_player.duel_id);
             }
 
-            // new player (not in queue)
-            if (matching_player.queue_info.slot.is_zero()) {
-                // randomize slot
-                let seed: felt252 = store.vrf_dispatcher().consume_random(Source::Nonce(caller));
-                let slot: u8 = queue.assign_slot(@store, seed);
-                // enter queue
-                matching_player.enter_queue(
-                    duelist_id,
-                    queue_mode,
-                    slot,
-                );
-            }
+            let mut queue: MatchQueue =
+                // new player (not in queue)
+                if (matching_player.queue_info.slot.is_zero()) {
+                    // validate input and get the queue
+                    assert(queue_id != QueueId::Undefined, Errors::INVALID_QUEUE);
+                    assert(queue_mode != QueueMode::Undefined, Errors::INVALID_MODE);
+                    let mut queue: MatchQueue = store.get_match_queue(queue_id);
+                    // randomize slot
+                    let seed: felt252 = store.vrf_dispatcher().consume_random(Source::Nonce(caller));
+                    let slot: u8 = queue.assign_slot(@store, seed);
+                    // enter queue
+                    matching_player.enter_queue(
+                        queue_id,
+                        queue_mode,
+                        slot,
+                        duelist_id,
+                    );
+                    (queue)
+                } else {
+                    // get the player's queue, ignore input
+                    (store.get_match_queue(matching_player.queue_id))
+                };
 
             // match player...
-            let duel_id: u128 = self._match(
-                ref store,
-                ref matching_player,
-                ref queue,
-            );
+            let duel_id: u128 =
+                self._match(
+                    ref store,
+                    ref matching_player,
+                    ref queue,
+                );
 
             // update players
             store.set_match_queue(@queue);
@@ -172,11 +181,11 @@ pub mod matchmaker {
                     // create duel
                     let duel_id: u128 = self._create_duel(
                         @store,
+                        queue.queue_id,
                         matching_player,
                         matched_player.player_address,
                         matched_player.duelist_id,
                     );
-
                     // update matched player
                     matched_player.enter_duel(duel_id);
                     store.set_match_player(@matched_player);
@@ -192,12 +201,13 @@ pub mod matchmaker {
                         matching_player.queue_info.expired || // was expired during other players matching
                         matching_player.queue_info.has_expired(timestamp) // in queue, and expired
                     ) {
+                        let bot_player_dispatcher: IBotPlayerProtectedDispatcher = store.world.bot_player_protected_dispatcher();
                         (self._create_duel(
                             @store,
+                            queue.queue_id,
                             matching_player,
-                            store.world.bot_player_address(),
-// TODO: randomize IMP
-                            0,
+                            bot_player_dispatcher.contract_address,
+                            bot_player_dispatcher.summon_duelist(DuelistProfile::Bot(BotKey::Pro), queue.queue_id.get_lives_staked()),
                         ))
                     } else {
                         // no duel created
@@ -235,6 +245,7 @@ pub mod matchmaker {
 
         fn _create_duel(ref self: ContractState,
             store: @Store,
+            queue_id: QueueId,
             matching_player: MatchPlayer,
             opponent_address: ContractAddress,
             opponent_duelist_id: u128,
@@ -245,10 +256,8 @@ pub mod matchmaker {
                 matching_player.duelist_id,
                 opponent_address,
                 opponent_duelist_id,
-                1, // lives_staked
-                10, // expire_minutes
-                Premise::Honour, // premise
-                "", // message
+                queue_id,
+                matching_player.queue_info.queue_mode,
             );
             // return the duel created
             (duel_id)

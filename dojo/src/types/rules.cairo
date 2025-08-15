@@ -55,17 +55,11 @@ pub struct DuelistBonus {
 //
 use core::num::traits::Zero;
 use pistols::models::ring::{RingType, RingTypeTrait};
-use pistols::types::timestamp::{TIMESTAMP};
 use pistols::types::constants::{CONST, FAME::{ONE_LIFE}};
 use pistols::utils::address::{ZERO};
 
 #[generate_trait]
 pub impl RulesImpl of RulesTrait {
-    fn get_reply_timeout(self: @Rules) -> u64 {
-        (match self {
-            _ => TIMESTAMP::ONE_DAY,
-        })
-    }
     //-------------------------------
     // End-duel rewards
     //
