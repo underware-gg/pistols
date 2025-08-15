@@ -15,6 +15,7 @@ pub mod matchmaker {
     use dojo::world::{WorldStorage};
 
     use pistols::models::{
+        duelist::{DuelistTrait},
         matches::{
             QueueId, QueueIdTrait, QueueMode,
             MatchQueue, MatchQueueTrait,
@@ -29,6 +30,7 @@ pub mod matchmaker {
         DnsTrait,
         IVrfProviderDispatcherTrait, Source,
         IDuelTokenProtectedDispatcherTrait,
+        IDuelistTokenProtectedDispatcher, IDuelistTokenProtectedDispatcherTrait,
         IBotPlayerProtectedDispatcher, IBotPlayerProtectedDispatcherTrait,
     };
     use pistols::libs::{
@@ -58,7 +60,7 @@ pub mod matchmaker {
     impl MatchMakerImpl of super::IMatchMaker<ContractState> {
 
         fn match_make_me(ref self: ContractState,
-            duelist_id: u128,
+            mut duelist_id: u128,
             queue_id: QueueId,      // only used to enter queue, not to match
             queue_mode: QueueMode,  // only used to enter queue, can change to to match
         ) -> u128 {
@@ -80,9 +82,13 @@ pub mod matchmaker {
             let mut queue: MatchQueue =
                 // new player... (not in queue)
                 if (matching_player.queue_info.slot.is_zero()) {
-                    // get queue and assign slot
+                    // validate and get queue
                     assert(queue_id != QueueId::Undefined, Errors::INVALID_QUEUE);
                     let mut queue: MatchQueue = store.get_match_queue(queue_id);
+                    // Validate duelist
+                    let duelist_dispatcher: IDuelistTokenProtectedDispatcher = store.world.duelist_token_protected_dispatcher();
+                    duelist_id = (duelist_dispatcher.get_validated_active_duelist_id(caller, duelist_id, queue_id.get_lives_staked()));
+                    store.enter_queue(duelist_id, queue_id);
                     // randomize slot
                     let seed: felt252 = store.vrf_dispatcher().consume_random(Source::Nonce(caller));
                     let slot: u8 = queue.assign_slot(@store, seed);
@@ -196,15 +202,17 @@ pub mod matchmaker {
                     }
                     i += 1;
                 };
-
+                // choose a candidate, if any
+                if (candidates.len() == 1) {
+                    matched_player_address = Option::Some(*candidates[0]);
+                } else if (candidates.len() > 1) {
 // TODO: choose one player from all candidates within slot
-
-                if (candidates.len().is_non_zero()) {
                     matched_player_address = Option::Some(*candidates[0]);
                 }
             }
 
-            // match player with another, create the duel...
+            //
+            // MATCHED!!! create the duel...
             let duel_id: u128 = match matched_player_address {
                 Option::Some(address) => {
                     // get matched player queue
@@ -232,13 +240,18 @@ pub mod matchmaker {
                         matching_player.queue_info.expired || // was expired during other players matching
                         matching_player.queue_info.has_expired(timestamp) // in queue, and expired
                     ) {
+                        // summon bot duelist
                         let bot_player_dispatcher: IBotPlayerProtectedDispatcher = store.world.bot_player_protected_dispatcher();
+                        let bot_duelist_id: u128 = bot_player_dispatcher.summon_duelist(DuelistProfile::Bot(BotKey::Pro), queue.queue_id.get_lives_staked());
+                        // Duel expects it to be in the queue
+                        store.enter_queue(bot_duelist_id, queue.queue_id);
+                        // create duel!
                         (self._create_duel(
                             @store,
                             queue.queue_id,
                             matching_player,
                             bot_player_dispatcher.contract_address,
-                            bot_player_dispatcher.summon_duelist(DuelistProfile::Bot(BotKey::Pro), queue.queue_id.get_lives_staked()),
+                            bot_duelist_id,
                         ))
                     } else {
                         // no duel created

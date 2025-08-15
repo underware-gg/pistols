@@ -1,4 +1,5 @@
 use starknet::{ContractAddress};
+use pistols::models::matches::{QueueId};
 pub use pistols::types::duelist_profile::{DuelistProfile, DuelistProfileTrait, GenesisKey, BotKey};
 
 //---------------------
@@ -40,6 +41,7 @@ pub struct DuelistAssignment {
     //-----------------------
     pub duel_id: u128,      // current Challenge a Duelist is in
     pub pass_id: u64,       // current Tournament a Duelist is in
+    pub queue_id: QueueId,  // current Match Queue a Duelist is in
 }
 
 // created for dead duelists
@@ -84,16 +86,26 @@ pub impl DuelistImpl of DuelistTrait {
     fn is_activated(self: @Duelist) -> bool {
         (*self.timestamps.active != 0)
     }
-    fn enter_challenge(ref self: Store, duelist_id: u128, duel_id: u128) {
+    fn enter_queue(ref self: Store, duelist_id: u128, queue_id: QueueId) {
         let mut assignment: DuelistAssignment = self.get_duelist_assignment(duelist_id);
-        assert(assignment.duel_id == 0, DuelErrors::DUELIST_IN_CHALLENGE);
+        assignment.assert_is_available(Option::None);
+        assignment.queue_id = queue_id;
+        self.set_duelist_challenge(@assignment);
+    }
+    fn enter_challenge(ref self: Store, duelist_id: u128, duel_id: u128, queue_id: Option<QueueId>) {
+        let mut assignment: DuelistAssignment = self.get_duelist_assignment(duelist_id);
+        assignment.assert_is_available(queue_id);
         assignment.duel_id = duel_id;
         self.set_duelist_challenge(@assignment);
     }
     fn exit_challenge(ref self: Store, duelist_id: u128) {
         if (duelist_id.is_non_zero()) {
-            let mut assignment: DuelistAssignment = self.get_duelist_assignment(duelist_id);
-            assignment.duel_id = 0;
+            let assignment = DuelistAssignment {
+                duelist_id,
+                duel_id: 0,
+                pass_id: 0,
+                queue_id: QueueId::Undefined,
+            };
             self.set_duelist_challenge(@assignment);
         }
     }
@@ -108,6 +120,23 @@ pub impl DuelistImpl of DuelistTrait {
         let mut assignment: DuelistAssignment = self.get_duelist_assignment(duelist_id);
         assignment.pass_id = 0;
         self.set_duelist_challenge(@assignment);
+    }
+}
+
+#[generate_trait]
+pub impl DuelistAssignmentImpl of DuelistAssignmentTrait {
+    fn assert_is_available(self: @DuelistAssignment, queue_id: Option<QueueId>) {
+        // must not be in another challenge
+        assert(*self.duel_id == 0, DuelErrors::DUELIST_IN_CHALLENGE);
+        // must be the same queue or not in a queue
+        match queue_id {
+            Option::None => {
+                assert(*self.queue_id == QueueId::Undefined, DuelErrors::DUELIST_MATCHMAKING);
+            },
+            Option::Some(queue_id) => {
+                assert(*self.queue_id == queue_id, DuelErrors::DUELIST_WRONG_QUEUE);
+            },
+        }
     }
 }
 
@@ -230,7 +259,13 @@ pub impl CauseOfDeathDebug of core::fmt::Debug<CauseOfDeath> {
 //
 #[cfg(test)]
 mod unit {
-    use super::{Totals, TotalsTrait};
+    use super::{
+        Totals, TotalsTrait,
+        DuelistTrait,
+        DuelistAssignmentTrait,
+    };
+    use pistols::models::matches::{QueueId};
+    use pistols::tests::tester::{tester, tester::{StoreTrait, FLAGS}};
 
     #[test]
     fn test_totals_honour_archetype() {
@@ -355,5 +390,65 @@ mod unit {
             n += 1;
         };
         assert_eq!(totals.honour_log, 0x10000e000c000a00, "{:x} != 0x10000e000c000a00", totals.honour_log);
+    }
+
+    const DUELIST_ID: u128 = 222;
+
+    #[test]
+    fn test_assignment_enter_challenge() {
+        let mut sys: tester::TestSystems = tester::setup_world(FLAGS::OWNER);
+        sys.store.enter_challenge(DUELIST_ID, 1, Option::None);
+        assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).duel_id, 1);
+        sys.store.exit_challenge(DUELIST_ID);
+        assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).queue_id, QueueId::Undefined);
+        assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).duel_id, 0);
+        sys.store.get_duelist_assignment(DUELIST_ID).assert_is_available(Option::None);
+    }
+    #[test]
+    #[should_panic(expected: ('DUEL: Duelist in a challenge',))]
+    fn test_assignment_enter_challenge_twice() {
+        let mut sys: tester::TestSystems = tester::setup_world(FLAGS::OWNER);
+        sys.store.enter_challenge(DUELIST_ID, 1, Option::None);
+        sys.store.enter_challenge(DUELIST_ID, 2, Option::None);
+    }
+    #[test]
+    fn test_assignment_enter_queue() {
+        let mut sys: tester::TestSystems = tester::setup_world(FLAGS::OWNER);
+        sys.store.enter_queue(DUELIST_ID, QueueId::Ranked);
+        assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).queue_id, QueueId::Ranked);
+        sys.store.enter_challenge(DUELIST_ID, 1, Option::Some(QueueId::Ranked));
+        assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).queue_id, QueueId::Ranked);
+        assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).duel_id, 1);
+        sys.store.exit_challenge(DUELIST_ID);
+        assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).queue_id, QueueId::Undefined);
+        assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).duel_id, 0);
+        sys.store.get_duelist_assignment(DUELIST_ID).assert_is_available(Option::None);
+    }
+    #[test]
+    #[should_panic(expected: ('DUEL: Duelist matchmaking',))]
+    fn test_assignment_enter_queue_twice() {
+        let mut sys: tester::TestSystems = tester::setup_world(FLAGS::OWNER);
+        sys.store.enter_queue(DUELIST_ID, QueueId::Ranked);
+        sys.store.enter_queue(DUELIST_ID, QueueId::Ranked);
+    }
+    #[test]
+    #[should_panic(expected: ('DUEL: Wrong queue',))]
+    fn test_assignment_enter_challenge_wrong_queue() {
+        let mut sys: tester::TestSystems = tester::setup_world(FLAGS::OWNER);
+        sys.store.enter_queue(DUELIST_ID, QueueId::Ranked);
+        sys.store.enter_challenge(DUELIST_ID, 1, Option::Some(QueueId::Unranked));
+    }
+    #[test]
+    #[should_panic(expected: ('DUEL: Duelist matchmaking',))]
+    fn test_assignment_enter_challenge_in_matchmaking() {
+        let mut sys: tester::TestSystems = tester::setup_world(FLAGS::OWNER);
+        sys.store.enter_queue(DUELIST_ID, QueueId::Ranked);
+        sys.store.enter_challenge(DUELIST_ID, 1, Option::None);
+    }
+    #[test]
+    #[should_panic(expected: ('DUEL: Wrong queue',))]
+    fn test_assignment_enter_challenge_not_in_queue() {
+        let mut sys: tester::TestSystems = tester::setup_world(FLAGS::OWNER);
+        sys.store.enter_challenge(DUELIST_ID, 1, Option::Some(QueueId::Ranked));
     }
 }
