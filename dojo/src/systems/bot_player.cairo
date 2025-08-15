@@ -1,4 +1,5 @@
 use starknet::{ContractAddress};
+use pistols::types::duelist_profile::{DuelistProfile};
 
 // Exposed to clients
 #[starknet::interface]
@@ -13,6 +14,7 @@ pub trait IBotPlayerProtected<TState> {
     fn reply_duel(ref self: TState, duel_id: u128);
     fn commit_moves(ref self: TState, duel_id: u128);
     fn transfer_to_winner(ref self: TState, duel_id: u128, duelist_id: u128, recipient: ContractAddress);
+    fn summon_duelist(ref self: TState, duelist_profile: DuelistProfile, lives_staked: u8) -> u128;
 }
 
 #[dojo::contract]
@@ -103,16 +105,27 @@ pub mod bot_player {
             };
 
             // get or mint a duelist
-            let bot_address: ContractAddress = starknet::get_contract_address();
-            let stack: PlayerDuelistStack = store.get_player_duelist_stack(bot_address, duelist_profile);
-            let mut duelist_id: u128 = stack.get_first_available_duelist_id(@store, challenge.lives_staked);
-            if (duelist_id.is_zero()) {
-                // mint new duelist
-                duelist_id = store.world.pack_token_protected_dispatcher().mint_bot_duelist(duelist_profile);
-            };
+            let duelist_id: u128 = self.summon_duelist(duelist_profile, challenge.lives_staked);
 
             // reply to the duel
             store.world.duel_token_dispatcher().reply_duel(duel_id, duelist_id, true);
+        }
+
+        fn summon_duelist(ref self: ContractState, duelist_profile: DuelistProfile, lives_staked: u8) -> u128 {
+            // only matchmaker or self can summon a duelist
+            let mut store: Store = StoreTrait::new(self.world_default());
+            assert(store.world.caller_is_self() || store.world.caller_is_matchmaker_contract(), Errors::INVALID_CALLER);
+
+            // get or mint a duelist
+            let bot_address: ContractAddress = starknet::get_contract_address();
+            let stack: PlayerDuelistStack = store.get_player_duelist_stack(bot_address, duelist_profile);
+            let duelist_id: u128 = stack.get_first_available_duelist_id(@store, lives_staked);
+            if (duelist_id.is_zero()) {
+                // mint new duelist
+                (store.world.pack_token_protected_dispatcher().mint_bot_duelist(duelist_profile))
+            } else {
+                (duelist_id)
+            }
         }
 
         fn commit_moves(ref self: ContractState, duel_id: u128) {

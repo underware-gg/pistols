@@ -98,17 +98,20 @@ pub struct DuelistState {
 // Traits
 //
 // use core::num::traits::Zero;
+use pistols::models::{
+    matches::{QueueMode, QueueModeTrait},
+};
+use pistols::types::{
+    duelist_profile::{CharacterKey},
+    rules::{Rules},
+    timestamp::{TimestampTrait, TIMESTAMP},
+    constants::{CONST},
+};
 use pistols::types::cards::{
     deck::{Deck, DeckType, DeckTypeTrait},
     hand::{DuelistHand},
     paces::{PacesCardTrait},
     hand::{FinalBlow},
-};
-use pistols::types::{
-    duelist_profile::{CharacterKey},
-    rules::{Rules, RulesTrait},
-    timestamp::{TimestampTrait},
-    constants::{CONST},
 };
 use pistols::interfaces::dns::{DnsTrait};
 use pistols::libs::store::{Store, StoreTrait};
@@ -201,6 +204,23 @@ pub impl DuelTypeImpl of DuelTypeTrait {
     fn is_practice(self: @DuelType, store: @Store) -> bool {
         (self.get_rules(store) == Rules::Undefined)
     }
+    fn get_reply_timeout(self: @DuelType, queue_mode: Option<QueueMode>) -> u64 {
+        (match self {
+            DuelType::Tournament |
+            DuelType::Seasonal |
+            DuelType::Tutorial |
+            DuelType::Practice |
+            DuelType::BotPlayer |
+            DuelType::Undefined => (TIMESTAMP::ONE_DAY),
+            DuelType::MatchMake |
+            DuelType::Unranked => {
+                match queue_mode {
+                    Option::Some(mode) => (mode.get_commit_timeout()),
+                    Option::None => (TIMESTAMP::ONE_DAY),
+                }
+            }
+        })
+    }
 }
 
 #[generate_trait]
@@ -221,13 +241,15 @@ pub impl RoundImpl of RoundTrait {
     fn make_seed(self: @Round) -> felt252 {
         (hash_values([(*self).moves_a.salt, (*self).moves_b.salt].span()))
     }
-    fn set_commit_timeout(ref self: Round, rules: Rules, current_timestamp: u64) {
-        self.moves_a.set_commit_timeout(rules, current_timestamp);
-        self.moves_b.set_commit_timeout(rules, current_timestamp);
+    fn set_commit_timeout(ref self: Round, duel_type: DuelType, current_timestamp: u64, queue_mode: Option<QueueMode>) {
+        let timeout: u64 = (current_timestamp + duel_type.get_reply_timeout(queue_mode));
+        self.moves_a.set_commit_timeout(timeout);
+        self.moves_b.set_commit_timeout(timeout);
     }
-    fn set_reveal_timeout(ref self: Round, rules: Rules, current_timestamp: u64) {
-        self.moves_a.set_reveal_timeout(rules, current_timestamp);
-        self.moves_b.set_reveal_timeout(rules, current_timestamp);
+    fn set_reveal_timeout(ref self: Round, duel_type: DuelType, current_timestamp: u64) {
+        let timeout: u64 = (current_timestamp + duel_type.get_reply_timeout(Option::None));
+        self.moves_a.set_reveal_timeout(timeout);
+        self.moves_b.set_reveal_timeout(timeout);
     }
 }
 
@@ -262,12 +284,12 @@ pub impl MovesImpl of MovesTrait {
         })
     }
     #[inline(always)]
-    fn set_commit_timeout(ref self: Moves, rules: Rules, current_timestamp: u64) {
-        self.timeout = if (!self.has_comitted()) {(current_timestamp + rules.get_reply_timeout())} else {(0)};
+    fn set_commit_timeout(ref self: Moves, timeout: u64) {
+        self.timeout = if (!self.has_comitted()) {(timeout)} else {(0)};
     }
     #[inline(always)]
-    fn set_reveal_timeout(ref self: Moves, rules: Rules, current_timestamp: u64) {
-        self.timeout = if (!self.has_revealed()) {(current_timestamp + rules.get_reply_timeout())} else {(0)};
+    fn set_reveal_timeout(ref self: Moves, timeout: u64) {
+        self.timeout = if (!self.has_revealed()) {(timeout)} else {(0)};
     }
     #[inline(always)]
     fn has_timed_out(ref self: Moves, challenge: @Challenge) -> bool {

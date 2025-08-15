@@ -1354,7 +1354,7 @@ pub mod tester {
     }
 
     pub fn assert_ranked_duel_results(sys: @TestSystems, duel_id: u128, mut prefix: ByteArray) {
-        prefix = format!("RANKED_{}", prefix);
+        prefix = format!("RANKED/{}", prefix);
         let ch: ChallengeValue = (*sys.store).get_challenge_value(duel_id);
         let rules: Rules = ch.duel_type.get_rules(sys.store);
         assert_eq!(rules, Rules::Season, "[{}] Rules::Season", prefix);
@@ -1363,7 +1363,7 @@ pub mod tester {
         _assert_ranked_scores(sys, ch, prefix.clone());
     }
     pub fn assert_unranked_duel_results(sys: @TestSystems, duel_id: u128, mut prefix: ByteArray) {
-        prefix = format!("UNRANKED_{}", prefix);
+        prefix = format!("UNRANKED/{}", prefix);
         let ch: ChallengeValue = (*sys.store).get_challenge_value(duel_id);
         let rules: Rules = ch.duel_type.get_rules(sys.store);
         assert_eq!(rules, Rules::Unranked, "[{}] unranked rules", prefix);
@@ -1371,7 +1371,7 @@ pub mod tester {
         _assert_unranked_scores(sys, ch, prefix.clone());
     }
     pub fn assert_practice_duel_results(sys: @TestSystems, duel_id: u128, mut prefix: ByteArray) {
-        prefix = format!("PRACTICE_{}", prefix);
+        prefix = format!("PRACTICE/{}", prefix);
         let ch: ChallengeValue = (*sys.store).get_challenge_value(duel_id);
         let rules: Rules = ch.duel_type.get_rules(sys.store);
         assert_eq!(rules, Rules::Undefined, "[{}] practice rules", prefix);

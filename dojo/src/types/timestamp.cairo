@@ -28,7 +28,14 @@ use pistols::models::challenge::{Challenge, DuelType};
 #[generate_trait]
 pub impl PeriodImpl of PeriodTrait {
     #[inline(always)]
-    fn new_from_now(expire_timestamp: u64) -> Period {
+    fn new_open() -> Period {
+        (Period {
+            start: starknet::get_block_timestamp(),
+            end: 0,
+        })
+    }
+    #[inline(always)]
+    fn new_expiring(expire_timestamp: u64) -> Period {
         let start: u64 = starknet::get_block_timestamp();
         (Period {
             start,

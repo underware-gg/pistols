@@ -377,6 +377,10 @@ pub impl StoreImpl of StoreTrait {
         self.world.write_model(model);
     }
     #[inline(always)]
+    fn delete_match_player(ref self: Store, contract_address: ContractAddress) {
+        self.world.erase_model(@self.get_match_player(contract_address));
+    }
+    #[inline(always)]
     fn set_match_counter(ref self: Store, model: @MatchCounter) {
         self.world.write_model(model);
     }

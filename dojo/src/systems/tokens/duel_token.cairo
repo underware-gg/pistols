@@ -1,6 +1,7 @@
 use starknet::{ContractAddress};
 use dojo::world::IWorldDispatcher;
 use pistols::models::challenge::{DuelType};
+use pistols::models::matches::{QueueId, QueueMode};
 // use pistols::models::tournament::{TournamentRules};
 use pistols::types::challenge_state::{ChallengeState};
 use pistols::types::premise::{Premise};
@@ -99,10 +100,8 @@ pub trait IDuelTokenProtected<TState> {
         duelist_id_a: u128,
         address_b: ContractAddress,
         duelist_id_b: u128,
-        lives_staked: u8,
-        expire_minutes: u64,
-        premise: Premise,
-        message: ByteArray,
+        queue_id: QueueId,
+        queue_mode: QueueMode,
     ) -> u128;
     fn transfer_to_winner(ref self: TState, duel_id: u128);
     // fn join_tournament_duel(
@@ -180,12 +179,13 @@ pub mod duel_token {
     use pistols::models::{
         player::{PlayerTrait, PlayerDelegationTrait},
         challenge::{
+            DuelType,
             Challenge, ChallengeTrait, ChallengeValue,
             ChallengeMessage, ChallengeMessageValue,
-            DuelType, DuelTypeTrait,
             Round, RoundTrait,
         },
         duelist::{DuelistTrait, DuelistProfile, DuelistProfileTrait},
+        matches::{QueueId, QueueIdTrait, QueueMode},
         pact::{PactTrait},
         events::{Activity, ActivityTrait, ChallengeAction},
         // tournament::{
@@ -202,7 +202,7 @@ pub mod duel_token {
     };
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::short_string::{ShortStringTrait};
-    use pistols::utils::misc::{ContractAddressIntoU256};//, ZERO};
+    use pistols::utils::address::{ContractAddressIntoU256};//, ZERO};
     use pistols::utils::math::{MathTrait};
 
     // use tournaments::components::{
@@ -321,7 +321,7 @@ pub mod duel_token {
             };
 
             // calc expiration
-            let timestamps: Period = PeriodTrait::new_from_now(
+            let timestamps: Period = PeriodTrait::new_expiring(
                 if (expire_minutes == 0) {TIMESTAMP::ONE_DAY}
                 else {TimestampTrait::from_minutes(expire_minutes)},
             );
@@ -417,7 +417,7 @@ pub mod duel_token {
 
                     // set reply timeouts
                     let mut round: Round = store.get_round(duel_id);
-                    round.set_commit_timeout(challenge.duel_type.get_rules(@store), timestamp);
+                    round.set_commit_timeout(challenge.duel_type, timestamp, Option::None);
                     store.set_round(@round);
                 } else {
                     // Challenged is Refusing
@@ -461,16 +461,15 @@ pub mod duel_token {
         //-----------------------------------
         // match-making
         // official ranked games created by team bots only
+        // called by matchmaker contract only
         //
         fn match_make(ref self: ContractState,
             address_a: ContractAddress,
-            duelist_id_a: u128,
+            mut duelist_id_a: u128,
             address_b: ContractAddress,
-            duelist_id_b: u128,
-            lives_staked: u8,
-            expire_minutes: u64,
-            premise: Premise,
-            message: ByteArray,
+            mut duelist_id_b: u128,
+            queue_id: QueueId,
+            queue_mode: QueueMode
         ) -> u128 {
             let mut store: Store = StoreTrait::new(self.world_default());
             assert(store.world.caller_is_matchmaker_contract(), Errors::INVALID_CALLER);
@@ -478,22 +477,19 @@ pub mod duel_token {
             // validate players
             assert(address_a != address_b, Errors::INVALID_CHALLENGE_SELF);
 
-            // must have stakes
-            assert(lives_staked > 0, Errors::INVALID_STAKE);
-            
-            // calc expiration
-            let timestamps: Period = PeriodTrait::new_from_now(
-                if (expire_minutes == 0) {TIMESTAMP::ONE_MINUTE * 10}
-                else {TimestampTrait::from_minutes(expire_minutes)}
-            );
+            // get active duelist from stack
+            let lives_staked: u8 = queue_id.get_lives_staked();
+            let duelist_dispatcher: IDuelistTokenProtectedDispatcher = store.world.duelist_token_protected_dispatcher();
+            duelist_id_a = (duelist_dispatcher.get_validated_active_duelist_id(address_a, duelist_id_a, lives_staked));
+            duelist_id_b = (duelist_dispatcher.get_validated_active_duelist_id(address_b, duelist_id_b, lives_staked));
 
             // create challenge
             let challenge: Challenge = self._spawn_challenge(
                 ref store,
                 Challenge {
                     duel_id: 0,
-                    duel_type: DuelType::MatchMake,
-                    premise,
+                    duel_type: queue_id.get_duel_type(),
+                    premise: queue_id.get_premise(),
                     lives_staked,
                     // duelists
                     address_a,
@@ -505,10 +501,18 @@ pub mod duel_token {
                     season_id: 0,
                     winner: 0,
                     // timestamps
-                    timestamps,
+                    timestamps: PeriodTrait::new_open(), // no reply timeout
                 },
-                message,
+                "", // message
             );
+
+            store.set_duelist_timestamp_active(challenge.duelist_id_a, challenge.timestamps.start);
+            store.set_duelist_timestamp_active(challenge.duelist_id_b, challenge.timestamps.start);
+
+            // set reply timeouts
+            let mut round: Round = store.get_round(challenge.duel_id);
+            round.set_commit_timeout(challenge.duel_type, challenge.timestamps.start, Option::Some(queue_mode));
+            store.set_round(@round);
 
             // Both duelists are ready to commit
             store.emit_challenge_action(@challenge, 1, ChallengeAction::Commit);
@@ -517,7 +521,9 @@ pub mod duel_token {
             (challenge.duel_id)
         }
 
+        //-----------------------------------
         // transfer duel to winner
+        //
         fn transfer_to_winner(ref self: ContractState,
             duel_id: u128,
         ) {

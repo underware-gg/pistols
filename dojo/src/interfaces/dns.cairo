@@ -190,6 +190,10 @@ pub impl DnsImpl of DnsTrait {
         })
     }
     #[inline(always)]
+    fn caller_is_self(self: @WorldStorage) -> bool {
+        (starknet::get_caller_address() == starknet::get_contract_address())
+    }
+    #[inline(always)]
     fn caller_is_world_contract(self: @WorldStorage) -> bool {
         (self.is_world_contract(starknet::get_caller_address()))
     }

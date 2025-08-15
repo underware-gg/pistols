@@ -1,5 +1,5 @@
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use starknet::{ContractAddress};
     // use core::num::traits::Zero;
     use pistols::models::{
@@ -246,6 +246,14 @@ mod tests {
     }
 
     #[test]
+    #[should_panic(expected: ('BOT_PLAYER: Invalid caller', 'ENTRYPOINT_FAILED'))]
+    fn test_bot_summon_duelist_invalid_caller() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER);
+        tester::impersonate(OTHER());
+        _protected(@sys).summon_duelist(DuelistProfile::Bot(BotKey::Pro), 1);
+    }
+
+    #[test]
     #[should_panic(expected: ('DUEL: Invalid stake', 'ENTRYPOINT_FAILED'))]
     fn test_bot_invalid_stake_1() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER | FLAGS::MOCK_RNG);
@@ -265,7 +273,7 @@ mod tests {
     // duel results (Seasonal/Unranked)
     //
 
-    fn _get_bot_moves_crit_a(archetype: Archetype) -> (Span<MockedValue>, PlayerMoves, PlayerMoves) {
+    pub fn _get_bot_moves_crit_a(archetype: Archetype) -> (Span<MockedValue>, PlayerMoves, PlayerMoves) {
         let (prefabs_mocked, moves_a, moves_b) = prefabs::get_moves_crit_a();
         let mut mocked: Array<MockedValue> = array![];
         mocked.extend_from_span(prefabs_mocked);
