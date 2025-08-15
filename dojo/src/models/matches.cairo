@@ -138,6 +138,10 @@ pub impl MatchQueueImpl of MatchQueueTrait {
         (dice.throw('queue_slot', self.slot_size))
     }
     #[inline(always)]
+    fn player_position(ref self: MatchQueue, player_address: @ContractAddress) -> Option<usize> {
+        self.players.position(player_address)
+    }
+    #[inline(always)]
     fn append_player(ref self: MatchQueue, player_address: ContractAddress) {
         self.players.append(player_address);
     }

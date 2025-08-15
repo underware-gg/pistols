@@ -41,6 +41,20 @@ pub impl SpanUtilsImpl<T, +Clone<T>, +Drop<T>> of SpanUtilsTrait<T> {
             };
         }
     }
+    fn position<+PartialEq<T>>(mut self: Span<T>, value: @T) -> Option<usize> {
+        let mut index: usize = 0;
+        loop {
+            match self.pop_front() {
+                Option::Some(v) => {
+                    if v == value {
+                        break Option::Some(index);
+                    }
+                    index += 1;
+                },
+                Option::None => { break Option::None; },
+            };
+        }
+    }
     fn remove<+PartialEq<T>>(mut self: Span<T>, value: @T) -> Array<T> {
         let mut ret: Array<T> = array![];
         loop {
@@ -72,6 +86,9 @@ pub impl ArrayUtilsImpl<T, +Clone<T>, +Drop<T>> of ArrayUtilsTrait<T> {
     // from alexandria
     fn contains<+PartialEq<T>>(self: @Array<T>, value: @T) -> bool {
         (self.span().contains(value))
+    }
+    fn position<+PartialEq<T>>(self: @Array<T>, value: @T) -> Option<usize> {
+        (self.span().position(value))
     }
     fn remove<+PartialEq<T>>(self: @Array<T>, value: @T) -> Array<T> {
         (self.span().remove(value))
@@ -146,6 +163,18 @@ mod unit {
             }
             i += 1;
         };
+    }
+
+    #[test]
+    fn test_array_position() {
+        let arr: Array<usize> = array![1, 3, 5];
+        assert_eq!(arr.position(@0), Option::None);
+        assert_eq!(arr.position(@1), Option::Some(0));
+        assert_eq!(arr.position(@2), Option::None);
+        assert_eq!(arr.position(@3), Option::Some(1));
+        assert_eq!(arr.position(@4), Option::None);
+        assert_eq!(arr.position(@5), Option::Some(2));
+        assert_eq!(arr.position(@0xffffff), Option::None);
     }
 
     #[test]
