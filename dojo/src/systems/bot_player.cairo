@@ -13,8 +13,8 @@ pub trait IBotPlayer<TState> {
 pub trait IBotPlayerProtected<TState> {
     fn reply_duel(ref self: TState, duel_id: u128);
     fn commit_moves(ref self: TState, duel_id: u128);
-    fn transfer_to_winner(ref self: TState, duel_id: u128, duelist_id: u128, recipient: ContractAddress);
     fn summon_duelist(ref self: TState, duelist_profile: DuelistProfile, lives_staked: u8) -> u128;
+    fn transfer_to_winner(ref self: TState, duel_id: u128, duelist_id: u128, recipient: ContractAddress);
 }
 
 #[dojo::contract]
@@ -105,27 +105,10 @@ pub mod bot_player {
             };
 
             // get or mint a duelist
-            let duelist_id: u128 = self.summon_duelist(duelist_profile, challenge.lives_staked);
+            let duelist_id: u128 = self._summon_duelist(@store, duelist_profile, challenge.lives_staked);
 
             // reply to the duel
             store.world.duel_token_dispatcher().reply_duel(duel_id, duelist_id, true);
-        }
-
-        fn summon_duelist(ref self: ContractState, duelist_profile: DuelistProfile, lives_staked: u8) -> u128 {
-            // only matchmaker or self can summon a duelist
-            let mut store: Store = StoreTrait::new(self.world_default());
-            assert(store.world.caller_is_self() || store.world.caller_is_matchmaker_contract(), Errors::INVALID_CALLER);
-
-            // get or mint a duelist
-            let bot_address: ContractAddress = starknet::get_contract_address();
-            let stack: PlayerDuelistStack = store.get_player_duelist_stack(bot_address, duelist_profile);
-            let duelist_id: u128 = stack.get_first_available_duelist_id(@store, lives_staked);
-            if (duelist_id.is_zero()) {
-                // mint new duelist
-                (store.world.pack_token_protected_dispatcher().mint_bot_duelist(duelist_profile))
-            } else {
-                (duelist_id)
-            }
         }
 
         fn commit_moves(ref self: ContractState, duel_id: u128) {
@@ -146,6 +129,14 @@ pub mod bot_player {
 
             // commit!
             store.world.game_dispatcher().commit_moves(duelist_id, duel_id, moves_hash);
+        }
+
+        fn summon_duelist(ref self: ContractState, duelist_profile: DuelistProfile, lives_staked: u8) -> u128 {
+            // only matchmaker can summon a duelist externally
+            let mut store: Store = StoreTrait::new(self.world_default());
+            assert(store.world.caller_is_matchmaker_contract(), Errors::INVALID_CALLER);
+            // get or mint a duelist
+            (self._summon_duelist(@store, duelist_profile, lives_staked))
         }
 
         fn transfer_to_winner(ref self: ContractState, duel_id: u128, duelist_id: u128, recipient: ContractAddress) {
@@ -169,6 +160,19 @@ pub mod bot_player {
             let wrapped: @RngWrap = RngWrapTrait::new(store.world.rng_address());
             let dice: Dice = DiceTrait::new(wrapped, seed);
             (dice)
+        }
+
+        fn _summon_duelist(ref self: ContractState, store: @Store, duelist_profile: DuelistProfile, lives_staked: u8) -> u128 {
+            // get or mint a duelist
+            let bot_address: ContractAddress = starknet::get_contract_address();
+            let stack: PlayerDuelistStack = store.get_player_duelist_stack(bot_address, duelist_profile);
+            let duelist_id: u128 = stack.get_first_available_duelist_id(store, lives_staked);
+            if (duelist_id.is_zero()) {
+                // mint new duelist
+                (store.world.pack_token_protected_dispatcher().mint_bot_duelist(duelist_profile))
+            } else {
+                (duelist_id)
+            }
         }
     }
 }
