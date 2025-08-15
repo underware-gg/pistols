@@ -225,6 +225,8 @@ pub mod duel_token {
         pub const CHALLENGE_NOT_AWAITING: felt252   = 'DUEL: Challenge not Awaiting';
         pub const DUELIST_IN_CHALLENGE: felt252     = 'DUEL: Duelist in a challenge';
         pub const PACT_EXISTS: felt252              = 'DUEL: Pact exists';
+        pub const DUELIST_MATCHMAKING: felt252      = 'DUEL: Duelist matchmaking';
+        pub const DUELIST_WRONG_QUEUE: felt252      = 'DUEL: Wrong queue';
     }
 
     //*******************************
@@ -347,6 +349,7 @@ pub mod duel_token {
                     timestamps,
                 },
                 message,
+                Option::None, // queue_id
             );
 
             // Duelist 1 is ready to commit
@@ -402,7 +405,7 @@ pub mod duel_token {
                     assert(challenge.duelist_id_b != challenge.duelist_id_a, Errors::INVALID_CHALLENGE_SELF);
 
                     // assert duelist is not in a challenge
-                    store.enter_challenge(challenge.duelist_id_b, duel_id);
+                    store.enter_challenge(challenge.duelist_id_b, duel_id, Option::None);
 
                     // Duelist 2 can commit
                     store.emit_challenge_action(@challenge, 2, ChallengeAction::Commit);
@@ -504,6 +507,7 @@ pub mod duel_token {
                     timestamps: PeriodTrait::new_open(), // no reply timeout
                 },
                 "", // message
+                Option::Some(queue_id),
             );
 
             store.set_duelist_timestamp_active(challenge.duelist_id_a, challenge.timestamps.start);
@@ -688,6 +692,7 @@ pub mod duel_token {
             ref store: Store,
             mut challenge: Challenge,
             message: ByteArray,
+            queue_id: Option<QueueId>,
         ) -> Challenge {
             // mint to game, so it can transfer to winner
             challenge.duel_id = self.token.mint_next(store.world.game_address());
@@ -697,12 +702,12 @@ pub mod duel_token {
             let duelist_dispatcher: IDuelistTokenProtectedDispatcher = store.world.duelist_token_protected_dispatcher();
             challenge.duelist_id_a = duelist_dispatcher.get_validated_active_duelist_id(challenge.address_a, challenge.duelist_id_a, challenge.lives_staked);
             // - assert duelist is not in a challenge, get into it
-            store.enter_challenge(challenge.duelist_id_a, challenge.duel_id);
+            store.enter_challenge(challenge.duelist_id_a, challenge.duel_id, queue_id);
 
             // Validate Duelist B
             if (challenge.duelist_id_b.is_non_zero()) {
                 challenge.duelist_id_b = duelist_dispatcher.get_validated_active_duelist_id(challenge.address_b, challenge.duelist_id_b, challenge.lives_staked);
-                store.enter_challenge(challenge.duelist_id_b, challenge.duel_id);
+                store.enter_challenge(challenge.duelist_id_b, challenge.duel_id, queue_id);
             }
 
             // save!

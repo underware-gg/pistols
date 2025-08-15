@@ -127,7 +127,7 @@ pub mod tests {
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         tester::make_challenge_ranked(ref sys, duel_id);
         assert_eq!(sys.store.get_challenge(duel_id).get_deck_type(), DeckType::Classic, "challenge.deck_type");
-        // tester::assert_pact(@sys, duel_id, challenge, true, true, "started"); // cant because changed DuelType
+        // tester::assert_pact(@sys, duel_id, true, true, "started"); // cant because changed DuelType
         let timestamp_active_a: u64 = sys.store.get_duelist_timestamps(ID(OWNER())).active;
         let timestamp_active_b: u64 = sys.store.get_duelist_timestamps(ID(OTHER())).active;
         assert_gt!(timestamp_active_a, 0, "timestamp_active_a");
@@ -142,7 +142,7 @@ pub mod tests {
         tester::drop_dojo_events(@sys);
         tester::execute_reveal_moves(@sys, OTHER(), duel_id, moves_b.salt, moves_b.moves);
         let (challenge, round) = tester::get_Challenge_Round_value(@sys, duel_id);
-        // tester::assert_pact(@sys, duel_id, challenge, false, false, "ended"); // cant because changed DuelType
+        // tester::assert_pact(@sys, duel_id, false, false, "ended"); // cant because changed DuelType
 // challenge.winner.print();
 // round.state_a.health.print();
 // round.state_b.health.print();
@@ -243,7 +243,7 @@ pub mod tests {
         let (_challenge, round_1, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         tester::make_challenge_ranked(ref sys, duel_id);
         assert_eq!(sys.store.get_challenge(duel_id).get_deck_type(), DeckType::Classic, "challenge.deck_type");
-        // tester::assert_pact(@sys, duel_id, challenge, true, true, "started"); // cant because changed DuelType
+        // tester::assert_pact(@sys, duel_id, true, true, "started"); // cant because changed DuelType
 
         // duel owned by contract
         assert_eq!(sys.duels.owner_of(duel_id.into()), sys.game.contract_address, "duels.owner_of");
@@ -284,7 +284,7 @@ pub mod tests {
         // 2nd reveal > Finished
         tester::execute_reveal_moves(@sys, OTHER(), duel_id, moves_b.salt, moves_b.moves);
         let (challenge, round) = tester::get_Challenge_Round_value(@sys, duel_id);
-        // tester::assert_pact(@sys, duel_id, challenge, false, false, "ended"); // cant because changed DuelType
+        // tester::assert_pact(@sys, duel_id, false, false, "ended"); // cant because changed DuelType
 // challenge.winner.print();
 // // challenge.state.print();
 // round.state_a.health.print();
@@ -375,7 +375,7 @@ pub mod tests {
 
         let (_challenge, round_2, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         tester::make_challenge_ranked(ref sys, duel_id);
-        // tester::assert_pact(@sys, duel_id, challenge, true, true, "started_2"); // cant because changed DuelType
+        // tester::assert_pact(@sys, duel_id, true, true, "started_2"); // cant because changed DuelType
         // assert(round_2.moves_a.seed != 0, "round_2.moves_a.seed");
         // assert(round_2.moves_b.seed != 0, "round_2.moves_b.seed");
         // assert(round_2.moves_a.seed != round_2.moves_b.seed, "round_2.moves_a.seed != moves_b");
@@ -395,7 +395,7 @@ pub mod tests {
         let round: RoundValue = sys.store.get_round_value(duel_id);
         assert_eq!(round.moves_b.timeout, 0, "++ timeout_reveal_b_reset");
         tester::execute_reveal_moves(@sys, OWNER(), duel_id, moves_a.salt, moves_a.moves);
-        // tester::assert_pact(@sys, duel_id, challenge, false, false, "ended_2"); // cant because changed DuelType
+        // tester::assert_pact(@sys, duel_id, false, false, "ended_2"); // cant because changed DuelType
         let (challenge, round) = tester::get_Challenge_Round_value(@sys, duel_id);
         assert_eq!(challenge.state, ChallengeState::Resolved, "challenge.state ++");
         assert_ne!(challenge.winner, 0, "challenge.winner ++");
@@ -1240,7 +1240,7 @@ pub mod tests {
         assert_eq!(challenge.season_id, sys.store.get_current_season_id(), "_assert_timed_out: challenge_season_id");
         assert_eq!(round.state, RoundState::Finished, "_assert_timed_out: round.state");
         assert_eq!(round.final_blow, FinalBlow::Forsaken, "_assert_timed_out: round.final_blow");
-        tester::assert_pact(sys, duel_id, challenge, false, false, "_assert_timed_out");
+        tester::assert_pact(sys, duel_id, false, false, "_assert_timed_out");
     }
 
     fn _assert_not_timed_out(sys: @TestSystems, duel_id: u128) {

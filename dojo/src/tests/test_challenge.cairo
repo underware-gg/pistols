@@ -218,17 +218,15 @@ mod tests {
         let A = OWNER();
         let B = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Practice, EXPIRE_MINUTES, 0);
-        let ch = sys.store.get_challenge_value(duel_id);
-        tester::assert_pact(@sys, duel_id, ch, true, false, "created");
+        tester::assert_pact(@sys, duel_id, true, false, "created");
         assert!(!sys.game.can_collect_duel(duel_id), "!can_collect_duel");
         // expire
         let (_block_number, _timestamp) = tester::elapse_block_timestamp(TimestampTrait::from_minutes(EXPIRE_MINUTES));
         assert!(sys.game.can_collect_duel(duel_id), "can_collect_duel");
         // reply expired
         let new_state: ChallengeState = tester::execute_reply_duel(@sys, B, ID(B), duel_id, true);
-        let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(new_state, ChallengeState::InProgress, "expired");
-        tester::assert_pact(@sys, duel_id, ch, true, true, "replied");
+        tester::assert_pact(@sys, duel_id, true, true, "replied");
     }
 
     #[test]
@@ -237,15 +235,14 @@ mod tests {
         let A = OWNER();
         let B = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Practice, EXPIRE_MINUTES, 0);
-        let ch = sys.store.get_challenge_value(duel_id);
 
-        tester::assert_pact(@sys, duel_id, ch, true, false, "created");
+        tester::assert_pact(@sys, duel_id, true, false, "created");
         assert!(!sys.game.can_collect_duel(duel_id), "!can_collect_duel");
         let (_block_number, timestamp) = tester::elapse_block_timestamp(TimestampTrait::from_minutes(EXPIRE_MINUTES));
         assert!(sys.game.can_collect_duel(duel_id), "can_collect_duel");
 
         tester::execute_collect_duel(@sys, A, duel_id);
-        tester::assert_pact(@sys, duel_id, ch, false, false, "collected");
+        tester::assert_pact(@sys, duel_id, false, false, "collected");
 
         let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.state, ChallengeState::Expired, "i");
@@ -264,8 +261,7 @@ mod tests {
         let A = OWNER();
         let B = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Practice, EXPIRE_MINUTES, 0);
-        let ch = sys.store.get_challenge_value(duel_id);
-        tester::assert_pact(@sys, duel_id, ch, true, false, "created");
+        tester::assert_pact(@sys, duel_id, true, false, "created");
         // elapse time to almost expired...
         let (_block_number, _timestamp) = tester::elapse_block_timestamp(TimestampTrait::from_minutes(EXPIRE_MINUTES) - 1);
         // panic!
@@ -288,12 +284,11 @@ mod tests {
         let A = OWNER();
         let B = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Seasonal, EXPIRE_MINUTES, 1);
-        let ch = sys.store.get_challenge_value(duel_id);
 
-        tester::assert_pact(@sys, duel_id, ch, true, false, "created");
+        tester::assert_pact(@sys, duel_id, true, false, "created");
         let new_state: ChallengeState = tester::execute_reply_duel(@sys, A, 0, duel_id, false);
         assert_eq!(new_state, ChallengeState::Withdrawn, "canceled");
-        tester::assert_pact(@sys, duel_id, ch, false, false, "withdrew");
+        tester::assert_pact(@sys, duel_id, false, false, "withdrew");
 
         let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.state, new_state, "state");
@@ -327,7 +322,7 @@ mod tests {
         assert_eq!(ch.address_b, B, "challenged");
         assert_eq!(ch.duelist_id_a, ID(A), "challenger_id");
         assert_eq!(ch.duelist_id_b, 0, "challenged_id"); // challenged an address, id is empty
-        tester::assert_pact(@sys, duel_id, ch, true, false, "created");
+        tester::assert_pact(@sys, duel_id, true, false, "created");
 
         let (_block_number, timestamp) = tester::elapse_block_timestamp(TimestampTrait::from_minutes(EXPIRE_MINUTES - 1));
         let new_state: ChallengeState = tester::execute_reply_duel(@sys, B, ID(B), duel_id, false);
@@ -338,7 +333,7 @@ mod tests {
         assert_eq!(ch.season_id, sys.store.get_current_season_id(), "season_id");
         assert_lt!(ch.timestamps.start, timestamp, "timestamps.start");
         assert_eq!(ch.timestamps.end, timestamp, "timestamps.end");
-        tester::assert_pact(@sys, duel_id, ch, false, false, "replied");
+        tester::assert_pact(@sys, duel_id, false, false, "replied");
 
         _assert_empty_progress(@sys, duel_id);
     }
@@ -369,7 +364,7 @@ mod tests {
         assert_eq!(ch.duelist_id_a, ID(A), "challenger_id");
         assert_eq!(ch.duelist_id_b, 0, "challenged_id"); // challenged an address, id is empty
         assert_eq!(ch.season_id, 0, "season_id_ZERO");
-        tester::assert_pact(@sys, duel_id, ch, true, false, "created");
+        tester::assert_pact(@sys, duel_id, true, false, "created");
         // elapse time to almost expired...
         let (_block_number, _timestamp) = tester::elapse_block_timestamp(TimestampTrait::from_minutes(EXPIRE_MINUTES - 1));
         assert!(!sys.game.can_collect_duel(duel_id), "!can_collect_duel");
@@ -377,9 +372,8 @@ mod tests {
         let new_state: ChallengeState = tester::execute_reply_duel(@sys, B, ID(B), duel_id, true);
         assert_eq!(new_state, ChallengeState::InProgress, "in_progress");
         assert_eq!(ch.season_id, 0, "season_id_STILL_ZERO");
-        let ch = sys.store.get_challenge_value(duel_id);
+        let ch = tester::assert_pact(@sys, duel_id, true, true, "replied");
         assert_eq!(ch.duelist_id_b, ID(B), "challenged_id_ok");   // << UPDATED!!!
-        tester::assert_pact(@sys, duel_id, ch, true, true, "replied");
 
         _assert_empty_progress(@sys, duel_id);
 
@@ -553,7 +547,7 @@ mod tests {
         assert_eq!(ch.address_b, B, "challenged");
         assert_eq!(ch.duelist_id_b, ID(B), "challenged_id");
         assert_eq!(ch.season_id, 0, "season_id_ZERO");
-        tester::assert_pact(@sys, duel_id, ch, true, true, "replied");
+        tester::assert_pact(@sys, duel_id, true, true, "replied");
         // token_uri
         assert_ne!(sys.duels.token_uri(duel_id.into()), "", "duels.token_uri()");
     }
