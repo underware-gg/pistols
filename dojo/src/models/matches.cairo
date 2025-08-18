@@ -18,8 +18,8 @@ pub mod MATCHMAKER {
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
 pub enum QueueId {
     Undefined,  // 0
-    Ranked,     // 1
-    Unranked,   // 2
+    Unranked,   // 1
+    Ranked,     // 2
 }
 
 //
@@ -32,6 +32,8 @@ pub struct MatchQueue {
     //-----------------------
     pub players: Array<ContractAddress>,
     pub slot_size: u8,
+    pub entry_token_address: ContractAddress,
+    pub entry_token_amount: u128,
 }
 
 //
@@ -128,11 +130,6 @@ pub impl QueueModeImpl of QueueModeTrait {
 pub impl MatchQueueImpl of MatchQueueTrait {
     // assign slot to new player
     fn assign_slot(ref self: MatchQueue, store: @Store, seed: felt252) -> u8 {
-        // initialize queue
-        if (self.slot_size == 0) {
-            self.slot_size = MATCHMAKER::INITIAL_SLOT_SIZE;
-        }
-        // randomize slot
         let wrapped: @RngWrap = RngWrapTrait::new(store.world.rng_address());
         let mut dice: Dice = DiceTrait::new(wrapped, seed);
         (dice.throw('queue_slot', self.slot_size))

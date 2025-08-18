@@ -20,11 +20,12 @@ mod tests {
     };
     use pistols::tests::tester::{tester,
         tester::{
-            TestSystems, StoreTrait,
+            TestSystems, StoreTrait, DnsTrait,
+            IMatchMakerDispatcherTrait,
             IDuelTokenProtectedDispatcherTrait,
             IBotPlayerDispatcherTrait,
             IRngMockDispatcherTrait,
-            FLAGS, SEASON_ID_1, ID,
+            FLAGS, SEASON_ID_1, ID, ZERO,
             OWNER, OTHER, BUMMER, SPENDER, TREASURY,
             OWNED_BY_OWNER, OWNED_BY_OTHER,
         }
@@ -136,6 +137,79 @@ mod tests {
         assert_eq!(match_player_b.duel_id, 0, "[{}] match_player_b.duel_id_ENDED", prefix);
         assert_eq!(match_player_b.duelist_id, 0, "[{}] match_player_b.duelist_id_ENDED", prefix);
         assert_eq!(match_player_b.queue_info.slot, 0, "[{}] match_player_b.queue_info.slot_ENDED", prefix);
+    }
+
+
+    //------------------------------
+    // setup/admin
+    //
+
+    #[test]
+    fn test_matchmaker_init() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::MATCHMAKER | FLAGS::ADMIN);
+        let queue: MatchQueue = sys.store.get_match_queue(QueueId::Unranked);
+        assert_eq!(queue.slot_size, MATCHMAKER::INITIAL_SLOT_SIZE, "QueueId::Unranked.slot_size");
+        assert_eq!(queue.entry_token_address, ZERO(), "QueueId::Unranked.entry_token_address");
+        assert_eq!(queue.entry_token_amount, 0, "QueueId::Unranked.entry_token_amount");
+        let queue: MatchQueue = sys.store.get_match_queue(QueueId::Ranked);
+        assert_eq!(queue.slot_size, MATCHMAKER::INITIAL_SLOT_SIZE, "QueueId::Ranked.slot_size");
+        assert_eq!(queue.entry_token_address, sys.store.world.fools_coin_address(), "QueueId::Ranked.entry_token_address");
+        assert_gt!(queue.entry_token_amount, 0, "QueueId::Ranked.entry_token_amount");
+        // admin functions
+        tester::impersonate(OWNER());
+        sys.matchmaker.set_queue_size(QueueId::Unranked, 11);
+        sys.matchmaker.set_queue_size(QueueId::Ranked, 22);
+        sys.matchmaker.set_queue_entry_token(QueueId::Unranked, TREASURY(), 100);
+        sys.matchmaker.set_queue_entry_token(QueueId::Ranked, ZERO(), 0);
+        // validate
+        let queue: MatchQueue = sys.store.get_match_queue(QueueId::Unranked);
+        assert_eq!(queue.slot_size, 11, "QueueId::Unranked.slot_size_EDITED");
+        assert_eq!(queue.entry_token_address, TREASURY(), "QueueId::Unranked.entry_token_address_EDITED");
+        assert_eq!(queue.entry_token_amount, 100, "QueueId::Unranked.entry_token_amount_EDITED");
+        let queue: MatchQueue = sys.store.get_match_queue(QueueId::Ranked);
+        assert_eq!(queue.slot_size, 22, "QueueId::Ranked.slot_size_EDITED");
+        assert_eq!(queue.entry_token_address, ZERO(), "QueueId::Ranked.entry_token_address_EDITED");
+        assert_eq!(queue.entry_token_amount, 0, "QueueId::Ranked.entry_token_amount_EDITED");
+    }
+
+    #[test]
+    #[should_panic(expected:('MATCHMAKER: Invalid queue', 'ENTRYPOINT_FAILED'))]
+    fn test_admin_set_entry_token_invalid_queue() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::MATCHMAKER | FLAGS::ADMIN);
+        tester::impersonate(OWNER());
+        sys.matchmaker.set_queue_entry_token(QueueId::Undefined, TREASURY(), 100);
+    }
+
+    #[test]
+    #[should_panic(expected:('MATCHMAKER: Invalid queue', 'ENTRYPOINT_FAILED'))]
+    fn test_admin_set_queue_size_invalid_queue() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::MATCHMAKER | FLAGS::ADMIN);
+        tester::impersonate(OWNER());
+        sys.matchmaker.set_queue_size(QueueId::Undefined, 11);
+    }
+
+    #[test]
+    #[should_panic(expected:('MATCHMAKER: Invalid size', 'ENTRYPOINT_FAILED'))]
+    fn test_admin_set_queue_size_invalid_size() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::MATCHMAKER | FLAGS::ADMIN);
+        tester::impersonate(OWNER());
+        sys.matchmaker.set_queue_size(QueueId::Unranked, 0);
+    }
+
+    #[test]
+    #[should_panic(expected:('MATCHMAKER: Caller not admin', 'ENTRYPOINT_FAILED'))]
+    fn test_admin_set_queue_size_not_admin() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::MATCHMAKER | FLAGS::ADMIN);
+        tester::impersonate(OTHER());
+        sys.matchmaker.set_queue_size(QueueId::Unranked, 11);
+    }
+
+    #[test]
+    #[should_panic(expected:('MATCHMAKER: Caller not admin', 'ENTRYPOINT_FAILED'))]
+    fn test_admin_set_entry_token_not_admin() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::MATCHMAKER | FLAGS::ADMIN);
+        tester::impersonate(OTHER());
+        sys.matchmaker.set_queue_entry_token(QueueId::Unranked, TREASURY(), 100);
     }
 
     // just make sure rng mocked values are working

@@ -363,14 +363,6 @@ pub mod tester {
             );
         }
 
-        if (deploy_matchmaker) {
-            resources.append(TestResource::Contract(matchmaker::TEST_CLASS_HASH));
-            contract_defs.append(
-                ContractDefTrait::new(@"pistols", @"matchmaker")
-                    .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
-            );
-        }
-
         if (deploy_vrf) {
             resources.append(TestResource::Contract(vrf_mock::TEST_CLASS_HASH));
             contract_defs.append(
@@ -502,6 +494,15 @@ pub mod tester {
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"fools_coin")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
+            );
+        }
+
+        if (deploy_matchmaker) { // AFTER Fools...
+            resources.append(TestResource::Contract(matchmaker::TEST_CLASS_HASH));
+            contract_defs.append(
+                ContractDefTrait::new(@"pistols", @"matchmaker")
+                    .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
+                    .with_init_calldata([].span()),
             );
         }
 

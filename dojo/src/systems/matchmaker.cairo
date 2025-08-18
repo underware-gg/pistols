@@ -1,11 +1,26 @@
-// use starknet::{ContractAddress};
+use starknet::{ContractAddress};
 use pistols::models::matches::{QueueId, QueueMode};
 
 // Exposed to clients
 #[starknet::interface]
 pub trait IMatchMaker<TState> {
     fn match_make_me(ref self: TState, duelist_id: u128, queue_id: QueueId, queue_mode: QueueMode) -> u128;
-    // fn ping_me(ref self: TState) -> u128;
+    // admin/protected
+    fn set_queue_size(ref self: TState, queue_id: QueueId, size: u8);
+    fn set_queue_entry_token(ref self: TState, queue_id: QueueId, entry_token_address: ContractAddress, entry_token_amount: u128);
+}
+
+// Exposed to clients
+#[starknet::interface]
+pub trait IMatchMakerPublic<TState> {
+    fn match_make_me(ref self: TState, duelist_id: u128, queue_id: QueueId, queue_mode: QueueMode) -> u128; //@description: Matches a player against each other
+}
+
+// Exposed to world
+#[starknet::interface]
+pub trait IMatchMakerProtected<TState> {
+    fn set_queue_size(ref self: TState, queue_id: QueueId, size: u8);
+    fn set_queue_entry_token(ref self: TState, queue_id: QueueId, entry_token_address: ContractAddress, entry_token_amount: u128);
 }
 
 #[dojo::contract]
@@ -23,10 +38,12 @@ pub mod matchmaker {
             MatchQueue, MatchQueueTrait,
             MatchPlayer, MatchPlayerTrait,
             QueueInfo, QueueInfoTrait,
+            MATCHMAKER,
         },
     };
     use pistols::types::{
         duelist_profile::{DuelistProfile, BotKey},
+        constants::{CONST},
     };
     use pistols::interfaces::dns::{
         DnsTrait,
@@ -34,20 +51,39 @@ pub mod matchmaker {
         IDuelTokenProtectedDispatcherTrait,
         IDuelistTokenProtectedDispatcher, IDuelistTokenProtectedDispatcherTrait,
         IBotPlayerProtectedDispatcher, IBotPlayerProtectedDispatcherTrait,
+        IAdminDispatcherTrait,
     };
     use pistols::libs::{
         store::{Store, StoreTrait},
     };
-    // use pistols::utils::address::{ZERO};
-    use pistols::utils::address::{ContractAddressDisplay, ContractAddressIntoU256};
+    use pistols::utils::{
+        address::{ZERO, ContractAddressDisplay, ContractAddressIntoU256},
+    };
 
     pub mod Errors {
+        pub const CALLER_NOT_ADMIN: felt252     = 'MATCHMAKER: Caller not admin';
         pub const INVALID_QUEUE: felt252        = 'MATCHMAKER: Invalid queue';
         pub const INVALID_MODE: felt252         = 'MATCHMAKER: Invalid mode';
         pub const WRONG_QUEUE: felt252          = 'MATCHMAKER: Wrong queue';
+        pub const INVALID_SIZE: felt252         = 'MATCHMAKER: Invalid size';
     }
 
     fn dojo_init(ref self: ContractState) {
+        let mut store: Store = StoreTrait::new(self.world_default());
+        store.set_match_queue(@MatchQueue {
+            queue_id: QueueId::Unranked,
+            slot_size: MATCHMAKER::INITIAL_SLOT_SIZE,
+            players: array![],
+            entry_token_address: ZERO(),
+            entry_token_amount: 0,
+        });
+        store.set_match_queue(@MatchQueue {
+            queue_id: QueueId::Ranked,
+            slot_size: MATCHMAKER::INITIAL_SLOT_SIZE,
+            players: array![],
+            entry_token_address: store.world.fools_coin_address(),
+            entry_token_amount: (5 * CONST::ETH_TO_WEI.low),
+        });
     }
 
     #[generate_trait]
@@ -58,8 +94,12 @@ pub mod matchmaker {
         }
     }
 
+
+    //-----------------------------------
+    // Public
+    //
     #[abi(embed_v0)]
-    impl MatchMakerImpl of super::IMatchMaker<ContractState> {
+    impl MatchMakerPublicImpl of super::IMatchMakerPublic<ContractState> {
 
         fn match_make_me(ref self: ContractState,
             mut duelist_id: u128,
@@ -126,7 +166,40 @@ pub mod matchmaker {
             // return the created duel id (not zero)
             (duel_id)
         }
+    }
 
+
+    //-----------------------------------
+    // Protected
+    //
+    #[abi(embed_v0)]
+    impl MatchMakerProtectedImpl of super::IMatchMakerProtected<ContractState> {
+        fn set_queue_size(ref self: ContractState,
+            queue_id: QueueId,
+            size: u8,
+        ) {
+            self._assert_caller_is_admin();
+            assert(queue_id != QueueId::Undefined, Errors::INVALID_QUEUE);
+            assert(size > 0, Errors::INVALID_SIZE);
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let mut queue: MatchQueue = store.get_match_queue(queue_id);
+            queue.slot_size = size;
+            store.set_match_queue(@queue);
+        }
+
+        fn set_queue_entry_token(ref self: ContractState,
+            queue_id: QueueId,
+            entry_token_address: ContractAddress,
+            entry_token_amount: u128,
+        ) {
+            self._assert_caller_is_admin();
+            assert(queue_id != QueueId::Undefined, Errors::INVALID_QUEUE);
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let mut queue: MatchQueue = store.get_match_queue(queue_id);
+            queue.entry_token_address = entry_token_address;
+            queue.entry_token_amount = entry_token_amount;
+            store.set_match_queue(@queue);
+        }
     }
 
 
@@ -135,6 +208,10 @@ pub mod matchmaker {
     //
     #[generate_trait]
     impl InternalImpl of InternalTrait {
+        fn _assert_caller_is_admin(self: @ContractState) {
+            let mut world = self.world_default();
+            assert(world.admin_dispatcher().am_i_admin(starknet::get_caller_address()) == true, Errors::CALLER_NOT_ADMIN);
+        }
 
         fn _match(ref self: ContractState,
             ref store: Store,
@@ -220,15 +297,15 @@ pub mod matchmaker {
                     };
                     let duel_counts: Span<u32> = store.get_pacts_duel_counts_batch(keys.span()).span();
                     // choose the candidate with the least duels
-                    let mut matched_candidate_index: usize = 0;
+                    let mut candidate_index: usize = 0;
                     let mut i: usize = 1;
                     while (i < candidates.len()) {
-                        if (duel_counts[i] < duel_counts[matched_candidate_index]) {
-                            matched_candidate_index = i;
+                        if (duel_counts[i] < duel_counts[candidate_index]) {
+                            candidate_index = i;
                         }
                         i += 1;
                     };
-                    matched_player_address = Option::Some(*candidates[matched_candidate_index]);
+                    matched_player_address = Option::Some(*candidates[candidate_index]);
                 }
             }
 
