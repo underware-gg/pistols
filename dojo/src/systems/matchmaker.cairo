@@ -4,8 +4,10 @@ use pistols::models::matches::{QueueId, QueueMode};
 // Exposed to clients
 #[starknet::interface]
 pub trait IMatchMaker<TState> {
+    // IMatchMakerPublic
     fn match_make_me(ref self: TState, duelist_id: u128, queue_id: QueueId, queue_mode: QueueMode) -> u128;
-    // admin/protected
+    fn get_entry_fee(ref self: TState, queue_id: QueueId) -> (ContractAddress, u128);
+    // IMatchMakerProtected
     fn set_queue_size(ref self: TState, queue_id: QueueId, size: u8);
     fn set_queue_entry_token(ref self: TState, queue_id: QueueId, entry_token_address: ContractAddress, entry_token_amount: u128);
 }
@@ -14,6 +16,8 @@ pub trait IMatchMaker<TState> {
 #[starknet::interface]
 pub trait IMatchMakerPublic<TState> {
     fn match_make_me(ref self: TState, duelist_id: u128, queue_id: QueueId, queue_mode: QueueMode) -> u128; //@description: Matches a player against each other
+    // view functions
+    fn get_entry_fee(ref self: TState, queue_id: QueueId) -> (ContractAddress, u128);
 }
 
 // Exposed to world
@@ -53,6 +57,7 @@ pub mod matchmaker {
         IBotPlayerProtectedDispatcher, IBotPlayerProtectedDispatcherTrait,
         IAdminDispatcherTrait,
     };
+    use pistols::interfaces::ierc20::{IErc20Trait};
     use pistols::libs::{
         store::{Store, StoreTrait},
     };
@@ -127,6 +132,15 @@ pub mod matchmaker {
                     // validate and get queue
                     assert(queue_id != QueueId::Undefined, Errors::INVALID_QUEUE);
                     let mut queue: MatchQueue = store.get_match_queue(queue_id);
+                    // charge entry fee, if any...
+                    if (queue.entry_token_address.is_non_zero() && queue.entry_token_amount.is_non_zero()) {
+                        IErc20Trait::asserted_transfer_from_to(
+                            queue.entry_token_address,
+                            queue.entry_token_amount,
+                            caller,
+                            starknet::get_contract_address(),
+                        );
+                    }
                     // Validate duelist
                     let duelist_dispatcher: IDuelistTokenProtectedDispatcher = store.world.duelist_token_protected_dispatcher();
                     duelist_id = (duelist_dispatcher.get_validated_active_duelist_id(caller, duelist_id, queue_id.get_lives_staked()));
@@ -166,6 +180,14 @@ pub mod matchmaker {
             // return the created duel id (not zero)
             (duel_id)
         }
+
+        fn get_entry_fee(ref self: ContractState, queue_id: QueueId) -> (ContractAddress, u128) {
+            assert(queue_id != QueueId::Undefined, Errors::INVALID_QUEUE);
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let queue: MatchQueue = store.get_match_queue(queue_id);
+            (queue.entry_token_address, queue.entry_token_amount)
+        }
+
     }
 
 

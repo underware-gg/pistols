@@ -305,7 +305,7 @@ pub mod pack_token {
             // transfer mint fee
             let lords_amount: u128 = self.calc_mint_fee(recipient, pack_type);
             if (lords_amount != 0) {
-                store.world.bank_protected_dispatcher().charge_purchase(recipient, lords_amount.into());
+                store.world.bank_protected_dispatcher().charge_lords_purchase(recipient, lords_amount.into());
             }
 
             // create vrf seed

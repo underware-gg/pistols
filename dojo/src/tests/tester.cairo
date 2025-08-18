@@ -275,7 +275,7 @@ pub mod tester {
         deploy_fame         = deploy_fame || deploy_game || deploy_duelist;
         deploy_fools        = deploy_fools || deploy_game;
         deploy_rng_mock     = deploy_rng_mock || deploy_tutorial;
-        deploy_bank         = deploy_bank || deploy_fame || deploy_lords || deploy_duelist;
+        deploy_bank         = deploy_bank || deploy_fame || deploy_lords || deploy_duelist || deploy_matchmaker;
         deploy_vrf          = deploy_vrf || deploy_game || deploy_pack || deploy_tournament || deploy_matchmaker;
         deploy_duelist_mock = !deploy_duelist && (deploy_game || deploy_duel || deploy_tournament);
         deploy_admin        = deploy_admin || deploy_game || deploy_lords || deploy_tournament || deploy_vrf;

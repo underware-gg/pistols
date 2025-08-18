@@ -532,14 +532,14 @@ tester::print_pools(@sys, 1, "COLLECTED");
     }
 
     #[test]
-    #[should_panic(expected:('BANK: insufficient allowance', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('IERC20: insufficient allowance', 'ENTRYPOINT_FAILED'))]
     fn test_sponsor_duelists_zero_allowance() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::FAME | FLAGS::LORDS);
         let amount: u128 = 1_000;
         sys.bank.sponsor_duelists(OWNER(), amount);
     }
     #[test]
-    #[should_panic(expected:('BANK: insufficient allowance', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('IERC20: insufficient allowance', 'ENTRYPOINT_FAILED'))]
     fn test_sponsor_duelists_insufficient_allowance() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::FAME | FLAGS::LORDS);
         let amount: u128 = 1_000;
@@ -571,14 +571,14 @@ tester::print_pools(@sys, 1, "COLLECTED");
         tester::assert_balance_equal(pool_sponsored.balance_fame, pool.balance_fame, "pool.balance_fame AFTER");
     }
     #[test]
-    #[should_panic(expected:('BANK: insufficient allowance', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('IERC20: insufficient allowance', 'ENTRYPOINT_FAILED'))]
     fn test_sponsor_season_zero_allowance() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::FAME | FLAGS::LORDS);
         let amount: u128 = 1_000;
         sys.bank.sponsor_season(OWNER(), amount);
     }
     #[test]
-    #[should_panic(expected:('BANK: insufficient allowance', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('IERC20: insufficient allowance', 'ENTRYPOINT_FAILED'))]
     fn test_sponsor_season_insufficient_allowance() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::FAME | FLAGS::LORDS);
         let amount: u128 = 1_000;
@@ -612,7 +612,7 @@ tester::print_pools(@sys, 1, "COLLECTED");
     }
     #[test]
     #[ignore]
-    #[should_panic(expected:('BANK: insufficient allowance', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('IERC20: insufficient allowance', 'ENTRYPOINT_FAILED'))]
     fn test_sponsor_tournament_zero_allowance() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::FAME | FLAGS::LORDS);
         let amount: u128 = 1_000;
@@ -620,7 +620,7 @@ tester::print_pools(@sys, 1, "COLLECTED");
     }
     #[test]
     #[ignore]
-    #[should_panic(expected:('BANK: insufficient allowance', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('IERC20: insufficient allowance', 'ENTRYPOINT_FAILED'))]
     fn test_sponsor_tournament_insufficient_allowance() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::FAME | FLAGS::LORDS);
         let amount: u128 = 1_000;

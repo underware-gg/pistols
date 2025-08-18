@@ -229,11 +229,30 @@ fn test_claim_not_sponsored() {
 }
 
 #[test]
-#[should_panic(expected: ('BANK: insufficient allowance', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
-fn test_mint_no_allowance_zero() {
+#[should_panic(expected: ('IERC20: insufficient balance', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
+fn test_mint_no_balance() {
+    let mut sys: TestSystems = setup(0);
+    assert!(sys.pack.can_claim_starter_pack(BUMMER()), "can_claim_starter_pack_BUMMER");
+    tester::execute_claim_starter_pack(@sys, BUMMER());
+    tester::execute_pack_purchase(@sys, BUMMER(), PackType::GenesisDuelists5x);
+}
+
+#[test]
+#[should_panic(expected: ('IERC20: insufficient allowance', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
+fn test_mint_zero_allowance() {
     let mut sys: TestSystems = setup(0);
     assert!(sys.pack.can_claim_starter_pack(OWNER()), "can_claim_starter_pack_OWNER");
     tester::execute_claim_starter_pack(@sys, OWNER());
+    tester::execute_pack_purchase(@sys, OWNER(), PackType::GenesisDuelists5x);
+}
+
+#[test]
+#[should_panic(expected: ('IERC20: insufficient allowance', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
+fn test_mint_no_allowance_half() {
+    let mut sys: TestSystems = setup(0);
+    tester::execute_claim_starter_pack(@sys, OWNER());
+    let price: u128 = sys.pack.calc_mint_fee(OWNER(), PackType::GenesisDuelists5x);
+    tester::execute_lords_approve(@sys.lords, OWNER(), sys.bank.contract_address, price / 2);
     tester::execute_pack_purchase(@sys, OWNER(), PackType::GenesisDuelists5x);
 }
 
@@ -245,16 +264,6 @@ fn test_claim_twice() {
     tester::execute_claim_starter_pack(@sys, OWNER());
     assert!(!sys.pack.can_claim_starter_pack(OWNER()), "can_claim_starter_pack_OWNER");
     tester::execute_claim_starter_pack(@sys, OWNER());
-}
-
-#[test]
-#[should_panic(expected: ('BANK: insufficient allowance', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
-fn test_mint_no_allowance_half() {
-    let mut sys: TestSystems = setup(0);
-    tester::execute_claim_starter_pack(@sys, OWNER());
-    let price: u128 = sys.pack.calc_mint_fee(OWNER(), PackType::GenesisDuelists5x);
-    tester::execute_lords_approve(@sys.lords, OWNER(), sys.bank.contract_address, price / 2);
-    tester::execute_pack_purchase(@sys, OWNER(), PackType::GenesisDuelists5x);
 }
 
 #[test]

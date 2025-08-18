@@ -26,7 +26,7 @@ pub trait IBankPublic<TState> {
 pub trait IBankProtected<TState> {
     // transfer LORDS from payer, adding to PoolType::Purchases
     // (called by pack_token)
-    fn charge_purchase(ref self: TState, payer: ContractAddress, lords_amount: u128);
+    fn charge_lords_purchase(ref self: TState, payer: ContractAddress, lords_amount: u128);
     // transfer LORDS from PoolType::Claimable/Purchases to PoolType::FamePeg
     // (called by pack_token)
     fn peg_minted_fame_to_lords(ref self: TState, payer: ContractAddress, lords_amount: u128, from_pool_type: PoolType);
@@ -52,6 +52,7 @@ pub mod bank {
         IFameCoinProtectedDispatcher, IFameCoinProtectedDispatcherTrait,
         IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
     };
+    use pistols::interfaces::ierc20::{IErc20Trait};
     use pistols::models::{
         season::{SeasonConfig, SeasonConfigTrait},
         pool::{Pool, PoolTrait, PoolType, LordsReleaseBill, ReleaseReason},
@@ -69,8 +70,6 @@ pub mod bank {
         pub const INVALID_AMOUNT: felt252           = 'BANK: invalid amount';
         pub const INVALID_SHARES: felt252           = 'BANK: invalid shares';
         pub const INVALID_TREASURY: felt252         = 'BANK: invalid treasury';
-        pub const INSUFFICIENT_ALLOWANCE: felt252   = 'BANK: insufficient allowance';
-        pub const INSUFFICIENT_BALANCE: felt252     = 'BANK: insufficient balance';
         pub const INSUFFICIENT_LORDS: felt252       = 'BANK: insufficient LORDS pool';
         pub const INSUFFICIENT_FAME: felt252        = 'BANK: insufficient FAME pool';
         pub const INVALID_SEASON: felt252           = 'BANK: invalid season';
@@ -148,13 +147,14 @@ pub mod bank {
 
     #[abi(embed_v0)]
     impl BankProtectedImpl of super::IBankProtected<ContractState> {
-        fn charge_purchase(ref self: ContractState,
+        fn charge_lords_purchase(ref self: ContractState,
             payer: ContractAddress,
             lords_amount: u128,
         ) {
+            // validate caller
             let mut store: Store = StoreTrait::new(self.world_default());
             assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
-            assert(lords_amount != 0, Errors::INVALID_AMOUNT);
+            // transfer...
             self._transfer_lords_to_pool(store, payer, lords_amount, PoolType::Purchases);
         }
 
@@ -202,28 +202,19 @@ pub mod bank {
 
     #[generate_trait]
     impl InternalImpl of InternalTrait {
-        fn _assert_payer_allowance(self: @ContractState,
-            lords_dispatcher: @Erc20Dispatcher,
-            payer: ContractAddress,
-            amount: u128,
-        ) {
-            let allowance: u128 = (*lords_dispatcher).allowance(payer, starknet::get_contract_address()).low;
-            assert(allowance >= amount, Errors::INSUFFICIENT_ALLOWANCE);
-            let balance: u128 = (*lords_dispatcher).balance_of(payer).low;
-            assert(balance >= amount, Errors::INSUFFICIENT_BALANCE);
-        }
-
-        fn _transfer_lords_to_pool(self: @ContractState,
+        fn _transfer_lords_to_pool(ref self: ContractState,
             mut store: Store,
             payer: ContractAddress,
             amount: u128,
             pool_id: PoolType,
         ) {
-            // payer must approve() first
-            let lords_dispatcher: Erc20Dispatcher = store.lords_dispatcher();
-            self._assert_payer_allowance(@lords_dispatcher, payer, amount);
-            // transfer to bank
-            lords_dispatcher.transfer_from(payer, starknet::get_contract_address(), amount.into());
+            // transfer funds...
+            IErc20Trait::asserted_transfer_from_to(
+                store.get_config_lords_address(), // token_address
+                amount, // token_amount
+                payer, // from
+                starknet::get_contract_address(), // to
+            );
             // add to pool
             let mut pool: Pool = store.get_pool(pool_id);
             pool.deposit_lords(amount);
