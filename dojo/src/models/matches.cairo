@@ -255,7 +255,7 @@ mod unit {
     };
 
     #[test]
-    fn test_get_match_players_info() {
+    fn test_get_match_players_info_batch() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         // create players
         let player_1: MatchPlayer = MatchPlayer {
@@ -288,7 +288,7 @@ mod unit {
         tester::set_MatchPlayer(ref sys.world, @player_1);
         tester::set_MatchPlayer(ref sys.world, @player_2);
         // get players batch
-        let players_info: Span<QueueInfo> = sys.store.get_match_players_info([OTHER(), OWNER()].span()).span();
+        let players_info: Span<QueueInfo> = sys.store.get_match_players_info_batch([OTHER(), OWNER()].span()).span();
         // validate stored info
         assert_eq!(*players_info[0].queue_mode, player_2.queue_info.queue_mode, "player_2.queue_mode");
         assert_eq!(*players_info[0].slot, player_2.queue_info.slot, "player_2.slot");

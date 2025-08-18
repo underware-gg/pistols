@@ -73,15 +73,54 @@ pub impl PactImpl of PactTrait {
 #[cfg(test)]
 mod unit {
     use starknet::{ContractAddress};
-    use super::{PactTrait};
+    use super::{Pact, PactTrait};
+    use pistols::models::challenge::{DuelType};
     use pistols::utils::address::{ContractAddressIntoU256};
+    use pistols::tests::tester::{tester,
+        tester::{
+            TestSystems, StoreTrait,
+            FLAGS,
+        }
+    };
+
+    fn A() -> ContractAddress {(starknet::contract_address_const::<0x127fd5f1fe78a71f8bcd1fec63e3fe2f0486b6ecd5c86a0466c3a21fa5cfcec>())}
+    fn B() -> ContractAddress {(starknet::contract_address_const::<0x13d9ee239f33fea4f8785b9e3870ade909e20a9599ae7cd62c1c292b73af1b7>())}
+    fn C() -> ContractAddress {(starknet::contract_address_const::<0x457643654334345634563456345634563456345634563456345634563456345>())}
 
     #[test]
     fn test_pact_pair() {
-        let a: ContractAddress = starknet::contract_address_const::<0x127fd5f1fe78a71f8bcd1fec63e3fe2f0486b6ecd5c86a0466c3a21fa5cfcec>();
-        let b: ContractAddress = starknet::contract_address_const::<0x13d9ee239f33fea4f8785b9e3870ade909e20a9599ae7cd62c1c292b73af1b7>();
-        let p_a = PactTrait::make_pair(a.into(), b.into());
-        let p_b = PactTrait::make_pair(b.into(), a.into());
+        let p_a = PactTrait::make_pair(A().into(), B().into());
+        let p_b = PactTrait::make_pair(B().into(), A().into());
         assert_eq!(p_a, p_b, "test_pact_pair");
+    }
+
+    #[test]
+    fn test_get_pacts_duel_counts_batch() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::OWNER);
+        // create players
+        let pair_a_b: u128 = PactTrait::make_pair(A().into(), B().into());
+        let pair_a_c: u128 = PactTrait::make_pair(A().into(), C().into());
+        let pact_a_b = Pact {
+            duel_type: DuelType::Seasonal,
+            pair: pair_a_b,
+            duel_id: 0,
+            duel_count: 11,
+        };
+        let pact_a_c = Pact {
+            duel_type: DuelType::Seasonal,
+            pair: pair_a_c,
+            duel_id: 0,
+            duel_count: 22,
+        };
+        tester::set_Pact(ref sys.world, @pact_a_b);
+        tester::set_Pact(ref sys.world, @pact_a_c);
+        // get pact batch
+        let keys: Span<(DuelType, u128)> = [
+            (DuelType::Seasonal, pair_a_c),
+            (DuelType::Seasonal, pair_a_b),
+        ].span();
+        let duels: Span<u32> = sys.store.get_pacts_duel_counts_batch(keys).span();
+        assert_eq!(*duels[0], pact_a_c.duel_count, "pact_a_c.duel_count");
+        assert_eq!(*duels[1], pact_a_b.duel_count, "pact_a_b.duel_count");
     }
 }

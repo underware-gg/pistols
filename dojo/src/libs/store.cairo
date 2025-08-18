@@ -630,14 +630,24 @@ pub impl StoreImpl of StoreTrait {
         (self.world.read_member(Model::<Ring>::ptr_from_keys(ring_id), selector!("ring_type")))
     }
 
+    //----------------------------------
+    // Batch member getters
+    // https://book.dojoengine.org/framework/world/api#batch-operations
+    //
+
     #[inline(always)]
-    fn get_match_players_info(self: @Store, player_addresses: Span<ContractAddress>) -> Array<QueueInfo> {
+    fn get_match_players_info_batch(self: @Store, player_addresses: Span<ContractAddress>) -> Array<QueueInfo> {
         (self.world.read_member_of_models(Model::<MatchPlayer>::ptrs_from_keys(player_addresses), selector!("queue_info")))
+    }
+
+    #[inline(always)]
+    fn get_pacts_duel_counts_batch(self: @Store, keys: Span<(DuelType, u128)>) -> Array<u32> {
+        (self.world.read_member_of_models(Model::<Pact>::ptrs_from_keys(keys), selector!("duel_count")))
     }
 
     //----------------------------------
     // Single member setters
-    // https://book.dojoengine.org/framework/world/api#write_member-and-write_member_of_models
+    // https://book.dojoengine.org/framework/world/api#write_membert
     //
 
     #[inline(always)]

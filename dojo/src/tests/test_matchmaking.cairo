@@ -286,6 +286,40 @@ mod tests {
     }
 
     #[test]
+    fn test_matchmaker_choose_least_duels() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        let C: ContractAddress = BUMMER();
+        tester::fund_duelists_pool(@sys, 3);
+        let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
+        let ID_B: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
+        let ID_C: u128 = *tester::execute_claim_starter_pack(@sys, C)[0];
+        let queue_id = QueueId::Unranked;
+        //
+        // matchmake player B-A
+        _mock_slot(@sys, 5);
+        let _duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, QueueMode::Fast);
+        let duel_id: u128 = tester::execute_match_make_me(@sys, B, ID_B, queue_id, QueueMode::Fast);
+        _assert_matchmaking_duel_started(@sys, duel_id, queue_id, B, ID_B, A, ID_A, "match_made_1");
+        _finish_duel(@sys, duel_id, 1, "finished_1");
+        //
+        // matchmake player B-C
+        _mock_slot(@sys, 5);
+        let _duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, QueueMode::Fast);
+        _mock_slot(@sys, 3);
+        let duel_id: u128 = tester::execute_match_make_me(@sys, C, ID_C, queue_id, QueueMode::Fast);
+        assert_eq!(duel_id, 0, "duel_id_C");
+        _assert_match_queue(@sys, queue_id, [A, C].span(), "match_B");
+        _mock_slot(@sys, 5);
+        let duel_id: u128 = tester::execute_match_make_me(@sys, B, ID_B, queue_id, QueueMode::Fast);
+        assert_eq!(duel_id, 2, "duel_id_B");
+        _assert_matchmaking_duel_started(@sys, duel_id, queue_id, B, ID_B, C, ID_C, "match_made_2");
+        _assert_match_queue(@sys, queue_id, [A].span(), "match_B");
+        _finish_duel(@sys, duel_id, 1, "finished_2");
+    }
+
+    #[test]
     fn test_matchmaker_no_flipping_slots() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
         let A: ContractAddress = OWNER();

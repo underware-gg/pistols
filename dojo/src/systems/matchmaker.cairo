@@ -15,7 +15,9 @@ pub mod matchmaker {
     use dojo::world::{WorldStorage};
 
     use pistols::models::{
+        challenge::{DuelType},
         duelist::{DuelistTrait},
+        pact::{PactTrait},
         matches::{
             QueueId, QueueIdTrait, QueueMode,
             MatchQueue, MatchQueueTrait,
@@ -37,7 +39,7 @@ pub mod matchmaker {
         store::{Store, StoreTrait},
     };
     // use pistols::utils::address::{ZERO};
-    use pistols::utils::address::{ContractAddressDisplay};
+    use pistols::utils::address::{ContractAddressDisplay, ContractAddressIntoU256};
 
     pub mod Errors {
         pub const INVALID_QUEUE: felt252        = 'MATCHMAKER: Invalid queue';
@@ -150,7 +152,7 @@ pub mod matchmaker {
             // queue is not empty, try to match...
             if (queue.players.len().is_non_zero()) {
                 // get all players in queue
-                let players_info: Span<QueueInfo> = store.get_match_players_info(queue.players.span()).span();
+                let players_info: Span<QueueInfo> = store.get_match_players_info_batch(queue.players.span()).span();
 
                 let player_slot: u8 = matching_player.queue_info.slot + 
                     (match player_position {
@@ -206,8 +208,27 @@ pub mod matchmaker {
                 if (candidates.len() == 1) {
                     matched_player_address = Option::Some(*candidates[0]);
                 } else if (candidates.len() > 1) {
-// TODO: choose one player from all candidates within slot
-                    matched_player_address = Option::Some(*candidates[0]);
+                    // tie breaker is number of duels between player and candidates
+                    // get duel count batch...
+                    let duel_type: DuelType = queue.queue_id.get_duel_type();
+                    let mut keys: Array<(DuelType, u128)> = array![];
+                    let mut i: usize = 0;
+                    while (i < candidates.len()) {
+                        let candidate_address: ContractAddress = *candidates[i];
+                        keys.append((duel_type, PactTrait::make_pair(matching_player.player_address.into(), candidate_address.into())));
+                        i += 1;
+                    };
+                    let duel_counts: Span<u32> = store.get_pacts_duel_counts_batch(keys.span()).span();
+                    // choose the candidate with the least duels
+                    let mut matched_candidate_index: usize = 0;
+                    let mut i: usize = 1;
+                    while (i < candidates.len()) {
+                        if (duel_counts[i] < duel_counts[matched_candidate_index]) {
+                            matched_candidate_index = i;
+                        }
+                        i += 1;
+                    };
+                    matched_player_address = Option::Some(*candidates[matched_candidate_index]);
                 }
             }
 
