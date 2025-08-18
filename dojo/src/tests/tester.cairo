@@ -1284,6 +1284,7 @@ pub mod tester {
             duel_type,
             pair: PactTrait::make_pair(p1.into(), p2.into()),
             duel_id: 0,
+            duel_count: 0,
         });
     }
 

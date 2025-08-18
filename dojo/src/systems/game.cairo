@@ -659,7 +659,7 @@ pub mod game {
             round.state = RoundState::Finished;
             store.set_round(@round);
             // unset pact (if set)
-            challenge.unset_pact(ref store);
+            challenge.unset_pact(ref store, challenge.state.is_concluded());
             // exit challenge
             store.exit_challenge(challenge.duelist_id_a);
             store.exit_challenge(challenge.duelist_id_b);

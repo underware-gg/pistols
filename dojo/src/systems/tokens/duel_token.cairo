@@ -432,7 +432,7 @@ pub mod duel_token {
             if (challenge.state.is_canceled()) {
                 challenge.season_id = store.get_current_season_id();
                 challenge.timestamps.end = timestamp;
-                challenge.unset_pact(ref store);
+                challenge.unset_pact(ref store, false);
                 store.exit_challenge(challenge.duelist_id_a);
                 store.emit_challenge_action(@challenge, 1, ChallengeAction::Finished);
                 store.emit_challenge_action(@challenge, 2, ChallengeAction::Finished);

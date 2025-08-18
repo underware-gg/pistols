@@ -18,6 +18,7 @@ pub mod tests {
         constants::{CONST},
     };
     use pistols::libs::moves_hash::{MovesHashTrait};
+    use pistols::utils::address::{ContractAddressIntoU256};
     use pistols::utils::arrays::{SpanUtilsTrait};
     use pistols::utils::math::{MathU8};
 
@@ -101,6 +102,27 @@ pub mod tests {
         assert_eq!(player_totals.honour, *duelist_totals.honour, "[{}] player_totals.honour", prefix);
     }
 
+
+    //-----------------------------------------
+    // Single Round Draw
+    //
+
+    #[test]
+    fn test_unranked_resolved_draw_miss() {
+        let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_miss();
+        let sys: TestSystems = _test_resolved_draw(mocked, moves_a, moves_b, CONST::FULL_HEALTH);
+        tester::assert_event_trophy(@sys, Trophy::Blindfold, OTHER());
+        // tester::assert_event_trophy(@sys, Trophy::Blindfold, OWNER());
+    }
+
+    #[test]
+    fn test_unranked_resolved_draw_crit() {
+        let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
+        let sys: TestSystems = _test_resolved_draw(mocked, moves_a, moves_b, 0);
+        tester::assert_event_trophy(@sys, Trophy::BloodBath, OTHER());
+        // tester::assert_event_trophy(@sys, Trophy::BloodBath, OWNER());
+    }
+
     fn _test_resolved_draw(mocked: Span<MockedValue>, moves_a: PlayerMoves, moves_b: PlayerMoves, final_health: u8) -> TestSystems {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         sys.rng.mock_values(mocked);
@@ -108,8 +130,6 @@ pub mod tests {
         tester::fund_duelists_pool(@sys, 2);
         let duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, OWNER())[0];
         let duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, OTHER())[0];
-
-        let season_id: u32 = SEASON_ID_1;
 
         let fame_balance_a_init: u128 = tester::fame_balance_of_token(@sys, duelist_id_a);
         let fame_balance_b_init: u128 = tester::fame_balance_of_token(@sys, duelist_id_b);
@@ -125,9 +145,9 @@ pub mod tests {
         assert_eq!(timestamp_active_b, 0, "timestamp_active_b");
 
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
-        tester::make_challenge_ranked(ref sys, duel_id);
         assert_eq!(sys.store.get_challenge(duel_id).get_deck_type(), DeckType::Classic, "challenge.deck_type");
-        // tester::assert_pact(@sys, duel_id, true, true, "started"); // cant because changed DuelType
+        tester::assert_pact(@sys, duel_id, true, true, "started");
+        assert_eq!(sys.store.get_pact(DuelType::Seasonal, OWNER().into(), OTHER().into()).duel_count, 0, "started");
         let timestamp_active_a: u64 = sys.store.get_duelist_timestamps(ID(OWNER())).active;
         let timestamp_active_b: u64 = sys.store.get_duelist_timestamps(ID(OTHER())).active;
         assert_gt!(timestamp_active_a, 0, "timestamp_active_a");
@@ -142,7 +162,8 @@ pub mod tests {
         tester::drop_dojo_events(@sys);
         tester::execute_reveal_moves(@sys, OTHER(), duel_id, moves_b.salt, moves_b.moves);
         let (challenge, round) = tester::get_Challenge_Round_value(@sys, duel_id);
-        // tester::assert_pact(@sys, duel_id, false, false, "ended"); // cant because changed DuelType
+        tester::assert_pact(@sys, duel_id, false, false, "ended");
+        assert_eq!(sys.store.get_pact(DuelType::Seasonal, OWNER().into(), OTHER().into()).duel_count, 1, "ended");
 // challenge.winner.print();
 // round.state_a.health.print();
 // round.state_b.health.print();
@@ -164,8 +185,8 @@ pub mod tests {
 
         let totals_a: Totals = sys.store.get_duelist_totals(ID(OWNER()).into());
         let totals_b: Totals = sys.store.get_duelist_totals(ID(OTHER()).into());
-        let score_a: SeasonScoreboard = sys.store.get_scoreboard(season_id, ID(OWNER()).into());
-        let score_b: SeasonScoreboard = sys.store.get_scoreboard(season_id, ID(OTHER()).into());
+        // let score_a: SeasonScoreboard = sys.store.get_scoreboard(season_id, ID(OWNER()).into());
+        // let score_b: SeasonScoreboard = sys.store.get_scoreboard(season_id, ID(OTHER()).into());
         assert_eq!(totals_a.total_duels, 1, "totals_a.total_duels");
         assert_eq!(totals_b.total_duels, 1, "totals_b.total_duels");
         assert_eq!(totals_a.total_draws, 1, "totals_a.total_draws");
@@ -182,15 +203,16 @@ pub mod tests {
         assert_eq!(totals_a.honour, round.state_a.honour, "totals_a.honour");
         assert_eq!(totals_b.honour, round.state_b.honour, "totals_b.honour");
 
-        let leaderboard: Leaderboard = sys.store.get_leaderboard(season_id);
-        let positions: Span<LeaderboardPosition> = leaderboard.get_all_positions();
-        assert_eq!(positions.len(), 2, "leaderboard_positions.len");
-        assert_eq!(*positions[0].duelist_id, ID(OWNER()).into(), "draw_leaderboards[0].pos");
-        assert_eq!(*positions[1].duelist_id, ID(OTHER()).into(), "draw_leaderboards[1].pos");
-        assert_gt!(*positions[0].points, 0, "draw_leaderboards[0].points");
-        assert_gt!(*positions[1].points, 0, "draw_leaderboards[1].points");
-        assert_eq!(*positions[0].points, score_a.points, "score_a.points");
-        assert_eq!(*positions[1].points, score_b.points, "score_b.points");
+        // DuelType::Seasonal is now Unranked
+        // let leaderboard: Leaderboard = sys.store.get_leaderboard(season_id);
+        // let positions: Span<LeaderboardPosition> = leaderboard.get_all_positions();
+        // assert_eq!(positions.len(), 2, "leaderboard_positions.len");
+        // assert_eq!(*positions[0].duelist_id, ID(OWNER()).into(), "draw_leaderboards[0].pos");
+        // assert_eq!(*positions[1].duelist_id, ID(OTHER()).into(), "draw_leaderboards[1].pos");
+        // assert_gt!(*positions[0].points, 0, "draw_leaderboards[0].points");
+        // assert_gt!(*positions[1].points, 0, "draw_leaderboards[1].points");
+        // assert_eq!(*positions[0].points, score_a.points, "score_a.points");
+        // assert_eq!(*positions[1].points, score_b.points, "score_b.points");
 
         // duel nft still owned by contract
         assert_eq!(sys.duels.owner_of(duel_id.into()), sys.game.contract_address, "duels.owner_of_END");
@@ -209,26 +231,22 @@ pub mod tests {
         (sys)
     }
 
-    #[test]
-    fn test_ranked_resolved_draw_miss() {
-        let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_miss();
-        let sys: TestSystems = _test_resolved_draw(mocked, moves_a, moves_b, CONST::FULL_HEALTH);
-        tester::assert_event_trophy(@sys, Trophy::Blindfold, OTHER());
-        // tester::assert_event_trophy(@sys, Trophy::Blindfold, OWNER());
-    }
-
-    #[test]
-    fn test_ranked_resolved_draw_crit() {
-        let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
-        let sys: TestSystems = _test_resolved_draw(mocked, moves_a, moves_b, 0);
-        tester::assert_event_trophy(@sys, Trophy::BloodBath, OTHER());
-        // tester::assert_event_trophy(@sys, Trophy::BloodBath, OWNER());
-    }
-
     
     //-----------------------------------------
     // Single Round Resolved (paces only)
     //
+
+    #[test]
+    fn test_unranked_resolved_win_a() {
+        let (mocked, moves_a, moves_b) = prefabs::get_moves_crit_a();
+        _test_resolved_win(mocked, moves_a, moves_b, 1);
+    }
+
+    #[test]
+    fn test_unranked_resolved_win_b() {
+        let (mocked, moves_a, moves_b) = prefabs::get_moves_crit_b();
+        _test_resolved_win(mocked, moves_a, moves_b, 2);
+    }
 
     fn _test_resolved_win(mocked: Span<MockedValue>, moves_a: PlayerMoves, moves_b: PlayerMoves, winner: u8) {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
@@ -238,12 +256,10 @@ pub mod tests {
         let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, OWNER())[0];
         let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, OTHER())[0];
 
-        let season_id: u32 = SEASON_ID_1;
-
         let (_challenge, round_1, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
-        tester::make_challenge_ranked(ref sys, duel_id);
         assert_eq!(sys.store.get_challenge(duel_id).get_deck_type(), DeckType::Classic, "challenge.deck_type");
-        // tester::assert_pact(@sys, duel_id, true, true, "started"); // cant because changed DuelType
+        tester::assert_pact(@sys, duel_id, true, true, "started");
+        assert_eq!(sys.store.get_pact(DuelType::Seasonal, OWNER().into(), OTHER().into()).duel_count, 0, "started_1");
 
         // duel owned by contract
         assert_eq!(sys.duels.owner_of(duel_id.into()), sys.game.contract_address, "duels.owner_of");
@@ -284,7 +300,9 @@ pub mod tests {
         // 2nd reveal > Finished
         tester::execute_reveal_moves(@sys, OTHER(), duel_id, moves_b.salt, moves_b.moves);
         let (challenge, round) = tester::get_Challenge_Round_value(@sys, duel_id);
-        // tester::assert_pact(@sys, duel_id, false, false, "ended"); // cant because changed DuelType
+        tester::assert_pact(@sys, duel_id, false, false, "ended_1");
+        assert_eq!(sys.store.get_pact(DuelType::Seasonal, OWNER().into(), OTHER().into()).duel_count, 1, "ended_1_a_b");
+        assert_eq!(sys.store.get_pact(DuelType::Seasonal, OTHER().into(), OWNER().into()).duel_count, 1, "ended_1_b_a");
 // challenge.winner.print();
 // // challenge.state.print();
 // round.state_a.health.print();
@@ -292,6 +310,7 @@ pub mod tests {
         assert_eq!(challenge.state, ChallengeState::Resolved, "4_challenge.state");
         assert_ne!(challenge.winner, 0, "4_challenge.winner");
         assert_eq!(challenge.season_id, sys.store.get_current_season_id(), "challenge_season_id");
+        assert_eq!(challenge.season_id, SEASON_ID_1, "SEASON_ID_1");
         assert_gt!(challenge.timestamps.end, 0, "4_challenge.timestamps.end");
         assert_eq!(round.state, RoundState::Finished, "4__state");
         assert_eq!(round.moves_a.hashed, moves_a.hashed, "43__hash");
@@ -321,14 +340,15 @@ pub mod tests {
         assert_eq!(totals_a_1.honour, round.state_a.honour, "totals_a_1.honour");
         assert_eq!(totals_b_1.honour, round.state_b.honour, "totals_b_1.honour");
 
-        let leaderboard_1: Leaderboard = sys.store.get_leaderboard(season_id);
-        let positions_1: Span<LeaderboardPosition> = leaderboard_1.get_all_positions();
-        assert_eq!(positions_1.len(), 2, "leaderboard_positions.len");
-        assert_gt!(*positions_1[0].points, 0, "leaderboard_1[0].points");
-        assert_gt!(*positions_1[1].points, 0, "leaderboard_1[1].points");
+        // DuelType::Seasonal is now Unranked
+        // let leaderboard_1: Leaderboard = sys.store.get_leaderboard(SEASON_ID_1);
+        // let positions_1: Span<LeaderboardPosition> = leaderboard_1.get_all_positions();
+        // assert_eq!(positions_1.len(), 2, "leaderboard_positions.len");
+        // assert_gt!(*positions_1[0].points, 0, "leaderboard_1[0].points");
+        // assert_gt!(*positions_1[1].points, 0, "leaderboard_1[1].points");
 
-        let score_a_1: SeasonScoreboard = sys.store.get_scoreboard(season_id, ID(OWNER()).into());
-        let score_b_1: SeasonScoreboard = sys.store.get_scoreboard(season_id, ID(OTHER()).into());
+        // let score_a_1: SeasonScoreboard = sys.store.get_scoreboard(SEASON_ID_1, ID(OWNER()).into());
+        // let score_b_1: SeasonScoreboard = sys.store.get_scoreboard(SEASON_ID_1, ID(OTHER()).into());
 
         assert_eq!(challenge.winner, winner, "winner");
         if (winner == 1) {
@@ -339,10 +359,10 @@ pub mod tests {
             assert_eq!(round.state_a.damage, CONST::FULL_HEALTH, "a_win_damage_a");
             assert_eq!(round.state_a.health, CONST::FULL_HEALTH, "a_win_health_a");
             assert_eq!(round.state_b.health, 0, "a_win_health_b");
-            assert_eq!(*positions_1[0].duelist_id, ID(OWNER()).into(), "a_win_leaderboards[0].pos");
-            assert_eq!(*positions_1[1].duelist_id, ID(OTHER()).into(), "a_win_leaderboards[1].pos");
-            assert_eq!(*positions_1[0].points, score_a_1.points, "score_a_1.points");
-            assert_eq!(*positions_1[1].points, score_b_1.points, "score_b_1.points");
+            // assert_eq!(*positions_1[0].duelist_id, ID(OWNER()).into(), "a_win_leaderboards[0].pos");
+            // assert_eq!(*positions_1[1].duelist_id, ID(OTHER()).into(), "a_win_leaderboards[1].pos");
+            // assert_eq!(*positions_1[0].points, score_a_1.points, "score_a_1.points");
+            // assert_eq!(*positions_1[1].points, score_b_1.points, "score_b_1.points");
             _assert_is_alive(round.state_a, "alive_a");
             _assert_is_dead(round.state_b, "dead_b");
             assert_eq!(sys.duels.owner_of(duel_id.into()), challenge.address_a, "duels.owner_of_END_1");
@@ -354,10 +374,10 @@ pub mod tests {
             assert_eq!(round.state_b.damage, CONST::FULL_HEALTH, "b_win_damage_b");
             assert_eq!(round.state_b.health, CONST::FULL_HEALTH, "b_win_health_b");
             assert_eq!(round.state_a.health, 0, "b_win_health_a");
-            assert_eq!(*positions_1[0].duelist_id, ID(OTHER()).into(), "b_win_leaderboards[0].pos");
-            assert_eq!(*positions_1[1].duelist_id, ID(OWNER()).into(), "b_win_leaderboards[1].pos");
-            assert_eq!(*positions_1[0].points, score_b_1.points, "score_b_1.points");
-            assert_eq!(*positions_1[1].points, score_a_1.points, "score_a_1.points");
+            // assert_eq!(*positions_1[0].duelist_id, ID(OTHER()).into(), "b_win_leaderboards[0].pos");
+            // assert_eq!(*positions_1[1].duelist_id, ID(OWNER()).into(), "b_win_leaderboards[1].pos");
+            // assert_eq!(*positions_1[0].points, score_b_1.points, "score_b_1.points");
+            // assert_eq!(*positions_1[1].points, score_a_1.points, "score_a_1.points");
             _assert_is_alive(round.state_b, "alive_b");
             _assert_is_dead(round.state_a, "dead_a");
             assert_eq!(sys.duels.owner_of(duel_id.into()), challenge.address_b, "duels.owner_of_END_1");
@@ -369,13 +389,9 @@ pub mod tests {
         // Run same challenge again!!!!
         // (to compute totals and scores)
         //
-
-        // clear pact manually because we changed to DuelType::Ranked
-        tester::clear_pact(ref sys, DuelType::Seasonal, OWNER(), OTHER());
-
         let (_challenge, round_2, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
-        tester::make_challenge_ranked(ref sys, duel_id);
-        // tester::assert_pact(@sys, duel_id, true, true, "started_2"); // cant because changed DuelType
+        tester::assert_pact(@sys, duel_id, true, true, "started_2");
+        assert_eq!(sys.store.get_pact(DuelType::Seasonal, OWNER().into(), OTHER().into()).duel_count, 1, "started_2");
         // assert(round_2.moves_a.seed != 0, "round_2.moves_a.seed");
         // assert(round_2.moves_b.seed != 0, "round_2.moves_b.seed");
         // assert(round_2.moves_a.seed != round_2.moves_b.seed, "round_2.moves_a.seed != moves_b");
@@ -395,11 +411,13 @@ pub mod tests {
         let round: RoundValue = sys.store.get_round_value(duel_id);
         assert_eq!(round.moves_b.timeout, 0, "++ timeout_reveal_b_reset");
         tester::execute_reveal_moves(@sys, OWNER(), duel_id, moves_a.salt, moves_a.moves);
-        // tester::assert_pact(@sys, duel_id, false, false, "ended_2"); // cant because changed DuelType
+        tester::assert_pact(@sys, duel_id, false, false, "ended_2");
+        assert_eq!(sys.store.get_pact(DuelType::Seasonal, OWNER().into(), OTHER().into()).duel_count, 2, "ended_2");
         let (challenge, round) = tester::get_Challenge_Round_value(@sys, duel_id);
         assert_eq!(challenge.state, ChallengeState::Resolved, "challenge.state ++");
         assert_ne!(challenge.winner, 0, "challenge.winner ++");
         assert_eq!(challenge.season_id, sys.store.get_current_season_id(), "challenge_season_id ++");
+        assert_eq!(challenge.season_id, SEASON_ID_1, "SEASON_ID_1 ++");
         assert_gt!(challenge.timestamps.end, 0, "challenge.timestamps.end ++");
         assert_eq!(round.state, RoundState::Finished, "state ++");
         assert_eq!(round.state_a.honour, (*moves_a.moves[0] * 10).try_into().unwrap(), "round.state_a.honour ++");
@@ -416,52 +434,40 @@ pub mod tests {
         _assert_player_totals(@sys, OWNER(), @totals_a_2, "A_2");
         _assert_player_totals(@sys, OTHER(), @totals_b_2, "B_2");
 
-        let leaderboard_2: Leaderboard = sys.store.get_leaderboard(season_id);
-        let positions_2: Span<LeaderboardPosition> = leaderboard_2.get_all_positions();
-        assert_eq!(positions_2.len(), 2, "leaderboard_positions.len() ++");
-        assert_gt!(*positions_2[0].points, *positions_1[0].points, "score_2 > score_1");
-        assert_gt!(*positions_2[1].points, *positions_1[1].points, "score_2 > score_1");
+        // DuelType::Seasonal is now Unranked
+        // let leaderboard_2: Leaderboard = sys.store.get_leaderboard(SEASON_ID_1);
+        // let positions_2: Span<LeaderboardPosition> = leaderboard_2.get_all_positions();
+        // assert_eq!(positions_2.len(), 2, "leaderboard_positions.len() ++");
+        // assert_gt!(*positions_2[0].points, *positions_1[0].points, "score_2 > score_1");
+        // assert_gt!(*positions_2[1].points, *positions_1[1].points, "score_2 > score_1");
 
-        let score_a_2: SeasonScoreboard = sys.store.get_scoreboard(season_id, ID(OWNER()).into());
-        let score_b_2: SeasonScoreboard = sys.store.get_scoreboard(season_id, ID(OTHER()).into());
+        // let score_a_2: SeasonScoreboard = sys.store.get_scoreboard(SEASON_ID_1, ID(OWNER()).into());
+        // let score_b_2: SeasonScoreboard = sys.store.get_scoreboard(SEASON_ID_1, ID(OTHER()).into());
 
         if (winner == 1) {
             assert_eq!(totals_a_2.total_wins, 2, "a_win_duelist_a.total_wins ++");
             assert_eq!(totals_b_2.total_wins, 0, "a_win_duelist_b.total_wins ++");
             assert_eq!(totals_a_2.total_losses, 0, "a_win_duelist_a.total_losses ++");
             assert_eq!(totals_b_2.total_losses, 2, "a_win_duelist_b.total_losses ++");
-            assert_eq!(*positions_2[0].duelist_id, ID(OWNER()).into(), "a_win_leaderboards[0].pos ++");
-            assert_eq!(*positions_2[1].duelist_id, ID(OTHER()).into(), "a_win_leaderboards[1].pos ++");
-            assert_eq!(*positions_2[0].points, score_a_2.points, "score_a_2.points ++");
-            assert_eq!(*positions_2[1].points, score_b_2.points, "score_b_2.points ++");
+            // assert_eq!(*positions_2[0].duelist_id, ID(OWNER()).into(), "a_win_leaderboards[0].pos ++");
+            // assert_eq!(*positions_2[1].duelist_id, ID(OTHER()).into(), "a_win_leaderboards[1].pos ++");
+            // assert_eq!(*positions_2[0].points, score_a_2.points, "score_a_2.points ++");
+            // assert_eq!(*positions_2[1].points, score_b_2.points, "score_b_2.points ++");
         } else if (winner == 2) {
             assert_eq!(totals_a_2.total_wins, 0, "b_win_duelist_a.total_wins ++");
             assert_eq!(totals_b_2.total_wins, 2, "b_win_duelist_b.total_wins ++");
             assert_eq!(totals_a_2.total_losses, 2, "b_win_duelist_a.total_losses ++");
             assert_eq!(totals_b_2.total_losses, 0, "b_win_duelist_b.total_losses ++");
-            assert_eq!(*positions_2[0].duelist_id, ID(OTHER()).into(), "b_win_leaderboards[0].pos ++");
-            assert_eq!(*positions_2[1].duelist_id, ID(OWNER()).into(), "b_win_leaderboards[1].pos ++");
-            assert_eq!(*positions_2[0].points, score_b_2.points, "score_b_2.points ++");
-            assert_eq!(*positions_2[1].points, score_a_2.points, "score_a_2.points ++");
+            // assert_eq!(*positions_2[0].duelist_id, ID(OTHER()).into(), "b_win_leaderboards[0].pos ++");
+            // assert_eq!(*positions_2[1].duelist_id, ID(OWNER()).into(), "b_win_leaderboards[1].pos ++");
+            // assert_eq!(*positions_2[0].points, score_b_2.points, "score_b_2.points ++");
+            // assert_eq!(*positions_2[1].points, score_a_2.points, "score_a_2.points ++");
         } else {
             assert!(false, "bad winner")
         }
 
         _assert_duel_progress(@sys, duel_id, moves_a.moves, moves_b.moves);
     }
-
-    #[test]
-    fn test_ranked_resolved_win_a() {
-        let (mocked, moves_a, moves_b) = prefabs::get_moves_crit_a();
-        _test_resolved_win(mocked, moves_a, moves_b, 1);
-    }
-
-    #[test]
-    fn test_ranked_resolved_win_b() {
-        let (mocked, moves_a, moves_b) = prefabs::get_moves_crit_b();
-        _test_resolved_win(mocked, moves_a, moves_b, 2);
-    }
-
 
     #[test]
     fn test_unranked_duel() {
@@ -1742,6 +1748,106 @@ pub mod tests {
     //-------------------------------
     // Ranked / leaderboards
     //
+
+    #[test]
+    fn test_ranked_leaderboards_a() {
+        let (mocked, moves_a, moves_b) = prefabs::get_moves_crit_a();
+        _test_ranked_leaderboards(mocked, moves_a, moves_b, 1);
+    }
+
+    #[test]
+    fn test_ranked_leaderboards_b() {
+        let (mocked, moves_a, moves_b) = prefabs::get_moves_crit_b();
+        _test_ranked_leaderboards(mocked, moves_a, moves_b, 2);
+    }
+
+    fn _test_ranked_leaderboards(mocked: Span<MockedValue>, moves_a: PlayerMoves, moves_b: PlayerMoves, winner: u8) {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        sys.rng.mock_values(mocked);
+
+        tester::fund_duelists_pool(@sys, 2);
+        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, OWNER())[0];
+        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, OTHER())[0];
+
+        // run duel 1
+        let (_challenge, _round_1, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
+        tester::make_challenge_ranked(ref sys, duel_id);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(@sys, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_reveal_moves(@sys, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        tester::assert_ranked_duel_results(@sys, duel_id, "unranked");
+        let (challenge, _round) = tester::get_Challenge_Round_value(@sys, duel_id);
+        assert_eq!(challenge.state, ChallengeState::Resolved, "4_challenge.state");
+        assert_eq!(challenge.winner, winner, "4_challenge.winner");
+
+        let leaderboard_1: Leaderboard = sys.store.get_leaderboard(SEASON_ID_1);
+        let positions_1: Span<LeaderboardPosition> = leaderboard_1.get_all_positions();
+        assert_eq!(positions_1.len(), 2, "leaderboard_positions.len");
+        assert_gt!(*positions_1[0].points, 0, "leaderboard_1[0].points");
+        assert_gt!(*positions_1[1].points, 0, "leaderboard_1[1].points");
+
+        let score_a_1: SeasonScoreboard = sys.store.get_scoreboard(SEASON_ID_1, ID(OWNER()).into());
+        let score_b_1: SeasonScoreboard = sys.store.get_scoreboard(SEASON_ID_1, ID(OTHER()).into());
+
+        assert_eq!(challenge.winner, winner, "winner");
+        if (winner == 1) {
+            assert_eq!(*positions_1[0].duelist_id, ID(OWNER()).into(), "a_win_leaderboards[0].pos");
+            assert_eq!(*positions_1[1].duelist_id, ID(OTHER()).into(), "a_win_leaderboards[1].pos");
+            assert_eq!(*positions_1[0].points, score_a_1.points, "score_a_1.points");
+            assert_eq!(*positions_1[1].points, score_b_1.points, "score_b_1.points");
+        } else if (winner == 2) {
+            assert_eq!(*positions_1[0].duelist_id, ID(OTHER()).into(), "b_win_leaderboards[0].pos");
+            assert_eq!(*positions_1[1].duelist_id, ID(OWNER()).into(), "b_win_leaderboards[1].pos");
+            assert_eq!(*positions_1[0].points, score_b_1.points, "score_b_1.points");
+            assert_eq!(*positions_1[1].points, score_a_1.points, "score_a_1.points");
+        } else {
+            assert!(false, "bad winner");
+        }
+
+        //
+        // Run same challenge again!!!!
+        // (to compute totals and scores)
+        //
+
+        // clear pact manually because we changed to DuelType::Ranked
+        tester::clear_pact(ref sys, DuelType::Seasonal, OWNER(), OTHER());
+
+        let (_challenge, _round_2, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
+        tester::make_challenge_ranked(ref sys, duel_id);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_reveal_moves(@sys, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        tester::execute_reveal_moves(@sys, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        let (_challenge, _round) = tester::get_Challenge_Round_value(@sys, duel_id);
+        // tester::assert_pact(@sys, duel_id, false, false, "ended_2"); // cant because changed DuelType
+        let (challenge, _round) = tester::get_Challenge_Round_value(@sys, duel_id);
+        assert_eq!(challenge.state, ChallengeState::Resolved, "challenge.state ++");
+        assert_eq!(challenge.winner, winner, "challenge.winner ++");
+
+        let leaderboard_2: Leaderboard = sys.store.get_leaderboard(SEASON_ID_1);
+        let positions_2: Span<LeaderboardPosition> = leaderboard_2.get_all_positions();
+        assert_eq!(positions_2.len(), 2, "leaderboard_positions.len() ++");
+        assert_gt!(*positions_2[0].points, *positions_1[0].points, "score_2 > score_1");
+        assert_gt!(*positions_2[1].points, *positions_1[1].points, "score_2 > score_1");
+
+        let score_a_2: SeasonScoreboard = sys.store.get_scoreboard(SEASON_ID_1, ID(OWNER()).into());
+        let score_b_2: SeasonScoreboard = sys.store.get_scoreboard(SEASON_ID_1, ID(OTHER()).into());
+
+        if (winner == 1) {
+            assert_eq!(*positions_2[0].duelist_id, ID(OWNER()).into(), "a_win_leaderboards[0].pos ++");
+            assert_eq!(*positions_2[1].duelist_id, ID(OTHER()).into(), "a_win_leaderboards[1].pos ++");
+            assert_eq!(*positions_2[0].points, score_a_2.points, "score_a_2.points ++");
+            assert_eq!(*positions_2[1].points, score_b_2.points, "score_b_2.points ++");
+        } else if (winner == 2) {
+            assert_eq!(*positions_2[0].duelist_id, ID(OTHER()).into(), "b_win_leaderboards[0].pos ++");
+            assert_eq!(*positions_2[1].duelist_id, ID(OWNER()).into(), "b_win_leaderboards[1].pos ++");
+            assert_eq!(*positions_2[0].points, score_b_2.points, "score_b_2.points ++");
+            assert_eq!(*positions_2[1].points, score_a_2.points, "score_a_2.points ++");
+        } else {
+            assert!(false, "bad winner")
+        }
+    }
 
     #[test]
     fn test_ranked_leaderboard_qualify_ok() {

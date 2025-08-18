@@ -439,10 +439,6 @@ pub impl StoreImpl of StoreTrait {
     fn set_pact(ref self: Store, model: @Pact) {
         self.world.write_model(model);
     }
-    #[inline(always)]
-    fn delete_pact(ref self: Store, model: @Pact) {
-        self.world.erase_model(model);
-    }
 
     #[inline(always)]
     fn set_scoreboard(ref self: Store, model: @SeasonScoreboard) {

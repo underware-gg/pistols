@@ -7,9 +7,10 @@ pub struct Pact {
     #[key]
     pub duel_type: DuelType,
     #[key]
-    pub pair: u128,     // xor'd players as u256(address).low
+    pub pair: u128,         // xor'd players as u256(address).low
     //------------
-    pub duel_id: u128,  // current Challenge, or 0x0
+    pub duel_id: u128,      // current Challenge, or 0x0
+    pub duel_count: u32,    // number of (finished) duels this pair has fought
 }
 
 
@@ -52,11 +53,15 @@ pub impl PactImpl of PactTrait {
         current_pact.duel_id = *self.duel_id;
         store.set_pact(@current_pact);
     }
-    fn unset_pact(self: @Challenge, ref store: Store) {
+    fn unset_pact(self: @Challenge, ref store: Store, is_concluded: bool) {
         let (a, b): (u256, u256) = self._challenge_pair();
         if (a.is_non_zero() && b.is_non_zero()) {
-            let current_pact: Pact = store.get_pact(*self.duel_type, a, b);
-            store.delete_pact(@current_pact);
+            let mut current_pact: Pact = store.get_pact(*self.duel_type, a, b);
+            current_pact.duel_id = 0;
+            if (is_concluded) {
+                current_pact.duel_count += 1;
+            }
+            store.set_pact(@current_pact);
         }
     }
 }

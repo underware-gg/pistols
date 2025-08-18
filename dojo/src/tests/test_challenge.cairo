@@ -24,6 +24,7 @@ mod tests {
             FAKE_OWNER_OF_1, OWNED_BY_OWNER, MESSAGE,
         }
     };
+    use pistols::utils::address::{ContractAddressIntoU256};
     use pistols::tests::token::test_pack_token::_airdrop_open;
 
     const EXPIRE_MINUTES: u64 = (48 * 60);
@@ -227,6 +228,7 @@ mod tests {
         let new_state: ChallengeState = tester::execute_reply_duel(@sys, B, ID(B), duel_id, true);
         assert_eq!(new_state, ChallengeState::InProgress, "expired");
         tester::assert_pact(@sys, duel_id, true, true, "replied");
+        assert_eq!(sys.store.get_pact(DuelType::Practice, A.into(), B.into()).duel_count, 0, "pact.duel_count");
     }
 
     #[test]
@@ -243,6 +245,7 @@ mod tests {
 
         tester::execute_collect_duel(@sys, A, duel_id);
         tester::assert_pact(@sys, duel_id, false, false, "collected");
+        assert_eq!(sys.store.get_pact(DuelType::Practice, A.into(), B.into()).duel_count, 0, "pact.duel_count");
 
         let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.state, ChallengeState::Expired, "i");
@@ -289,6 +292,7 @@ mod tests {
         let new_state: ChallengeState = tester::execute_reply_duel(@sys, A, 0, duel_id, false);
         assert_eq!(new_state, ChallengeState::Withdrawn, "canceled");
         tester::assert_pact(@sys, duel_id, false, false, "withdrew");
+        assert_eq!(sys.store.get_pact(DuelType::Seasonal, A.into(), B.into()).duel_count, 0, "pact.duel_count");
 
         let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.state, new_state, "state");
@@ -334,6 +338,7 @@ mod tests {
         assert_lt!(ch.timestamps.start, timestamp, "timestamps.start");
         assert_eq!(ch.timestamps.end, timestamp, "timestamps.end");
         tester::assert_pact(@sys, duel_id, false, false, "replied");
+        assert_eq!(sys.store.get_pact(DuelType::Practice, A.into(), B.into()).duel_count, 0, "pact.duel_count");
 
         _assert_empty_progress(@sys, duel_id);
     }
@@ -548,6 +553,7 @@ mod tests {
         assert_eq!(ch.duelist_id_b, ID(B), "challenged_id");
         assert_eq!(ch.season_id, 0, "season_id_ZERO");
         tester::assert_pact(@sys, duel_id, true, true, "replied");
+        assert_eq!(sys.store.get_pact(DuelType::Seasonal, A.into(), B.into()).duel_count, 0, "pact.duel_count");
         // token_uri
         assert_ne!(sys.duels.token_uri(duel_id.into()), "", "duels.token_uri()");
     }
