@@ -11,11 +11,12 @@ mod tests {
             MatchPlayer,
             MATCHMAKER,
         },
+        pack::{PackType},
     };
     use pistols::types::{
         challenge_state::{ChallengeState},
         round_state::{RoundState},
-        duelist_profile::{DuelistProfile, BotKey},
+        duelist_profile::{DuelistProfile, GenesisKey, BotKey},
         timestamp::{TIMESTAMP},
     };
     use pistols::tests::tester::{tester,
@@ -35,6 +36,7 @@ mod tests {
         prefabs::{MockedValueTrait, PlayerMoves}
     };
     use pistols::tests::test_bot_player::tests::{_get_bot_moves_crit_a};
+    use pistols::tests::token::test_pack_token::{_airdrop_open};
     use pistols::utils::address::{ContractAddressDisplay};
     use pistols::utils::arrays::{ArrayTestUtilsTrait};
 
@@ -497,11 +499,11 @@ mod tests {
     #[test]
     fn test_matchmaker_ranked_ok() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::ADMIN | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
+        tester::fund_duelists_pool(@sys, 2);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
-        tester::fund_duelists_pool(@sys, 2);
-        let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
-        let ID_B: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
+        let ID_A: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_A");
+        let ID_B: u128 = _airdrop_open(@sys, B, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_B");
         let queue_id = QueueId::Ranked;
         // setup lords
         _setup_ranked_lords(@sys, [A, B].span());
@@ -537,14 +539,28 @@ mod tests {
     }
     
     #[test]
+    #[should_panic(expected: ('MATCHMAKER: Ineligible duelist', 'ENTRYPOINT_FAILED'))]
+    fn test_matchmaker_ranked_ineligible_duelist() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::ADMIN | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
+        tester::fund_duelists_pool(@sys, 2);
+        let A: ContractAddress = OWNER();
+        let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
+        let queue_id = QueueId::Ranked;
+        _setup_ranked_lords(@sys, [A].span());
+        tester::execute_lords_approve(@sys.lords, A, sys.matchmaker.contract_address, LORDS_PRICE);
+        // enter the starter duelist an panic
+        tester::execute_enter_queue(@sys, A, ID_A, queue_id);
+    }
+
+    #[test]
     #[should_panic(expected: ('IERC20: insufficient balance', 'ENTRYPOINT_FAILED'))]
     fn test_matchmaker_ranked_no_balance() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
-        let A: ContractAddress = OWNER();
         tester::fund_duelists_pool(@sys, 2);
-        let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
+        let A: ContractAddress = OWNER();
+        let ID_A: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop");
         let queue_id = QueueId::Ranked;
-        // try to pay...
+        // try to pay... (no FOOLS)
         tester::execute_enter_queue(@sys, A, ID_A, queue_id);
     }
     
@@ -552,9 +568,9 @@ mod tests {
     #[should_panic(expected: ('IERC20: insufficient allowance', 'ENTRYPOINT_FAILED'))]
     fn test_matchmaker_ranked_zero_allowance() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::ADMIN | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
-        let A: ContractAddress = OWNER();
         tester::fund_duelists_pool(@sys, 2);
-        let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
+        let A: ContractAddress = OWNER();
+        let ID_A: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop");
         let queue_id = QueueId::Ranked;
         _setup_ranked_lords(@sys, [A].span());
         // try to pay...
@@ -565,9 +581,9 @@ mod tests {
     #[should_panic(expected: ('IERC20: insufficient allowance', 'ENTRYPOINT_FAILED'))]
     fn test_matchmaker_ranked_no_allowance() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::ADMIN | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
-        let A: ContractAddress = OWNER();
         tester::fund_duelists_pool(@sys, 2);
-        let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
+        let A: ContractAddress = OWNER();
+        let ID_A: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop");
         let queue_id = QueueId::Ranked;
         _setup_ranked_lords(@sys, [A].span());
         tester::execute_lords_approve(@sys.lords, A, sys.matchmaker.contract_address, LORDS_PRICE - 1);

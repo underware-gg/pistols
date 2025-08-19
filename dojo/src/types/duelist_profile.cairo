@@ -614,6 +614,18 @@ pub impl DuelistProfileImpl of DuelistProfileTrait {
             _ => Archetype::Undefined,
         })
     }
+    fn is_starter_duelist(self: @DuelistProfile) -> bool {
+        (match *self {
+            DuelistProfile::Genesis(key) => {
+                (match key {
+                    GenesisKey::SerWalker |
+                    GenesisKey::LadyVengeance => true,
+                    _ => false,
+                })
+            },
+            _ => false,
+        })
+    }
 }
 
 

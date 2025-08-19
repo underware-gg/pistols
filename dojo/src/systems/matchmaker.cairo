@@ -48,7 +48,7 @@ pub mod matchmaker {
         },
     };
     use pistols::types::{
-        duelist_profile::{DuelistProfile, BotKey},
+        duelist_profile::{DuelistProfile, DuelistProfileTrait, BotKey},
         constants::{CONST},
     };
     use pistols::interfaces::dns::{
@@ -72,6 +72,7 @@ pub mod matchmaker {
         pub const INVALID_QUEUE: felt252        = 'MATCHMAKER: Invalid queue';
         pub const INVALID_MODE: felt252         = 'MATCHMAKER: Invalid mode';
         pub const INVALID_DUELIST: felt252      = 'MATCHMAKER: Invalid duelist';
+        pub const INELIGIBLE_DUELIST: felt252   = 'MATCHMAKER: Ineligible duelist';
         pub const WRONG_DUELIST: felt252        = 'MATCHMAKER: Wrong duelist';
         pub const WRONG_QUEUE: felt252          = 'MATCHMAKER: Wrong queue';
         pub const INVALID_SIZE: felt252         = 'MATCHMAKER: Invalid size';
@@ -131,6 +132,12 @@ pub mod matchmaker {
             let duelist_dispatcher: IDuelistTokenProtectedDispatcher = store.world.duelist_token_protected_dispatcher();
             duelist_id = (duelist_dispatcher.get_validated_active_duelist_id(caller, duelist_id, queue_id.get_lives_staked()));
             assert(duelist_id.is_non_zero(), Errors::INVALID_DUELIST);
+
+            // Ranked Duelists requirement
+            if (queue_id == QueueId::Ranked) {
+                let duelist_profile: DuelistProfile = store.get_duelist_profile(duelist_id);
+                assert(!duelist_profile.is_starter_duelist(), Errors::INELIGIBLE_DUELIST);
+            }
 
             // assign queue
             // will panic if already assigned or not in a duel
