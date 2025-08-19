@@ -86,27 +86,32 @@ pub impl DuelistImpl of DuelistTrait {
     fn is_activated(self: @Duelist) -> bool {
         (*self.timestamps.active != 0)
     }
-    fn enter_queue(ref self: Store, duelist_id: u128, queue_id: QueueId) {
+}
+
+#[generate_trait]
+pub impl DuelistAssignmentImpl of DuelistAssignmentTrait {
+    fn enter_matchmaking(ref self: Store, duelist_id: u128, queue_id: QueueId) {
         let mut assignment: DuelistAssignment = self.get_duelist_assignment(duelist_id);
         assignment.assert_is_available(Option::None);
-        assignment.queue_id = queue_id;
-        self.set_duelist_challenge(@assignment);
+        assignment.queue_id = queue_id; // this is permanent!!!
+        self.set_duelist_assignment(@assignment);
+    }
+    fn is_matchmaking(self: @Store, duelist_id: u128, queue_id: QueueId) -> bool {
+        (self.get_duelist_assigned_queue_id(duelist_id) == queue_id)
     }
     fn enter_challenge(ref self: Store, duelist_id: u128, duel_id: u128, queue_id: Option<QueueId>) {
         let mut assignment: DuelistAssignment = self.get_duelist_assignment(duelist_id);
         assignment.assert_is_available(queue_id);
         assignment.duel_id = duel_id;
-        self.set_duelist_challenge(@assignment);
+        self.set_duelist_assignment(@assignment);
     }
     fn exit_challenge(ref self: Store, duelist_id: u128) {
         if (duelist_id.is_non_zero()) {
-            let assignment = DuelistAssignment {
-                duelist_id,
-                duel_id: 0,
-                pass_id: 0,
-                queue_id: QueueId::Undefined,
-            };
-            self.set_duelist_challenge(@assignment);
+            let mut assignment: DuelistAssignment = self.get_duelist_assignment(duelist_id);
+            assignment.duel_id = 0;
+            assignment.pass_id = 0;
+            // assignment.queue_id = QueueId::Undefined; // matchmaking queue is permanent
+            self.set_duelist_assignment(@assignment);
         }
     }
     // fn enter_tournament(ref self: Store, duelist_id: u128, pass_id: u64) {
@@ -119,12 +124,8 @@ pub impl DuelistImpl of DuelistTrait {
     fn exit_tournament(ref self: Store, duelist_id: u128) {
         let mut assignment: DuelistAssignment = self.get_duelist_assignment(duelist_id);
         assignment.pass_id = 0;
-        self.set_duelist_challenge(@assignment);
+        self.set_duelist_assignment(@assignment);
     }
-}
-
-#[generate_trait]
-pub impl DuelistAssignmentImpl of DuelistAssignmentTrait {
     fn assert_is_available(self: @DuelistAssignment, queue_id: Option<QueueId>) {
         // must not be in another challenge
         assert(*self.duel_id == 0, DuelErrors::DUELIST_IN_CHALLENGE);
@@ -261,7 +262,6 @@ pub impl CauseOfDeathDebug of core::fmt::Debug<CauseOfDeath> {
 mod unit {
     use super::{
         Totals, TotalsTrait,
-        DuelistTrait,
         DuelistAssignmentTrait,
     };
     use pistols::models::matches::{QueueId};
@@ -399,9 +399,10 @@ mod unit {
         let mut sys: tester::TestSystems = tester::setup_world(FLAGS::OWNER);
         sys.store.enter_challenge(DUELIST_ID, 1, Option::None);
         assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).duel_id, 1);
-        sys.store.exit_challenge(DUELIST_ID);
         assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).queue_id, QueueId::Undefined);
+        sys.store.exit_challenge(DUELIST_ID);
         assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).duel_id, 0);
+        assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).queue_id, QueueId::Undefined);
         sys.store.get_duelist_assignment(DUELIST_ID).assert_is_available(Option::None);
     }
     #[test]
@@ -412,37 +413,40 @@ mod unit {
         sys.store.enter_challenge(DUELIST_ID, 2, Option::None);
     }
     #[test]
-    fn test_assignment_enter_queue() {
+    fn test_assignment_enter_matchmaking() {
         let mut sys: tester::TestSystems = tester::setup_world(FLAGS::OWNER);
-        sys.store.enter_queue(DUELIST_ID, QueueId::Ranked);
+        sys.store.enter_matchmaking(DUELIST_ID, QueueId::Ranked);
+        assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).duel_id, 0);
         assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).queue_id, QueueId::Ranked);
         sys.store.enter_challenge(DUELIST_ID, 1, Option::Some(QueueId::Ranked));
-        assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).queue_id, QueueId::Ranked);
         assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).duel_id, 1);
+        assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).queue_id, QueueId::Ranked);
         sys.store.exit_challenge(DUELIST_ID);
-        assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).queue_id, QueueId::Undefined);
         assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).duel_id, 0);
-        sys.store.get_duelist_assignment(DUELIST_ID).assert_is_available(Option::None);
+        // assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).queue_id, QueueId::Undefined);
+        // sys.store.get_duelist_assignment(DUELIST_ID).assert_is_available(Option::None);
+        assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).queue_id, QueueId::Ranked);
+        sys.store.get_duelist_assignment(DUELIST_ID).assert_is_available(Option::Some(QueueId::Ranked));
     }
     #[test]
     #[should_panic(expected: ('DUEL: Duelist matchmaking',))]
-    fn test_assignment_enter_queue_twice() {
+    fn test_assignment_enter_matchmaking_twice() {
         let mut sys: tester::TestSystems = tester::setup_world(FLAGS::OWNER);
-        sys.store.enter_queue(DUELIST_ID, QueueId::Ranked);
-        sys.store.enter_queue(DUELIST_ID, QueueId::Ranked);
+        sys.store.enter_matchmaking(DUELIST_ID, QueueId::Ranked);
+        sys.store.enter_matchmaking(DUELIST_ID, QueueId::Ranked);
     }
     #[test]
     #[should_panic(expected: ('DUEL: Wrong queue',))]
     fn test_assignment_enter_challenge_wrong_queue() {
         let mut sys: tester::TestSystems = tester::setup_world(FLAGS::OWNER);
-        sys.store.enter_queue(DUELIST_ID, QueueId::Ranked);
+        sys.store.enter_matchmaking(DUELIST_ID, QueueId::Ranked);
         sys.store.enter_challenge(DUELIST_ID, 1, Option::Some(QueueId::Unranked));
     }
     #[test]
     #[should_panic(expected: ('DUEL: Duelist matchmaking',))]
     fn test_assignment_enter_challenge_in_matchmaking() {
         let mut sys: tester::TestSystems = tester::setup_world(FLAGS::OWNER);
-        sys.store.enter_queue(DUELIST_ID, QueueId::Ranked);
+        sys.store.enter_matchmaking(DUELIST_ID, QueueId::Ranked);
         sys.store.enter_challenge(DUELIST_ID, 1, Option::None);
     }
     #[test]

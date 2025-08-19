@@ -184,7 +184,7 @@ pub mod duel_token {
             ChallengeMessage, ChallengeMessageValue,
             Round, RoundTrait,
         },
-        duelist::{DuelistTrait, DuelistProfile, DuelistProfileTrait},
+        duelist::{DuelistProfile, DuelistProfileTrait, DuelistAssignmentTrait},
         matches::{QueueId, QueueIdTrait, QueueMode},
         pact::{PactTrait},
         events::{Activity, ActivityTrait, ChallengeAction},

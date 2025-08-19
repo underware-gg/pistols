@@ -207,7 +207,13 @@ impl QueueModeIntoByteArray of core::traits::Into<QueueMode, ByteArray> {
         }
     }
 }
-// for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
+pub impl QueueIdDisplay of core::fmt::Display<QueueId> {
+    fn fmt(self: @QueueId, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        let result: ByteArray = (*self).into();
+        f.buffer.append(@result);
+        Result::Ok(())
+    }
+}
 #[cfg(test)]
 pub impl QueueIdDebug of core::fmt::Debug<QueueId> {
     fn fmt(self: @QueueId, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {

@@ -94,7 +94,7 @@ pub mod game {
             Round, RoundTrait,
             MovesTrait,
         },
-        duelist::{DuelistTrait, Totals, TotalsTrait},
+        duelist::{DuelistAssignmentTrait, Totals, TotalsTrait},
         leaderboard::{Leaderboard, LeaderboardTrait, LeaderboardPosition},
         pact::{PactTrait},
         ring::{RingType},

@@ -907,6 +907,15 @@ pub mod tester {
     }
 
     // ::matchmaker
+    pub fn execute_enter_queue(sys: @TestSystems, sender: ContractAddress,
+        duelist_id: u128,
+        queue_id: QueueId,
+    ) -> u128 {
+        impersonate(sender);
+        let duelist_id: u128 = (*sys.matchmaker).enter_duelist(duelist_id, queue_id);
+        _next_block();
+        (duelist_id)
+    }
     pub fn execute_match_make_me(sys: @TestSystems, sender: ContractAddress,
         duelist_id: u128,
         queue_id: QueueId,
@@ -1258,6 +1267,10 @@ pub mod tester {
     // }
 
     pub fn assert_pact(sys: @TestSystems, duel_id: u128, has_pact: bool, accepted: bool, prefix: ByteArray) -> ChallengeValue {
+        (assert_pact_queue(sys, duel_id, has_pact, accepted, QueueId::Undefined, prefix))
+    }
+
+    pub fn assert_pact_queue(sys: @TestSystems, duel_id: u128, has_pact: bool, accepted: bool, queue_id: QueueId, prefix: ByteArray) -> ChallengeValue {
         assert_gt!(duel_id, 0, "assert_pact:[{}] duel_id", prefix);
         let ch: ChallengeValue = (*sys.store).get_challenge_value(duel_id);
         assert_eq!((*sys.duels).has_pact(ch.duel_type, ch.address_a, ch.address_b), has_pact, "assert_pact:[{}] has_pact_a_b", prefix);
@@ -1265,16 +1278,11 @@ pub mod tester {
         let expected_duel_id_a: u128 = if (has_pact) {duel_id} else {0};
         let assignment_a: DuelistAssignment = (*sys.store).get_duelist_assignment(ch.duelist_id_a);
         assert_eq!(assignment_a.duel_id, expected_duel_id_a, "assert_pact:[{}] duelist_challenge_a", prefix);
+        assert_eq!(assignment_a.queue_id, queue_id, "assert_pact:[{}] queue_id_a", prefix);
         let expected_duel_id_b: u128 = if (has_pact && accepted) {duel_id} else {0};
         let assignment_b: DuelistAssignment = (*sys.store).get_duelist_assignment(ch.duelist_id_b);
         assert_eq!(assignment_b.duel_id, expected_duel_id_b, "assert_pact:[{}] duelist_challenge_b", prefix);
-        if (has_pact) {
-            // assert_ne!(assignment_a.queue_id, QueueId::Undefined, "assert_pact:[{}] queue_id_a", prefix);
-            // assert_ne!(assignment_b.queue_id, QueueId::Undefined, "assert_pact:[{}] queue_id_b", prefix);
-        } else {
-            assert_eq!(assignment_a.queue_id, QueueId::Undefined, "assert_pact:[{}] queue_id_a", prefix);
-            assert_eq!(assignment_b.queue_id, QueueId::Undefined, "assert_pact:[{}] queue_id_b", prefix);
-        }
+        assert_eq!(assignment_b.queue_id, queue_id, "assert_pact:[{}] queue_id_b", prefix);
         (ch)
     }
 

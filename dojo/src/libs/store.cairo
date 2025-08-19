@@ -426,7 +426,7 @@ pub impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn set_duelist_challenge(ref self: Store, model: @DuelistAssignment) {
+    fn set_duelist_assignment(ref self: Store, model: @DuelistAssignment) {
         self.world.write_model(model);
     }
 
@@ -582,6 +582,10 @@ pub impl StoreImpl of StoreTrait {
     #[inline(always)]
     fn get_duelist_assigned_duel_id(self: @Store, duelist_id: u128) -> u128 {
         (self.world.read_member(Model::<DuelistAssignment>::ptr_from_keys(duelist_id), selector!("duel_id")))
+    }
+    #[inline(always)]
+    fn get_duelist_assigned_queue_id(self: @Store, duelist_id: u128) -> QueueId {
+        (self.world.read_member(Model::<DuelistAssignment>::ptr_from_keys(duelist_id), selector!("queue_id")))
     }
 
     #[inline(always)]
