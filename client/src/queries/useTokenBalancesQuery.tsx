@@ -63,14 +63,14 @@ export const useFetchInitialTokenBalancesQuery = () => {
     formatFn,
   });
 
-  useEffect(() => debug.log('SQL BALANCES:', fetched, data.length, !fetched && query), [fetched, data, query])
+  useEffect(() => debug.log('SQL BALANCES:', fetched, data?.length, !fetched && query), [fetched, data, query])
 
   // add balances to token stores
   useAddBalancesToTokenStores(data);
 
   // avoid running this more than once
   useEffect(() => {
-    if (data.length > 0) {
+    if (data?.length > 0) {
       setFetched(true);
     }
   }, [data])
@@ -125,8 +125,8 @@ function useAddBalancesToTokenStores(balances: torii.TokenBalance[]) {
   const fools_state = useFoolsCoinStore((state) => state)
 
   useEffect(() => {
-    const pageNumber = (balances.length == 0 ? 0 : 1)
-    balances.forEach(balance => {
+    // const pageNumber = (balances?.length == 0 ? 0 : 1)
+    balances?.forEach(balance => {
       if (balance.contract_address === allTokens.lordsContractAddress) {
         lords_state.updateBalance(balance)
       } else if (balance.contract_address === allTokens.fameContractAddress) {

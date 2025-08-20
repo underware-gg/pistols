@@ -82,7 +82,7 @@ export function TokenStoreSync() {
         tournament_state.updateBalance(balance)
       }
     },
-    enabled: (mounted && initialTokenBalances.length > 0),
+    enabled: (mounted && initialTokenBalances?.length > 0),
   })
 
   // useEffect(() => debug.log("TokenStoreSync() token_state =>", token_state.contracts), [token_state.contracts])

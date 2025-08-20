@@ -185,7 +185,7 @@ const localKatanaConfig: DojoNetworkConfig = {
   ],
   connectorIds: [
     supportedConnetorIds.PREDEPLOYED,
-    supportedConnetorIds.CONTROLLER,
+    // supportedConnetorIds.CONTROLLER,
   ],
   // starknet Chain
   nativeCurrency: ETH_KATANA,
@@ -376,7 +376,7 @@ export const getNetworkConfig = (networkId: NetworkId, env?: DojoNetworkEnv): Do
     throw new Error(`Network [${networkId}] and .env missing: SLOT_NAME or TORII_SQL_URL`);
   }
 
-  // derive starknet Chain
+  // derive starknet Chain (Katana)
   if (!result.chain) {
     result.chain = {
       id: BigInt(stringToFelt(result.chainId)),
@@ -388,8 +388,12 @@ export const getNetworkConfig = (networkId: NetworkId, env?: DojoNetworkEnv): Do
         default: { http: [] },
         public: { http: [] },
       },
+      paymasterRpcUrls: {
+        default: { http: [result.rpcUrl] },
+        public: { http: [result.rpcUrl] },
+        avnu: { http: [result.rpcUrl] },
+      },
       explorers: result.explorers,
-      paymasterRpcUrls: {},
     } as Chain
   }
 

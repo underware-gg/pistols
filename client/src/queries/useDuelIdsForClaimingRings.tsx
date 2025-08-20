@@ -48,13 +48,13 @@ export const useDuelIdsForClaimingRings = () => {
   // console.log ('SQL RINGS data', data)
 
   const goldRingDuelIds = useMemo(() => (
-    data.filter((row) => (row.ring_type === constants.RingType.GoldSignetRing)).map((row) => row.duel_id)
+    data?.filter((row) => (row.ring_type === constants.RingType.GoldSignetRing)).map((row) => row.duel_id) ?? []
   ), [data])
   const silverRingDuelIds = useMemo(() => (
-    data.filter((row) => (row.ring_type === constants.RingType.SilverSignetRing)).map((row) => row.duel_id)
+    data?.filter((row) => (row.ring_type === constants.RingType.SilverSignetRing)).map((row) => row.duel_id) ?? []
   ), [data])
   const leadRingDuelIds = useMemo(() => (
-    data.filter((row) => (row.ring_type === constants.RingType.LeadSignetRing)).map((row) => row.duel_id)
+    data?.filter((row) => (row.ring_type === constants.RingType.LeadSignetRing)).map((row) => row.duel_id) ?? []
   ), [data])
   
   // useEffect(() => {
