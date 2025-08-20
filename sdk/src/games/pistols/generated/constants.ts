@@ -24,10 +24,19 @@ export const INTERFACE_DESCRIPTIONS: any = {
     clear_player_social_link: 'Unlink player from social platform',
     emit_player_setting: 'Store player settings',
   },
+  // from: ../dojo/src/systems/matchmaker.cairo
+  IMatchMakerPublic: {
+    enlist_duelist: 'Enlist a Duelist in a ranked queue',
+    match_make_me: 'Match a player against another player',
+  },
   // from: ../dojo/src/systems/tokens/duel_token.cairo
   IDuelTokenPublic: {
     create_duel: 'Create a Duel, mint its token',
     reply_duel: 'Reply to a Duel (accept or reject)',
+  },
+  // from: ../dojo/src/systems/tokens/duel_token.cairo
+  IDuelTokenProtected: {
+    match_make: 'Create an official ranked Duel',
   },
   // from: ../dojo/src/systems/tokens/duelist_token.cairo
   IDuelistTokenPublic: {
@@ -92,6 +101,8 @@ export enum DuelType {
   Tutorial = 'Tutorial', // 3
   Practice = 'Practice', // 4
   BotPlayer = 'BotPlayer', // 5
+  Ranked = 'Ranked', // 6
+  Unranked = 'Unranked', // 7
 };
 export const getDuelTypeValue = (name: DuelType): number | undefined => _indexOrUndefined(Object.keys(DuelType).indexOf(name));
 export const getDuelTypeFromValue = (value: number): DuelType | undefined => Object.keys(DuelType)[value] as DuelType;
@@ -187,6 +198,26 @@ export enum PlayerSettingValue {
 export const getPlayerSettingValueValue = (name: PlayerSettingValue): number | undefined => _indexOrUndefined(Object.keys(PlayerSettingValue).indexOf(name));
 export const getPlayerSettingValueFromValue = (value: number): PlayerSettingValue | undefined => Object.keys(PlayerSettingValue)[value] as PlayerSettingValue;
 export const getPlayerSettingValueMap = (): Record<PlayerSettingValue, number> => Object.keys(PlayerSettingValue).reduce((acc, v, index) => { acc[v as PlayerSettingValue] = index; return acc; }, {} as Record<PlayerSettingValue, number>);
+
+// from: ../dojo/src/models/matches.cairo
+export enum QueueId {
+  Undefined = 'Undefined', // 0
+  Unranked = 'Unranked', // 1
+  Ranked = 'Ranked', // 2
+};
+export const getQueueIdValue = (name: QueueId): number | undefined => _indexOrUndefined(Object.keys(QueueId).indexOf(name));
+export const getQueueIdFromValue = (value: number): QueueId | undefined => Object.keys(QueueId)[value] as QueueId;
+export const getQueueIdMap = (): Record<QueueId, number> => Object.keys(QueueId).reduce((acc, v, index) => { acc[v as QueueId] = index; return acc; }, {} as Record<QueueId, number>);
+
+// from: ../dojo/src/models/matches.cairo
+export enum QueueMode {
+  Undefined = 'Undefined', // 0
+  Fast = 'Fast', // 1
+  Slow = 'Slow', // 2
+};
+export const getQueueModeValue = (name: QueueMode): number | undefined => _indexOrUndefined(Object.keys(QueueMode).indexOf(name));
+export const getQueueModeFromValue = (value: number): QueueMode | undefined => Object.keys(QueueMode)[value] as QueueMode;
+export const getQueueModeMap = (): Record<QueueMode, number> => Object.keys(QueueMode).reduce((acc, v, index) => { acc[v as QueueMode] = index; return acc; }, {} as Record<QueueMode, number>);
 
 // from: ../dojo/src/models/pack.cairo
 export enum PackType {
@@ -749,8 +780,8 @@ export const CHANCES: type_CHANCES = {
 
 // from: ../dojo/src/types/constants.cairo
 type type_FAME = {
-  MINT_GRANT_AMOUNT: bigint, // cairo: u256
-  ONE_LIFE: bigint, // cairo: u256
+  MINT_GRANT_AMOUNT: bigint, // cairo: u128
+  ONE_LIFE: bigint, // cairo: u128
   MAX_INACTIVE_TIMESTAMP: bigint, // cairo: u64
   TIMESTAMP_TO_DRIP_ONE_FAME: bigint, // cairo: u64
   SACRIFICE_PERCENTAGE: number, // cairo: u8
@@ -770,6 +801,7 @@ type type_SELECTORS = {
   GAME: bigint, // cairo: felt252
   GAME_LOOP: bigint, // cairo: felt252
   BOT_PLAYER: bigint, // cairo: felt252
+  MATCHMAKER: bigint, // cairo: felt252
   RNG: bigint, // cairo: felt252
   RNG_MOCK: bigint, // cairo: felt252
   DUEL_TOKEN: bigint, // cairo: felt252
@@ -788,6 +820,7 @@ export const SELECTORS: type_SELECTORS = {
   GAME: BigInt('0x032c102830cbffaddecbdce7ef85735e6f08da08ee762a2d7b09304b6533dd57'), // selector_from_tag!("pistols-game")
   GAME_LOOP: BigInt('0x01bf3dd2b828d461e19dc794352723ae8d8a1760c61b936a916cf3b4de8d5b9f'), // selector_from_tag!("pistols-game_loop")
   BOT_PLAYER: BigInt('0x022366a4c25ee7406d1d3bd13fab733b310945461fda8a7c721412ac7c01de53'), // selector_from_tag!("pistols-bot_player")
+  MATCHMAKER: BigInt('0x05b2844d155e3c1b34dbddfa9a4d321e431b76826510f51dab224efecc822072'), // selector_from_tag!("pistols-matchmaker")
   RNG: BigInt('0x013f1a6a9ae118440a997d6624230b59f43516220a1208526c3f66e202910504'), // selector_from_tag!("pistols-rng")
   RNG_MOCK: BigInt('0x00fbd28ccd9cffb9b1783a0bf7cdf42a9b88c49d4568116cd1f7ee70ba415705'), // selector_from_tag!("pistols-rng_mock")
   DUEL_TOKEN: BigInt('0x0670a5c673ac776e00e61c279cf7dc0efbe282787f4d719498e55643c5116063'), // selector_from_tag!("pistols-duel_token")
@@ -801,12 +834,40 @@ export const SELECTORS: type_SELECTORS = {
   VRF_MOCK: BigInt('0x07d13bd4624d7bc31b13c78648f762d0b293e1ca94e19173659859209082629e'), // selector_from_tag!("pistols-vrf_mock")
 };
 
+// from: ../dojo/src/interfaces/ierc20.cairo
+type type_Errors = {
+  INVALID_AMOUNT: string, // cairo: felt252
+  INSUFFICIENT_ALLOWANCE: string, // cairo: felt252
+  INSUFFICIENT_BALANCE: string, // cairo: felt252
+};
+export const Errors: type_Errors = {
+  INVALID_AMOUNT: 'IERC20: invalid amount',
+  INSUFFICIENT_ALLOWANCE: 'IERC20: insufficient allowance',
+  INSUFFICIENT_BALANCE: 'IERC20: insufficient balance',
+};
+
 // from: ../dojo/src/models/config.cairo
 type type_CONFIG = {
   CONFIG_KEY: number, // cairo: u8
 };
 export const CONFIG: type_CONFIG = {
   CONFIG_KEY: 1,
+};
+
+// from: ../dojo/src/models/matches.cairo
+type type_MATCHMAKER = {
+  INITIAL_SLOT_SIZE: number, // cairo: u8
+  QUEUE_TIMEOUT_FAST: bigint, // cairo: u64
+  QUEUE_TIMEOUT_SLOW: bigint, // cairo: u64
+  COMMIT_TIMEOUT_FAST: bigint, // cairo: u64
+  COMMIT_TIMEOUT_SLOW: bigint, // cairo: u64
+};
+export const MATCHMAKER: type_MATCHMAKER = {
+  INITIAL_SLOT_SIZE: 5,
+  QUEUE_TIMEOUT_FAST: TIMESTAMP.ONE_MINUTE,
+  QUEUE_TIMEOUT_SLOW: TIMESTAMP.ONE_DAY,
+  COMMIT_TIMEOUT_FAST: (TIMESTAMP.ONE_MINUTE * 10n),
+  COMMIT_TIMEOUT_SLOW: TIMESTAMP.ONE_DAY,
 };
 
 // from: ../dojo/src/models/pack.cairo
@@ -1274,7 +1335,7 @@ export const BOT_PROFILES: type_BOT_PROFILES = {
     name: 'Kind Imp',
   },
   Pro: {
-    name: 'Pro Imp',
+    name: 'Veteran Imp',
   },
 };
 

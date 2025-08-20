@@ -14,6 +14,9 @@ historical = [
   "pistols-TrophyProgression",
 ]
 
+# [grpc]
+# subscription_buffer_size = 10000
+
 [indexing]
 world_block = 1
 blocks_chunk_size = 1024
@@ -22,12 +25,12 @@ transactions = true
 controllers = true
 pending = true
 contracts = [
-  "erc721:0x73cf757140a2cff9dd4679ef48b177ab80b0cfd888a18f0c397ae26f7262900", # duel_token
-  "erc721:0x266af479dad5ddcb27a8672f5e122cde040a59a21cafd4b27f82506324d6c73", # duelist_token
-  "erc721:0x210fa7f9987259964b97417bc370c67ece8330f44c2bf5fcc6e7e8efd4ee1b9", # pack_token
-  "erc721:0x5c35892166ddd96f6ba3bc7af2ba2ba5354b6a746b00727051364a51a00bf45", # ring_token
+  "erc721:0x6aef89ab63c4ad8b7decbcf469a200db4ab794e02a354f0696920f41cdb9608", # duel_token
+  "erc721:0x26292744e0ce371ac2b4cf04cea60e45530897efe589057b72fd391bbef9acc", # duelist_token
+  "erc721:0x3e2bcb37304f428530867e4f72ce90fabf8b1fd78b4f3ff7b214007c3fda8f", # pack_token
+  "erc721:0xa924d792eaa75c10dc458f6f86f4e7cd79ff3be4fb1f894c1dc1d015a274ba", # ring_token
   # "erc721:$tournament_token", # tournament_token
-  "erc20:0x55d8d0ab6eacfc99d5cb593237bdeed3681da22d568b4a2cab156e4899c2959", # fame_coin
-  "erc20:0x4e37b896e4c01d42b8d191c904d015e655c2069593b7dc3d47829bafad0fdb2", # fools_coin
+  "erc20:0x337f9138858e4172f54773af952937dfa7129ef0a581d7f860eae858694f632", # fame_coin
+  "erc20:0x5733bbc9d5a7c92c51d7246def365850a088dd72aa23969fc07c451a91f80c9", # fools_coin
   "erc20:0x41f5e539b5d70ac035d3ef6fe15f5f7e6056e3e9aa247e9b4cfa1b5505822fa", # lords
 ]

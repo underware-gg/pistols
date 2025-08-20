@@ -92,6 +92,7 @@ export interface DuelistAssignment {
 	duelist_id: BigNumberish;
 	duel_id: BigNumberish;
 	pass_id: BigNumberish;
+	queue_id: QueueIdEnum;
 }
 
 // Type definition for `pistols::models::duelist::DuelistMemorial` struct
@@ -128,6 +129,39 @@ export interface Leaderboard {
 	scores: BigNumberish;
 }
 
+// Type definition for `pistols::models::matches::MatchCounter` struct
+export interface MatchCounter {
+	pair: BigNumberish;
+	count: BigNumberish;
+}
+
+// Type definition for `pistols::models::matches::MatchPlayer` struct
+export interface MatchPlayer {
+	player_address: string;
+	queue_id: QueueIdEnum;
+	queue_info: QueueInfo;
+	duelist_id: BigNumberish;
+	duel_id: BigNumberish;
+}
+
+// Type definition for `pistols::models::matches::MatchQueue` struct
+export interface MatchQueue {
+	queue_id: QueueIdEnum;
+	players: Array<string>;
+	slot_size: BigNumberish;
+	entry_token_address: string;
+	entry_token_amount: BigNumberish;
+}
+
+// Type definition for `pistols::models::matches::QueueInfo` struct
+export interface QueueInfo {
+	queue_mode: QueueModeEnum;
+	slot: BigNumberish;
+	timestamp_enter: BigNumberish;
+	timestamp_ping: BigNumberish;
+	expired: boolean;
+}
+
 // Type definition for `pistols::models::pack::Pack` struct
 export interface Pack {
 	pack_id: BigNumberish;
@@ -143,6 +177,7 @@ export interface Pact {
 	duel_type: DuelTypeEnum;
 	pair: BigNumberish;
 	duel_id: BigNumberish;
+	duel_count: BigNumberish;
 }
 
 // Type definition for `pistols::models::player::Player` struct
@@ -180,7 +215,7 @@ export interface PlayerFlags {
 export interface PlayerOnline {
 	identity: string;
 	timestamp: BigNumberish;
-	available: BigNumberish;
+	available: boolean;
 }
 
 // Type definition for `pistols::models::player::PlayerTeamFlags` struct
@@ -364,6 +399,8 @@ export const duelType = [
 	'Tutorial',
 	'Practice',
 	'BotPlayer',
+	'Ranked',
+	'Unranked',
 ] as const;
 export type DuelType = { [key in typeof duelType[number]]: string };
 export type DuelTypeEnum = CairoCustomEnum;
@@ -378,6 +415,24 @@ export const causeOfDeath = [
 ] as const;
 export type CauseOfDeath = { [key in typeof causeOfDeath[number]]: string };
 export type CauseOfDeathEnum = CairoCustomEnum;
+
+// Type definition for `pistols::models::matches::QueueId` enum
+export const queueId = [
+	'Undefined',
+	'Unranked',
+	'Ranked',
+] as const;
+export type QueueId = { [key in typeof queueId[number]]: string };
+export type QueueIdEnum = CairoCustomEnum;
+
+// Type definition for `pistols::models::matches::QueueMode` enum
+export const queueMode = [
+	'Undefined',
+	'Fast',
+	'Slow',
+] as const;
+export type QueueMode = { [key in typeof queueMode[number]]: string };
+export type QueueModeEnum = CairoCustomEnum;
 
 // Type definition for `pistols::models::pack::PackType` enum
 export const packType = [
@@ -728,6 +783,10 @@ export interface SchemaType extends ISchemaType {
 		DuelistTimestamps: DuelistTimestamps,
 		Totals: Totals,
 		Leaderboard: Leaderboard,
+		MatchCounter: MatchCounter,
+		MatchPlayer: MatchPlayer,
+		MatchQueue: MatchQueue,
+		QueueInfo: QueueInfo,
 		Pack: Pack,
 		Pact: Pact,
 		Player: Player,
@@ -768,7 +827,9 @@ export const schema: SchemaType = {
 				Tournament: undefined,
 				Tutorial: undefined,
 				Practice: undefined,
-				BotPlayer: undefined, }),
+				BotPlayer: undefined,
+				Ranked: undefined,
+				Unranked: undefined, }),
 		premise: new CairoCustomEnum({ 
 					Undefined: "",
 				Matter: undefined,
@@ -870,6 +931,10 @@ export const schema: SchemaType = {
 			duelist_id: 0,
 			duel_id: 0,
 			pass_id: 0,
+		queue_id: new CairoCustomEnum({ 
+					Undefined: "",
+				Unranked: undefined,
+				Ranked: undefined, }),
 		},
 		DuelistMemorial: {
 			duelist_id: 0,
@@ -902,6 +967,43 @@ export const schema: SchemaType = {
 			duelist_ids: 0,
 			scores: 0,
 		},
+		MatchCounter: {
+			pair: 0,
+			count: 0,
+		},
+		MatchPlayer: {
+			player_address: "",
+		queue_id: new CairoCustomEnum({ 
+					Undefined: "",
+				Unranked: undefined,
+				Ranked: undefined, }),
+		queue_info: { queue_mode: new CairoCustomEnum({ 
+					Undefined: "",
+				Fast: undefined,
+				Slow: undefined, }), slot: 0, timestamp_enter: 0, timestamp_ping: 0, expired: false, },
+			duelist_id: 0,
+			duel_id: 0,
+		},
+		MatchQueue: {
+		queue_id: new CairoCustomEnum({ 
+					Undefined: "",
+				Unranked: undefined,
+				Ranked: undefined, }),
+			players: [""],
+			slot_size: 0,
+			entry_token_address: "",
+			entry_token_amount: 0,
+		},
+		QueueInfo: {
+		queue_mode: new CairoCustomEnum({ 
+					Undefined: "",
+				Fast: undefined,
+				Slow: undefined, }),
+			slot: 0,
+			timestamp_enter: 0,
+			timestamp_ping: 0,
+			expired: false,
+		},
 		Pack: {
 			pack_id: 0,
 		pack_type: new CairoCustomEnum({ 
@@ -923,9 +1025,12 @@ export const schema: SchemaType = {
 				Tournament: undefined,
 				Tutorial: undefined,
 				Practice: undefined,
-				BotPlayer: undefined, }),
+				BotPlayer: undefined,
+				Ranked: undefined,
+				Unranked: undefined, }),
 			pair: 0,
 			duel_id: 0,
+			duel_count: 0,
 		},
 		Player: {
 			player_address: "",
@@ -962,7 +1067,7 @@ export const schema: SchemaType = {
 		PlayerOnline: {
 			identity: "",
 			timestamp: 0,
-			available: 0,
+			available: false,
 		},
 		PlayerTeamFlags: {
 			player_address: "",
@@ -1178,6 +1283,12 @@ export enum ModelsMapping {
 	DuelistTimestamps = 'pistols-DuelistTimestamps',
 	Totals = 'pistols-Totals',
 	Leaderboard = 'pistols-Leaderboard',
+	MatchCounter = 'pistols-MatchCounter',
+	MatchPlayer = 'pistols-MatchPlayer',
+	MatchQueue = 'pistols-MatchQueue',
+	QueueId = 'pistols-QueueId',
+	QueueInfo = 'pistols-QueueInfo',
+	QueueMode = 'pistols-QueueMode',
 	Pack = 'pistols-Pack',
 	PackType = 'pistols-PackType',
 	Pact = 'pistols-Pact',
