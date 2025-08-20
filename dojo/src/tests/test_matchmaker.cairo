@@ -147,14 +147,18 @@ mod tests {
 
     const LORDS_PRICE: u128 = (100 * CONST::ETH_TO_WEI.low);
 
-    fn _setup_ranked_lords(sys: @TestSystems, players: Span<ContractAddress>) {
+    fn _setup_ranked_lords(sys: @TestSystems, players: Span<ContractAddress>, approve_amount: u128) {
         // set LORDS as token fee
         tester::impersonate(OWNER());
         (*sys.matchmaker).set_queue_entry_token(QueueId::Ranked, *sys.lords.contract_address, LORDS_PRICE);
         // faucet to players
         let mut i: usize = 0;
         while (i < players.len()) {
-            tester::execute_lords_faucet(sys.lords, *players[i]);
+            let address: ContractAddress = *players[i];
+            tester::execute_lords_faucet(sys.lords, address);
+            if (approve_amount > 0) {
+                tester::execute_lords_approve(sys.lords, address, *sys.matchmaker.contract_address, LORDS_PRICE * approve_amount);
+            }
             i += 1;
         };
     }
@@ -321,6 +325,7 @@ mod tests {
         tester::fund_duelists_pool(@sys, 2);
         let ID_A: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_A");
         let queue_id = QueueId::Ranked;
+        _setup_ranked_lords(@sys, [A].span(), 2);
         tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
         tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
     }
@@ -505,9 +510,7 @@ mod tests {
         let ID_B: u128 = _airdrop_open(@sys, B, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_B");
         let queue_id = QueueId::Ranked;
         // setup lords
-        _setup_ranked_lords(@sys, [A, B].span());
-        tester::execute_lords_approve(@sys.lords, A, sys.matchmaker.contract_address, LORDS_PRICE);
-        tester::execute_lords_approve(@sys.lords, B, sys.matchmaker.contract_address, LORDS_PRICE);
+        _setup_ranked_lords(@sys, [A, B].span(), 1);
         let balance_lords_a: u128 = sys.lords.balance_of(A).low;
         let balance_lords_b: u128 = sys.lords.balance_of(B).low;
         assert_eq!(sys.lords.balance_of(sys.matchmaker.contract_address).low, 0, "balance_lords_MM_1");
@@ -545,8 +548,7 @@ mod tests {
         let A: ContractAddress = OWNER();
         let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
         let queue_id = QueueId::Ranked;
-        _setup_ranked_lords(@sys, [A].span());
-        tester::execute_lords_approve(@sys.lords, A, sys.matchmaker.contract_address, LORDS_PRICE);
+        _setup_ranked_lords(@sys, [A].span(), 1);
         // enter the starter duelist an panic
         tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
     }
@@ -571,7 +573,7 @@ mod tests {
         let A: ContractAddress = OWNER();
         let ID_A: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop");
         let queue_id = QueueId::Ranked;
-        _setup_ranked_lords(@sys, [A].span());
+        _setup_ranked_lords(@sys, [A].span(), 0);
         // try to pay...
         tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
     }
@@ -584,7 +586,7 @@ mod tests {
         let A: ContractAddress = OWNER();
         let ID_A: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop");
         let queue_id = QueueId::Ranked;
-        _setup_ranked_lords(@sys, [A].span());
+        _setup_ranked_lords(@sys, [A].span(), 0);
         tester::execute_lords_approve(@sys.lords, A, sys.matchmaker.contract_address, LORDS_PRICE - 1);
         // try to pay...
         tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
@@ -958,9 +960,7 @@ mod tests {
         tester::assert_pact(@sys, duel_id, true, true, "replied");
         assert_eq!(duel_id, 1, "create_duel");
         // enter matchmaking with different duelists...
-        _setup_ranked_lords(@sys, [A, B].span());
-        tester::execute_lords_approve(@sys.lords, A, sys.matchmaker.contract_address, LORDS_PRICE);
-        tester::execute_lords_approve(@sys.lords, B, sys.matchmaker.contract_address, LORDS_PRICE);
+        _setup_ranked_lords(@sys, [A, B].span(), 1);
         tester::execute_enlist_duelist(@sys, A, OWNED_BY_OWNER(), queue_id);
         tester::execute_enlist_duelist(@sys, B, OWNED_BY_OTHER(), queue_id);
         _mock_slot(@sys, 5);
@@ -977,9 +977,7 @@ mod tests {
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         let queue_id = QueueId::Ranked;
-        _setup_ranked_lords(@sys, [A, B].span());
-        tester::execute_lords_approve(@sys.lords, A, sys.matchmaker.contract_address, LORDS_PRICE);
-        tester::execute_lords_approve(@sys.lords, B, sys.matchmaker.contract_address, LORDS_PRICE);
+        _setup_ranked_lords(@sys, [A, B].span(), 1);
         tester::execute_enlist_duelist(@sys, A, OWNED_BY_OWNER(), queue_id);
         tester::execute_enlist_duelist(@sys, B, OWNED_BY_OTHER(), queue_id);
         // enter matchmaking...
@@ -1034,8 +1032,7 @@ mod tests {
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         let queue_id = QueueId::Ranked;
-        _setup_ranked_lords(@sys, [A, B].span());
-        tester::execute_lords_approve(@sys.lords, A, sys.matchmaker.contract_address, LORDS_PRICE);
+        _setup_ranked_lords(@sys, [A, B].span(), 1);
         tester::execute_enlist_duelist(@sys, A, ID(A), queue_id);
         // enter a normal duel...
         let duel_id: u128 = tester::execute_create_duel(@sys, A, B, "", DuelType::Seasonal, 48, 1);
@@ -1049,8 +1046,7 @@ mod tests {
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         let queue_id = QueueId::Ranked;
-        _setup_ranked_lords(@sys, [A, B].span());
-        tester::execute_lords_approve(@sys.lords, B, sys.matchmaker.contract_address, LORDS_PRICE);
+        _setup_ranked_lords(@sys, [A, B].span(), 1);
         tester::execute_enlist_duelist(@sys, B, ID(B), queue_id);
         // enter a normal duel...
         let duel_id: u128 = tester::execute_create_duel(@sys, A, B, "", DuelType::Seasonal, 48, 1);

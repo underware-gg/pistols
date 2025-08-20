@@ -116,7 +116,7 @@ mod tests {
     pub mod test_env_cards;
     pub mod test_rng;
     pub mod test_season;
-    pub mod test_matchmaking;
+    pub mod test_matchmaker;
     pub mod test_player;
     // pub mod test_tournament;
     // pub mod test_tournament_duels;
