@@ -82,12 +82,15 @@ pub struct MatchCounter {
 //----------------------------------
 // Traits
 //
+use core::num::traits::Zero;
 use pistols::models::challenge::{DuelType};
 use pistols::systems::rng::{RngWrap, RngWrapTrait, Dice, DiceTrait};
 use pistols::interfaces::dns::{DnsTrait};
-use pistols::libs::store::{Store};
+use pistols::libs::store::{Store, StoreTrait};
+use pistols::utils::address::{ZERO};
 use pistols::utils::arrays::{ArrayUtilsTrait};
 use pistols::utils::misc::{FeltToLossy};
+use pistols::types::constants::{CONST};
 use pistols::types::premise::{Premise};
 
 #[generate_trait]
@@ -128,6 +131,25 @@ pub impl QueueModeImpl of QueueModeTrait {
 
 #[generate_trait]
 pub impl MatchQueueImpl of MatchQueueTrait {
+    fn initialize(ref store: Store) {
+        store.set_match_queue(@MatchQueue {
+            queue_id: QueueId::Unranked,
+            slot_size: MATCHMAKER::INITIAL_SLOT_SIZE,
+            players: array![],
+            entry_token_address: ZERO(),
+            entry_token_amount: 0,
+        });
+        store.set_match_queue(@MatchQueue {
+            queue_id: QueueId::Ranked,
+            slot_size: MATCHMAKER::INITIAL_SLOT_SIZE,
+            players: array![],
+            entry_token_address: store.world.fools_coin_address(),
+            entry_token_amount: (5 * CONST::ETH_TO_WEI.low),
+        });
+    }
+    fn requires_enlistment(self: @MatchQueue) -> bool {
+        (self.entry_token_address.is_non_zero() && self.entry_token_amount.is_non_zero())
+    }
     // assign slot to new player
     fn assign_slot(ref self: MatchQueue, store: @Store, seed: felt252) -> u8 {
         let wrapped: @RngWrap = RngWrapTrait::new(store.world.rng_address());
@@ -188,7 +210,6 @@ pub impl QueueInfoImpl of QueueInfoTrait {
 //---------------------------
 // Converters
 //
-#[cfg(test)]
 impl QueueIdIntoByteArray of core::traits::Into<QueueId, ByteArray> {
     fn into(self: QueueId) -> ByteArray {
         match self {

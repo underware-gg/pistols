@@ -907,12 +907,12 @@ pub mod tester {
     }
 
     // ::matchmaker
-    pub fn execute_enter_queue(sys: @TestSystems, sender: ContractAddress,
+    pub fn execute_enlist_duelist(sys: @TestSystems, sender: ContractAddress,
         duelist_id: u128,
         queue_id: QueueId,
     ) -> u128 {
         impersonate(sender);
-        let duelist_id: u128 = (*sys.matchmaker).enter_duelist(duelist_id, queue_id);
+        let duelist_id: u128 = (*sys.matchmaker).enlist_duelist(duelist_id, queue_id);
         _next_block();
         (duelist_id)
     }

@@ -6,7 +6,7 @@ use pistols::models::matches::{QueueId, QueueMode};
 pub trait IMatchMaker<TState> {
     // IMatchMakerPublic
     fn get_entry_fee(self: @TState, queue_id: QueueId) -> (ContractAddress, u128);
-    fn enter_duelist(ref self: TState, duelist_id: u128, queue_id: QueueId) -> u128;
+    fn enlist_duelist(ref self: TState, duelist_id: u128, queue_id: QueueId) -> u128;
     fn match_make_me(ref self: TState, duelist_id: u128, queue_id: QueueId, queue_mode: QueueMode) -> u128;
     // IMatchMakerProtected
     fn set_queue_size(ref self: TState, queue_id: QueueId, size: u8);
@@ -16,7 +16,7 @@ pub trait IMatchMaker<TState> {
 // Exposed to clients
 #[starknet::interface]
 pub trait IMatchMakerPublic<TState> {
-    fn enter_duelist(ref self: TState, duelist_id: u128, queue_id: QueueId) -> u128; //@description: Enter a Duelist in a matchmaking queue
+    fn enlist_duelist(ref self: TState, duelist_id: u128, queue_id: QueueId) -> u128; //@description: Enlist a Duelist in a ranked queue
     fn match_make_me(ref self: TState, duelist_id: u128, queue_id: QueueId, queue_mode: QueueMode) -> u128; //@description: Match a player against another player
     // view functions
     fn get_entry_fee(self: @TState, queue_id: QueueId) -> (ContractAddress, u128);
@@ -44,12 +44,10 @@ pub mod matchmaker {
             MatchQueue, MatchQueueTrait,
             MatchPlayer, MatchPlayerTrait,
             QueueInfo, QueueInfoTrait,
-            MATCHMAKER,
         },
     };
     use pistols::types::{
         duelist_profile::{DuelistProfile, DuelistProfileTrait, BotKey},
-        constants::{CONST},
     };
     use pistols::interfaces::dns::{
         DnsTrait,
@@ -64,36 +62,24 @@ pub mod matchmaker {
         store::{Store, StoreTrait},
     };
     use pistols::utils::{
-        address::{ZERO, ContractAddressDisplay, ContractAddressIntoU256},
+        address::{ContractAddressDisplay, ContractAddressIntoU256},
     };
 
     pub mod Errors {
-        pub const CALLER_NOT_ADMIN: felt252     = 'MATCHMAKER: Caller not admin';
-        pub const INVALID_QUEUE: felt252        = 'MATCHMAKER: Invalid queue';
-        pub const INVALID_MODE: felt252         = 'MATCHMAKER: Invalid mode';
-        pub const INVALID_DUELIST: felt252      = 'MATCHMAKER: Invalid duelist';
-        pub const INELIGIBLE_DUELIST: felt252   = 'MATCHMAKER: Ineligible duelist';
-        pub const WRONG_DUELIST: felt252        = 'MATCHMAKER: Wrong duelist';
-        pub const WRONG_QUEUE: felt252          = 'MATCHMAKER: Wrong queue';
-        pub const INVALID_SIZE: felt252         = 'MATCHMAKER: Invalid size';
+        pub const CALLER_NOT_ADMIN: felt252         = 'MATCHMAKER: Caller not admin';
+        pub const INVALID_QUEUE: felt252            = 'MATCHMAKER: Invalid queue';
+        pub const INVALID_MODE: felt252             = 'MATCHMAKER: Invalid mode';
+        pub const INVALID_DUELIST: felt252          = 'MATCHMAKER: Invalid duelist';
+        pub const ENLISTMENT_NOT_REQUIRED: felt252  = 'MATCHMAKER: Not required';
+        pub const INELIGIBLE_DUELIST: felt252       = 'MATCHMAKER: Ineligible duelist';
+        pub const NOT_ENLISTED: felt252             = 'MATCHMAKER: Not enlisted';
+        pub const WRONG_QUEUE: felt252              = 'MATCHMAKER: Wrong queue';
+        pub const INVALID_SIZE: felt252             = 'MATCHMAKER: Invalid size';
     }
 
     fn dojo_init(ref self: ContractState) {
         let mut store: Store = StoreTrait::new(self.world_default());
-        store.set_match_queue(@MatchQueue {
-            queue_id: QueueId::Unranked,
-            slot_size: MATCHMAKER::INITIAL_SLOT_SIZE,
-            players: array![],
-            entry_token_address: ZERO(),
-            entry_token_amount: 0,
-        });
-        store.set_match_queue(@MatchQueue {
-            queue_id: QueueId::Ranked,
-            slot_size: MATCHMAKER::INITIAL_SLOT_SIZE,
-            players: array![],
-            entry_token_address: store.world.fools_coin_address(),
-            entry_token_amount: (5 * CONST::ETH_TO_WEI.low),
-        });
+        MatchQueueTrait::initialize(ref store);
     }
 
     #[generate_trait]
@@ -118,14 +104,15 @@ pub mod matchmaker {
             (queue.entry_token_address, queue.entry_token_amount)
         }
 
-        fn enter_duelist(ref self: ContractState,
+        fn enlist_duelist(ref self: ContractState,
             mut duelist_id: u128,
             queue_id: QueueId,
         ) -> u128 {
             let mut store: Store = StoreTrait::new(self.world_default());
 
             // validate queue
-            assert(queue_id != QueueId::Undefined, Errors::INVALID_QUEUE);
+            let queue: MatchQueue = store.get_match_queue(queue_id);
+            assert(queue.requires_enlistment(), Errors::ENLISTMENT_NOT_REQUIRED);
 
             // Validate duelist
             let caller: ContractAddress = starknet::get_caller_address();
@@ -133,28 +120,23 @@ pub mod matchmaker {
             duelist_id = (duelist_dispatcher.get_validated_active_duelist_id(caller, duelist_id, queue_id.get_lives_staked()));
             assert(duelist_id.is_non_zero(), Errors::INVALID_DUELIST);
 
-            // Ranked Duelists requirement
-            if (queue_id == QueueId::Ranked) {
-                let duelist_profile: DuelistProfile = store.get_duelist_profile(duelist_id);
-                assert(!duelist_profile.is_starter_duelist(), Errors::INELIGIBLE_DUELIST);
-            }
+            // No starter duelists...
+            let duelist_profile: DuelistProfile = store.get_duelist_profile(duelist_id);
+            assert(!duelist_profile.is_starter_duelist(), Errors::INELIGIBLE_DUELIST);
 
             // assign queue
-            // will panic if already assigned or not in a duel
+            // will panic if already enlisted or not in another duel
             store.enter_matchmaking(duelist_id, queue_id);
 
             // charge entry fee, if any...
-            let mut queue: MatchQueue = store.get_match_queue(queue_id);
-            if (queue.entry_token_address.is_non_zero() && queue.entry_token_amount.is_non_zero()) {
-                IErc20Trait::asserted_transfer_from_to(
-                    queue.entry_token_address,
-                    queue.entry_token_amount,
-                    caller,
-                    starknet::get_contract_address(),
-                );
-            }
+            IErc20Trait::asserted_transfer_from_to(
+                queue.entry_token_address,
+                queue.entry_token_amount,
+                caller,
+                starknet::get_contract_address(),
+            );
 
-            // return the active duelist id
+            // return the enlisted duelist id
             (duelist_id)
         }
 
@@ -187,10 +169,14 @@ pub mod matchmaker {
                     let duelist_dispatcher: IDuelistTokenProtectedDispatcher = store.world.duelist_token_protected_dispatcher();
                     duelist_id = (duelist_dispatcher.get_validated_active_duelist_id(caller, duelist_id, queue_id.get_lives_staked()));
                     assert(duelist_id.is_non_zero(), Errors::INVALID_DUELIST);
-                    // validate duelist is enlisted
-                    assert(store.is_matchmaking(duelist_id, queue_id), Errors::WRONG_DUELIST);
-                    // randomize slot
+                    // verify enlistment
                     let mut queue: MatchQueue = store.get_match_queue(queue_id);
+                    if (queue.requires_enlistment()) {
+                        assert(store.is_matchmaking(duelist_id, queue_id), Errors::NOT_ENLISTED);
+                    } else {
+                        store.enter_matchmaking(duelist_id, queue_id);
+                    }
+                    // randomize slot
                     let seed: felt252 = store.vrf_dispatcher().consume_random(Source::Nonce(caller));
                     let slot: u8 = queue.assign_slot(@store, seed);
                     // enter queue
