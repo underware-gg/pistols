@@ -67,17 +67,6 @@ pub enum QueueMode {
     Slow,       // 2
 }
 
-//
-// count duels between two players
-#[derive(Copy, Drop, Serde)]
-#[dojo::model]
-pub struct MatchCounter {
-    #[key]
-    pub pair: u128,     // xor'd players_low
-    //-----------------------
-    pub count: u64,
-}
-
 
 //----------------------------------
 // Traits

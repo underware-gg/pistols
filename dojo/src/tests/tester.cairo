@@ -296,7 +296,6 @@ pub mod tester {
             TestResource::Model(pistols::models::leaderboard::m_Leaderboard::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::matches::m_MatchQueue::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::matches::m_MatchPlayer::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::matches::m_MatchCounter::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::pack::m_Pack::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::ring::m_Ring::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::ring::m_RingBalance::TEST_CLASS_HASH),

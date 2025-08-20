@@ -129,12 +129,6 @@ export interface Leaderboard {
 	scores: BigNumberish;
 }
 
-// Type definition for `pistols::models::matches::MatchCounter` struct
-export interface MatchCounter {
-	pair: BigNumberish;
-	count: BigNumberish;
-}
-
 // Type definition for `pistols::models::matches::MatchPlayer` struct
 export interface MatchPlayer {
 	player_address: string;
@@ -791,7 +785,6 @@ export interface SchemaType extends ISchemaType {
 		DuelistTimestamps: DuelistTimestamps,
 		Totals: Totals,
 		Leaderboard: Leaderboard,
-		MatchCounter: MatchCounter,
 		MatchPlayer: MatchPlayer,
 		MatchQueue: MatchQueue,
 		QueueInfo: QueueInfo,
@@ -974,10 +967,6 @@ export const schema: SchemaType = {
 			positions: 0,
 			duelist_ids: 0,
 			scores: 0,
-		},
-		MatchCounter: {
-			pair: 0,
-			count: 0,
 		},
 		MatchPlayer: {
 			player_address: "",
@@ -1291,7 +1280,6 @@ export enum ModelsMapping {
 	DuelistTimestamps = 'pistols-DuelistTimestamps',
 	Totals = 'pistols-Totals',
 	Leaderboard = 'pistols-Leaderboard',
-	MatchCounter = 'pistols-MatchCounter',
 	MatchPlayer = 'pistols-MatchPlayer',
 	MatchQueue = 'pistols-MatchQueue',
 	QueueId = 'pistols-QueueId',

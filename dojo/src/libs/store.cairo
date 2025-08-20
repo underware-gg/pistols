@@ -25,7 +25,6 @@ pub use pistols::models::{
     matches::{
         MatchQueue,
         MatchPlayer,
-        MatchCounter,
         QueueId, QueueInfo,
     },
     pack::{
@@ -130,10 +129,6 @@ pub impl StoreImpl of StoreTrait {
     #[inline(always)]
     fn get_match_player(self: @Store, player_address: ContractAddress) -> MatchPlayer {
         (self.world.read_model(player_address))
-    }
-    #[inline(always)]
-    fn get_match_counter(self: @Store, pair: u128) -> MatchCounter {
-        (self.world.read_model(pair))
     }
 
     #[inline(always)]
@@ -379,10 +374,6 @@ pub impl StoreImpl of StoreTrait {
     #[inline(always)]
     fn delete_match_player(ref self: Store, contract_address: ContractAddress) {
         self.world.erase_model(@self.get_match_player(contract_address));
-    }
-    #[inline(always)]
-    fn set_match_counter(ref self: Store, model: @MatchCounter) {
-        self.world.write_model(model);
     }
 
     #[inline(always)]
