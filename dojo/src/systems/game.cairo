@@ -665,7 +665,7 @@ pub mod game {
             store.exit_challenge(challenge.duelist_id_b);
             // clear matchmaker
             match challenge.duel_type {
-                DuelType::MatchMake |
+                DuelType::Ranked |
                 DuelType::Unranked => {
                     store.delete_match_player(challenge.address_a);
                     store.delete_match_player(challenge.address_b);

@@ -611,7 +611,7 @@ mod tests {
     #[should_panic(expected:('DUEL: Invalid duel type', 'ENTRYPOINT_FAILED'))]
     fn test_create_invalid_duel_type_matchmake() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        tester::execute_create_duel(@sys, OWNER(), OTHER(), MESSAGE(), DuelType::MatchMake, 0, 1);
+        tester::execute_create_duel(@sys, OWNER(), OTHER(), MESSAGE(), DuelType::Ranked, 0, 1);
     }
 
     #[test]

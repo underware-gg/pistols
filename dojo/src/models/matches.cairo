@@ -98,7 +98,7 @@ pub impl QueueIdImpl of QueueIdTrait {
     fn get_duel_type(self: @QueueId) -> DuelType {
         match self {
             QueueId::Undefined => DuelType::Undefined,
-            QueueId::Ranked => DuelType::MatchMake,
+            QueueId::Ranked => DuelType::Ranked,
             QueueId::Unranked => DuelType::Unranked,
         }
     }

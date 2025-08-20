@@ -63,7 +63,7 @@ mod tests {
         assert_ne!(duel_id, 0, "[{}] duel_id", prefix);
         let (ch, round) = tester::get_Challenge_Round_value(sys, duel_id);
         let is_bot: bool = (ch.address_b == (*sys.bot_player).contract_address);
-        assert_eq!(ch.duel_type, if(queue_id==QueueId::Ranked){DuelType::MatchMake}else{DuelType::Unranked}, "[{}] duel_type", prefix);
+        assert_eq!(ch.duel_type, if(queue_id==QueueId::Ranked){DuelType::Ranked}else{DuelType::Unranked}, "[{}] duel_type", prefix);
         assert_eq!(ch.state, ChallengeState::InProgress, "[{}] ch.state", prefix);
         assert_eq!(round.state, RoundState::Commit, "[{}] round.state", prefix);
         assert_eq!(ch.address_a, address_a, "[{}] ch.address_a", prefix);

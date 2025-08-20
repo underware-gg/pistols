@@ -736,7 +736,7 @@ pub mod tester {
     //
     pub fn make_challenge_ranked(ref sys: TestSystems, duel_id: u128) {
         let mut challenge: Challenge = sys.store.get_challenge(duel_id);
-        challenge.duel_type = DuelType::MatchMake;
+        challenge.duel_type = DuelType::Ranked;
         set_Challenge(ref sys.world, @challenge);
     }
 

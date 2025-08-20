@@ -315,7 +315,7 @@ pub mod duel_token {
                 },
                 DuelType::Tutorial |    // created by the tutorials contact only
                 DuelType::Tournament |  // created by the tournaments contact only
-                DuelType::MatchMake |   // created by matchmaker contract only
+                DuelType::Ranked |      // created by matchmaker contract only
                 DuelType::Unranked |    // created by matchmaker contract only
                 DuelType::Undefined => {
                     assert(false, Errors::INVALID_DUEL_TYPE);
