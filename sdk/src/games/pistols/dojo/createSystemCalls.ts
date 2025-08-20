@@ -1,7 +1,7 @@
 import { DojoCall, DojoProvider, getContractByName } from '@dojoengine/core'
 import { AccountInterface, BigNumberish, CairoCustomEnum, Call, CallData, UniversalDetails, CairoOption, CairoOptionVariant } from 'starknet'
 import { arrayClean, shortAddress, isPositiveBigint, bigintToHex, bigintToAddress } from 'src/utils/misc/types'
-import { NAMESPACE, getLordsAddress, getBankAddress, getVrfAddress, DojoManifest } from 'src/games/pistols/config/config'
+import { NAMESPACE, getLordsAddress, getBankAddress, getVrfAddress, DojoManifest, getMatchmakerAddress } from 'src/games/pistols/config/config'
 import { bigintToU256 } from 'src/starknet/starknet'
 import { makeCustomEnum } from 'src/starknet/starknet_enum'
 import { DojoNetworkConfig } from 'src/games/pistols/config/networks'
@@ -88,12 +88,12 @@ export function createSystemCalls(
   //   return results as T
   // }
 
-  const approve_call = (approved_value: BigNumberish): Call | undefined => {
+  const approve_lords_call = (approved_value: BigNumberish, spenderContractAddress?: BigNumberish): Call | undefined => {
     if (!isPositiveBigint(approved_value)) return undefined
     return {
       contractAddress: getLordsAddress(selectedNetworkConfig.networkId),
       entrypoint: 'approve',
-      calldata: [getBankAddress(selectedNetworkConfig.networkId), bigintToU256(approved_value)],
+      calldata: [spenderContractAddress ?? getBankAddress(selectedNetworkConfig.networkId), bigintToU256(approved_value)],
     }
   }
 
@@ -188,6 +188,36 @@ export function createSystemCalls(
       },
     },
     //
+    // matchmaker.cairo
+    //
+    // fn enlist_duelist(ref self: TState, duelist_id: u128, queue_id: QueueId) -> u128; //@description: Enlist a Duelist in a ranked queue
+    // fn match_make_me(ref self: TState, duelist_id: u128, queue_id: QueueId, queue_mode: QueueMode) -> u128; //@description: Match a player against another player
+    matchmaker: {
+      enlist_duelist: async (signer: AccountInterface, duelist_id: BigNumberish, queue_id: constants.QueueId, key?: string): Promise<boolean> => {
+        const queue_id_enum = makeCustomEnum(queue_id);
+        const approved_value = await contractCalls.matchmaker.getEntryFee(queue_id_enum) as BigNumberish;
+        const calls: DojoCalls = [
+          approve_lords_call(approved_value, getMatchmakerAddress(selectedNetworkConfig.networkId)),
+          vrf_request_call('matchmaker', signer.address),
+          contractCalls.matchmaker.buildEnlistDuelistCalldata(
+            duelist_id,
+            queue_id_enum,
+          ),
+        ];;
+        return await _executeTransaction(signer, calls, key);
+      },
+      match_make_me: async (signer: AccountInterface, duelist_id: BigNumberish, queue_id: constants.QueueId, queue_mode: constants.QueueMode, key?: string): Promise<boolean> => {
+        const calls: DojoCalls = [
+          contractCalls.matchmaker.buildMatchMakeMeCalldata(
+            duelist_id,
+            makeCustomEnum(queue_id),
+            makeCustomEnum(queue_mode),
+          ),
+        ];
+        return await _executeTransaction(signer, calls, key);
+      },
+    },
+    //
     // tutorial.cairo
     //
     tutorial: {
@@ -265,7 +295,7 @@ export function createSystemCalls(
         const pack_type_enum = makeCustomEnum(pack_type)
         const approved_value = await contractCalls.pack_token.calcMintFee(signer.address, pack_type_enum) as BigNumberish
         const calls: DojoCalls = [
-          approve_call(approved_value),
+          approve_lords_call(approved_value),
           vrf_request_call('pack_token', signer.address),
           contractCalls.pack_token.buildPurchaseCalldata(
             pack_type_enum,
@@ -334,7 +364,7 @@ export function createSystemCalls(
     bank: {
       sponsor_duelists: async (signer: AccountInterface, lords_amount: BigNumberish, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
-          approve_call(lords_amount),
+          approve_lords_call(lords_amount),
           contractCalls.bank.buildSponsorDuelistsCalldata(
             signer.address,
             lords_amount,
@@ -344,7 +374,7 @@ export function createSystemCalls(
       },
       sponsor_season: async (signer: AccountInterface, lords_amount: BigNumberish, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
-          approve_call(lords_amount),
+          approve_lords_call(lords_amount),
           contractCalls.bank.buildSponsorSeasonCalldata(
             signer.address,
             lords_amount,
@@ -354,7 +384,7 @@ export function createSystemCalls(
       },
       sponsor_tournament: async (signer: AccountInterface, lords_amount: BigNumberish, tournament_id: BigNumberish, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
-          approve_call(lords_amount),
+          approve_lords_call(lords_amount),
           contractCalls.bank.buildSponsorTournamentCalldata(
             signer.address,
             lords_amount,

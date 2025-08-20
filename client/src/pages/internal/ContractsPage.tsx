@@ -61,6 +61,7 @@ function Contracts() {
         <ContractRow name='game' />
         <ContractRow name='game_loop' />
         <ContractRow name='bot_player' />
+        <ContractRow name='matchmaker' />
         <ContractRow name='tutorial' />
         <ContractRow name='admin' />
         <ContractRow name='bank' />

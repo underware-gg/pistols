@@ -134,6 +134,28 @@ export const useGameTimestamp = () => {
 
 
 //------------------------------------------
+// matchmaker
+//
+
+export const useGetMatchMakerEntryFee = (queue_id: constants.QueueId) => {
+  const { matchmaker: { getEntryFee } } = useDojoContractCalls()
+  const options = useMemo(() => ({
+    call: getEntryFee,
+    args: [makeCustomEnum(queue_id)],
+    enabled: Boolean(queue_id),
+    defaultValue: [0n, 0n],
+  }), [queue_id])
+  const { value, isLoading } = useSdkCallPromise<bigint[]>(options)
+  return {
+    requiresDuelistEnlistment: (isPositiveBigint(value?.[0] ?? 0) && isPositiveBigint(value?.[1] ?? 0)),
+    tokenContractAddress: value?.[0],
+    tokenAmount: value?.[1],
+    isLoading,
+  }
+}
+
+
+//------------------------------------------
 // tutorial
 //
 

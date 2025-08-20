@@ -66,6 +66,7 @@ export const getWorldAddress = (networkId: NetworkId): string => bigintToHex(man
 export const getGameAddress = (networkId: NetworkId): string => bigintToHex(_getContractAddress(networkId, 'game'));
 export const getGameLoopAddress = (networkId: NetworkId): string => bigintToHex(_getContractAddress(networkId, 'game_loop'));
 export const getBotPlayerAddress = (networkId: NetworkId): string => bigintToHex(_getContractAddress(networkId, 'bot_player'));
+export const getMatchmakerAddress = (networkId: NetworkId): string => bigintToHex(_getContractAddress(networkId, 'matchmaker'));
 export const getTutorialAddress = (networkId: NetworkId): string => bigintToHex(_getContractAddress(networkId, 'tutorial'));
 export const getBankAddress = (networkId: NetworkId): string => bigintToHex(_getContractAddress(networkId, 'bank'));
 export const getAdminAddress = (networkId: NetworkId): string => bigintToHex(_getContractAddress(networkId, 'admin'));

@@ -134,7 +134,7 @@ dojoup install v1.6.2
 # or...
 dojoup component add sozo v1.6.2
 dojoup component add katana v1.6.3
-dojoup component add torii v1.6.0
+dojoup component add torii v1.6.1
 
 # test dojo
 cd dojo
