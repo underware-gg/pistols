@@ -127,8 +127,8 @@ pub impl StoreImpl of StoreTrait {
         (self.world.read_model(queue_id))
     }
     #[inline(always)]
-    fn get_match_player(self: @Store, player_address: ContractAddress) -> MatchPlayer {
-        (self.world.read_model(player_address))
+    fn get_match_player(self: @Store, player_address: ContractAddress, queue_id: QueueId) -> MatchPlayer {
+        (self.world.read_model((player_address, queue_id),))
     }
 
     #[inline(always)]
@@ -372,8 +372,8 @@ pub impl StoreImpl of StoreTrait {
         self.world.write_model(model);
     }
     #[inline(always)]
-    fn delete_match_player(ref self: Store, contract_address: ContractAddress) {
-        self.world.erase_model(@self.get_match_player(contract_address));
+    fn delete_match_player(ref self: Store, contract_address: ContractAddress, queue_id: QueueId) {
+        self.world.erase_model(@self.get_match_player(contract_address, queue_id),);
     }
 
     #[inline(always)]
@@ -631,8 +631,8 @@ pub impl StoreImpl of StoreTrait {
     //
 
     #[inline(always)]
-    fn get_match_players_info_batch(self: @Store, player_addresses: Span<ContractAddress>) -> Array<QueueInfo> {
-        (self.world.read_member_of_models(Model::<MatchPlayer>::ptrs_from_keys(player_addresses), selector!("queue_info")))
+    fn get_match_players_info_batch(self: @Store, keys: Span<(ContractAddress, QueueId)>) -> Array<QueueInfo> {
+        (self.world.read_member_of_models(Model::<MatchPlayer>::ptrs_from_keys(keys), selector!("queue_info")))
     }
 
     #[inline(always)]
@@ -680,8 +680,8 @@ pub impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn set_match_player_queue_info(ref self: Store, player_address: ContractAddress, queue_info: QueueInfo) {
-        self.world.write_member(Model::<MatchPlayer>::ptr_from_keys(player_address), selector!("queue_info"), queue_info);
+    fn set_match_player_queue_info(ref self: Store, player_address: ContractAddress, queue_id: QueueId, queue_info: QueueInfo) {
+        self.world.write_member(Model::<MatchPlayer>::ptr_from_keys((player_address, queue_id),), selector!("queue_info"), queue_info);
     }
 
 

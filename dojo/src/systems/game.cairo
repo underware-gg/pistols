@@ -96,6 +96,7 @@ pub mod game {
         },
         duelist::{DuelistAssignmentTrait, Totals, TotalsTrait},
         leaderboard::{Leaderboard, LeaderboardTrait, LeaderboardPosition},
+        matches::{QueueId},
         pact::{PactTrait},
         ring::{RingType},
         season::{SeasonScoreboard, SeasonScoreboardTrait},
@@ -664,13 +665,13 @@ pub mod game {
             store.exit_challenge(challenge.duelist_id_a);
             store.exit_challenge(challenge.duelist_id_b);
             // clear matchmaker
-            match challenge.duel_type {
-                DuelType::Ranked |
-                DuelType::Unranked => {
-                    store.delete_match_player(challenge.address_a);
-                    store.delete_match_player(challenge.address_b);
-                },
-                _ => {}
+            let queue_id: QueueId = challenge.duel_type.into();
+            match queue_id {
+                QueueId::Undefined => {},
+                _ => {
+                    store.delete_match_player(challenge.address_a, queue_id);
+                    store.delete_match_player(challenge.address_b, queue_id);
+                }
             }
             // distributions
             if (challenge.state.is_concluded()) {

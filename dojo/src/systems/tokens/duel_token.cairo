@@ -491,7 +491,7 @@ pub mod duel_token {
                 ref store,
                 Challenge {
                     duel_id: 0,
-                    duel_type: queue_id.get_duel_type(),
+                    duel_type: queue_id.into(),
                     premise: queue_id.get_premise(),
                     lives_staked,
                     // duelists

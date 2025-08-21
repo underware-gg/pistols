@@ -73,7 +73,6 @@ pub mod matchmaker {
         pub const ENLISTMENT_NOT_REQUIRED: felt252  = 'MATCHMAKER: Not required';
         pub const INELIGIBLE_DUELIST: felt252       = 'MATCHMAKER: Ineligible duelist';
         pub const NOT_ENLISTED: felt252             = 'MATCHMAKER: Not enlisted';
-        pub const WRONG_QUEUE: felt252              = 'MATCHMAKER: Wrong queue';
         pub const INVALID_SIZE: felt252             = 'MATCHMAKER: Invalid size';
     }
 
@@ -149,7 +148,7 @@ pub mod matchmaker {
 
             // get player entry in queue
             let caller: ContractAddress = starknet::get_caller_address();
-            let mut matching_player: MatchPlayer = store.get_match_player(caller);
+            let mut matching_player: MatchPlayer = store.get_match_player(caller, queue_id);
 
             // player is already in a duel...
             if (matching_player.duel_id.is_non_zero()) {
@@ -181,15 +180,12 @@ pub mod matchmaker {
                     let slot: u8 = queue.assign_slot(@store, seed);
                     // enter queue
                     matching_player.enter_queue(
-                        queue_id,
                         queue_mode,
                         slot,
                         duelist_id,
                     );
                     (queue)
                 } else {
-                    // already in queue, must ping to same queue...
-                    assert(queue_id == matching_player.queue_id, Errors::WRONG_QUEUE);
                     // update queue mode (players can change)
                     matching_player.queue_info.queue_mode = queue_mode;
                     // get the player's queue, ignore input
@@ -275,7 +271,13 @@ pub mod matchmaker {
             // queue is not empty, try to match...
             if (queue.players.len().is_non_zero()) {
                 // get all players in queue
-                let players_info: Span<QueueInfo> = store.get_match_players_info_batch(queue.players.span()).span();
+                let mut keys: Array<(ContractAddress, QueueId)> = array![];
+                let mut i: usize = 0;
+                while (i < queue.players.len()) {
+                    keys.append((*queue.players[i], queue.queue_id),);
+                    i += 1;
+                };
+                let players_info: Span<QueueInfo> = store.get_match_players_info_batch(keys.span()).span();
 
                 let player_slot: u8 = matching_player.queue_info.slot + 
                     (match player_position {
@@ -297,7 +299,7 @@ pub mod matchmaker {
                         if (candidate_info.has_expired(timestamp)) {
                             // expire player
                             candidate_info.expired = true;
-                            store.set_match_player_queue_info(candidate_address, candidate_info);
+                            store.set_match_player_queue_info(candidate_address, queue.queue_id, candidate_info);
                             // mark for removal
                             expired_players.append(candidate_address);
                         }
@@ -333,12 +335,11 @@ pub mod matchmaker {
                 } else if (candidates.len() > 1) {
                     // tie breaker is number of duels between player and candidates
                     // get duel count batch...
-                    let duel_type: DuelType = queue.queue_id.get_duel_type();
+                    let duel_type: DuelType = queue.queue_id.into();
                     let mut keys: Array<(DuelType, u128)> = array![];
                     let mut i: usize = 0;
                     while (i < candidates.len()) {
-                        let candidate_address: ContractAddress = *candidates[i];
-                        keys.append((duel_type, PactTrait::make_pair(matching_player.player_address.into(), candidate_address.into())));
+                        keys.append((duel_type, PactTrait::make_pair(matching_player.player_address.into(), (*candidates[i]).into())));
                         i += 1;
                     };
                     let duel_counts: Span<u32> = store.get_pacts_duel_counts_batch(keys.span()).span();
@@ -360,7 +361,7 @@ pub mod matchmaker {
             let duel_id: u128 = match matched_player_address {
                 Option::Some(address) => {
                     // get matched player queue
-                    let mut matched_player: MatchPlayer = store.get_match_player(address);
+                    let mut matched_player: MatchPlayer = store.get_match_player(address, queue.queue_id);
                     // create duel
                     let duel_id: u128 = self._create_duel(
                         @store,

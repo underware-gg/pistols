@@ -43,8 +43,9 @@ pub struct MatchQueue {
 pub struct MatchPlayer {
     #[key]
     pub player_address: ContractAddress,
-    //-----------------------
+    #[key]
     pub queue_id: QueueId,
+    //-----------------------
     pub queue_info: QueueInfo,
     // player assignments
     pub duelist_id: u128,
@@ -84,13 +85,6 @@ use pistols::types::premise::{Premise};
 
 #[generate_trait]
 pub impl QueueIdImpl of QueueIdTrait {
-    fn get_duel_type(self: @QueueId) -> DuelType {
-        match self {
-            QueueId::Undefined => DuelType::Undefined,
-            QueueId::Ranked => DuelType::Ranked,
-            QueueId::Unranked => DuelType::Unranked,
-        }
-    }
     fn get_lives_staked(self: @QueueId) -> u8 {
         match self {
             QueueId::Undefined => 0,
@@ -161,11 +155,11 @@ pub impl MatchQueueImpl of MatchQueueTrait {
 
 #[generate_trait]
 pub impl MatchPlayerImpl of MatchPlayerTrait {
-    fn enter_queue(ref self: MatchPlayer, queue_id: QueueId, queue_mode: QueueMode, slot: u8, duelist_id: u128) {
+    fn enter_queue(ref self: MatchPlayer, queue_mode: QueueMode, slot: u8, duelist_id: u128) {
         let timestamp: u64 = starknet::get_block_timestamp();
         self = MatchPlayer {
             player_address: self.player_address,
-            queue_id,
+            queue_id: self.queue_id,
             duelist_id,
             duel_id: 0,
             queue_info: QueueInfo{
@@ -198,6 +192,29 @@ pub impl QueueInfoImpl of QueueInfoTrait {
 
 //---------------------------
 // Converters
+//
+impl QueueIdIntoDuelType of core::traits::Into<QueueId, DuelType> {
+    fn into(self: QueueId) -> DuelType {
+        match self {
+            QueueId::Undefined      =>  DuelType::Undefined,
+            QueueId::Ranked         =>  DuelType::Ranked,
+            QueueId::Unranked       =>  DuelType::Unranked,
+        }
+    }
+}
+impl DuelTypeIntoQueueId of core::traits::Into<DuelType, QueueId> {
+    fn into(self: DuelType) -> QueueId {
+        match self {
+            DuelType::Ranked         =>  QueueId::Ranked,
+            DuelType::Unranked       =>  QueueId::Unranked,
+            _ => QueueId::Unranked,
+        }
+    }
+}
+
+
+//
+// Print/debug
 //
 impl QueueIdIntoByteArray of core::traits::Into<QueueId, ByteArray> {
     fn into(self: QueueId) -> ByteArray {
@@ -271,9 +288,10 @@ mod unit {
     fn test_get_match_players_info_batch() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         // create players
+        let queue_id = QueueId::Ranked;
         let player_1: MatchPlayer = MatchPlayer {
             player_address: OWNER(),
-            queue_id: QueueId::Ranked,
+            queue_id,
             duelist_id: 1,
             duel_id: 1,
             queue_info: QueueInfo {
@@ -286,7 +304,7 @@ mod unit {
         };
         let player_2: MatchPlayer = MatchPlayer {
             player_address: OTHER(),
-            queue_id: QueueId::Ranked,
+            queue_id,
             duelist_id: 2,
             duel_id: 2,
             queue_info: QueueInfo {
@@ -301,7 +319,10 @@ mod unit {
         tester::set_MatchPlayer(ref sys.world, @player_1);
         tester::set_MatchPlayer(ref sys.world, @player_2);
         // get players batch
-        let players_info: Span<QueueInfo> = sys.store.get_match_players_info_batch([OTHER(), OWNER()].span()).span();
+        let players_info: Span<QueueInfo> = sys.store.get_match_players_info_batch([
+            (OTHER(), queue_id),
+            (OWNER(), queue_id),
+        ].span()).span();
         // validate stored info
         assert_eq!(*players_info[0].queue_mode, player_2.queue_info.queue_mode, "player_2.queue_mode");
         assert_eq!(*players_info[0].slot, player_2.queue_info.slot, "player_2.slot");
