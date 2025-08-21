@@ -14459,12 +14459,6 @@
     },
     {
       "members": [],
-      "class_hash": "0x4a3ed335e4c3ce8932d559ea95aaf695a9c71734d2315cd6fde3ebd8704184f",
-      "tag": "pistols-MatchCounter",
-      "selector": "0x7734b345e32a0ca9f29f20dd67fa2aed48f1ffc3db4498ebe132876dc9a44c8"
-    },
-    {
-      "members": [],
       "class_hash": "0x35f66051fec7a54b95a6c27ec4f92d81c7d7693b83030d9b4f397d2def1578",
       "tag": "pistols-MatchPlayer",
       "selector": "0x36cbfae32f102062669ab4daf04b39bf84c9ae8e26e7f0813a9728fe3c11558"
