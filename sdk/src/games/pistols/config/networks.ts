@@ -90,6 +90,7 @@ export type DojoNetworkConfig = {
   lordsAddress: string,
   vrfAddress: string,
   strkAddress: string
+  useRevealServer: boolean
   predeployedAccounts: PredeployedAccount[]
   connectorIds: string[]
   // starknet Chain
@@ -121,6 +122,7 @@ const localKatanaConfig: DojoNetworkConfig = {
   lordsAddress: undefined,
   vrfAddress: undefined,
   strkAddress: undefined,
+  useRevealServer: false,
   predeployedAccounts: [
     {
       name: 'Local Katana Deployer',
@@ -213,6 +215,7 @@ const katanaSlotConfig: DojoNetworkConfig = {
   lordsAddress: undefined,
   vrfAddress: undefined,
   strkAddress: undefined,
+  useRevealServer: false,
   predeployedAccounts: [
     {
       name: 'Katana 1',
@@ -270,6 +273,7 @@ const pistolsStagingConfig: DojoNetworkConfig = {
   lordsAddress: '0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210',
   vrfAddress: '0x051fea4450da9d6aee758bdeba88b2f665bcbf549d2c61421aa724e9ac0ced8f',
   strkAddress: '0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d',
+  useRevealServer: true,
   predeployedAccounts: [],
   connectorIds: [
     supportedConnetorIds.CONTROLLER,
@@ -294,6 +298,7 @@ const snSepoliaConfig: DojoNetworkConfig = {
   lordsAddress: '0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210',
   vrfAddress: '0x051fea4450da9d6aee758bdeba88b2f665bcbf549d2c61421aa724e9ac0ced8f',
   strkAddress: '0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d',
+  useRevealServer: true,
   predeployedAccounts: [],
   connectorIds: [
     supportedConnetorIds.CONTROLLER,
@@ -317,6 +322,7 @@ const snMainnetConfig: DojoNetworkConfig = {
   lordsAddress: '0x124aeb495b947201f5fac96fd1138e326ad86195b98df6dec9009158a533b49',
   vrfAddress: '0x051fea4450da9d6aee758bdeba88b2f665bcbf549d2c61421aa724e9ac0ced8f',
   strkAddress: '0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d',
+  useRevealServer: true,
   predeployedAccounts: [],
   connectorIds: [
     supportedConnetorIds.CONTROLLER,

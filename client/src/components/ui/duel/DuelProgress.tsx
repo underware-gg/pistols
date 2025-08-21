@@ -57,10 +57,11 @@ export default function DuelProgress({
   const { isLoading: isLoadingCommit } = useTransactionObserver({ key: `commit_paces${duelId}`, indexerCheck: completedStagesLeft[DuelStage.Round1Commit] })
 
   const { selectedNetworkConfig } = useDojoSetup()
+  const revealFromServer = useMemo(() => (selectedNetworkConfig.useRevealServer && !isTutorial), [selectedNetworkConfig, isTutorial])
   const { isRevealing: isLoadingAutoReveal, isRevealed } = useApiAutoReveal(
     selectedNetworkConfig.assetsServerUrl,
     duelId,
-    (canAutoReveal && canReveal && isYou && !isLoadingCommit && !isTutorial)
+    (canAutoReveal && canReveal && isYou && !isLoadingCommit && revealFromServer)
   )
 
   const onClick = useCallback(() => {
@@ -70,13 +71,13 @@ export default function DuelProgress({
       }
       else if (duelStage == DuelStage.Round1Reveal) {
         // ONLY FOR TUTORIALS
-        if (canReveal && !isLoadingReveal && !isLoadingCommit && !isRevealingRef.current && isTutorial) {
+        if (canReveal && !isLoadingReveal && !isLoadingCommit && !isRevealingRef.current && !revealFromServer) {
           isRevealingRef.current = true
           revealMoves()
         }
       }
     }
-  }, [isMyDuelist, isConnected, duelStage, completedStages, canReveal, isTutorial, isLoadingReveal, isLoadingCommit])
+  }, [isMyDuelist, isConnected, duelStage, completedStages, canReveal, revealFromServer, isLoadingReveal, isLoadingCommit])
 
   useEffect(() => {
     gameImpl.setIsLoading(isA, isLoadingAutoReveal || isLoadingCommit || isLoadingReveal)
@@ -85,10 +86,10 @@ export default function DuelProgress({
   // Auto-reveal when conditions are met
   // ONLY FOR TUTORIALS
   useEffect(() => {
-    if (canAutoReveal && canReveal && isYou && isTutorial) {
+    if (canAutoReveal && canReveal && isYou && !revealFromServer) {
       onClick?.()
     }
-  }, [onClick, canAutoReveal, canReveal, isYou, isTutorial])
+  }, [onClick, canAutoReveal, canReveal, isYou, revealFromServer])
 
   // Update player progress in the game
   useEffect(() => {
