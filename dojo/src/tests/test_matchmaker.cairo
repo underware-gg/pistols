@@ -119,30 +119,50 @@ mod tests {
     fn _finish_duel(sys: @TestSystems, duel_id: u128, winner: u8, queue_id: QueueId, prefix: ByteArray) {
         // pact must be set
         tester::assert_pact_queue(sys, duel_id, true, true, queue_id, prefix.clone());
-        // finish duel...
+        // MatchPlayer
         let ch: ChallengeValue = (*sys.store).get_challenge_value(duel_id);
         let is_bot: bool = (ch.address_b == (*sys.bot_player).contract_address);
+        let match_player_a: MatchPlayer = sys.store.get_match_player(ch.address_a, queue_id);
+        assert_eq!(match_player_a.duel_id, duel_id, "[{}] match_player_a.duel_id_STARTED", prefix);
+        assert_eq!(match_player_a.duelist_id, ch.duelist_id_a, "[{}] match_player_a.duelist_id_STARTED", prefix);
+        assert_gt!(match_player_a.queue_info.slot, 0, "[{}] match_player_a.queue_info.slot_STARTED", prefix);
+        assert_eq!(match_player_a.queue_info.matched, true, "[{}] match_player_a.queue_info.matched_STARTED", prefix);
+        if (!is_bot) {
+            let match_player_b: MatchPlayer = sys.store.get_match_player(ch.address_b, queue_id);
+            assert_eq!(match_player_b.duel_id, duel_id, "[{}] match_player_b.duel_id_STARTED", prefix);
+            assert_eq!(match_player_b.duelist_id, ch.duelist_id_b, "[{}] match_player_b.duelist_id_STARTED", prefix);
+            assert_gt!(match_player_b.queue_info.slot, 0, "[{}] match_player_b.queue_info.slot_STARTED", prefix);
+            assert_eq!(match_player_b.queue_info.matched, true, "[{}] match_player_b.queue_info.matched_STARTED", prefix);
+        }
+        // finish duel...
         let (moves_a, moves_b) = _get_moves_for_winner(sys, winner, is_bot);
         tester::execute_commit_moves_ID(sys, ch.address_a, ch.duelist_id_a, duel_id, moves_a.hashed);
-        if (!is_bot) { tester::execute_commit_moves_ID(sys, ch.address_b, ch.duelist_id_b, duel_id, moves_b.hashed); }
+        if (!is_bot) {
+            tester::execute_commit_moves_ID(sys, ch.address_b, ch.duelist_id_b, duel_id, moves_b.hashed);
+        }
         tester::execute_reveal_moves_ID(sys, ch.address_a, ch.duelist_id_a, duel_id, moves_a.salt, moves_a.moves);
-        if (!is_bot) { tester::execute_reveal_moves_ID(sys, ch.address_b, ch.duelist_id_b, duel_id, moves_b.salt, moves_b.moves); }
-        else { (*sys.bot_player).reveal_moves(duel_id); }
+        if (!is_bot) {
+            tester::execute_reveal_moves_ID(sys, ch.address_b, ch.duelist_id_b, duel_id, moves_b.salt, moves_b.moves);
+        } else {
+            (*sys.bot_player).reveal_moves(duel_id);
+        }
         let ch = (*sys.store).get_challenge_value(duel_id);
         assert_eq!(ch.state, if (winner == 0){ChallengeState::Draw}else{ChallengeState::Resolved}, "[{}] challenge.state_ENDED", prefix);
         assert_eq!(ch.winner, winner, "[{}] challenge.winner_ENDED", prefix);
         assert_eq!(ch.season_id, SEASON_ID_1, "[{}] challenge.season_id_ENDED", prefix);
         // pact and assignment unset
         tester::assert_pact_queue(sys, duel_id, false, false, if(queue_id==QueueId::Ranked){queue_id}else{QueueId::Undefined}, prefix.clone());
-        // MatchPlayer
+        // MatchPlayer (reset)
         let match_player_a: MatchPlayer = sys.store.get_match_player(ch.address_a, queue_id);
         assert_eq!(match_player_a.duel_id, 0, "[{}] match_player_a.duel_id_ENDED", prefix);
         assert_eq!(match_player_a.duelist_id, 0, "[{}] match_player_a.duelist_id_ENDED", prefix);
         assert_eq!(match_player_a.queue_info.slot, 0, "[{}] match_player_a.queue_info.slot_ENDED", prefix);
+        assert_eq!(match_player_a.queue_info.matched, false, "[{}] match_player_a.queue_info.matched_ENDED", prefix);
         let match_player_b: MatchPlayer = sys.store.get_match_player(ch.address_b, queue_id);
         assert_eq!(match_player_b.duel_id, 0, "[{}] match_player_b.duel_id_ENDED", prefix);
         assert_eq!(match_player_b.duelist_id, 0, "[{}] match_player_b.duelist_id_ENDED", prefix);
         assert_eq!(match_player_b.queue_info.slot, 0, "[{}] match_player_b.queue_info.slot_ENDED", prefix);
+        assert_eq!(match_player_b.queue_info.matched, false, "[{}] match_player_b.queue_info.matched_ENDED", prefix);
     }
 
     const LORDS_PRICE: u128 = (100 * CONST::ETH_TO_WEI.low);

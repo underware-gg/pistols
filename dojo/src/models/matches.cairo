@@ -59,6 +59,7 @@ pub struct QueueInfo {
     pub timestamp_enter: u64,
     pub timestamp_ping: u64,
     pub expired: bool,
+    pub matched: bool,
 }
 
 #[derive(Serde, Copy, Drop, PartialEq, IntrospectPacked)]
@@ -168,12 +169,14 @@ pub impl MatchPlayerImpl of MatchPlayerTrait {
                 timestamp_enter: timestamp,
                 timestamp_ping: timestamp,
                 expired: false,
+                matched: false,
             }
         };
     }
     fn enter_duel(ref self: MatchPlayer, duel_id: u128) {
         self.duel_id = duel_id;
         // self.queue_info.slot = 0; // no need to reset, and we can test it
+        self.queue_info.matched = true;
     }
 }
 
@@ -300,6 +303,7 @@ mod unit {
                 timestamp_enter: 1200,
                 timestamp_ping: 1300,
                 expired: false,
+                matched: false,
             },
         };
         let player_2: MatchPlayer = MatchPlayer {
@@ -313,6 +317,7 @@ mod unit {
                 timestamp_enter: 5000,
                 timestamp_ping: 5100,
                 expired: true,
+                matched: false,
             },
         };
         // store players
