@@ -68,7 +68,7 @@ export function DojoAccount() {
 }
 
 
-export function Connect() {
+export function Connect({ children }: { children?: React.ReactNode }) {
   const { connectOpener } = usePistolsContext()
   const { address, isConnecting, isConnected, connector } = useAccount()
   const { selectedNetworkConfig } = useDojoSetup()
@@ -132,6 +132,7 @@ export function Connect() {
               <LordsBalance address={address} size='big' decimals={3} />
             </Cell>
           </Row>
+          {children}
           <Row>
             <Cell></Cell>
             <Cell>

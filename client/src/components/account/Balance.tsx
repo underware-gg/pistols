@@ -97,10 +97,13 @@ export function Balance({
 
   const fontSize = useMemo(() => {
     switch(size) {
+      case 'mini': return aspectWidth(0.4)
       case 'tiny': return aspectWidth(0.6)
       case 'small': return aspectWidth(0.8) 
+      case 'large': return aspectWidth(1.2)
       case 'big': return aspectWidth(1.4)
       case 'huge': return aspectWidth(1.8)
+      case 'massive': return aspectWidth(2.5)
       default: return aspectWidth(1)
     }
   }, [size, aspectWidth])

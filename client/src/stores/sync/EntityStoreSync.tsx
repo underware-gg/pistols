@@ -12,6 +12,7 @@ import { useBankStore } from '/src/stores/bankStore'
 import { usePackStore } from '/src/stores/packStore'
 import { useScoreboardStore } from '/src/stores/scoreboardStore'
 import { useProgressStore } from '/src/stores/progressStore'
+import { useMatchStore } from '/src/stores/matchStore'
 import { debug } from '@underware/pistols-sdk/pistols'
 
 
@@ -26,6 +27,9 @@ const _modelsGet = [
   // season
   "pistols-SeasonConfig",
   "pistols-Leaderboard",
+  // matchmaking
+  "pistols-MatchQueue",
+  "pistols-MatchPlayer",
   // players
   "pistols-Player",
   "pistols-PlayerFlags",
@@ -78,6 +82,7 @@ export function EntityStoreSync() {
   const configState = useConfigStore((state) => state)
   const tokenState = useTokenConfigStore((state) => state)
   const seasonState = useSeasonStore((state) => state)
+  const matchState = useMatchStore((state) => state)
   const bankState = useBankStore((state) => state)
   const packState = usePackStore((state) => state)
   // players
@@ -104,6 +109,7 @@ export function EntityStoreSync() {
       configState.resetStore()
       tokenState.resetStore()
       seasonState.resetStore()
+      matchState.resetStore()
       bankState.resetStore()
     },
     setEntities: (entities: PistolsEntity[]) => {
@@ -121,6 +127,7 @@ export function EntityStoreSync() {
       tokenState.setEntities(filterEntitiesByModels(entities, ['TokenConfig']))
       bankState.setEntities(filterEntitiesByModels(entities, ['Pool']))
       seasonState.setEntities(filterEntitiesByModels(entities, ['SeasonConfig', 'Leaderboard']))
+      matchState.setEntities(filterEntitiesByModels(entities, ['MatchQueue', 'MatchPlayer']))
       playerState.setEntities(filterEntitiesByModels(entities, ['Player', 'PlayerFlags', 'PlayerTeamFlags', 'Ring', 'RingBalance']))
       playerDataState.updateMessages(filterEntitiesByModels(entities, ['PlayerOnline']))
     },
@@ -142,6 +149,9 @@ export function EntityStoreSync() {
       }
       if (entityContainsModels(entity, ['SeasonConfig', 'Leaderboard'])) {
         seasonState.updateEntity(entity)
+      }
+      if (entityContainsModels(entity, ['MatchQueue', 'MatchPlayer'])) {
+        matchState.updateEntity(entity)
       }
       if (entityContainsModels(entity, ['Player', 'PlayerFlags', 'PlayerTeamFlags', 'Ring', 'RingBalance'])) {
         playerState.updateEntity(entity)
@@ -179,8 +189,9 @@ export function EntityStoreSync() {
 
   // useEffect(() => debug.log("EntityStoreSync() [configStore.entities] =>", Object.values(configState.entities).length), [configState.entities])
   // useEffect(() => debug.log("EntityStoreSync() [seasonState.entities] =>", Object.values(seasonState.entities).length), [seasonState.entities])
+  useEffect(() => debug.log("EntityStoreSync() [matchState.entities] =>", Object.values(matchState.entities).length), [matchState.entities])
   // useEffect(() => debug.log("EntityStoreSync() [tokenStore.entities] =>", Object.values(tokenState.entities).length), [tokenState.entities])
-  useEffect(() => debug.log("EntityStoreSync() [challengeState.entities] =>", Object.values(challengeState.entities).length), [challengeState.entities])
+  // useEffect(() => debug.log("EntityStoreSync() [challengeState.entities] =>", Object.values(challengeState.entities).length), [challengeState.entities])
   // useEffect(() => debug.log("EntityStoreSync() [duelistStore.entities] =>", Object.values(duelistState.entities).length), [duelistState.entities])
   // useEffect(() => debug.log("EntityStoreSync() [duelistStackStore.entities] =>", Object.values(duelistStackState.entities).length), [duelistStackState.entities])
   // useEffect(() => debug.log("EntityStoreSync() [playerDataState.players] =>", Object.values(playerDataState.players_names).length), [playerDataState.players_names])

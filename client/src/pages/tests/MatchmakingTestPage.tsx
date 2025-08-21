@@ -1,25 +1,33 @@
 import React from 'react'
-import { Container, Table } from 'semantic-ui-react'
-import { useTutorialLevel, useTutorialPlayerId, useTutorialProgress } from '/src/hooks/useTutorial'
-import { useChallenge } from '/src/stores/challengeStore'
-import { CreateTutorialChallengeButton, OpenTutorialChallengeButton } from '/src/components/TutorialButtons'
-import { Connect } from '/src/pages/tests/ConnectTestPage'
-import { bigintToDecimal, bigintToHex } from '@underware/pistols-sdk/utils'
+import { Button, Container, Tab, Table, TabPane } from 'semantic-ui-react'
+import { BigNumberish } from 'starknet'
+import { useAccount } from '@starknet-react/core'
+import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
+import { useDuelistsOwnedByPlayer } from '/src/hooks/useTokenDuelists'
+import { useMatchQueue, useMatchPlayer, useDuelistsInMatchMaking } from '/src/stores/matchStore'
+import { getPlayernameFromAddress, usePlayersAvailableForMatchmaking } from '/src/stores/playerStore'
+import { PublishOnlineStatusButton } from '/src/stores/sync/PlayerOnlineSync'
+import { bigintToDecimal } from '@underware/pistols-sdk/utils'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
+import { FoolsBalance } from '/src/components/account/LordsBalance'
+import { Balance } from '/src/components/account/Balance'
+import { Address } from '/src/components/ui/Address'
 import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
+import { Connect } from '/src/pages/tests/ConnectTestPage'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import ChallengeModal from '/src/components/modals/ChallengeModal'
 import StoreSync from '/src/stores/sync/StoreSync'
-import AppDojo from '/src/components/AppDojo'
-import { PlayerOnlineSync, PublishOnlineStatusButton } from '/src/stores/sync/PlayerOnlineSync'
 import ActivityOnline from '/src/components/ActivityOnline'
-import { getPlayernameFromAddress, usePlayersAvailableForMatchmaking } from '/src/stores/playerStore'
-// import * as ENV from '/src/utils/env'
+import AppDojo from '/src/components/AppDojo'
+import { useFoolsBalance } from '/src/stores/coinStore'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
 const Row = Table.Row
 const Cell = Table.Cell
 const Body = Table.Body
+const Header = Table.Header
+const HeaderCell = Table.HeaderCell
 
 export default function MatchmakingTestPage() {
   return (
@@ -28,9 +36,18 @@ export default function MatchmakingTestPage() {
         <TestPageMenu />
         <CurrentChainHint />
 
-        <Connect />
+        <Connect>
+          <FoolsRow />
+        </Connect>
+
+        {/* <br /> */}
+        {/* <OnlineStatus /> */}
+
         <br />
-        <TutorialProgress />
+        <Tab panes={[
+          { menuItem: 'Unranked', render: () => <TabPane className='NoBorder'><MatchQueue queueId={constants.QueueId.Unranked} /></TabPane> },
+          { menuItem: 'Ranked', render: () => <TabPane className='NoBorder'><MatchQueue queueId={constants.QueueId.Ranked} /></TabPane> },
+        ]} />
 
         <StoreSync />
         <ChallengeModal />
@@ -39,13 +56,27 @@ export default function MatchmakingTestPage() {
   );
 }
 
-function TutorialProgress() {
+function FoolsRow() {
+  const { address } = useAccount()
+  return (
+    <Row className='H5'>
+      <Cell>FOOLS</Cell>
+      <Cell className='Code'>
+        <FoolsBalance address={address} size='big' />
+      </Cell>
+      <Cell></Cell>
+    </Row>
+
+  )
+}
+
+function OnlineStatus() {
   const { playerIds } = usePlayersAvailableForMatchmaking()
   return (
-    <Table celled striped size='small'>
+    <Table celled striped size='small' color='orange'>
       <Body className='H5'>
         <Row>
-          <Cell className='ModalText'>Publish</Cell>
+          <Cell className='ModalText' width={3}>Publish</Cell>
           <Cell>
             <PublishOnlineStatusButton absolute={false} available={false} />
             &nbsp;&nbsp;
@@ -63,9 +94,11 @@ function TutorialProgress() {
         <Row>
           <Cell className='ModalText'>Players available</Cell>
           <Cell>
-            {playerIds.map((playerId) => (
-              <div key={playerId}>{getPlayernameFromAddress(playerId)} : {playerId}</div>
-            ))}
+            <ul>
+              {playerIds.map((playerId) => (
+                <li key={playerId}>{getPlayernameFromAddress(playerId)} : {playerId}</li>
+              ))}
+            </ul>
           </Cell>
         </Row>
       </Body>
@@ -73,3 +106,167 @@ function TutorialProgress() {
   )
 }
 
+
+function MatchQueue({ queueId }: { queueId: constants.QueueId }) {
+  const { address } = useAccount();
+  const { balance: foolsBalance } = useFoolsBalance(address)
+  const { slotSize, requiresEnlistment, entryTokenAddress, entryTokenAmount, players } = useMatchQueue(queueId);
+  const { duelistIds } = useDuelistsOwnedByPlayer();
+  const { canEnlist, canMatchMake, inQueue, inDuel, duels } = useDuelistsInMatchMaking(duelistIds, queueId);
+  return (
+    <>
+      <Table celled striped size='small' color='orange'>
+        <Body className='H5'>
+          <Row>
+            <Cell className='ModalText' width={3}>Slot size</Cell>
+            <Cell>{slotSize}</Cell>
+          </Row>
+          <Row>
+            <Cell className='ModalText'>Enlist Fee</Cell>
+            <Cell>{requiresEnlistment ? <Balance fools size='large' wei={entryTokenAmount} /> : 'None'}</Cell>
+          </Row>
+          <Row>
+            <Cell className='ModalText'>Players in queue ({players.length})</Cell>
+            <Cell className='Code'>
+              <ul>
+                {players.map((address) => (
+                  <MatchPlayer key={address} queueId={queueId} playerAddress={address} />
+                ))}
+              </ul>
+            </Cell>
+          </Row>
+        </Body>
+      </Table>
+
+      <Table celled striped size='small' color='green'>
+        <Body className='H5'>
+
+          <Row>
+            <Cell className='ModalText' width={3}>IN QUEUE/DUEL</Cell>
+            <Cell className='Code'>
+              {inQueue.map((duelistId) => (
+                <Button key={duelistId} disabled={true}>
+                  {bigintToDecimal(duelistId)}
+                </Button>
+              ))}
+              {inDuel.map((duelistId) => (
+                <Button key={duelistId} onClick={() => window.open(`/duel/${duels[duelistId.toString()]}`, '_blank')}>
+                  {bigintToDecimal(duelistId)}: Duel#{duels[duelistId.toString()].toString()}
+                </Button>
+              ))}
+            </Cell>
+          </Row>
+
+          {queueId == constants.QueueId.Ranked && <>
+            <Row>
+              <Cell className='ModalText Important'>
+                Enlist Duelists
+                <span className={(foolsBalance < entryTokenAmount) ? 'Negative' : 'Positive'}>
+                  <FoolsBalance address={address} size='big' />
+                </span>
+              </Cell>
+              <Cell className='Code'>
+                {duelistIds.map((duelistId) => (
+                  <EnlistDuelistButton
+                    key={duelistId}
+                    duelistId={duelistId}
+                    queueId={queueId}
+                    disabled={!canEnlist.includes(duelistId)}
+                  />
+                ))}
+              </Cell>
+            </Row>
+            <Row>
+              <Cell className='ModalText' width={3}>Enter {queueId} FAST</Cell>
+              <Cell className='Code'>
+                {duelistIds.map((duelistId) => (
+                  <MatchMakeMeButton
+                    key={duelistId}
+                    duelistId={duelistId}
+                    queueId={queueId}
+                    queueMode={constants.QueueMode.Fast}
+                    disabled={!canMatchMake.includes(duelistId)}
+                  />
+                ))}
+              </Cell>
+            </Row>
+          </>}
+
+          <Row>
+            <Cell className='ModalText' width={3}>Enter {queueId} SLOW</Cell>
+            <Cell className='Code'>
+              {duelistIds.map((duelistId) => (
+                <MatchMakeMeButton
+                  key={duelistId}
+                  duelistId={duelistId}
+                  queueId={queueId}
+                  queueMode={constants.QueueMode.Slow}
+                  disabled={!canMatchMake.includes(duelistId)}
+                />
+              ))}
+            </Cell>
+          </Row>
+        </Body>
+      </Table>
+    </>
+  )
+}
+
+function MatchPlayer({
+  queueId,
+  playerAddress,
+}: {
+  queueId: constants.QueueId
+  playerAddress: BigNumberish
+}) {
+  const { slot, duelistId } = useMatchPlayer(playerAddress)
+  return (
+    <li>
+      {getPlayernameFromAddress(playerAddress)}:
+      <Address address={playerAddress} />
+      / Duelist#{Number(duelistId)} / SLOT: {slot}
+    </li>
+  )
+}
+
+function EnlistDuelistButton({
+  duelistId,
+  queueId,
+  disabled,
+}: {
+  duelistId: BigNumberish
+  queueId: constants.QueueId
+  disabled?: boolean
+}) {
+  const { account } = useAccount();
+  const { matchmaker } = useDojoSystemCalls();
+  return (
+    <Button disabled={disabled} onClick={() => {
+      matchmaker.enlist_duelist(account, duelistId, queueId)
+    }}>
+      {bigintToDecimal(duelistId)}
+    </Button>
+  )
+}
+
+function MatchMakeMeButton({
+  duelistId,
+  queueId,
+  queueMode,
+  disabled,
+}: {
+  duelistId: BigNumberish
+  queueId: constants.QueueId
+  queueMode: constants.QueueMode
+  disabled?: boolean
+}) {
+  const { account } = useAccount();
+  const { matchmaker } = useDojoSystemCalls();
+  return (
+    <Button disabled={disabled} onClick={() => {
+      matchmaker.match_make_me(account, duelistId, queueId, queueMode)
+    }}>
+      {bigintToDecimal(duelistId)}
+    </Button>
+  )
+}
