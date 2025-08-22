@@ -156,7 +156,11 @@ pub impl MatchQueueImpl of MatchQueueTrait {
 
 #[generate_trait]
 pub impl MatchPlayerImpl of MatchPlayerTrait {
-    fn enter_queue(ref self: MatchPlayer, queue_mode: QueueMode, slot: u8, duelist_id: u128) {
+    fn enter_queue(ref self: MatchPlayer,
+        queue_mode: QueueMode,
+        duelist_id: u128,
+        slot: u8,
+    ) {
         let timestamp: u64 = starknet::get_block_timestamp();
         self = MatchPlayer {
             player_address: self.player_address,
@@ -172,11 +176,6 @@ pub impl MatchPlayerImpl of MatchPlayerTrait {
                 matched: false,
             }
         };
-    }
-    fn enter_duel(ref self: MatchPlayer, duel_id: u128) {
-        self.duel_id = duel_id;
-        // self.queue_info.slot = 0; // no need to reset, and we can test it
-        self.queue_info.matched = true;
     }
 }
 

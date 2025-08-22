@@ -94,16 +94,21 @@ pub trait IDuelTokenPublic<TState> {
 // Exposed to world
 #[starknet::interface]
 pub trait IDuelTokenProtected<TState> {
-    fn match_make( //@description: Create an official ranked Duel
+    fn create_match( //@description: Create an official ranked Duel
         ref self: TState,
         address_a: ContractAddress,
         duelist_id_a: u128,
+        queue_id: QueueId,
+    ) -> u128;
+    fn start_match( //@description: Match an official ranked Duel
+        ref self: TState,
+        duel_id: u128,
         address_b: ContractAddress,
         duelist_id_b: u128,
         queue_id: QueueId,
         queue_mode: QueueMode,
     ) -> u128;
-    fn transfer_to_winner(ref self: TState, duel_id: u128);
+    fn transfer_to_winner(ref self: TState, duel_id: u128); //@description: Transfer a Duel token to its winner
     // fn join_tournament_duel(
     //     ref self: TState,
     //     player_address: ContractAddress,
@@ -202,7 +207,7 @@ pub mod duel_token {
     };
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::short_string::{ShortStringTrait};
-    use pistols::utils::address::{ContractAddressIntoU256};//, ZERO};
+    use pistols::utils::address::{ContractAddressIntoU256, ZERO};
     use pistols::utils::math::{MathTrait};
 
     // use tournaments::components::{
@@ -377,6 +382,22 @@ pub mod duel_token {
             assert(challenge.exists(), Errors::INVALID_CHALLENGE);
             assert(challenge.state == ChallengeState::Awaiting, Errors::CHALLENGE_NOT_AWAITING);
 
+            // validate duel type
+            match challenge.duel_type {
+                DuelType::Seasonal |
+                DuelType::Tournament |
+                DuelType::BotPlayer |
+                DuelType::Practice => {
+                    // ok to reply
+                },
+                DuelType::Tutorial |    // reply by the tutorials contact only
+                DuelType::Ranked |      // reply by matchmaker contract only
+                DuelType::Unranked |    // reply by matchmaker contract only
+                DuelType::Undefined => {
+                    assert(false, Errors::INVALID_DUEL_TYPE);
+                },
+            };
+
             let caller: ContractAddress = starknet::get_caller_address();
             let timestamp: u64 = starknet::get_block_timestamp();
 
@@ -405,7 +426,7 @@ pub mod duel_token {
                     assert(challenge.duelist_id_b != challenge.duelist_id_a, Errors::INVALID_CHALLENGE_SELF);
 
                     // assert duelist is not in a challenge
-                    store.enter_challenge(challenge.duelist_id_b, duel_id, Option::None);
+                    store.assign_challenge(challenge.duelist_id_b, duel_id, Option::None);
 
                     // Duelist 2 can commit
                     store.emit_challenge_action(@challenge, 2, ChallengeAction::Commit);
@@ -433,7 +454,7 @@ pub mod duel_token {
                 challenge.season_id = store.get_current_season_id();
                 challenge.timestamps.end = timestamp;
                 challenge.unset_pact(ref store, false);
-                store.exit_challenge(challenge.duelist_id_a);
+                store.unassign_challenge(challenge.duelist_id_a);
                 store.emit_challenge_action(@challenge, 1, ChallengeAction::Finished);
                 store.emit_challenge_action(@challenge, 2, ChallengeAction::Finished);
                 // emit event in behalf of the player who canceled the duel
@@ -466,25 +487,18 @@ pub mod duel_token {
         // official ranked games created by team bots only
         // called by matchmaker contract only
         //
-        fn match_make(ref self: ContractState,
+        fn create_match(ref self: ContractState,
             address_a: ContractAddress,
             mut duelist_id_a: u128,
-            address_b: ContractAddress,
-            mut duelist_id_b: u128,
             queue_id: QueueId,
-            queue_mode: QueueMode
         ) -> u128 {
             let mut store: Store = StoreTrait::new(self.world_default());
             assert(store.world.caller_is_matchmaker_contract(), Errors::INVALID_CALLER);
-            
-            // validate players
-            assert(address_a != address_b, Errors::INVALID_CHALLENGE_SELF);
 
             // get active duelist from stack
             let lives_staked: u8 = queue_id.get_lives_staked();
             let duelist_dispatcher: IDuelistTokenProtectedDispatcher = store.world.duelist_token_protected_dispatcher();
             duelist_id_a = (duelist_dispatcher.get_validated_active_duelist_id(address_a, duelist_id_a, lives_staked));
-            duelist_id_b = (duelist_dispatcher.get_validated_active_duelist_id(address_b, duelist_id_b, lives_staked));
 
             // create challenge
             let challenge: Challenge = self._spawn_challenge(
@@ -496,11 +510,11 @@ pub mod duel_token {
                     lives_staked,
                     // duelists
                     address_a,
-                    address_b,
+                    address_b: ZERO(),
                     duelist_id_a,
-                    duelist_id_b,
+                    duelist_id_b: 0,
                     // progress
-                    state: ChallengeState::InProgress,
+                    state: ChallengeState::Awaiting,
                     season_id: 0,
                     winner: 0,
                     // timestamps
@@ -510,16 +524,54 @@ pub mod duel_token {
                 Option::Some(queue_id),
             );
 
+            // Events for player A
             store.set_duelist_timestamp_active(challenge.duelist_id_a, challenge.timestamps.start);
-            store.set_duelist_timestamp_active(challenge.duelist_id_b, challenge.timestamps.start);
+            store.emit_challenge_action(@challenge, 1, ChallengeAction::Commit);
+
+            (challenge.duel_id)
+        }
+
+        fn start_match(ref self: ContractState,
+            duel_id: u128,
+            address_b: ContractAddress,
+            mut duelist_id_b: u128,
+            queue_id: QueueId,
+            queue_mode: QueueMode
+        ) -> u128 {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            assert(store.world.caller_is_matchmaker_contract(), Errors::INVALID_CALLER);
+            
+            // validate chalenge
+            let mut challenge: Challenge = store.get_challenge(duel_id);
+            assert(challenge.exists(), Errors::INVALID_CHALLENGE);
+            assert(challenge.state == ChallengeState::Awaiting, Errors::CHALLENGE_NOT_AWAITING);
+
+            // validate players
+            assert(address_b != challenge.address_a, Errors::INVALID_CHALLENGE_SELF);
+
+            // get active duelist from stack
+            let duelist_dispatcher: IDuelistTokenProtectedDispatcher = store.world.duelist_token_protected_dispatcher();
+            duelist_id_b = (duelist_dispatcher.get_validated_active_duelist_id(address_b, duelist_id_b, challenge.lives_staked));
+            // set assignemnt
+            store.assign_challenge(duelist_id_b, challenge.duel_id, Option::Some(queue_id));
+
+            // update challenge
+            challenge.address_b = address_b;
+            challenge.duelist_id_b = duelist_id_b;
+            challenge.state = ChallengeState::InProgress;
+            challenge.timestamps = PeriodTrait::new_open(); // no reply timeout
+            store.set_challenge(@challenge);
+
+            // create pact
+            challenge.assert_set_pact(ref store);
 
             // set reply timeouts
             let mut round: Round = store.get_round(challenge.duel_id);
             round.set_commit_timeout(challenge.duel_type, challenge.timestamps.start, Option::Some(queue_mode));
             store.set_round(@round);
 
-            // Both duelists are ready to commit
-            store.emit_challenge_action(@challenge, 1, ChallengeAction::Commit);
+            // Events for player B
+            store.set_duelist_timestamp_active(duelist_id_b, challenge.timestamps.start);
             store.emit_challenge_action(@challenge, 2, ChallengeAction::Commit);
 
             (challenge.duel_id)
@@ -629,7 +681,7 @@ pub mod duel_token {
 //                     store.world.game_dispatcher().collect_duel(duel_id);
 //                 } else {
 //                     // assert duelist is not in a challenge
-//                     store.enter_challenge(duelist_id, duel_id);
+//                     store.assign_challenge(duelist_id, duel_id);
 //                     // Duelist 1 is ready to commit
 //                     store.emit_challenge_action(@challenge, duelist_number, true);
 //                     // events
@@ -668,7 +720,7 @@ pub mod duel_token {
 //                 store.set_challenge(@challenge);
 
 //                 // assert duelist is not in a challenge
-//                 store.enter_challenge(duelist_id, duel_id);
+//                 store.assign_challenge(duelist_id, duel_id);
 
 //                 // Duelist 2 can commit
 //                 store.emit_challenge_action(@challenge, duelist_number, true);
@@ -702,12 +754,12 @@ pub mod duel_token {
             let duelist_dispatcher: IDuelistTokenProtectedDispatcher = store.world.duelist_token_protected_dispatcher();
             challenge.duelist_id_a = duelist_dispatcher.get_validated_active_duelist_id(challenge.address_a, challenge.duelist_id_a, challenge.lives_staked);
             // - assert duelist is not in a challenge, get into it
-            store.enter_challenge(challenge.duelist_id_a, challenge.duel_id, queue_id);
+            store.assign_challenge(challenge.duelist_id_a, challenge.duel_id, queue_id);
 
             // Validate Duelist B
             if (challenge.duelist_id_b.is_non_zero()) {
                 challenge.duelist_id_b = duelist_dispatcher.get_validated_active_duelist_id(challenge.address_b, challenge.duelist_id_b, challenge.lives_staked);
-                store.enter_challenge(challenge.duelist_id_b, challenge.duel_id, queue_id);
+                store.assign_challenge(challenge.duelist_id_b, challenge.duel_id, queue_id);
             }
 
             // save!

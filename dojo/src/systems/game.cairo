@@ -662,8 +662,8 @@ pub mod game {
             // unset pact (if set)
             challenge.unset_pact(ref store, challenge.state.is_concluded());
             // exit challenge
-            store.exit_challenge(challenge.duelist_id_a);
-            store.exit_challenge(challenge.duelist_id_b);
+            store.unassign_challenge(challenge.duelist_id_a);
+            store.unassign_challenge(challenge.duelist_id_b);
             // clear matchmaker
             let queue_id: QueueId = challenge.duel_type.into();
             match queue_id {
