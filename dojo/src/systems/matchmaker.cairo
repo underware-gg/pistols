@@ -188,6 +188,8 @@ pub mod matchmaker {
                     );
                     (queue)
                 } else {
+                    // can't change duelist
+                    assert(matching_player.duelist_id == duelist_id, Errors::INVALID_DUELIST);
                     // it is ok to switch from SLOW to FAST only...
                     if (queue_mode != matching_player.queue_info.queue_mode) {
                         assert(queue_mode == QueueMode::Fast, Errors::INVALID_MODE);
