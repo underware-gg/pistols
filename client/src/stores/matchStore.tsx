@@ -1,12 +1,12 @@
 import { useEffect, useMemo } from 'react'
-import { createDojoStore } from '@dojoengine/sdk/react'
-import { keysToEntityId, makeCustomEnumEntityId, useDojoSystem, useStoreModelsById, useStoreModelsByKeys } from '@underware/pistols-sdk/dojo'
-import { PistolsSchemaType, getEntityModel } from '@underware/pistols-sdk/pistols/sdk'
-import { constants, models } from '@underware/pistols-sdk/pistols/gen'
-import { makeAbiCustomEnum, parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/starknet'
 import { BigNumberish } from 'starknet'
-import { useDuelistStore } from './duelistStore'
+import { createDojoStore } from '@dojoengine/sdk/react'
+import { keysToEntityId, useStoreModelsByKeys } from '@underware/pistols-sdk/dojo'
+import { PistolsSchemaType, getEntityModel } from '@underware/pistols-sdk/pistols/sdk'
+import { parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/starknet'
+import { useDuelistStore } from '/src/stores/duelistStore'
 import { DuelistProfileKey } from '@underware/pistols-sdk/pistols'
+import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 
 export const useMatchStore = createDojoStore<PistolsSchemaType>();
 
@@ -14,17 +14,10 @@ export const useMatchStore = createDojoStore<PistolsSchemaType>();
 //--------------------------------
 // 'consumer' hooks
 //
-const _useQueueIdEntityId = (queueId: constants.QueueId): string | undefined => {
-  const { abi } = useDojoSystem('matchmaker')
-  const _enum = makeAbiCustomEnum(abi, 'QueueId', queueId)
-  const _entityId = makeCustomEnumEntityId(_enum)
-  return _entityId
-}
 export const useMatchQueue = (queueId: constants.QueueId) => {
   const entities = useMatchStore((state) => state.entities);
-  const entityId = _useQueueIdEntityId(queueId)
-  const queue = useStoreModelsById<models.MatchQueue>(entities, 'MatchQueue', entityId)
-  // useEffect(() => console.log(`useMatchQueue() =>`, queue), [queue])
+  const queue = useStoreModelsByKeys<models.MatchQueue>(entities, 'MatchQueue', [constants.getQueueIdValue(queueId)])
+  useEffect(() => console.log(`useMatchQueue() =>`, queue), [queue])
 
   const slotSize = useMemo(() => Number(queue?.slot_size ?? 0), [queue])
   const players = useMemo(() => (queue?.players ?? []), [queue])
@@ -42,14 +35,12 @@ export const useMatchQueue = (queueId: constants.QueueId) => {
   }
 }
 
-export const useMatchPlayer = (playerAddress: BigNumberish) => {
+export const useMatchPlayer = (playerAddress: BigNumberish, queueId: constants.QueueId) => {
   const entities = useMatchStore((state) => state.entities);
-  const player = useStoreModelsByKeys<models.MatchPlayer>(entities, 'MatchPlayer', [playerAddress])
-  // useEffect(() => console.log(`useMatchQueue() =>`, queue), [queue])
+  const player = useStoreModelsByKeys<models.MatchPlayer>(entities, 'MatchPlayer', [playerAddress, constants.getQueueIdValue(queueId)])
+  useEffect(() => console.log(`useMatchPlayer() =>`, queueId, player), [queueId, player])
 
-  const queueId = useMemo(() => player ? parseEnumVariant<constants.QueueId>(player.queue_id) : undefined, [player])
   const queueMode = useMemo(() => player ? parseEnumVariant<constants.QueueMode>(player.queue_info.queue_mode) : undefined, [player])
-
   const duelistId = useMemo(() => BigInt(player?.duelist_id ?? 0), [player])
   const duelId = useMemo(() => BigInt(player?.duel_id ?? 0), [player])
 
@@ -57,6 +48,7 @@ export const useMatchPlayer = (playerAddress: BigNumberish) => {
   const timestampEnter = useMemo(() => Number(player?.queue_info.timestamp_enter ?? 0), [player])
   const timestampPing = useMemo(() => Number(player?.queue_info.timestamp_ping ?? 0), [player])
   const expired = useMemo(() => Boolean(player?.queue_info.expired ?? false), [player])
+  const matched = useMemo(() => Boolean(player?.queue_info.matched ?? false), [player])
 
   return {
     queueId,
@@ -67,6 +59,7 @@ export const useMatchPlayer = (playerAddress: BigNumberish) => {
     timestampEnter,
     timestampPing,
     expired,
+    matched,
   }
 }
 

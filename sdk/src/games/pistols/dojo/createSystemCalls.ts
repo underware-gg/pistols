@@ -88,21 +88,20 @@ export function createSystemCalls(
   //   return results as T
   // }
 
-  const approve_erc20_call = ({
-    value,
-    tokenAddress,
-    spenderAddress,
-  }: {
-    value: BigNumberish,
-    tokenAddress?: BigNumberish,    // defaults to LORDS
-    spenderAddress?: BigNumberish,  // defaults to BANK
-  }): Call | undefined => {
+  const approve_erc20_call = (value: BigNumberish, tokenAddress: BigNumberish, spenderAddress: BigNumberish): Call | undefined => {
     if (!isPositiveBigint(value)) return undefined
     return {
-      contractAddress: bigintToAddress(tokenAddress ?? getLordsAddress(selectedNetworkConfig.networkId)),
+      contractAddress: bigintToAddress(tokenAddress),
       entrypoint: 'approve',
-      calldata: [spenderAddress ?? getBankAddress(selectedNetworkConfig.networkId), bigintToU256(value)],
+      calldata: [bigintToAddress(spenderAddress), bigintToU256(value)],
     }
+  }
+  const approve_lords_call = (value: BigNumberish): Call | undefined => {
+    return approve_erc20_call(
+      value,
+      getLordsAddress(selectedNetworkConfig.networkId),
+      getBankAddress(selectedNetworkConfig.networkId),
+    );
   }
 
   // https://docs.cartridge.gg/vrf/overview#executing-vrf-transactions
@@ -204,11 +203,11 @@ export function createSystemCalls(
         const fees = await contractCalls.matchmaker.getEntryFee(queue_id_enum) as Record<string, BigNumberish>;
         const [tokenAddress, value] = Object.values(fees);
         const calls: DojoCalls = [
-          approve_erc20_call({
+          approve_erc20_call(
             value,
             tokenAddress,
-            spenderAddress: getMatchmakerAddress(selectedNetworkConfig.networkId),
-          }),
+            getMatchmakerAddress(selectedNetworkConfig.networkId),
+          ),
           vrf_request_call('matchmaker', signer.address),
           contractCalls.matchmaker.buildEnlistDuelistCalldata(
             duelist_id,
@@ -306,7 +305,7 @@ export function createSystemCalls(
         const pack_type_enum = makeCustomEnum(pack_type)
         const value = await contractCalls.pack_token.calcMintFee(signer.address, pack_type_enum) as BigNumberish
         const calls: DojoCalls = [
-          approve_erc20_call({ value }),
+          approve_lords_call(value),
           vrf_request_call('pack_token', signer.address),
           contractCalls.pack_token.buildPurchaseCalldata(
             pack_type_enum,
@@ -375,7 +374,7 @@ export function createSystemCalls(
     bank: {
       sponsor_duelists: async (signer: AccountInterface, lords_amount: BigNumberish, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
-          approve_erc20_call({ value: lords_amount }),
+          approve_lords_call(lords_amount),
           contractCalls.bank.buildSponsorDuelistsCalldata(
             signer.address,
             lords_amount,
@@ -385,7 +384,7 @@ export function createSystemCalls(
       },
       sponsor_season: async (signer: AccountInterface, lords_amount: BigNumberish, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
-          approve_erc20_call({ value: lords_amount }),
+          approve_lords_call(lords_amount),
           contractCalls.bank.buildSponsorSeasonCalldata(
             signer.address,
             lords_amount,
@@ -395,7 +394,7 @@ export function createSystemCalls(
       },
       sponsor_tournament: async (signer: AccountInterface, lords_amount: BigNumberish, tournament_id: BigNumberish, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
-          approve_erc20_call({ value: lords_amount }),
+          approve_lords_call(lords_amount),
           contractCalls.bank.buildSponsorTournamentCalldata(
             signer.address,
             lords_amount,

@@ -5,7 +5,8 @@ import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { useDuelistsOwnedByPlayer } from '/src/hooks/useTokenDuelists'
 import { useMatchQueue, useMatchPlayer, useDuelistsInMatchMaking } from '/src/stores/matchStore'
-import { getPlayernameFromAddress, usePlayersAvailableForMatchmaking } from '/src/stores/playerStore'
+import { usePlayersAvailableForMatchmaking, getPlayernameFromAddress } from '/src/stores/playerStore'
+import { useFoolsBalance } from '/src/stores/coinStore'
 import { PublishOnlineStatusButton } from '/src/stores/sync/PlayerOnlineSync'
 import { bigintToDecimal } from '@underware/pistols-sdk/utils'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
@@ -19,7 +20,6 @@ import ChallengeModal from '/src/components/modals/ChallengeModal'
 import StoreSync from '/src/stores/sync/StoreSync'
 import ActivityOnline from '/src/components/ActivityOnline'
 import AppDojo from '/src/components/AppDojo'
-import { useFoolsBalance } from '/src/stores/coinStore'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -142,7 +142,7 @@ function MatchQueue({ queueId }: { queueId: constants.QueueId }) {
         <Body className='H5'>
 
           <Row>
-            <Cell className='ModalText' width={3}>IN QUEUE/DUEL</Cell>
+            <Cell className='ModalText' width={3}>Enlisted / In Queue</Cell>
             <Cell className='Code'>
               {inQueue.map((duelistId) => (
                 <Button key={duelistId} disabled={true}>
@@ -219,12 +219,12 @@ function MatchPlayer({
   queueId: constants.QueueId
   playerAddress: BigNumberish
 }) {
-  const { slot, duelistId } = useMatchPlayer(playerAddress)
+  const { slot, duelistId, duelId } = useMatchPlayer(playerAddress, queueId)
   return (
     <li>
       {getPlayernameFromAddress(playerAddress)}:
       <Address address={playerAddress} />
-      / Duelist#{Number(duelistId)} / SLOT: {slot}
+      / Duelist#{Number(duelistId)} / Duel#{duelId ? Number(duelId) : '-'} / SLOT: {slot}
     </li>
   )
 }

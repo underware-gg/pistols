@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
-import { useDojoSystem, makeCustomEnumEntityId, useStoreModelsById } from '@underware/pistols-sdk/dojo'
+import { keysToEntityId, useDojoSystem, useStoreModelsById } from '@underware/pistols-sdk/dojo'
 import { feltToString, makeAbiCustomEnum } from '@underware/pistols-sdk/starknet'
 import { PistolsSchemaType } from '@underware/pistols-sdk/pistols/sdk'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
@@ -12,8 +12,9 @@ export const useBankStore = createDojoStore<PistolsSchemaType>();
 
 const _usePoolEntityId = (pool_type: string, value?: bigint): string | undefined => {
   const { abi } = useDojoSystem('bank')
-  const _enum = makeAbiCustomEnum(abi, 'PoolType', pool_type, value)
-  const _entityId = makeCustomEnumEntityId(_enum)
+  const _entityId = useMemo(() => keysToEntityId([
+    makeAbiCustomEnum(abi, 'PoolType', pool_type, value)
+  ]), [abi, pool_type, value])
   return _entityId
 }
 

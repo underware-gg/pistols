@@ -3,7 +3,7 @@ import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { BigNumberish, CairoCustomEnum } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
-import { useEntityIds, useDojoSystem, keysToEntityId, getCustomEnumCalldata, useStoreModelsByKeys, useStoreModelsById, useAllStoreModels, formatQueryValue, useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
+import { useEntityIds, useDojoSystem, keysToEntityId, useStoreModelsByKeys, useStoreModelsById, useAllStoreModels, formatQueryValue, useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
 import { useClientTimestamp, useMemoGate } from '@underware/pistols-sdk/utils/hooks'
 import { isPositiveBigint, bigintToDecimal, bigintToHex, bigintEquals } from '@underware/pistols-sdk/utils'
 import { makeAbiCustomEnum, parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/starknet'
@@ -270,8 +270,7 @@ export function useTotals(totals: models.Totals | undefined) {
 const _useDuelistStackEntityId = (address: BigNumberish, profileType: constants.DuelistProfile, profileId: number): string | undefined => {
   const { abi } = useDojoSystem('duelist_token')
   const _enum = makeAbiCustomEnum(abi, 'DuelistProfile', profileType, profileId)
-  const calldata = useMemoGate(() => getCustomEnumCalldata(_enum), [_enum])
-  const entityId = useMemoGate(() => (keysToEntityId([address, ...calldata])), [address, calldata])
+  const entityId = useMemoGate(() => (keysToEntityId([address, _enum])), [address, _enum])
   return entityId
 }
 
