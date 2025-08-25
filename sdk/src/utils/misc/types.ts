@@ -1,4 +1,8 @@
-import { BigNumberish, addAddressPadding } from 'starknet'
+import {
+  BigNumberish,
+  addAddressPadding,
+  encode,
+} from 'starknet'
 
 //
 // misc
@@ -34,7 +38,8 @@ export const capitalize = (v: string) => (v.charAt(0).toUpperCase() + v.slice(1)
 //
 
 export const bigintToHex = (v: BigNumberish): `0x${string}` => (!v ? '0x0' : `0x${BigInt(v).toString(16)}`)
-export const bigintToAddress = (v: BigNumberish): string => addAddressPadding(bigintToHex(v))
+export const bigintToAddress = (v: BigNumberish): `0x${string}` => addAddressPadding(bigintToHex(v)) as `0x${string}`
+export const bigintToAddressEth = (v: BigNumberish): `0x${string}` => (!v ? '0x0' : `0x${BigInt(v).toString(16).padStart(ETHEREUM_ADDRESS_LENGTH - 2, '0')}`)
 export const bigintToDecimal = (v: BigNumberish): string => (!v ? '0' : BigInt(v).toString())
 export const bigintToNumber = (v: BigNumberish): number => (!v ? 0 : Number(BigInt(v)))
 export const bigintEquals = (a: BigNumberish | null, b: BigNumberish | null): boolean => (a != null && b != null && BigInt(a) == BigInt(b))
@@ -47,7 +52,7 @@ export const isPositiveBigint = (v: BigNumberish | null): boolean => {
   try { return (v != null && BigInt(v) > 0n) } catch { return false }
 }
 export const isNumeric = (v: string | null): boolean => (v != null && /^\d+$/.test(v))
-
+export const sanitizedAddress = (v: BigNumberish): string | null => (isPositiveBigint(v) ? encode.sanitizeHex(bigintToHex(v)) : null)
 export const shortAddress = (address: bigint | string | null) => {
   const _address = (typeof address === 'bigint' || isBigint(address)) ? bigintToHex(address) : address
   const addresLength = 12
@@ -60,6 +65,17 @@ export const shortAddress = (address: bigint | string | null) => {
           : `${_address.slice(0, sliceStart)}..${_address.slice(-sliceEnd)}`
   )
 }
+
+// Starknet address: 0x + 64 hex digits (or less)
+// starknet ex: 0xe29882a1fcba1e7e10cad46212257fea5c752a4f9b1b1ec683c503a2cf5c8a
+// starknet ex: 0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8
+export const STARKNET_ADDRESS_LENGTH = 66
+export const isStarknetAddress = (v: BigNumberish): boolean => Math.abs(STARKNET_ADDRESS_LENGTH - sanitizedAddress(v)?.length) <= 2
+// Ethereum address: 0x + 40 hex digits (or less)
+// ex: 0x8822d811b5749c544e80aad7421fe17555feed29
+// ex: 0x5fae26ee1a7f27201bf8e23173ac1c2f9a0c7d
+export const ETHEREUM_ADDRESS_LENGTH = 42
+export const isEthereumAddress = (v: BigNumberish): boolean => Math.abs(ETHEREUM_ADDRESS_LENGTH - sanitizedAddress(v)?.length) <= 2
 
 //
 // arrays

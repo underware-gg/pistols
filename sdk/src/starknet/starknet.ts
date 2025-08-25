@@ -15,10 +15,6 @@ import {
 import { bigintToHex, isBigint, isPositiveBigint } from 'src/utils/misc/types'
 import { encodeBase64 } from 'src/utils/misc/decoder'
 
-//
-// Lenghts of a Starknet address
-export const STARKNET_ADDRESS_LENGTHS = [66, 64] // [max,min]
-export const ETHEREUM_ADDRESS_LENGTH = 42
 
 //
 // Cairo functions
@@ -28,7 +24,6 @@ export const poseidonString = (v: string): bigint => poseidon(byteArray.byteArra
 //
 // Cairo type conversions
 export const validateCairoString = (v: string): string => (v ? v.slice(0, 31) : '')
-export const sanitizedAddress = (v: BigNumberish): string | null => (isPositiveBigint(v) ? encode.sanitizeHex(bigintToHex(v)) : null)
 export const stringToFelt = (v: string): BigNumberish => (v ? shortString.encodeShortString(v) : '0x0')
 export const feltToString = (v: BigNumberish): string => (BigInt(v) > 0n ? shortString.decodeShortString(bigintToHex(v)) : '')
 export const chainIdToString = (chainId: string | bigint | null | undefined): string | undefined => (chainId ? (typeof chainId === 'string' ? chainId : feltToString(chainId)) : undefined)

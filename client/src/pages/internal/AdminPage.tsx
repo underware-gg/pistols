@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import { BigNumberish } from 'starknet'
 import { Button, Checkbox, Container, Icon, Input, Table } from 'semantic-ui-react'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
-import { STARKNET_ADDRESS_LENGTHS } from '@underware/pistols-sdk/starknet'
 import { ExplorerLink } from '@underware/pistols-sdk/starknet/components'
 import { useConfig } from '/src/stores/configStore'
 import { Address } from '/src/components/ui/Address'
@@ -14,7 +13,7 @@ import { Connect } from '/src/pages/tests/ConnectTestPage'
 import { useAccount } from '@starknet-react/core'
 import { useBlockedPlayersAccounts, usePlayer, useTeamMembersAccounts, getPlayernameFromAddress, getAddressFromPlayername } from '/src/stores/playerStore'
 import { useValidateWalletAddress } from '@underware/pistols-sdk/utils/hooks'
-import { bigintToAddress, isBigint, isPositiveBigint } from '@underware/pistols-sdk/utils'
+import { bigintToAddress, isBigint, isPositiveBigint, STARKNET_ADDRESS_LENGTH } from '@underware/pistols-sdk/utils'
 import { PlayerNameSync } from '/src/stores/sync/PlayerNameSync'
 import { Leaderboards } from './SeasonsPage'
 import CurrentChainHint from '/src/components/CurrentChainHint'
@@ -103,7 +102,7 @@ export function WalletAddressRow({
           onChange={(e) => {
             if (isBigint(e.target.value ?? '')) setAddress(e.target.value)
           }}
-          maxLength={STARKNET_ADDRESS_LENGTHS[0]}
+          maxLength={STARKNET_ADDRESS_LENGTH}
           placeholder={null}
           label='Address:'
         />

@@ -2,7 +2,7 @@ import React, { ReactNode, useEffect, useState } from 'react'
 import { Grid, Modal, Breadcrumb, Icon } from 'semantic-ui-react'
 import { useControllerAccount, useDojoSetup } from '@underware/pistols-sdk/dojo'
 import { useMounted, useStarkName, useStarkProfile, useValidateWalletAddressOrName } from '@underware/pistols-sdk/utils/hooks'
-import { STARKNET_ADDRESS_LENGTHS } from '@underware/pistols-sdk/starknet'
+import { STARKNET_ADDRESS_LENGTH } from '@underware/pistols-sdk/utils'
 import { useIsMyAccount } from '/src/hooks/useIsYou'
 import { ProfilePic } from '/src/components/account/ProfilePic'
 import { ActionButton } from '/src/components/ui/Buttons'
@@ -77,7 +77,7 @@ function _WalletFinderModal({
                   placeholder={'Address or Starknet ID'}
                   value={inputAddress}
                   setValue={setInputAddres}
-                  maxLength={STARKNET_ADDRESS_LENGTHS[0]}
+                  maxLength={STARKNET_ADDRESS_LENGTH}
                   code={true}
                   disabled={false}
                 />
