@@ -2865,8 +2865,8 @@
       ]
     },
     {
-      "address": "0x6aef89ab63c4ad8b7decbcf469a200db4ab794e02a354f0696920f41cdb9608",
-      "class_hash": "0x587d64df2a27130c83768c05d8195850922a476024f3091e8dd14d50627e0c7",
+      "address": "0x85226b41a44df47e8a2ae5b1093ad7926c994083e263f0fcd7535daed7f513",
+      "class_hash": "0x242593bee3aafb74d9d1232c6d6a7abfec219d62e6579d2733290b117e9ee71",
       "abi": [
         {
           "type": "impl",
@@ -3244,7 +3244,7 @@
           "items": [
             {
               "type": "function",
-              "name": "match_make",
+              "name": "create_match",
               "inputs": [
                 {
                   "name": "address_a",
@@ -3252,6 +3252,26 @@
                 },
                 {
                   "name": "duelist_id_a",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "queue_id",
+                  "type": "pistols::models::matches::QueueId"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u128"
+                }
+              ],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "start_match",
+              "inputs": [
+                {
+                  "name": "duel_id",
                   "type": "core::integer::u128"
                 },
                 {
@@ -4244,7 +4264,8 @@
         "dojo_init",
         "create_duel",
         "reply_duel",
-        "match_make",
+        "create_match",
+        "start_match",
         "transfer_to_winner",
         "upgrade",
         "safe_transfer_from",
@@ -7467,8 +7488,8 @@
       ]
     },
     {
-      "address": "0x3b0d736ab0d5bd6ce70da56ff6353040d4609d55969927f33b6705544a85e35",
-      "class_hash": "0x4cf1a273ebbcb9859c70c03efc07f2e8c78ef1e15deddc38b936f1f76180c4",
+      "address": "0x2c6dbcf3c612e9e84ea42cc610f49de1670e318029bb5a0bcef3117bb0da303",
+      "class_hash": "0x3fa84c4e8fc4c5413eea13bd2ed7dd7a75217740bbe2145a911025cec1726fe",
       "abi": [
         {
           "type": "impl",
@@ -9764,8 +9785,8 @@
       ]
     },
     {
-      "address": "0x7026b992f88033af9932b32f6a2169f8fa243ce7d1d7a69ea0de4c9fe025a32",
-      "class_hash": "0x2538b398ddb1e934b8e37bf443acc1bb08000d990965650e60e11b16c27aa8b",
+      "address": "0x445f86b07be509cfb9b3344e86b874d26f204f6edea5473a0d7dcb23c9bac14",
+      "class_hash": "0x499356a8a1af93b03a4c14132ae67a323e9e30df026c62aeb39319706f59a97",
       "abi": [
         {
           "type": "impl",
@@ -14459,7 +14480,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x35f66051fec7a54b95a6c27ec4f92d81c7d7693b83030d9b4f397d2def1578",
+      "class_hash": "0x697d9883b5963c8732c702cd0dc54a853cc9f41c173d050e452184a01376318",
       "tag": "pistols-MatchPlayer",
       "selector": "0x36cbfae32f102062669ab4daf04b39bf84c9ae8e26e7f0813a9728fe3c11558"
     },

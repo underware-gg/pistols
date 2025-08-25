@@ -36,7 +36,9 @@ export const INTERFACE_DESCRIPTIONS: any = {
   },
   // from: ../dojo/src/systems/tokens/duel_token.cairo
   IDuelTokenProtected: {
-    match_make: 'Create an official ranked Duel',
+    create_match: 'Create an official ranked Duel',
+    start_match: 'Match an official ranked Duel',
+    transfer_to_winner: 'Transfer a Duel token to its winner',
   },
   // from: ../dojo/src/systems/tokens/duelist_token.cairo
   IDuelistTokenPublic: {

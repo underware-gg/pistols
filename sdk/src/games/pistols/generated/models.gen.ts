@@ -154,6 +154,7 @@ export interface QueueInfo {
 	timestamp_enter: BigNumberish;
 	timestamp_ping: BigNumberish;
 	expired: boolean;
+	matched: boolean;
 }
 
 // Type definition for `pistols::models::pack::Pack` struct
@@ -977,7 +978,7 @@ export const schema: SchemaType = {
 		queue_info: { queue_mode: new CairoCustomEnum({ 
 					Undefined: "",
 				Fast: undefined,
-				Slow: undefined, }), slot: 0, timestamp_enter: 0, timestamp_ping: 0, expired: false, },
+				Slow: undefined, }), slot: 0, timestamp_enter: 0, timestamp_ping: 0, expired: false, matched: false, },
 			duelist_id: 0,
 			duel_id: 0,
 		},
@@ -1000,6 +1001,7 @@ export const schema: SchemaType = {
 			timestamp_enter: 0,
 			timestamp_ping: 0,
 			expired: false,
+			matched: false,
 		},
 		Pack: {
 			pack_id: 0,

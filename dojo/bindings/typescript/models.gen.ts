@@ -129,12 +129,6 @@ export interface Leaderboard {
 	scores: BigNumberish;
 }
 
-// Type definition for `pistols::models::matches::MatchCounter` struct
-export interface MatchCounter {
-	pair: BigNumberish;
-	count: BigNumberish;
-}
-
 // Type definition for `pistols::models::matches::MatchPlayer` struct
 export interface MatchPlayer {
 	player_address: string;
@@ -160,6 +154,7 @@ export interface QueueInfo {
 	timestamp_enter: BigNumberish;
 	timestamp_ping: BigNumberish;
 	expired: boolean;
+	matched: boolean;
 }
 
 // Type definition for `pistols::models::pack::Pack` struct
@@ -783,7 +778,6 @@ export interface SchemaType extends ISchemaType {
 		DuelistTimestamps: DuelistTimestamps,
 		Totals: Totals,
 		Leaderboard: Leaderboard,
-		MatchCounter: MatchCounter,
 		MatchPlayer: MatchPlayer,
 		MatchQueue: MatchQueue,
 		QueueInfo: QueueInfo,
@@ -967,10 +961,6 @@ export const schema: SchemaType = {
 			duelist_ids: 0,
 			scores: 0,
 		},
-		MatchCounter: {
-			pair: 0,
-			count: 0,
-		},
 		MatchPlayer: {
 			player_address: "",
 		queue_id: new CairoCustomEnum({ 
@@ -980,7 +970,7 @@ export const schema: SchemaType = {
 		queue_info: { queue_mode: new CairoCustomEnum({ 
 					Undefined: "",
 				Fast: undefined,
-				Slow: undefined, }), slot: 0, timestamp_enter: 0, timestamp_ping: 0, expired: false, },
+				Slow: undefined, }), slot: 0, timestamp_enter: 0, timestamp_ping: 0, expired: false, matched: false, },
 			duelist_id: 0,
 			duel_id: 0,
 		},
@@ -1003,6 +993,7 @@ export const schema: SchemaType = {
 			timestamp_enter: 0,
 			timestamp_ping: 0,
 			expired: false,
+			matched: false,
 		},
 		Pack: {
 			pack_id: 0,
@@ -1283,7 +1274,6 @@ export enum ModelsMapping {
 	DuelistTimestamps = 'pistols-DuelistTimestamps',
 	Totals = 'pistols-Totals',
 	Leaderboard = 'pistols-Leaderboard',
-	MatchCounter = 'pistols-MatchCounter',
 	MatchPlayer = 'pistols-MatchPlayer',
 	MatchQueue = 'pistols-MatchQueue',
 	QueueId = 'pistols-QueueId',

@@ -25,7 +25,7 @@ transactions = true
 controllers = true
 pending = true
 contracts = [
-  "erc721:0x6aef89ab63c4ad8b7decbcf469a200db4ab794e02a354f0696920f41cdb9608", # duel_token
+  "erc721:0x85226b41a44df47e8a2ae5b1093ad7926c994083e263f0fcd7535daed7f513", # duel_token
   "erc721:0x26292744e0ce371ac2b4cf04cea60e45530897efe589057b72fd391bbef9acc", # duelist_token
   "erc721:0x3e2bcb37304f428530867e4f72ce90fabf8b1fd78b4f3ff7b214007c3fda8f", # pack_token
   "erc721:0xa924d792eaa75c10dc458f6f86f4e7cd79ff3be4fb1f894c1dc1d015a274ba", # ring_token

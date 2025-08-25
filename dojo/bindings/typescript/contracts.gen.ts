@@ -589,6 +589,27 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
+	const build_duel_token_createMatch_calldata = (addressA: string, duelistIdA: BigNumberish, queueId: CairoCustomEnum): DojoCall => {
+		return {
+			contractName: "duel_token",
+			entrypoint: "create_match",
+			calldata: [addressA, duelistIdA, queueId],
+		};
+	};
+
+	const duel_token_createMatch = async (snAccount: Account | AccountInterface, addressA: string, duelistIdA: BigNumberish, queueId: CairoCustomEnum) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_duel_token_createMatch_calldata(addressA, duelistIdA, queueId),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 	const build_duel_token_defaultRoyalty_calldata = (): DojoCall => {
 		return {
 			contractName: "duel_token",
@@ -725,27 +746,6 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_duel_token_matchMake_calldata = (addressA: string, duelistIdA: BigNumberish, addressB: string, duelistIdB: BigNumberish, queueId: CairoCustomEnum, queueMode: CairoCustomEnum): DojoCall => {
-		return {
-			contractName: "duel_token",
-			entrypoint: "match_make",
-			calldata: [addressA, duelistIdA, addressB, duelistIdB, queueId, queueMode],
-		};
-	};
-
-	const duel_token_matchMake = async (snAccount: Account | AccountInterface, addressA: string, duelistIdA: BigNumberish, addressB: string, duelistIdB: BigNumberish, queueId: CairoCustomEnum, queueMode: CairoCustomEnum) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				build_duel_token_matchMake_calldata(addressA, duelistIdA, addressB, duelistIdB, queueId, queueMode),
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
 	const build_duel_token_maxSupply_calldata = (): DojoCall => {
 		return {
 			contractName: "duel_token",
@@ -869,6 +869,27 @@ export function setupWorld(provider: DojoProvider) {
 			return await provider.execute(
 				snAccount,
 				build_duel_token_setApprovalForAll_calldata(operator, approved),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_duel_token_startMatch_calldata = (duelId: BigNumberish, addressB: string, duelistIdB: BigNumberish, queueId: CairoCustomEnum, queueMode: CairoCustomEnum): DojoCall => {
+		return {
+			contractName: "duel_token",
+			entrypoint: "start_match",
+			calldata: [duelId, addressB, duelistIdB, queueId, queueMode],
+		};
+	};
+
+	const duel_token_startMatch = async (snAccount: Account | AccountInterface, duelId: BigNumberish, addressB: string, duelistIdB: BigNumberish, queueId: CairoCustomEnum, queueMode: CairoCustomEnum) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_duel_token_startMatch_calldata(duelId, addressB, duelistIdB, queueId, queueMode),
 				"pistols",
 			);
 		} catch (error) {
@@ -4504,6 +4525,8 @@ export function setupWorld(provider: DojoProvider) {
 			buildContractUriCalldata: build_duel_token_contractUri_calldata,
 			createDuel: duel_token_createDuel,
 			buildCreateDuelCalldata: build_duel_token_createDuel_calldata,
+			createMatch: duel_token_createMatch,
+			buildCreateMatchCalldata: build_duel_token_createMatch_calldata,
 			defaultRoyalty: duel_token_defaultRoyalty,
 			buildDefaultRoyaltyCalldata: build_duel_token_defaultRoyalty_calldata,
 			getApproved: duel_token_getApproved,
@@ -4520,8 +4543,6 @@ export function setupWorld(provider: DojoProvider) {
 			buildIsOwnerOfCalldata: build_duel_token_isOwnerOf_calldata,
 			lastTokenId: duel_token_lastTokenId,
 			buildLastTokenIdCalldata: build_duel_token_lastTokenId_calldata,
-			matchMake: duel_token_matchMake,
-			buildMatchMakeCalldata: build_duel_token_matchMake_calldata,
 			maxSupply: duel_token_maxSupply,
 			buildMaxSupplyCalldata: build_duel_token_maxSupply_calldata,
 			name: duel_token_name,
@@ -4536,6 +4557,8 @@ export function setupWorld(provider: DojoProvider) {
 			buildSafeTransferFromCalldata: build_duel_token_safeTransferFrom_calldata,
 			setApprovalForAll: duel_token_setApprovalForAll,
 			buildSetApprovalForAllCalldata: build_duel_token_setApprovalForAll_calldata,
+			startMatch: duel_token_startMatch,
+			buildStartMatchCalldata: build_duel_token_startMatch_calldata,
 			supportsInterface: duel_token_supportsInterface,
 			buildSupportsInterfaceCalldata: build_duel_token_supportsInterface_calldata,
 			symbol: duel_token_symbol,
