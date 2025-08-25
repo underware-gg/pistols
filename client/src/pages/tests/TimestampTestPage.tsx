@@ -16,7 +16,7 @@ const HeaderCell = Table.HeaderCell
 
 export default function TimestampTestPage() {
   return (
-    <AppDojo>
+    <AppDojo subtitle='Test: Timestamp'>
       <Container>
         <TestPageMenu />
         <CurrentChainHint />

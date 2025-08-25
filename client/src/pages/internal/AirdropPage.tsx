@@ -37,7 +37,7 @@ const HeaderCell = Table.HeaderCell
 
 export default function AirdropPage() {
   return (
-    <AppDojo>
+    <AppDojo subtitle='Internal: Airdrop'>
       <Container>
         <InternalPageMenu />
         <CurrentChainHint />

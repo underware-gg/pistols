@@ -4,13 +4,15 @@ import { GameplayProvider } from '/src/hooks/GameplayContext'
 import AppDojo, { AppDojoProps } from '/src/components/AppDojo'
 
 export default function AppGame({
+  title,
+  subtitle,
   backgroundImage,
   networkId,
   autoConnect,
   children,
 }: AppDojoProps) {
   return (
-    <AppDojo networkId={networkId} backgroundImage={backgroundImage} autoConnect={autoConnect}>
+    <AppDojo title={title} subtitle={subtitle} networkId={networkId} backgroundImage={backgroundImage} autoConnect={autoConnect}>
       <ThreeJsProvider>
         <GameplayProvider>
           {children}

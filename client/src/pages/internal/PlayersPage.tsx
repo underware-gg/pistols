@@ -28,7 +28,7 @@ const HeaderCell = Table.HeaderCell
 
 export default function PlayersPage() {
   return (
-    <AppDojo>
+    <AppDojo subtitle='Internal: Players'>
       <Container>
         <InternalPageMenu />
         <CurrentChainHint />

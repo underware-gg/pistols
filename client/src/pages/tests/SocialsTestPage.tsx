@@ -22,7 +22,7 @@ const HeaderCell = Table.HeaderCell
 
 export default function SocialsTestPage() {
   return (
-    <AppDojo>
+    <AppDojo subtitle='Test: Socials'>
       <Container>
         <TestPageMenu />
         <CurrentChainHint />

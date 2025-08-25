@@ -35,7 +35,7 @@ const HeaderCell = Table.HeaderCell
 
 export default function SeasonsPage() {
   return (
-    <AppDojo>
+    <AppDojo subtitle='Internal: Seasons'>
       <Container>
         <InternalPageMenu />
         <CurrentChainHint />

@@ -13,7 +13,7 @@ const Col = Grid.Column
 export default function IconsTestPage() {
   const [state, setState] = useState(false)
   return (
-    <App>
+    <App subtitle='Test: Icons'>
       <Container text>
         <TestPageMenu />
 

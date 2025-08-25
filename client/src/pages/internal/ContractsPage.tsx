@@ -23,7 +23,7 @@ const HeaderCell = Table.HeaderCell
 
 export default function ContractsPage() {
   return (
-    <AppDojo>
+    <AppDojo subtitle='Internal: Contracts'>
       <Container>
         <InternalPageMenu />
         <CurrentChainHint />

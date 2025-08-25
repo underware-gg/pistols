@@ -30,7 +30,7 @@ const HeaderCell = Table.HeaderCell
 
 export default function AdminPage() {
   return (
-    <AppDojo>
+    <AppDojo subtitle='Internal: Admin'>
       <Container>
         <InternalPageMenu />
         <CurrentChainHint />

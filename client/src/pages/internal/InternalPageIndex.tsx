@@ -27,7 +27,7 @@ export default function InternalPageIndex() {
     navigate(`/internal/${name}`)
   }
   return (
-    <App>
+    <App subtitle='Internal'>
       <Container text>
         <h3>Internal pages</h3>
         <Menu inverted vertical>

@@ -22,7 +22,7 @@ type Profiles = {
 
 export default function ProfilesTestPage() {
   return (
-    <App>
+    <App subtitle='Test: Profiles'>
       <Container>
         <TestPageMenu />
         <br />

@@ -45,7 +45,7 @@ export default function SignTestPage() {
   if (!networkId) return <div>Loading...</div>
 
   return (
-    <AppDojo autoConnect={networkId === NetworkId.KATANA_LOCAL}>
+    <AppDojo subtitle='Test: Chain Switch' autoConnect={networkId === NetworkId.KATANA_LOCAL}>
       <TestPageMenu />
       <CurrentChainHint />
 

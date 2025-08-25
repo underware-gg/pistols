@@ -4,7 +4,7 @@ import { NetworkId, getNetworkConfig } from '@underware/pistols-sdk/pistols/conf
 import { makeDojoAppConfig, makePistolsControllerConnector } from '@underware/pistols-sdk/pistols/dojo'
 import { useEffectOnce } from '@underware/pistols-sdk/utils/hooks'
 import { Dojo } from '@underware/pistols-sdk/dojo'
-import App from '/src/components/App'
+import App, { AppProps } from '/src/components/App'
 import * as ENV from '/src/utils/env'
 
 if (!getNetworkConfig(ENV.DEFAULT_NETWORK_ID, ENV)) {
@@ -13,18 +13,18 @@ if (!getNetworkConfig(ENV.DEFAULT_NETWORK_ID, ENV)) {
 
 const controllerConnector = makePistolsControllerConnector(ENV.DEFAULT_NETWORK_ID, ENV)
 
-export interface AppDojoProps {
-  backgroundImage?: string
+export type AppDojoProps = AppProps & {
   networkId?: NetworkId
   autoConnect?: boolean
-  children: ReactNode
 }
 
 export default function AppDojo({
+  title,
+  subtitle,
   backgroundImage,
   networkId,
   autoConnect,
-  children
+  children,
 }: AppDojoProps) {
   const { dojoAppConfig, isDefaultNetwork } = useMemo(() => {
     const _networkId = networkId || ENV.DEFAULT_NETWORK_ID;
@@ -34,7 +34,7 @@ export default function AppDojo({
   }, [networkId])
   const env = useMemo(() => (isDefaultNetwork ? ENV : {}), [isDefaultNetwork, ENV])
   return (
-    <App backgroundImage={backgroundImage}>
+    <App title={title} subtitle={subtitle} backgroundImage={backgroundImage}>
       <Dojo dojoAppConfig={dojoAppConfig} env={env}>
         {autoConnect ? <AutoConnect /> : <AutoDisconnect />}
         {children}

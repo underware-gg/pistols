@@ -84,7 +84,7 @@ export default function SignTestPage() {
   const { comps, colors1, colors2, colors3, values, hash } = useDeternimisticSign(sig1, sig2, sig3)
 
   return (
-    <AppDojo>
+    <AppDojo subtitle='Test: Sign'>
       <TestPageMenu />
       <CurrentChainHint />
 

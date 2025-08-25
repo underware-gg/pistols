@@ -37,7 +37,7 @@ export default function SignTestPage() {
   }), [])
 
   return (
-    <AppDojo>
+    <AppDojo subtitle='Test: Sign'>
       <TestPageMenu />
       <CurrentChainHint />
 

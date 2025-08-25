@@ -36,7 +36,7 @@ const HeaderCell = Table.HeaderCell
 
 export default function TokensTestPage() {
   return (
-    <AppDojo>
+    <AppDojo subtitle='Test: Tokens'>
       <Container>
         <TestPageMenu />
         <CurrentChainHint />

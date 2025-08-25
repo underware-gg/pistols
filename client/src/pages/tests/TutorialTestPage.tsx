@@ -20,7 +20,7 @@ const Body = Table.Body
 
 export default function TutorialTestPage() {
   return (
-    <AppDojo autoConnect>
+    <AppDojo subtitle='Test: Tutorial' autoConnect>
       <Container>
         <TestPageMenu />
         <CurrentChainHint />

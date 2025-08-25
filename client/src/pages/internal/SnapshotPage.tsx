@@ -66,7 +66,7 @@ export const useStore = createStore();
 
 export default function SnapshotPage() {
   return (
-    <AppDojo>
+    <AppDojo subtitle='Internal: Snapshot'>
       <InternalPageMenu />
       <InternalPageWrapper>
         <Snapshots />

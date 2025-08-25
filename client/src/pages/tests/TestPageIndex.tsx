@@ -18,7 +18,7 @@ const testPages = [
 
 export default function TestPageIndex() {
   return (
-    <App>
+    <App subtitle='Tests'>
       <Container text>
         <TestPageMainMenu />
       </Container>

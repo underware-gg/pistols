@@ -30,7 +30,7 @@ const HeaderCell = Table.HeaderCell
 
 export default function ConnectTestPage() {
   return (
-    <AppDojo>
+    <AppDojo subtitle='Test: Connect'>
       <Container>
         <TestPageMenu />
         <CurrentChainHint />
