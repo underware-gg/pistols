@@ -9786,7 +9786,7 @@
     },
     {
       "address": "0x445f86b07be509cfb9b3344e86b874d26f204f6edea5473a0d7dcb23c9bac14",
-      "class_hash": "0x499356a8a1af93b03a4c14132ae67a323e9e30df026c62aeb39319706f59a97",
+      "class_hash": "0x7b5ce06e296f137fb74fcfefc697562059c0d4f3299e7bf0d3c4dda82218867",
       "abi": [
         {
           "type": "impl",
