@@ -114,27 +114,16 @@ mod tests {
             assert_eq!(duelist_profile, DuelistProfile::Bot(BotKey::Pro), "[{}] bot_duelist_profile", prefix);
         }
         // pact and assignment set
-         (sys, duel_id, true, true, prefix.clone());
-        let assignment_a: DuelistAssignment = (*sys.store).get_duelist_assignment(ch.duelist_id_a);
-        let assignment_b: DuelistAssignment = (*sys.store).get_duelist_assignment(ch.duelist_id_b);
-        assert_eq!(assignment_a.queue_id, queue_id, "[{}] assignment_a.queue_id", prefix);
-        assert_eq!(assignment_b.queue_id, queue_id, "[{}] assignment_b.queue_id", prefix);
-        // MatchPlayer
+        tester::assert_pact_queue(sys, duel_id, true, true, queue_id, prefix.clone());
+        // MatchPlayer was cleared...
         let player_a: MatchPlayer = sys.store.get_match_player(address_a, queue_id);
-        assert_eq!(player_a.duel_id, duel_id, "[{}] player_a.duel_id", prefix);
-        assert_eq!(player_a.duelist_id, duelist_id_a, "[{}] player_a.duelist_id", prefix);
-        assert_gt!(player_a.queue_info.slot, 0, "[{}] player_a.queue_info.slot", prefix);
+        assert_eq!(player_a.duel_id, 0, "[{}] player_a.duel_id", prefix);
+        assert_eq!(player_a.duelist_id, 0, "[{}] player_a.duelist_id", prefix);
+        assert_eq!(player_a.queue_info.slot, 0, "[{}] player_a.queue_info.slot", prefix);
         let player_b: MatchPlayer = sys.store.get_match_player(address_b, queue_id);
-        if (!is_bot) {
-            assert_eq!(player_b.duel_id, duel_id, "[{}] player_b.duel_id", prefix);
-            assert_eq!(player_b.duelist_id, duelist_id_b, "[{}] player_b.duelist_id", prefix);
-            assert_gt!(player_b.queue_info.slot, 0, "[{}] player_b.queue_info.slot", prefix);
-        } else {
-            // bot_player never has a MatchPlayer
-            assert_eq!(player_b.duel_id, 0, "[{}] player_b.duel_id_BOT", prefix);
-            assert_eq!(player_b.duelist_id, 0, "[{}] player_b.duelist_id_BOT", prefix);
-            assert_eq!(player_b.queue_info.slot, 0, "[{}] player_b.queue_info.slot_BOT", prefix);
-        }
+        assert_eq!(player_b.duel_id, 0, "[{}] player_b.duel_id_BOT", prefix);
+        assert_eq!(player_b.duelist_id, 0, "[{}] player_b.duelist_id_BOT", prefix);
+        assert_eq!(player_b.queue_info.slot, 0, "[{}] player_b.queue_info.slot_BOT", prefix);
     }
 
     fn _assert_match_queue(sys: @TestSystems, queue_id: QueueId, players: Span<ContractAddress>, prefix: ByteArray) {
@@ -156,23 +145,18 @@ mod tests {
         assert_gt!(duel_id, 0, "[{}] duel_id", prefix);
         // pact must be set
         tester::assert_pact_queue(sys, duel_id, true, true, queue_id, format!("{}_pact_set", prefix));
-        // MatchPlayer
+        // MatchPlayer was already cleared...
         let ch: ChallengeValue = (*sys.store).get_challenge_value(duel_id);
-        let is_bot: bool = (ch.address_b == (*sys.bot_player).contract_address);
-        let match_player_a: MatchPlayer = sys.store.get_match_player(ch.address_a, queue_id);
-        assert_eq!(match_player_a.duel_id, duel_id, "[{}] match_player_a.duel_id_STARTED", prefix);
-        assert_eq!(match_player_a.duelist_id, ch.duelist_id_a, "[{}] match_player_a.duelist_id_STARTED", prefix);
-        assert_gt!(match_player_a.queue_info.slot, 0, "[{}] match_player_a.queue_info.slot_STARTED", prefix);
-        assert_eq!(match_player_a.queue_info.matched, true, "[{}] match_player_a.queue_info.matched_STARTED", prefix);
-        if (!is_bot) {
-            // bot_player dont have MatchPlayer
-            let match_player_b: MatchPlayer = sys.store.get_match_player(ch.address_b, queue_id);
-            assert_eq!(match_player_b.duel_id, duel_id, "[{}] match_player_b.duel_id_STARTED", prefix);
-            assert_eq!(match_player_b.duelist_id, ch.duelist_id_b, "[{}] match_player_b.duelist_id_STARTED", prefix);
-            assert_gt!(match_player_b.queue_info.slot, 0, "[{}] match_player_b.queue_info.slot_STARTED", prefix);
-            assert_eq!(match_player_b.queue_info.matched, true, "[{}] match_player_b.queue_info.matched_STARTED", prefix);
-        }
+        let player_a: MatchPlayer = sys.store.get_match_player(ch.address_a, queue_id);
+        assert_eq!(player_a.duel_id, 0, "[{}] player_a.duel_id_ENDED", prefix);
+        assert_eq!(player_a.duelist_id, 0, "[{}] player_a.duelist_id_ENDED", prefix);
+        assert_eq!(player_a.queue_info.slot, 0, "[{}] player_a.queue_info.slot_ENDED", prefix);
+        let player_b: MatchPlayer = sys.store.get_match_player(ch.address_b, queue_id);
+        assert_eq!(player_b.duel_id, 0, "[{}] player_b.duel_id_ENDED", prefix);
+        assert_eq!(player_b.duelist_id, 0, "[{}] player_b.duelist_id_ENDED", prefix);
+        assert_eq!(player_b.queue_info.slot, 0, "[{}] player_b.queue_info.slot_ENDED", prefix);
         // finish duel...
+        let is_bot: bool = (ch.address_b == (*sys.bot_player).contract_address);
         let (moves_a, moves_b) = _get_moves_for_winner(sys, winner, is_bot);
         tester::execute_commit_moves_ID(sys, ch.address_a, ch.duelist_id_a, duel_id, moves_a.hashed);
         if (!is_bot) {
@@ -190,17 +174,6 @@ mod tests {
         assert_eq!(ch.season_id, SEASON_ID_1, "[{}] challenge.season_id_ENDED", prefix);
         // pact and assignment unset
         tester::assert_pact_queue(sys, duel_id, false, false, if(queue_id==QueueId::Ranked){queue_id}else{QueueId::Undefined}, format!("{}_pact_unset", prefix));
-        // MatchPlayer (reset)
-        let match_player_a: MatchPlayer = sys.store.get_match_player(ch.address_a, queue_id);
-        assert_eq!(match_player_a.duel_id, 0, "[{}] match_player_a.duel_id_ENDED", prefix);
-        assert_eq!(match_player_a.duelist_id, 0, "[{}] match_player_a.duelist_id_ENDED", prefix);
-        assert_eq!(match_player_a.queue_info.slot, 0, "[{}] match_player_a.queue_info.slot_ENDED", prefix);
-        assert_eq!(match_player_a.queue_info.matched, false, "[{}] match_player_a.queue_info.matched_ENDED", prefix);
-        let match_player_b: MatchPlayer = sys.store.get_match_player(ch.address_b, queue_id);
-        assert_eq!(match_player_b.duel_id, 0, "[{}] match_player_b.duel_id_ENDED", prefix);
-        assert_eq!(match_player_b.duelist_id, 0, "[{}] match_player_b.duelist_id_ENDED", prefix);
-        assert_eq!(match_player_b.queue_info.slot, 0, "[{}] match_player_b.queue_info.slot_ENDED", prefix);
-        assert_eq!(match_player_b.queue_info.matched, false, "[{}] match_player_b.queue_info.matched_ENDED", prefix);
     }
 
     const LORDS_PRICE: u128 = (100 * CONST::ETH_TO_WEI.low);
@@ -323,18 +296,14 @@ mod tests {
         _mock_slot(@sys, 4);
         tester::execute_match_make_me(@sys, OTHER(), ID(OTHER()), queue_id, QueueMode::Fast);
         assert_eq!(sys.store.get_match_player(OTHER(), queue_id).queue_info.slot, 4);
-        // player 3
+        // player 3 -- will match 4 and not set a slot
         _mock_slot(@sys, 3);
         tester::execute_match_make_me(@sys, BUMMER(), ID(BUMMER()), queue_id, QueueMode::Fast);
-        assert_eq!(sys.store.get_match_player(BUMMER(), queue_id).queue_info.slot, 3);
-        // player 2
-        _mock_slot(@sys, 2);
-        tester::execute_match_make_me(@sys, SPENDER(), ID(SPENDER()), queue_id, QueueMode::Fast);
-        assert_eq!(sys.store.get_match_player(SPENDER(), queue_id).queue_info.slot, 2);
-        // player 1
+        assert_eq!(sys.store.get_match_player(BUMMER(), queue_id).queue_info.slot, 0);
+        // player 4
         _mock_slot(@sys, 1);
-        tester::execute_match_make_me(@sys, TREASURY(), ID(TREASURY()), queue_id, QueueMode::Fast);
-        assert_eq!(sys.store.get_match_player(TREASURY(), queue_id).queue_info.slot, 1);
+        tester::execute_match_make_me(@sys, SPENDER(), ID(SPENDER()), queue_id, QueueMode::Fast);
+        assert_eq!(sys.store.get_match_player(SPENDER(), queue_id).queue_info.slot, 1);
     }
 
 
@@ -786,11 +755,11 @@ mod tests {
         // expire...
         tester::elapse_block_timestamp(MATCHMAKER::QUEUE_TIMEOUT_FAST);
         //
-        // matchmake player B > NO MATCH (A expired)
+        // matchmake player B > NO MATCH (player A expired)
         let duel_id: u128 = tester::execute_match_make_me(@sys, B, ID_B, queue_id, QueueMode::Fast);
         assert_eq!(duel_id, 0, "duel_id_B");
         assert_eq!(sys.store.get_match_player(B, queue_id).queue_info.expired, false, "expired_B");
-        // A was kicked out of queue...
+        // player A was kicked out of queue...
         assert_eq!(sys.store.get_match_player(A, queue_id).queue_info.expired, true, "expired_A");
         _assert_match_queue(@sys, queue_id, [B].span(), "match_B");
         _assert_match_created(@sys, queue_id, QueueMode::Fast, B, ID_B, "match_created_B");
@@ -830,7 +799,8 @@ mod tests {
         // switched to FAST > match! uses SLOW duel
         let duel_id: u128 = tester::execute_match_make_me(@sys, B, ID_B, queue_id, QueueMode::Fast);
         assert_eq!(duel_id, 1, "duel_id_matched");
-        assert_eq!(sys.store.get_match_player(B, queue_id).queue_info.queue_mode, QueueMode::Fast, "QueueMode_B");
+        // matched and cleared...
+        assert_eq!(sys.store.get_match_player(B, queue_id).queue_info.queue_mode, QueueMode::Undefined, "QueueMode_B");
         _assert_match_queue(@sys, queue_id, [].span(), "matched");
         _assert_match_started(@sys, queue_id, duel_id_B, B, ID_B, A, ID_A, "match_made");
         // check commit timeouts

@@ -210,10 +210,10 @@ pub mod bank {
         ) {
             // transfer funds...
             IErc20Trait::asserted_transfer_from_to(
-                store.get_config_lords_address(), // token_address
-                amount, // token_amount
                 payer, // from
                 starknet::get_contract_address(), // to
+                store.get_config_lords_address(), // token_address
+                amount, // token_amount
             );
             // add to pool
             let mut pool: Pool = store.get_pool(pool_id);

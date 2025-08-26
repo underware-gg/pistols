@@ -111,6 +111,8 @@ pub impl DuelistAssignmentImpl of DuelistAssignmentTrait {
             let mut assignment: DuelistAssignment = self.get_duelist_assignment(duelist_id);
             assignment.duel_id = 0;
             assignment.pass_id = 0;
+            // clear matchmaking queue
+            // but only if the duelist was not enlisted (paid ranked)
             if (assignment.queue_id != QueueId::Undefined && !self.get_match_queue(assignment.queue_id).requires_enlistment()) {
                 assignment.queue_id = QueueId::Undefined;
             }

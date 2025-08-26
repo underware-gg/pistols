@@ -38,7 +38,7 @@ pub struct MatchQueue {
 
 //
 // a player in matchmaker queue
-#[derive(Copy, Drop, Serde, Introspect)]
+#[derive(Drop, Serde, Introspect)]
 #[dojo::model]
 pub struct MatchPlayer {
     #[key]
@@ -50,16 +50,22 @@ pub struct MatchPlayer {
     // player assignments
     pub duelist_id: u128,
     pub duel_id: u128,
+    pub next_duelists: Array<QueueNextDuelist>,
 }
 
 #[derive(Serde, Copy, Drop, IntrospectPacked)]
+pub struct QueueNextDuelist {
+    pub duelist_id: u128,
+    pub slot: u8,
+}
+
+#[derive(Serde, Copy, Drop, IntrospectPacked, Default)]
 pub struct QueueInfo {
     pub queue_mode: QueueMode,
     pub slot: u8,
     pub timestamp_enter: u64,
     pub timestamp_ping: u64,
     pub expired: bool,
-    pub matched: bool,
 }
 
 #[derive(Serde, Copy, Drop, PartialEq, IntrospectPacked)]
@@ -67,6 +73,9 @@ pub enum QueueMode {
     Undefined,  // 0
     Fast,       // 1
     Slow,       // 2
+}
+impl QueueModeDefault of Default<QueueMode> {
+    fn default() -> QueueMode {(QueueMode::Undefined)}
 }
 
 
@@ -135,18 +144,18 @@ pub impl MatchQueueImpl of MatchQueueTrait {
         (self.entry_token_address.is_non_zero() && self.entry_token_amount.is_non_zero())
     }
     // assign slot to new player
-    fn assign_slot(ref self: MatchQueue, store: @Store, seed: felt252) -> u8 {
+    fn assign_slot(self: @MatchQueue, store: @Store, seed: felt252) -> u8 {
         let wrapped: @RngWrap = RngWrapTrait::new(store.world.rng_address());
         let mut dice: Dice = DiceTrait::new(wrapped, seed);
-        (dice.throw('queue_slot', self.slot_size))
+        (dice.throw('queue_slot', *self.slot_size))
     }
     #[inline(always)]
-    fn player_position(ref self: MatchQueue, player_address: @ContractAddress) -> Option<usize> {
+    fn player_position(self: @MatchQueue, player_address: @ContractAddress) -> Option<usize> {
         self.players.position(player_address)
     }
     #[inline(always)]
-    fn append_player(ref self: MatchQueue, player_address: ContractAddress) {
-        self.players.append(player_address);
+    fn append_player(ref self: MatchQueue, player_address: @ContractAddress) {
+        self.players.append(*player_address);
     }
     #[inline(always)]
     fn remove_player(ref self: MatchQueue, player_address: @ContractAddress) {
@@ -165,17 +174,55 @@ pub impl MatchPlayerImpl of MatchPlayerTrait {
         self = MatchPlayer {
             player_address: self.player_address,
             queue_id: self.queue_id,
-            duelist_id,
-            duel_id: 0,
-            queue_info: QueueInfo{
+            queue_info: QueueInfo {
                 queue_mode,
                 slot,
                 timestamp_enter: timestamp,
                 timestamp_ping: timestamp,
                 expired: false,
-                matched: false,
-            }
+            },
+            duelist_id,
+            duel_id: 0,
+            next_duelists: self.next_duelists.clone(),
         };
+    }
+    // stack a duelist to get in queue as soon as the current is matched
+    fn stack_duelist(ref self: MatchPlayer,
+        duelist_id: u128,
+        slot: u8,
+    ) {
+        self.next_duelists.append(QueueNextDuelist {
+            duelist_id,
+            slot,
+        });
+    }
+    // unstack a duelist to re-enter queue, or clear this player
+    // return true if a duelist was unstacked and player re-entered queue
+    fn unstack_duelist_or_clear(ref self: MatchPlayer) -> bool {
+        (match self.next_duelists.pop_front() {
+            Option::Some(next_duelist) => {
+                self.enter_queue(
+                    QueueMode::Slow,
+                    next_duelist.duelist_id,
+                    next_duelist.slot,
+                );
+                // still in queue
+                (true)
+            },
+            Option::None => {
+                // clear player queue
+                self = MatchPlayer {
+                    player_address: self.player_address,
+                    queue_id: self.queue_id,
+                    queue_info: Default::default(),
+                    duelist_id: 0,
+                    duel_id: 0,
+                    next_duelists: array![],
+                };
+                // left queue
+                (false)
+            },
+        })
     }
 }
 
@@ -294,30 +341,30 @@ mod unit {
         let player_1: MatchPlayer = MatchPlayer {
             player_address: OWNER(),
             queue_id,
-            duelist_id: 1,
-            duel_id: 1,
             queue_info: QueueInfo {
                 queue_mode: QueueMode::Slow,
                 slot: 11,
                 timestamp_enter: 1200,
                 timestamp_ping: 1300,
                 expired: false,
-                matched: false,
             },
+            duelist_id: 1,
+            duel_id: 1,
+            next_duelists: array![],
         };
         let player_2: MatchPlayer = MatchPlayer {
             player_address: OTHER(),
             queue_id,
-            duelist_id: 2,
-            duel_id: 2,
             queue_info: QueueInfo {
                 queue_mode: QueueMode::Fast,
                 slot: 101,
                 timestamp_enter: 5000,
                 timestamp_ping: 5100,
                 expired: true,
-                matched: false,
             },
+            duelist_id: 2,
+            duel_id: 2,
+            next_duelists: array![],
         };
         // store players
         tester::set_MatchPlayer(ref sys.world, @player_1);

@@ -371,10 +371,6 @@ pub impl StoreImpl of StoreTrait {
     fn set_match_player(ref self: Store, model: @MatchPlayer) {
         self.world.write_model(model);
     }
-    #[inline(always)]
-    fn delete_match_player(ref self: Store, contract_address: ContractAddress, queue_id: QueueId) {
-        self.world.erase_model(@self.get_match_player(contract_address, queue_id),);
-    }
 
     #[inline(always)]
     fn set_player_duelist_stack(ref self: Store, model: @PlayerDuelistStack) {

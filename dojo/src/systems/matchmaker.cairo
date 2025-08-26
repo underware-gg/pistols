@@ -129,10 +129,10 @@ pub mod matchmaker {
 
             // charge entry fee, if any...
             IErc20Trait::asserted_transfer_from_to(
-                queue.entry_token_address,
-                queue.entry_token_amount,
                 caller,
                 starknet::get_contract_address(),
+                queue.entry_token_address,
+                queue.entry_token_amount,
             );
 
             // return the enlisted duelist id
@@ -146,59 +146,55 @@ pub mod matchmaker {
         ) -> u128 {
             let mut store: Store = StoreTrait::new(self.world_default());
 
+            // validate and get queue
+            assert(queue_id != QueueId::Undefined, Errors::INVALID_QUEUE);
+            
             // get player entry in queue
             let caller: ContractAddress = starknet::get_caller_address();
             let mut matching_player: MatchPlayer = store.get_match_player(caller, queue_id);
 
-            // match started...
-            if (matching_player.queue_info.matched) {
-                return (matching_player.duel_id);
-            }
-
-            // validate mode
-            assert(queue_mode != QueueMode::Undefined, Errors::INVALID_MODE);
-            
             // get the queue
-            let mut queue: MatchQueue =
+            let mut queue: MatchQueue = store.get_match_queue(queue_id);
+
+            //----------------------------------
+            // new player... (not in queue)
+            //
+            if (matching_player.queue_info.slot.is_zero()) {
+                // validate mode
+                assert(queue_mode != QueueMode::Undefined, Errors::INVALID_MODE);
+                // Validate duelist and set a slot
+                let (duelist_id, slot): (u128, u8) = self._validate_and_randomize_slot(ref store, @queue, caller, duelist_id);
+                // enter queue
+                matching_player.enter_queue(
+                    queue_mode,
+                    duelist_id,
+                    slot,
+                );
+            } else {
                 //----------------------------------
-                // new player... (not in queue)
+                // player ping...
                 //
-                if (matching_player.queue_info.slot.is_zero()) {
-                    // validate and get queue
-                    assert(queue_id != QueueId::Undefined, Errors::INVALID_QUEUE);
-                    // Validate duelist
-                    let duelist_dispatcher: IDuelistTokenProtectedDispatcher = store.world.duelist_token_protected_dispatcher();
-                    duelist_id = (duelist_dispatcher.get_validated_active_duelist_id(caller, duelist_id, queue_id.get_lives_staked()));
-                    assert(duelist_id > 0, Errors::INVALID_DUELIST);
-                    // verify enlistment
-                    let mut queue: MatchQueue = store.get_match_queue(queue_id);
-                    if (queue.requires_enlistment()) {
-                        assert(store.is_enlisted_matchmaking(duelist_id, queue_id), Errors::NOT_ENLISTED);
-                    } else {
-                        store.enlist_matchmaking(duelist_id, queue_id);
-                    }
-                    // randomize slot
-                    let seed: felt252 = store.vrf_dispatcher().consume_random(Source::Nonce(caller));
-                    let slot: u8 = queue.assign_slot(@store, seed);
-                    // enter queue
-                    matching_player.enter_queue(
-                        queue_mode,
+                // validate input duelist
+                if (duelist_id != matching_player.duelist_id) {
+                    // can stack duelists in SLOW mode only
+                    assert(matching_player.queue_info.queue_mode == QueueMode::Slow, Errors::INVALID_DUELIST);
+                    // Validate duelist and set a slot
+                    let (duelist_id, slot): (u128, u8) = self._validate_and_randomize_slot(ref store, @queue, caller, duelist_id);
+                    // save it for later...
+                    matching_player.stack_duelist(
                         duelist_id,
                         slot,
                     );
-                    (queue)
-                } else {
-                    // can't change duelist
-                    assert(matching_player.duelist_id == duelist_id, Errors::INVALID_DUELIST);
-                    // it is ok to switch from SLOW to FAST only...
-                    if (queue_mode != matching_player.queue_info.queue_mode) {
-                        assert(queue_mode == QueueMode::Fast, Errors::INVALID_MODE);
-                        matching_player.queue_info.queue_mode = queue_mode;
-                        matching_player.queue_info.expired = true; // match or get an imp!
-                    }
-                    // get the player's queue, ignore input
-                    (store.get_match_queue(matching_player.queue_id))
-                };
+                    return (0);
+                }
+                // validate input mode
+                // can switch from SLOW to FAST only...
+                if (queue_mode != matching_player.queue_info.queue_mode) {
+                    assert(matching_player.queue_info.queue_mode == QueueMode::Slow, Errors::INVALID_MODE);
+                    matching_player.queue_info.queue_mode = queue_mode;
+                    matching_player.queue_info.expired = true; // match or get an imp!
+                }
+            };
 
             // match player...
             let matched_duel_id: u128 = self._match_or_enqueue(
@@ -226,6 +222,29 @@ pub mod matchmaker {
         fn _assert_caller_is_admin(self: @ContractState) {
             let mut world = self.world_default();
             assert(world.admin_dispatcher().am_i_admin(starknet::get_caller_address()) == true, Errors::CALLER_NOT_ADMIN);
+        }
+
+        fn _validate_and_randomize_slot(ref self: ContractState,
+            ref store: Store,
+            queue: @MatchQueue,
+            caller: ContractAddress,
+            mut duelist_id: u128,
+        ) -> (u128, u8) {
+            // Validate duelist
+            let duelist_dispatcher: IDuelistTokenProtectedDispatcher = store.world.duelist_token_protected_dispatcher();
+            duelist_id = (duelist_dispatcher.get_validated_active_duelist_id(caller, duelist_id, (*queue.queue_id).get_lives_staked()));
+            assert(duelist_id > 0, Errors::INVALID_DUELIST);
+            // verify enlistment
+            if (queue.requires_enlistment()) {
+                assert(store.is_enlisted_matchmaking(duelist_id, *queue.queue_id), Errors::NOT_ENLISTED);
+            } else {
+                store.enlist_matchmaking(duelist_id, *queue.queue_id);
+            }
+            // randomize slot
+            let seed: felt252 = store.vrf_dispatcher().consume_random(Source::Nonce(caller));
+            let slot: u8 = queue.assign_slot(@store, seed);
+            // return validated duelist and slot
+            (duelist_id, slot)
         }
 
         fn _match_or_enqueue(ref self: ContractState,
@@ -344,13 +363,16 @@ pub mod matchmaker {
                     //
                     // start duel...
                     let mut matched_player: MatchPlayer = store.get_match_player(address, queue.queue_id);
-                    self._start_match(ref store, ref matching_player, ref matched_player, queue.queue_id);
+                    let duel_id: u128 = self._start_match(ref store, ref matching_player, ref matched_player, queue.queue_id);
+                    // unstack next duelist, if any
+                    let stay_in_queue: bool = matched_player.unstack_duelist_or_clear();
+                    if (!stay_in_queue) {
+                        queue.remove_player(@matched_player.player_address);
+                    }
                     // save matched_player (matching_player is saved at the end)
                     store.set_match_player(@matched_player);
-                    // remove from queue
-                    queue.remove_player(@matched_player.player_address);
                     // return the matched duel
-                    (matched_player.duel_id)
+                    (duel_id)
                 },
                 Option::None => {
                     //----------------------------------
@@ -371,13 +393,18 @@ pub mod matchmaker {
                 },
             };
 
-            // remove from queue...
-            if (matched_duel_id > 0 && player_position.is_some()) {
-                queue.remove_player(@matching_player.player_address);
+            // matched player...
+            if (matched_duel_id > 0) {
+                let stay_in_queue: bool = matching_player.unstack_duelist_or_clear();
+                if (!stay_in_queue && player_position.is_some()) {
+                    queue.remove_player(@matching_player.player_address);
+                } else if (stay_in_queue && player_position.is_none()) {
+                    queue.append_player(@matching_player.player_address);
+                }
             }
             // player is new, add to queue...
-            else if (matched_duel_id.is_zero() && player_position.is_none()) {
-                queue.append_player(matching_player.player_address);
+            else if (player_position.is_none()) {
+                queue.append_player(@matching_player.player_address);
             }
 
             // remove expired players...
@@ -412,8 +439,8 @@ pub mod matchmaker {
             ref matching_player: MatchPlayer,
             ref matched_player: MatchPlayer,
             queue_id: QueueId,
-        ) {
-            if (matching_player.duel_id > 0) {
+        ) -> u128 {
+            let duel_id: u128 = if (matching_player.duel_id > 0) {
                 // was-SLOW player matching a FAST player
                 // (use pre-minted duel)
                 store.world.duel_token_protected_dispatcher().start_match(
@@ -425,7 +452,7 @@ pub mod matchmaker {
                     queue_id,
                     matched_player.queue_info.queue_mode,
                 );
-                matched_player.duel_id = matching_player.duel_id;
+                (matching_player.duel_id)
             } else {
                 // new SLOW player matching existing SLOW player (duel exists)
                 // new FAST player matching existing FAST player (mint duel)
@@ -441,18 +468,16 @@ pub mod matchmaker {
                     queue_id,
                     matching_player.queue_info.queue_mode,
                 );
-                matching_player.duel_id = matched_player.duel_id;
+                (matched_player.duel_id)
             };
-
-            matching_player.queue_info.matched = true;
-            matched_player.queue_info.matched = true;
+            (duel_id)
         }
 
         fn _start_match_with_imp(ref self: ContractState,
             ref store: Store,
             ref matching_player: MatchPlayer,
             queue_id: QueueId,
-        ) {
+        ) -> u128 {
             // mint duel if needed
             if (matching_player.duel_id.is_zero()) {
                 self._create_match(ref store, ref matching_player, queue_id);
@@ -470,7 +495,7 @@ pub mod matchmaker {
                 queue_id,
                 matching_player.queue_info.queue_mode,
             );
-            matching_player.queue_info.matched = true;
+            (matching_player.duel_id)
         }
     }
 

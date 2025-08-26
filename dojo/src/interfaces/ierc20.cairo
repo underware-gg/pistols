@@ -25,10 +25,10 @@ pub mod Errors {
 #[generate_trait]
 pub impl IErc20Impl of IErc20Trait {
     fn asserted_transfer_from_to(
-        token_address: ContractAddress,
-        token_amount: u128,
         from: ContractAddress,
         to: ContractAddress,
+        token_address: ContractAddress,
+        token_amount: u128,
     ) {
         // check amount
         assert(token_amount != 0, Errors::INVALID_AMOUNT);
