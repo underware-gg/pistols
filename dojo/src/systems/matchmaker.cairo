@@ -195,7 +195,8 @@ pub mod matchmaker {
                 if (queue_mode != matching_player.queue_info.queue_mode) {
                     assert(matching_player.queue_info.queue_mode == QueueMode::Slow && queue_mode == QueueMode::Fast, Errors::INVALID_MODE);
                     matching_player.queue_info.queue_mode = queue_mode;
-                    matching_player.queue_info.expired = true; // match or get an imp!
+                    // force expire to avoid getting in queue with a minted duel
+                    matching_player.queue_info.expired = true;
                 }
             };
 
@@ -267,9 +268,10 @@ pub mod matchmaker {
             matching_player.queue_info.expired = matching_player.queue_info.expired || matching_player.queue_info.has_expired(timestamp);
 
             // queue is not empty, try to match if...
-            if (queue.players.len() > 0 &&
-                (player_position.is_none() ||       // new player in queue
-                matching_player.queue_info.expired) // expired, try to match new players...
+            if (queue.players.len() > 0 && (
+                (!matching_player.queue_info.expired && player_position.is_none()) ||       // new player in queue
+                (matching_player.queue_info.expired && matching_player.queue_info.queue_mode == QueueMode::Fast)   // last chance only if on /Fast (queue has no duels minted)
+                )
             ) {
                 // get all players in queue
                 let mut keys: Array<(ContractAddress, QueueId)> = array![];
