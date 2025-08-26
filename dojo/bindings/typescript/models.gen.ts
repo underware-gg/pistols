@@ -136,6 +136,7 @@ export interface MatchPlayer {
 	queue_info: QueueInfo;
 	duelist_id: BigNumberish;
 	duel_id: BigNumberish;
+	next_duelists: Array<QueueNextDuelist>;
 }
 
 // Type definition for `pistols::models::matches::MatchQueue` struct
@@ -154,7 +155,12 @@ export interface QueueInfo {
 	timestamp_enter: BigNumberish;
 	timestamp_ping: BigNumberish;
 	expired: boolean;
-	matched: boolean;
+}
+
+// Type definition for `pistols::models::matches::QueueNextDuelist` struct
+export interface QueueNextDuelist {
+	duelist_id: BigNumberish;
+	slot: BigNumberish;
 }
 
 // Type definition for `pistols::models::pack::Pack` struct
@@ -781,6 +787,7 @@ export interface SchemaType extends ISchemaType {
 		MatchPlayer: MatchPlayer,
 		MatchQueue: MatchQueue,
 		QueueInfo: QueueInfo,
+		QueueNextDuelist: QueueNextDuelist,
 		Pack: Pack,
 		Pact: Pact,
 		Player: Player,
@@ -970,9 +977,10 @@ export const schema: SchemaType = {
 		queue_info: { queue_mode: new CairoCustomEnum({ 
 					Undefined: "",
 				Fast: undefined,
-				Slow: undefined, }), slot: 0, timestamp_enter: 0, timestamp_ping: 0, expired: false, matched: false, },
+				Slow: undefined, }), slot: 0, timestamp_enter: 0, timestamp_ping: 0, expired: false, },
 			duelist_id: 0,
 			duel_id: 0,
+			next_duelists: [{ duelist_id: 0, slot: 0, }],
 		},
 		MatchQueue: {
 		queue_id: new CairoCustomEnum({ 
@@ -993,7 +1001,10 @@ export const schema: SchemaType = {
 			timestamp_enter: 0,
 			timestamp_ping: 0,
 			expired: false,
-			matched: false,
+		},
+		QueueNextDuelist: {
+			duelist_id: 0,
+			slot: 0,
 		},
 		Pack: {
 			pack_id: 0,
@@ -1279,6 +1290,7 @@ export enum ModelsMapping {
 	QueueId = 'pistols-QueueId',
 	QueueInfo = 'pistols-QueueInfo',
 	QueueMode = 'pistols-QueueMode',
+	QueueNextDuelist = 'pistols-QueueNextDuelist',
 	Pack = 'pistols-Pack',
 	PackType = 'pistols-PackType',
 	Pact = 'pistols-Pact',

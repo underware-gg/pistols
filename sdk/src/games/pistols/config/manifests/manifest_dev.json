@@ -1706,8 +1706,8 @@
       ]
     },
     {
-      "address": "0x1299dbc551083db2b5a6ed68ca8f7fae81f3bc1b02e908751973ff706769025",
-      "class_hash": "0x4f68e18aa263caf15c6b821fd3532345becf8eadb32de8a364ad1d2b1657a94",
+      "address": "0x280f4334e55c81541c091cf51a0b1f92c1f7a0076157e28e1761c1d84232fdc",
+      "class_hash": "0x30014497d5293e28c06c8a2b5f896f8fd056f9b4956937bfae278c08490d108",
       "abi": [
         {
           "type": "impl",
@@ -7488,8 +7488,8 @@
       ]
     },
     {
-      "address": "0x2c6dbcf3c612e9e84ea42cc610f49de1670e318029bb5a0bcef3117bb0da303",
-      "class_hash": "0x3fa84c4e8fc4c5413eea13bd2ed7dd7a75217740bbe2145a911025cec1726fe",
+      "address": "0x52f1fd3b0b99a100637cfe1d6fae8d12b243cd1594194aaa14b9ab87792e3d4",
+      "class_hash": "0x3c1547c3cc7f85aba037674aa5426a95da8e205011c26b177d87ef8a795ffc8",
       "abi": [
         {
           "type": "impl",
@@ -9785,8 +9785,8 @@
       ]
     },
     {
-      "address": "0x445f86b07be509cfb9b3344e86b874d26f204f6edea5473a0d7dcb23c9bac14",
-      "class_hash": "0x7b5ce06e296f137fb74fcfefc697562059c0d4f3299e7bf0d3c4dda82218867",
+      "address": "0x23f420e6513e0bef3262065f85c23fcbb93432a2f8976bfc11c169c7f252718",
+      "class_hash": "0x5cdb88cd07127b90ad8ec46d6532a44cccc11cf584a07840c00fc152cc02ef9",
       "abi": [
         {
           "type": "impl",
@@ -14480,7 +14480,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x697d9883b5963c8732c702cd0dc54a853cc9f41c173d050e452184a01376318",
+      "class_hash": "0x66fb35f32477c2acd4c3f4f637a66639cd6ca7e15d889695545c1bf908fee1b",
       "tag": "pistols-MatchPlayer",
       "selector": "0x36cbfae32f102062669ab4daf04b39bf84c9ae8e26e7f0813a9728fe3c11558"
     },
