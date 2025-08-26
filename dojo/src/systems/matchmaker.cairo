@@ -147,7 +147,9 @@ pub mod matchmaker {
             let mut store: Store = StoreTrait::new(self.world_default());
 
             // validate and get queue
-            assert(queue_id != QueueId::Undefined, Errors::INVALID_QUEUE);
+            // Ranked: any mode is permitted
+            // Unranked: only Slow mode
+            assert(queue_id != QueueId::Undefined && !(queue_id == QueueId::Unranked && queue_mode == QueueMode::Fast), Errors::INVALID_QUEUE);
             
             // get player entry in queue
             let caller: ContractAddress = starknet::get_caller_address();
@@ -177,7 +179,7 @@ pub mod matchmaker {
                 // validate input duelist
                 if (duelist_id != matching_player.duelist_id) {
                     // can stack duelists in SLOW mode only
-                    assert(matching_player.queue_info.queue_mode == QueueMode::Slow, Errors::INVALID_DUELIST);
+                    assert(queue_mode == QueueMode::Slow, Errors::INVALID_MODE);
                     // Validate duelist and set a slot
                     let (duelist_id, slot): (u128, u8) = self._validate_and_randomize_slot(ref store, @queue, caller, duelist_id);
                     // save it for later...
@@ -185,12 +187,13 @@ pub mod matchmaker {
                         duelist_id,
                         slot,
                     );
+                    store.set_match_player(@matching_player);
                     return (0);
                 }
                 // validate input mode
                 // can switch from SLOW to FAST only...
                 if (queue_mode != matching_player.queue_info.queue_mode) {
-                    assert(matching_player.queue_info.queue_mode == QueueMode::Slow, Errors::INVALID_MODE);
+                    assert(matching_player.queue_info.queue_mode == QueueMode::Slow && queue_mode == QueueMode::Fast, Errors::INVALID_MODE);
                     matching_player.queue_info.queue_mode = queue_mode;
                     matching_player.queue_info.expired = true; // match or get an imp!
                 }
