@@ -111,8 +111,21 @@ function MatchQueue({ queueId }: { queueId: constants.QueueId }) {
   const { address } = useAccount();
   const { balance: foolsBalance } = useFoolsBalance(address)
   const { slotSize, requiresEnlistment, entryTokenAddress, entryTokenAmount, players } = useMatchQueue(queueId);
-  const { duelistIds } = useDuelistsOwnedByPlayer();
-  const { canEnlist, canMatchMake, inQueue, inDuel, duels } = useDuelistsInMatchMaking(duelistIds, queueId);
+  const {
+    // current queue
+    currentDuelistId,
+    currentDuelId,
+    inQueueIds,
+    // ranked only
+    rankedCanEnlistIds,
+    rankedEnlistedIds,
+    // all queues
+    canMatchMakeIds,
+    duellingIds,
+    duelsByDuelistId,
+    // all duelist ids
+    duelistIds,
+  } = useDuelistsInMatchMaking(queueId);
   return (
     <>
       <Table celled striped size='small' color='orange'>
@@ -142,16 +155,22 @@ function MatchQueue({ queueId }: { queueId: constants.QueueId }) {
         <Body className='H5'>
 
           <Row>
-            <Cell className='ModalText' width={3}>Enlisted / In Queue</Cell>
+            <Cell className='ModalText' width={3}>In Queue</Cell>
             <Cell className='Code'>
-              {inQueue.map((duelistId) => (
+              {inQueueIds.map((duelistId) => (
                 <Button key={duelistId} disabled={true}>
                   {bigintToDecimal(duelistId)}
                 </Button>
               ))}
-              {inDuel.map((duelistId) => (
-                <Button key={duelistId} onClick={() => window.open(`/duel/${duels[duelistId.toString()]}`, '_blank')}>
-                  {bigintToDecimal(duelistId)}: Duel#{duels[duelistId.toString()].toString()}
+            </Cell>
+          </Row>
+
+          <Row>
+            <Cell className='ModalText' width={3}>Dueling</Cell>
+            <Cell className='Code'>
+              {duellingIds.map((duelistId) => (
+                <Button key={duelistId} onClick={() => window.open(`/duel/${duelsByDuelistId[duelistId.toString()]}`, '_blank')}>
+                  {bigintToDecimal(duelistId)}: Duel#{duelsByDuelistId[duelistId.toString()].toString()}
                 </Button>
               ))}
             </Cell>
@@ -171,7 +190,22 @@ function MatchQueue({ queueId }: { queueId: constants.QueueId }) {
                     key={duelistId}
                     duelistId={duelistId}
                     queueId={queueId}
-                    disabled={!canEnlist.includes(duelistId)}
+                    disabled={!rankedCanEnlistIds.includes(duelistId)}
+                  />
+                ))}
+              </Cell>
+            </Row>
+            <Row>
+              <Cell className='ModalText Important'>
+                Enlisted Duelists
+              </Cell>
+              <Cell className='Code'>
+                {rankedEnlistedIds.map((duelistId) => (
+                  <EnlistDuelistButton
+                    key={duelistId}
+                    duelistId={duelistId}
+                    queueId={queueId}
+                    disabled={true}
                   />
                 ))}
               </Cell>
@@ -185,7 +219,7 @@ function MatchQueue({ queueId }: { queueId: constants.QueueId }) {
                     duelistId={duelistId}
                     queueId={queueId}
                     queueMode={constants.QueueMode.Fast}
-                    disabled={!canMatchMake.includes(duelistId)}
+                    disabled={!canMatchMakeIds.includes(duelistId)}
                   />
                 ))}
               </Cell>
@@ -201,7 +235,7 @@ function MatchQueue({ queueId }: { queueId: constants.QueueId }) {
                   duelistId={duelistId}
                   queueId={queueId}
                   queueMode={constants.QueueMode.Slow}
-                  disabled={!canMatchMake.includes(duelistId)}
+                  disabled={!canMatchMakeIds.includes(duelistId)}
                 />
               ))}
             </Cell>

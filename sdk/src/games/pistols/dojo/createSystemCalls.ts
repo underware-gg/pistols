@@ -208,7 +208,6 @@ export function createSystemCalls(
             tokenAddress,
             getMatchmakerAddress(selectedNetworkConfig.networkId),
           ),
-          vrf_request_call('matchmaker', signer.address),
           contractCalls.matchmaker.buildEnlistDuelistCalldata(
             duelist_id,
             queue_id_enum,
@@ -218,6 +217,7 @@ export function createSystemCalls(
       },
       match_make_me: async (signer: AccountInterface, duelist_id: BigNumberish, queue_id: constants.QueueId, queue_mode: constants.QueueMode, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
+          vrf_request_call('matchmaker', signer.address),
           contractCalls.matchmaker.buildMatchMakeMeCalldata(
             duelist_id,
             makeCustomEnum(queue_id),

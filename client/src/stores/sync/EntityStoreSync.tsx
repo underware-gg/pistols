@@ -118,6 +118,7 @@ export function EntityStoreSync() {
       // debug.log("EntityStoreSync() SET =======> [TokenConfig]:", filterEntitiesByModels(entities, ['TokenConfig']))
       // debug.log("EntityStoreSync() SET =======> [Pool]:", filterEntitiesByModels(entities, ['Pool']))
       // debug.log("EntityStoreSync() SET =======> [SeasonConfig]:", filterEntitiesByModels(entities, ['SeasonConfig', 'Leaderboard']))
+      debug.log("EntityStoreSync() SET =======> [MatchQueue,MatchPlayer]:", filterEntitiesByModels(entities, ['MatchQueue', 'MatchPlayer']))
       // debug.log("EntityStoreSync() SET =======> [Leaderboard]:", filterEntitiesByModels(entities, ['Leaderboard']))
       // debug.log("EntityStoreSync() SET PLAYERS =======> [Player]:", filterEntitiesByModels(entities, ['Player']))
       // debug.log("EntityStoreSync() SET PLAYERS =======> [PlayerOnline]:", filterEntitiesByModels(entities, ['PlayerOnline']))
