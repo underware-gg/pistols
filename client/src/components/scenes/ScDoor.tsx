@@ -319,7 +319,7 @@ export function ConnectButton({
   useEffect(() => {
     let timeoutId;
 
-    if (isConnected && !isError && hasClickedButton.current) {
+    if (isConnected && hasClickedButton.current && !isError) {
       if (enterScene) {
         onDoorCreak?.()
         dispatchSetScene(enterScene)
@@ -343,7 +343,7 @@ export function ConnectButton({
       }
     }
 
-  }, [isConnected, isError, canClaimStarterPack, hasClickedButton])
+  }, [isConnected, isError, canClaimStarterPack, hasClickedButton.current, enterScene])
 
   return (
     <ActionButton 
