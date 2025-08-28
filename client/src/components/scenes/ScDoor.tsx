@@ -28,6 +28,7 @@ export default function ScDoor() {
   const { gameImpl } = useThreeJsContext()
   const soundTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
+  // this makes the page re-render every frame when the mouse is moving
   const { x: bubbleShiftX, y: bubbleShiftY } = useTextureShift(2)
   const { x: uiShiftX, y: uiShiftY } = useTextureShift(3)
 
