@@ -492,6 +492,41 @@ mod tests {
     }
 
     #[test]
+    fn test_matchmaker_slot_skip_has_pact() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        tester::fund_duelists_pool(@sys, 3);
+        let ID_A_1: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
+        let ID_B_1: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
+        let ID_A_2: u128 = ID_A_1 + 1;
+        let ID_B_2: u128 = ID_B_1 + 1;
+        let queue_id = QueueId::Unranked;
+        //
+        // matchmake player A
+        _mock_slot(@sys, 5);
+        let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A_1, queue_id, QueueMode::Slow);
+        assert_eq!(duel_id, 0, "duel_id_A_1");
+        _assert_match_queue(@sys, queue_id, [A].span(), "match_A_1");
+        //
+        // matchmake player B > MATCH!
+        let duel_id: u128 = tester::execute_match_make_me(@sys, B, ID_B_1, queue_id, QueueMode::Slow);
+        assert_eq!(duel_id, 1, "duel_id_B_1");
+        _assert_match_queue(@sys, queue_id, [].span(), "match_B_1");
+        _assert_match_started(@sys, queue_id, duel_id, A, ID_A_1, B, ID_B_1, "match_made");
+        //
+        // matchmake player A again
+        let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A_2, queue_id, QueueMode::Slow);
+        assert_eq!(duel_id, 0, "duel_id_A_2");
+        _assert_match_queue(@sys, queue_id, [A].span(), "match_A_2");
+        //
+        // matchmake player B < NO MATCH (has pact)
+        let duel_id: u128 = tester::execute_match_make_me(@sys, B, ID_B_2, queue_id, QueueMode::Slow);
+        assert_eq!(duel_id, 0, "duel_id_B_2");
+        _assert_match_queue(@sys, queue_id, [A, B].span(), "match_B_2");
+    }
+
+    #[test]
     fn test_matchmaker_choose_least_duels() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
         let A: ContractAddress = OWNER();

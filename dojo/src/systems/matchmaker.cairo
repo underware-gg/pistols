@@ -259,6 +259,7 @@ pub mod matchmaker {
             let mut matched_player_address: Option<ContractAddress> = Option::None;
             let mut expired_players: Array<ContractAddress> = array![];
             let player_position: Option<usize> = queue.player_position(@matching_player.player_address);
+            let duel_type: DuelType = queue.queue_id.into();
 
             // update ping timestamp
             let timestamp: u64 = starknet::get_block_timestamp();
@@ -306,8 +307,11 @@ pub mod matchmaker {
                             // mark for removal
                             expired_players.append(candidate_address);
                         }
-                        // player has the same speed...
-                        else if (candidate_info.queue_mode == matching_player.queue_info.queue_mode) {
+                        // validate candidate...
+                        else if (
+                            candidate_info.queue_mode == matching_player.queue_info.queue_mode && // player has the same speed...
+                            !store.get_has_pact(duel_type, matching_player.player_address.into(), candidate_address.into()) // dont have a pact
+                        ) {
                             // compare slots...
                             match player_position {
                                 // player not in the queue yet
@@ -339,7 +343,6 @@ pub mod matchmaker {
                 } else if (candidates.len() > 1) {
                     // tie breaker is number of duels between player and candidates
                     // get duel count batch...
-                    let duel_type: DuelType = queue.queue_id.into();
                     let mut keys: Array<(DuelType, u128)> = array![];
                     let mut i: usize = 0;
                     while (i < candidates.len()) {

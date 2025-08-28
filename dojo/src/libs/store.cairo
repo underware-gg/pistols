@@ -621,6 +621,13 @@ pub impl StoreImpl of StoreTrait {
         (self.world.read_member(Model::<Ring>::ptr_from_keys(ring_id), selector!("ring_type")))
     }
 
+    #[inline(always)]
+    fn get_has_pact(self: @Store, duel_type: DuelType, a: u256, b: u256) -> bool {
+        let pair: u128 = PactTrait::make_pair(a, b);
+        let duel_id: u128 = self.world.read_member(Model::<Pact>::ptr_from_keys((duel_type, pair),), selector!("duel_id"));
+        (duel_id > 0)
+    }
+
     //----------------------------------
     // Batch member getters
     // https://book.dojoengine.org/framework/world/api#batch-operations
