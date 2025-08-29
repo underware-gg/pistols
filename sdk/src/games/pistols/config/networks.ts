@@ -260,7 +260,7 @@ const pistolsStagingConfig: DojoNetworkConfig = {
   clientUrl: 'https://stage.pistols.gg',
   assetsServerUrl: 'https://assets.underware.gg',
   slotName: 'pistols-staging',
-  rpcUrl: 'https://api.cartridge.gg/x/starknet/sepolia',
+  rpcUrl: 'https://api.cartridge.gg/x/starknet/sepolia/rpc/v0_8',
   toriiUrl: undefined,    // derive from slotName
   graphqlUrl: undefined,  // derive from slotName
   sqlUrl: undefined,      // derive from slotName
@@ -284,7 +284,7 @@ const snSepoliaConfig: DojoNetworkConfig = {
   clientUrl: 'https://testnet.pistols.gg',
   assetsServerUrl: 'https://assets.underware.gg',
   slotName: 'pistols-sepolia',
-  rpcUrl: 'https://api.cartridge.gg/x/starknet/sepolia',
+  rpcUrl: 'https://api.cartridge.gg/x/starknet/sepolia/rpc/v0_8',
   toriiUrl: undefined,    // derive from slotName
   graphqlUrl: undefined,  // derive from slotName
   sqlUrl: undefined,      // derive from slotName
@@ -308,7 +308,7 @@ const snMainnetConfig: DojoNetworkConfig = {
   clientUrl: 'https://play.pistols.gg',
   assetsServerUrl: 'https://assets.underware.gg',
   slotName: 'pistols-mainnet',
-  rpcUrl: 'https://api.cartridge.gg/x/starknet/mainnet',
+  rpcUrl: 'https://api.cartridge.gg/x/starknet/mainnet/rpc/v0_8',
   toriiUrl: undefined,    // derive from slotName
   graphqlUrl: undefined,  // derive from slotName
   sqlUrl: undefined,      // derive from slotName
