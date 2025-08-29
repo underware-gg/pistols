@@ -392,8 +392,7 @@ pub mod matchmaker {
                     }
                     // if expired match, an Imp!
                     (if (matching_player.queue_info.expired) {
-                        self._start_match_with_imp(ref store, ref matching_player, queue.queue_id);
-                        (matching_player.duel_id)
+                        (self._start_match_with_imp(ref store, ref matching_player, queue.queue_id))
                     } else {
                         // not matched
                         (0)
@@ -486,12 +485,16 @@ pub mod matchmaker {
             ref matching_player: MatchPlayer,
             queue_id: QueueId,
         ) -> u128 {
+            // dont match if has a pact
+            let bot_player_dispatcher: IBotPlayerProtectedDispatcher = store.world.bot_player_protected_dispatcher();
+            if (store.get_has_pact(queue_id.into(), matching_player.player_address.into(), bot_player_dispatcher.contract_address.into())) {
+                return (0);
+            }
             // mint duel if needed
             if (matching_player.duel_id.is_zero()) {
                 self._create_match(ref store, ref matching_player, queue_id);
             }
             // summon bot duelist
-            let bot_player_dispatcher: IBotPlayerProtectedDispatcher = store.world.bot_player_protected_dispatcher();
             let bot_duelist_id: u128 = bot_player_dispatcher.summon_duelist(DuelistProfile::Bot(BotKey::Pro), queue_id.get_lives_staked());
             // Duel expects the bot duelist to be in the queue
             store.enlist_matchmaking(bot_duelist_id, queue_id);
