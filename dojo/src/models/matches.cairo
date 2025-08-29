@@ -65,7 +65,8 @@ pub struct QueueInfo {
     pub slot: u8,
     pub timestamp_enter: u64,
     pub timestamp_ping: u64,
-    pub expired: bool,
+    pub expired: bool,          // expired and out of the queue
+    pub has_minted_duel: bool,  // has minted a duel
 }
 
 #[derive(Serde, Copy, Drop, PartialEq, IntrospectPacked)]
@@ -168,21 +169,22 @@ pub impl MatchPlayerImpl of MatchPlayerTrait {
     fn enter_queue(ref self: MatchPlayer,
         queue_mode: QueueMode,
         duelist_id: u128,
+        duel_id: u128,
         slot: u8,
     ) {
-        let timestamp: u64 = starknet::get_block_timestamp();
         self = MatchPlayer {
             player_address: self.player_address,
             queue_id: self.queue_id,
             queue_info: QueueInfo {
                 queue_mode,
                 slot,
-                timestamp_enter: timestamp,
-                timestamp_ping: timestamp,
+                timestamp_enter: starknet::get_block_timestamp(),
+                timestamp_ping: 0,
                 expired: false,
+                has_minted_duel: duel_id.is_non_zero(),
             },
             duelist_id,
-            duel_id: 0,
+            duel_id,
             next_duelists: self.next_duelists.clone(),
         };
     }
@@ -204,6 +206,7 @@ pub impl MatchPlayerImpl of MatchPlayerTrait {
                 self.enter_queue(
                     QueueMode::Slow,
                     next_duelist.duelist_id,
+                    0,
                     next_duelist.slot,
                 );
                 // still in queue
@@ -347,6 +350,7 @@ mod unit {
                 timestamp_enter: 1200,
                 timestamp_ping: 1300,
                 expired: false,
+                has_minted_duel: false,
             },
             duelist_id: 1,
             duel_id: 1,
@@ -361,6 +365,7 @@ mod unit {
                 timestamp_enter: 5000,
                 timestamp_ping: 5100,
                 expired: true,
+                has_minted_duel: false,
             },
             duelist_id: 2,
             duel_id: 2,

@@ -170,6 +170,7 @@ pub mod matchmaker {
                 matching_player.enter_queue(
                     queue_mode,
                     duelist_id,
+                    0,
                     slot,
                 );
             } else {
@@ -187,25 +188,35 @@ pub mod matchmaker {
                         duelist_id,
                         slot,
                     );
+                    // save and return
                     store.set_match_player(@matching_player);
                     return (0);
                 }
                 // validate input mode
                 // can switch from SLOW to FAST only...
-                if (queue_mode != matching_player.queue_info.queue_mode) {
+                else if (queue_mode != matching_player.queue_info.queue_mode) {
                     assert(matching_player.queue_info.queue_mode == QueueMode::Slow && queue_mode == QueueMode::Fast, Errors::INVALID_MODE);
-                    matching_player.queue_info.queue_mode = queue_mode;
-                    // force expire to avoid getting in queue with a minted duel
-                    matching_player.queue_info.expired = true;
+                    // re-enter queue with new speed
+                    matching_player.enter_queue(
+                        queue_mode,
+                        matching_player.duelist_id,
+                        matching_player.duel_id,
+                        matching_player.queue_info.slot,
+                    );
+                } else {
+                    matching_player.queue_info.expired = matching_player.queue_info.expired || matching_player.queue_info.has_expired(starknet::get_block_timestamp());
                 }
             };
 
             // match player...
-            let matched_duel_id: u128 = self._match_or_enqueue(
-                ref store,
-                ref queue,
-                ref matching_player,
-            );
+            let matched_duel_id: u128 =
+                if (matching_player.queue_info.timestamp_ping.is_zero() || matching_player.queue_info.expired) {
+                    (self._match_or_enqueue(
+                        ref store,
+                        ref queue,
+                        ref matching_player,
+                    ))
+                } else {(0)};
 
             // save queue and player state
             store.set_match_queue(@queue);
@@ -264,16 +275,8 @@ pub mod matchmaker {
             // update ping timestamp
             let timestamp: u64 = starknet::get_block_timestamp();
             matching_player.queue_info.timestamp_ping = timestamp;
-
-            // check if we expired...
-            matching_player.queue_info.expired = matching_player.queue_info.expired || matching_player.queue_info.has_expired(timestamp);
-
             // queue is not empty, try to match if...
-            if (queue.players.len() > 0 && (
-                (!matching_player.queue_info.expired && player_position.is_none()) ||       // new player in queue
-                (matching_player.queue_info.expired && matching_player.queue_info.queue_mode == QueueMode::Fast)   // last chance only if on /Fast (queue has no duels minted)
-                )
-            ) {
+            if (queue.players.len() > 0) {
                 // get all players in queue
                 let mut keys: Array<(ContractAddress, QueueId)> = array![];
                 let mut i: usize = 0;
@@ -309,8 +312,9 @@ pub mod matchmaker {
                         }
                         // validate candidate...
                         else if (
-                            candidate_info.queue_mode == matching_player.queue_info.queue_mode && // player has the same speed...
-                            !store.get_has_pact(duel_type, matching_player.player_address.into(), candidate_address.into()) // dont have a pact
+                            candidate_info.queue_mode == matching_player.queue_info.queue_mode && // players have the same speed
+                            !store.get_has_pact(duel_type, matching_player.player_address.into(), candidate_address.into()) && // dont have a pact
+                            !(matching_player.queue_info.has_minted_duel && candidate_info.has_minted_duel) // cant both have minted duel
                         ) {
                             // compare slots...
                             match player_position {
@@ -386,14 +390,14 @@ pub mod matchmaker {
                     //----------------------------------
                     // NO MATCH!!!
                     //
-                    // new SLOW players must have a duel created to be able to pre-commit
-                    if (matching_player.queue_info.queue_mode == QueueMode::Slow && matching_player.duel_id.is_zero()) {
-                        self._create_match(ref store, ref matching_player, queue.queue_id);
-                    }
                     // if expired match, an Imp!
                     (if (matching_player.queue_info.expired) {
                         (self._start_match_with_imp(ref store, ref matching_player, queue.queue_id))
                     } else {
+                        // new SLOW players must have a duel created to be able to pre-commit
+                        if (matching_player.queue_info.queue_mode == QueueMode::Slow) {
+                            self._mint_match_to_player(ref store, ref matching_player, queue.queue_id);
+                        }
                         // not matched
                         (0)
                     })
@@ -428,16 +432,19 @@ pub mod matchmaker {
             (matched_duel_id)
         }
 
-        fn _create_match(ref self: ContractState,
+        fn _mint_match_to_player(ref self: ContractState,
             ref store: Store,
             ref matching_player: MatchPlayer,
             queue_id: QueueId,
         ) -> u128 {
-            matching_player.duel_id = store.world.duel_token_protected_dispatcher().create_match(
-                matching_player.player_address,
-                matching_player.duelist_id,
-                queue_id,
-            );
+            if (!matching_player.queue_info.has_minted_duel) {
+                matching_player.duel_id = store.world.duel_token_protected_dispatcher().create_match(
+                    matching_player.player_address,
+                    matching_player.duelist_id,
+                    queue_id,
+                );
+                matching_player.queue_info.has_minted_duel = true;
+            }
             (matching_player.duel_id)
         }
 
@@ -447,7 +454,7 @@ pub mod matchmaker {
             ref matched_player: MatchPlayer,
             queue_id: QueueId,
         ) -> u128 {
-            let duel_id: u128 = if (matching_player.duel_id > 0) {
+            let duel_id: u128 = if (matching_player.queue_info.has_minted_duel) {
                 // was-SLOW player matching a FAST player
                 // (use pre-minted duel)
                 store.world.duel_token_protected_dispatcher().start_match(
@@ -463,9 +470,7 @@ pub mod matchmaker {
             } else {
                 // new SLOW player matching existing SLOW player (duel exists)
                 // new FAST player matching existing FAST player (mint duel)
-                if (matched_player.duel_id.is_zero()) {
-                    self._create_match(ref store, ref matched_player, queue_id);
-                }
+                self._mint_match_to_player(ref store, ref matched_player, queue_id);
                 store.world.duel_token_protected_dispatcher().start_match(
                     // matched player duel
                     matched_player.duel_id,
@@ -490,14 +495,12 @@ pub mod matchmaker {
             if (store.get_has_pact(queue_id.into(), matching_player.player_address.into(), bot_player_dispatcher.contract_address.into())) {
                 return (0);
             }
-            // mint duel if needed
-            if (matching_player.duel_id.is_zero()) {
-                self._create_match(ref store, ref matching_player, queue_id);
-            }
             // summon bot duelist
             let bot_duelist_id: u128 = bot_player_dispatcher.summon_duelist(DuelistProfile::Bot(BotKey::Pro), queue_id.get_lives_staked());
             // Duel expects the bot duelist to be in the queue
             store.enlist_matchmaking(bot_duelist_id, queue_id);
+            // mint duel if needed
+            self._mint_match_to_player(ref store, ref matching_player, queue_id);
             // start duel with an imp!
             store.world.duel_token_protected_dispatcher().start_match(
                 matching_player.duel_id,
