@@ -828,12 +828,12 @@ mod unit {
     //
     // core::num::traits::Zero gas test
     //
-    // test pistols::models::matches::unit::test_non_zero_trait ... ok (gas usage est.: 1040)
-    // test pistols::models::matches::unit::test_zero ... ok (gas usage est.: 300)
-    // test pistols::models::matches::unit::test_gt_zero2 ... ok (gas usage est.: 300)
-    // test pistols::models::matches::unit::test_non_zero ... ok (gas usage est.: 1040)
-    // test pistols::models::matches::unit::test_gt_zero ... ok (gas usage est.: 300)
-    // test pistols::models::matches::unit::test_zero_trait ... ok (gas usage est.: 300)
+    // test pistols::models::match_queue::unit::test_non_zero_trait ... ok (gas usage est.: 1040)
+    // test pistols::models::match_queue::unit::test_zero ... ok (gas usage est.: 300)
+    // test pistols::models::match_queue::unit::test_gt_zero2 ... ok (gas usage est.: 300)
+    // test pistols::models::match_queue::unit::test_non_zero ... ok (gas usage est.: 1040)
+    // test pistols::models::match_queue::unit::test_gt_zero ... ok (gas usage est.: 300)
+    // test pistols::models::match_queue::unit::test_zero_trait ... ok (gas usage est.: 300)
     #[test]
     fn test_zero() {
         let value: felt252 = 0;

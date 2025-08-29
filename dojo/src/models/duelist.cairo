@@ -1,5 +1,5 @@
 use starknet::{ContractAddress};
-use pistols::models::matches::{QueueId};
+use pistols::models::match_queue::{QueueId};
 pub use pistols::types::duelist_profile::{DuelistProfile, DuelistProfileTrait, GenesisKey, BotKey};
 
 //---------------------
@@ -74,7 +74,7 @@ pub enum CauseOfDeath {
 use core::num::traits::Zero;
 use pistols::systems::tokens::duel_token::duel_token::{Errors as DuelErrors};
 // use pistols::systems::tokens::tournament_token::tournament_token::{Errors as TournamentErrors};
-use pistols::models::matches::{MatchQueueTrait};
+use pistols::models::match_queue::{MatchQueueTrait};
 use pistols::types::rules::{RewardValues};
 use pistols::types::constants::{HONOUR};
 use pistols::libs::store::{Store, StoreTrait};
@@ -269,7 +269,7 @@ mod unit {
         Totals, TotalsTrait,
         DuelistAssignmentTrait,
     };
-    use pistols::models::matches::{QueueId, MatchQueueTrait};
+    use pistols::models::match_queue::{QueueId, MatchQueueTrait};
     use pistols::tests::tester::{tester, tester::{StoreTrait, FLAGS}};
 
     #[test]

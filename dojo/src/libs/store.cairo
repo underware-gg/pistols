@@ -22,7 +22,7 @@ pub use pistols::models::{
         PlayerDuelistStack, PlayerDuelistStackValue,
         PlayerDelegation,
     },
-    matches::{
+    match_queue::{
         MatchQueue,
         MatchPlayer,
         QueueId, QueueInfo,

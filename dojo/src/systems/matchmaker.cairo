@@ -1,5 +1,5 @@
 use starknet::{ContractAddress};
-use pistols::models::matches::{QueueId, QueueMode};
+use pistols::models::match_queue::{QueueId, QueueMode};
 
 // Exposed to clients
 #[starknet::interface]
@@ -39,7 +39,7 @@ pub mod matchmaker {
         challenge::{DuelType},
         duelist::{DuelistAssignmentTrait},
         pact::{PactTrait},
-        matches::{
+        match_queue::{
             QueueId, QueueIdTrait, QueueMode,
             MatchQueue, MatchQueueTrait,
             MatchPlayer, MatchPlayerTrait,

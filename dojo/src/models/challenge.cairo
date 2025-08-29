@@ -99,7 +99,7 @@ pub struct DuelistState {
 //
 // use core::num::traits::Zero;
 use pistols::models::{
-    matches::{QueueMode, QueueModeTrait},
+    match_queue::{QueueMode, QueueModeTrait},
 };
 use pistols::types::{
     duelist_profile::{CharacterKey},

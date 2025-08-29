@@ -53,7 +53,7 @@ mod models {
     pub mod config;
     pub mod duelist;
     pub mod events;
-    pub mod matches;
+    pub mod match_queue;
     pub mod pack;
     pub mod pact;
     pub mod player;

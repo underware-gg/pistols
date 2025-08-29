@@ -1,7 +1,7 @@
 use starknet::{ContractAddress};
 use dojo::world::IWorldDispatcher;
 use pistols::models::challenge::{DuelType};
-use pistols::models::matches::{QueueId, QueueMode};
+use pistols::models::match_queue::{QueueId, QueueMode};
 // use pistols::models::tournament::{TournamentRules};
 use pistols::types::challenge_state::{ChallengeState};
 use pistols::types::premise::{Premise};
@@ -190,7 +190,7 @@ pub mod duel_token {
             Round, RoundTrait,
         },
         duelist::{DuelistProfile, DuelistProfileTrait, DuelistAssignmentTrait},
-        matches::{QueueId, QueueIdTrait, QueueMode},
+        match_queue::{QueueId, QueueIdTrait, QueueMode},
         pact::{PactTrait},
         events::{Activity, ActivityTrait, ChallengeAction},
         // tournament::{

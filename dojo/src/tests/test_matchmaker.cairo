@@ -5,7 +5,7 @@ mod tests {
     use pistols::models::{
         challenge::{Challenge, ChallengeValue, DuelType, Round},
         duelist::{DuelistAssignment, Archetype},
-        matches::{
+        match_queue::{
             QueueId, QueueMode, QueueNextDuelist,
             MatchQueue, MatchQueueTrait,
             MatchPlayer,
