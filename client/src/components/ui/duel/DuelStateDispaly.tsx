@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Grid, Segment, Divider } from 'semantic-ui-react'
+import { Grid, Segment, Divider, Icon } from 'semantic-ui-react'
 import { useGameplayContext } from '/src/hooks/GameplayContext'
 import { useGetChallenge } from '/src/stores/challengeStore'
 import { AnimationState } from '/src/three/game'
@@ -271,7 +271,7 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
             )}
 
             {(!isCanceled && !isExpired) && (
-              <Grid style={{width: '100%', height: aspectHeight(25)}}>
+              <Grid style={{ width: '100%', height: aspectHeight(25) }}>
                 <Row>
                   <Col width={7} textAlign='center'>
                     <RewardRow show={showRewards} delay={0} animation='slideInFromTop'>
@@ -283,22 +283,22 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
                       }}>{winnerIsLeft ? 'Victory' : 'Defeat'}</div>
                     </RewardRow>
 
-                    <div style={{fontSize: aspectWidth(1.2)}}>
+                    <div style={{ fontSize: aspectWidth(1.2) }}>
                       <RewardRow show={showRewards} delay={0.3} animation='slideInFromTop'>
-                        <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: aspectHeight(0.5)}}>
-                          <div style={{textAlign: 'left'}}>{winnerIsLeft ? '+' : '-'}</div>
-                          <div style={{textAlign: 'right'}}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: aspectHeight(0.5) }}>
+                          <div style={{ textAlign: 'left' }}>{winnerIsLeft ? <Icon name='plus' size='tiny' /> : <Icon name='minus' size='tiny' />}</div>
+                          <div style={{ textAlign: 'right' }}>
                             <Balance fame wei={winnerIsLeft ? leftRewards?.fame_gained_wei : leftRewards?.fame_lost_wei || 0n} size='large' />
                           </div>
                         </div>
                       </RewardRow>
 
                       <RewardRow show={showRewards} delay={0.6} animation='slideInFromTop'>
-                        <div style={{display: 'flex', justifyContent: winnerIsLeft ? 'space-between' : 'flex-end', marginBottom: aspectHeight(0.5)}}>
+                        <div style={{ display: 'flex', justifyContent: winnerIsLeft ? 'space-between' : 'flex-end', marginBottom: aspectHeight(0.5) }}>
                           {winnerIsLeft ? (
                             <>
-                              <div style={{textAlign: 'left'}}>+</div>
-                              <div style={{textAlign: 'right'}}>
+                              <div style={{ textAlign: 'left' }}><Icon name='plus' size='tiny' /></div>
+                              <div style={{ textAlign: 'right' }}>
                                 <Balance fools wei={leftRewards?.fools_gained_wei || 0n} size='large' />
                               </div>
                             </>
@@ -309,17 +309,11 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
                       </RewardRow>
 
                       <RewardRow show={showRewards} delay={0.9} animation='slideInFromTop'>
-                        <div style={{display: 'flex', justifyContent: winnerIsLeft ? 'space-between' : 'flex-end', marginBottom: aspectHeight(0.5)}}>
-                          {winnerIsLeft ? (
-                            <>
-                              <div style={{textAlign: 'left'}}>+</div>
-                              <div style={{textAlign: 'right', fontSize: aspectWidth(1)}}>
-                                {Number(leftRewards?.points_scored || 0)} Points
-                              </div>
-                            </>
-                          ) : (
-                            <div>-</div>
-                          )}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: aspectHeight(0.5) }}>
+                          <div style={{ textAlign: 'left' }}><Icon name='plus' size='tiny' /></div>
+                          <div style={{ textAlign: 'right', fontSize: aspectWidth(1) }}>
+                            {Number((winnerIsLeft ? leftRewards?.points_scored : rightRewards?.points_scored) || 0)} Points
+                          </div>
                         </div>
                       </RewardRow>
 
@@ -356,22 +350,22 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
                       }}>{winnerIsRight ? 'Victory' : 'Defeat'}</div>
                     </RewardRow>
 
-                    <div style={{fontSize: aspectWidth(1.2)}}>
+                    <div style={{ fontSize: aspectWidth(1.2) }}>
                       <RewardRow show={showRewards} delay={0.3} animation='slideInFromTop'>
-                        <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: aspectHeight(0.5)}}>
-                          <div style={{textAlign: 'left'}}>{winnerIsRight ? '+' : '-'}</div>
-                          <div style={{textAlign: 'right'}}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: aspectHeight(0.5) }}>
+                          <div style={{ textAlign: 'left' }}>{winnerIsRight ? <Icon name='plus' size='tiny' /> : <Icon name='minus' size='tiny' />}</div>
+                          <div style={{ textAlign: 'right' }}>
                             <Balance fame wei={winnerIsRight ? rightRewards?.fame_gained_wei : rightRewards?.fame_lost_wei || 0n} size='large' />
                           </div>
                         </div>
                       </RewardRow>
 
                       <RewardRow show={showRewards} delay={0.6} animation='slideInFromTop'>
-                        <div style={{display: 'flex', justifyContent: winnerIsRight ? 'space-between' : 'flex-end', marginBottom: aspectHeight(0.5)}}>
+                        <div style={{ display: 'flex', justifyContent: winnerIsRight ? 'space-between' : 'flex-end', marginBottom: aspectHeight(0.5) }}>
                           {winnerIsRight ? (
                             <>
-                              <div style={{textAlign: 'left'}}>+</div>
-                              <div style={{textAlign: 'right'}}>
+                              <div style={{ textAlign: 'left' }}><Icon name='plus' size='tiny' /></div>
+                              <div style={{ textAlign: 'right' }}>
                                 <Balance fools wei={rightRewards?.fools_gained_wei || 0n} size='large' />
                               </div>
                             </>
@@ -382,17 +376,11 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
                       </RewardRow>
 
                       <RewardRow show={showRewards} delay={0.9} animation='slideInFromTop'>
-                        <div style={{display: 'flex', justifyContent: winnerIsRight ? 'space-between' : 'flex-end', marginBottom: aspectHeight(0.5)}}>
-                          {winnerIsRight ? (
-                            <>
-                              <div style={{textAlign: 'left'}}>+</div>
-                              <div style={{textAlign: 'right', fontSize: aspectWidth(1)}}>
-                                {Number(rightRewards?.points_scored || 0)} Points
-                              </div>
-                            </>
-                          ) : (
-                            <div>-</div>
-                          )}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: aspectHeight(0.5) }}>
+                          <div style={{ textAlign: 'left' }}><Icon name='plus' size='tiny' /></div>
+                          <div style={{ textAlign: 'right', fontSize: aspectWidth(1) }}>
+                            {Number((winnerIsRight ? rightRewards?.points_scored : leftRewards?.points_scored) || 0)} Points
+                          </div>
                         </div>
                       </RewardRow>
 
