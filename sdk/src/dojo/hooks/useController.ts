@@ -108,7 +108,7 @@ export const useVerifyControllerSignature = (messageHash: BigNumberish, signatur
 
   useEffect(() => {
     let _mounted = true
-    const _verify = async () => {
+    const _fetch = async () => {
       setIsLoading(true);
       try {
         console.log(`useVerifyControllerSignature() chainId:`, feltToString(chainId), address);
@@ -137,7 +137,7 @@ export const useVerifyControllerSignature = (messageHash: BigNumberish, signatur
     }
     setIsValid(undefined);
     if (account && isPositiveBigint(messageHash) && signature?.length > 0) {
-      _verify()
+      _fetch()
     }
     return () => {
       _mounted = false
