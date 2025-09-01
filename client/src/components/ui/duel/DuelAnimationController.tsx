@@ -166,7 +166,7 @@ export const DuelAnimationController = forwardRef<DuelAnimationControllerRef, Du
         
         const startStats = () => {
           if (!duelProgress || !duelProgress.steps || duelProgress.steps.length === 0) {
-            console.error("Duel progress data is invalid");
+            console.error("Duel progress data is invalid:", duelProgress);
             return;
           }
           
