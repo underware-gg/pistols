@@ -18,7 +18,7 @@ export const useApiVerifyControllerSignature = (
 
   useEffect(() => {
     let _mounted = true
-    const _verify = async () => {
+    const _fetch = async () => {
       setIsLoading(true);
       try {
         const res = await apiVerifyControllerSignature(
@@ -42,7 +42,7 @@ export const useApiVerifyControllerSignature = (
     }
     setIsValid(undefined);
     if (account && isPositiveBigint(messageHash) && signature?.length > 0) {
-      _verify()
+      _fetch()
     }
     return () => {
       _mounted = false

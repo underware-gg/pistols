@@ -17,6 +17,7 @@ import PlayersPage from '/src/pages/internal/PlayersPage'
 import SnapshotPage from '/src/pages/internal/SnapshotPage'
 import ContractsPage from '/src/pages/internal/ContractsPage'
 import DuelDataPage from '/src/pages/DuelDataPage'
+import StatusPage from '/src/pages/StatusPage'
 import ErrorPage from '/src/pages/error/ErrorPage'
 import TestPageIndex from '/src/pages/tests/TestPageIndex'
 import ConnectTestPage from '/src/pages/tests/ConnectTestPage'
@@ -61,6 +62,7 @@ const router = createBrowserRouter([
       { path: "graveyard", element: <MainPage /> },
       { path: "duel/:duel_id", element: <MainPage /> },
       { path: "dueldata/:duel_id", element: <DuelDataPage /> },
+      { path: "status", element: <StatusPage /> },
     ],
     errorElement: <ErrorPage />,
   },

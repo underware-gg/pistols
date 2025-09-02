@@ -54,7 +54,7 @@ export function useCallToChallenges() {
   ), [entities])
   const requiredDuelIds = useMemo(() => activeChallenges.filter((ch) => ch.requiresAction).map((ch) => ch.duelId), [activeChallenges])
   const requiresAction = useMemo(() => (requiredDuelIds.length > 0), [requiredDuelIds])
-  // console.log(`useCallToChallenge() =================>`, entities, activeChallenges, requiredDuelIds)
+  // useMemo(() => console.log(`[EventsModelStoreSync] useCallToChallenge() =================>`, entities, activeChallenges, requiredDuelIds), [activeChallenges])
   return {
     activeChallenges,   // all current active challenges
     requiredDuelIds,    // IDs of challenges that require action

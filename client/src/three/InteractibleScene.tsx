@@ -14,6 +14,12 @@ import { sceneBackgrounds, SceneData, SceneObject, TextureName, TextureState, An
 import { ShaderManager, ShaderMaterial } from './shaders'
 import TWEEN from '@tweenjs/tween.js'
 
+const _vectorHasChanged = (a: THREE.Vector2, b: THREE.Vector2, f: number = 0.0001) => {
+  if (!a || !b) return true;
+  // console.log(`_vectorHasChanged`, a.x, b.y, Math.abs(a.x - b.x))
+  return (Math.abs(a.x - b.x) > f || Math.abs(a.y - b.y) > f);
+}
+
 export class InteractibleScene extends THREE.Scene {
 
   sceneData: SceneData
@@ -63,6 +69,8 @@ export class InteractibleScene extends THREE.Scene {
 
   private animatedLayers: Map<number, AnimatedLayer> = new Map();
   private currentTextures: THREE.Texture[] = [];
+
+  private emittedVectors: Map<string, THREE.Vector2> = new Map();
 
   constructor(sceneName: string, renderer: THREE.WebGLRenderer, camera: THREE.Camera) {
     super()
@@ -501,7 +509,11 @@ export class InteractibleScene extends THREE.Scene {
         const shiftVector = new THREE.Vector2(this.layerShiftAmounts[index], 0);
         this.maskShader.setUniformValue(`uTextureShift${index}`, shiftVector);
         this.maskShader.setUniformValue(`uRandomShift${index}`, this.currentRandomValues[index]);
-        emitter.emit(`texture_shift_${index}`, shiftVector);
+        const emit_key = `texture_shift_${index}`;
+        if (_vectorHasChanged(this.emittedVectors.get(emit_key), shiftVector)) {
+          emitter.emit(emit_key, shiftVector);
+          this.emittedVectors.set(emit_key, shiftVector);
+        }
       } else {
         const aspectRatio = 1920/1080;
         const screenSize = Math.min(window.innerWidth, window.innerHeight);
@@ -513,7 +525,11 @@ export class InteractibleScene extends THREE.Scene {
         const textureShift = scaledMousePos.multiplyScalar(background.shiftMultiplier);
         this.maskShader.setUniformValue(`uTextureShift${index}`, textureShift);
         this.maskShader.setUniformValue(`uRandomShift${index}`, this.currentRandomValues[index]);
-        emitter.emit(`texture_shift_${index}`, textureShift);
+        const emit_key = `texture_shift_${index}`;
+        if (_vectorHasChanged(this.emittedVectors.get(emit_key), textureShift)) {
+          emitter.emit(emit_key, textureShift);
+          this.emittedVectors.set(emit_key, textureShift);
+        }
       }
     })
     

@@ -42,7 +42,10 @@ export async function queryToriiSql<ResponseRaw, Response>(
       },
       body: _query,
     });
-    if (!response.ok) throw new Error(`Not ok`);
+    if (!response.ok) {
+      console.error(`queryToriiSql() response not ok:`, response, query);
+      throw new Error(`queryToriiSql() response not ok`);
+    }
     return formatFn(await response.json() as ResponseRaw);
   } catch (error) {
     console.error(`queryToriiSql() Error fetching data:`, error, query);

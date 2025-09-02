@@ -28,6 +28,7 @@ export default function ScDoor() {
   const { gameImpl } = useThreeJsContext()
   const soundTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
+  // this makes the page re-render every frame when the mouse is moving
   const { x: bubbleShiftX, y: bubbleShiftY } = useTextureShift(2)
   const { x: uiShiftX, y: uiShiftY } = useTextureShift(3)
 
@@ -319,7 +320,7 @@ export function ConnectButton({
   useEffect(() => {
     let timeoutId;
 
-    if (isConnected && !isError && hasClickedButton.current) {
+    if (isConnected && hasClickedButton.current && !isError) {
       if (enterScene) {
         onDoorCreak?.()
         dispatchSetScene(enterScene)
@@ -343,7 +344,7 @@ export function ConnectButton({
       }
     }
 
-  }, [isConnected, isError, canClaimStarterPack, hasClickedButton])
+  }, [isConnected, isError, canClaimStarterPack, hasClickedButton.current, enterScene])
 
   return (
     <ActionButton 

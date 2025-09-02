@@ -1,6 +1,6 @@
 {
   "name": "pistols-monorepo",
-  "version": "1.1.6",
+  "version": "1.1.9",
   "description": "Pistols at Dawn monorepo",
   "homepage": "https://github.com/underware-gg/pistols",
   "author": "Underware",
@@ -15,5 +15,5 @@
   "devDependencies": {
     "turbo": "^2.5.5"
   },
-  "packageManager": "pnpm@10.10.0"
+  "packageManager": "pnpm@10.15.1"
 }

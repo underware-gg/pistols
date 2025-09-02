@@ -2,7 +2,7 @@
 # torii config for profile [staging]
 #
 world_address = "0x5898736105a52dad26771eb4d9d166ae9df6f43010f2c16d4878c9d3a834a71"
-rpc = "https://api.cartridge.gg/x/starknet/sepolia"
+rpc = "https://api.cartridge.gg/x/starknet/sepolia/rpc/v0_8"
 
 [events]
 raw = true
