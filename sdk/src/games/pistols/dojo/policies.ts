@@ -30,6 +30,11 @@ export const contractPolicyDescriptions_pistols: ContractPolicyDescriptions = {
     description: 'Game loop contract',
     // interfaces: ['IGameLoop'],
   },
+  matchmaker: {
+    name: 'Match Maker',
+    description: 'Match Maker contract',
+    interfaces: ['IMatchMakerPublic'],
+  },
   tutorial: {
     name: 'Tutorial',
     description: 'Tutorial game contract',
