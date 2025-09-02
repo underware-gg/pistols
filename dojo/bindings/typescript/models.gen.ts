@@ -129,7 +129,7 @@ export interface Leaderboard {
 	scores: BigNumberish;
 }
 
-// Type definition for `pistols::models::matches::MatchPlayer` struct
+// Type definition for `pistols::models::match_queue::MatchPlayer` struct
 export interface MatchPlayer {
 	player_address: string;
 	queue_id: QueueIdEnum;
@@ -139,7 +139,7 @@ export interface MatchPlayer {
 	next_duelists: Array<QueueNextDuelist>;
 }
 
-// Type definition for `pistols::models::matches::MatchQueue` struct
+// Type definition for `pistols::models::match_queue::MatchQueue` struct
 export interface MatchQueue {
 	queue_id: QueueIdEnum;
 	players: Array<string>;
@@ -148,16 +148,17 @@ export interface MatchQueue {
 	entry_token_amount: BigNumberish;
 }
 
-// Type definition for `pistols::models::matches::QueueInfo` struct
+// Type definition for `pistols::models::match_queue::QueueInfo` struct
 export interface QueueInfo {
 	queue_mode: QueueModeEnum;
 	slot: BigNumberish;
 	timestamp_enter: BigNumberish;
 	timestamp_ping: BigNumberish;
 	expired: boolean;
+	has_minted_duel: boolean;
 }
 
-// Type definition for `pistols::models::matches::QueueNextDuelist` struct
+// Type definition for `pistols::models::match_queue::QueueNextDuelist` struct
 export interface QueueNextDuelist {
 	duelist_id: BigNumberish;
 	slot: BigNumberish;
@@ -417,7 +418,7 @@ export const causeOfDeath = [
 export type CauseOfDeath = { [key in typeof causeOfDeath[number]]: string };
 export type CauseOfDeathEnum = CairoCustomEnum;
 
-// Type definition for `pistols::models::matches::QueueId` enum
+// Type definition for `pistols::models::match_queue::QueueId` enum
 export const queueId = [
 	'Undefined',
 	'Unranked',
@@ -426,7 +427,7 @@ export const queueId = [
 export type QueueId = { [key in typeof queueId[number]]: string };
 export type QueueIdEnum = CairoCustomEnum;
 
-// Type definition for `pistols::models::matches::QueueMode` enum
+// Type definition for `pistols::models::match_queue::QueueMode` enum
 export const queueMode = [
 	'Undefined',
 	'Fast',
@@ -977,7 +978,7 @@ export const schema: SchemaType = {
 		queue_info: { queue_mode: new CairoCustomEnum({ 
 					Undefined: "",
 				Fast: undefined,
-				Slow: undefined, }), slot: 0, timestamp_enter: 0, timestamp_ping: 0, expired: false, },
+				Slow: undefined, }), slot: 0, timestamp_enter: 0, timestamp_ping: 0, expired: false, has_minted_duel: false, },
 			duelist_id: 0,
 			duel_id: 0,
 			next_duelists: [{ duelist_id: 0, slot: 0, }],
@@ -1001,6 +1002,7 @@ export const schema: SchemaType = {
 			timestamp_enter: 0,
 			timestamp_ping: 0,
 			expired: false,
+			has_minted_duel: false,
 		},
 		QueueNextDuelist: {
 			duelist_id: 0,

@@ -155,6 +155,7 @@ export interface QueueInfo {
 	timestamp_enter: BigNumberish;
 	timestamp_ping: BigNumberish;
 	expired: boolean;
+	has_minted_duel: boolean;
 }
 
 // Type definition for `pistols::models::match_queue::QueueNextDuelist` struct
@@ -985,7 +986,7 @@ export const schema: SchemaType = {
 		queue_info: { queue_mode: new CairoCustomEnum({ 
 					Undefined: "",
 				Fast: undefined,
-				Slow: undefined, }), slot: 0, timestamp_enter: 0, timestamp_ping: 0, expired: false, },
+				Slow: undefined, }), slot: 0, timestamp_enter: 0, timestamp_ping: 0, expired: false, has_minted_duel: false, },
 			duelist_id: 0,
 			duel_id: 0,
 			next_duelists: [{ duelist_id: 0, slot: 0, }],
@@ -1009,6 +1010,7 @@ export const schema: SchemaType = {
 			timestamp_enter: 0,
 			timestamp_ping: 0,
 			expired: false,
+			has_minted_duel: false,
 		},
 		QueueNextDuelist: {
 			duelist_id: 0,

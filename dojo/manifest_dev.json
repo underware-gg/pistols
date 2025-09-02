@@ -2184,8 +2184,8 @@
       ]
     },
     {
-      "address": "0x1216add4201caef04f91dc6f3dabb5069c3f6974839db68b15736736a7c1d36",
-      "class_hash": "0x17e1994b1dffb3360885b4651db15a42502ef984d421d130dfffe018816ae22",
+      "address": "0x4813ba82cd5fc39baf1ca3d7b9b1ad84060d598098ad4960fe4f90be4f6200a",
+      "class_hash": "0x4c81abf09df01216f6449e074625c377375d49258e8492ec8eccae48b4640bd",
       "abi": [
         {
           "type": "impl",
@@ -2865,8 +2865,8 @@
       ]
     },
     {
-      "address": "0x85226b41a44df47e8a2ae5b1093ad7926c994083e263f0fcd7535daed7f513",
-      "class_hash": "0x242593bee3aafb74d9d1232c6d6a7abfec219d62e6579d2733290b117e9ee71",
+      "address": "0x2ecc473b0b86a59e63a43a64622374851fe558b407684ed736693ecbda5f7f6",
+      "class_hash": "0x6d95f01cc2f30794c2c2c908f1d1d6f0c3b4b3b7a98a1f44143c2627cc62e62",
       "abi": [
         {
           "type": "impl",
@@ -3204,7 +3204,7 @@
         },
         {
           "type": "enum",
-          "name": "pistols::models::matches::QueueId",
+          "name": "pistols::models::match_queue::QueueId",
           "variants": [
             {
               "name": "Undefined",
@@ -3222,7 +3222,7 @@
         },
         {
           "type": "enum",
-          "name": "pistols::models::matches::QueueMode",
+          "name": "pistols::models::match_queue::QueueMode",
           "variants": [
             {
               "name": "Undefined",
@@ -3256,7 +3256,7 @@
                 },
                 {
                   "name": "queue_id",
-                  "type": "pistols::models::matches::QueueId"
+                  "type": "pistols::models::match_queue::QueueId"
                 }
               ],
               "outputs": [
@@ -3284,11 +3284,11 @@
                 },
                 {
                   "name": "queue_id",
-                  "type": "pistols::models::matches::QueueId"
+                  "type": "pistols::models::match_queue::QueueId"
                 },
                 {
                   "name": "queue_mode",
-                  "type": "pistols::models::matches::QueueMode"
+                  "type": "pistols::models::match_queue::QueueMode"
                 }
               ],
               "outputs": [
@@ -4281,8 +4281,8 @@
       ]
     },
     {
-      "address": "0x26292744e0ce371ac2b4cf04cea60e45530897efe589057b72fd391bbef9acc",
-      "class_hash": "0x12bfd712b5b3834b5066dbe67e5ca347b5eb5c1158d23c985c43d7b62af8292",
+      "address": "0x374e4790ceb3b31829e65229c81d7c9179fa73c94fea1713bae63e4780a0268",
+      "class_hash": "0x7184f276dc11f904fcc3e635fe527027fae9d107839c03316c4b7a760befb7a",
       "abi": [
         {
           "type": "impl",
@@ -7488,8 +7488,8 @@
       ]
     },
     {
-      "address": "0x52f1fd3b0b99a100637cfe1d6fae8d12b243cd1594194aaa14b9ab87792e3d4",
-      "class_hash": "0x3c1547c3cc7f85aba037674aa5426a95da8e205011c26b177d87ef8a795ffc8",
+      "address": "0x50777340b23f689e1d8e40e33c205424240c9a5e22bda1e3330153793f384c0",
+      "class_hash": "0x58ea43835a41f92b11cc13e38a66641af52e173db2af3f94984060303d39955",
       "abi": [
         {
           "type": "impl",
@@ -9785,8 +9785,8 @@
       ]
     },
     {
-      "address": "0x23f420e6513e0bef3262065f85c23fcbb93432a2f8976bfc11c169c7f252718",
-      "class_hash": "0x5cdb88cd07127b90ad8ec46d6532a44cccc11cf584a07840c00fc152cc02ef9",
+      "address": "0x593cdc552a9e90cf2e6bbaa0a587b66b9c9fa2bfbcfb6366449f9fa4fde47d8",
+      "class_hash": "0x73a29f53dfa84023350ae75c3d6e8193d325e79b7630f7a4b0280d8612e4db",
       "abi": [
         {
           "type": "impl",
@@ -9852,7 +9852,7 @@
         },
         {
           "type": "enum",
-          "name": "pistols::models::matches::QueueId",
+          "name": "pistols::models::match_queue::QueueId",
           "variants": [
             {
               "name": "Undefined",
@@ -9870,7 +9870,7 @@
         },
         {
           "type": "enum",
-          "name": "pistols::models::matches::QueueMode",
+          "name": "pistols::models::match_queue::QueueMode",
           "variants": [
             {
               "name": "Undefined",
@@ -9900,7 +9900,7 @@
                 },
                 {
                   "name": "queue_id",
-                  "type": "pistols::models::matches::QueueId"
+                  "type": "pistols::models::match_queue::QueueId"
                 }
               ],
               "outputs": [
@@ -9920,11 +9920,11 @@
                 },
                 {
                   "name": "queue_id",
-                  "type": "pistols::models::matches::QueueId"
+                  "type": "pistols::models::match_queue::QueueId"
                 },
                 {
                   "name": "queue_mode",
-                  "type": "pistols::models::matches::QueueMode"
+                  "type": "pistols::models::match_queue::QueueMode"
                 }
               ],
               "outputs": [
@@ -9940,7 +9940,7 @@
               "inputs": [
                 {
                   "name": "queue_id",
-                  "type": "pistols::models::matches::QueueId"
+                  "type": "pistols::models::match_queue::QueueId"
                 }
               ],
               "outputs": [
@@ -9967,7 +9967,7 @@
               "inputs": [
                 {
                   "name": "queue_id",
-                  "type": "pistols::models::matches::QueueId"
+                  "type": "pistols::models::match_queue::QueueId"
                 },
                 {
                   "name": "size",
@@ -9983,7 +9983,7 @@
               "inputs": [
                 {
                   "name": "queue_id",
-                  "type": "pistols::models::matches::QueueId"
+                  "type": "pistols::models::match_queue::QueueId"
                 },
                 {
                   "name": "entry_token_address",
@@ -14462,7 +14462,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x6713973b437dc603c3917d30c53e1aff988bd423f8d29582d7008851d2e8b13",
+      "class_hash": "0x6202af98d1a8b8b26aef1fd10827757a0b3a13fd0539474e120e2e34dbfd558",
       "tag": "pistols-DuelistAssignment",
       "selector": "0x3f4e86c5f78bd99b4030bb44259374c178e3c03f664ce866d15e4ddcd7d4e52"
     },
@@ -14480,13 +14480,13 @@
     },
     {
       "members": [],
-      "class_hash": "0x66fb35f32477c2acd4c3f4f637a66639cd6ca7e15d889695545c1bf908fee1b",
+      "class_hash": "0x7e12c0e2489cded16a6e1b2aa36267e772b9c96101d0c4455f38422a5a76314",
       "tag": "pistols-MatchPlayer",
       "selector": "0x36cbfae32f102062669ab4daf04b39bf84c9ae8e26e7f0813a9728fe3c11558"
     },
     {
       "members": [],
-      "class_hash": "0x7c48ea4d45eb9417ebb62f2b40620024bc784af30d6f3fcebc3adc6c8de4a4c",
+      "class_hash": "0x774299d993f95cf01267a5488671415cd4d6900fdc27aa2f24e84ba1b2888bd",
       "tag": "pistols-MatchQueue",
       "selector": "0x624ecb978d73d21798831974104ecd70c0013d09e9a440db4a7a8bd066cd7fc"
     },

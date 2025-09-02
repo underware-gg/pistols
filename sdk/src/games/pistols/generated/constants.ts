@@ -201,7 +201,7 @@ export const getPlayerSettingValueValue = (name: PlayerSettingValue): number | u
 export const getPlayerSettingValueFromValue = (value: number): PlayerSettingValue | undefined => Object.keys(PlayerSettingValue)[value] as PlayerSettingValue;
 export const getPlayerSettingValueMap = (): Record<PlayerSettingValue, number> => Object.keys(PlayerSettingValue).reduce((acc, v, index) => { acc[v as PlayerSettingValue] = index; return acc; }, {} as Record<PlayerSettingValue, number>);
 
-// from: ../dojo/src/models/matches.cairo
+// from: ../dojo/src/models/match_queue.cairo
 export enum QueueId {
   Undefined = 'Undefined', // 0
   Unranked = 'Unranked', // 1
@@ -211,7 +211,7 @@ export const getQueueIdValue = (name: QueueId): number | undefined => _indexOrUn
 export const getQueueIdFromValue = (value: number): QueueId | undefined => Object.keys(QueueId)[value] as QueueId;
 export const getQueueIdMap = (): Record<QueueId, number> => Object.keys(QueueId).reduce((acc, v, index) => { acc[v as QueueId] = index; return acc; }, {} as Record<QueueId, number>);
 
-// from: ../dojo/src/models/matches.cairo
+// from: ../dojo/src/models/match_queue.cairo
 export enum QueueMode {
   Undefined = 'Undefined', // 0
   Fast = 'Fast', // 1
@@ -856,7 +856,7 @@ export const CONFIG: type_CONFIG = {
   CONFIG_KEY: 1,
 };
 
-// from: ../dojo/src/models/matches.cairo
+// from: ../dojo/src/models/match_queue.cairo
 type type_MATCHMAKER = {
   INITIAL_SLOT_SIZE: number, // cairo: u8
   QUEUE_TIMEOUT_FAST: bigint, // cairo: u64
