@@ -20,7 +20,8 @@
   },
   "bin": {
     "generate-constants": "dist/bin/generateConstants.cjs",
-    "generate-controller-preset": "dist/bin/generateControllerPreset.mjs"
+    "generate-controller-preset": "dist/bin/generateControllerPreset.mjs",
+    "test-get-events": "dist/bin/testStarknetGetEvents.mjs"
   },
   "main": "dist/index.js",
   "files": [
