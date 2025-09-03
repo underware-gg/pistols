@@ -1,12 +1,23 @@
 #!/usr/bin/env node
-import { RpcProvider, num, hash } from 'starknet';
+import { RpcProvider, num, hash, events, CallData } from 'starknet';
+import { NetworkId, getNetworkConfig, getDuelistTokenAddress, getManifest, NAMESPACE } from '../pistols_config.js';
+import { getContractByName } from '@dojoengine/core';
 
 //--------------------------------
 // run with:
 // turbo build && npm exec test - get - events
 // 
+const networkId = NetworkId.MAINNET;
+const networkConfig = getNetworkConfig(networkId);
+const provider = new RpcProvider({ nodeUrl: networkConfig.rpcUrl });
 
-const provider = new RpcProvider({ nodeUrl: `https://api.cartridge.gg/x/starknet/mainnet/rpc/v0_8` });
+const pistolsDeployBlock = 1376382;
+const duelistsContractAddress = getDuelistTokenAddress(networkId);
+const manifest = getManifest({ networkId });
+const abi = getContractByName(manifest, NAMESPACE, 'duelist_token').abi
+
+
+// get latest block + test RPC
 const getBlockData = await provider.getBlock('latest');
 if (!getBlockData || !getBlockData.block_number) {
   console.error(`invalid block data:`, getBlockData);
@@ -45,10 +56,8 @@ const keyFilter = [
   [], // token id high
 ];
 
-const pistolsDeployBlock = 1376382;
-const duelistsContractAddress = '0x7aaa9866750a0db82a54ba8674c38620fa2f967d2fbb31133def48e0527c87f';
 
-//
+//--------------------------------
 // provider.getEvents()
 // https://starknetjs.com/docs/guides/events/#without-transaction-hash
 //
@@ -62,5 +71,12 @@ const eventsList = await provider.getEvents({
   keys: keyFilter,
   chunk_size: 100,
 });
+console.log(`got [${eventsList.events.length}] events...`);
+// console.log(`events:`, JSON.stringify(eventsList, null, 2));
 
-console.log(`events (${eventsList.events.length}):`, JSON.stringify(eventsList, null, 2));
+// parse events
+const abiEvents = events.getAbiEvents(abi);
+const abiStructs = CallData.getAbiStruct(abi);
+const abiEnums = CallData.getAbiEnum(abi);
+const parsed = events.parseEvents(eventsList.events, abiEvents, abiStructs, abiEnums);
+console.log('events:', parsed);
