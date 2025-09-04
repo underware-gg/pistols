@@ -11,7 +11,7 @@ export const useToriiBlockHead = ({
   enabled?: boolean,
 }) => {
   const query = useMemo(() => (
-    `select head from contracts where contract_type = "WORLD" and head <= "${blockNumber}"`
+    `select head from contracts where contract_type = "WORLD" and contract_type != "${blockNumber}"`
   ), [toriiUrl, blockNumber])
   const { data, isLoading, latency } = useSqlQuery({
     query: enabled ? query : null,

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Container, Table } from 'semantic-ui-react'
 import { useApiSlotServiceStatus } from '@underware/pistols-sdk/api'
 import { useToriiBlockHead } from '/src/queries/useToriiStatusQueries'
@@ -29,20 +29,34 @@ export default function StatusPage() {
 }
 
 function Status() {
-  const { data: blockNumber, isLoading: isBlockNumberLoading } = useBlockNumber({
+  const { data: blockNumber, isLoading: isBlockNumberLoading, isError: isBlockNumberError, error: blockNumberError } = useBlockNumber({
     refetchInterval: 1000,
   })
   return (
     <>
-      <ToriiStatus slotName='pistols-mainnet' blockNumber={blockNumber} />
-      <ToriiStatus slotName='pistols-mainnet-2' blockNumber={blockNumber} />
-      <ToriiStatus slotName='pistols-testnet' blockNumber={blockNumber} />
+      <Table>
+        <Header>
+          <Row className='ModalText Important'>
+            <HeaderCell>Torii Servers</HeaderCell>
+            <HeaderCell>Response</HeaderCell>
+            <HeaderCell>Latency</HeaderCell>
+            <HeaderCell>Version</HeaderCell>
+            <HeaderCell width={3}>Block/Head</HeaderCell>
+            <HeaderCell></HeaderCell>
+          </Row>
+        </Header>
+        <Body className='Smaller'>
+          <ToriiStatusRow slotName='pistols-mainnet' blockNumber={blockNumber} />
+          <ToriiStatusRow slotName='pistols-mainnet-2' blockNumber={blockNumber} />
+          <ToriiStatusRow slotName='pistols-sepolia' blockNumber={blockNumber} />
+        </Body>
+      </Table>
     </>
   )
 }
 
 
-function ToriiStatus({
+function ToriiStatusRow({
   slotName,
   blockNumber,
 }: {
@@ -55,66 +69,48 @@ function ToriiStatus({
   const isCurrentTorii = (selectedNetworkConfig.slotName === slotName)
   const isCurrentNetwork = (
     (selectedNetworkConfig.networkId === NetworkId.MAINNET && slotName.includes('mainnet')) ||
-    (selectedNetworkConfig.networkId === NetworkId.SEPOLIA && slotName.includes('testnet'))
+    (selectedNetworkConfig.networkId === NetworkId.SEPOLIA && slotName.includes('sepolia'))
   )
 
   const { status, isLoading, isError } = useApiSlotServiceStatus(toriiUrl)
   const isOnline = (status?.success ?? false);
   // console.log(`ToriiStatus() status:`, status, isLoading, isError)
 
-  const { blockHead, isLoading: isBlockHeadLoading, latency } = useToriiBlockHead({ toriiUrl, blockNumber, enabled: isOnline })
+  const [blockHead, setBlockHead] = useState<number | null>(null)
+  const { blockHead: newBlockHead, isLoading: isLoadingBlockHead, latency } = useToriiBlockHead({ toriiUrl, blockNumber, enabled: isOnline })
+  useEffect(() => {
+    if (!isLoadingBlockHead) {
+      setBlockHead(newBlockHead)
+    }
+  }, [newBlockHead, isLoadingBlockHead])
 
   const blockOffset = (blockNumber && blockHead ? (blockHead - blockNumber) : null);
-  const isHead = (blockOffset !== null && blockOffset <= 1);
 
   const statusClass = (status?.success === true ? 'Positive' : (status?.success === false || status?.error) ? 'Negative' : 'Warning');
-  const headClass = ((!isCurrentNetwork || blockOffset < -3) ? 'Negative' : blockOffset < -1 ? 'Warning' : 'Positive');
+  const headClass = (!isCurrentNetwork ? '' : blockOffset < -3 ? 'Negative' : blockOffset < -1 ? 'Warning' : 'Positive');
   const latencyClass = (latency < 500 ? 'Positive' : latency < 1000 ? 'Warning' : 'Negative');
 
   return (
-    <Table color={!isOnline ? 'red' : !isHead ? 'orange' : 'green'}>
-      {/* <Header>
-        <Row className='H5'>
-          <HeaderCell className='Important'>Torii Server</HeaderCell>
-        </Row>
-      </Header> */}
-      <Body className='Smallerrr'>
-        <Row className='Number'>
-          <Cell width={3}>Torii Server</Cell>
-          <Cell><b>{slotName}{isCurrentTorii && <span className='Important'> (CURRENT)</span>}</b></Cell>
-        </Row>
-        <Row className='Number'>
-          <Cell>Torii URL</Cell>
-          <Cell><a href={toriiUrl} target='_blank'>{toriiUrl}</a></Cell>
-        </Row>
-        <Row className='Number'>
-          <Cell>Server Response</Cell>
-          <Cell className={statusClass}>
-            <b>{status ? (status.success ? 'OK' : 'Error') : '...'}</b>
-            {status?.error && <>: {status.error}</>}
-          </Cell>
-        </Row>
-        <Row className='Number'>
-          <Cell>Version</Cell>
-          <Cell><b>{status?.version ?? '...'}</b></Cell>
-        </Row>
-        <Row className='Number'>
-          <Cell>Head Block</Cell>
-          <Cell>
-            <b>{blockHead ? (<span className={headClass}>{blockHead}</span>) : '...'}</b>
-            {' of '}
-            <b>{isCurrentNetwork ? (blockNumber ?? '?') : 'N/A'}</b>
-            {' '}
-            ({blockOffset == null || !isCurrentNetwork ? '?' : <span className={headClass}>{blockOffset === 0 ? 'head' : blockOffset}</span>})
-          </Cell>
-        </Row>
-        <Row className='Number'>
-          <Cell>SQL Latency</Cell>
-          <Cell>
-            <b>{latency ? <span className={latencyClass}>{latency}ms</span> : '...'}</b>
-          </Cell>
-        </Row>
-      </Body>
-    </Table>
+    <>
+      <Row className='Number'>
+        <Cell><b>{slotName}{isCurrentTorii && <><br /><span className='Important'> (CURRENT)</span></>}</b></Cell>
+        <Cell className={statusClass}>
+          <b>{status ? (status.success ? 'OK' : 'Error') : '...'}</b>
+          {status?.error && <>: {status.error}</>}
+        </Cell>
+        <Cell>
+          <b>{latency ? <span className={latencyClass}>{latency}ms</span> : '...'}</b>
+        </Cell>
+        <Cell><b>{status?.version ?? '...'}</b></Cell>
+        <Cell>
+          <b>{blockHead ? (<span className={headClass}>{blockHead}</span>) : '...'}</b>
+          {' of '}
+          <b>{isCurrentNetwork ? (blockNumber ?? '?') : 'N/A'}</b>
+          {' '}
+          ({blockOffset == null || !isCurrentNetwork ? '?' : <span className={headClass}>{blockOffset === 0 ? 'head' : blockOffset}</span>})
+        </Cell>
+        <Cell singleLine={false}><a href={toriiUrl} target='_blank'>link</a></Cell>
+      </Row>
+    </>
   )
 }
