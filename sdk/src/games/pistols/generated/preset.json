@@ -333,6 +333,19 @@
               }
             ]
           },
+          "0x016f7e3c140b4778e776221c7bb8b880d20d247c3ab0d06fab9a8eb96e7098bb": {
+            "description": "Match Maker contract",
+            "methods": [
+              {
+                "entrypoint": "enlist_duelist",
+                "description": "Enlist a Duelist in a ranked queue"
+              },
+              {
+                "entrypoint": "match_make_me",
+                "description": "Match a player against another player"
+              }
+            ]
+          },
           "0x03c77186b8e509085ec66e1a5d1dbcf9dc1f212852b4c1f461a48901d290fc9b": {
             "description": "Tutorial game contract",
             "methods": [

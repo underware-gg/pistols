@@ -1707,7 +1707,7 @@
     },
     {
       "address": "0x426c16fe76f12586718c07e47c8e4312e9fee5e7dc849a75f3c587ad9e70b4f",
-      "class_hash": "0x31b2856aa9c3b77452ac6efff699499519ddade17e6fe768e07f1c29382414c",
+      "class_hash": "0x30014497d5293e28c06c8a2b5f896f8fd056f9b4956937bfae278c08490d108",
       "abi": [
         {
           "type": "impl",
@@ -1969,7 +1969,7 @@
           "items": [
             {
               "type": "function",
-              "name": "charge_purchase",
+              "name": "charge_lords_purchase",
               "inputs": [
                 {
                   "name": "payer",
@@ -2176,7 +2176,7 @@
         "sponsor_season",
         "sponsor_tournament",
         "collect_season",
-        "charge_purchase",
+        "charge_lords_purchase",
         "peg_minted_fame_to_lords",
         "release_lords_from_fame_to_be_burned",
         "duelist_lost_fame_to_pool",
@@ -2185,7 +2185,7 @@
     },
     {
       "address": "0x5d9c9168e6bf86f250a813d38ad5a95c67cb3ca42ab93411a184c9c731fa69a",
-      "class_hash": "0x4451bd9bde0222690a0162d734847f30b637f8a18e85f972ed3871ff9431ba1",
+      "class_hash": "0x4c81abf09df01216f6449e074625c377375d49258e8492ec8eccae48b4640bd",
       "abi": [
         {
           "type": "impl",
@@ -2282,6 +2282,392 @@
           "interface_name": "pistols::systems::bot_player::IBotPlayerProtected"
         },
         {
+          "type": "enum",
+          "name": "pistols::types::duelist_profile::CharacterKey",
+          "variants": [
+            {
+              "name": "Unknown",
+              "type": "()"
+            },
+            {
+              "name": "Bartender",
+              "type": "()"
+            },
+            {
+              "name": "Drunkard",
+              "type": "()"
+            },
+            {
+              "name": "Devil",
+              "type": "()"
+            },
+            {
+              "name": "Player",
+              "type": "()"
+            },
+            {
+              "name": "ImpMaster",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "pistols::types::duelist_profile::BotKey",
+          "variants": [
+            {
+              "name": "Unknown",
+              "type": "()"
+            },
+            {
+              "name": "TinMan",
+              "type": "()"
+            },
+            {
+              "name": "Scarecrow",
+              "type": "()"
+            },
+            {
+              "name": "Leon",
+              "type": "()"
+            },
+            {
+              "name": "Pro",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "pistols::types::duelist_profile::GenesisKey",
+          "variants": [
+            {
+              "name": "Unknown",
+              "type": "()"
+            },
+            {
+              "name": "SerWalker",
+              "type": "()"
+            },
+            {
+              "name": "LadyVengeance",
+              "type": "()"
+            },
+            {
+              "name": "Duke",
+              "type": "()"
+            },
+            {
+              "name": "Duella",
+              "type": "()"
+            },
+            {
+              "name": "Jameson",
+              "type": "()"
+            },
+            {
+              "name": "Misty",
+              "type": "()"
+            },
+            {
+              "name": "Karaku",
+              "type": "()"
+            },
+            {
+              "name": "Kenzu",
+              "type": "()"
+            },
+            {
+              "name": "Pilgrim",
+              "type": "()"
+            },
+            {
+              "name": "Jack",
+              "type": "()"
+            },
+            {
+              "name": "Pops",
+              "type": "()"
+            },
+            {
+              "name": "NynJah",
+              "type": "()"
+            },
+            {
+              "name": "Thrak",
+              "type": "()"
+            },
+            {
+              "name": "Bloberto",
+              "type": "()"
+            },
+            {
+              "name": "Squiddo",
+              "type": "()"
+            },
+            {
+              "name": "SlenderDuck",
+              "type": "()"
+            },
+            {
+              "name": "Breadman",
+              "type": "()"
+            },
+            {
+              "name": "Groggus",
+              "type": "()"
+            },
+            {
+              "name": "Pistolopher",
+              "type": "()"
+            },
+            {
+              "name": "Secreto",
+              "type": "()"
+            },
+            {
+              "name": "ShadowMare",
+              "type": "()"
+            },
+            {
+              "name": "Fjolnir",
+              "type": "()"
+            },
+            {
+              "name": "ChimpDylan",
+              "type": "()"
+            },
+            {
+              "name": "Hinata",
+              "type": "()"
+            },
+            {
+              "name": "HelixVex",
+              "type": "()"
+            },
+            {
+              "name": "BuccaneerJames",
+              "type": "()"
+            },
+            {
+              "name": "TheSensei",
+              "type": "()"
+            },
+            {
+              "name": "SenseiTarrence",
+              "type": "()"
+            },
+            {
+              "name": "ThePainter",
+              "type": "()"
+            },
+            {
+              "name": "Ashe",
+              "type": "()"
+            },
+            {
+              "name": "SerGogi",
+              "type": "()"
+            },
+            {
+              "name": "TheSurvivor",
+              "type": "()"
+            },
+            {
+              "name": "TheFrenchman",
+              "type": "()"
+            },
+            {
+              "name": "SerFocger",
+              "type": "()"
+            },
+            {
+              "name": "SillySosij",
+              "type": "()"
+            },
+            {
+              "name": "BloodBeard",
+              "type": "()"
+            },
+            {
+              "name": "Fredison",
+              "type": "()"
+            },
+            {
+              "name": "TheBard",
+              "type": "()"
+            },
+            {
+              "name": "Ponzimancer",
+              "type": "()"
+            },
+            {
+              "name": "DealerTani",
+              "type": "()"
+            },
+            {
+              "name": "SerRichard",
+              "type": "()"
+            },
+            {
+              "name": "Recipromancer",
+              "type": "()"
+            },
+            {
+              "name": "Mataleone",
+              "type": "()"
+            },
+            {
+              "name": "FortunaRegem",
+              "type": "()"
+            },
+            {
+              "name": "Amaro",
+              "type": "()"
+            },
+            {
+              "name": "Mononoke",
+              "type": "()"
+            },
+            {
+              "name": "Parsa",
+              "type": "()"
+            },
+            {
+              "name": "Jubilee",
+              "type": "()"
+            },
+            {
+              "name": "LadyOfCrows",
+              "type": "()"
+            },
+            {
+              "name": "BananaDuke",
+              "type": "()"
+            },
+            {
+              "name": "LordGladstone",
+              "type": "()"
+            },
+            {
+              "name": "LadyStrokes",
+              "type": "()"
+            },
+            {
+              "name": "Bliss",
+              "type": "()"
+            },
+            {
+              "name": "StormMirror",
+              "type": "()"
+            },
+            {
+              "name": "Aldreda",
+              "type": "()"
+            },
+            {
+              "name": "Petronella",
+              "type": "()"
+            },
+            {
+              "name": "SeraphinaRose",
+              "type": "()"
+            },
+            {
+              "name": "LucienDeSombrel",
+              "type": "()"
+            },
+            {
+              "name": "FyernVirelock",
+              "type": "()"
+            },
+            {
+              "name": "Noir",
+              "type": "()"
+            },
+            {
+              "name": "QueenAce",
+              "type": "()"
+            },
+            {
+              "name": "JoshPeel",
+              "type": "()"
+            },
+            {
+              "name": "IronHandRogan",
+              "type": "()"
+            },
+            {
+              "name": "GoodPupStarky",
+              "type": "()"
+            },
+            {
+              "name": "ImyaSuspect",
+              "type": "()"
+            },
+            {
+              "name": "TheAlchemist",
+              "type": "()"
+            },
+            {
+              "name": "PonziusPilate",
+              "type": "()"
+            },
+            {
+              "name": "MistressNoodle",
+              "type": "()"
+            },
+            {
+              "name": "MasterOfSecrets",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "pistols::types::duelist_profile::LegendsKey",
+          "variants": [
+            {
+              "name": "Unknown",
+              "type": "()"
+            },
+            {
+              "name": "TGC1",
+              "type": "()"
+            },
+            {
+              "name": "TGC2",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "pistols::types::duelist_profile::DuelistProfile",
+          "variants": [
+            {
+              "name": "Undefined",
+              "type": "()"
+            },
+            {
+              "name": "Character",
+              "type": "pistols::types::duelist_profile::CharacterKey"
+            },
+            {
+              "name": "Bot",
+              "type": "pistols::types::duelist_profile::BotKey"
+            },
+            {
+              "name": "Genesis",
+              "type": "pistols::types::duelist_profile::GenesisKey"
+            },
+            {
+              "name": "Legends",
+              "type": "pistols::types::duelist_profile::LegendsKey"
+            }
+          ]
+        },
+        {
           "type": "interface",
           "name": "pistols::systems::bot_player::IBotPlayerProtected",
           "items": [
@@ -2307,6 +2693,26 @@
                 }
               ],
               "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "summon_duelist",
+              "inputs": [
+                {
+                  "name": "duelist_profile",
+                  "type": "pistols::types::duelist_profile::DuelistProfile"
+                },
+                {
+                  "name": "lives_staked",
+                  "type": "core::integer::u8"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u128"
+                }
+              ],
               "state_mutability": "external"
             },
             {
@@ -2453,13 +2859,14 @@
         "reveal_moves",
         "reply_duel",
         "commit_moves",
+        "summon_duelist",
         "transfer_to_winner",
         "upgrade"
       ]
     },
     {
       "address": "0x2e9c711b1a7e2784570b1bda5082a92606044e836ba392d2b977d280fb74b3c",
-      "class_hash": "0x2a8b4999d4426a554246ac3a81622256875281a03a4f6ff5e2a6c48ff9ec817",
+      "class_hash": "0x6d95f01cc2f30794c2c2c908f1d1d6f0c3b4b3b7a98a1f44143c2627cc62e62",
       "abi": [
         {
           "type": "impl",
@@ -2558,6 +2965,14 @@
             },
             {
               "name": "BotPlayer",
+              "type": "()"
+            },
+            {
+              "name": "Ranked",
+              "type": "()"
+            },
+            {
+              "name": "Unranked",
               "type": "()"
             }
           ]
@@ -2788,9 +3203,101 @@
           "interface_name": "pistols::systems::tokens::duel_token::IDuelTokenProtected"
         },
         {
+          "type": "enum",
+          "name": "pistols::models::match_queue::QueueId",
+          "variants": [
+            {
+              "name": "Undefined",
+              "type": "()"
+            },
+            {
+              "name": "Unranked",
+              "type": "()"
+            },
+            {
+              "name": "Ranked",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "pistols::models::match_queue::QueueMode",
+          "variants": [
+            {
+              "name": "Undefined",
+              "type": "()"
+            },
+            {
+              "name": "Fast",
+              "type": "()"
+            },
+            {
+              "name": "Slow",
+              "type": "()"
+            }
+          ]
+        },
+        {
           "type": "interface",
           "name": "pistols::systems::tokens::duel_token::IDuelTokenProtected",
           "items": [
+            {
+              "type": "function",
+              "name": "create_match",
+              "inputs": [
+                {
+                  "name": "address_a",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "duelist_id_a",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "queue_id",
+                  "type": "pistols::models::match_queue::QueueId"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u128"
+                }
+              ],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "start_match",
+              "inputs": [
+                {
+                  "name": "duel_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "address_b",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "duelist_id_b",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "queue_id",
+                  "type": "pistols::models::match_queue::QueueId"
+                },
+                {
+                  "name": "queue_mode",
+                  "type": "pistols::models::match_queue::QueueMode"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u128"
+                }
+              ],
+              "state_mutability": "external"
+            },
             {
               "type": "function",
               "name": "transfer_to_winner",
@@ -3757,6 +4264,8 @@
         "dojo_init",
         "create_duel",
         "reply_duel",
+        "create_match",
+        "start_match",
         "transfer_to_winner",
         "upgrade",
         "safe_transfer_from",
@@ -3773,7 +4282,7 @@
     },
     {
       "address": "0x7aaa9866750a0db82a54ba8674c38620fa2f967d2fbb31133def48e0527c87f",
-      "class_hash": "0x31ca5db04cae0cf6bd612be68e08a2726396d0add0a2f3166d16fceaf9b2f1c",
+      "class_hash": "0x7184f276dc11f904fcc3e635fe527027fae9d107839c03316c4b7a760befb7a",
       "abi": [
         {
           "type": "impl",
@@ -4459,6 +4968,14 @@
             },
             {
               "name": "BotPlayer",
+              "type": "()"
+            },
+            {
+              "name": "Ranked",
+              "type": "()"
+            },
+            {
+              "name": "Unranked",
               "type": "()"
             }
           ]
@@ -5749,7 +6266,7 @@
     },
     {
       "address": "0x2549653a4ae1ff8d04a20b8820a49cbe97486c536ec0e4c8f68aa33d80067cf",
-      "class_hash": "0x2e0f24863fbda55d9552569673d96ef8339a46212cd7e902b73b203014393b0",
+      "class_hash": "0x20fd57cd17a275eae64605b5a65b20f0364eac4abdb3381e363f355e8981241",
       "abi": [
         {
           "type": "impl",
@@ -5831,7 +6348,7 @@
             },
             {
               "type": "function",
-              "name": "reward_duelist",
+              "name": "reward_duelist_fame",
               "inputs": [
                 {
                   "name": "duelist_id",
@@ -6438,7 +6955,7 @@
       "systems": [
         "dojo_init",
         "minted_duelist",
-        "reward_duelist",
+        "reward_duelist_fame",
         "burn",
         "upgrade",
         "transfer",
@@ -6452,7 +6969,7 @@
     },
     {
       "address": "0x68a7a07e08fc3e723a878223d00f669106780d5ea6665eb15d893476d47bf3b",
-      "class_hash": "0x25ec89d7633058c1c4ecf8a9888e95e0025991a7aace9d9451a6971fc2cb803",
+      "class_hash": "0x748b43aa471b22aa043df47a0f4e60278483fe32b6a03769f0205e3af911b54",
       "abi": [
         {
           "type": "impl",
@@ -6522,7 +7039,7 @@
           "items": [
             {
               "type": "function",
-              "name": "reward_player",
+              "name": "reward_player_fools",
               "inputs": [
                 {
                   "name": "recipient",
@@ -6962,7 +7479,7 @@
       "selector": "0x58070034702ab2b03c2911459d7299e63048e70e3d41f77e1d806b4cb8f2dcd",
       "systems": [
         "dojo_init",
-        "reward_player",
+        "reward_player_fools",
         "upgrade",
         "transfer",
         "transfer_from",
@@ -6972,7 +7489,7 @@
     },
     {
       "address": "0x2c6a7c98a9dea8322b51018eef7be99ebedd209cebdaacb9f4c5bbf661c1cc9",
-      "class_hash": "0x3fa1e842bb37a8cc9c690a53cc2b81fc47f64623964a10cb86996e78c943d05",
+      "class_hash": "0x58ea43835a41f92b11cc13e38a66641af52e173db2af3f94984060303d39955",
       "abi": [
         {
           "type": "impl",
@@ -8728,8 +9245,343 @@
       ]
     },
     {
+      "address": "0x16f7e3c140b4778e776221c7bb8b880d20d247c3ab0d06fab9a8eb96e7098bb",
+      "class_hash": "0x73a29f53dfa84023350ae75c3d6e8193d325e79b7630f7a4b0280d8612e4db",
+      "abi": [
+        {
+          "type": "impl",
+          "name": "matchmaker__ContractImpl",
+          "interface_name": "dojo::contract::interface::IContract"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::interface::IContract",
+          "items": []
+        },
+        {
+          "type": "impl",
+          "name": "matchmaker__DeployedContractImpl",
+          "interface_name": "dojo::meta::interface::IDeployedResource"
+        },
+        {
+          "type": "struct",
+          "name": "core::byte_array::ByteArray",
+          "members": [
+            {
+              "name": "data",
+              "type": "core::array::Array::<core::bytes_31::bytes31>"
+            },
+            {
+              "name": "pending_word",
+              "type": "core::felt252"
+            },
+            {
+              "name": "pending_word_len",
+              "type": "core::integer::u32"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "dojo::meta::interface::IDeployedResource",
+          "items": [
+            {
+              "type": "function",
+              "name": "dojo_name",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "function",
+          "name": "dojo_init",
+          "inputs": [],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "impl",
+          "name": "MatchMakerPublicImpl",
+          "interface_name": "pistols::systems::matchmaker::IMatchMakerPublic"
+        },
+        {
+          "type": "enum",
+          "name": "pistols::models::match_queue::QueueId",
+          "variants": [
+            {
+              "name": "Undefined",
+              "type": "()"
+            },
+            {
+              "name": "Unranked",
+              "type": "()"
+            },
+            {
+              "name": "Ranked",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "pistols::models::match_queue::QueueMode",
+          "variants": [
+            {
+              "name": "Undefined",
+              "type": "()"
+            },
+            {
+              "name": "Fast",
+              "type": "()"
+            },
+            {
+              "name": "Slow",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "pistols::systems::matchmaker::IMatchMakerPublic",
+          "items": [
+            {
+              "type": "function",
+              "name": "enlist_duelist",
+              "inputs": [
+                {
+                  "name": "duelist_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "queue_id",
+                  "type": "pistols::models::match_queue::QueueId"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u128"
+                }
+              ],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "match_make_me",
+              "inputs": [
+                {
+                  "name": "duelist_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "queue_id",
+                  "type": "pistols::models::match_queue::QueueId"
+                },
+                {
+                  "name": "queue_mode",
+                  "type": "pistols::models::match_queue::QueueMode"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u128"
+                }
+              ],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "get_entry_fee",
+              "inputs": [
+                {
+                  "name": "queue_id",
+                  "type": "pistols::models::match_queue::QueueId"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "(core::starknet::contract_address::ContractAddress, core::integer::u128)"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "MatchMakerProtectedImpl",
+          "interface_name": "pistols::systems::matchmaker::IMatchMakerProtected"
+        },
+        {
+          "type": "interface",
+          "name": "pistols::systems::matchmaker::IMatchMakerProtected",
+          "items": [
+            {
+              "type": "function",
+              "name": "set_queue_size",
+              "inputs": [
+                {
+                  "name": "queue_id",
+                  "type": "pistols::models::match_queue::QueueId"
+                },
+                {
+                  "name": "size",
+                  "type": "core::integer::u8"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "set_queue_entry_token",
+              "inputs": [
+                {
+                  "name": "queue_id",
+                  "type": "pistols::models::match_queue::QueueId"
+                },
+                {
+                  "name": "entry_token_address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "entry_token_amount",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "WorldProviderImpl",
+          "interface_name": "dojo::contract::components::world_provider::IWorldProvider"
+        },
+        {
+          "type": "struct",
+          "name": "dojo::world::iworld::IWorldDispatcher",
+          "members": [
+            {
+              "name": "contract_address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::components::world_provider::IWorldProvider",
+          "items": [
+            {
+              "type": "function",
+              "name": "world_dispatcher",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "dojo::world::iworld::IWorldDispatcher"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "UpgradeableImpl",
+          "interface_name": "dojo::contract::components::upgradeable::IUpgradeable"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::components::upgradeable::IUpgradeable",
+          "items": [
+            {
+              "type": "function",
+              "name": "upgrade",
+              "inputs": [
+                {
+                  "name": "new_class_hash",
+                  "type": "core::starknet::class_hash::ClassHash"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "constructor",
+          "name": "constructor",
+          "inputs": []
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "class_hash",
+              "type": "core::starknet::class_hash::ClassHash",
+              "kind": "data"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "Upgraded",
+              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
+              "kind": "nested"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::world_provider::world_provider_cpt::Event",
+          "kind": "enum",
+          "variants": []
+        },
+        {
+          "type": "event",
+          "name": "pistols::systems::matchmaker::matchmaker::Event",
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "UpgradeableEvent",
+              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
+              "kind": "nested"
+            },
+            {
+              "name": "WorldProviderEvent",
+              "type": "dojo::contract::components::world_provider::world_provider_cpt::Event",
+              "kind": "nested"
+            }
+          ]
+        }
+      ],
+      "init_calldata": [],
+      "tag": "pistols-matchmaker",
+      "selector": "0x5b2844d155e3c1b34dbddfa9a4d321e431b76826510f51dab224efecc822072",
+      "systems": [
+        "dojo_init",
+        "enlist_duelist",
+        "match_make_me",
+        "set_queue_size",
+        "set_queue_entry_token",
+        "upgrade"
+      ]
+    },
+    {
       "address": "0x71333ac75b7d5ba89a2d0c2b67d5b955258a4d46eb42f3428da6137bbbfdfd9",
-      "class_hash": "0xe382254cd5be3528821117e783f2d981c624057ce625d8eabd19ff205dca8",
+      "class_hash": "0x7ba9bba8262ef3ac5de56b6f735a3fd16c4097b0b0a64ac5a7e09ea5c8f2e7a",
       "abi": [
         {
           "type": "impl",
@@ -10405,7 +11257,7 @@
     },
     {
       "address": "0x14aa76e6c6f11e3f657ee2c213a62006c78ff2c6f8ed40b92c42fd554c246f2",
-      "class_hash": "0x746fba4bc34fc30de71faedf5f379c841d3e30cec435596162c374beadd524d",
+      "class_hash": "0x339e7188d78c1bfc1d22cc74863b658c17116a98ce9de6ff8696b3ec9229ce3",
       "abi": [
         {
           "type": "impl",
@@ -12158,7 +13010,7 @@
     },
     {
       "address": "0x3c77186b8e509085ec66e1a5d1dbcf9dc1f212852b4c1f461a48901d290fc9b",
-      "class_hash": "0x4c1e980f389d2ace474a819fee5e2e87161ddd418eadb732556212a536b8d24",
+      "class_hash": "0x44733e724240e9d09eb9124277ce87499d2aee8509e2e4d6c502241cfb87346",
       "abi": [
         {
           "type": "impl",
@@ -12806,7 +13658,7 @@
   "models": [
     {
       "members": [],
-      "class_hash": "0x74fac4fe0182e88af5bb65e4b13270f249fcc5e23a762483e2d0fe8a3855b16",
+      "class_hash": "0x32cce036a1075df6d34ca9cb0d050bb12a989596df70b21536f7e52ffe0db96",
       "tag": "pistols-Challenge",
       "selector": "0x673267b69d74c703ea86d97b041278944b49f62b52867345a95d3047b11378a"
     },
@@ -12836,7 +13688,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x67ae524edd972fdc023ffdd753d83711e89210ef07c71b37082b01f3d2aa69a",
+      "class_hash": "0x6202af98d1a8b8b26aef1fd10827757a0b3a13fd0539474e120e2e34dbfd558",
       "tag": "pistols-DuelistAssignment",
       "selector": "0x3f4e86c5f78bd99b4030bb44259374c178e3c03f664ce866d15e4ddcd7d4e52"
     },
@@ -12854,6 +13706,18 @@
     },
     {
       "members": [],
+      "class_hash": "0x7e12c0e2489cded16a6e1b2aa36267e772b9c96101d0c4455f38422a5a76314",
+      "tag": "pistols-MatchPlayer",
+      "selector": "0x36cbfae32f102062669ab4daf04b39bf84c9ae8e26e7f0813a9728fe3c11558"
+    },
+    {
+      "members": [],
+      "class_hash": "0x774299d993f95cf01267a5488671415cd4d6900fdc27aa2f24e84ba1b2888bd",
+      "tag": "pistols-MatchQueue",
+      "selector": "0x624ecb978d73d21798831974104ecd70c0013d09e9a440db4a7a8bd066cd7fc"
+    },
+    {
+      "members": [],
       "class_hash": "0x625e5904addd4c29fa90f3eed093d5794199df904ca6abcdab9a673a9f90c38",
       "tag": "pistols-MockedValue",
       "selector": "0x8deb0b9e5cc0c6c2089ee6a4bfdd306444147a869b6179c4e22b283a5176dc"
@@ -12866,7 +13730,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x6aa6d89c2a43b93d164bc5c4b41afb9b89f53fe3e812d0bd325a9e771ee401b",
+      "class_hash": "0x6b120d5e58b33874535dc1140b11cd8c3927d8790ca9f29ebec638061d80a5e",
       "tag": "pistols-Pact",
       "selector": "0x72a33a6586ae24471fdae1c6f3cc9da6629f3fd3dce300a48324617dd511617"
     },
