@@ -4,15 +4,15 @@ use starknet::{ContractAddress};
 #[starknet::interface]
 pub trait IAdmin<TState> {
     fn am_i_admin(self: @TState, account_address: ContractAddress) -> bool;
-    fn set_paused(ref self: TState, paused: bool);
-    fn set_treasury(ref self: TState, treasury_address: ContractAddress);
-    fn set_is_team_member(ref self: TState, account_address: ContractAddress, is_team_member: bool, is_admin: bool);
-    fn set_is_blocked(ref self: TState, account_address: ContractAddress, is_blocked: bool);
-    fn disqualify_duelist(ref self: TState, season_id: u32, duelist_id: u128, block_owner: bool) -> bool;
-    fn qualify_duelist(ref self: TState, season_id: u32, duelist_id: u128) -> u8;
+    fn set_paused(ref self: TState, paused: bool); //@description: Admin function
+    fn set_treasury(ref self: TState, treasury_address: ContractAddress); //@description: Admin function
+    fn set_is_team_member(ref self: TState, account_address: ContractAddress, is_team_member: bool, is_admin: bool); //@description: Admin function
+    fn set_is_blocked(ref self: TState, account_address: ContractAddress, is_blocked: bool); //@description: Admin function
+    fn disqualify_duelist(ref self: TState, season_id: u32, duelist_id: u128, block_owner: bool) -> bool; //@description: Admin function
+    fn qualify_duelist(ref self: TState, season_id: u32, duelist_id: u128) -> u8; //@description: Admin function
     // maintenance functions
-    fn urgent_update(ref self: TState);
-    fn fix_player_bookmark(ref self: TState, player_address: ContractAddress, target_address: ContractAddress, target_id: u128, enabled: bool);
+    fn urgent_update(ref self: TState); //@description: Admin function
+    fn fix_player_bookmark(ref self: TState, player_address: ContractAddress, target_address: ContractAddress, target_id: u128, enabled: bool); //@description: Admin function
 }
 
 #[dojo::contract]

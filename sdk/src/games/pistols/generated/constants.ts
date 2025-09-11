@@ -5,6 +5,17 @@
 // interfaces
 //
 export const INTERFACE_DESCRIPTIONS: any = {
+  // from: ../dojo/src/systems/admin.cairo
+  IAdmin: {
+    set_paused: 'Admin function',
+    set_treasury: 'Admin function',
+    set_is_team_member: 'Admin function',
+    set_is_blocked: 'Admin function',
+    disqualify_duelist: 'Admin function',
+    qualify_duelist: 'Admin function',
+    urgent_update: 'Admin function',
+    fix_player_bookmark: 'Admin function',
+  },
   // from: ../dojo/src/systems/bank.cairo
   IBankPublic: {
     sponsor_duelists: 'Sponsor duelist starter packs with $LORDS',
