@@ -35,7 +35,7 @@ export const makeControllerConnector = (
     defaultChainId: bigintToHex(stringToFelt(chainId)),
     chains: [{ rpcUrl }],
     // IFrameOptions
-    preset: preset_name,
+    // preset: preset_name,
     // KeychainOptions
     namespace,
     policies,

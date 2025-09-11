@@ -43,7 +43,7 @@ export const contractPolicyDescriptions_pistols: ContractPolicyDescriptions = {
   admin: {
     name: 'Admin',
     description: 'Admin contract',
-    // interfaces: ['IAdmin'],
+    interfaces: ['IAdmin'],
   },
   //
   // ERC-721
