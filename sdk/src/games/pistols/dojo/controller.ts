@@ -34,9 +34,8 @@ export const makePistolsControllerConnector = (networkId: NetworkId, env?: any):
   // do not generate policies for Mainnet, as it uses the preset
   const networkConfig = getNetworkConfig(networkId, env)
   const policies = (
-    // networkId === NetworkId.MAINNET ? undefined
-    //   : makePistolsPolicies(networkId, !Boolean(networkConfig.lordsAddress), false)
-      makePistolsPolicies(networkId, !Boolean(networkConfig.lordsAddress), false)
+    networkId === NetworkId.MAINNET ? undefined
+      : makePistolsPolicies(networkId, !Boolean(networkConfig.lordsAddress), false)
   )
 
   //
