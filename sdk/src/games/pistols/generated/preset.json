@@ -31,6 +31,10 @@
                 "description": "Close expired duels"
               },
               {
+                "entrypoint": "delegate_game_actions",
+                "description": "Delegate game actions to another account"
+              },
+              {
                 "entrypoint": "clear_call_to_challenge",
                 "description": "Clear call to action for a player"
               },
@@ -49,6 +53,19 @@
               {
                 "entrypoint": "emit_player_setting",
                 "description": "Store player settings"
+              }
+            ]
+          },
+          "0x016f7e3c140b4778e776221c7bb8b880d20d247c3ab0d06fab9a8eb96e7098bb": {
+            "description": "Match Maker contract",
+            "methods": [
+              {
+                "entrypoint": "enlist_duelist",
+                "description": "Enlist a Duelist in a ranked queue"
+              },
+              {
+                "entrypoint": "match_make_me",
+                "description": "Match a player against another player"
               }
             ]
           },
@@ -273,6 +290,10 @@
                 {
                   "name": "timestamp",
                   "type": "felt"
+                },
+                {
+                  "name": "available",
+                  "type": "bool"
                 }
               ]
             },
