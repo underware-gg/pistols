@@ -190,14 +190,11 @@ pub impl DuelTypeImpl of DuelTypeTrait {
         (match self {
             // Ranked
             DuelType::Tournament |
-            DuelType::Seasonal => store.get_current_season_rules(),
-            // DuelType::Ranked => store.get_current_season_rules(),
+            DuelType::Ranked => store.get_current_season_rules(),
             // Unranked
-            // DuelType::Seasonal |
-            // DuelType::Unranked => Rules::Unranked,
+            DuelType::Seasonal |
+            DuelType::Unranked => Rules::Unranked,
             // Practice
-            DuelType::Ranked |
-            DuelType::Unranked |
             DuelType::Tutorial |
             DuelType::Practice |
             DuelType::BotPlayer |
