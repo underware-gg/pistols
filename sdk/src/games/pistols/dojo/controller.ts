@@ -37,6 +37,7 @@ export const makePistolsControllerConnector = (networkId: NetworkId, env?: any):
     networkId === NetworkId.MAINNET ? undefined
       : makePistolsPolicies(networkId, !Boolean(networkConfig.lordsAddress), false)
   )
+  // const policies = makePistolsPolicies(networkId, !Boolean(networkConfig.lordsAddress), false)
 
   //
   // export controller connector

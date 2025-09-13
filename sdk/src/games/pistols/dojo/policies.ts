@@ -5,6 +5,7 @@ import { makeStarknetDomain } from 'src/games/pistols/config/typed_data'
 import { NetworkId } from 'src/games/pistols/config/networks'
 import {
   NAMESPACE,
+  getLordsAddress,
   getManifest,
   getVrfAddress,
 } from 'src/games/pistols/config/config'
@@ -118,6 +119,19 @@ const contractPolicyDescriptions_vrf = (networkId: NetworkId): ContractPolicyDes
     ]
   },
 })
+const contractPolicyDescriptions_lords = (networkId: NetworkId): ContractPolicyDescriptions => ({
+  lords: {
+    name: 'LORDS',
+    description: 'Lords ERC20 contract',
+    contract_address: getLordsAddress(networkId),
+    methods: [
+      {
+        entrypoint: 'approve',
+        description: 'Approve amount to spend',
+      },
+    ]
+  },
+})
 
 export const makePistolsPolicies = (networkId: NetworkId, mock: boolean, admin: boolean): SessionPolicies => {
   const signedMessagePolicyDescriptions: SignedMessagePolicyDescriptions = [
@@ -152,6 +166,7 @@ export const makePistolsPolicies = (networkId: NetworkId, mock: boolean, admin: 
       ...(mock ? contractPolicyDescriptions_mock : {}),
       ...(admin ? contractPolicyDescriptions_admin : {}),
       ...contractPolicyDescriptions_vrf(networkId),
+      // ...contractPolicyDescriptions_lords(networkId),
     },
     signedMessagePolicyDescriptions,
   );
