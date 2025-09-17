@@ -226,6 +226,14 @@ export function createSystemCalls(
         ];
         return await _executeTransaction(signer, calls, key);
       },
+      clear_queue: async (signer: AccountInterface, queue_id: constants.QueueId, key?: string): Promise<boolean> => {
+        const calls: DojoCalls = [
+          contractCalls.matchmaker.buildClearQueueCalldata(
+            makeCustomEnum(queue_id),
+          ),
+        ];
+        return await _executeTransaction(signer, calls, key);
+      },
     },
     //
     // tutorial.cairo

@@ -108,7 +108,7 @@ function OnlineStatus() {
 
 
 function MatchQueue({ queueId }: { queueId: constants.QueueId }) {
-  const { address } = useAccount();
+  const { account, address } = useAccount();
   const { balance: foolsBalance } = useFoolsBalance(address)
   const { slotSize, requiresEnlistment, entryTokenAddress, entryTokenAmount, players } = useMatchQueue(queueId);
   const {
@@ -126,6 +126,7 @@ function MatchQueue({ queueId }: { queueId: constants.QueueId }) {
     // all duelist ids
     duelistIds,
   } = useDuelistsInMatchMaking(queueId);
+  const { matchmaker } = useDojoSystemCalls();
   return (
     <>
       <Table celled striped size='small' color='orange'>
@@ -146,6 +147,11 @@ function MatchQueue({ queueId }: { queueId: constants.QueueId }) {
                   <MatchPlayer key={address} queueId={queueId} playerAddress={address} />
                 ))}
               </ul>
+              <Button onClick={() => {
+                matchmaker.clear_queue(account, queueId)
+              }}>
+                Clear Queue
+              </Button>
             </Cell>
           </Row>
         </Body>

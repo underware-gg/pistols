@@ -105,10 +105,14 @@ export const useDuelistsInMatchMaking = (queueId: constants.QueueId) => {
     const duellingIds: bigint[] = [];
     const duelsByDuelistId: Record<string, bigint> = {};
 
-    duelistIds.forEach(duelistId => {
+    duelistIds.forEach((duelistId, index) => {
       // get duelist
       const duelistEntityId = keysToEntityId([duelistId]);
       const duelist = getEntityModel<models.Duelist>(duelistEntities[duelistEntityId], 'Duelist');
+      if (!duelist) {
+        console.warn(`useDuelistsInMatchMaking() => duelist not found:`, duelistId)
+        return;
+      }
       
       // get duelist assignment
       const assignment = getEntityModel<models.DuelistAssignment>(duelistEntities[duelistEntityId], 'DuelistAssignment');

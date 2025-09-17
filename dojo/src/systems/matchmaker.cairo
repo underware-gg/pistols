@@ -11,6 +11,7 @@ pub trait IMatchMaker<TState> {
     // IMatchMakerProtected
     fn set_queue_size(ref self: TState, queue_id: QueueId, size: u8);
     fn set_queue_entry_token(ref self: TState, queue_id: QueueId, entry_token_address: ContractAddress, entry_token_amount: u128);
+    fn clear_queue(ref self: TState, queue_id: QueueId);
 }
 
 // Exposed to clients
@@ -27,6 +28,7 @@ pub trait IMatchMakerPublic<TState> {
 pub trait IMatchMakerProtected<TState> {
     fn set_queue_size(ref self: TState, queue_id: QueueId, size: u8);
     fn set_queue_entry_token(ref self: TState, queue_id: QueueId, entry_token_address: ContractAddress, entry_token_amount: u128);
+    fn clear_queue(ref self: TState, queue_id: QueueId);
 }
 
 #[dojo::contract]
@@ -543,6 +545,29 @@ pub mod matchmaker {
             let mut queue: MatchQueue = store.get_match_queue(queue_id);
             queue.entry_token_address = entry_token_address;
             queue.entry_token_amount = entry_token_amount;
+            store.set_match_queue(@queue);
+        }
+
+        fn clear_queue(ref self: ContractState, queue_id: QueueId) {
+            self._assert_caller_is_admin();
+            assert(queue_id != QueueId::Undefined, Errors::INVALID_QUEUE);
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let mut queue: MatchQueue = store.get_match_queue(queue_id);
+            for player in queue.players {
+                let mut match_player: MatchPlayer = store.get_match_player(player, queue_id);
+                for next_duelist in match_player.next_duelists.clone() {
+                    DuelistAssignmentTrait::unassign_challenge(ref store, next_duelist.duelist_id);
+                };
+                if (match_player.duel_id.is_zero()) {
+                    // no duel, just unassign duelist
+                    DuelistAssignmentTrait::unassign_challenge(ref store, match_player.duelist_id);
+                } else {
+                    // has a duel, do something with it
+                    self._start_match_with_imp(ref store, ref match_player, queue.queue_id);
+                }
+                store.delete_match_player(@match_player);
+            };
+            queue.players = array![];
             store.set_match_queue(@queue);
         }
     }
