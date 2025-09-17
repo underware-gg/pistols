@@ -2905,6 +2905,27 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
+	const build_matchmaker_clearQueue_calldata = (queueId: CairoCustomEnum): DojoCall => {
+		return {
+			contractName: "matchmaker",
+			entrypoint: "clear_queue",
+			calldata: [queueId],
+		};
+	};
+
+	const matchmaker_clearQueue = async (snAccount: Account | AccountInterface, queueId: CairoCustomEnum) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_matchmaker_clearQueue_calldata(queueId),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 	const build_matchmaker_enlistDuelist_calldata = (duelistId: BigNumberish, queueId: CairoCustomEnum): DojoCall => {
 		return {
 			contractName: "matchmaker",
@@ -4787,6 +4808,8 @@ export function setupWorld(provider: DojoProvider) {
 			buildTransferFromCalldata: build_lords_mock_transferFrom_calldata,
 		},
 		matchmaker: {
+			clearQueue: matchmaker_clearQueue,
+			buildClearQueueCalldata: build_matchmaker_clearQueue_calldata,
 			enlistDuelist: matchmaker_enlistDuelist,
 			buildEnlistDuelistCalldata: build_matchmaker_enlistDuelist_calldata,
 			getEntryFee: matchmaker_getEntryFee,
