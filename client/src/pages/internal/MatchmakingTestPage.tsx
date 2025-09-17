@@ -13,8 +13,8 @@ import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { FoolsBalance } from '/src/components/account/LordsBalance'
 import { Balance } from '/src/components/account/Balance'
 import { Address } from '/src/components/ui/Address'
-import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
 import { Connect } from '/src/pages/tests/ConnectTestPage'
+import { InternalPageMenu } from '/src/pages/internal/InternalPageIndex'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import ChallengeModal from '/src/components/modals/ChallengeModal'
 import StoreSync from '/src/stores/sync/StoreSync'
@@ -33,7 +33,7 @@ export default function MatchmakingTestPage() {
   return (
     <AppDojo subtitle='Test: Matchmaking' autoConnect>
       <Container>
-        <TestPageMenu />
+        <InternalPageMenu />
         <CurrentChainHint />
 
         <Connect>
@@ -147,6 +147,11 @@ function MatchQueue({ queueId }: { queueId: constants.QueueId }) {
                   <MatchPlayer key={address} queueId={queueId} playerAddress={address} />
                 ))}
               </ul>
+            </Cell>
+          </Row>
+          <Row>
+            <Cell className='ModalText'></Cell>
+            <Cell className='Code'>
               <Button onClick={() => {
                 matchmaker.clear_queue(account, queueId)
               }}>

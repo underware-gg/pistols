@@ -15,6 +15,7 @@ const internalPages = [
   { name: 'airdrop', connected: true },
   { name: 'pools', connected: true },
   { name: 'seasons', connected: true },
+  { name: 'matchmaking', connected: true },
   { name: 'players', connected: true },
   { name: 'snapshot', connected: true },
 ]

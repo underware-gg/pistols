@@ -16,6 +16,7 @@ import SeasonsPage from '/src/pages/internal/SeasonsPage'
 import PlayersPage from '/src/pages/internal/PlayersPage'
 import SnapshotPage from '/src/pages/internal/SnapshotPage'
 import ContractsPage from '/src/pages/internal/ContractsPage'
+import MatchmakingTestPage from './pages/internal/MatchmakingTestPage'
 import DuelDataPage from '/src/pages/DuelDataPage'
 import StatusPage from '/src/pages/StatusPage'
 import ErrorPage from '/src/pages/error/ErrorPage'
@@ -29,7 +30,6 @@ import ProfilesTestPage from '/src/pages/tests/ProfilesTestPage'
 import TutorialTestPage from '/src/pages/tests/TutorialTestPage'
 import ChainSwitchPage from '/src/pages/tests/ChainSwitchPage'
 import SocialsTestPage from '/src/pages/tests/SocialsTestPage'
-import MatchmakingTestPage from '/src/pages/tests/MatchmakingTestPage'
 
 //
 // REF:
@@ -80,7 +80,6 @@ const router = createBrowserRouter([
       { path: "sign", element: <SignTestPage /> },
       { path: "chainswitch", element: <ChainSwitchPage /> },
       { path: "socials", element: <SocialsTestPage /> },
-      { path: "matchmaking", element: <MatchmakingTestPage /> },
     ],
   },
   // internal pages
@@ -95,6 +94,7 @@ const router = createBrowserRouter([
       { path: "players", element: <PlayersPage /> },
       { path: "snapshot", element: <SnapshotPage /> },
       { path: "contracts", element: <ContractsPage /> },
+      { path: "matchmaking", element: <MatchmakingTestPage /> },
     ],
   },
 ]);
