@@ -20,6 +20,7 @@ pub enum QueueId {
     Undefined,  // 0
     Unranked,   // 1
     Ranked,     // 2
+    RankedFast, // 3
 }
 
 //
@@ -61,7 +62,7 @@ pub struct QueueNextDuelist {
 
 #[derive(Serde, Copy, Drop, IntrospectPacked, Default)]
 pub struct QueueInfo {
-    pub queue_mode: QueueMode,
+    pub queue_mode: QueueMode,  // not used! queue_id.into() has it now
     pub slot: u8,
     pub timestamp_enter: u64,
     pub timestamp_ping: u64,
@@ -100,6 +101,7 @@ pub impl QueueIdImpl of QueueIdTrait {
         match self {
             QueueId::Undefined => 0,
             QueueId::Ranked => 1,
+            QueueId::RankedFast => 1,
             QueueId::Unranked => 1,
         }
     }
@@ -107,6 +109,7 @@ pub impl QueueIdImpl of QueueIdTrait {
         match self {
             QueueId::Undefined => Premise::Undefined,
             QueueId::Ranked => Premise::Honour,
+            QueueId::RankedFast => Premise::Honour,
             QueueId::Unranked => Premise::Honour,
         }
     }
@@ -167,7 +170,6 @@ pub impl MatchQueueImpl of MatchQueueTrait {
 #[generate_trait]
 pub impl MatchPlayerImpl of MatchPlayerTrait {
     fn enter_queue(ref self: MatchPlayer,
-        queue_mode: QueueMode,
         duelist_id: u128,
         duel_id: u128,
         slot: u8,
@@ -176,7 +178,7 @@ pub impl MatchPlayerImpl of MatchPlayerTrait {
             player_address: self.player_address,
             queue_id: self.queue_id,
             queue_info: QueueInfo {
-                queue_mode,
+                queue_mode: self.queue_id.into(),
                 slot,
                 timestamp_enter: starknet::get_block_timestamp(),
                 timestamp_ping: 0,
@@ -204,7 +206,6 @@ pub impl MatchPlayerImpl of MatchPlayerTrait {
         (match self.next_duelists.pop_front() {
             Option::Some(next_duelist) => {
                 self.enter_queue(
-                    QueueMode::Slow,
                     next_duelist.duelist_id,
                     0,
                     next_duelist.slot,
@@ -245,11 +246,22 @@ pub impl QueueInfoImpl of QueueInfoTrait {
 //---------------------------
 // Converters
 //
+impl QueueIdIntoQueueMode of core::traits::Into<QueueId, QueueMode> {
+    fn into(self: QueueId) -> QueueMode {
+        match self {
+            QueueId::Undefined      =>  QueueMode::Undefined,
+            QueueId::Ranked         =>  QueueMode::Slow,
+            QueueId::RankedFast     =>  QueueMode::Fast,
+            QueueId::Unranked       =>  QueueMode::Slow,
+        }
+    }
+}
 impl QueueIdIntoDuelType of core::traits::Into<QueueId, DuelType> {
     fn into(self: QueueId) -> DuelType {
         match self {
             QueueId::Undefined      =>  DuelType::Undefined,
             QueueId::Ranked         =>  DuelType::Ranked,
+            QueueId::RankedFast     =>  DuelType::RankedFast,
             QueueId::Unranked       =>  DuelType::Unranked,
         }
     }
@@ -258,6 +270,7 @@ impl DuelTypeIntoQueueId of core::traits::Into<DuelType, QueueId> {
     fn into(self: DuelType) -> QueueId {
         match self {
             DuelType::Ranked         =>  QueueId::Ranked,
+            DuelType::RankedFast     =>  QueueId::RankedFast,
             DuelType::Unranked       =>  QueueId::Unranked,
             _ => QueueId::Unranked,
         }
@@ -273,6 +286,7 @@ impl QueueIdIntoByteArray of core::traits::Into<QueueId, ByteArray> {
         match self {
             QueueId::Undefined      =>  "Undefined",
             QueueId::Ranked         =>  "Ranked",
+            QueueId::RankedFast     =>  "RankedFast",
             QueueId::Unranked       =>  "Unranked",
         }
     }

@@ -344,21 +344,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER);
         tester::execute_match_make_me(@sys, OWNER(), ID(OWNER()), QueueId::Undefined, QueueMode::Slow);
     }
-    
-    #[test]
-    #[should_panic(expected: ('MATCHMAKER: Invalid queue', 'ENTRYPOINT_FAILED'))]
-    fn test_match_make_me_unranked_fast() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER);
-        tester::execute_match_make_me(@sys, OWNER(), ID(OWNER()), QueueId::Unranked, QueueMode::Fast);
-    }
-    
-    #[test]
-    #[should_panic(expected: ('MATCHMAKER: Invalid mode', 'ENTRYPOINT_FAILED'))]
-    fn test_match_make_me_invalid_mode() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER);
-        tester::execute_match_make_me(@sys, OWNER(), ID(OWNER()), QueueId::Unranked, QueueMode::Undefined);
-    }
-    
+        
     #[test]
     #[should_panic(expected: ('MATCHMAKER: Not enlisted', 'ENTRYPOINT_FAILED'))]
     fn test_enlistment_not_enlisted() {
@@ -379,8 +365,8 @@ mod tests {
         let ID_A: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_A");
         let queue_id = QueueId::Ranked;
         _setup_ranked_lords(@sys, [A].span(), 2);
-        tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
-        tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, A, ID_A, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, A, ID_A, queue_id);
     }
 
     #[test]
@@ -391,7 +377,7 @@ mod tests {
         tester::fund_duelists_pool(@sys, 2);
         let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
         let queue_id = QueueId::Unranked;
-        tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, A, ID_A, queue_id);
     }
     
     #[test]
@@ -705,10 +691,10 @@ mod tests {
         let balance_lords_b: u128 = sys.lords.balance_of(B).low;
         assert_eq!(sys.lords.balance_of(sys.matchmaker.contract_address).low, 0, "balance_lords_MM_1");
         // enter and pay fees
-        tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, A, ID_A, queue_id);
         assert_eq!(sys.lords.balance_of(A).low, balance_lords_a - LORDS_PRICE, "balance_lords_a");
         assert_eq!(sys.lords.balance_of(sys.matchmaker.contract_address).low, LORDS_PRICE, "balance_lords_MM_2");
-        tester::execute_enlist_duelist(@sys, B, ID_B, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, B, ID_B, queue_id);
         assert_eq!(sys.lords.balance_of(B).low, balance_lords_b - LORDS_PRICE, "balance_lords_b");
         assert_eq!(sys.lords.balance_of(sys.matchmaker.contract_address).low, LORDS_PRICE * 2, "balance_lords_MM_3");
         //
@@ -746,10 +732,10 @@ mod tests {
         let balance_lords_b: u128 = sys.lords.balance_of(B).low;
         assert_eq!(sys.lords.balance_of(sys.matchmaker.contract_address).low, 0, "balance_lords_MM_1");
         // enter and pay fees
-        tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, A, ID_A, queue_id);
         assert_eq!(sys.lords.balance_of(A).low, balance_lords_a - LORDS_PRICE, "balance_lords_a");
         assert_eq!(sys.lords.balance_of(sys.matchmaker.contract_address).low, LORDS_PRICE, "balance_lords_MM_2");
-        tester::execute_enlist_duelist(@sys, B, ID_B, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, B, ID_B, queue_id);
         assert_eq!(sys.lords.balance_of(B).low, balance_lords_b - LORDS_PRICE, "balance_lords_b");
         assert_eq!(sys.lords.balance_of(sys.matchmaker.contract_address).low, LORDS_PRICE * 2, "balance_lords_MM_3");
         //
@@ -782,7 +768,7 @@ mod tests {
         let queue_id = QueueId::Ranked;
         _setup_ranked_lords(@sys, [A].span(), 1);
         // enter the starter duelist an panic
-        tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, A, ID_A, queue_id);
     }
 
     #[test]
@@ -794,7 +780,7 @@ mod tests {
         let ID_A: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop");
         let queue_id = QueueId::Ranked;
         // try to pay... (no FOOLS)
-        tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, A, ID_A, queue_id);
     }
     
     #[test]
@@ -807,7 +793,7 @@ mod tests {
         let queue_id = QueueId::Ranked;
         _setup_ranked_lords(@sys, [A].span(), 0);
         // try to pay...
-        tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, A, ID_A, queue_id);
     }
     
     #[test]
@@ -821,7 +807,7 @@ mod tests {
         _setup_ranked_lords(@sys, [A].span(), 0);
         tester::execute_lords_approve(@sys.lords, A, sys.matchmaker.contract_address, LORDS_PRICE - 1);
         // try to pay...
-        tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, A, ID_A, queue_id);
     }
 
 
@@ -840,8 +826,8 @@ mod tests {
         let queue_id = QueueId::Ranked;
         // setup lords
         _setup_ranked_lords(@sys, [A, B].span(), 1);
-        tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
-        tester::execute_enlist_duelist(@sys, B, ID_B, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, A, ID_A, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, B, ID_B, queue_id);
         //
         // matchmake player A
         _mock_slot(@sys, 5);
@@ -881,8 +867,8 @@ mod tests {
         let queue_id = QueueId::Ranked;
         // setup lords
         _setup_ranked_lords(@sys, [A, B].span(), 1);
-        tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
-        tester::execute_enlist_duelist(@sys, B, ID_B, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, A, ID_A, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, B, ID_B, queue_id);
         //
         // matchmake player A
         _mock_slot(@sys, 5);
@@ -922,8 +908,8 @@ mod tests {
         let queue_id = QueueId::Ranked;
         // setup lords
         _setup_ranked_lords(@sys, [A, B].span(), 1);
-        tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
-        tester::execute_enlist_duelist(@sys, B, ID_B, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, A, ID_A, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, B, ID_B, queue_id);
         //
         // matchmake player A
         _mock_slot(@sys, 5);
@@ -962,8 +948,8 @@ mod tests {
         let queue_id = QueueId::Ranked;
         // setup lords
         _setup_ranked_lords(@sys, [A, B].span(), 1);
-        tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
-        tester::execute_enlist_duelist(@sys, B, ID_B, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, A, ID_A, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, B, ID_B, queue_id);
         //
         // matchmake player A
         _mock_slot(@sys, 5);
@@ -1004,7 +990,7 @@ mod tests {
         let queue_id = QueueId::Ranked;
         // setup lords
         _setup_ranked_lords(@sys, [A].span(), 1);
-        tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, A, ID_A, queue_id);
         //
         // matchmake player A: SLOW
         _mock_slot(@sys, 5);
@@ -1040,8 +1026,8 @@ mod tests {
         let queue_id = QueueId::Ranked;
         // setup lords
         _setup_ranked_lords(@sys, [A, B].span(), 1);
-        tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
-        tester::execute_enlist_duelist(@sys, B, ID_B, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, A, ID_A, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, B, ID_B, queue_id);
         //
         // matchmake player A: SLOW
         _mock_slot(@sys, 5);
@@ -1074,8 +1060,8 @@ mod tests {
         let queue_id = QueueId::Ranked;
         // setup lords
         _setup_ranked_lords(@sys, [A, B].span(), 1);
-        tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
-        tester::execute_enlist_duelist(@sys, B, ID_B, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, A, ID_A, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, B, ID_B, queue_id);
         //
         // matchmake player A: SLOW
         _mock_slot(@sys, 5);
@@ -1117,8 +1103,8 @@ mod tests {
         _setup_ranked_lords(@sys, [A, B, C].span(), 1);
         // enter and pay fees
         let queue_id = QueueId::Ranked;
-        tester::execute_enlist_duelist(@sys, A, ID_A_1, queue_id);
-        tester::execute_enlist_duelist(@sys, B, ID_B, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, A, ID_A_1, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, B, ID_B, queue_id);
         //
         // enter Ranked
         _mock_slot(@sys, 5);
@@ -1163,8 +1149,8 @@ mod tests {
         _setup_ranked_lords(@sys, [A, B, C].span(), 1);
         // enter and pay fees
         let queue_id = QueueId::Ranked;
-        tester::execute_enlist_duelist(@sys, A, ID_A_1, queue_id);
-        tester::execute_enlist_duelist(@sys, B, ID_B, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, A, ID_A_1, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, B, ID_B, queue_id);
         //
         // enter Ranked
         _mock_slot(@sys, 5);
@@ -1375,8 +1361,8 @@ mod tests {
         //
         // enlist duelist 2, select duelist 1
         _setup_ranked_lords(@sys, [A, B].span(), 1);
-        let enlisted_duelist_a: u128 = tester::execute_enlist_duelist(@sys, A, ID_A_2, queue_id);
-        let enlisted_duelist_b: u128 = tester::execute_enlist_duelist(@sys, B, ID_B_2, queue_id);
+        let enlisted_duelist_a: u128 = tester::execute_enlist_ranked_duelist(@sys, A, ID_A_2, queue_id);
+        let enlisted_duelist_b: u128 = tester::execute_enlist_ranked_duelist(@sys, B, ID_B_2, queue_id);
         assert_eq!(enlisted_duelist_a, ID_A_1, "enlisted_duelist_a");
         assert_eq!(enlisted_duelist_b, ID_B_1, "enlisted_duelist_b");
         //
@@ -1575,8 +1561,8 @@ mod tests {
         assert_eq!(duel_id, 1, "create_duel");
         // enter matchmaking with different duelists...
         _setup_ranked_lords(@sys, [A, B].span(), 1);
-        tester::execute_enlist_duelist(@sys, A, OWNED_BY_OWNER(), queue_id);
-        tester::execute_enlist_duelist(@sys, B, OWNED_BY_OTHER(), queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, A, OWNED_BY_OWNER(), queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, B, OWNED_BY_OTHER(), queue_id);
         _mock_slot(@sys, 5);
         let duel_id: u128 = tester::execute_match_make_me(@sys, A, OWNED_BY_OWNER(), queue_id, QueueMode::Slow);
         assert_eq!(duel_id, 0, "match_A");
@@ -1593,8 +1579,8 @@ mod tests {
         let B: ContractAddress = OTHER();
         let queue_id = QueueId::Ranked;
         _setup_ranked_lords(@sys, [A, B].span(), 1);
-        tester::execute_enlist_duelist(@sys, A, OWNED_BY_OWNER(), queue_id);
-        tester::execute_enlist_duelist(@sys, B, OWNED_BY_OTHER(), queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, A, OWNED_BY_OWNER(), queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, B, OWNED_BY_OTHER(), queue_id);
         // enter matchmaking...
         _mock_slot(@sys, 5);
         let duel_id: u128 = tester::execute_match_make_me(@sys, A, OWNED_BY_OWNER(), queue_id, QueueMode::Slow);
@@ -1622,7 +1608,7 @@ mod tests {
         assert_eq!(duel_id, 1, "create_duel");
         tester::assert_pact(@sys, duel_id, true, false, "create_duel");
         // enter matchmaking...
-        tester::execute_enlist_duelist(@sys, A, ID(A), queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, A, ID(A), queue_id);
     }
 
     #[test]
@@ -1638,7 +1624,7 @@ mod tests {
         tester::execute_reply_duel(@sys, B, ID(B), duel_id, true);
         tester::assert_pact(@sys, duel_id, true, true, "create_duel");
         // enter matchmaking...
-        tester::execute_enlist_duelist(@sys, B, ID(B), queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, B, ID(B), queue_id);
     }
 
     #[test]
@@ -1649,7 +1635,7 @@ mod tests {
         let B: ContractAddress = OTHER();
         let queue_id = QueueId::Ranked;
         _setup_ranked_lords(@sys, [A, B].span(), 1);
-        tester::execute_enlist_duelist(@sys, A, ID(A), queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, A, ID(A), queue_id);
         // enter a normal duel...
         let duel_id: u128 = tester::execute_create_duel(@sys, A, B, "", DuelType::Seasonal, 48, 1);
         assert_eq!(duel_id, 1, "create_duel");
@@ -1663,7 +1649,7 @@ mod tests {
         let B: ContractAddress = OTHER();
         let queue_id = QueueId::Ranked;
         _setup_ranked_lords(@sys, [A, B].span(), 1);
-        tester::execute_enlist_duelist(@sys, B, ID(B), queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, B, ID(B), queue_id);
         // enter a normal duel...
         let duel_id: u128 = tester::execute_create_duel(@sys, A, B, "", DuelType::Seasonal, 48, 1);
         assert_eq!(duel_id, 1, "create_duel");
@@ -1754,10 +1740,10 @@ mod tests {
         let queue_id = QueueId::Ranked;
         // setup lords
         _setup_ranked_lords(@sys, [A, B, C].span(), 2);
-        tester::execute_enlist_duelist(@sys, A, ID_A_1, queue_id);
-        tester::execute_enlist_duelist(@sys, A, ID_A_2, queue_id);
-        tester::execute_enlist_duelist(@sys, B, ID_B, queue_id);
-        tester::execute_enlist_duelist(@sys, C, ID_C, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, A, ID_A_1, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, A, ID_A_2, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, B, ID_B, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, C, ID_C, queue_id);
         // enter matchmaking...
         _mock_slot(@sys, 4);
         let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A_1, queue_id, QueueMode::Slow);
@@ -1806,10 +1792,10 @@ mod tests {
         let queue_id = QueueId::Ranked;
         // setup lords
         _setup_ranked_lords(@sys, [A, B, C].span(), 2);
-        tester::execute_enlist_duelist(@sys, A, ID_A_1, queue_id);
-        tester::execute_enlist_duelist(@sys, A, ID_A_2, queue_id);
-        tester::execute_enlist_duelist(@sys, B, ID_B, queue_id);
-        tester::execute_enlist_duelist(@sys, C, ID_C, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, A, ID_A_1, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, A, ID_A_2, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, B, ID_B, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, C, ID_C, queue_id);
         // enter matchmaking...
         _mock_slot(@sys, 4);
         let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A_1, queue_id, QueueMode::Slow);
@@ -1868,10 +1854,10 @@ mod tests {
 //         let queue_id = QueueId::Ranked;
 //         // setup lords
 //         _setup_ranked_lords(@sys, [A, B, C].span(), 2);
-//         tester::execute_enlist_duelist(@sys, A, ID_A_1, queue_id);
-//         tester::execute_enlist_duelist(@sys, A, ID_A_2, queue_id);
-//         tester::execute_enlist_duelist(@sys, B, ID_B, queue_id);
-//         tester::execute_enlist_duelist(@sys, C, ID_C, queue_id);
+//         tester::execute_enlist_ranked_duelist(@sys, A, ID_A_1, queue_id);
+//         tester::execute_enlist_ranked_duelist(@sys, A, ID_A_2, queue_id);
+//         tester::execute_enlist_ranked_duelist(@sys, B, ID_B, queue_id);
+//         tester::execute_enlist_ranked_duelist(@sys, C, ID_C, queue_id);
 //         // enter matchmaking...
 //         _mock_slot(@sys, 4);
 //         let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A_1, queue_id, QueueMode::Slow);
@@ -1926,8 +1912,8 @@ mod tests {
         let queue_id = QueueId::Ranked;
         // setup lords
         _setup_ranked_lords(@sys, [A].span(), 2);
-        tester::execute_enlist_duelist(@sys, A, ID_A_1, queue_id);
-        tester::execute_enlist_duelist(@sys, A, ID_A_2, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, A, ID_A_1, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, A, ID_A_2, queue_id);
         // enter matchmaking...
         _mock_slot(@sys, 5);
         let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A_1, queue_id, QueueMode::Slow);
@@ -1943,8 +1929,8 @@ mod tests {
         let A: ContractAddress = OWNER();
         let queue_id = QueueId::Ranked;
         _setup_ranked_lords(@sys, [A].span(), 2);
-        tester::execute_enlist_duelist(@sys, A, ID(A), queue_id);
-        tester::execute_enlist_duelist(@sys, A, OWNED_BY_OWNER(), queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, A, ID(A), queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, A, OWNED_BY_OWNER(), queue_id);
         // enter matchmaking...
         tester::execute_match_make_me(@sys, A, ID(A), queue_id, QueueMode::Slow);
         // adding another duelist to Fast will panic
@@ -1958,8 +1944,8 @@ mod tests {
         let A: ContractAddress = OWNER();
         let queue_id = QueueId::Ranked;
         _setup_ranked_lords(@sys, [A].span(), 2);
-        tester::execute_enlist_duelist(@sys, A, ID(A), queue_id);
-        tester::execute_enlist_duelist(@sys, A, OWNED_BY_OWNER(), queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, A, ID(A), queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, A, OWNED_BY_OWNER(), queue_id);
         // enter matchmaking...
         tester::execute_match_make_me(@sys, A, ID(A), queue_id, QueueMode::Fast);
         // adding another duelist to Fast will panic
@@ -2045,8 +2031,8 @@ mod tests {
         let queue_id = QueueId::Ranked;
         // setup lords
         _setup_ranked_lords(@sys, [A, B].span(), 2);
-        tester::execute_enlist_duelist(@sys, A, ID_A_1, queue_id);
-        tester::execute_enlist_duelist(@sys, B, ID_B, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, A, ID_A_1, queue_id);
+        tester::execute_enlist_ranked_duelist(@sys, B, ID_B, queue_id);
         // enter matchmaking...
         _mock_slot(@sys, 4);
         let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A_1, queue_id, QueueMode::Fast);

@@ -47,6 +47,7 @@ export const useMatchPlayer = (playerAddress: BigNumberish, queueId: constants.Q
   const duelId = useMemo(() => BigInt(player?.duel_id ?? 0), [player])
   const nextDuelists = useMemo(() => Object.values(player?.next_duelists ?? {}).map(v => BigInt(v.duelist_id)), [player])
   const inQueueIds = useMemo(() => (duelistId ? [duelistId, ...nextDuelists] : []), [duelistId, nextDuelists])
+  console.log(`useMatNEXT >>>> =>`, player, Object.values(player?.next_duelists ?? {}), nextDuelists)
 
   const slot = useMemo(() => Number(player?.queue_info.slot ?? 0), [player])
   const timestampEnter = useMemo(() => Number(player?.queue_info.timestamp_enter ?? 0), [player])
@@ -83,6 +84,7 @@ export const useMatchPlayer = (playerAddress: BigNumberish, queueId: constants.Q
 
 export const useDuelistsInMatchMaking = (queueId: constants.QueueId) => {
   // get all duelists
+  // const address = '0x07e268203c670265e8af497a201d568947db4087438c7fdac2be3b956de73811'; // fortuna
   const { address } = useAccount();
   const { duelistIds: allDuelistIds } = useDuelistIdsOwnedByAccount(address);
   const duelistEntities = useDuelistStore((state) => state.entities);

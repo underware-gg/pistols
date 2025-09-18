@@ -198,7 +198,7 @@ export function createSystemCalls(
     // matchmaker.cairo
     //
     matchmaker: {
-      enlist_duelist: async (signer: AccountInterface, duelist_id: BigNumberish, queue_id: constants.QueueId, key?: string): Promise<boolean> => {
+      enlist_ranked_duelist: async (signer: AccountInterface, duelist_id: BigNumberish, queue_id: constants.QueueId, key?: string): Promise<boolean> => {
         const queue_id_enum = makeCustomEnum(queue_id);
         const fees = await contractCalls.matchmaker.getEntryFee(queue_id_enum) as Record<string, BigNumberish>;
         const [tokenAddress, value] = Object.values(fees);

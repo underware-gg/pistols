@@ -906,12 +906,12 @@ pub mod tester {
     }
 
     // ::matchmaker
-    pub fn execute_enlist_duelist(sys: @TestSystems, sender: ContractAddress,
+    pub fn execute_enlist_ranked_duelist(sys: @TestSystems, sender: ContractAddress,
         duelist_id: u128,
         queue_id: QueueId,
     ) -> u128 {
         impersonate(sender);
-        let duelist_id: u128 = (*sys.matchmaker).enlist_duelist(duelist_id, queue_id);
+        let duelist_id: u128 = (*sys.matchmaker).enlist_ranked_duelist(duelist_id, queue_id);
         _next_block();
         (duelist_id)
     }
@@ -955,12 +955,12 @@ pub mod tester {
     //     _next_block();
     //     (tournament_id)
     // }
-    // pub fn execute_enlist_duelist(sys: @TestSystems, sender: ContractAddress,
+    // pub fn execute_enlist_ranked_duelist(sys: @TestSystems, sender: ContractAddress,
     //     pass_id: u64,
     //     duelist_id: u128,
     // ) {
     //     impersonate(sender);
-    //     (*sys.tournaments).enlist_duelist(pass_id, duelist_id);
+    //     (*sys.tournaments).enlist_ranked_duelist(pass_id, duelist_id);
     //     _next_block();
     // }
     // pub fn execute_join_duel(sys: @TestSystems, sender: ContractAddress,

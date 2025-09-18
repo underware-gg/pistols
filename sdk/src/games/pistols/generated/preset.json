@@ -60,7 +60,7 @@
             "description": "Match Maker contract",
             "methods": [
               {
-                "entrypoint": "enlist_duelist",
+                "entrypoint": "enlist_ranked_duelist",
                 "description": "Enlist a Duelist in a ranked queue"
               },
               {
@@ -358,7 +358,7 @@
             "description": "Match Maker contract",
             "methods": [
               {
-                "entrypoint": "enlist_duelist",
+                "entrypoint": "enlist_ranked_duelist",
                 "description": "Enlist a Duelist in a ranked queue"
               },
               {

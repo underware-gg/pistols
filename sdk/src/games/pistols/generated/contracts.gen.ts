@@ -2929,7 +2929,7 @@ export function setupWorld(provider: DojoProvider) {
 	const build_matchmaker_enlistDuelist_calldata = (duelistId: BigNumberish, queueId: CairoCustomEnum): DojoCall => {
 		return {
 			contractName: "matchmaker",
-			entrypoint: "enlist_duelist",
+			entrypoint: "enlist_ranked_duelist",
 			calldata: [duelistId, queueId],
 		};
 	};

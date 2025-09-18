@@ -40,6 +40,7 @@ pub enum DuelType {
     BotPlayer,      // 5 - Single Player Imps
     Ranked,         // 6 - Matchmaking Ranked
     Unranked,       // 7 - Matchmaking Unranked
+    RankedFast,     // 8 - Matchmaking Ranked Fast
 }
 
 #[derive(Clone, Drop, Serde)]
@@ -190,7 +191,8 @@ pub impl DuelTypeImpl of DuelTypeTrait {
         (match self {
             // Ranked
             DuelType::Tournament |
-            DuelType::Ranked => store.get_current_season_rules(),
+            DuelType::Ranked |
+            DuelType::RankedFast => store.get_current_season_rules(),
             // Unranked
             DuelType::Seasonal |
             DuelType::Unranked => Rules::Unranked,
@@ -213,6 +215,7 @@ pub impl DuelTypeImpl of DuelTypeTrait {
             DuelType::BotPlayer |
             DuelType::Undefined => (TIMESTAMP::ONE_DAY),
             DuelType::Ranked |
+            DuelType::RankedFast |
             DuelType::Unranked => {
                 match queue_mode {
                     Option::Some(mode) => (mode.get_commit_timeout()),
@@ -334,7 +337,8 @@ impl DuelTypeIntoByteArray of core::traits::Into<DuelType, ByteArray> {
             DuelType::Tutorial     => "DuelType::Tutorial",
             DuelType::Practice     => "DuelType::Practice",
             DuelType::BotPlayer    => "DuelType::BotPlayer",
-            DuelType::Ranked    => "DuelType::Ranked",
+            DuelType::Ranked       => "DuelType::Ranked",
+            DuelType::RankedFast   => "DuelType::RankedFast",
             DuelType::Unranked     => "DuelType::Unranked",
         }
     }

@@ -6,8 +6,8 @@ use pistols::models::match_queue::{QueueId, QueueMode};
 pub trait IMatchMaker<TState> {
     // IMatchMakerPublic
     fn get_entry_fee(self: @TState, queue_id: QueueId) -> (ContractAddress, u128);
-    fn enlist_duelist(ref self: TState, duelist_id: u128, queue_id: QueueId) -> u128;
-    fn match_make_me(ref self: TState, duelist_id: u128, queue_id: QueueId, queue_mode: QueueMode) -> u128;
+    fn enlist_ranked_duelist(ref self: TState, duelist_id: u128) -> u128;
+    fn match_make_me(ref self: TState, duelist_id: u128, queue_id: QueueId) -> u128;
     // IMatchMakerProtected
     fn set_queue_size(ref self: TState, queue_id: QueueId, size: u8);
     fn set_queue_entry_token(ref self: TState, queue_id: QueueId, entry_token_address: ContractAddress, entry_token_amount: u128);
@@ -17,8 +17,8 @@ pub trait IMatchMaker<TState> {
 // Exposed to clients
 #[starknet::interface]
 pub trait IMatchMakerPublic<TState> {
-    fn enlist_duelist(ref self: TState, duelist_id: u128, queue_id: QueueId) -> u128; //@description: Enlist a Duelist in a ranked queue
-    fn match_make_me(ref self: TState, duelist_id: u128, queue_id: QueueId, queue_mode: QueueMode) -> u128; //@description: Match a player against another player
+    fn enlist_ranked_duelist(ref self: TState, duelist_id: u128) -> u128; //@description: Enlist a Duelist in a ranked queue
+    fn match_make_me(ref self: TState, duelist_id: u128, queue_id: QueueId) -> u128; //@description: Match a player against another player
     // view functions
     fn get_entry_fee(self: @TState, queue_id: QueueId) -> (ContractAddress, u128);
 }
@@ -105,13 +105,13 @@ pub mod matchmaker {
             (queue.entry_token_address, queue.entry_token_amount)
         }
 
-        fn enlist_duelist(ref self: ContractState,
+        fn enlist_ranked_duelist(ref self: ContractState,
             mut duelist_id: u128,
-            queue_id: QueueId,
         ) -> u128 {
             let mut store: Store = StoreTrait::new(self.world_default());
 
             // validate queue
+            let queue_id: QueueId = QueueId::Ranked;
             let queue: MatchQueue = store.get_match_queue(queue_id);
             assert(queue.requires_enlistment(), Errors::ENLISTMENT_NOT_REQUIRED);
 
@@ -144,14 +144,13 @@ pub mod matchmaker {
         fn match_make_me(ref self: ContractState,
             mut duelist_id: u128,
             queue_id: QueueId,      // only used to enter queue, not to match
-            queue_mode: QueueMode,  // only used to enter queue, can change to to match
         ) -> u128 {
             let mut store: Store = StoreTrait::new(self.world_default());
 
             // validate and get queue
             // Ranked: any mode is permitted
             // Unranked: only Slow mode
-            assert(queue_id != QueueId::Undefined && !(queue_id == QueueId::Unranked && queue_mode == QueueMode::Fast), Errors::INVALID_QUEUE);
+            assert(queue_id != QueueId::Undefined, Errors::INVALID_QUEUE);
             
             // get player entry in queue
             let caller: ContractAddress = starknet::get_caller_address();
@@ -163,55 +162,64 @@ pub mod matchmaker {
             //----------------------------------
             // new player... (not in queue)
             //
+            // player not in the queue...
             if (matching_player.queue_info.slot.is_zero()) {
-                // validate mode
-                assert(queue_mode != QueueMode::Undefined, Errors::INVALID_MODE);
+
+
+
+                // TODO: is FAST > unstack from SLOR
+                // or... add to queue
+
+
                 // Validate duelist and set a slot
                 let (duelist_id, slot): (u128, u8) = self._validate_and_randomize_slot(ref store, @queue, caller, duelist_id);
                 // enter queue
                 matching_player.enter_queue(
-                    queue_mode,
                     duelist_id,
                     0,
                     slot,
                 );
             } else {
                 //----------------------------------
-                // player ping...
+                // Player in the queue...
                 //
-                // validate input duelist
-                if (duelist_id != matching_player.duelist_id) {
-                    // can stack duelists in SLOW mode only
-                    assert(queue_mode == QueueMode::Slow, Errors::INVALID_MODE);
-                    // Validate duelist and set a slot
-                    let (duelist_id, slot): (u128, u8) = self._validate_and_randomize_slot(ref store, @queue, caller, duelist_id);
-                    // save it for later...
-                    matching_player.stack_duelist(
-                        duelist_id,
-                        slot,
-                    );
-                    // save and return
-                    store.set_match_player(@matching_player);
-                    return (0);
-                }
-                // validate input mode
-                // can switch from SLOW to FAST only...
-                else if (queue_mode != matching_player.queue_info.queue_mode) {
-                    assert(matching_player.queue_info.queue_mode == QueueMode::Slow && queue_mode == QueueMode::Fast, Errors::INVALID_MODE);
-                    // re-enter queue with new speed
-                    matching_player.enter_queue(
-                        queue_mode,
-                        matching_player.duelist_id,
-                        matching_player.duel_id,
-                        matching_player.queue_info.slot,
-                    );
-                } else {
+                // is the front duelist in the queue
+                if (duelist_id == matching_player.duelist_id) {
+                    // verify expiration and continue...
                     matching_player.queue_info.expired = matching_player.queue_info.expired || matching_player.queue_info.has_expired(starknet::get_block_timestamp());
+                } else {
+                    // different duelist > add to the stack
+                    if (duelist_id != matching_player.duelist_id) {
+                        // can stack duelists in SLOW mode only
+                        assert(queue_id.into() == QueueMode::Slow, Errors::INVALID_MODE);
+                        // Validate duelist and set a slot
+                        let (duelist_id, slot): (u128, u8) = self._validate_and_randomize_slot(ref store, @queue, caller, duelist_id);
+                        // save it for later...
+                        matching_player.stack_duelist(
+                            duelist_id,
+                            slot,
+                        );
+                        // save and return
+                        store.set_match_player(@matching_player);
+                        return (0);
+                    }
+                    // validate input mode
+                    // can switch from SLOW to FAST only...
+                    else if (queue_mode != matching_player.queue_info.queue_mode) {
+                        assert(matching_player.queue_info.queue_mode == QueueMode::Slow && queue_mode == QueueMode::Fast, Errors::INVALID_MODE);
+                        // re-enter queue with new speed
+                        matching_player.enter_queue(
+                            matching_player.duelist_id,
+                            matching_player.duel_id,
+                            matching_player.queue_info.slot,
+                        );
+                    }
                 }
             };
 
             // match player...
             let matched_duel_id: u128 =
+                // match only if new in the queue or expired
                 if (matching_player.queue_info.timestamp_ping.is_zero() || matching_player.queue_info.expired) {
                     (self._match_or_enqueue(
                         ref store,
@@ -466,7 +474,7 @@ pub mod matchmaker {
                     matched_player.player_address,
                     matched_player.duelist_id,
                     queue_id,
-                    matched_player.queue_info.queue_mode,
+                    queue_id.into(),
                 );
                 (matching_player.duel_id)
             } else {
@@ -480,7 +488,7 @@ pub mod matchmaker {
                     matching_player.player_address,
                     matching_player.duelist_id,
                     queue_id,
-                    matching_player.queue_info.queue_mode,
+                    queue_id.into(),
                 );
                 (matched_player.duel_id)
             };
@@ -509,7 +517,7 @@ pub mod matchmaker {
                 bot_player_dispatcher.contract_address,
                 bot_duelist_id,
                 queue_id,
-                matching_player.queue_info.queue_mode,
+                queue_id.into(),
             );
             (matching_player.duel_id)
         }

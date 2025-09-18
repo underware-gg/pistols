@@ -200,7 +200,6 @@ function MatchQueue({ queueId }: { queueId: constants.QueueId }) {
                   <EnlistDuelistButton
                     key={duelistId}
                     duelistId={duelistId}
-                    queueId={queueId}
                     disabled={!rankedCanEnlistIds.includes(duelistId)}
                   />
                 ))}
@@ -276,18 +275,16 @@ function MatchPlayer({
 
 function EnlistDuelistButton({
   duelistId,
-  queueId,
   disabled,
 }: {
   duelistId: BigNumberish
-  queueId: constants.QueueId
   disabled?: boolean
 }) {
   const { account } = useAccount();
   const { matchmaker } = useDojoSystemCalls();
   return (
     <Button disabled={disabled} onClick={() => {
-      matchmaker.enlist_duelist(account, duelistId, queueId)
+      matchmaker.enlist_ranked_duelist(account, duelistId)
     }}>
       {bigintToDecimal(duelistId)}
     </Button>

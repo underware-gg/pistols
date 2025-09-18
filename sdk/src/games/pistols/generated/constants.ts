@@ -37,7 +37,7 @@ export const INTERFACE_DESCRIPTIONS: any = {
   },
   // from: ../dojo/src/systems/matchmaker.cairo
   IMatchMakerPublic: {
-    enlist_duelist: 'Enlist a Duelist in a ranked queue',
+    enlist_ranked_duelist: 'Enlist a Duelist in a ranked queue',
     match_make_me: 'Match a player against another player',
   },
   // from: ../dojo/src/systems/tokens/duel_token.cairo
