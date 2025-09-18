@@ -9246,7 +9246,7 @@
     },
     {
       "address": "0x16f7e3c140b4778e776221c7bb8b880d20d247c3ab0d06fab9a8eb96e7098bb",
-      "class_hash": "0x73a29f53dfa84023350ae75c3d6e8193d325e79b7630f7a4b0280d8612e4db",
+      "class_hash": "0x116b549e01f5f37afcb820ef2521b3635cd791bb7762d5b74144c96acc0669f",
       "abi": [
         {
           "type": "impl",
@@ -9456,6 +9456,18 @@
               ],
               "outputs": [],
               "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "clear_queue",
+              "inputs": [
+                {
+                  "name": "queue_id",
+                  "type": "pistols::models::match_queue::QueueId"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
             }
           ]
         },
@@ -9576,6 +9588,7 @@
         "match_make_me",
         "set_queue_size",
         "set_queue_entry_token",
+        "clear_queue",
         "upgrade"
       ]
     },
