@@ -237,7 +237,7 @@ mod unit {
     fn test_stack_append_remove() {
         let profile = DuelistProfile::Genesis(GenesisKey::Duke);
         let mut stack = PlayerDuelistStack {
-            player_address: starknet::contract_address_const::<0x1>(),
+            player_address: 0x1.try_into().unwrap(),
             duelist_profile: profile,
             active_duelist_id: 0,
             level: 0,

@@ -19,7 +19,7 @@ mod tests {
 
     const CONFIG_HASH: felt252 = selector_from_tag!("pistols-Config");
 
-    fn DUMMY_LORDS() -> ContractAddress { starknet::contract_address_const::<0x131313131313>() }
+    fn DUMMY_LORDS() -> ContractAddress { 0x131313131313.try_into().unwrap() }
 
     //
     // Initialize
@@ -28,7 +28,7 @@ mod tests {
     fn setup_alternative_world() -> (WorldStorage, IRngDispatcher) {
         let namespace: ByteArray = "alternative";
         let resources: Span<TestResource> = array![
-            TestResource::Contract(rng::TEST_CLASS_HASH)
+            TestResource::Contract(rng::TEST_CLASS_HASH.into())
         ].span();
         let contract_defs: Span<ContractDef> = array![
             ContractDefTrait::new(@namespace, @"rng")

@@ -123,8 +123,8 @@ impl PoolTypeIntoByteArray of core::traits::Into<PoolType, ByteArray> {
             PoolType::Undefined     =>  "Undefined",
             PoolType::Purchases     =>  "Purchases",
             PoolType::FamePeg       =>  "FamePeg",
-            PoolType::Season        =>  "Season",
-            PoolType::Tournament    =>  "Tournament",
+            PoolType::Season(_)     =>  "Season",
+            PoolType::Tournament(_) =>  "Tournament",
             PoolType::Sacrifice     =>  "Sacrifice",
             PoolType::Claimable     =>  "Claimable",
         }

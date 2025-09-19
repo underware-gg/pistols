@@ -263,9 +263,9 @@ fn _assert_stack(sys: @TestSystems, account: ContractAddress, profile: DuelistPr
 #[ignore] // (not using seed anymore)
 fn test_duelist_stack_random() {
     let mut sys: TestSystems = setup(0);
-    let acc1 = starknet::contract_address_const::<0x0201>();
-    let acc2 = starknet::contract_address_const::<0x0102>();
-    let acc3 = starknet::contract_address_const::<0x0303>();
+    let acc1: ContractAddress = 0x0201.try_into().unwrap();
+    let acc2: ContractAddress = 0x0102.try_into().unwrap();
+    let acc3: ContractAddress = 0x0303.try_into().unwrap();
     let tokens1: Span<u128> = tester::execute_claim_starter_pack(@sys, acc1);
     let tokens2: Span<u128> = tester::execute_claim_starter_pack(@sys, acc2);
     let tokens3: Span<u128> = tester::execute_claim_starter_pack(@sys, acc3);
@@ -360,9 +360,9 @@ fn test_duelist_stack_random() {
 #[test]
 fn test_duelist_stack_deterministic() {
     let mut sys: TestSystems = setup(0);
-    let acc1 = starknet::contract_address_const::<0x0201>();
-    let acc2 = starknet::contract_address_const::<0x0102>();
-    let acc3 = starknet::contract_address_const::<0x0303>();
+    let acc1: ContractAddress = 0x0201.try_into().unwrap();
+    let acc2: ContractAddress = 0x0102.try_into().unwrap();
+    let acc3: ContractAddress = 0x0303.try_into().unwrap();
     let tokens1: Span<u128> = tester::execute_claim_starter_pack(@sys, acc1);
     let tokens2: Span<u128> = tester::execute_claim_starter_pack(@sys, acc2);
     let tokens3: Span<u128> = tester::execute_claim_starter_pack(@sys, acc3);

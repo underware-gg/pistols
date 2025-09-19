@@ -54,6 +54,7 @@ pub impl BoolToString of BoolToStringTrait {
 //
 #[cfg(test)]
 mod unit {
+    use starknet::{ContractAddress};
     use super::{
         U8IntoByteArray,
         U16IntoByteArray,
@@ -73,7 +74,8 @@ mod unit {
         let as_u64: ByteArray = 18446744073709551615_u64.into();
         let as_u128: ByteArray = 340282366920938463463374607431768211455_u128.into();
         let as_u256: ByteArray = 115792089237316195423570985008687907853269984665640564039457584007913129639935_u256.into();
-        let as_addr: ByteArray = starknet::contract_address_const::<0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffff>().into();
+        let addr: ContractAddress = 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffff.try_into().unwrap();
+        let as_addr: ByteArray = addr.into();
         assert_eq!(as_u8, "255", "u8");
         assert_eq!(as_u16, "65535", "u16");
         assert_eq!(as_u32, "4294967295", "u32");

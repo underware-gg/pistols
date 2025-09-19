@@ -21,13 +21,13 @@ mod unit {
 
     #[test]
     fn test_make_seed() {
-        let s0 = make_seed(starknet::contract_address_const::<0x0>(), 1);
-        let s1 = make_seed(starknet::contract_address_const::<0x1>(), 1);
-        let s1_2 = make_seed(starknet::contract_address_const::<0x1>(), 2);
-        let s2 = make_seed(starknet::contract_address_const::<0x2>(), 1);
-        let s3 = make_seed(starknet::contract_address_const::<0x54f650fb5e1fb61d7b429ae728a365b69e5aff9a559a05de70f606aaea1a243>(), 1);
-        let s4 = make_seed(starknet::contract_address_const::<0x19b55e33610cdb4b3ceda054f8870b741733f129992894ebce56f38a4150dfb>(), 1);
-        let s0_1 = make_seed(starknet::contract_address_const::<0x0>(), 1);
+        let s0: felt252 = make_seed(0x0.try_into().unwrap(), 1);
+        let s1: felt252 = make_seed(0x1.try_into().unwrap(), 1);
+        let s1_2: felt252 = make_seed(0x1.try_into().unwrap(), 2);
+        let s2: felt252 = make_seed(0x2.try_into().unwrap(), 1);
+        let s3: felt252 = make_seed(0x54f650fb5e1fb61d7b429ae728a365b69e5aff9a559a05de70f606aaea1a243.try_into().unwrap(), 1);
+        let s4: felt252 = make_seed(0x19b55e33610cdb4b3ceda054f8870b741733f129992894ebce56f38a4150dfb.try_into().unwrap(), 1);
+        let s0_1: felt252 = make_seed(0x0.try_into().unwrap(), 1);
         // never zero
         assert_ne!(s0, 0, "s0");
         assert_ne!(s1, 0, "s1");

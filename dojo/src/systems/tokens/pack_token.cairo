@@ -439,7 +439,7 @@ pub mod pack_token {
     impl InternalImpl of InternalTrait {
         fn _assert_caller_is_admin(self: @ContractState) {
             let mut world = self.world_default();
-            assert(world.admin_dispatcher().am_i_admin(starknet::get_caller_address()) == true, Errors::CALLER_NOT_ADMIN);
+            assert(world.admin_dispatcher().am_i_admin(starknet::get_caller_address()), Errors::CALLER_NOT_ADMIN);
         }
 
         fn _mint_pack(ref self: ContractState,
@@ -453,7 +453,7 @@ pub mod pack_token {
             // mint!
             let token_id: u128 = self.token.mint_next(recipient);
             // create Pack
-            let mut pack = Pack {
+            let mut pack: Pack = Pack {
                 pack_id: token_id,
                 pack_type,
                 seed,

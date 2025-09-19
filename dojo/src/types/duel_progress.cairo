@@ -83,10 +83,10 @@ pub impl SpecialsDrawnImpl of SpecialsDrawnTrait {
 impl DuelistDrawnCardIntoByteArray of core::traits::Into<DuelistDrawnCard, ByteArray> {
     fn into(self: DuelistDrawnCard) -> ByteArray {
         match self {
-            DuelistDrawnCard::None =>   "None",
-            DuelistDrawnCard::Fire =>   "Fire",
-            DuelistDrawnCard::Dodge =>  "Dodge",
-            DuelistDrawnCard::Blades => "Blades",
+            DuelistDrawnCard::None      =>   "None",
+            DuelistDrawnCard::Fire(_)   =>   "Fire",
+            DuelistDrawnCard::Dodge(_)  =>  "Dodge",
+            DuelistDrawnCard::Blades(_) => "Blades",
         }
     }
 }

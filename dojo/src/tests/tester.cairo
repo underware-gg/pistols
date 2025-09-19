@@ -101,22 +101,22 @@ pub mod tester {
     // https://github.com/starkware-libs/cairo/blob/main/corelib/src/starknet/testing.cairo
     //
 
-    pub fn ZERO()      -> ContractAddress { starknet::contract_address_const::<0x0>() }
-    pub fn OWNER()     -> ContractAddress { starknet::contract_address_const::<0x1>() } // mock owner of duelists 1-2
-    pub fn OWNER2()    -> ContractAddress { starknet::contract_address_const::<0x2>() } // mock owner of duelists 1-2
-    pub fn OTHER()     -> ContractAddress { starknet::contract_address_const::<0x3>() } // mock owner of duelists 3-4
-    pub fn OTHER2()    -> ContractAddress { starknet::contract_address_const::<0x4>() } // mock owner of duelists 3-4
-    pub fn BUMMER()    -> ContractAddress { starknet::contract_address_const::<0x5>() } // mock owner of duelists 5-6
-    pub fn BUMMER2()   -> ContractAddress { starknet::contract_address_const::<0x6>() } // mock owner of duelists 5-6
-    pub fn RECIPIENT() -> ContractAddress { starknet::contract_address_const::<0x222>() }
-    pub fn SPENDER()   -> ContractAddress { starknet::contract_address_const::<0x333>() }
-    pub fn TREASURY()  -> ContractAddress { starknet::contract_address_const::<0x444>() }
-    pub fn DELEGATEE() -> ContractAddress { starknet::contract_address_const::<0x555>() }
-    pub fn STACKER()   -> ContractAddress { starknet::contract_address_const::<0x0101>() } // owns 2 stacked duelists
-    pub fn STACKER2()  -> ContractAddress { starknet::contract_address_const::<0x0202>() } // owns 2 stacked duelists
+    pub fn ZERO()      -> ContractAddress { 0x0.try_into().unwrap() }
+    pub fn OWNER()     -> ContractAddress { 0x1.try_into().unwrap() } // mock owner of duelists 1-2
+    pub fn OWNER2()    -> ContractAddress { 0x2.try_into().unwrap() } // mock owner of duelists 1-2
+    pub fn OTHER()     -> ContractAddress { 0x3.try_into().unwrap() } // mock owner of duelists 3-4
+    pub fn OTHER2()    -> ContractAddress { 0x4.try_into().unwrap() } // mock owner of duelists 3-4
+    pub fn BUMMER()    -> ContractAddress { 0x5.try_into().unwrap() } // mock owner of duelists 5-6
+    pub fn BUMMER2()   -> ContractAddress { 0x6.try_into().unwrap() } // mock owner of duelists 5-6
+    pub fn RECIPIENT() -> ContractAddress { 0x222.try_into().unwrap() }
+    pub fn SPENDER()   -> ContractAddress { 0x333.try_into().unwrap() }
+    pub fn TREASURY()  -> ContractAddress { 0x444.try_into().unwrap() }
+    pub fn DELEGATEE() -> ContractAddress { 0x555.try_into().unwrap() }
+    pub fn STACKER()   -> ContractAddress { 0x0101.try_into().unwrap() } // owns 2 stacked duelists
+    pub fn STACKER2()  -> ContractAddress { 0x0202.try_into().unwrap() } // owns 2 stacked duelists
     // low part is owned token, but different address
-    pub fn FAKE_OWNER_OF_1() -> ContractAddress { starknet::contract_address_const::<0x1234000000000000000000000000000000001>() }
-    pub fn FAKE_OWNER_OF_2() -> ContractAddress { starknet::contract_address_const::<0x2234000000000000000000000000000000002>() }
+    pub fn FAKE_OWNER_OF_1() -> ContractAddress { 0x1234000000000000000000000000000000001.try_into().unwrap() }
+    pub fn FAKE_OWNER_OF_2() -> ContractAddress { 0x2234000000000000000000000000000000002.try_into().unwrap() }
     // hard-coded owners
     pub fn OWNED_BY_OWNER() -> u128 { 0xeeee }
     pub fn OWNED_BY_OTHER() -> u128 { 0xdddd }
@@ -284,93 +284,93 @@ pub mod tester {
 
         let mut resources: Array<TestResource> = array![
             // pistols models
-            TestResource::Model(pistols::models::config::m_Config::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::config::m_TokenConfig::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::config::m_CoinConfig::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::challenge::m_Challenge::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::challenge::m_ChallengeMessage::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::challenge::m_Round::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::duelist::m_Duelist::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::duelist::m_DuelistAssignment::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::duelist::m_DuelistMemorial::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::leaderboard::m_Leaderboard::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::match_queue::m_MatchQueue::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::match_queue::m_MatchPlayer::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::pack::m_Pack::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::ring::m_Ring::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::ring::m_RingBalance::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::pact::m_Pact::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::pool::m_Pool::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::player::m_Player::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::player::m_PlayerDuelistStack::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::player::m_PlayerTeamFlags::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::player::m_PlayerFlags::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::player::m_PlayerDelegation::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::season::m_SeasonScoreboard::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::season::m_SeasonConfig::TEST_CLASS_HASH),
-            // TestResource::Model(pistols::models::tournament::m_TournamentPass::TEST_CLASS_HASH),
-            // TestResource::Model(pistols::models::tournament::m_TournamentSettings::TEST_CLASS_HASH),
-            // TestResource::Model(pistols::models::tournament::m_Tournament::TEST_CLASS_HASH),
-            // TestResource::Model(pistols::models::tournament::m_TournamentRound::TEST_CLASS_HASH),
-            // TestResource::Model(pistols::models::tournament::m_TournamentToChallenge::TEST_CLASS_HASH),
-            // TestResource::Model(pistols::models::tournament::m_ChallengeToTournament::TEST_CLASS_HASH),
-            TestResource::Model(pistols::systems::components::token_bound::m_TokenBoundAddress::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::config::m_Config::TEST_CLASS_HASH.into()),
+            TestResource::Model(pistols::models::config::m_TokenConfig::TEST_CLASS_HASH.into()),
+            TestResource::Model(pistols::models::config::m_CoinConfig::TEST_CLASS_HASH.into()),
+            TestResource::Model(pistols::models::challenge::m_Challenge::TEST_CLASS_HASH.into()),
+            TestResource::Model(pistols::models::challenge::m_ChallengeMessage::TEST_CLASS_HASH.into()),
+            TestResource::Model(pistols::models::challenge::m_Round::TEST_CLASS_HASH.into()),
+            TestResource::Model(pistols::models::duelist::m_Duelist::TEST_CLASS_HASH.into()),
+            TestResource::Model(pistols::models::duelist::m_DuelistAssignment::TEST_CLASS_HASH.into()),
+            TestResource::Model(pistols::models::duelist::m_DuelistMemorial::TEST_CLASS_HASH.into()),
+            TestResource::Model(pistols::models::leaderboard::m_Leaderboard::TEST_CLASS_HASH.into()),
+            TestResource::Model(pistols::models::match_queue::m_MatchQueue::TEST_CLASS_HASH.into()),
+            TestResource::Model(pistols::models::match_queue::m_MatchPlayer::TEST_CLASS_HASH.into()),
+            TestResource::Model(pistols::models::pack::m_Pack::TEST_CLASS_HASH.into()),
+            TestResource::Model(pistols::models::ring::m_Ring::TEST_CLASS_HASH.into()),
+            TestResource::Model(pistols::models::ring::m_RingBalance::TEST_CLASS_HASH.into()),
+            TestResource::Model(pistols::models::pact::m_Pact::TEST_CLASS_HASH.into()),
+            TestResource::Model(pistols::models::pool::m_Pool::TEST_CLASS_HASH.into()),
+            TestResource::Model(pistols::models::player::m_Player::TEST_CLASS_HASH.into()),
+            TestResource::Model(pistols::models::player::m_PlayerDuelistStack::TEST_CLASS_HASH.into()),
+            TestResource::Model(pistols::models::player::m_PlayerTeamFlags::TEST_CLASS_HASH.into()),
+            TestResource::Model(pistols::models::player::m_PlayerFlags::TEST_CLASS_HASH.into()),
+            TestResource::Model(pistols::models::player::m_PlayerDelegation::TEST_CLASS_HASH.into()),
+            TestResource::Model(pistols::models::season::m_SeasonScoreboard::TEST_CLASS_HASH.into()),
+            TestResource::Model(pistols::models::season::m_SeasonConfig::TEST_CLASS_HASH.into()),
+            // TestResource::Model(pistols::models::tournament::m_TournamentPass::TEST_CLASS_HASH.into()),
+            // TestResource::Model(pistols::models::tournament::m_TournamentSettings::TEST_CLASS_HASH.into()),
+            // TestResource::Model(pistols::models::tournament::m_Tournament::TEST_CLASS_HASH.into()),
+            // TestResource::Model(pistols::models::tournament::m_TournamentRound::TEST_CLASS_HASH.into()),
+            // TestResource::Model(pistols::models::tournament::m_TournamentToChallenge::TEST_CLASS_HASH.into()),
+            // TestResource::Model(pistols::models::tournament::m_ChallengeToTournament::TEST_CLASS_HASH.into()),
+            TestResource::Model(pistols::systems::components::token_bound::m_TokenBoundAddress::TEST_CLASS_HASH.into()),
             // mocks
-            TestResource::Model(pistols::systems::rng_mock::m_MockedValue::TEST_CLASS_HASH),
-            TestResource::Model(pistols::tests::token::mock_duelist::m_MockDuelistOwners::TEST_CLASS_HASH),
+            TestResource::Model(pistols::systems::rng_mock::m_MockedValue::TEST_CLASS_HASH.into()),
+            TestResource::Model(pistols::tests::token::mock_duelist::m_MockDuelistOwners::TEST_CLASS_HASH.into()),
             // pistols events
-            TestResource::Event(pistols::models::events::e_PlayerActivityEvent::TEST_CLASS_HASH),
-            TestResource::Event(pistols::models::events::e_CallToChallengeEvent::TEST_CLASS_HASH),
-            TestResource::Event(pistols::models::events::e_ChallengeRewardsEvent::TEST_CLASS_HASH),
-            TestResource::Event(pistols::models::events::e_LordsReleaseEvent::TEST_CLASS_HASH),
-            TestResource::Event(pistols::models::events::e_PlayerBookmarkEvent::TEST_CLASS_HASH),
-            TestResource::Event(pistols::models::events::e_PlayerSocialLinkEvent::TEST_CLASS_HASH),
-            TestResource::Event(pistols::models::events::e_PlayerSettingEvent::TEST_CLASS_HASH),
+            TestResource::Event(pistols::models::events::e_PlayerActivityEvent::TEST_CLASS_HASH.into()),
+            TestResource::Event(pistols::models::events::e_CallToChallengeEvent::TEST_CLASS_HASH.into()),
+            TestResource::Event(pistols::models::events::e_ChallengeRewardsEvent::TEST_CLASS_HASH.into()),
+            TestResource::Event(pistols::models::events::e_LordsReleaseEvent::TEST_CLASS_HASH.into()),
+            TestResource::Event(pistols::models::events::e_PlayerBookmarkEvent::TEST_CLASS_HASH.into()),
+            TestResource::Event(pistols::models::events::e_PlayerSocialLinkEvent::TEST_CLASS_HASH.into()),
+            TestResource::Event(pistols::models::events::e_PlayerSettingEvent::TEST_CLASS_HASH.into()),
             // cartridge arcade
-            TestResource::Event(achievement::events::index::e_TrophyCreation::TEST_CLASS_HASH),
-            TestResource::Event(achievement::events::index::e_TrophyProgression::TEST_CLASS_HASH),
+            TestResource::Event(achievement::events::index::e_TrophyCreation::TEST_CLASS_HASH.into()),
+            TestResource::Event(achievement::events::index::e_TrophyProgression::TEST_CLASS_HASH.into()),
             // budokan
-            // TestResource::Model(tournaments::components::models::game::m_GameMetadata::TEST_CLASS_HASH),
-            // TestResource::Model(tournaments::components::models::game::m_TokenMetadata::TEST_CLASS_HASH),
-            // TestResource::Model(tournaments::components::models::game::m_GameCounter::TEST_CLASS_HASH),
-            // TestResource::Model(tournaments::components::models::game::m_Score::TEST_CLASS_HASH),
-            // TestResource::Model(tournaments::components::models::game::m_Settings::TEST_CLASS_HASH),
-            // TestResource::Model(tournaments::components::models::game::m_SettingsDetails::TEST_CLASS_HASH),
-            // TestResource::Model(tournaments::components::models::game::m_SettingsCounter::TEST_CLASS_HASH),
+            // TestResource::Model(tournaments::components::models::game::m_GameMetadata::TEST_CLASS_HASH.into()),
+            // TestResource::Model(tournaments::components::models::game::m_TokenMetadata::TEST_CLASS_HASH.into()),
+            // TestResource::Model(tournaments::components::models::game::m_GameCounter::TEST_CLASS_HASH.into()),
+            // TestResource::Model(tournaments::components::models::game::m_Score::TEST_CLASS_HASH.into()),
+            // TestResource::Model(tournaments::components::models::game::m_Settings::TEST_CLASS_HASH.into()),
+            // TestResource::Model(tournaments::components::models::game::m_SettingsDetails::TEST_CLASS_HASH.into()),
+            // TestResource::Model(tournaments::components::models::game::m_SettingsCounter::TEST_CLASS_HASH.into()),
         ];
 
         let mut contract_defs: Array<ContractDef> = array![];
 
         if (deploy_game) {
-            resources.append(TestResource::Contract(game::TEST_CLASS_HASH));
+            resources.append(TestResource::Contract(game::TEST_CLASS_HASH.into()));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"game")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
             );
         }
         if (deploy_game_loop) {
-            resources.append(TestResource::Contract(game_loop::TEST_CLASS_HASH));
+            resources.append(TestResource::Contract(game_loop::TEST_CLASS_HASH.into()));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"game_loop")
             );
         }
 
         if (deploy_bot_player) {
-            resources.append(TestResource::Contract(bot_player::TEST_CLASS_HASH));
+            resources.append(TestResource::Contract(bot_player::TEST_CLASS_HASH.into()));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"bot_player")
             );
         }
 
         if (deploy_vrf) {
-            resources.append(TestResource::Contract(vrf_mock::TEST_CLASS_HASH));
+            resources.append(TestResource::Contract(vrf_mock::TEST_CLASS_HASH.into()));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"vrf_mock")
             );
         }
 
         if (deploy_tutorial) {
-            resources.append(TestResource::Contract(tutorial::TEST_CLASS_HASH));
+            resources.append(TestResource::Contract(tutorial::TEST_CLASS_HASH.into()));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"tutorial")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
@@ -378,7 +378,7 @@ pub mod tester {
         }
 
         if (deploy_admin) {
-            resources.append(TestResource::Contract(admin::TEST_CLASS_HASH));
+            resources.append(TestResource::Contract(admin::TEST_CLASS_HASH.into()));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"admin")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
@@ -391,7 +391,7 @@ pub mod tester {
         }
 
         if (deploy_duel) {
-            resources.append(TestResource::Contract(duel_token::TEST_CLASS_HASH));
+            resources.append(TestResource::Contract(duel_token::TEST_CLASS_HASH.into()));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"duel_token")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
@@ -404,7 +404,7 @@ pub mod tester {
 
         // println!("---- 3");
         if (deploy_duelist) {
-            resources.append(TestResource::Contract(duelist_token::TEST_CLASS_HASH));
+            resources.append(TestResource::Contract(duelist_token::TEST_CLASS_HASH.into()));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"duelist_token")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
@@ -414,7 +414,7 @@ pub mod tester {
             );
         }
         else if (deploy_duelist_mock) {
-            resources.append(TestResource::Contract(mock_duelist::TEST_CLASS_HASH));
+            resources.append(TestResource::Contract(mock_duelist::TEST_CLASS_HASH.into()));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"duelist_token")
                     .with_writer_of([selector_from_tag!("pistols-MockDuelistOwners")].span())
@@ -422,7 +422,7 @@ pub mod tester {
         }
 
         if (deploy_pack) {
-            resources.append(TestResource::Contract(pack_token::TEST_CLASS_HASH));
+            resources.append(TestResource::Contract(pack_token::TEST_CLASS_HASH.into()));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"pack_token")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
@@ -433,7 +433,7 @@ pub mod tester {
         }
 
         if (deploy_rings) {
-            resources.append(TestResource::Contract(ring_token::TEST_CLASS_HASH));
+            resources.append(TestResource::Contract(ring_token::TEST_CLASS_HASH.into()));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"ring_token")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
@@ -444,8 +444,8 @@ pub mod tester {
         }
 
         // if (deploy_tournament) {
-        //     resources.append(TestResource::Contract(tournament_token::TEST_CLASS_HASH));
-        //     resources.append(TestResource::Contract(budokan_mock::TEST_CLASS_HASH));
+        //     resources.append(TestResource::Contract(tournament_token::TEST_CLASS_HASH.into()));
+        //     resources.append(TestResource::Contract(budokan_mock::TEST_CLASS_HASH.into()));
         //     contract_defs.append(
         //         ContractDefTrait::new(@"pistols", @"tournament_token")
         //             .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
@@ -461,7 +461,7 @@ pub mod tester {
         // }
 
         if (deploy_lords) {
-            resources.append(TestResource::Contract(lords_mock::TEST_CLASS_HASH));
+            resources.append(TestResource::Contract(lords_mock::TEST_CLASS_HASH.into()));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"lords_mock")
                     .with_writer_of([selector_from_tag!("pistols-CoinConfig")].span())
@@ -474,7 +474,7 @@ pub mod tester {
         }
 
         if (deploy_bank) {
-            resources.append(TestResource::Contract(bank::TEST_CLASS_HASH));
+            resources.append(TestResource::Contract(bank::TEST_CLASS_HASH.into()));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"bank")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
@@ -482,14 +482,14 @@ pub mod tester {
         }
 
         if (deploy_fame) {
-            resources.append(TestResource::Contract(fame_coin::TEST_CLASS_HASH));
+            resources.append(TestResource::Contract(fame_coin::TEST_CLASS_HASH.into()));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"fame_coin")
                     .with_writer_of([selector_from_tag!("pistols-CoinConfig"),selector_from_tag!("pistols-TokenBoundAddress")].span()), // same as config
             );
         }
         if (deploy_fools) {
-            resources.append(TestResource::Contract(fools_coin::TEST_CLASS_HASH));
+            resources.append(TestResource::Contract(fools_coin::TEST_CLASS_HASH.into()));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"fools_coin")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
@@ -497,7 +497,7 @@ pub mod tester {
         }
 
         if (deploy_matchmaker) { // AFTER Fools...
-            resources.append(TestResource::Contract(matchmaker::TEST_CLASS_HASH));
+            resources.append(TestResource::Contract(matchmaker::TEST_CLASS_HASH.into()));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"matchmaker")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
@@ -506,13 +506,13 @@ pub mod tester {
         }
 
         if (deploy_rng_mock) {
-            resources.append(TestResource::Contract(rng_mock::TEST_CLASS_HASH));
+            resources.append(TestResource::Contract(rng_mock::TEST_CLASS_HASH.into()));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"rng_mock")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
             );
         } else {
-            resources.append(TestResource::Contract(rng::TEST_CLASS_HASH));
+            resources.append(TestResource::Contract(rng::TEST_CLASS_HASH.into()));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"rng")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
@@ -1063,7 +1063,7 @@ pub mod tester {
     }
     pub fn fund_duelists_pool(sys: @TestSystems, stater_pack_quantity: u8) -> u128 {
         // mint lords
-        let sponsor: ContractAddress = starknet::contract_address_const::<0x12178517312>();
+        let sponsor: ContractAddress = 0x12178517312.try_into().unwrap();
         execute_lords_faucet(sys.lords, sponsor);
         // approve lords
         let balance: u256 = (*sys.lords).balance_of(sponsor);

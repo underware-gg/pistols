@@ -1027,7 +1027,7 @@ pub mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         // try to commmit with another account
-        let someone_else: ContractAddress = starknet::contract_address_const::<0x999>();
+        let someone_else: ContractAddress = 0x999.try_into().unwrap();
         let hashed: u128 = MovesHashTrait::hash(0x12121, [1, 1].span());
         tester::execute_commit_moves(@sys, someone_else, duel_id, hashed);
     }

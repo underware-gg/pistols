@@ -84,9 +84,9 @@ mod unit {
         }
     };
 
-    fn A() -> ContractAddress {(starknet::contract_address_const::<0x127fd5f1fe78a71f8bcd1fec63e3fe2f0486b6ecd5c86a0466c3a21fa5cfcec>())}
-    fn B() -> ContractAddress {(starknet::contract_address_const::<0x13d9ee239f33fea4f8785b9e3870ade909e20a9599ae7cd62c1c292b73af1b7>())}
-    fn C() -> ContractAddress {(starknet::contract_address_const::<0x457643654334345634563456345634563456345634563456345634563456345>())}
+    fn A() -> ContractAddress {(0x127fd5f1fe78a71f8bcd1fec63e3fe2f0486b6ecd5c86a0466c3a21fa5cfcec.try_into().unwrap())}
+    fn B() -> ContractAddress {(0x13d9ee239f33fea4f8785b9e3870ade909e20a9599ae7cd62c1c292b73af1b7.try_into().unwrap())}
+    fn C() -> ContractAddress {(0x457643654334345634563456345634563456345634563456345634563456345.try_into().unwrap())}
 
     #[test]
     fn test_pact_pair() {

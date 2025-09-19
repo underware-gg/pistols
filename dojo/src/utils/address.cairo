@@ -5,7 +5,7 @@ use starknet::{ContractAddress};
 //
 #[inline(always)]
 pub fn ZERO() -> ContractAddress {
-    (starknet::contract_address_const::<0x0>())
+    (0x0.try_into().unwrap())
 }
 
 pub impl ContractAddressDefault of Default<ContractAddress> {

@@ -16,7 +16,7 @@ mod tests {
 
     const CONFIG_HASH: felt252 = selector_from_tag!("pistols-Config");
 
-    fn DUMMY_LORDS() -> ContractAddress { starknet::contract_address_const::<0x131313131313>() }
+    fn DUMMY_LORDS() -> ContractAddress { 0x131313131313.try_into().unwrap() }
 
     //
     // Initialize
@@ -146,7 +146,7 @@ mod tests {
         let mut config: Config = sys.store.get_config();
         assert_eq!(config.treasury_address, TREASURY(), "treasury_address_default");
         // set
-        let new_treasury: ContractAddress = starknet::contract_address_const::<0x121212>();
+        let new_treasury: ContractAddress = 0x121212.try_into().unwrap();
         tester::execute_admin_set_treasury(@sys.admin, OWNER(), new_treasury);
         let mut config: Config = sys.store.get_config();
         assert_eq!(config.treasury_address, new_treasury, "set_config_new");
