@@ -1,4 +1,4 @@
-import { Account, AccountInterface, RpcProvider, constants, Call } from 'starknet'
+import { Account, AccountInterface, RpcProvider, constants, Call, Signer } from 'starknet'
 import { AddInvokeTransactionParameters, RequestFn } from '@starknet-io/types-js'
 import { Connector } from '@starknet-react/core'
 import { stringToFelt } from 'src/starknet/starknet'
@@ -23,13 +23,12 @@ export class PredeployedConnector extends Connector {
       throw new Error('PredeployedConnector: missing account')
     }
     this._chainId = BigInt(stringToFelt(chainId))
-    this._account = new Account(
-      new RpcProvider({ nodeUrl: rpcUrl }),
-      account.address,
-      account.privateKey,
-      undefined,
-      constants.TRANSACTION_VERSION.V3,
-    )
+    this._account = new Account({
+      provider: new RpcProvider({ nodeUrl: rpcUrl }),
+      address: account.address,
+      signer: new Signer(account.privateKey),
+      // transactionVersion: SupportedTransactionVersion,
+    });
   }
 
   readonly icon = {

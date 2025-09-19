@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react'
-import { Result } from 'starknet'
+import { CallResult } from 'starknet'
 import { arrayHasNullElements } from 'src/utils/misc/types'
 
-export const useSdkCallPromise = <T extends Result>({
+export const useSdkCallPromise = <T extends CallResult>({
   call,
   args = [],
   enabled = true,
   defaultValue = undefined,
   forceCounter = 0,
 }: {
-  call: (...args: any[]) => Promise<Result>,
+  call: (...args: any[]) => Promise<CallResult>,
   args?: any[],
   enabled?: boolean,
   defaultValue?: T | null | undefined
@@ -20,7 +20,7 @@ export const useSdkCallPromise = <T extends Result>({
 } => {
   const [isLoading, setIsLoading] = useState(false)
   const [value, setValue] = useState<T>(defaultValue)
-  
+
   useEffect(() => {
     let _mounted = true
     const _get = async (): Promise<T> => {
@@ -48,7 +48,7 @@ export const useSdkCallPromise = <T extends Result>({
       _mounted = false
     }
   }, [call, args, enabled, forceCounter])
-  
+
   return {
     value,
     isLoading,
