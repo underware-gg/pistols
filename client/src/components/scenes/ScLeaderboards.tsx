@@ -150,7 +150,7 @@ const PlayerRow = memo(({
   const { aspectWidth } = useGameAspect();
   const { dispatchSelectPlayerAddress, dispatchSelectDuelistId } = usePistolsContext();
   const [isHovered, setIsHovered] = useState(false);
-  const { name: duelistName, profilePic: duelistProfilePic, isDead } = useDuelist(duelistId);
+  const { name: duelistName, profilePic: duelistProfilePic, profileType: duelistProfileType, isDead } = useDuelist(duelistId);
   const { owner } = useOwnerOfDuelist(duelistId);
   const { name: playerName } = usePlayer(owner);
   const { isMyAccount: isMe } = useIsMyAccount(owner);
@@ -196,7 +196,7 @@ const PlayerRow = memo(({
 
         <Grid.Column width={3} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => dispatchSelectDuelistId(duelistId)}>
           <div style={{ width: aspectWidth(0.05), height: '100%', backgroundColor: 'white', opacity: 0.3, marginRight: aspectWidth(0.6) }} />
-          <ProfilePic profilePic={duelistProfilePic} profileType={constants.DuelistProfile.Genesis} width={2.5} />
+          <ProfilePic profilePic={duelistProfilePic} profileType={duelistProfileType} width={2.5} />
           <div style={{ marginLeft: aspectWidth(1), fontSize: aspectWidth(0.8), color: '#888', overflow: 'hidden', textOverflow: 'ellipsis' }}>{duelistName}</div>
           <img id='DuelistDeadOverlayLeaderboard' className={ `${isDead ? 'visible' : ''}`} src='/textures/cards/card_disabled.png' />
           <div id='DuelistDeadOverlayLeaderboard' className={ `${isDead ? 'visible filter' : ''}`} />
