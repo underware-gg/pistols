@@ -132,7 +132,7 @@ dist
 *.zip
 
 # Cairo
-*/target
+**/target
 *.pem
 
 # Turbo

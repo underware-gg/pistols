@@ -1,0 +1,5 @@
+# Virtual workspace
+# https://docs.swmansion.com/scarb/docs/reference/workspaces.html#virtual-workspace
+
+[workspace]
+members = ["dojo"]
