@@ -25,6 +25,7 @@ pub enum QueueId {
 //
 // a matchmaker queue
 #[derive(Drop, Serde)]
+#[derive(DojoLegacyStore)]
 #[dojo::model]
 pub struct MatchQueue {
     #[key]
@@ -39,6 +40,7 @@ pub struct MatchQueue {
 //
 // a player in matchmaker queue
 #[derive(Drop, Serde, Introspect)]
+#[derive(DojoLegacyStore)]
 #[dojo::model]
 pub struct MatchPlayer {
     #[key]

@@ -34,6 +34,7 @@ pub trait ITokenBoundInternal<TState> {
 }
 
 #[derive(Copy, Drop, Serde)]
+#[derive(DojoLegacyStore)]
 #[dojo::model]
 pub struct TokenBoundAddress {
     #[key]

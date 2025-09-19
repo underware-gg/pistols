@@ -5,6 +5,7 @@ pub use pistols::types::duelist_profile::{DuelistProfile};
 
 
 #[derive(Copy, Drop, Serde)]
+#[derive(DojoLegacyStore)]
 #[dojo::model]
 pub struct Player {
     #[key]
@@ -26,6 +27,7 @@ pub struct PlayerTimestamps {
 }
 
 #[derive(Clone, Drop, Serde)]
+#[derive(DojoLegacyStore)]
 #[dojo::model]
 pub struct PlayerDuelistStack {
     #[key]
@@ -39,6 +41,7 @@ pub struct PlayerDuelistStack {
 }
 
 #[derive(Clone, Drop, Serde)]
+#[derive(DojoLegacyStore)]
 #[dojo::model]
 pub struct PlayerDelegation {
     #[key]
@@ -54,6 +57,7 @@ pub struct PlayerDelegation {
 // Player tags
 //
 #[derive(Clone, Drop, Serde)]
+#[derive(DojoLegacyStore)]
 #[dojo::model]
 pub struct PlayerTeamFlags {
     #[key]
@@ -63,6 +67,7 @@ pub struct PlayerTeamFlags {
     pub is_admin: bool,
 }
 #[derive(Clone, Drop, Serde)]
+#[derive(DojoLegacyStore)]
 #[dojo::model]
 pub struct PlayerFlags {
     #[key]
@@ -80,6 +85,7 @@ pub struct PlayerFlags {
 // pub identity: ContractAddress,
 //
 #[derive(Copy, Drop, Serde)]
+#[derive(DojoLegacyStore)]
 #[dojo::model]
 pub struct PlayerOnline {
     #[key]

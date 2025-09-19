@@ -6,6 +6,7 @@ pub use pistols::types::duelist_profile::{DuelistProfile, DuelistProfileTrait, G
 // Duelist
 //
 #[derive(Copy, Drop, Serde)]
+#[derive(DojoLegacyStore)]
 #[dojo::model]
 pub struct Duelist {
     #[key]
@@ -34,6 +35,7 @@ pub struct Totals {
 
 
 #[derive(Copy, Drop, Serde)]
+#[derive(DojoLegacyStore)]
 #[dojo::model]
 pub struct DuelistAssignment {
     #[key]
@@ -46,6 +48,7 @@ pub struct DuelistAssignment {
 
 // created for dead duelists
 #[derive(Copy, Drop, Serde)]
+#[derive(DojoLegacyStore)]
 #[dojo::model]
 pub struct DuelistMemorial {
     #[key]

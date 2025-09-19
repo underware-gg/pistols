@@ -1,5 +1,6 @@
 
 #[derive(Copy, Drop, Serde)]
+#[derive(DojoLegacyStore)]
 #[dojo::model]
 pub struct Leaderboard {
     #[key]

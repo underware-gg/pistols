@@ -503,23 +503,23 @@ pub impl StoreImpl of StoreTrait {
 
     #[inline(always)]
     fn get_current_season_id(self: @Store) -> u32 {
-        (self.world.read_member(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("current_season_id")))
+        (self.world.read_member_legacy(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("current_season_id")))
     }
     #[inline(always)]
     fn get_config_lords_address(self: @Store) -> ContractAddress {
-        (self.world.read_member(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("lords_address")))
+        (self.world.read_member_legacy(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("lords_address")))
     }
     #[inline(always)]
     fn get_config_vrf_address(self: @Store) -> ContractAddress {
-        (self.world.read_member(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("vrf_address")))
+        (self.world.read_member_legacy(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("vrf_address")))
     }
     #[inline(always)]
     fn get_config_treasury_address(self: @Store) -> ContractAddress {
-        (self.world.read_member(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("treasury_address")))
+        (self.world.read_member_legacy(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("treasury_address")))
     }
     #[inline(always)]
     fn get_config_is_paused(self: @Store) -> bool {
-        (self.world.read_member(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("is_paused")))
+        (self.world.read_member_legacy(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("is_paused")))
     }
 
     #[inline(always)]
@@ -528,12 +528,12 @@ pub impl StoreImpl of StoreTrait {
     }
     #[inline(always)]
     fn get_season_rules(self: @Store, season_id: u32) -> Rules {
-        (self.world.read_member(Model::<SeasonConfig>::ptr_from_keys(season_id), selector!("rules")))
+        (self.world.read_member_legacy(Model::<SeasonConfig>::ptr_from_keys(season_id), selector!("rules")))
     }
 
     #[inline(always)]
     fn get_challenge_duel_type(self: @Store, duel_id: u128) -> DuelType {
-        (self.world.read_member(Model::<Challenge>::ptr_from_keys(duel_id), selector!("duel_type")))
+        (self.world.read_member_legacy(Model::<Challenge>::ptr_from_keys(duel_id), selector!("duel_type")))
     }
 
     // #[inline(always)]
@@ -556,75 +556,75 @@ pub impl StoreImpl of StoreTrait {
 
     #[inline(always)]
     fn get_duelist_timestamps(self: @Store, duelist_id: u128) -> DuelistTimestamps {
-        (self.world.read_member(Model::<Duelist>::ptr_from_keys(duelist_id), selector!("timestamps")))
+        (self.world.read_member_legacy(Model::<Duelist>::ptr_from_keys(duelist_id), selector!("timestamps")))
     }
     #[inline(always)]
     fn get_duelist_profile(self: @Store, duelist_id: u128) -> DuelistProfile {
-        (self.world.read_member(Model::<Duelist>::ptr_from_keys(duelist_id), selector!("duelist_profile")))
+        (self.world.read_member_legacy(Model::<Duelist>::ptr_from_keys(duelist_id), selector!("duelist_profile")))
     }
     #[inline(always)]
     fn get_duelist_totals(self: @Store, duelist_id: u128) -> Totals {
-        (self.world.read_member(Model::<Duelist>::ptr_from_keys(duelist_id), selector!("totals")))
+        (self.world.read_member_legacy(Model::<Duelist>::ptr_from_keys(duelist_id), selector!("totals")))
     }
     #[inline(always)]
     fn get_duelist_assigned_duel_id(self: @Store, duelist_id: u128) -> u128 {
-        (self.world.read_member(Model::<DuelistAssignment>::ptr_from_keys(duelist_id), selector!("duel_id")))
+        (self.world.read_member_legacy(Model::<DuelistAssignment>::ptr_from_keys(duelist_id), selector!("duel_id")))
     }
     #[inline(always)]
     fn get_duelist_assigned_queue_id(self: @Store, duelist_id: u128) -> QueueId {
-        (self.world.read_member(Model::<DuelistAssignment>::ptr_from_keys(duelist_id), selector!("queue_id")))
+        (self.world.read_member_legacy(Model::<DuelistAssignment>::ptr_from_keys(duelist_id), selector!("queue_id")))
     }
 
     #[inline(always)]
     fn get_player_is_admin(self: @Store, player_address: ContractAddress) -> bool {
-        (self.world.read_member(Model::<PlayerTeamFlags>::ptr_from_keys(player_address), selector!("is_admin")))
+        (self.world.read_member_legacy(Model::<PlayerTeamFlags>::ptr_from_keys(player_address), selector!("is_admin")))
     }
     #[inline(always)]
     fn get_player_is_team_member(self: @Store, player_address: ContractAddress) -> bool {
-        (self.world.read_member(Model::<PlayerTeamFlags>::ptr_from_keys(player_address), selector!("is_team_member")))
+        (self.world.read_member_legacy(Model::<PlayerTeamFlags>::ptr_from_keys(player_address), selector!("is_team_member")))
     }
     #[inline(always)]
     fn get_player_is_blocked(self: @Store, player_address: ContractAddress) -> bool {
-        (self.world.read_member(Model::<PlayerFlags>::ptr_from_keys(player_address), selector!("is_blocked")))
+        (self.world.read_member_legacy(Model::<PlayerFlags>::ptr_from_keys(player_address), selector!("is_blocked")))
     }
     #[inline(always)]
     fn get_player_totals(self: @Store, player_address: ContractAddress) -> Totals {
-        (self.world.read_member(Model::<Player>::ptr_from_keys(player_address), selector!("totals")))
+        (self.world.read_member_legacy(Model::<Player>::ptr_from_keys(player_address), selector!("totals")))
     }
     #[inline(always)]
     fn get_player_alive_duelist_count(self: @Store, player_address: ContractAddress) -> u16 {
-        (self.world.read_member(Model::<Player>::ptr_from_keys(player_address), selector!("alive_duelist_count")))
+        (self.world.read_member_legacy(Model::<Player>::ptr_from_keys(player_address), selector!("alive_duelist_count")))
     }
     #[inline(always)]
     fn get_player_active_signet_ring(self: @Store, player_address: ContractAddress) -> RingType {
-        (self.world.read_member(Model::<Player>::ptr_from_keys(player_address), selector!("active_signet_ring")))
+        (self.world.read_member_legacy(Model::<Player>::ptr_from_keys(player_address), selector!("active_signet_ring")))
     }
     #[inline(always)]
     fn get_player_has_signet_ring(self: @Store, player_address: ContractAddress, ring_type: RingType) -> bool {
-        let ring_balance: u128 = (self.world.read_member(Model::<RingBalance>::ptr_from_keys((player_address, ring_type),), selector!("balance")));
+        let ring_balance: u128 = (self.world.read_member_legacy(Model::<RingBalance>::ptr_from_keys((player_address, ring_type),), selector!("balance")));
         (ring_balance > 0)
     }
     #[inline(always)]
     fn get_player_delegation_can_play_game(self: @Store, player_address: ContractAddress, delegatee_address: ContractAddress) -> bool {
-        (self.world.read_member(Model::<PlayerDelegation>::ptr_from_keys((player_address, delegatee_address),), selector!("can_play_game")))
+        (self.world.read_member_legacy(Model::<PlayerDelegation>::ptr_from_keys((player_address, delegatee_address),), selector!("can_play_game")))
     }
 
     #[inline(always)]
     fn get_active_duelist_id(self: @Store, player_address: ContractAddress, duelist_id: u128) -> u128 {
-        (self.world.read_member(Model::<PlayerDuelistStack>::ptr_from_keys((
+        (self.world.read_member_legacy(Model::<PlayerDuelistStack>::ptr_from_keys((
             player_address,
             self.get_duelist_profile(duelist_id)
         ),), selector!("active_duelist_id")))
     }
     #[inline(always)]
     fn get_ring_type(self: @Store, ring_id: u128) -> RingType {
-        (self.world.read_member(Model::<Ring>::ptr_from_keys(ring_id), selector!("ring_type")))
+        (self.world.read_member_legacy(Model::<Ring>::ptr_from_keys(ring_id), selector!("ring_type")))
     }
 
     #[inline(always)]
     fn get_has_pact(self: @Store, duel_type: DuelType, a: u256, b: u256) -> bool {
         let pair: u128 = PactTrait::make_pair(a, b);
-        let duel_id: u128 = self.world.read_member(Model::<Pact>::ptr_from_keys((duel_type, pair),), selector!("duel_id"));
+        let duel_id: u128 = self.world.read_member_legacy(Model::<Pact>::ptr_from_keys((duel_type, pair),), selector!("duel_id"));
         (duel_id > 0)
     }
 
@@ -635,12 +635,12 @@ pub impl StoreImpl of StoreTrait {
 
     #[inline(always)]
     fn get_match_players_info_batch(self: @Store, keys: Span<(ContractAddress, QueueId)>) -> Array<QueueInfo> {
-        (self.world.read_member_of_models(Model::<MatchPlayer>::ptrs_from_keys(keys), selector!("queue_info")))
+        (self.world.read_member_of_models_legacy(Model::<MatchPlayer>::ptrs_from_keys(keys), selector!("queue_info")))
     }
 
     #[inline(always)]
     fn get_pacts_duel_counts_batch(self: @Store, keys: Span<(DuelType, u128)>) -> Array<u32> {
-        (self.world.read_member_of_models(Model::<Pact>::ptrs_from_keys(keys), selector!("duel_count")))
+        (self.world.read_member_of_models_legacy(Model::<Pact>::ptrs_from_keys(keys), selector!("duel_count")))
     }
 
     //----------------------------------
@@ -650,41 +650,41 @@ pub impl StoreImpl of StoreTrait {
 
     #[inline(always)]
     fn set_config_is_paused(ref self: Store, is_paused: bool) {
-        self.world.write_member(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("is_paused"), is_paused);
+        self.world.write_member_legacy(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("is_paused"), is_paused);
     }
     #[inline(always)]
     fn set_config_season_id(ref self: Store, season_id: u32) {
-        self.world.write_member(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("current_season_id"), season_id);
+        self.world.write_member_legacy(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("current_season_id"), season_id);
     }
     #[inline(always)]
     fn set_config_treasury_address(ref self: Store, treasury_address: ContractAddress) {
-        self.world.write_member(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("treasury_address"), treasury_address);
+        self.world.write_member_legacy(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("treasury_address"), treasury_address);
     }
 
     #[inline(always)]
     fn set_duelist_timestamp_active(ref self: Store, duelist_id: u128, current_timestamp: u64) {
         let model_ptr: ModelPtr<Duelist> = Model::<Duelist>::ptr_from_keys(duelist_id);
-        let mut timestamps: DuelistTimestamps = self.world.read_member(model_ptr, selector!("timestamps"));
+        let mut timestamps: DuelistTimestamps = self.world.read_member_legacy(model_ptr, selector!("timestamps"));
         timestamps.active = current_timestamp;
-        self.world.write_member(model_ptr, selector!("timestamps"), timestamps);
+        self.world.write_member_legacy(model_ptr, selector!("timestamps"), timestamps);
     }
     #[inline(always)]
     fn set_duelist_totals(ref self: Store, duelist_id: u128, totals: Totals) {
-        self.world.write_member(Model::<Duelist>::ptr_from_keys(duelist_id), selector!("totals"), totals);
+        self.world.write_member_legacy(Model::<Duelist>::ptr_from_keys(duelist_id), selector!("totals"), totals);
     }
 
     #[inline(always)]
     fn set_player_totals(ref self: Store, player_address: ContractAddress, totals: Totals) {
-        self.world.write_member(Model::<Player>::ptr_from_keys(player_address), selector!("totals"), totals);
+        self.world.write_member_legacy(Model::<Player>::ptr_from_keys(player_address), selector!("totals"), totals);
     }
     #[inline(always)]
     fn set_player_alive_duelist_count(ref self: Store, player_address: ContractAddress, alive_duelist_count: u16) {
-        self.world.write_member(Model::<Player>::ptr_from_keys(player_address), selector!("alive_duelist_count"), alive_duelist_count);
+        self.world.write_member_legacy(Model::<Player>::ptr_from_keys(player_address), selector!("alive_duelist_count"), alive_duelist_count);
     }
 
     #[inline(always)]
     fn set_match_player_queue_info(ref self: Store, player_address: ContractAddress, queue_id: QueueId, queue_info: QueueInfo) {
-        self.world.write_member(Model::<MatchPlayer>::ptr_from_keys((player_address, queue_id),), selector!("queue_info"), queue_info);
+        self.world.write_member_legacy(Model::<MatchPlayer>::ptr_from_keys((player_address, queue_id),), selector!("queue_info"), queue_info);
     }
 
 

@@ -12,6 +12,7 @@ pub enum RingType {
 // Signet Ring tokens
 //
 #[derive(Copy, Drop, Serde)]
+#[derive(DojoLegacyStore)]
 #[dojo::model]
 pub struct Ring {
     #[key]
@@ -22,6 +23,7 @@ pub struct Ring {
 }
 
 #[derive(Copy, Drop, Serde)]
+#[derive(DojoLegacyStore)]
 #[dojo::model]
 pub struct RingBalance {
     #[key]

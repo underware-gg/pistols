@@ -5,6 +5,7 @@ pub mod CONFIG {
 }
 
 #[derive(Copy, Drop, Serde)]
+#[derive(DojoLegacyStore)]
 #[dojo::model]
 pub struct Config {
     #[key]
@@ -18,6 +19,7 @@ pub struct Config {
 }
 
 #[derive(Copy, Drop, Serde)]
+#[derive(DojoLegacyStore)]
 #[dojo::model]
 pub struct TokenConfig {
     #[key]
@@ -28,6 +30,7 @@ pub struct TokenConfig {
 }
 
 #[derive(Copy, Drop, Serde)]
+#[derive(DojoLegacyStore)]
 #[dojo::model]
 pub struct CoinConfig {
     #[key]

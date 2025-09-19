@@ -3,7 +3,7 @@ use pistols::types::timestamp::{Period};
 //------------------------------------
 // Tournament entry (tournament_token)
 //
-#[derive(Copy, Drop, Serde)]
+#[derive(Copy, Drop)]
 #[dojo::model]
 pub struct TournamentPass {
     #[key]
@@ -21,7 +21,7 @@ pub struct TournamentPass {
 //------------------------------------
 // Tournament loop
 //
-#[derive(Copy, Drop, Serde)]
+#[derive(Copy, Drop)]
 #[dojo::model]
 pub struct Tournament {
     #[key]
@@ -31,15 +31,16 @@ pub struct Tournament {
     pub round_number: u8,           // current or last round
 }
 
-#[derive(Copy, Drop, Serde, PartialEq, Introspect)]
+#[derive(Copy, Drop, PartialEq, Introspect, DojoStore, Default)]
 pub enum TournamentState {
+    #[default]
     Undefined,   // 0
     InProgress,  // 1
     Finished,    // 2
 }
 
 
-#[derive(Copy, Drop, Serde)]
+#[derive(Copy, Drop)]
 #[dojo::model]
 pub struct TournamentRound {
     #[key]
@@ -66,7 +67,7 @@ pub struct TournamentRound {
 // Links tournament rounds to its Duels
 //
 // TournamentToChallenge: required for player B to find the duel created by player A
-#[derive(Copy, Drop, Serde)]
+#[derive(Copy, Drop)]
 #[dojo::model]
 pub struct TournamentToChallenge {
     #[key]
@@ -75,7 +76,7 @@ pub struct TournamentToChallenge {
     pub duel_id: u128,
 }
 // ChallengeToTournament: required to settle results of a duel in the tournament
-#[derive(Copy, Drop, Serde)]
+#[derive(Copy, Drop)]
 #[dojo::model]
 pub struct ChallengeToTournament {
     #[key]
@@ -84,7 +85,7 @@ pub struct ChallengeToTournament {
     pub keys: TournamentDuelKeys,
 }
 
-#[derive(Copy, Drop, Serde, IntrospectPacked)]
+#[derive(Copy, Drop, IntrospectPacked, DojoStore)]
 pub struct TournamentDuelKeys {
     pub tournament_id: u64,
     pub round_number: u8,
@@ -98,7 +99,7 @@ pub struct TournamentDuelKeys {
 // Tournament settings/rules
 // selected in Budokan
 //
-#[derive(Copy, Drop, Serde)]
+#[derive(Copy, Drop)]
 #[dojo::model]
 pub struct TournamentSettings {
     #[key]
@@ -108,14 +109,14 @@ pub struct TournamentSettings {
     // pub description: ByteArray,
 }
 
-#[derive(Serde, Copy, Drop, PartialEq, Introspect)]
+#[derive(Copy, Drop, PartialEq, Introspect)]
 pub enum TournamentType {
     Undefined,          // 0
     LastManStanding,    // 2
     BestOfThree,        // 1
 }
 
-#[derive(Copy, Drop, Serde, Default)]
+#[derive(Copy, Drop, Default)]
 pub struct TournamentRules {
     pub settings_id: u32,       // Budokan settings id
     pub description: felt252,   // @generateContants:shortstring

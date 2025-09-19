@@ -4,31 +4,32 @@ version = 1
 [[package]]
 name = "achievement"
 version = "0.0.0"
-source = "git+https://github.com/cartridge-gg/arcade?tag=v1.6.1#6438a74b589c3cac19b9782709e3845215ec67d6"
+source = "git+https://github.com/rsodre/arcade?rev=dd076d8a628b011fdc4cbcca0de7ec523ecd1d66#dd076d8a628b011fdc4cbcca0de7ec523ecd1d66"
 dependencies = [
  "dojo",
+ "dojo_macros",
 ]
 
 [[package]]
 name = "dojo"
-version = "1.6.1"
-source = "git+https://github.com/dojoengine/dojo?tag=v1.6.1#a4f9445cf925e999d97038f596806ec307981a9b"
+version = "1.7.0-alpha.4"
+source = "git+https://github.com/dojoengine/dojo?tag=v1.7.0-alpha.4#7b78108ce7aea7753c0a9e34cb83465a76bbf2e4"
 dependencies = [
- "dojo_plugin",
+ "dojo_macros",
 ]
 
 [[package]]
 name = "dojo_cairo_test"
-version = "1.6.1"
-source = "git+https://github.com/dojoengine/dojo?tag=v1.6.1#a4f9445cf925e999d97038f596806ec307981a9b"
+version = "1.7.0-alpha.4"
+source = "git+https://github.com/dojoengine/dojo?tag=v1.7.0-alpha.4#7b78108ce7aea7753c0a9e34cb83465a76bbf2e4"
 dependencies = [
  "dojo",
 ]
 
 [[package]]
-name = "dojo_plugin"
-version = "2.10.1"
-source = "git+https://github.com/dojoengine/dojo?tag=v1.6.1#a4f9445cf925e999d97038f596806ec307981a9b"
+name = "dojo_macros"
+version = "1.7.0-alpha.4"
+source = "git+https://github.com/dojoengine/dojo?tag=v1.7.0-alpha.4#7b78108ce7aea7753c0a9e34cb83465a76bbf2e4"
 
 [[package]]
 name = "graffiti"
@@ -38,7 +39,7 @@ source = "git+https://github.com/rsodre/graffiti?rev=url#e8b0854798ebbcebde504ea
 [[package]]
 name = "nft_combo"
 version = "1.0.0"
-source = "git+https://github.com/underware-gg/cairo-nft-combo?tag=v1.0.0#a70521897e115f3418e49ac78cfb693d185fed66"
+source = "git+https://github.com/underware-gg/cairo-nft-combo?branch=v1.0.0_scarb_2.12.2#7769094f3b2481e0ff794c25d307705faef37590"
 dependencies = [
  "graffiti",
  "openzeppelin_introspection",
@@ -91,6 +92,7 @@ dependencies = [
  "achievement",
  "dojo",
  "dojo_cairo_test",
+ "dojo_macros",
  "graffiti",
  "nft_combo",
  "openzeppelin_introspection",

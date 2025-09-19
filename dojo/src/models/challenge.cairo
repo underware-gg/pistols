@@ -8,6 +8,7 @@ use pistols::types::timestamp::{Period};
 // Challenge lifecycle
 //
 #[derive(Copy, Drop, Serde)]
+#[derive(DojoLegacyStore)]
 #[dojo::model]
 pub struct Challenge {
     #[key]
@@ -43,6 +44,7 @@ pub enum DuelType {
 }
 
 #[derive(Clone, Drop, Serde)]
+#[derive(DojoLegacyStore)]
 #[dojo::model]
 pub struct ChallengeMessage {
     #[key]
@@ -54,6 +56,7 @@ pub struct ChallengeMessage {
 //
 // Each duel round
 #[derive(Copy, Drop, Serde)]
+#[derive(DojoLegacyStore)]
 #[dojo::model]
 pub struct Round {
     #[key]

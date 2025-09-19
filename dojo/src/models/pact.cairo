@@ -2,6 +2,7 @@ use pistols::models::challenge::{DuelType};
 
 // Current challenge between two Duelists
 #[derive(Copy, Drop, Serde)]
+#[derive(DojoLegacyStore)]
 #[dojo::model]
 pub struct Pact {
     #[key]

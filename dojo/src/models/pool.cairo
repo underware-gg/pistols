@@ -42,6 +42,7 @@ impl PoolTypeDefault of Default<PoolType> {
 }
 
 #[derive(Copy, Drop, Serde)]
+#[derive(DojoLegacyStore)]
 #[dojo::model]
 pub struct Pool {
     #[key]

@@ -14,6 +14,7 @@ pub enum PackType {
 // Pack (consumable token)
 //
 #[derive(Copy, Drop, Serde)]
+#[derive(DojoLegacyStore)]
 #[dojo::model]
 pub struct Pack {
     #[key]

@@ -2,6 +2,7 @@ pub use pistols::types::rules::{Rules, RulesTrait};
 use pistols::types::timestamp::{Period};
 
 #[derive(Copy, Drop, Serde)]
+#[derive(DojoLegacyStore)]
 #[dojo::model]
 pub struct SeasonConfig {
     #[key]
@@ -21,6 +22,7 @@ pub enum SeasonPhase {
 
 // Per season scoreboard
 #[derive(Copy, Drop, Serde)]
+#[derive(DojoLegacyStore)]
 #[dojo::model]
 pub struct SeasonScoreboard {
     #[key]

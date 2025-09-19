@@ -1,1 +1,4 @@
-scarb 2.10.1
+scarb 2.12.2
+sozo 1.7.0-alpha.4
+katana 1.7.0-alpha.4
+torii 1.7.0-alpha.7
