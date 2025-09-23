@@ -7639,8 +7639,8 @@
       ]
     },
     {
-      "address": "0x29b9f16be2f4d4f474d495dd745db8a92a6f1d8156d1901c19d9d8e5fb419a6",
-      "class_hash": "0x2d2ee192feee9ec2e1e0af22a34264c819e6ef553fe163c65ae43e7f6932ea4",
+      "address": "0x266f83d0a07f5145c0bf78cb691a5d9048894f8e2efaf637a80bc78ca2f3732",
+      "class_hash": "0x34163f5d47c8150733873ab53567a614880348e53f4553b6f2d91eaf6829f95",
       "abi": [
         {
           "type": "impl",
@@ -8484,13 +8484,6 @@
           "items": [
             {
               "type": "function",
-              "name": "create_trophies",
-              "inputs": [],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
               "name": "do_that_thing",
               "inputs": [],
               "outputs": [],
@@ -8631,7 +8624,6 @@
         "emit_player_social_link",
         "clear_player_social_link",
         "emit_player_setting",
-        "create_trophies",
         "do_that_thing",
         "upgrade"
       ]
