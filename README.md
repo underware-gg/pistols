@@ -91,7 +91,7 @@ Pistols at Dawn is an onchain game, in which you face off against another Lord i
 
 ### Environment Setup
 
-> [Dojo Book](https://book.dojoengine.org/getting-started/setup.html)
+> [Dojo Book](https://book.dojoengine.org/getting-started)
 
 Install Rust + Cargo + others
 
@@ -151,24 +151,6 @@ brew install llvm@19
 brew install jq
 brew install protobuf
 cargo install toml-cli
-```
-
-Install the [Cairo 1.0](https://marketplace.visualstudio.com/items?itemName=starkware.cairo1) extension for Visual Studio Code / Cursor
-
-
-### Install Dojo 
-
-> [Dojo Book](https://book.dojoengine.org/getting-started)
-
-```sh
-curl -L https://install.dojoengine.org | bash
-# open new terminal to update PATH
-# install each toolchain component...
-dojoup -v v1.6.2
-# or...
-dojoup component add sozo v1.6.2
-dojoup component add katana v1.6.3
-dojoup component add torii v1.6.1
 
 # test dojo
 cd dojo
@@ -179,6 +161,8 @@ sozo test
 cd ../client
 pnpm install
 ```
+
+* Install the [Cairo 1.0](https://marketplace.visualstudio.com/items?itemName=starkware.cairo1) extension for Visual Studio Code / Cursor
 
 
 ## Launch Dojo
