@@ -8,10 +8,10 @@ catalog:
   #--------------------------------
   # dojo.js
   #
-  "@dojoengine/core": 1.7.0
-  "@dojoengine/sdk": 1.7.1
-  "@dojoengine/torii-client": 1.7.1
-  "@dojoengine/utils": 1.7.0
+  "@dojoengine/core": 1.7.1
+  "@dojoengine/sdk": 1.7.2
+  "@dojoengine/torii-client": 1.7.2
+  "@dojoengine/utils": 1.7.1
   # "@dojoengine/core": ../../dojo4js/packages/core
   # "@dojoengine/sdk": ../../dojo.js/packages/sdk
   # "@dojoengine/torii-client": ../../dojo.js/packages/torii-client
@@ -36,8 +36,8 @@ catalog:
   #--------------------------------
   # misc
   #
-  "@cartridge/connector": 0.10.4
-  "@cartridge/controller": 0.10.4
+  "@cartridge/connector": 0.10.5
+  "@cartridge/controller": 0.10.5
   "@cartridge/presets": 0.5.4
   "@apollo/client": ^3.11.8
   "@types/node": "^22.10.2"
