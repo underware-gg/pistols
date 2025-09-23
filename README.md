@@ -93,15 +93,46 @@ Pistols at Dawn is an onchain game, in which you face off against another Lord i
 Install Rust + Cargo + others
 
 ```sh
-# Install Rust
+# cleanup if you used to use dojoup
+rm -rf ~/.dojo
+rm -rf ~/.local/bin/scarb
+rm -rf ~/.local/share/scarb-install
+rm -rf ~/.cargo
+
+# Install Rust >=1.90
+# https://www.rust-lang.org/tools/install
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 # open new terminal
 rustup override set stable
 rustup update
 
-# Install Scarb v2.10.1
-curl --proto '=https' --tlsv1.2 -sSf https://docs.swmansion.com/scarb/install.sh | sh -s -- -v 2.10.1
+# install asdf
+# https://asdf-vm.com/guide/getting-started.html
+brew install asdf
+
+# configure asdf
+# https://asdf-vm.com/guide/getting-started.html#_2-configure-asdf
+# add this to ~/.zshrc
+export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
+. <(asdf completion bash)
+
+# install Scarb+Dojo plugins
+# https://docs.swmansion.com/scarb/download.html#install-via-asdf
+# https://book.dojoengine.org/installation#installing-with-asdf
+asdf plugin add scarb
+asdf plugin add katana https://github.com/dojoengine/asdf-katana.git
+asdf plugin add torii https://github.com/dojoengine/asdf-torii.git
+asdf plugin add sozo https://github.com/dojoengine/asdf-sozo.git
+asdf install scarb 2.12.2
+asdf install sozo 1.7.0
+asdf install katana 1.7.0-alpha.4
+asdf install torii 1.7.0
+# enable all...
+asdf set -u scarb 2.12.2
+asdf set -u sozo 1.7.0
+asdf set -u katana 1.7.0-alpha.4
+asdf set -u torii 1.7.0
 
 # Install starkli
 # https://github.com/xJonathanLEI/starkli

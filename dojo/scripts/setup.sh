@@ -50,12 +50,12 @@ done
 # check tools
 #
 if ! [ -x "$(command -v toml)" ]; then
-  echo '❌ Error: toml not instlaled!'
+  echo '❌ Error: toml not installed!'
   echo 'Instal with: cargo install toml-cli'
   exit 1
 fi
 if ! [ -x "$(command -v starkli)" ]; then
-  echo '❌ Error: starkli not instlaled!'
+  echo '❌ Error: starkli not installed!'
   echo 'Instal with: curl https://get.starkli.sh | sh'
   exit 1
 fi

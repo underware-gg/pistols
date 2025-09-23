@@ -1,37 +1,29 @@
 [package] 
 name = "pistols"
 version = "1.1.10"
-cairo-version = "2.12.2"
+cairo-version = ">=2.12.2"
 edition = "2024_07"
 license = "CC0-1.0"
 
 [cairo]
 sierra-replace-ids = true
 
-[scripts]
-migrate = "./migrate"
-
 [dependencies]
-starknet = "2.12.2"
-dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.7.0-alpha.4" }
-dojo_macros = { git = "https://github.com/dojoengine/dojo", tag = "v1.7.0-alpha.4" }
-achievement = { git = "https://github.com/rsodre/arcade", rev = "dd076d8a628b011fdc4cbcca0de7ec523ecd1d66" }
-# achievement = { git = "https://github.com/rsodre/arcade", branch = "v1.7.0-alpha.4" }
-# achievement = { git = "https://github.com/cartridge-gg/arcade", tag = "v1.6.1" }
+starknet = ">=2.12.2"
+dojo = "1.7.0"
+dojo_cairo_macros = "1.7.0"
+achievement = { git = "https://github.com/cartridge-gg/arcade", rev = "a4de9f4c38814a19716b6c5f9cbd4213645e9cb1" }
 graffiti = { git = "https://github.com/rsodre/graffiti", rev = "url" }
 nft_combo = { git = "https://github.com/underware-gg/cairo-nft-combo", branch = "v1.0.0_scarb_2.12.2" }
 openzeppelin_token = { git = "https://github.com/OpenZeppelin/cairo-contracts", tag = "v1.0.0" }
 openzeppelin_introspection = { git = "https://github.com/OpenZeppelin/cairo-contracts", tag = "v1.0.0" }
-# openzeppelin_account = { git = "https://github.com/OpenZeppelin/cairo-contracts", tag = "v1.0.0" }
-# openzeppelin_token = { path = "../../cairo-contracts" }
 # cartridge_vrf = { git = "https://github.com/cartridge-gg/vrf" }
 # tournaments = { git = "https://github.com/Provable-Games/tournaments.git" }
 # tournaments = { git = "https://github.com/underware-gg/tournaments", branch = "pistols" }
 
 [dev-dependencies]
-cairo_test = "2.12.2"
-dojo_cairo_test = { git = "https://github.com/dojoengine/dojo.git", tag = "v1.7.0-alpha.4" }
-# openzeppelin_account = { git = "https://github.com/OpenZeppelin/cairo-contracts", tag = "v1.0.0" }
+cairo_test = ">=2.12.2"
+dojo_cairo_test = "1.7.0"
 
 # [features]
 # default = ["lords_mock"]

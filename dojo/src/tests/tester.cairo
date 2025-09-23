@@ -519,7 +519,7 @@ pub mod tester {
             );
         }
 
-        let namespace_def = NamespaceDef {
+        let namespace_def: NamespaceDef = NamespaceDef {
             namespace: "pistols",
             resources: resources.span(),
         };
@@ -528,7 +528,10 @@ pub mod tester {
         testing::set_block_number(1);
         testing::set_block_timestamp(INITIAL_TIMESTAMP);
 
-        let mut world: WorldStorage = spawn_test_world([namespace_def].span());
+        let mut world: WorldStorage = spawn_test_world(
+            dojo::world::world::TEST_CLASS_HASH.into(),
+            [namespace_def].span(),
+        );
 
         world.sync_perms_and_inits(contract_defs.span());
 

@@ -4,32 +4,35 @@ version = 1
 [[package]]
 name = "achievement"
 version = "0.0.0"
-source = "git+https://github.com/rsodre/arcade?rev=dd076d8a628b011fdc4cbcca0de7ec523ecd1d66#dd076d8a628b011fdc4cbcca0de7ec523ecd1d66"
+source = "git+https://github.com/cartridge-gg/arcade?rev=a4de9f4c38814a19716b6c5f9cbd4213645e9cb1#a4de9f4c38814a19716b6c5f9cbd4213645e9cb1"
 dependencies = [
  "dojo",
- "dojo_macros",
+ "dojo_cairo_macros",
 ]
 
 [[package]]
 name = "dojo"
-version = "1.7.0-alpha.4"
-source = "git+https://github.com/dojoengine/dojo?tag=v1.7.0-alpha.4#7b78108ce7aea7753c0a9e34cb83465a76bbf2e4"
+version = "1.7.0"
+source = "registry+https://scarbs.xyz/"
+checksum = "sha256:43866af1b23659c992fcf786f7f69429689eb684d42ffb77a351490e763bf915"
 dependencies = [
- "dojo_macros",
+ "dojo_cairo_macros",
 ]
+
+[[package]]
+name = "dojo_cairo_macros"
+version = "1.7.0"
+source = "registry+https://scarbs.xyz/"
+checksum = "sha256:53d38987d9a0acc9493282711cd504ad4920fd4cd31f230deb5ff4ea11183958"
 
 [[package]]
 name = "dojo_cairo_test"
-version = "1.7.0-alpha.4"
-source = "git+https://github.com/dojoengine/dojo?tag=v1.7.0-alpha.4#7b78108ce7aea7753c0a9e34cb83465a76bbf2e4"
+version = "1.7.0"
+source = "registry+https://scarbs.xyz/"
+checksum = "sha256:3e95042deeef76bd43c8c05b15f8757060663269aed7e31f9c6c4a3934a5cba4"
 dependencies = [
  "dojo",
 ]
-
-[[package]]
-name = "dojo_macros"
-version = "1.7.0-alpha.4"
-source = "git+https://github.com/dojoengine/dojo?tag=v1.7.0-alpha.4#7b78108ce7aea7753c0a9e34cb83465a76bbf2e4"
 
 [[package]]
 name = "graffiti"
@@ -39,7 +42,7 @@ source = "git+https://github.com/rsodre/graffiti?rev=url#e8b0854798ebbcebde504ea
 [[package]]
 name = "nft_combo"
 version = "1.0.0"
-source = "git+https://github.com/underware-gg/cairo-nft-combo?branch=v1.0.0_scarb_2.12.2#7769094f3b2481e0ff794c25d307705faef37590"
+source = "git+https://github.com/underware-gg/cairo-nft-combo?branch=v1.0.0_scarb_2.12.2#a16b7ee2567a7441013044c46649f7003fcdecff"
 dependencies = [
  "graffiti",
  "openzeppelin_introspection",
@@ -91,8 +94,8 @@ version = "1.1.10"
 dependencies = [
  "achievement",
  "dojo",
+ "dojo_cairo_macros",
  "dojo_cairo_test",
- "dojo_macros",
  "graffiti",
  "nft_combo",
  "openzeppelin_introspection",

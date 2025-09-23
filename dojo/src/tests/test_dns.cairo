@@ -35,8 +35,11 @@ mod tests {
                 .with_writer_of([dojo::utils::bytearray_hash(@namespace)].span())
         ].span();
 
-        let namespace_def = NamespaceDef { namespace, resources };
-        let mut world: WorldStorage = spawn_test_world([namespace_def].span());
+        let namespace_def: NamespaceDef = NamespaceDef { namespace, resources };
+        let mut world: WorldStorage = spawn_test_world(
+            dojo::world::world::TEST_CLASS_HASH.into(),
+            [namespace_def].span(),
+        );
         world.sync_perms_and_inits(contract_defs);
         (world, world.rng_dispatcher())
     }
