@@ -44,7 +44,7 @@ fi
 
 echo ">>> Do migrations..."
 # execute_command "sozo -P $PROFILE $ARG_OFFLINE migrate -vvv --world $WORLD_ADDRESS"
-execute_command "sozo -P $PROFILE $ARG_OFFLINE migrate --world $WORLD_ADDRESS $ARG_VERBOSE"
+execute_command "sozo -P $PROFILE $ARG_OFFLINE migrate --max-calls 10 --world $WORLD_ADDRESS $ARG_VERBOSE"
 echo "👍"
 
 # echo ">>> Inspect again..."
