@@ -43,7 +43,7 @@ pub trait IGame<TState> {
 // Exposed to world
 #[starknet::interface]
 pub trait IGameProtected<TState> {
-    fn create_trophies(ref self: TState);
+    // fn create_trophies(ref self: TState);
     fn do_that_thing(ref self: TState);
 }
 
@@ -112,7 +112,8 @@ pub mod game {
         cards::hand::{FinalBlow, FinalBlowTrait},
         constants::{FAME},
     };
-    use pistols::types::trophies::{Trophy, TrophyTrait, TrophyProgressTrait, TROPHY_ID};
+    // use pistols::types::trophies::{Trophy, TrophyTrait, TrophyProgressTrait, TROPHY_ID};
+    use pistols::types::trophies::{TrophyProgressTrait};
     use pistols::utils::address::{ZERO};
     use pistols::libs::{
         store::{Store, StoreTrait},
@@ -147,7 +148,7 @@ pub mod game {
     }
 
     fn dojo_init(ref self: ContractState) {
-        self._create_trophies();
+        // self._create_trophies();
     }
 
     #[generate_trait]
@@ -532,10 +533,10 @@ pub mod game {
     //
     #[abi(embed_v0)]
     impl GameProtectedImpl of super::IGameProtected<ContractState> {
-        fn create_trophies(ref self: ContractState) {
-            self._assert_caller_is_owner();
-            self._create_trophies();
-        }
+        // fn create_trophies(ref self: ContractState) {
+        //     self._assert_caller_is_owner();
+        //     self._create_trophies();
+        // }
         fn do_that_thing(ref self: ContractState) {
             TrophyProgressTrait::the_thing(@self.world_default(), @starknet::get_caller_address());
         }
@@ -556,29 +557,29 @@ pub mod game {
             assert(world.admin_dispatcher().am_i_admin(starknet::get_caller_address()) == true, Errors::CALLER_NOT_ADMIN);
         }
 
-        fn _create_trophies(ref self: ContractState) {
-            let mut world = self.world_default();
-            let mut trophy_id: u8 = 1;
-            while (trophy_id <= TROPHY_ID::COUNT) {
-                let trophy: Trophy = trophy_id.into();
-                self.achievable.create(
-                    world,
-                    id: trophy.identifier(),
-                    hidden: trophy.hidden(),
-                    index: trophy.index(),
-                    points: trophy.points(),
-                    start: trophy.start(),
-                    end: trophy.end(),
-                    group: trophy.group(),
-                    icon: trophy.icon(),
-                    title: trophy.title(),
-                    description: trophy.description(),
-                    tasks: trophy.tasks(),
-                    data: trophy.data(),
-                );
-                trophy_id += 1;
-            }
-        }
+        // fn _create_trophies(ref self: ContractState) {
+        //     let mut world = self.world_default();
+        //     let mut trophy_id: u8 = 1;
+        //     while (trophy_id <= TROPHY_ID::COUNT) {
+        //         let trophy: Trophy = trophy_id.into();
+        //         self.achievable.create(
+        //             world,
+        //             id: trophy.identifier(),
+        //             hidden: trophy.hidden(),
+        //             index: trophy.index(),
+        //             points: trophy.points(),
+        //             start: trophy.start(),
+        //             end: trophy.end(),
+        //             group: trophy.group(),
+        //             icon: trophy.icon(),
+        //             title: trophy.title(),
+        //             description: trophy.description(),
+        //             tasks: trophy.tasks(),
+        //             data: trophy.data(),
+        //         );
+        //         trophy_id += 1;
+        //     }
+        // }
 
         // fn _get_tournament_round(ref self: ContractState, ref store: Store, duel_id: u128) -> Option<(TournamentDuelKeys, TournamentRound)> {
         //     let keys: TournamentDuelKeys = store.get_duel_tournament_keys(duel_id);
