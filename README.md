@@ -282,7 +282,7 @@ VITE_ASSETS_SERVER_URL=https://assets.underware.gg
 
 # optional/alternative dojo urls
 VITE_SLOT_NAME=pistols-mainnet-2
-# VITE_RPC_URL=https://api.cartridge.gg/x/starknet/mainnet/rpc/v0_8
+# VITE_RPC_URL=https://api.cartridge.gg/x/starknet/mainnet/rpc/v0_9
 # VITE_TORII_URL=https://api.cartridge.gg/x/pistols-mainnet-2/torii
 # VITE_TORII_GRAPHQL_URL=https://api.cartridge.gg/x/pistols-mainnet-2/torii/graphql
 # VITE_TORII_SQL_URL=https://api.cartridge.gg/x/pistols-mainnet-2/torii/sql
