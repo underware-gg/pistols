@@ -1,6 +1,6 @@
 {
   "world": {
-    "class_hash": "0x13d92333361bb7049c1232c0a5404e2c19082ededc3a73d75cb33fa952adec7",
+    "class_hash": "0x57994b6a75fad550ca18b41ee82e2110e158c59028c4478109a67965a0e5b1e",
     "address": "0x8b4838140a3cbd36ebe64d4b5aaf56a30cc3753c928a79338bf56c53f506c5",
     "seed": "pistols_v1_0_0",
     "name": "Pistols at Dawn",
@@ -11,11 +11,13 @@
       "register_event",
       "register_model",
       "register_contract",
+      "register_external_contract",
       "register_library",
       "init_contract",
       "upgrade_event",
       "upgrade_model",
       "upgrade_contract",
+      "upgrade_external_contract",
       "emit_event",
       "emit_events",
       "set_entity",
@@ -83,6 +85,10 @@
           {
             "name": "Library",
             "type": "(core::starknet::class_hash::ClassHash, core::felt252)"
+          },
+          {
+            "name": "ExternalContract",
+            "type": "(core::starknet::contract_address::ContractAddress, core::felt252)"
           }
         ]
       },
@@ -213,6 +219,10 @@
           {
             "name": "Enum",
             "type": "core::array::Span::<dojo::meta::layout::FieldLayout>"
+          },
+          {
+            "name": "FixedArray",
+            "type": "(core::array::Span::<dojo::meta::layout::Layout>, core::integer::u32)"
           }
         ]
       },
@@ -369,6 +379,34 @@
           },
           {
             "type": "function",
+            "name": "register_external_contract",
+            "inputs": [
+              {
+                "name": "namespace",
+                "type": "core::byte_array::ByteArray"
+              },
+              {
+                "name": "contract_name",
+                "type": "core::byte_array::ByteArray"
+              },
+              {
+                "name": "instance_name",
+                "type": "core::byte_array::ByteArray"
+              },
+              {
+                "name": "contract_address",
+                "type": "core::starknet::contract_address::ContractAddress"
+              },
+              {
+                "name": "block_number",
+                "type": "core::integer::u64"
+              }
+            ],
+            "outputs": [],
+            "state_mutability": "external"
+          },
+          {
+            "type": "function",
             "name": "register_library",
             "inputs": [
               {
@@ -461,6 +499,30 @@
                 "type": "core::starknet::class_hash::ClassHash"
               }
             ],
+            "state_mutability": "external"
+          },
+          {
+            "type": "function",
+            "name": "upgrade_external_contract",
+            "inputs": [
+              {
+                "name": "namespace",
+                "type": "core::byte_array::ByteArray"
+              },
+              {
+                "name": "instance_name",
+                "type": "core::byte_array::ByteArray"
+              },
+              {
+                "name": "contract_address",
+                "type": "core::starknet::contract_address::ContractAddress"
+              },
+              {
+                "name": "block_number",
+                "type": "core::integer::u64"
+              }
+            ],
+            "outputs": [],
             "state_mutability": "external"
           },
           {
@@ -928,6 +990,85 @@
       },
       {
         "type": "event",
+        "name": "dojo::world::world_contract::world::ExternalContractRegistered",
+        "kind": "struct",
+        "members": [
+          {
+            "name": "namespace",
+            "type": "core::byte_array::ByteArray",
+            "kind": "key"
+          },
+          {
+            "name": "contract_name",
+            "type": "core::byte_array::ByteArray",
+            "kind": "key"
+          },
+          {
+            "name": "instance_name",
+            "type": "core::byte_array::ByteArray",
+            "kind": "key"
+          },
+          {
+            "name": "contract_selector",
+            "type": "core::felt252",
+            "kind": "key"
+          },
+          {
+            "name": "class_hash",
+            "type": "core::starknet::class_hash::ClassHash",
+            "kind": "data"
+          },
+          {
+            "name": "contract_address",
+            "type": "core::starknet::contract_address::ContractAddress",
+            "kind": "data"
+          },
+          {
+            "name": "block_number",
+            "type": "core::integer::u64",
+            "kind": "data"
+          }
+        ]
+      },
+      {
+        "type": "event",
+        "name": "dojo::world::world_contract::world::ExternalContractUpgraded",
+        "kind": "struct",
+        "members": [
+          {
+            "name": "namespace",
+            "type": "core::byte_array::ByteArray",
+            "kind": "key"
+          },
+          {
+            "name": "instance_name",
+            "type": "core::byte_array::ByteArray",
+            "kind": "key"
+          },
+          {
+            "name": "contract_selector",
+            "type": "core::felt252",
+            "kind": "key"
+          },
+          {
+            "name": "class_hash",
+            "type": "core::starknet::class_hash::ClassHash",
+            "kind": "data"
+          },
+          {
+            "name": "contract_address",
+            "type": "core::starknet::contract_address::ContractAddress",
+            "kind": "data"
+          },
+          {
+            "name": "block_number",
+            "type": "core::integer::u64",
+            "kind": "data"
+          }
+        ]
+      },
+      {
+        "type": "event",
         "name": "dojo::world::world_contract::world::ModelUpgraded",
         "kind": "struct",
         "members": [
@@ -1258,6 +1399,16 @@
             "kind": "nested"
           },
           {
+            "name": "ExternalContractRegistered",
+            "type": "dojo::world::world_contract::world::ExternalContractRegistered",
+            "kind": "nested"
+          },
+          {
+            "name": "ExternalContractUpgraded",
+            "type": "dojo::world::world_contract::world::ExternalContractUpgraded",
+            "kind": "nested"
+          },
+          {
             "name": "ModelUpgraded",
             "type": "dojo::world::world_contract::world::ModelUpgraded",
             "kind": "nested"
@@ -1329,7 +1480,7 @@
   "contracts": [
     {
       "address": "0x610423526de7adfd8c18bd027111fcb7d1bc0de329f28fb651a34752273328a",
-      "class_hash": "0x7fa1a64b492c18ebd782e5c9afabd5d0a0b43b9155dafb7cfcb944aca85494",
+      "class_hash": "0x5824afd06bc00b70270b82d2eb35f6dbfdcc9d4baca78325dbb0f95d7e9e761",
       "abi": [
         {
           "type": "impl",
@@ -1343,7 +1494,7 @@
         },
         {
           "type": "impl",
-          "name": "admin__DeployedContractImpl",
+          "name": "DojoDeployedContractImpl",
           "interface_name": "dojo::meta::interface::IDeployedResource"
         },
         {
@@ -1707,7 +1858,7 @@
     },
     {
       "address": "0x426c16fe76f12586718c07e47c8e4312e9fee5e7dc849a75f3c587ad9e70b4f",
-      "class_hash": "0x30014497d5293e28c06c8a2b5f896f8fd056f9b4956937bfae278c08490d108",
+      "class_hash": "0xeaeaa196f06243412aadde9e28228572b1145c58f9251ca3a2533145e4d3a5",
       "abi": [
         {
           "type": "impl",
@@ -1721,7 +1872,7 @@
         },
         {
           "type": "impl",
-          "name": "bank__DeployedContractImpl",
+          "name": "DojoDeployedContractImpl",
           "interface_name": "dojo::meta::interface::IDeployedResource"
         },
         {
@@ -2185,7 +2336,7 @@
     },
     {
       "address": "0x5d9c9168e6bf86f250a813d38ad5a95c67cb3ca42ab93411a184c9c731fa69a",
-      "class_hash": "0x17e1994b1dffb3360885b4651db15a42502ef984d421d130dfffe018816ae22",
+      "class_hash": "0x19eb9a9740c2aae565d8c2ab10568396b686a419fbbcdcacbeb365137f6af93",
       "abi": [
         {
           "type": "impl",
@@ -2199,7 +2350,7 @@
         },
         {
           "type": "impl",
-          "name": "bot_player__DeployedContractImpl",
+          "name": "DojoDeployedContractImpl",
           "interface_name": "dojo::meta::interface::IDeployedResource"
         },
         {
@@ -2866,7 +3017,7 @@
     },
     {
       "address": "0x2e9c711b1a7e2784570b1bda5082a92606044e836ba392d2b977d280fb74b3c",
-      "class_hash": "0x6d95f01cc2f30794c2c2c908f1d1d6f0c3b4b3b7a98a1f44143c2627cc62e62",
+      "class_hash": "0x3b1ed939f302c693a661ab7c45165adb8f75ca9994914d94a695ca9dc36480b",
       "abi": [
         {
           "type": "impl",
@@ -2880,7 +3031,7 @@
         },
         {
           "type": "impl",
-          "name": "duel_token__DeployedContractImpl",
+          "name": "DojoDeployedContractImpl",
           "interface_name": "dojo::meta::interface::IDeployedResource"
         },
         {
@@ -4282,7 +4433,7 @@
     },
     {
       "address": "0x7aaa9866750a0db82a54ba8674c38620fa2f967d2fbb31133def48e0527c87f",
-      "class_hash": "0x18de66a023e76ba920304595d75eab50f369dc0497a94a26b5aa5d44d29c7c4",
+      "class_hash": "0x6694e85a690880657a9ad4372a47e7473075fd15138ff2222ad75d45608b058",
       "abi": [
         {
           "type": "impl",
@@ -4296,7 +4447,7 @@
         },
         {
           "type": "impl",
-          "name": "duelist_token__DeployedContractImpl",
+          "name": "DojoDeployedContractImpl",
           "interface_name": "dojo::meta::interface::IDeployedResource"
         },
         {
@@ -6266,7 +6417,7 @@
     },
     {
       "address": "0x2549653a4ae1ff8d04a20b8820a49cbe97486c536ec0e4c8f68aa33d80067cf",
-      "class_hash": "0x20fd57cd17a275eae64605b5a65b20f0364eac4abdb3381e363f355e8981241",
+      "class_hash": "0x3078e54ea37910ef039e0a3678541f73c75532c3c71fb51d815c2689ca7374",
       "abi": [
         {
           "type": "impl",
@@ -6280,7 +6431,7 @@
         },
         {
           "type": "impl",
-          "name": "fame_coin__DeployedContractImpl",
+          "name": "DojoDeployedContractImpl",
           "interface_name": "dojo::meta::interface::IDeployedResource"
         },
         {
@@ -6969,7 +7120,7 @@
     },
     {
       "address": "0x68a7a07e08fc3e723a878223d00f669106780d5ea6665eb15d893476d47bf3b",
-      "class_hash": "0x748b43aa471b22aa043df47a0f4e60278483fe32b6a03769f0205e3af911b54",
+      "class_hash": "0x4ff8f72d0da76be818b3aa05b62c286e3b7bfbc87ec0097fba17003244fa76c",
       "abi": [
         {
           "type": "impl",
@@ -6983,7 +7134,7 @@
         },
         {
           "type": "impl",
-          "name": "fools_coin__DeployedContractImpl",
+          "name": "DojoDeployedContractImpl",
           "interface_name": "dojo::meta::interface::IDeployedResource"
         },
         {
@@ -7489,7 +7640,7 @@
     },
     {
       "address": "0x2c6a7c98a9dea8322b51018eef7be99ebedd209cebdaacb9f4c5bbf661c1cc9",
-      "class_hash": "0x58ea43835a41f92b11cc13e38a66641af52e173db2af3f94984060303d39955",
+      "class_hash": "0x34163f5d47c8150733873ab53567a614880348e53f4553b6f2d91eaf6829f95",
       "abi": [
         {
           "type": "impl",
@@ -7503,7 +7654,7 @@
         },
         {
           "type": "impl",
-          "name": "game__DeployedContractImpl",
+          "name": "DojoDeployedContractImpl",
           "interface_name": "dojo::meta::interface::IDeployedResource"
         },
         {
@@ -8333,13 +8484,6 @@
           "items": [
             {
               "type": "function",
-              "name": "create_trophies",
-              "inputs": [],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
               "name": "do_that_thing",
               "inputs": [],
               "outputs": [],
@@ -8480,14 +8624,13 @@
         "emit_player_social_link",
         "clear_player_social_link",
         "emit_player_setting",
-        "create_trophies",
         "do_that_thing",
         "upgrade"
       ]
     },
     {
       "address": "0x46c950af2df9e56e0a225356afb73ce6d67c9fa44122bc82c1c4f0106307440",
-      "class_hash": "0x35b3a7047b92ddb5d2deaf1b3db751bf36c879b6251713c9418c822c9a08e1c",
+      "class_hash": "0xbcd062078f619fccfd153027a92cb47c4b1353f95fbd877654fab47c6cdd76",
       "abi": [
         {
           "type": "impl",
@@ -8501,7 +8644,7 @@
         },
         {
           "type": "impl",
-          "name": "game_loop__DeployedContractImpl",
+          "name": "DojoDeployedContractImpl",
           "interface_name": "dojo::meta::interface::IDeployedResource"
         },
         {
@@ -9246,7 +9389,7 @@
     },
     {
       "address": "0x16f7e3c140b4778e776221c7bb8b880d20d247c3ab0d06fab9a8eb96e7098bb",
-      "class_hash": "0x116b549e01f5f37afcb820ef2521b3635cd791bb7762d5b74144c96acc0669f",
+      "class_hash": "0x43c85aa3cfe7397739ad865ef4ff75592e22c9717125a9c7c102364fb1c709f",
       "abi": [
         {
           "type": "impl",
@@ -9260,7 +9403,7 @@
         },
         {
           "type": "impl",
-          "name": "matchmaker__DeployedContractImpl",
+          "name": "DojoDeployedContractImpl",
           "interface_name": "dojo::meta::interface::IDeployedResource"
         },
         {
@@ -9594,7 +9737,7 @@
     },
     {
       "address": "0x71333ac75b7d5ba89a2d0c2b67d5b955258a4d46eb42f3428da6137bbbfdfd9",
-      "class_hash": "0x7ba9bba8262ef3ac5de56b6f735a3fd16c4097b0b0a64ac5a7e09ea5c8f2e7a",
+      "class_hash": "0x57ba425aa9e19ad4613cc6d82f34c4b498979cee2f94b13397af8d7672512db",
       "abi": [
         {
           "type": "impl",
@@ -9608,7 +9751,7 @@
         },
         {
           "type": "impl",
-          "name": "pack_token__DeployedContractImpl",
+          "name": "DojoDeployedContractImpl",
           "interface_name": "dojo::meta::interface::IDeployedResource"
         },
         {
@@ -11270,7 +11413,7 @@
     },
     {
       "address": "0x14aa76e6c6f11e3f657ee2c213a62006c78ff2c6f8ed40b92c42fd554c246f2",
-      "class_hash": "0x339e7188d78c1bfc1d22cc74863b658c17116a98ce9de6ff8696b3ec9229ce3",
+      "class_hash": "0x392b3ba0590bc1d99254b8f40e578f38bc9ab3b23a7b0c8faabeb63b69b0555",
       "abi": [
         {
           "type": "impl",
@@ -11284,7 +11427,7 @@
         },
         {
           "type": "impl",
-          "name": "ring_token__DeployedContractImpl",
+          "name": "DojoDeployedContractImpl",
           "interface_name": "dojo::meta::interface::IDeployedResource"
         },
         {
@@ -12461,7 +12604,7 @@
     },
     {
       "address": "0x7c1cf4925c8349eb594ed0f1fe7c036664ca1342cfafd35fda5ce92475df798",
-      "class_hash": "0x441b500039f5f95100d43f94d4290c39a1a85ad16e9314151f2bbbd3ed68688",
+      "class_hash": "0x60119f3bd53c47e4fd6113c4d8432a8b0db79605617b9036793b8a34ff0d54a",
       "abi": [
         {
           "type": "impl",
@@ -12475,7 +12618,7 @@
         },
         {
           "type": "impl",
-          "name": "rng__DeployedContractImpl",
+          "name": "DojoDeployedContractImpl",
           "interface_name": "dojo::meta::interface::IDeployedResource"
         },
         {
@@ -12730,7 +12873,7 @@
     },
     {
       "address": "0x62047f0e743448e97e28398e980b63f25d6c071a2599655d6b03404773c8cbf",
-      "class_hash": "0x1e59282be83ac9b2cd0e293fd23186df616fa1ac69a6733f9d42f717b3c276a",
+      "class_hash": "0x70c052af27992b1dd7c67fa18843494031be9798315c14ba5084b3e4769724a",
       "abi": [
         {
           "type": "impl",
@@ -12744,7 +12887,7 @@
         },
         {
           "type": "impl",
-          "name": "rng_mock__DeployedContractImpl",
+          "name": "DojoDeployedContractImpl",
           "interface_name": "dojo::meta::interface::IDeployedResource"
         },
         {
@@ -13023,7 +13166,7 @@
     },
     {
       "address": "0x3c77186b8e509085ec66e1a5d1dbcf9dc1f212852b4c1f461a48901d290fc9b",
-      "class_hash": "0x44733e724240e9d09eb9124277ce87499d2aee8509e2e4d6c502241cfb87346",
+      "class_hash": "0x3b9e6fa41fa83d60a66b5ed76dcaae84983735adb7658518c968e8443903460",
       "abi": [
         {
           "type": "impl",
@@ -13037,7 +13180,7 @@
         },
         {
           "type": "impl",
-          "name": "tutorial__DeployedContractImpl",
+          "name": "DojoDeployedContractImpl",
           "interface_name": "dojo::meta::interface::IDeployedResource"
         },
         {
@@ -13671,163 +13814,163 @@
   "models": [
     {
       "members": [],
-      "class_hash": "0x32cce036a1075df6d34ca9cb0d050bb12a989596df70b21536f7e52ffe0db96",
+      "class_hash": "0x273cd00eb80252d920b87f9944b73cb68ffb6021efcf0852d30dc980d2f15e",
       "tag": "pistols-Challenge",
       "selector": "0x673267b69d74c703ea86d97b041278944b49f62b52867345a95d3047b11378a"
     },
     {
       "members": [],
-      "class_hash": "0x632e2f28fcfbb1e2d16568af88baaaf4e527e7df8491cb126871a0cbd3f4d49",
+      "class_hash": "0x1cb3923ff44943ab6d1c311fb22e7f2448e016867d63e5a7c2c61f7ded746c",
       "tag": "pistols-ChallengeMessage",
       "selector": "0x1718653e9a900d7f6a3c59a2c98b6704b9b8e580674c9395bf9b6c0be098e27"
     },
     {
       "members": [],
-      "class_hash": "0x63447de4f95b77c7f4cd93d41f0661ae781b9c6cca5a4dede1a30fc1542f88a",
+      "class_hash": "0x232143bc765ba1019a600eee1cae1d09fcf71fea7e616cc39e344f15bd4c61a",
       "tag": "pistols-CoinConfig",
       "selector": "0x26fad4dff063a4f2c3b3889723194b9bdbbbf833e44ff2d573af01741b966ac"
     },
     {
       "members": [],
-      "class_hash": "0x6772ca79b35b9aae87ae7cd7480c6ff080752f5c79acf8fa7cb24dd49c4b54e",
+      "class_hash": "0x7d4ce046ee9138b227b60b72401b15affac65d9fc0764b7bc858ceeefeaa581",
       "tag": "pistols-Config",
       "selector": "0x60742fa7259b7ce3ebc0a2dde90b740d1234c770199a822fa2e7cf779dc0392"
     },
     {
       "members": [],
-      "class_hash": "0x4413d46ccf25658dd83beb3630e4d34a92dd9678d311b54a294898b823c47db",
+      "class_hash": "0x3d4a7b10d971439b6457469ba3cea44de41d9aede48b93d106730651de5f6f8",
       "tag": "pistols-Duelist",
       "selector": "0x1ec34ce9ccaa39b540179d85e0dd0d46c1c1ae712f4cb40a9cd7f8c21ebaa46"
     },
     {
       "members": [],
-      "class_hash": "0x6202af98d1a8b8b26aef1fd10827757a0b3a13fd0539474e120e2e34dbfd558",
+      "class_hash": "0xcd69f7c185ab785ea6954c5deada5c59c93d4e102338783b01ecdd6a499da9",
       "tag": "pistols-DuelistAssignment",
       "selector": "0x3f4e86c5f78bd99b4030bb44259374c178e3c03f664ce866d15e4ddcd7d4e52"
     },
     {
       "members": [],
-      "class_hash": "0x2fec9ee5c8d4dc0cddea327127fc7ce7f8b9dd4805c3678dcdd612dfe3588eb",
+      "class_hash": "0x29dd75e653e32c4e6a6cae12b2a45f29ec561fbf785829740363465df0b68d8",
       "tag": "pistols-DuelistMemorial",
       "selector": "0x399b9689c37bf440c4f0478f361f68bd59161d01a096160d3ceaeae53b67b71"
     },
     {
       "members": [],
-      "class_hash": "0x3c46ca1685eb59e739c1b96c432950f001a21b6edc7ab79d22aca58e09b6a",
+      "class_hash": "0x2d42fa0dda3865082d1a3a3686dc40c2f8f5f5ac8b77842250373722d7217c",
       "tag": "pistols-Leaderboard",
       "selector": "0x39835217fd4998f6024a6ae92f98bd185d158168f92b4363a47f73e5e1073ae"
     },
     {
       "members": [],
-      "class_hash": "0x7e12c0e2489cded16a6e1b2aa36267e772b9c96101d0c4455f38422a5a76314",
+      "class_hash": "0x44cf00ab068bd30d776a6ce4b112ff1298d87f4be8b76e7c725b46a08183eae",
       "tag": "pistols-MatchPlayer",
       "selector": "0x36cbfae32f102062669ab4daf04b39bf84c9ae8e26e7f0813a9728fe3c11558"
     },
     {
       "members": [],
-      "class_hash": "0x774299d993f95cf01267a5488671415cd4d6900fdc27aa2f24e84ba1b2888bd",
+      "class_hash": "0x24170217e601dc2320293530bbcb54f82250362449cd2d1aedde448b909abdc",
       "tag": "pistols-MatchQueue",
       "selector": "0x624ecb978d73d21798831974104ecd70c0013d09e9a440db4a7a8bd066cd7fc"
     },
     {
       "members": [],
-      "class_hash": "0x625e5904addd4c29fa90f3eed093d5794199df904ca6abcdab9a673a9f90c38",
+      "class_hash": "0x12228d6ab7b4a47a9aeff5f048ba29549952ea47c1b7779ce3a86706ac1864a",
       "tag": "pistols-MockedValue",
       "selector": "0x8deb0b9e5cc0c6c2089ee6a4bfdd306444147a869b6179c4e22b283a5176dc"
     },
     {
       "members": [],
-      "class_hash": "0x7c04cf5dab74384eefd397d2288716c8dc29896b0c4c4da56fef9001bdb0d45",
+      "class_hash": "0x3c77f8c8deb967ffbd633bdeccf2598924ee000f0a12aab2fab0357e9e1794c",
       "tag": "pistols-Pack",
       "selector": "0x64159b4947adcdc7a87b41f7889ba33495ac8e3a3a333305c7712806763fa2d"
     },
     {
       "members": [],
-      "class_hash": "0x6b120d5e58b33874535dc1140b11cd8c3927d8790ca9f29ebec638061d80a5e",
+      "class_hash": "0x52d650db3575ec880512d15d83e68f00a444b2a60633458bd3636ee493448b",
       "tag": "pistols-Pact",
       "selector": "0x72a33a6586ae24471fdae1c6f3cc9da6629f3fd3dce300a48324617dd511617"
     },
     {
       "members": [],
-      "class_hash": "0xcb51faf59c9c97028878391e88d82cd2ac215ee469e8d1d7617f3f49d0ba92",
+      "class_hash": "0x7f06a945cb1414be96961dc9ae230f31f3af1e05825ca539a145d1c132d2511",
       "tag": "pistols-Player",
       "selector": "0x4fc7ed2304172cd24d40e2b967bf3642228eec13547b09e0ffdfb85469f6f86"
     },
     {
       "members": [],
-      "class_hash": "0x72274721bf23c93387459a3d59a30dd1c064a57181c165e3d3432e97ec72a0e",
+      "class_hash": "0x25b202ae41897b6686aaea05fe98c3f19e657bff46507841a2356ccab3390ca",
       "tag": "pistols-PlayerDelegation",
       "selector": "0x54aec2977788969f3222b10eb58bb6560e6b364483932a454b8f95b7bcb5f8e"
     },
     {
       "members": [],
-      "class_hash": "0x59719e51e7c5ebb309313f968958e7d37a1b997c77b8a826dbb6c40c3a37cd3",
+      "class_hash": "0x15048ae790dd4b34ab6b36b1e9783ec9709b0844a2e42f881bfc76564be88da",
       "tag": "pistols-PlayerDuelistStack",
       "selector": "0xb47a4ea3849ae004ed3d0ba58070c0eb3cdca2bed8c9a6ab6bfe01210effc6"
     },
     {
       "members": [],
-      "class_hash": "0x5d5c9b201fb263769884201e72d2b92b4aa2a9f242a914a78eda1fca60d4cd0",
+      "class_hash": "0x149ac6b786ec69522a8e8f2b6bf6a29de8ec10da1a3553e9b267d9535adcf59",
       "tag": "pistols-PlayerFlags",
       "selector": "0x14dddd7c3b64adcbff56d72f482cf837ee1c24c81f28fe6edc10654b0b2c6ac"
     },
     {
       "members": [],
-      "class_hash": "0x42616c87e5a616960bb886857ac93b1f2081a4a35466f2302120c7d1998d151",
+      "class_hash": "0x119e627e34084181597ecc9dd0b7315c35b0452148dcb22e3ca817c6ea8633a",
       "tag": "pistols-PlayerOnline",
       "selector": "0x6f3391bc3684ea92009be25543fc6cc734c1f756253523354efdf10e2a57dff"
     },
     {
       "members": [],
-      "class_hash": "0x7b3c2334d9ffa8131f4990d07cd617bd72d929d21edbdd2dcfb933c9ef22719",
+      "class_hash": "0xf4208869b64f2c9ca62aced5c28c432033fa79784c7f5467b58f48f97f3ef3",
       "tag": "pistols-PlayerTeamFlags",
       "selector": "0x2489d18f02fac0971dd8e249bfa97f8b28d3d5527bc9db1517bb411abd07151"
     },
     {
       "members": [],
-      "class_hash": "0x4e29528b41c56c75bf382febe9833b6cb301e058333cfaf207d6955a78b45a5",
+      "class_hash": "0x2352b78ce3eeae0dcc9bd0ecec8971999e06561f0429d751ab479709a2465fe",
       "tag": "pistols-Pool",
       "selector": "0xb4328e5f120dfe361a8f367e6ea51e2be55dbc6b1c9f2c17a87b7d06ab8972"
     },
     {
       "members": [],
-      "class_hash": "0x2808cea8f9fa67b944ef17b9c939e6ebef44d41b53798bf8a5bddf2ec115a85",
+      "class_hash": "0x2c887233e4dc345d861b5b2db47ec88bd3ae99655dfac14de8a4b7ff21a714f",
       "tag": "pistols-Ring",
       "selector": "0x34351c549b6e63b6b7342e3ea8e75c28c5ec360414805eab776b75a979bacc9"
     },
     {
       "members": [],
-      "class_hash": "0x56c18bf002e28974b95d9fa923e459bf1fe59ac86925750dc2419e653fbedbb",
+      "class_hash": "0x6ef807ae7da08cb29d5082bfa5ba7dbf28df309bb29bdcafe91d2f783b0907c",
       "tag": "pistols-RingBalance",
       "selector": "0x771214858afa98884b58a8a719e616f10c80ce915c4c5233f658e69245c126b"
     },
     {
       "members": [],
-      "class_hash": "0x23cd7b14e65107b32b07bb47054c91828eea0b1ed46dfffae812b3b2d9bfeee",
+      "class_hash": "0x58d1571630e7ddd52ef4a06f447f00f151e931bb16b8858b7529af60a23a670",
       "tag": "pistols-Round",
       "selector": "0x617e0a3d97aa8cb3f83bbb5341ede98d3e3d825b6424bcab0676933fec52bc2"
     },
     {
       "members": [],
-      "class_hash": "0x14e87e626c23c0b6d25b1ac16c89ec9f85c90e342a984caa7dd3af6e2ed582e",
+      "class_hash": "0x368fb80a46d95dd92042bc0a4d0298b7c6cccfb3d19f07ecc153a5550989365",
       "tag": "pistols-SeasonConfig",
       "selector": "0x407b92d935dd7193931243082059cb7180309a73de27eea948ffa0649f6ebf3"
     },
     {
       "members": [],
-      "class_hash": "0xc24b772517c0635529934153a926c46ccb2f47933b10e8e32c54b5d40e5043",
+      "class_hash": "0x436294e33c5de171c8d1601fdcf895ac45ab2d542234fda8643757d00223573",
       "tag": "pistols-SeasonScoreboard",
       "selector": "0x61ce6335075a988d622daba43a8b6893062e84f0deda10fa764ec399827faa9"
     },
     {
       "members": [],
-      "class_hash": "0x7976b62d5caed7e1b4401b157e43a4c9783a494877dcc1208cfb5fb433e9c61",
+      "class_hash": "0x33073d7e125fc7a191136e996aa45b817b8619d7a2910eb1b615dbca7a779d2",
       "tag": "pistols-TokenBoundAddress",
       "selector": "0x51e7eddb7555dc0cb6f6bdb0de4d85ac38457ede50d70e4f714a27c00047c8f"
     },
     {
       "members": [],
-      "class_hash": "0x35d85a648e4ab43d10b7d316f1b08822cccfe7e36faf4c0ad7583e7d7efe697",
+      "class_hash": "0x2cc6621b64b05dcab8bbaeffc9155a769d9aa0a8914d7c4a903a49deaba4a6a",
       "tag": "pistols-TokenConfig",
       "selector": "0x56ebd3387f45e8b292b472f3539e675031f12cf156c07c309c6403044f71fed"
     }
@@ -13835,55 +13978,55 @@
   "events": [
     {
       "members": [],
-      "class_hash": "0x1e184235ea5f0c9d811c574f51ba8603d4c608e7604b85371040e14556563f6",
+      "class_hash": "0x411f5ba56fb72efb739bf5dfd3d461506d8d14ad4fbc3c3862ee421021ab012",
       "tag": "pistols-CallToChallengeEvent",
       "selector": "0x1ba7f84f0de5fbe4d2d56640e9c17b2f0ec42dbdaaba69eb31fa4b6ad4fe63f"
     },
     {
       "members": [],
-      "class_hash": "0x2f5683a169af038aebc19144d83017693ce5af6e68f2a52b8081546d9030e37",
+      "class_hash": "0x7713a6a889b68e88d5f046dbab352e7d8f3b5e166a54a0c6639956d871cc9f2",
       "tag": "pistols-ChallengeRewardsEvent",
       "selector": "0x5d14202bbb6fb802276824aacd8f0256d17d49407a1909c2de53c66acebcfa8"
     },
     {
       "members": [],
-      "class_hash": "0x3c6dc947d9450405b7cb66377c2f17bb03b573700c223083ec364983e5c7dfe",
+      "class_hash": "0x36030567075dbbc2fc27f746d789391ccc09043268a4a5ab581531bf0e74efc",
       "tag": "pistols-LordsReleaseEvent",
       "selector": "0x7121aa913fad664b07951ce2c9a3ee807c721c6fa15b015d5b6fc22f8daa7a1"
     },
     {
       "members": [],
-      "class_hash": "0x30f045ec01d80f780a5e9c2d8e1bbf509281083c9aac074cb662d6184286c8a",
+      "class_hash": "0x24fc10c0ca4fc5425fdd281176a79e7f8403bb777cf513155cdc4fa0114722e",
       "tag": "pistols-PlayerActivityEvent",
       "selector": "0x46a192c105a4598953e7aeaf3809703964eb9e6d65403156d0458dcd2ee379b"
     },
     {
       "members": [],
-      "class_hash": "0x617a32d2569068cebd7e633e7e7b26ba207233494d324d0705b6aa695f340bc",
+      "class_hash": "0x435054f46020ddf8ceec6c69e8a0e6510c367e5b12a888cf0e33f5bf8e2768b",
       "tag": "pistols-PlayerBookmarkEvent",
       "selector": "0x3075e796a774ce4fe1a6f34d9cf7915d5d76f0bcdec07acb8af65fbb3b23b4"
     },
     {
       "members": [],
-      "class_hash": "0x161013bbdf7383c8b4a038785fac31550cfec40ab291318b79f713b5ddfc582",
+      "class_hash": "0x36f0852e0be2c29bf7cd78604a2fc589ee845b9a1cbdd1f76c6d5b7ff91a16c",
       "tag": "pistols-PlayerSettingEvent",
       "selector": "0x11eaf687b501164991ef978d89c94bd94698f102deafddda9b777e5cefd9a58"
     },
     {
       "members": [],
-      "class_hash": "0x60986606db824831cacf73e1b8464c285a1bf3b298dce052af8f2a33e25bcac",
+      "class_hash": "0x553da86fa42c38891f5dde9be00530c823b12610de41b0bd6d4ddd7c01f8863",
       "tag": "pistols-PlayerSocialLinkEvent",
       "selector": "0x480838a3c770e19dee008a3d8f3668402af487acf0d2ecacc584ec65a22f845"
     },
     {
       "members": [],
-      "class_hash": "0x702d5440a155e0704b268f8d6dbf74cb8ae09b164064fe3b4f896cf725dcac7",
+      "class_hash": "0x21c8f9729d91b7e385218f5d396e084137b13144227b2b53060ee7c3c72e24a",
       "tag": "pistols-TrophyCreation",
       "selector": "0x193f7990b65fed69ab857fd2526961d796fc50b6a72287c5be68f32415ad80c"
     },
     {
       "members": [],
-      "class_hash": "0x113e43bc604068a5811205b126a3e318b21e5c72746138efa6fb40277067f00",
+      "class_hash": "0x10a76e791a65a86a40e9b10d175104e370746e6ad2c57a658d17468a73f403d",
       "tag": "pistols-TrophyProgression",
       "selector": "0x528aee6e1c2ad2e0f603b1bfe15e3aefc1ded821cd118e5eab5092b704c79b0"
     }
