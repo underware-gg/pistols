@@ -10,7 +10,6 @@ const testPages = [
   { name: 'socials', connected: true },
   { name: 'tokens', connected: true },
   { name: 'tutorial', connected: true },
-  { name: 'matchmaking', connected: true },
   { name: 'timestamp', connected: true },
   { name: 'profiles', connected: false },
   { name: 'icons', connected: false },
