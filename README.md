@@ -51,19 +51,22 @@ Pistols at Dawn is an onchain game, in which you face off against another Lord i
 > **Blood sprays in a beautiful arc from his head, and he drops like a felled log. Silence, interrupted only by the spattering of
 > blood from your arm, into the morning grass.**
 
+
 ## Team
 
-* Recipromancer — Lead, Renaissance Chaos Mode - [@recipromancer](https://x.com/recipromancer)
-* Mataleone — Engineering - [@matalecode](https://x.com/matalecode)
-* FortunaRegem - Engineering, Frontend, UI & Animations - [@FortunaRegem](https://x.com/FortunaRegem)
+* Recipromancer — Founder, Renaissance Chaos Mode - [@recipromancer](https://x.com/recipromancer)
+* Mataleone — Co-Founder & Tech Lead. Engineering, backend, infra, smart contracts - [@matalecode](https://x.com/matalecode)
+* FortunaRegem - Frontend & Product Lead. Engineering, frontend, UI, game design - [@FortunaRegem](https://x.com/FortunaRegem)
 * Amaro — Art, Design, UI & Animations - [@AmaroKoberle](https://x.com/AmaroKoberle)
-* Parsa - Comms, Marketing, Operations - [@ParsaBolor] (https://x.com/ParsaBolor)
-* Mononoke - Art, Brand, Marketing - [@MononokeArts] (https://x.com/MononokeArts)
-* Jubilee - R&D, Technical 3D systems
+* Parsa - Comms, Marketing, Operations - [@ParsaBolor](https://x.com/ParsaBolor)
+* Nehkee - Comms, Marketing, Operations - [@paceking1](https://x.com/paceking1)
 
 ### Other Contributors
 
-* [@voltrevo](https://x.com/voltrevo) — Engineering, Hidden information mechanism
+* [@voltrevo](https://x.com/voltrevo) — Engineering, initial commit/reveal mechanism
+* [@MononokeArts](https://x.com/MononokeArts) - Art, Brand & various other contributions
+* Jubilee - R&D, Technical 3D systems
+
 
 ## Contents
 
@@ -161,7 +164,7 @@ Install the [Cairo 1.0](https://marketplace.visualstudio.com/items?itemName=star
 curl -L https://install.dojoengine.org | bash
 # open new terminal to update PATH
 # install each toolchain component...
-dojoup install v1.6.2
+dojoup -v v1.6.2
 # or...
 dojoup component add sozo v1.6.2
 dojoup component add katana v1.6.3
