@@ -3,3 +3,12 @@
 
 [workspace]
 members = ["dojo"]
+
+#--------------------------
+# Dojo profiles declaration
+#
+[profile.dev]
+[profile.slot]
+[profile.staging]
+[profile.sepolia]
+[profile.mainnet]

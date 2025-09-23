@@ -27,11 +27,7 @@ echo "--------------------------------------------------------------------------
 echo ">>> Cleaning..."
 execute_command "sozo -P $PROFILE $ARG_OFFLINE clean"
 echo ">>> Building..."
-if [[ "$PROFILE" == "dev" ]]; then
-  execute_command "sozo -P $PROFILE $ARG_OFFLINE build $ARG_BINDINGS"
-else
-  execute_command "sozo -P $PROFILE $ARG_OFFLINE build"
-fi
+execute_command "sozo -P $PROFILE $ARG_OFFLINE build $ARG_BINDINGS"
 echo "👍"
 
 #-----------------

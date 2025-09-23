@@ -60,16 +60,6 @@ build-external-contracts = [
 
 
 #--------------------------
-# Dojo profiles declaration
-#
-[profile.dev]
-[profile.slot]
-[profile.staging]
-[profile.sepolia]
-[profile.mainnet]
-
-
-#--------------------------
 # Voyager verification
 # https://github.com/NethermindEth/starknet-contract-verifier
 [tool.voyager]

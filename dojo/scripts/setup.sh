@@ -22,7 +22,7 @@ do
   if [[ -z "$PROFILE" ]]; then # if not set
     # $1: Profile
     export PROFILE=$1
-    export DOJO_PROFILE_FILE="dojo_$PROFILE.toml"
+    export DOJO_PROFILE_FILE="../dojo_$PROFILE.toml"
     if [ ! -f $DOJO_PROFILE_FILE ]; then
       echo "❌ Error: Missing profile config file: $DOJO_PROFILE_FILE"
       exit 1
@@ -32,7 +32,11 @@ do
   elif [[ $arg == "--inspect" ]]; then
     export ARG_INSPECT="--stats.by-tag"
   elif [[ $arg == "--bindings" ]]; then
-    export ARG_BINDINGS="--typescript"
+    if [[ "$PROFILE" == "dev" ]]; then
+      export ARG_BINDINGS="--typescript"
+    else
+      echo "⚠️ Warning: --bindings is only supported for dev profile"
+    fi
   elif [[ $arg == "--verbose" ]]; then
     export ARG_VERBOSE="-vvv"
   else
@@ -101,7 +105,7 @@ export ACCOUNT_ADDRESS=${DOJO_ACCOUNT_ADDRESS:-$(get_profile_env "account_addres
 # use $STARKNET_RPC_URL else read from profile
 export RPC_URL=${STARKNET_RPC_URL:-$(get_profile_env "rpc_url")}
 
-export MANIFEST_FILE_PATH="./manifest_$PROFILE.json"
+export MANIFEST_FILE_PATH="../manifest_$PROFILE.json"
 export BINDINGS_PATH="./bindings"
 export SDK_GAME_PATH="../sdk/src/games/$GAME_SLUG"
 export SDK_MANIFEST_PATH="$SDK_GAME_PATH/config/manifests"

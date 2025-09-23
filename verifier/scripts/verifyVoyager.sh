@@ -3,7 +3,7 @@ set -e # exit on error
 
 export NETWORK="mainnet"
 
-export MANIFEST_FILE_PATH="../../dojo/manifest_$NETWORK.json"
+export MANIFEST_FILE_PATH="../../manifest_$NETWORK.json"
 export SCARB_PROJECT_PATH="../../dojo"
 
 get_contract_class_hash () {

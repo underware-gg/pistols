@@ -88,7 +88,9 @@ function getConstantsFromCairoFile(filePath) {
             mods[current_mod].lines.push(l)
           } else if (current_enum && l) {
             // console.log(l)
-            enums[current_enum].lines.push(l)
+            if (l[0] != '#') {
+              enums[current_enum].lines.push(l)
+            }
           } else if (current_struct && l) {
             if (l.endsWith(',')) {
               l = l.slice(0, -1); // remove ','
@@ -222,7 +224,7 @@ function format_ts_value(value, cairo_type, ts_type) {
     if (ts_value.startsWith('selector_from_tag!')) {
       let match = ts_value.match(/"(.*?)"/g)
       if (match) {
-        const stdout = execSync(`sozo hash compute ${match}`).toString();
+        const stdout = execSync(`cd ../dojo && sozo hash compute ${match}`).toString();
         const hash = stdout.match(/0x[A-Fa-f0-9]*/g)
         // console.log(`>>> match [${match}] hash [${hash}]`)
         if (hash) {
