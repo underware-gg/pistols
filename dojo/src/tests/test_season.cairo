@@ -113,6 +113,16 @@ mod tests {
     }
 
     #[test]
+    #[should_panic(expected:('BANK: caller not admin', 'ENTRYPOINT_FAILED'))]
+    fn test_collect_season_not_admin() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME);
+        let season: SeasonConfig = sys.store.get_current_season();
+        tester::set_block_timestamp(season.period.end);
+        tester::drop_dojo_events(@sys);
+        tester::execute_collect_season(@sys, OTHER());
+    }
+
+    #[test]
     #[should_panic(expected:('BANK: is paused', 'ENTRYPOINT_FAILED'))]
     fn test_collect_season_is_paused() {
         let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME);

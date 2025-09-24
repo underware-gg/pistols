@@ -51,6 +51,7 @@ pub mod bank {
         IFameCoinDispatcher, IFameCoinDispatcherTrait,
         IFameCoinProtectedDispatcher, IFameCoinProtectedDispatcherTrait,
         IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
+        IAdminDispatcherTrait,
     };
     use pistols::interfaces::ierc20::{IErc20Trait};
     use pistols::models::{
@@ -67,6 +68,7 @@ pub mod bank {
 
     pub mod Errors {
         pub const INVALID_CALLER: felt252           = 'BANK: invalid caller';
+        pub const CALLER_NOT_ADMIN: felt252         = 'BANK: caller not admin';
         pub const INVALID_AMOUNT: felt252           = 'BANK: invalid amount';
         pub const INVALID_SHARES: felt252           = 'BANK: invalid shares';
         pub const INVALID_TREASURY: felt252         = 'BANK: invalid treasury';
@@ -130,6 +132,7 @@ pub mod bank {
         }
 
         fn collect_season(ref self: ContractState) -> u32 {
+            self._assert_caller_is_admin();
             let mut store: Store = StoreTrait::new(self.world_default());
             assert(!store.get_config_is_paused(), Errors::IS_PAUSED);
             // collect season if permitted
@@ -202,6 +205,11 @@ pub mod bank {
 
     #[generate_trait]
     impl InternalImpl of InternalTrait {
+        fn _assert_caller_is_admin(self: @ContractState) {
+            let mut world = self.world_default();
+            assert(world.admin_dispatcher().am_i_admin(starknet::get_caller_address()) == true, Errors::CALLER_NOT_ADMIN);
+        }
+
         fn _transfer_lords_to_pool(ref self: ContractState,
             mut store: Store,
             payer: ContractAddress,
