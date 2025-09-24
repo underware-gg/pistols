@@ -103,6 +103,7 @@ pub struct DuelistState {
 // use core::num::traits::Zero;
 use pistols::models::{
     match_queue::{QueueMode, QueueModeTrait},
+    season::{SeasonConfigTrait},
 };
 use pistols::types::{
     duelist_profile::{CharacterKey},
@@ -190,19 +191,23 @@ pub impl ChallengeImpl of ChallengeTrait {
 #[generate_trait]
 pub impl DuelTypeImpl of DuelTypeTrait {
     fn get_rules(self: @DuelType, store: @Store) -> Rules {
-        (match self {
-            // Ranked
-            DuelType::Tournament |
-            DuelType::Ranked => store.get_current_season_rules(),
-            // Unranked
-            DuelType::Seasonal |
-            DuelType::Unranked => Rules::Unranked,
-            // Practice
-            DuelType::Tutorial |
-            DuelType::Practice |
-            DuelType::BotPlayer |
-            DuelType::Undefined => Rules::Undefined,
-        })
+        if (store.get_current_season().can_collect()) {
+            (Rules::Undefined)
+        } else {
+            (match self {
+                // Ranked
+                DuelType::Tournament |
+                DuelType::Ranked => store.get_current_season_rules(),
+                // Unranked
+                DuelType::Seasonal |
+                DuelType::Unranked => Rules::Unranked,
+                // Practice
+                DuelType::Tutorial |
+                DuelType::Practice |
+                DuelType::BotPlayer |
+                DuelType::Undefined => Rules::Undefined,
+            })
+        }
     }
     fn is_practice(self: @DuelType, store: @Store) -> bool {
         (self.get_rules(store) == Rules::Undefined)

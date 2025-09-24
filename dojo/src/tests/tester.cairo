@@ -108,6 +108,8 @@ pub mod tester {
     pub fn OTHER2()    -> ContractAddress { 0x4.try_into().unwrap() } // mock owner of duelists 3-4
     pub fn BUMMER()    -> ContractAddress { 0x5.try_into().unwrap() } // mock owner of duelists 5-6
     pub fn BUMMER2()   -> ContractAddress { 0x6.try_into().unwrap() } // mock owner of duelists 5-6
+    pub fn JOKER()     -> ContractAddress { 0x7.try_into().unwrap() } // mock owner of duelists 7-8
+    pub fn JOKER2()    -> ContractAddress { 0x8.try_into().unwrap() } // mock owner of duelists 7-8
     pub fn RECIPIENT() -> ContractAddress { 0x222.try_into().unwrap() }
     pub fn SPENDER()   -> ContractAddress { 0x333.try_into().unwrap() }
     pub fn TREASURY()  -> ContractAddress { 0x444.try_into().unwrap() }

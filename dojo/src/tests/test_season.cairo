@@ -1,5 +1,6 @@
 #[cfg(test)]
 mod tests {
+    use starknet::{ContractAddress};
     use pistols::models::{
         challenge::{ChallengeValue, DuelType},
         season::{SeasonConfig, SeasonConfigTrait, SeasonPhase},
@@ -14,8 +15,9 @@ mod tests {
         tester::{
             StoreTrait,
             IBankDispatcherTrait,
+            IRngMockDispatcherTrait,
             TestSystems, FLAGS,
-            ID, OWNER, OTHER, SEASON_ID_1, SEASON_ID_2, MESSAGE,
+            ID, OWNER, OTHER, BUMMER, JOKER, SEASON_ID_1, SEASON_ID_2, MESSAGE,
             Trophy,
         }
     };
@@ -99,6 +101,38 @@ mod tests {
         // settled on season 2
         let season_2: SeasonConfig = sys.store.get_current_season();
         assert_eq!(challenge.season_id, season_2.season_id, "challenge.season_id_2");
+    }
+
+    #[test]
+    fn test_season_ended_no_scores() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        let season_1: SeasonConfig = sys.store.get_current_season();
+        tester::set_block_timestamp(season_1.period.end - TIMESTAMP::ONE_HOUR);
+        assert!(!season_1.can_collect(), "!season_1.can_collect");
+        // fund duelists
+        tester::fund_duelists_pool(@sys, 4);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        let C: ContractAddress = BUMMER();
+        let D: ContractAddress = JOKER();
+        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
+        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
+        let _duelist_id_c: u128 = *tester::execute_claim_starter_pack(@sys, C)[0];
+        let _duelist_id_d: u128 = *tester::execute_claim_starter_pack(@sys, D)[0];
+        // default unranked duel
+        let (mocked, moves_a, moves_b) = prefabs::get_moves_crit_b_at_10();
+        sys.rng.mock_values(mocked);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, A, B, DuelType::Seasonal, 1);
+        prefabs::commit_reveal_get(@sys, duel_id, A, B, mocked, moves_a, moves_b);
+        tester::assert_unranked_duel_results(@sys, duel_id, "unranked");
+        // collect season 1
+        tester::set_block_timestamp(season_1.period.end);
+        assert!(season_1.can_collect(), "season_1.can_collect");
+        // duel gain, no scores...
+        sys.rng.mock_values(mocked);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, C, D, DuelType::Seasonal, 1);
+        prefabs::commit_reveal_get(@sys, duel_id, C, D, mocked, moves_a, moves_b);
+        tester::assert_practice_duel_results(@sys, duel_id, "unranked no more");
     }
 
     #[test]
