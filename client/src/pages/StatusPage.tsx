@@ -41,7 +41,7 @@ function Status() {
             <HeaderCell>Response</HeaderCell>
             <HeaderCell>Latency</HeaderCell>
             <HeaderCell>Version</HeaderCell>
-            <HeaderCell width={3}>Block/Head</HeaderCell>
+            <HeaderCell width={5}>Block/Head</HeaderCell>
             <HeaderCell></HeaderCell>
           </Row>
         </Header>
@@ -85,6 +85,7 @@ function ToriiStatusRow({
   }, [newBlockHead, isLoadingBlockHead])
 
   const blockOffset = (blockNumber && blockHead ? (blockHead - blockNumber) : null);
+  const percent = Math.floor(blockHead && blockNumber ? (blockHead / blockNumber) * 10000 : 0);
 
   const statusClass = (status?.success === true ? 'Positive' : (status?.success === false || status?.error) ? 'Negative' : 'Warning');
   const headClass = (!isCurrentNetwork ? '' : blockOffset < -3 ? 'Negative' : blockOffset < -1 ? 'Warning' : 'Positive');
@@ -107,9 +108,13 @@ function ToriiStatusRow({
           {' of '}
           <b>{isCurrentNetwork ? (blockNumber ?? '?') : 'N/A'}</b>
           {' '}
-          ({blockOffset == null || !isCurrentNetwork ? '?' : <span className={headClass}>{blockOffset === 0 ? 'head' : blockOffset}</span>})
+          ({blockOffset == null || !isCurrentNetwork ? '?'
+            : blockOffset === 0 ? <span className={headClass}>head</span>
+              : headClass == 'Negative' ? <span className={headClass}>{`${blockOffset}, ${(percent / 100)?.toFixed(2)}%`}</span>
+                : <span className={headClass}>{blockOffset}</span>
+          })
         </Cell>
-        <Cell singleLine={false}><a href={toriiUrl} target='_blank'>link</a></Cell>
+        <Cell singleLine={false}><a href={`${toriiUrl}/sql`} target='_blank'>sql</a></Cell>
       </Row>
     </>
   )
