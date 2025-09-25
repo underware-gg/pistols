@@ -2,21 +2,21 @@ import { useEffect, useMemo } from 'react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { BigNumberish, CairoCustomEnum } from 'starknet'
+import { useAccount } from '@starknet-react/core'
 import { createDojoStore } from '@dojoengine/sdk/react'
-import { useEntityIds, useDojoSystem, keysToEntityId, useStoreModelsByKeys, useStoreModelsById, useAllStoreModels, useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
 import { useClientTimestamp, useMemoGate } from '@underware/pistols-sdk/utils/hooks'
-import { isPositiveBigint, bigintToDecimal, bigintToHex, bigintEquals, bigintToAddress } from '@underware/pistols-sdk/utils'
-import { makeAbiCustomEnum, parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/starknet'
+import { useEntityIds, useDojoSystem, keysToEntityId, useStoreModelsByKeys, useStoreModelsById, useAllStoreModels, useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
 import { getCollectionDescriptor, getProfileDescriptor, getProfileGender, getProfileId, DuelistProfileKey, DuelistGender, getProfileQuote } from '@underware/pistols-sdk/pistols'
+import { isPositiveBigint, bigintToDecimal, bigintToHex, bigintEquals, bigintToAddress, bigintToHex128 } from '@underware/pistols-sdk/utils'
 import { PistolsEntity, PistolsSchemaType, getEntityModel, PistolsQueryBuilder, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols/sdk'
+import { makeAbiCustomEnum, parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/starknet'
+import { useDuelistIdsOwnedByAccounts, useDuelistsOwnedByPlayer, useOwnerOfDuelist } from '/src/hooks/useTokenDuelists'
+import { useDuelistFetchStore, useDuelistStackFetchStore } from '/src/stores/fetchStore'
+import { useFetchChallengeRewardsByDuelistIds } from '/src/stores/challengeRewardsStore'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { CharacterType } from '/src/data/assets'
 import { ArchetypeNames } from '/src/utils/pistols'
 import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
-import { useAccount } from '@starknet-react/core'
-import { useDuelistIdsOwnedByAccounts, useDuelistsOwnedByPlayer, useOwnerOfDuelist } from '/src/hooks/useTokenDuelists'
-import { useDuelistFetchStore, useDuelistStackFetchStore } from '/src/stores/fetchStore'
-import { useFetchChallengeRewardsByDuelistIds } from '/src/stores/challengeRewardsStore'
 import { debug } from '@underware/pistols-sdk/pistols'
 
 export const useDuelistStore = createDojoStore<PistolsSchemaType>();
@@ -416,9 +416,9 @@ export const useFetchDuelistsByIds = (duelistIds: BigNumberish[], retryInterval?
       ? new PistolsQueryBuilder()
         .withClause(
           new PistolsClauseBuilder().compose().or([
-            new PistolsClauseBuilder().where("pistols-Duelist", "duelist_id", "In", newDuelistIds.map(bigintToAddress)),
-            new PistolsClauseBuilder().where("pistols-DuelistAssignment", "duelist_id", "In", newDuelistIds.map(bigintToAddress)),
-            new PistolsClauseBuilder().where("pistols-DuelistMemorial", "duelist_id", "In", newDuelistIds.map(bigintToAddress)),
+            new PistolsClauseBuilder().where("pistols-Duelist", "duelist_id", "In", newDuelistIds.map(bigintToHex128)),
+            new PistolsClauseBuilder().where("pistols-DuelistAssignment", "duelist_id", "In", newDuelistIds.map(bigintToHex128)),
+            new PistolsClauseBuilder().where("pistols-DuelistMemorial", "duelist_id", "In", newDuelistIds.map(bigintToHex128)),
           ]).build()
         )
         .withEntityModels([
@@ -435,7 +435,7 @@ export const useFetchDuelistsByIds = (duelistIds: BigNumberish[], retryInterval?
     query,
     retryInterval,
     setEntities: (entities: PistolsEntity[]) => {
-      // debug.log(`useFetchDuelistsByIds() GOT`, newDuelistIds, entities);
+      debug.log(`useFetchDuelistsByIds() GOT`, newDuelistIds, entities);
       setEntities(entities);
     },
   })

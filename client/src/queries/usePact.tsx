@@ -35,7 +35,7 @@ export const usePactGet = (duel_type: constants.DuelType, address_a: BigNumberis
   const pact = useEntityModel<models.Pact>(entities?.[0], 'Pact')
   const pactDuelId = useMemo(() => BigInt(pact?.duel_id ?? 0n), [pact])
   const hasPact = useMemo(() => (pactDuelId > 0n), [pactDuelId])
-  // useEffect(() => console.log(`usePactGet()`, duel_type, bigintToHex(pair), pacts), [duel_type, pair, pacts])
+  // useEffect(() => console.log(`usePactGet()`, query, entities, pact), [query, entities, pact])
   return {
     pactDuelId,
     hasPact,
@@ -51,7 +51,7 @@ export const usePactSubscription = (duel_type: constants.DuelType, address_a: Bi
   const pact = useEntityModel<models.Pact>(entities?.[0], 'Pact')
   const pactDuelId = useMemo(() => BigInt(pact?.duel_id ?? 0n), [pact])
   const hasPact = useMemo(() => (pactDuelId > 0n), [pactDuelId])
-  // useEffect(() => console.log(`usePactSubscription()`, duel_type, bigintToHex(pair), pacts), [duel_type, pair, pacts])
+  // useEffect(() => console.log(`usePactSubscription()`, query, entities, pact), [query, entities, pact])
   return {
     pactDuelId,
     hasPact,

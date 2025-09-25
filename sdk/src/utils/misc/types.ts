@@ -1,6 +1,5 @@
 import {
   BigNumberish,
-  addAddressPadding,
   encode,
 } from 'starknet'
 
@@ -38,7 +37,9 @@ export const capitalize = (v: string) => (v.charAt(0).toUpperCase() + v.slice(1)
 //
 
 export const bigintToHex = (v: BigNumberish): `0x${string}` => (!v ? '0x0' : `0x${BigInt(v).toString(16)}`)
-export const bigintToAddress = (v: BigNumberish): `0x${string}` => addAddressPadding(bigintToHex(v)) as `0x${string}`
+export const bigintToHex64 = (v: BigNumberish): `0x${string}` => (!v ? '0x0' : `0x${BigInt(v).toString(16).padStart(16, '0')}`)
+export const bigintToHex128 = (v: BigNumberish): `0x${string}` => (!v ? '0x0' : `0x${BigInt(v).toString(16).padStart(32, '0')}`)
+export const bigintToAddress = (v: BigNumberish): `0x${string}` => (!v ? '0x0' : `0x${BigInt(v).toString(16).padStart(64, '0')}`)
 export const bigintToAddressEth = (v: BigNumberish): `0x${string}` => (!v ? '0x0' : `0x${BigInt(v).toString(16).padStart(ETHEREUM_ADDRESS_LENGTH - 2, '0')}`)
 export const bigintToDecimal = (v: BigNumberish): string => (!v ? '0' : BigInt(v).toString())
 export const bigintToNumber = (v: BigNumberish): number => (!v ? 0 : Number(BigInt(v)))
@@ -83,7 +84,7 @@ export const isEthereumAddress = (v: BigNumberish): boolean => Math.abs(ETHEREUM
 
 export const arrayUnique = <T,>(array: T[]): T[] => (array?.filter((value, index, array) => (array.indexOf(value) === index)) ?? [])
 export const arrayLast = <T,>(array: T[]): T => (array?.slice(-1)[0])
-export const arrayRemoveValue = <T,>(array: T[], v: T): T[] => (array?.filter(e => (e !== v)) ?? [] ?? [])
+export const arrayRemoveValue = <T,>(array: T[], v: T): T[] => (array?.filter(e => (e !== v)) ?? [])
 export const arrayHasNullElements = <T,>(array: T[]): boolean => (array?.findIndex(e => (e == null)) >= 0)
 export const arrayClean = <T,>(array: T[]): T[] => (array?.filter(e => (e != null)) ?? [])
 

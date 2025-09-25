@@ -4,6 +4,9 @@ import {
   isEthereumAddress,
   bigintToAddress,
   bigintToAddressEth,
+  bigintToHex,
+  bigintToHex64,
+  bigintToHex128,
 } from "./types";
 
 
@@ -30,6 +33,24 @@ test("isEthereumAddress()", () => {
   expect(isEthereumAddress('0x05fae26ee1a7f27201bf8e23173ac1c2f9a0c7d')).toBe(true)
   expect(isEthereumAddress('0x005fae26ee1a7f27201bf8e23173ac1c2f9a0c7d')).toBe(true)
   expect(isEthereumAddress('0x8822d811b5749c544e80aad7421fe17555feed29')).toBe(true)
+});
+test("bigintToHex()", () => {
+  expect(bigintToHex(1)).toBe('0x1')
+  expect(bigintToHex(BigInt(1))).toBe('0x1')
+  expect(bigintToHex('1')).toBe('0x1')
+  expect(bigintToHex('0x1')).toBe('0x1')
+});
+test("bigintToHex64()", () => {
+  expect(bigintToHex64(1)).toBe('0x0000000000000001')
+  expect(bigintToHex64(BigInt(1))).toBe('0x0000000000000001')
+  expect(bigintToHex64('1')).toBe('0x0000000000000001')
+  expect(bigintToHex64('0x1')).toBe('0x0000000000000001')
+});
+test("bigintToHex128()", () => {
+  expect(bigintToHex128(1)).toBe('0x00000000000000000000000000000001')
+  expect(bigintToHex128(BigInt(1))).toBe('0x00000000000000000000000000000001')
+  expect(bigintToHex128('1')).toBe('0x00000000000000000000000000000001')
+  expect(bigintToHex128('0x1')).toBe('0x00000000000000000000000000000001')
 });
 test("bigintToAddress()", () => {
   expect(bigintToAddress('0xe29882a1fcba1e7e10cad46212257fea5c752a4f9b1b1ec683c503a2cf5c8a')).toBe('0x00e29882a1fcba1e7e10cad46212257fea5c752a4f9b1b1ec683c503a2cf5c8a')

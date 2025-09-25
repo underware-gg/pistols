@@ -7,7 +7,7 @@ import { createDojoStore } from '@dojoengine/sdk/react'
 import { useStoreModelsByKeys, useSdkEntitiesGet, useAllStoreModels } from '@underware/pistols-sdk/dojo'
 import { PistolsSchemaType, PistolsQueryBuilder, PistolsClauseBuilder, PistolsEntity } from '@underware/pistols-sdk/pistols/sdk'
 import { parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/starknet'
-import { bigintEquals, bigintToAddress, bigintToHex, isPositiveBigint } from '@underware/pistols-sdk/utils'
+import { bigintEquals, bigintToAddress, bigintToHex, bigintToHex128, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
 import { movesToHand } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
@@ -370,8 +370,8 @@ export const useFetchChallengeIdsByDuelistIds = (duelistIds: BigNumberish[]) => 
       ? new PistolsQueryBuilder()
         .withClause(
           new PistolsClauseBuilder().compose().or([
-            new PistolsClauseBuilder().where("pistols-Challenge", "duelist_id_a", "In", newDuelistIds.map(bigintToAddress)),
-            new PistolsClauseBuilder().where("pistols-Challenge", "duelist_id_b", "In", newDuelistIds.map(bigintToAddress)),
+            new PistolsClauseBuilder().where("pistols-Challenge", "duelist_id_a", "In", newDuelistIds.map(bigintToHex128)),
+            new PistolsClauseBuilder().where("pistols-Challenge", "duelist_id_b", "In", newDuelistIds.map(bigintToHex128)),
           ]).build()
         )
         .withEntityModels([

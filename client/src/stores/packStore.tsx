@@ -8,7 +8,7 @@ import { PistolsSchemaType, PistolsQueryBuilder, PistolsEntity, PistolsClauseBui
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { usePacksOwnedByAccount } from '/src/hooks/useTokenPacks'
 import { debug } from '@underware/pistols-sdk/pistols'
-import { bigintToAddress, bigintToDecimal } from '@underware/pistols-sdk/utils'
+import { bigintToAddress, bigintToDecimal, bigintToHex128 } from '@underware/pistols-sdk/utils'
 import { useDuelistProfile } from './duelistStore'
 
 export const usePackStore = createDojoStore<PistolsSchemaType>();
@@ -98,7 +98,7 @@ export const useFetchPacksOwnedByAccount = (address: BigNumberish) => {
     newPackIds.length > 0
       ? new PistolsQueryBuilder()
         .withClause(
-          new PistolsClauseBuilder().where("pistols-Pack", "pack_id", "In", newPackIds.map(bigintToAddress)).build()
+          new PistolsClauseBuilder().where("pistols-Pack", "pack_id", "In", newPackIds.map(bigintToHex128)).build()
         )
         .withEntityModels(
           ["pistols-Pack"]
