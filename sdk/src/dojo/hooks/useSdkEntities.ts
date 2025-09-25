@@ -312,12 +312,6 @@ export const useSdkEventsSub = ({
 //
 
 //
-// Format Bignumberish value for torii query operators
-export const formatQueryValue = (value: BigNumberish): string => {
-  return bigintToAddress(value)
-}
-
-//
 // Extract models from a stored entity
 //
 

@@ -2,8 +2,8 @@ import { useEffect, useMemo } from 'react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
-import { bigintEquals } from '@underware/pistols-sdk/utils'
-import { formatQueryValue, useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
+import { bigintEquals, bigintToAddress } from '@underware/pistols-sdk/utils'
+import { useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
 import { PistolsClauseBuilder, PistolsEntity, PistolsQueryBuilder } from '@underware/pistols-sdk/pistols/sdk'
 import { useLeaderboard, DuelistScore } from '/src/stores/seasonStore'
 import { useScoreboardFetchStore } from '/src/stores/fetchStore'
@@ -130,7 +130,7 @@ export const useGetSeasonScoreboard = (season_id: number) => {
         .withClause(
           new PistolsClauseBuilder().keys(
             ["pistols-SeasonScoreboard"],
-            [formatQueryValue(season_id), undefined]
+            [bigintToAddress(season_id), undefined]
           ).build()
         )
         .withEntityModels(

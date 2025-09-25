@@ -3,9 +3,9 @@ import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { BigNumberish, CairoCustomEnum } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
-import { useEntityIds, useDojoSystem, keysToEntityId, useStoreModelsByKeys, useStoreModelsById, useAllStoreModels, formatQueryValue, useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
+import { useEntityIds, useDojoSystem, keysToEntityId, useStoreModelsByKeys, useStoreModelsById, useAllStoreModels, useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
 import { useClientTimestamp, useMemoGate } from '@underware/pistols-sdk/utils/hooks'
-import { isPositiveBigint, bigintToDecimal, bigintToHex, bigintEquals } from '@underware/pistols-sdk/utils'
+import { isPositiveBigint, bigintToDecimal, bigintToHex, bigintEquals, bigintToAddress } from '@underware/pistols-sdk/utils'
 import { makeAbiCustomEnum, parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/starknet'
 import { getCollectionDescriptor, getProfileDescriptor, getProfileGender, getProfileId, DuelistProfileKey, DuelistGender, getProfileQuote } from '@underware/pistols-sdk/pistols'
 import { PistolsEntity, PistolsSchemaType, getEntityModel, PistolsQueryBuilder, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols/sdk'
@@ -416,9 +416,9 @@ export const useFetchDuelistsByIds = (duelistIds: BigNumberish[], retryInterval?
       ? new PistolsQueryBuilder()
         .withClause(
           new PistolsClauseBuilder().compose().or([
-            new PistolsClauseBuilder().where("pistols-Duelist", "duelist_id", "In", newDuelistIds.map(formatQueryValue)),
-            new PistolsClauseBuilder().where("pistols-DuelistAssignment", "duelist_id", "In", newDuelistIds.map(formatQueryValue)),
-            new PistolsClauseBuilder().where("pistols-DuelistMemorial", "duelist_id", "In", newDuelistIds.map(formatQueryValue)),
+            new PistolsClauseBuilder().where("pistols-Duelist", "duelist_id", "In", newDuelistIds.map(bigintToAddress)),
+            new PistolsClauseBuilder().where("pistols-DuelistAssignment", "duelist_id", "In", newDuelistIds.map(bigintToAddress)),
+            new PistolsClauseBuilder().where("pistols-DuelistMemorial", "duelist_id", "In", newDuelistIds.map(bigintToAddress)),
           ]).build()
         )
         .withEntityModels([
@@ -510,7 +510,7 @@ const useFetchPlayerDuelistStacks = (addresses: BigNumberish[]) => {
       ? new PistolsQueryBuilder()
         .withClause(
           new PistolsClauseBuilder()
-            .where('pistols-PlayerDuelistStack', 'player_address', 'In', newAddresses.map(formatQueryValue))
+            .where('pistols-PlayerDuelistStack', 'player_address', 'In', newAddresses.map(bigintToAddress))
             .build()
         )
         .withEntityModels(['pistols-PlayerDuelistStack'])

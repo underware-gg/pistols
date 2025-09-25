@@ -6,9 +6,8 @@ import type { SessionPolicies, ContractPolicies, SignMessagePolicy, Method } fro
 import { ContractPolicyDescriptions, SignedMessagePolicyDescriptions } from 'src/dojo/contexts/Dojo'
 import { supportedConnetorIds } from 'src/games/pistols/config/networks'
 import { DojoManifest } from 'src/games/pistols/config/config'
-import { formatQueryValue } from 'src/dojo/hooks/useSdkEntities'
 import { stringToFelt } from 'src/starknet/starknet'
-import { bigintToHex } from 'src/utils/misc/types'
+import { bigintToAddress, bigintToHex } from 'src/utils/misc/types'
 import { assert } from 'src/utils/misc/math'
 import { getContractByName } from '@dojoengine/core'
 import { INTERFACE_DESCRIPTIONS } from 'src/games/pistols/generated/constants'
@@ -126,7 +125,7 @@ const _makeControllerContractPolicies = (
     }
     // create policy
     if (contract_address && methods.length > 0) {
-      contracts[formatQueryValue(contract_address)] = {
+      contracts[bigintToAddress(contract_address)] = {
         // name: desc.name,
         description: desc.description,
         methods,

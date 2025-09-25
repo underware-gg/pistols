@@ -4,10 +4,10 @@ import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { createDojoStore } from '@dojoengine/sdk/react'
-import { formatQueryValue, useStoreModelsByKeys, useSdkEntitiesGet, useAllStoreModels } from '@underware/pistols-sdk/dojo'
+import { useStoreModelsByKeys, useSdkEntitiesGet, useAllStoreModels } from '@underware/pistols-sdk/dojo'
 import { PistolsSchemaType, PistolsQueryBuilder, PistolsClauseBuilder, PistolsEntity } from '@underware/pistols-sdk/pistols/sdk'
 import { parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/starknet'
-import { bigintEquals, bigintToHex, isPositiveBigint } from '@underware/pistols-sdk/utils'
+import { bigintEquals, bigintToAddress, bigintToHex, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
 import { movesToHand } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
@@ -308,7 +308,7 @@ export const useFetchChallengeIds = (duelIds: BigNumberish[], retryInterval?: nu
     newDuelIds.length > 0
       ? new PistolsQueryBuilder()
         .withClause(
-          new PistolsClauseBuilder().where("pistols-Challenge", "duel_id", "In", newDuelIds.map(formatQueryValue)).build()
+          new PistolsClauseBuilder().where("pistols-Challenge", "duel_id", "In", newDuelIds.map(bigintToAddress)).build()
         )
         .withEntityModels([
           "pistols-Challenge",
@@ -370,8 +370,8 @@ export const useFetchChallengeIdsByDuelistIds = (duelistIds: BigNumberish[]) => 
       ? new PistolsQueryBuilder()
         .withClause(
           new PistolsClauseBuilder().compose().or([
-            new PistolsClauseBuilder().where("pistols-Challenge", "duelist_id_a", "In", newDuelistIds.map(formatQueryValue)),
-            new PistolsClauseBuilder().where("pistols-Challenge", "duelist_id_b", "In", newDuelistIds.map(formatQueryValue)),
+            new PistolsClauseBuilder().where("pistols-Challenge", "duelist_id_a", "In", newDuelistIds.map(bigintToAddress)),
+            new PistolsClauseBuilder().where("pistols-Challenge", "duelist_id_b", "In", newDuelistIds.map(bigintToAddress)),
           ]).build()
         )
         .withEntityModels([
@@ -427,8 +427,8 @@ export const useFetchChallengeIdsOwnedByAccounts = (addresses: BigNumberish[]) =
       ? new PistolsQueryBuilder()
         .withClause(
           new PistolsClauseBuilder().compose().or([
-            new PistolsClauseBuilder().where("pistols-Challenge", "address_a", "In", newAddresses.map(formatQueryValue)),
-            new PistolsClauseBuilder().where("pistols-Challenge", "address_b", "In", newAddresses.map(formatQueryValue)),
+            new PistolsClauseBuilder().where("pistols-Challenge", "address_a", "In", newAddresses.map(bigintToAddress)),
+            new PistolsClauseBuilder().where("pistols-Challenge", "address_b", "In", newAddresses.map(bigintToAddress)),
           ]).build()
         )
         .withEntityModels([

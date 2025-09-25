@@ -1,4 +1,4 @@
-import { formatQueryValue, useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
+import { useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
 import { useMemoGate, useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols/sdk'
 import { useChallengeStore } from '/src/stores/challengeStore'

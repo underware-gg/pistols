@@ -1,13 +1,13 @@
 import { useMemo } from 'react'
 import { useAccount } from '@starknet-react/core'
 import { PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder, entityContainsModels, getEntityModel } from '@underware/pistols-sdk/pistols/sdk'
-import { filterEntitiesByModels, formatQueryValue, useSdkEventsGet, useSdkEventsSub } from '@underware/pistols-sdk/dojo'
+import { filterEntitiesByModels, useSdkEventsGet, useSdkEventsSub } from '@underware/pistols-sdk/dojo'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useEventsStore } from '/src/stores/eventsModelStore'
 import { usePlayerDataStore } from '/src/stores/playerStore'
 import { useChallengeRewardsStore } from '/src/stores/challengeRewardsStore'
 import { useProgressStore } from '/src/stores/progressStore'
-import { bigintEquals, bigintToAddress, bigintToHex, isPositiveBigint } from '@underware/pistols-sdk/utils'
+import { bigintEquals, bigintToAddress, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { debug } from '@underware/pistols-sdk/pistols'
 
 
@@ -33,7 +33,7 @@ export function EventsModelStoreSync() {
               'pistols-PlayerBookmarkEvent',
             ],
             // VariableLen means: must have at least the address key...
-            [formatQueryValue(address)],
+            [bigintToAddress(address)],
             "VariableLen"
           ).build()
         )
@@ -78,7 +78,7 @@ export function EventsModelStoreSync() {
                 'pistols-PlayerBookmarkEvent',
               ],
               // get only current player's events
-              [formatQueryValue(address)],
+              [bigintToAddress(address)],
               // VariableLen means: must have at least one key
               "VariableLen"
             ),

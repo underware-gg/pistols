@@ -1,9 +1,9 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
-import { formatQueryValue, useAllStoreModels, useSdkEventsGet } from '@underware/pistols-sdk/dojo'
+import { useAllStoreModels, useSdkEventsGet } from '@underware/pistols-sdk/dojo'
 import { PistolsSchemaType, PistolsQueryBuilder, PistolsClauseBuilder, PistolsEntity } from '@underware/pistols-sdk/pistols/sdk'
-import { bigintEquals, bigintToDecimal } from '@underware/pistols-sdk/utils'
+import { bigintEquals, bigintToAddress, bigintToDecimal } from '@underware/pistols-sdk/utils'
 import { weiToEth } from '@underware/pistols-sdk/starknet'
 import { useChallengeRewardsFetchStore } from '/src/stores/fetchStore'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
@@ -150,7 +150,7 @@ export const useFetchChallengeRewardsByDuelistIds = (duelistIds: BigNumberish[])
             "pistols-ChallengeRewardsEvent",
             "duelist_id",
             "In",
-            newDuelistIds.map(formatQueryValue)
+            newDuelistIds.map(bigintToAddress)
           ).build()
         )
         .withEntityModels(

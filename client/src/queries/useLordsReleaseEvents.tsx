@@ -1,8 +1,9 @@
 import { useMemo } from 'react'
 import { PistolsClauseBuilder, PistolsHistoricalQueryBuilder } from '@underware/pistols-sdk/pistols/sdk'
-import { useSdkEventsGetState, formatQueryValue, useEntitiesModel } from '@underware/pistols-sdk/dojo'
-import { parseCustomEnum } from '@underware/pistols-sdk/starknet'
+import { useSdkEventsGetState, useEntitiesModel } from '@underware/pistols-sdk/dojo'
 import { useMemoGate } from '@underware/pistols-sdk/utils/hooks'
+import { parseCustomEnum } from '@underware/pistols-sdk/starknet'
+import { bigintToAddress } from '@underware/pistols-sdk/utils'
 import { models, constants } from '@underware/pistols-sdk/pistols/gen'
 
 export type Bill = {
@@ -24,7 +25,7 @@ export const useLordsReleaseEvents = (season_id: number) => {
       .withClause(
         new PistolsClauseBuilder().keys(
           ["pistols-LordsReleaseEvent"],
-          [formatQueryValue(season_id)]
+          [bigintToAddress(season_id)]
         ).build()
       )
       .withEntityModels(
