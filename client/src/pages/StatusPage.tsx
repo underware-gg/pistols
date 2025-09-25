@@ -37,12 +37,12 @@ function Status() {
       <Table>
         <Header>
           <Row className='ModalText Important'>
-            <HeaderCell>Torii Servers</HeaderCell>
-            <HeaderCell>Response</HeaderCell>
-            <HeaderCell>Latency</HeaderCell>
-            <HeaderCell>Version</HeaderCell>
+            <HeaderCell width={2}>Torii Servers</HeaderCell>
+            <HeaderCell width={1}>Status</HeaderCell>
+            <HeaderCell width={1}>Latency</HeaderCell>
+            <HeaderCell width={3}>Version</HeaderCell>
             <HeaderCell width={5}>Block/Head</HeaderCell>
-            <HeaderCell></HeaderCell>
+            <HeaderCell width={1}></HeaderCell>
           </Row>
         </Header>
         <Body className='Smaller'>

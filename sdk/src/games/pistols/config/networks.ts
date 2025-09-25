@@ -286,7 +286,7 @@ const snSepoliaConfig: DojoNetworkConfig = {
   chainId: ChainId.SN_SEPOLIA,
   name: 'Sepolia Testnet',
   clientUrl: 'https://testnet.pistols.gg',
-  assetsServerUrl: 'https://assets.underware.gg',
+  assetsServerUrl: 'https://assets-server-testnet.vercel.app',
   slotName: 'pistols-sepolia',
   rpcUrl: 'https://api.cartridge.gg/x/starknet/sepolia/rpc/v0_9',
   toriiUrl: undefined,    // derive from slotName
