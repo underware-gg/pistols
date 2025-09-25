@@ -1857,7 +1857,7 @@
       ]
     },
     {
-      "address": "0x750b592fc54f80bcacd0f557418090bdf6c57022429743e751c1eafc8dbaeab",
+      "address": "0x256b3ff6c8b0640c987c409515b845354b730ee23ba656635bcdef32c81f765",
       "class_hash": "0x257d062ae0ea56ba8355b562b50c532b313b6ed49cb8e19c7f436511fac4ad9",
       "abi": [
         {
@@ -2335,7 +2335,7 @@
       ]
     },
     {
-      "address": "0x6253b628cebe572c5e1ddb3c78463402dcda725d8538633dc7fa4533442cd80",
+      "address": "0x3df2ee4a2dc0ff66a3e1b5fffcaa104db45497396d1a04957175980646497e7",
       "class_hash": "0x60386a28a815ab05fcda05a6e9cf9a6d5636811ab1cf135c46acc324e53d20e",
       "abi": [
         {
@@ -4432,7 +4432,7 @@
       ]
     },
     {
-      "address": "0x61c35b9a6893d60d0e216fd8a6ab7389d3da89cf44396be89a209385cba6ea9",
+      "address": "0x2ee50811913309cdb06b6f14f1a9e1dbf3b0f2b28a5f7290aaee9826797f1f3",
       "class_hash": "0x5ea11bfa0bb38b1e9ef9bc44d7fcef24532a0a516c03a497d39d277fb2913a0",
       "abi": [
         {
@@ -9928,8 +9928,8 @@
       ]
     },
     {
-      "address": "0x1188cc203fb8cd2b6d12dd55a8bcba6d141078804120b986c4919d39a7b6afb",
-      "class_hash": "0x43c85aa3cfe7397739ad865ef4ff75592e22c9717125a9c7c102364fb1c709f",
+      "address": "0x5c13218b1c94dde0cf37bf63db2bc7311a8f3ca900692c6a3a8d633cf88502f",
+      "class_hash": "0xbaed1257e69c148615832e1d6ad636fde8a7b2abb27b8b8def2b75fdf8ec57",
       "abi": [
         {
           "type": "impl",
@@ -10151,6 +10151,22 @@
               ],
               "outputs": [],
               "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "clear_player_queue",
+              "inputs": [
+                {
+                  "name": "queue_id",
+                  "type": "pistols::models::match_queue::QueueId"
+                },
+                {
+                  "name": "player_address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
             }
           ]
         },
@@ -10272,6 +10288,7 @@
         "set_queue_size",
         "set_queue_entry_token",
         "clear_queue",
+        "clear_player_queue",
         "upgrade"
       ]
     },

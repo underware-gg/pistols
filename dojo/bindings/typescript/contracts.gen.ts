@@ -2449,27 +2449,6 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_game_createTrophies_calldata = (): DojoCall => {
-		return {
-			contractName: "game",
-			entrypoint: "create_trophies",
-			calldata: [],
-		};
-	};
-
-	const game_createTrophies = async (snAccount: Account | AccountInterface) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				build_game_createTrophies_calldata(),
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
 	const build_game_delegateGameActions_calldata = (delegateeAddress: string, enabled: boolean): DojoCall => {
 		return {
 			contractName: "game",
@@ -2905,6 +2884,27 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
+	const build_matchmaker_clearPlayerQueue_calldata = (queueId: CairoCustomEnum, playerAddress: string): DojoCall => {
+		return {
+			contractName: "matchmaker",
+			entrypoint: "clear_player_queue",
+			calldata: [queueId, playerAddress],
+		};
+	};
+
+	const matchmaker_clearPlayerQueue = async (snAccount: Account | AccountInterface, queueId: CairoCustomEnum, playerAddress: string) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_matchmaker_clearPlayerQueue_calldata(queueId, playerAddress),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 	const build_matchmaker_clearQueue_calldata = (queueId: CairoCustomEnum): DojoCall => {
 		return {
 			contractName: "matchmaker",
@@ -3027,7 +3027,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_pack_token_airdrop_calldata = (recipient: string, packType: CairoCustomEnum, duelistProfile: CairoOption<CairoCustomEnum>): DojoCall => {
+	const build_pack_token_airdrop_calldata = (recipient: string, packType: CairoCustomEnum, duelistProfile: CairoOption<DuelistProfile>): DojoCall => {
 		return {
 			contractName: "pack_token",
 			entrypoint: "airdrop",
@@ -3035,7 +3035,7 @@ export function setupWorld(provider: DojoProvider) {
 		};
 	};
 
-	const pack_token_airdrop = async (snAccount: Account | AccountInterface, recipient: string, packType: CairoCustomEnum, duelistProfile: CairoOption<CairoCustomEnum>) => {
+	const pack_token_airdrop = async (snAccount: Account | AccountInterface, recipient: string, packType: CairoCustomEnum, duelistProfile: CairoOption<DuelistProfile>) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -4754,8 +4754,6 @@ export function setupWorld(provider: DojoProvider) {
 			buildCollectDuelCalldata: build_game_collectDuel_calldata,
 			commitMoves: game_commitMoves,
 			buildCommitMovesCalldata: build_game_commitMoves_calldata,
-			createTrophies: game_createTrophies,
-			buildCreateTrophiesCalldata: build_game_createTrophies_calldata,
 			delegateGameActions: game_delegateGameActions,
 			buildDelegateGameActionsCalldata: build_game_delegateGameActions_calldata,
 			doThatThing: game_doThatThing,
@@ -4808,6 +4806,8 @@ export function setupWorld(provider: DojoProvider) {
 			buildTransferFromCalldata: build_lords_mock_transferFrom_calldata,
 		},
 		matchmaker: {
+			clearPlayerQueue: matchmaker_clearPlayerQueue,
+			buildClearPlayerQueueCalldata: build_matchmaker_clearPlayerQueue_calldata,
 			clearQueue: matchmaker_clearQueue,
 			buildClearQueueCalldata: build_matchmaker_clearQueue_calldata,
 			enlistDuelist: matchmaker_enlistDuelist,
