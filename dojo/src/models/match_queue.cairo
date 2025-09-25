@@ -157,6 +157,10 @@ pub impl MatchQueueImpl of MatchQueueTrait {
         self.players.position(player_address)
     }
     #[inline(always)]
+    fn is_player_in_queue(self: @MatchQueue, player_address: @ContractAddress) -> bool {
+        (self.player_position(player_address).is_some())
+    }
+    #[inline(always)]
     fn append_player(ref self: MatchQueue, player_address: @ContractAddress) {
         self.players.append(*player_address);
     }

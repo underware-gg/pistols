@@ -2035,6 +2035,70 @@ mod tests {
     }
 
     #[test]
+    fn test_unranked_slow_clear_player_queue_ok() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        tester::fund_duelists_pool(@sys, 4);
+        let ID_A_1: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_A_1");
+        let ID_A_2: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Misty)), "airdrop_A_2");
+        let ID_B: u128 = _airdrop_open(@sys, B, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_B");
+        let queue_id = QueueId::Unranked;
+        // enter matchmaking...
+        _mock_slot(@sys, 4);
+        let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A_1, queue_id, QueueMode::Slow);
+        assert_eq!(duel_id, 0, "match_A_1");
+        _assert_match_created(@sys, queue_id, QueueMode::Slow, A, ID_A_1, "match_created_A");
+        _assert_match_queue(@sys, queue_id, [A].span(), "match_A_1");
+        _assert_next_duelists(@sys, queue_id, A, ID_A_1, [].span(), "next_A_1");
+        assert_eq!(sys.store.get_match_player(A, queue_id).queue_info.slot, 4);
+        //
+        // stack a duelist...
+        _mock_slot(@sys, 5);
+        let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A_2, queue_id, QueueMode::Slow);
+        assert_eq!(duel_id, 0, "match_A_2");
+        _assert_match_queue(@sys, queue_id, [A].span(), "match_A_2");
+        _assert_next_duelists(@sys, queue_id, A, ID_A_1, [ID_A_2].span(), "next_A_2");
+        //
+        // matchmake B > no match
+        _mock_slot(@sys, 1);
+        let duel_id: u128 = tester::execute_match_make_me(@sys, B, ID_B, queue_id, QueueMode::Slow);
+        assert_eq!(duel_id, 0, "match_B");
+        // _assert_match_started(@sys, queue_id, duel_id, A, ID_A_1, B, ID_B, "match_made_B"); // will fail as duelist_id is still set
+        // A still in queue, new duelist/slot in
+        _assert_match_queue(@sys, queue_id, [A, B].span(), "match_B");
+        _assert_next_duelists(@sys, queue_id, A, ID_A_1, [ID_A_2].span(), "match_B_next_A");
+        _assert_next_duelists(@sys, queue_id, B, ID_B, [].span(), "match_B_next_B");
+        //
+        // assignments
+        let assignment_a_1: DuelistAssignment = sys.store.get_duelist_assignment(ID_A_1);
+        assert_eq!(assignment_a_1.queue_id, queue_id, "assignment_a_1.queue_id");
+        assert_gt!(assignment_a_1.duel_id, 0, "assignment_a_1.duel_id");
+        let assignment_a_2: DuelistAssignment = sys.store.get_duelist_assignment(ID_A_2);
+        assert_eq!(assignment_a_2.queue_id, queue_id, "assignment_a_2.queue_id");
+        assert_eq!(assignment_a_2.duel_id, 0, "assignment_a_2.duel_id");
+        let assignment_b: DuelistAssignment = sys.store.get_duelist_assignment(ID_B);
+        assert_eq!(assignment_b.queue_id, queue_id, "assignment_b.queue_id");
+        assert_gt!(assignment_b.duel_id, 0, "assignment_b.duel_id");
+        //
+        // clear A...
+        tester::impersonate(OWNER());
+        sys.matchmaker.clear_player_queue(queue_id, A);
+        // check queues...
+        _assert_match_queue(@sys, queue_id, [B].span(), "cleared_player_queue_A");
+        _assert_next_duelists(@sys, queue_id, A, 0, [].span(), "cleared_player_A_queue_next_A");
+        _assert_next_duelists(@sys, queue_id, B, ID_B, [].span(), "cleared_player_A_queue_next_B");
+        //
+        // clear B...
+        tester::impersonate(OWNER());
+        sys.matchmaker.clear_player_queue(queue_id, B);
+        // check queues...
+        _assert_match_queue(@sys, queue_id, [].span(), "cleared_player_B_queue");
+        _assert_next_duelists(@sys, queue_id, A, 0, [].span(), "cleared_player_B_queue_next_A");
+        _assert_next_duelists(@sys, queue_id, B, 0, [].span(), "cleared_player_B_queue_next_B");
+    }
+
+    #[test]
     fn test_ranked_fast_clear_queue_ok() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
         let A: ContractAddress = OWNER();

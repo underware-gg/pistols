@@ -157,6 +157,12 @@ function MatchQueue({ queueId }: { queueId: constants.QueueId }) {
               }}>
                 Clear Queue
               </Button>
+              &nbsp;&nbsp;&nbsp;
+              <Button onClick={() => {
+                matchmaker.clear_player_queue(account, queueId, address)
+              }}>
+                Clear Player Queue
+              </Button>
             </Cell>
           </Row>
         </Body>
