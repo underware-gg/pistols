@@ -2,25 +2,10 @@ import { useEffect, useState } from 'react'
 import { BigNumberish } from 'starknet'
 import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
 import { bigintToAddress, bigintToHex, isPositiveBigint } from 'src/utils/misc/types'
-// import { SubscriptionCallbackArgs } from '@dojoengine/sdk'
+import { SubscriptionCallbackArgs } from '@dojoengine/sdk'
 import { Page } from '@dojoengine/torii-client'
 import * as torii from '@dojoengine/torii-client'
 import { debug } from 'src/games/pistols/misc/debug'
-
-
-//----------------------------------------
-// SDK FIX
-type Success<T> = {
-  data: T;
-  error: undefined;
-};
-type Failure<E> = {
-  data: undefined;
-  error: E;
-};
-type SubscriptionCallbackArgs<T, E = Error> = Success<T> | Failure<E>;
-//----------------------------------------
-
 
 //---------------------------------------
 // Get entities from torii

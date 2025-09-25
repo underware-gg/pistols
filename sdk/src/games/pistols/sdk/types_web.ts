@@ -1,37 +1,14 @@
 import {
-  SchemaType,
-  // GetParams,
-  // ToriiResponse,
+  GetParams,
+  ToriiResponse,
   ParsedEntity,
   ClauseBuilder,
   ToriiQueryBuilder,
   HistoricalToriiQueryBuilder,
-  // UnionOfModelData,
-  StandardizedQueryResult,
+  UnionOfModelData,
 } from '@dojoengine/sdk'
 import * as torii from '@dojoengine/torii-client'
 import * as models from 'src/games/pistols/generated/models.gen'
-
-//----------------------------------------
-// SDK FIX
-interface GetParams<T extends SchemaType> {
-  query: ToriiQueryBuilder<T>;
-  historical?: boolean;
-}
-interface Pagination<T extends SchemaType, Inner extends any[]> {
-  cursor?: string;
-  getItems(): Inner;
-  getNextQuery(query: ToriiQueryBuilder<T>): ToriiQueryBuilder<T>;
-  getPreviousQuery(query: ToriiQueryBuilder<T>): ToriiQueryBuilder<T>;
-};
-type ToriiResponse<T extends SchemaType> = Pagination<T,StandardizedQueryResult<T>>;
-export type UnionOfModelData<T extends SchemaType> = {
-  [K in keyof T]: {
-    [L in keyof T[K]]: T[K][L];
-  }[keyof T[K]];
-}[keyof T];
-//----------------------------------------
-
 
 type PistolsSchemaType = models.SchemaType;
 type PistolsSchemaModels = PistolsSchemaType['pistols'];
