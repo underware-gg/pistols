@@ -53,7 +53,7 @@ const createStore = () => {
           )),
         // add new event
         activity,
-      ]
+      ].sort((a, b) => (a.timestamp - b.timestamp))
     }
   }
   return create<State>()(immer((set) => ({
