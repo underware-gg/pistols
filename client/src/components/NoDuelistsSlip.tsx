@@ -6,7 +6,11 @@ import { useGameAspect } from '/src/hooks/useGameAspect'
 import { useCanClaimStarterPack } from '/src/hooks/usePistolsContractCalls'
 
 
-interface NoDuelistsSlipProps extends InteractibleComponentProps {}
+interface NoDuelistsSlipProps extends InteractibleComponentProps {
+  title?: string
+  message?: string
+  subtext?: string
+}
 
 export interface NoDuelistsSlipHandle extends InteractibleComponentHandle {}
 
@@ -77,17 +81,36 @@ export const NoDuelistsSlip = forwardRef<NoDuelistsSlipHandle, NoDuelistsSlipPro
             fontWeight: 'bold',
             padding: aspectWidth(1),
           }}>
-            {!canClaimStarterPack ? (
+            {props.title && (
+              <p style={{ fontSize: aspectWidth(1.4), marginTop: 0, marginBottom: aspectWidth(1) }}>
+                {props.title}
+              </p>
+            )}
+            {props.message && (
+              <p style={{ fontSize: aspectWidth(1.2) }}>
+                {props.message}
+              </p>
+            )}
+            {props.subtext && (
+              <p style={{ fontSize: aspectWidth(1) }}>
+                {props.subtext}
+              </p>
+            )}
+            {!props.title && !props.message && !props.subtext && (
               <>
-                <p style={{ fontSize: aspectWidth(1.4), marginTop: 0, marginBottom: aspectWidth(1) }}>Note to self:</p>
-                <p style={{ fontSize: aspectWidth(1.2) }}>Should probably get a new duelist... or two.</p>
-                <p style={{ fontSize: aspectWidth(1) }}>...preferably one who can aim this time.</p>
-              </>
-            ) : (
-              <>
-                <p style={{ fontSize: aspectWidth(1.4), marginTop: 0, marginBottom: aspectWidth(1) }}>Urgent reminder:</p>
-                <p style={{ fontSize: aspectWidth(1.2) }}>Still need to get myself a duelist... or two.</p>
-                <p style={{ fontSize: aspectWidth(1) }}>...can't really duel without one.</p>
+                {!canClaimStarterPack ? (
+                  <>
+                    <p style={{ fontSize: aspectWidth(1.4), marginTop: 0, marginBottom: aspectWidth(1) }}>Note to self:</p>
+                    <p style={{ fontSize: aspectWidth(1.2) }}>Should probably get a new duelist... or two.</p>
+                    <p style={{ fontSize: aspectWidth(1) }}>...preferably one who can aim this time.</p>
+                  </>
+                ) : (
+                  <>
+                    <p style={{ fontSize: aspectWidth(1.4), marginTop: 0, marginBottom: aspectWidth(1) }}>Urgent reminder:</p>
+                    <p style={{ fontSize: aspectWidth(1.2) }}>Still need to get myself a duelist... or two.</p>
+                    <p style={{ fontSize: aspectWidth(1) }}>...can't really duel without one.</p>
+                  </>
+                )}
               </>
             )}
           </div>

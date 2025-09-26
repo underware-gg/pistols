@@ -176,15 +176,15 @@ export default function ScMatchmaking() {
   }
 
   const handleBellClick = () => {
-    // Don't allow clicking if any duelists are committing
-    if (isAnyCommitting) return
-    
     const commitFns: Array<() => void> = []
     const duelistsToCommit: bigint[] = []
 
+    // Only process duelists that are NOT already committing
+    const nonCommittingSlowDuelists = selectedSlowDuelists.filter(id => !committingDuelists.has(id))
+
     if (false && isRankedMode && selectedFastDuelist && queuedFastDuelistId === undefined) {
       const fastHandle = fastSlotRef.current
-      if (fastHandle && fastHandle.isReady) {
+      if (fastHandle && fastHandle.isReady && !committingDuelists.has(selectedFastDuelist)) {
         commitFns.push(() => fastHandle.commitToQueue())
         duelistsToCommit.push(selectedFastDuelist)
       } else if (fastHandle?.enlistmentState.enlistError) {
@@ -194,29 +194,47 @@ export default function ScMatchmaking() {
       }
     }
 
-    selectedSlowDuelists.forEach((duelistId, index) => {
-      const slotIndex = queuedSlowIds.length + index
+    nonCommittingSlowDuelists.forEach((duelistId, index) => {
+      // Find the correct slot index for this duelist in slowSlotsData
+      const slotData = slowSlotsData.find(slot => slot.selectedId === duelistId)
+      if (!slotData) {
+        return
+      }
+      
+      const slotIndex = slotData.slotIndex
       const slotHandle = slowSlotRefs.current.get(slotIndex)
+      
       if (slotHandle && slotHandle.isReady) {
         commitFns.push(() => slotHandle.commitToQueue())
         duelistsToCommit.push(duelistId)
       } else if (slotHandle?.enlistmentState.enlistError) {
         // Clear failed enlistment
         slotHandle.clearEnlistmentError()
-        handleSlowDuelistRemoved(selectedSlowDuelists[index])
+        handleSlowDuelistRemoved(duelistId)
       }
     })
 
-    // Move all committing duelists from selected to committing state
-    if (duelistsToCommit.length > 0) {
+    // Execute commit functions first, then add to committing state only if successful
+    const successfulCommits: bigint[] = []
+    
+    commitFns.forEach((commit, index) => {
+      try {
+        commit()
+        // If we get here without error, consider it successful
+        successfulCommits.push(duelistsToCommit[index])
+      } catch (error) {
+        console.error('Commit function failed:', error)
+      }
+    })
+
+    // Only add successfully started commits to committing state
+    if (successfulCommits.length > 0) {
       setCommittingDuelists(prev => {
         const newSet = new Set(prev)
-        duelistsToCommit.forEach(id => newSet.add(id))
+        successfulCommits.forEach(id => newSet.add(id))
         return newSet
       })
     }
-
-    commitFns.forEach(commit => commit())
   }
 
   const handleSlowSlotSelected = (slotIndex: number, duelistId: bigint) => {
@@ -263,7 +281,6 @@ export default function ScMatchmaking() {
     setCommittingDuelists(prev => {
       const newSet = new Set(prev)
       newSet.delete(duelistId)
-      console.log('Commit failed for duelist', duelistId, 'remaining committing:', newSet)
       return newSet
     })
   }

@@ -123,10 +123,19 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
 
   // Blinking colon effect
   useEffect(() => {
-    if (props.isInQueue && props.queueTimestampStart) {
-      const colonInterval = setInterval(() => {
-        setColonVisible(prev => !prev)
-      }, 1000)
+    if ((props.isInQueue && props.queueTimestampStart) || (props.showDuelDurationTimer && props.duelDurationTimestamp)) {
+      const updateColonVisibility = () => {
+        // Use current time to determine if colon should be visible
+        // Even seconds = visible, odd seconds = hidden
+        const currentSecond = Math.floor(Date.now() / 1000)
+        setColonVisible(currentSecond % 2 === 0)
+      }
+      
+      // Update immediately
+      updateColonVisibility()
+      
+      // Update every second
+      const colonInterval = setInterval(updateColonVisibility, 1000)
       
       return () => clearInterval(colonInterval)
     } else {

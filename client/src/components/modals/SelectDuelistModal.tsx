@@ -5,7 +5,8 @@ import { Button } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { DuelistCard, DuelistCardHandle } from '/src/components/cards/DuelistCard'
-import { useDuellingDuelists, usePlayerDuelistsOrganized } from '/src/stores/duelistStore'
+import { useDuellingDuelists, usePlayerDuelistsOrganized, useDuelist } from '/src/stores/duelistStore'
+import { useCurrentSeason } from '/src/stores/seasonStore'
 import { NoDuelistsSlip, NoDuelistsSlipHandle } from '/src/components/NoDuelistsSlip'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
@@ -405,7 +406,7 @@ function _SelectDuelistModal({
         ref={noDuelistsCardRef}
         isLeft={true}
         isVisible={true}
-        isHighlightable={false}
+        isHighlightable={true}
         instantVisible={true}
         width={25 * CARD_ASPECT_RATIO}
         height={25}
@@ -454,7 +455,8 @@ function _SelectDuelistModal({
             handleCancelEnlist={handleCancelEnlist} 
             handleConfirmEnlist={handleConfirmEnlist} 
             requiresEnlistment={requiresEnlistment} 
-            entryTokenAmount={entryTokenAmount} 
+            entryTokenAmount={entryTokenAmount}
+            pendingSelectedDuelistId={pendingSelectedDuelistId}
           />
           <img 
             ref={bottomCardRef}
@@ -470,9 +472,7 @@ function _SelectDuelistModal({
           {noDuelistsSlipMemo}
 
           {/* Big center-bottom toggle button for ranked mode */}
-          {opener.props?.matchmakingType === constants.QueueId.Ranked && 
-           canMatchMakeIds.length > 0 && 
-           rankedCanEnlistIds.length > 0 && (
+          {opener.props?.matchmakingType === constants.QueueId.Ranked && (
             <div
             className='YesMouse NoDrag'
               style={{
@@ -602,15 +602,19 @@ function EnlistmentConfirmationDialog({
   handleCancelEnlist, 
   handleConfirmEnlist, 
   requiresEnlistment, 
-  entryTokenAmount 
+  entryTokenAmount,
+  pendingSelectedDuelistId
 }: { 
   showConfirmation: boolean, 
   handleCancelEnlist: () => void, 
   handleConfirmEnlist: () => void, 
   requiresEnlistment: boolean, 
-  entryTokenAmount: bigint
+  entryTokenAmount: bigint,
+  pendingSelectedDuelistId: BigNumberish
  }) {
   const { aspectWidth } = useGameAspect()
+  const { seasonId } = useCurrentSeason()
+  const { nameAndId } = useDuelist(pendingSelectedDuelistId)
   
   return (
     <Modal
@@ -620,40 +624,123 @@ function EnlistmentConfirmationDialog({
       className="ModalText"
     >
       <Modal.Header>
-        <h2 className="Important" style={{ textAlign: 'center', margin: `${aspectWidth(0.3)}px 0` }}>Enlist Duelist?</h2>
+        <h2
+          className="Important"
+          style={{ textAlign: "center", margin: `${aspectWidth(0.3)}px 0` }}
+        >
+          Enlist Duelist In Ranked
+        </h2>
       </Modal.Header>
-      
-      <Modal.Content style={{ padding: aspectWidth(1.2) }}>
-        <div style={{ 
-          textAlign: 'center', 
-          lineHeight: '1.6',
-          fontSize: aspectWidth(1.4),
-          marginBottom: aspectWidth(0.4)
-        }}>
-          Are you sure you want to enlist this duelist for ranked matches?
+
+      <Modal.Content style={{ padding: aspectWidth(2) }}>
+        {/* Introduction */}
+        <div
+          style={{
+            textAlign: "center",
+            lineHeight: "1.4",
+            fontSize: aspectWidth(1.2),
+            marginBottom: aspectWidth(1.8),
+            color: "#c8b6a8",
+            fontWeight: "bold",
+          }}
+        >
+          To participate in ranked play, each duelist must enlist.
         </div>
-        
-        <div style={{
-          textAlign: 'center',
-          fontSize: aspectWidth(1),
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: aspectWidth(1.6),
-          color: COLORS.ACTIVE
-        }}>
-          <span>Enlistment Fee:</span>
-          {requiresEnlistment ? <Balance fools size='large' wei={entryTokenAmount} /> : <span style={{color: '#90EE90', fontWeight: 'bold'}}>FREE</span>}
+
+        {/* Details section */}
+        <div
+          style={{
+            background: "rgba(0, 0, 0, 0.3)",
+            border: "1px solid rgba(239, 151, 88, 0.3)",
+            borderRadius: aspectWidth(0.5),
+            padding: aspectWidth(1.5),
+            marginBottom: aspectWidth(2),
+          }}
+        >
+          <div
+            style={{
+              textAlign: "left",
+              lineHeight: "1.5",
+              fontSize: aspectWidth(1.1),
+              marginBottom: aspectWidth(1),
+              color: "#c8b6a8",
+            }}
+          >
+            <strong style={{ color: "#ef9758" }}>Enlistment Fee:</strong> 🎩5
+            per duelist, per season
+          </div>
+
+          <div
+            style={{
+              textAlign: "left",
+              lineHeight: "1.5",
+              fontSize: aspectWidth(1.1),
+              marginBottom: aspectWidth(1),
+              color: "#c8b6a8",
+            }}
+          >
+            <strong style={{ color: "#ef9758" }}>Duration:</strong> Once
+            enlisted, a duelist may participate in ranked duels until they meet
+            their untimely demise or the season ends, whichever comes first.
+          </div>
+
+          <div
+            style={{
+              textAlign: "left",
+              lineHeight: "1.5",
+              fontSize: aspectWidth(1.1),
+              color: "#c8b6a8",
+            }}
+          >
+            <strong style={{ color: "#ef9758" }}>Benefits:</strong> Only
+            enlisted duelists are eligible for the ranked season leaderboard and
+            prizes.
+          </div>
+        </div>
+
+        {/* Confirmation question */}
+        <div
+          style={{
+            textAlign: "center",
+            lineHeight: "1.4",
+            fontSize: aspectWidth(1.4),
+            marginBottom: aspectWidth(2),
+            color: "#ef9758",
+            fontWeight: "bold",
+            padding: aspectWidth(1),
+            background: "rgba(239, 151, 88, 0.1)",
+            borderRadius: aspectWidth(0.5),
+            border: "1px solid rgba(239, 151, 88, 0.2)",
+          }}
+        >
+          <span style={{ color: "#c8b6a8" }}>Enlist</span> {nameAndId}{" "}
+          <span style={{ color: "#c8b6a8" }}>for</span> Season {seasonId}?
+        </div>
+
+        {/* Fee display */}
+        <div
+          style={{
+            textAlign: "center",
+            fontSize: aspectWidth(1.2),
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: aspectWidth(1.6),
+            color: COLORS.ACTIVE,
+            fontWeight: "bold",
+          }}
+        >
+          <span style={{ color: "#c8b6a8" }}>Cost:</span>
+          {requiresEnlistment ? (
+            <Balance fools size="large" wei={entryTokenAmount} />
+          ) : (
+            <span style={{ color: "#90EE90" }}>FREE</span>
+          )}
         </div>
       </Modal.Content>
-      
-      <Modal.Actions style={{ display: 'flex' }}>
-        <ActionButton 
-          fill
-          dimmed
-          onClick={handleCancelEnlist}
-          label="Cancel"
-        />
+
+      <Modal.Actions style={{ display: "flex" }}>
+        <ActionButton fill dimmed onClick={handleCancelEnlist} label="Cancel" />
         <ActionButton
           fill
           important
@@ -662,28 +749,29 @@ function EnlistmentConfirmationDialog({
         />
       </Modal.Actions>
     </Modal>
-  )
+  );
 }
 
-// Custom empty state slip with context-aware messages - tentacles know all! 🐙
-function CustomEmptyStateSlip({
+const CustomEmptyStateSlip = React.forwardRef<NoDuelistsSlipHandle, {
+  isEnlistMode: boolean
+  rankedCanEnlistIds: bigint[]
+  canMatchMakeIds: bigint[]
+  matchmakingType?: constants.QueueId
+} & Omit<React.ComponentProps<typeof NoDuelistsSlip>, 'childrenInFront'>>(({
   isEnlistMode,
   rankedCanEnlistIds,
   canMatchMakeIds,
   matchmakingType,
   ...props
-}: {
-  isEnlistMode: boolean
-  rankedCanEnlistIds: bigint[]
-  canMatchMakeIds: bigint[]
-  matchmakingType?: constants.QueueId
-} & Omit<React.ComponentProps<typeof NoDuelistsSlip>, 'childrenInFront'>) {
+}, ref) => {
   const { aspectWidth } = useGameAspect()
   
   const getEmptyStateMessage = () => {
+    console.log('getEmptyStateMessage', matchmakingType, isEnlistMode, rankedCanEnlistIds.length, canMatchMakeIds.length)
     if (matchmakingType === constants.QueueId.Ranked) {
       if (isEnlistMode) {
         if (rankedCanEnlistIds.length === 0) {
+          console.log('No duelists to enlist')
           return {
             title: "No duelists to enlist",
             message: "All your duelists are already enlisted for ranked matches.",
@@ -722,34 +810,11 @@ function CustomEmptyStateSlip({
 
   return (
     <NoDuelistsSlip
+      ref={ref}
       {...props}
-      childrenInFront={
-        <div className='Poster'>
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'flex-start',
-            width: '100%',
-            height: '100%',
-            textAlign: 'center',
-            fontStyle: 'italic',
-            color: '#3b2a23',
-            fontWeight: 'bold',
-            padding: aspectWidth(1),
-          }}>
-            <p style={{ fontSize: aspectWidth(1.4), marginTop: 0, marginBottom: aspectWidth(1) }}>
-              {emptyState.title}
-            </p>
-            <p style={{ fontSize: aspectWidth(1.2) }}>
-              {emptyState.message}
-            </p>
-            <p style={{ fontSize: aspectWidth(1) }}>
-              {emptyState.subtext}
-            </p>
-          </div>
-        </div>
-      }
+      title={emptyState.title}
+      message={emptyState.message}
+      subtext={emptyState.subtext}
     />
   )
-}
+})
