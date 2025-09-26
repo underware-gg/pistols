@@ -812,4 +812,34 @@ export class InteractibleScene extends THREE.Scene {
     });
   }
 
+  public setLayerVariant(textureName: TextureName, variantName: string): boolean {
+    const layerIndex = this.sceneData.backgrounds.findIndex(background => background.texture === textureName);
+    
+    if (layerIndex === -1) {
+      console.warn(`Layer with texture ${textureName} not found`);
+      return false;
+    }
+
+    const background = this.sceneData.backgrounds[layerIndex];
+    
+    if (!background.variants || background.variants.length === 0) {
+      console.warn(`Layer ${textureName} has no variants defined`);
+      return false;
+    }
+
+    const variant = background.variants.find(v => v.name === variantName);
+    
+    if (!variant) {
+      console.warn(`Variant ${variantName} not found for layer ${textureName}`);
+      return false;
+    }
+
+    // Update the current variant and texture
+    this.currentTextures[layerIndex] = _textures[variant.texture];
+    
+    // Update shader uniforms
+    this.maskShader.setUniformValue('uTextures', this.currentTextures);
+
+    return true;
+  }
 }

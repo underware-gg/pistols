@@ -54,7 +54,7 @@ export function useTransactionHandler<T, Args extends any[] = []>({
         if (canComplete) {
           setIsLoading(false)
           setIsWaitingForIndexer(false)
-          onComplete?.(transaction.result as T, transaction.meta?.args as Args || [] as Args)
+          onComplete?.(transaction.result as T, transaction.meta as Args || [] as Args)
           transactionStore.removeTransaction(key)
         } else {
           setIsLoading(true)
@@ -69,7 +69,7 @@ export function useTransactionHandler<T, Args extends any[] = []>({
       } else if (transaction.status === 'failed' && mounted) {
         setIsLoading(false)
         setIsWaitingForIndexer(false)
-        onComplete?.(new Error(transaction.error || 'Transaction failed'), transaction.meta?.args as Args || [] as Args)
+        onComplete?.(new Error(transaction.error || 'Transaction failed'), transaction.meta as Args || [] as Args)
         transactionStore.removeTransaction(key)
       } else if (transaction.status === 'pending' && mounted) {
         setIsLoading(true)

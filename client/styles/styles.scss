@@ -1770,6 +1770,38 @@ input::placeholder {
 .ui.button.toggle.active:hover {
   background-color: $color-important!important; // default is green
 }
+
+// Mode toggle buttons (Casual/Ranked)
+.mode-toggle-buttons {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  
+  .ui.button {
+    padding: 1rem 2rem;
+    font-size: aspect-width(1.6);
+    font-weight: bold;
+    font-family: 'Garamond', serif;
+    text-shadow: 0.05rem 0.05rem 1px rgba(0, 0, 0, 0.5);
+    border-radius: 0.25rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    min-width: aspect-width(12);
+    
+    &.toggle {
+      background-color: rgba(68, 68, 68, 0.3);
+      color: rgba(239, 225, 215, 0.35);
+      border: 1px solid #666;
+      
+      &.active {
+        background-color: rgba(206, 111, 44, 0.2);
+        color: #ce6f2c;
+        border-color: #ce6f2c;
+      }
+    }
+  }
+}
+
 //
 // <Menu> buttons
 .ui.menu {
@@ -3058,4 +3090,21 @@ a.active.step:hover,
   height: 70%;
   width: aspect-width(0.1);
   background: rgba(241, 210, 66, 0.3);
+}
+
+// Matchmaking info popup animation
+@keyframes fadeInScale {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.8) translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1) translateY(0);
+  }
+}
+
+.matchmaking-info-popup {
+  animation: fadeInScale 0.3s ease-out;
+  z-index: 300;
 }

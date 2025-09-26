@@ -58,6 +58,7 @@ const router = createBrowserRouter([
       { path: "tutorial/duel", element: <MainPage /> },
       { path: "tutorial/duel/:duel_id", element: <MainPage /> },
       { path: "balcony", element: <MainPage /> },
+      { path: "matchmaking", element: <MainPage /> },
       { path: "duels", element: <MainPage /> },
       { path: "graveyard", element: <MainPage /> },
       { path: "duel/:duel_id", element: <MainPage /> },

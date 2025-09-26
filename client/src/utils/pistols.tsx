@@ -290,6 +290,7 @@ export const MenuLabels: Partial<Record<SceneName, string>> = {
   [SceneName.Gate]: 'Exit to Gate',
   [SceneName.Tavern]: 'The Bar',
   [SceneName.Duelists]: 'The Balcony (Opponents)',
+  [SceneName.Matchmaking]: 'The Matchmaking Table',
   [SceneName.DuelsBoard]: 'The Tables (Live Duels)',
   [SceneName.Graveyard]: 'The Graveyard (Past Duels)',
   [SceneName.Profile]: 'Account & Duelists',

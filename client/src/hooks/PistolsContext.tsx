@@ -58,6 +58,7 @@ export const initialState = {
   tavernRingsOpener: null as Opener,
   ringAnimationOpener: null as Opener,
   tutorialPromptOpener: null as Opener,
+  modeSelectOpener: null as Opener,
 }
 
 const PistolsActions = {
@@ -185,6 +186,7 @@ const PistolsProvider = ({
   const tavernRingsOpener = useOpener()
   const ringAnimationOpener = useOpener()
   const tutorialPromptOpener = useOpener()
+  const modeSelectOpener = useOpener()
 
   const [hasSearchParams, setHasSearchParams] = useState(false)
 
@@ -335,6 +337,7 @@ const PistolsProvider = ({
     tavernRingsOpener,
     ringAnimationOpener,
     tutorialPromptOpener,
+    modeSelectOpener,
   })
 
   emitter.on('searchParams', (data) => {
@@ -355,6 +358,7 @@ const PistolsProvider = ({
                         tavernRingsOpener.isOpen ||
                         ringAnimationOpener.isOpen ||
                         tutorialPromptOpener.isOpen ||
+                        modeSelectOpener.isOpen ||
                         hasSearchParams ||
                         (state.challengingAddress && state.challengingDuelistId)
 
@@ -373,6 +377,7 @@ const PistolsProvider = ({
     tavernRingsOpener.isOpen,
     ringAnimationOpener.isOpen,
     tutorialPromptOpener.isOpen,
+    modeSelectOpener.isOpen,
     hasSearchParams,
     state.challengingAddress,
     state.challengingDuelistId
@@ -395,6 +400,7 @@ const PistolsProvider = ({
       tavernRingsOpener,
       ringAnimationOpener,
       tutorialPromptOpener,
+      modeSelectOpener,
     } }}>
       {children}
     </PistolsContext.Provider>
@@ -558,6 +564,7 @@ export const sceneRoutes: Record<SceneName, SceneRoute> = {
   [SceneName.Profile]: { baseUrl: '/profile', title: 'Pistols - Profile' },
 
   [SceneName.Duelists]: { baseUrl: '/balcony', title: 'Pistols - Duelists' },
+  [SceneName.Matchmaking]: { baseUrl: '/matchmaking', title: 'Pistols - Matchmaking' },
   [SceneName.DuelsBoard]: { baseUrl: '/duels', title: 'Pistols - Your Duels' },
   [SceneName.Leaderboards]: { baseUrl: '/leaderboards', title: 'Pistols - Leaderboards' },
   [SceneName.Graveyard]: { baseUrl: '/graveyard', title: 'Pistols - Past Duels' },
@@ -664,6 +671,7 @@ export const usePistolsScene = () => {
     atCardPacks: (currentScene == SceneName.CardPacks),
     atDuelistBook: (currentScene == SceneName.DuelistBook),
     atDuelists: (currentScene == SceneName.Duelists),
+    atMatchmaking: (currentScene == SceneName.Matchmaking),
     atDuelsBoard: (currentScene == SceneName.DuelsBoard),
     atLeaderboards: (currentScene == SceneName.Leaderboards),
     atGraveyard: (currentScene == SceneName.Graveyard),

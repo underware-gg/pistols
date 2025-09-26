@@ -8,16 +8,14 @@ import { InteractibleScene } from '/src/three/InteractibleScene'
 import BarkeepModal from '/src/components/modals/BarkeepModal'
 import ActivityPanel from '/src/components/ActivityPanel'
 import { Image } from 'semantic-ui-react'
-import { useTextureShift } from '/src/hooks/useTextureShift'
-import { useGameAspect } from '/src/hooks/useGameAspect'
 import { useNotifications } from '/src/stores/notificationStore'
-import * as TWEEN from '@tweenjs/tween.js'
 import { emitter } from '/src/three/game'
 import { useAccount } from '@starknet-react/core'
 import { useDuelIdsForClaimingRings } from '/src/queries/useDuelIdsForClaimingRings'
 import { useHasClaimedRing } from '/src/hooks/usePistolsContractCalls'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import TavernRingsModal from '../modals/TavernRingsModal'
+import { ExclamationIndicator } from '../ui/ExclamationIndicator'
 
 // TEMP cheat to stop the rings popup from showing multiple times in a session
 let hasShownInThisSession = false
@@ -130,115 +128,51 @@ function TavernRingsChecker() {
   )
 }
 
-//
-// TEMP:::Removed from main scene
-// should be somewhere else???
-// 
-// 
+
 function NotificationExclamation() {
-  const { aspectWidth } = useGameAspect()
   const { hasUnreadNotifications } = useNotifications()
   const { barkeepModalOpener } = usePistolsContext()
-  const { x: notificationShiftX, y: notificationShiftY } = useTextureShift(1)
-
-  const [exclamationOpacity, setExclamationOpacity] = useState(0)
-  const [isHovered, setIsHovered] = useState(false)
-  const [pulseIntensity, setPulseIntensity] = useState(8)
-  const [verticalShift, setVerticalShift] = useState(0)
-
-  const opacityTweenRef = useRef<TWEEN.Tween<any> | null>(null)
-  const pulseTweenRef = useRef<TWEEN.Tween<any> | null>(null)
-  const floatTweenRef = useRef<TWEEN.Tween<any> | null>(null)
-
-  useEffect(() => {
-    if (opacityTweenRef.current) {
-      opacityTweenRef.current.stop()
-    }
-
-    const targetOpacity = hasUnreadNotifications && !barkeepModalOpener.isOpen ? 1 : 0
-    opacityTweenRef.current = new TWEEN.Tween({ opacity: exclamationOpacity })
-      .to({ opacity: targetOpacity }, 200)
-      .easing(TWEEN.Easing.Quadratic.InOut)
-      .onUpdate(({ opacity }) => {
-        setExclamationOpacity(opacity)
-      })
-      .start()
-  }, [hasUnreadNotifications, barkeepModalOpener.isOpen])
-
-  useEffect(() => {
-    if (pulseTweenRef.current) {
-      pulseTweenRef.current.stop()
-    }
-    if (floatTweenRef.current) {
-      floatTweenRef.current.stop()
-    }
-
-    if (exclamationOpacity > 0 && !isHovered && !barkeepModalOpener.isOpen) {
-      pulseTweenRef.current = new TWEEN.Tween({ intensity: pulseIntensity })
-        .to({ intensity: 16 }, 800)
-        .easing(TWEEN.Easing.Sinusoidal.InOut)
-        .yoyo(true)
-        .repeat(Infinity)
-        .onUpdate(({ intensity }) => {
-          setPulseIntensity(intensity)
-        })
-        .start()
-
-      floatTweenRef.current = new TWEEN.Tween({ shift: verticalShift })
-        .to({ shift: 8 }, 800)
-        .easing(TWEEN.Easing.Sinusoidal.InOut)
-        .yoyo(true)
-        .repeat(Infinity)
-        .onUpdate(({ shift }) => {
-          setVerticalShift(shift)
-        })
-        .start()
-    } else {
-      setPulseIntensity(isHovered ? 16 : 8)
-      setVerticalShift(0)
-    }
-  }, [exclamationOpacity, isHovered, barkeepModalOpener.isOpen])
 
   const handleMouseEnter = useCallback(() => {
-    setIsHovered(true)
     emitter.emit('hover_description', 'You have unread notifications')
-  }, [emitter])
+  }, [])
 
   const handleMouseLeave = useCallback(() => {
-    setIsHovered(false)
     emitter.emit('hover_description', '')
-  }, [emitter])
+  }, [])
 
+  const handleClick = useCallback(() => {
+    (_currentScene as InteractibleScene)?.excludeItem(TextureName.bg_tavern_bartender_mask);
+    (_currentScene as InteractibleScene)?.toggleBlur(true);
+    (_currentScene as InteractibleScene)?.setClickable(false);
+    barkeepModalOpener.open({ initialStage: 'notifications' })
+  }, [barkeepModalOpener])
 
   return (
-    <>
-      <Image
-        src="/images/ui/notification_exclamation.png"
-        className="YeMouse NoDrag"
-        style={{
-          position: 'absolute',
-          display: exclamationOpacity > 0 ? 'block' : 'none',
-          top: '30%',
-          left: '46%',
-          rotate: '-20deg',
-          width: aspectWidth(10),
-          height: 'auto',
-          transform: `translate(${notificationShiftX}px, ${notificationShiftY + verticalShift}px) scale(${isHovered ? 1.2 : 1})`,
-          cursor: 'pointer',
-          opacity: exclamationOpacity,
-          filter: `drop-shadow(0 0 ${pulseIntensity}px rgba(255, 255, 255, ${isHovered ? 1 : 0.8}))`,
-          transition: 'transform 0.2s ease-out',
-          pointerEvents: 'auto'
-        }}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        onClick={() => {
-          (_currentScene as InteractibleScene)?.excludeItem(TextureName.bg_tavern_bartender_mask);
-          (_currentScene as InteractibleScene)?.toggleBlur(true);
-          (_currentScene as InteractibleScene)?.setClickable(false);
-          barkeepModalOpener.open({ initialStage: 'notifications' })
-        }}
-      />
-    </>
+    <ExclamationIndicator
+      src="/images/ui/notification_exclamation.png"
+      visible={hasUnreadNotifications && !barkeepModalOpener.isOpen}
+      textureShiftIndex={1}
+      position={{ top: '30%', left: '46%' }}
+      size={{ width: 10 }}
+      rotation={-20}
+      animations={{
+        opacity: true,
+        pulse: true,
+        float: true,
+        hoverScale: true
+      }}
+      animationTiming={{
+        opacityDuration: 200,
+        pulseDuration: 800,
+        floatDuration: 800,
+        pulseIntensity: 8,
+        floatAmount: 8,
+        hoverScaleFactor: 1.2
+      }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onClick={handleClick}
+    />
   )
 }

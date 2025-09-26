@@ -1,13 +1,14 @@
 import * as constants from '../generated/constants'
 
 enum CardColor {
-  WHITE = 'white',
-  RED = '#e34a4a',
-  YELLOW = '#f1d242',
-  BLUE = '#4d9ad6',
-  BROWN = '#27110b',
-  ORANGE = '#ffa500',
-  PURPLE = '#c64dc6'
+  WHITE = "white",
+  RED = "#e34a4a",
+  YELLOW = "#f1d242",
+  BLUE = "#4d9ad6",
+  BROWN = "#27110b",
+  ORANGE = "#ffa500",
+  PURPLE = "#c64dc6",
+  GREEN = "#77d64d",
 }
 
 interface CardData {

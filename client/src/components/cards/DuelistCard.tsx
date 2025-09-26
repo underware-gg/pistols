@@ -32,6 +32,15 @@ interface DuelistCardProps extends InteractibleComponentProps {
   hideSouls?: boolean
   shouldAnimateIncrease?: boolean
 
+  isInQueue?: boolean
+  isCommitting?: boolean
+  queueTimestampStart?: number
+  showSeasonRank?: boolean
+  isEnlisting?: boolean
+
+  showDuelDurationTimer?: boolean
+  duelDurationTimestamp?: number
+
   showBack?: boolean
   animateFlip?: (showBack: boolean) => void
   showSouls?: (duelistId: number, stackedDuelistIds: number[]) => void
@@ -82,6 +91,63 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
       setAnimationCompleted(false)
     }
   }, [animationCompleted, level])
+
+  // Queue timer functionality
+  const [queueTimeElapsed, setQueueTimeElapsed] = useState(0)
+  const [colonVisible, setColonVisible] = useState(true)
+  const [duelTimeElapsed, setDuelTimeElapsed] = useState(0)
+  
+  useEffect(() => {
+    if ((props.isInQueue && props.queueTimestampStart) || (props.showDuelDurationTimer && props.duelDurationTimestamp)) {
+      const updateTimer = () => {
+        const now = Date.now()
+        const elapsed = Math.floor((now - (props.queueTimestampStart * 1000)) / 1000)
+        setQueueTimeElapsed(elapsed)
+
+        const elapsedDuel = Math.floor((now - (props.duelDurationTimestamp * 1000)) / 1000)
+        setDuelTimeElapsed(elapsedDuel);
+      }
+      
+      // Update immediately
+      updateTimer()
+      
+      // Update every second
+      const interval = setInterval(updateTimer, 1000)
+      
+      return () => clearInterval(interval)
+    } else {
+      setQueueTimeElapsed(0)
+      setDuelTimeElapsed(0)
+    }
+  }, [props.isInQueue, props.queueTimestampStart])
+
+  // Blinking colon effect
+  useEffect(() => {
+    if (props.isInQueue && props.queueTimestampStart) {
+      const colonInterval = setInterval(() => {
+        setColonVisible(prev => !prev)
+      }, 1000)
+      
+      return () => clearInterval(colonInterval)
+    } else {
+      setColonVisible(true)
+    }
+  }, [props.isInQueue, props.queueTimestampStart])
+
+  const formatQueueTime = (seconds: number, showColon: boolean) => {
+    const hours = Math.floor(seconds / 3600)
+    const mins = Math.floor((seconds % 3600) / 60)
+    const secs = seconds % 60
+    const colon = showColon ? ':' : ' '
+    
+    if (hours > 0) {
+      // HH:MM format when over 1 hour - NO SECONDS!
+      return `${hours.toString().padStart(2, '0')}${colon}${mins.toString().padStart(2, '0')}`
+    } else {
+      // MM:SS format when under 1 hour
+      return `${mins.toString().padStart(2, '0')}${colon}${secs.toString().padStart(2, '0')}`
+    }
+  }
 
   const { owner } = useOwnerOfDuelist(props.duelistId)
   const { name: playerName } = usePlayer(isPositiveBigint(props.address) ? props.address : owner)
@@ -446,91 +512,133 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
             <ProfileBadge duelistId={props.duelistId} />
           </div>
           <div className="duelist-card-details">
-            {props.isSmall ? (
-              props.showQuote ? (
-                <div className="duelist-quote" style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  textAlign: 'center',
-                  height: '100%',
-                  padding: '0.5rem',
-                  fontSize: aspectWidth(1),
-                  lineHeight: '1.2',
-                  overflow: 'hidden',
-                  fontStyle: 'italic',
-                  color: '#200'
-                }}>
-                  {quote}
+            {props.isInQueue || props.isCommitting || props.isEnlisting || props.showDuelDurationTimer ? (
+              // Queue status display
+              <div className={`queue-status-container ${props.isSmall ? 'small' : ''}`}>
+                <div className="queue-spinner-timer-container">
+                  <div className='button-dialog-spinner-container'>
+                    <div className='dialog-spinner'></div>
+                  </div>
+                  
+                  {props.queueTimestampStart && (
+                    <div className="queue-timer">
+                      {formatQueueTime(queueTimeElapsed, colonVisible)}
+                    </div>
+                  )}
+
+                  {props.showDuelDurationTimer && !props.isInQueue && (
+                    <div className="duel-timer">
+                      {formatQueueTime(duelTimeElapsed, colonVisible)}
+                    </div>
+                  )}
                 </div>
+                
+                <div className="queue-status-text">
+                  {props.isEnlisting ? 'Enlisting...' : props.isCommitting ? 'Commiting...' : props.queueTimestampStart ? 'Searching for Match...' : props.showDuelDurationTimer ? 'Playing duel...' : 'Waiting in Line'}
+                </div>
+
+                {props.showSeasonRank && (
+                <div className="duelist-name small no-margin" data-contentlength={_nameLength(playerName)}>
+                    {`Rank: ${position}`}
+                  </div>
+                )}
+              </div>
+            ) : (
+              // Regular duelist details
+              props.isSmall ? (
+                props.showQuote ? (
+                  <div className="duelist-quote" style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    textAlign: 'center',
+                    height: '100%',
+                    padding: '0.5rem',
+                    fontSize: aspectWidth(1),
+                    lineHeight: '1.2',
+                    overflow: 'hidden',
+                    fontStyle: 'italic',
+                    color: '#200'
+                  }}>
+                    {quote}
+                  </div>
+                ) : (
+                  <>
+                  <div className="duelist-fame">
+                    <FameLivesDuelist duelistId={props.duelistId} overrideFame={props.overrideFame} fame={props.fame} />
+                  </div>
+                  <FameProgressBar duelistId={props.duelistId} width={props.width * 0.8} height={props.height * 0.1} hideValue overrideFame={props.overrideFame} fame={props.fame} />
+                  <div className="duelist-name small" data-contentlength={_nameLength(playerName)}>
+                    {props.showSeasonRank ? `Rank: ${position}` : playerName}
+                  </div>
+                  </>
+                )
               ) : (
                 <>
-                <div className="duelist-fame">
-                  <FameLivesDuelist duelistId={props.duelistId} overrideFame={props.overrideFame} fame={props.fame} />
-                </div>
-                <FameProgressBar duelistId={props.duelistId} width={props.width * 0.8} height={props.height * 0.1} hideValue overrideFame={props.overrideFame} fame={props.fame} />
-                <div className="duelist-name small" data-contentlength={_nameLength(playerName)}>{playerName}</div>
+                  <div className="duelist-fame">
+                    <FameLivesDuelist duelistId={props.duelistId} size='huge' />
+                  </div>
+                  <FameProgressBar duelistId={props.duelistId} width={props.width * 0.8} />
+                  
+                  <div className="TextDivider CardDivider">Stats</div>
+                  
+                  <Grid className='NoMargin' columns={2} divided style={{ width: '96%' }}>
+                    <GridColumn>
+                      <Grid className='NoMargin'>
+                        <GridRow>
+                          <GridColumn className='Bold' textAlign='left' width={5}>
+                            {props.showSeasonRank ? 'Rank:' : 'Owner:'}
+                          </GridColumn>
+                          <GridColumn className="Anchor Black" textAlign='right' width={11} onClick={() => {
+                            if (!props.showSeasonRank) {
+                              dispatchSelectPlayerAddress(owner)
+                            }
+                          }}>
+                            {props.showSeasonRank ? position : playerName}
+                          </GridColumn>
+                        </GridRow>
+                        <GridRow>
+                          <GridColumn className='Bold' textAlign='left' width={6}>Honour:</GridColumn>
+                          <GridColumn textAlign='right' width={10}>{totals.honour}/10</GridColumn>
+                        </GridRow>
+                        <GridRow>
+                          <GridColumn className='Bold' textAlign='left' width={6}>Archetype:</GridColumn>
+                          <GridColumn textAlign='right' width={10}>{ArchetypeNames[totals.archetype]}</GridColumn>
+                        </GridRow>
+                      </Grid>
+                    </GridColumn>
+                    
+                    <GridColumn>
+                      <Grid className='NoMargin'>
+                        <GridRow>
+                          <GridColumn className='Bold' textAlign='left' width={6}>Duels:</GridColumn>
+                          <GridColumn textAlign='right' width={10}>{totals.total_duels}</GridColumn>
+                        </GridRow>
+                        <GridRow>
+                          <GridColumn className='Bold' textAlign='left' width={6}>Wins:</GridColumn>
+                          <GridColumn textAlign='right' width={10}>{totals.total_wins} ({winPercentage})</GridColumn>
+                        </GridRow>
+                        <GridRow>
+                          <GridColumn className='Bold' textAlign='left' width={6}>Losses:</GridColumn>
+                          <GridColumn textAlign='right' width={10}>{totals.total_losses + totals.total_draws} ({lossPercentage})</GridColumn>
+                        </GridRow>
+                      </Grid>
+                    </GridColumn>
+                  </Grid>
+                  <div className={`duels-button-container padded ${props.isAnimating ? '' : 'visible'}`}>
+                    <ActionButton 
+                      className='NoMargin YesMouse' 
+                      large 
+                      fillParent 
+                      important
+                      label='Show Duels'
+                      onClick={() => {
+                        props.animateFlip(true)
+                      }} 
+                    />
+                  </div>
                 </>
               )
-            ) : (
-              <>
-                <div className="duelist-fame">
-                  <FameLivesDuelist duelistId={props.duelistId} size='huge' />
-                </div>
-                <FameProgressBar duelistId={props.duelistId} width={props.width * 0.8} />
-                
-                <div className="TextDivider CardDivider">Stats</div>
-                
-                <Grid className='NoMargin' columns={2} divided style={{ width: '96%' }}>
-                  <GridColumn>
-                    <Grid className='NoMargin'>
-                      <GridRow>
-                        <GridColumn className='Bold' textAlign='left' width={5}>Owner:</GridColumn>
-                        <GridColumn className="Anchor Black" textAlign='right' width={11} onClick={() => {
-                          dispatchSelectPlayerAddress(owner)
-                        }}>{playerName}</GridColumn>
-                      </GridRow>
-                      <GridRow>
-                        <GridColumn className='Bold' textAlign='left' width={6}>Honour:</GridColumn>
-                        <GridColumn textAlign='right' width={10}>{totals.honour}/10</GridColumn>
-                      </GridRow>
-                      <GridRow>
-                        <GridColumn className='Bold' textAlign='left' width={6}>Archetype:</GridColumn>
-                        <GridColumn textAlign='right' width={10}>{ArchetypeNames[totals.archetype]}</GridColumn>
-                      </GridRow>
-                    </Grid>
-                  </GridColumn>
-                  
-                  <GridColumn>
-                    <Grid className='NoMargin'>
-                      <GridRow>
-                        <GridColumn className='Bold' textAlign='left' width={6}>Duels:</GridColumn>
-                        <GridColumn textAlign='right' width={10}>{totals.total_duels}</GridColumn>
-                      </GridRow>
-                      <GridRow>
-                        <GridColumn className='Bold' textAlign='left' width={6}>Wins:</GridColumn>
-                        <GridColumn textAlign='right' width={10}>{totals.total_wins} ({winPercentage})</GridColumn>
-                      </GridRow>
-                      <GridRow>
-                        <GridColumn className='Bold' textAlign='left' width={6}>Losses:</GridColumn>
-                        <GridColumn textAlign='right' width={10}>{totals.total_losses + totals.total_draws} ({lossPercentage})</GridColumn>
-                      </GridRow>
-                    </Grid>
-                  </GridColumn>
-                </Grid>
-                <div className={`duels-button-container padded ${props.isAnimating ? '' : 'visible'}`}>
-                  <ActionButton 
-                    className='NoMargin YesMouse' 
-                    large 
-                    fillParent 
-                    important
-                    label='Show Duels'
-                    onClick={() => {
-                      props.animateFlip(true)
-                    }} 
-                  />
-                </div>
-              </>
             )}
           </div>
         </>

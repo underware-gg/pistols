@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import * as TWEEN from '@tweenjs/tween.js'
 import { useAccount } from '@starknet-react/core'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
+import { useSettings } from '/src/hooks/SettingsContext'
 import { useGameEvent } from '/src/hooks/useGameEvent'
 import { useQueryPlayerIds } from '/src/stores/playerStore'
 import { useGameAspect } from '/src/hooks/useGameAspect'
@@ -10,12 +11,14 @@ import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { DojoSetupErrorDetector } from '/src/components/account/DojoSetupErrorDetector'
 import { POSTER_HEIGHT_SMALL, POSTER_WIDTH_SMALL, ProfilePoster, ProfilePosterHandle } from '/src/components/ui/ProfilePoster'
 import { SortDirection, PlayerColumn, useQueryParams, ChallengeColumn } from '/src/stores/queryParamsStore'
-import { SceneName } from '/src/data/assets'
+import { SceneName, TextureName } from '/src/data/assets'
 import { LiveChallengeStates } from '/src/utils/pistols'
 import DuelTutorialOverlay from '/src/components/ui/duel/DuelTutorialOverlay'
 import { bigintEquals } from '@underware/pistols-sdk/utils'
 import { usePactGet } from '/src/queries/usePact'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
+import { _currentScene } from '/src/three/game'
+import { InteractibleScene } from '/src/three/InteractibleScene'
 
 export default function ScDuelists() {
   const { filterPlayerName, filterPlayerActive, filterPlayerBookmarked, filterPlayerSortColumn, filterPlayerSortDirection } = useQueryParams()
@@ -28,8 +31,9 @@ export default function ScDuelists() {
   const { challenges: currentChallenges } = useQueryChallengesOwnedByAccount(address, LiveChallengeStates)
 
   const { aspectWidth, aspectHeight } = useGameAspect()
-  const { dispatchSelectPlayerAddress, tutorialOpener, duelistSelectOpener, dispatchChallengingPlayerAddress, dispatchSelectDuel } = usePistolsContext()
+  const { dispatchSelectPlayerAddress, tutorialOpener, duelistSelectOpener, dispatchChallengingPlayerAddress, dispatchSelectDuel, modeSelectOpener } = usePistolsContext()
   const { dispatchSetScene} = usePistolsScene()
+  const { selectedMode } = useSettings()
   const { botPlayerContractAddress } = useTokenContracts()
   const { hasPact, pactDuelId } = usePactGet(constants.DuelType.BotPlayer, address, botPlayerContractAddress)
 
@@ -62,23 +66,23 @@ export default function ScDuelists() {
           dispatchSetScene(SceneName.DuelsBoard)
           break
         case 'matchmaking':
-          if (availableMatchmakingPlayers.length > 0) {
-            const randomIndex = Math.floor(Math.random() * availableMatchmakingPlayers.length)
-            const randomPlayer = availableMatchmakingPlayers[randomIndex]
-            dispatchSelectPlayerAddress(randomPlayer)
+          // Check if current selectedMode is singleplayer before doing singleplayer logic
+          if (selectedMode === 'singleplayer') {
+            if (!hasPact) {
+              // pick duelist and create a new duel
+              dispatchChallengingPlayerAddress(botPlayerContractAddress);
+              duelistSelectOpener.open();
+            } else {
+              // go to existing duel
+              dispatchSelectDuel(pactDuelId);
+            }
           } else {
-            console.log("No players available for matchmaking")
+            dispatchSetScene(SceneName.Matchmaking)
           }
           break
-        case 'singleplayer':
-          if (!hasPact) {
-            // pick duelist and create a new duel
-            dispatchChallengingPlayerAddress(botPlayerContractAddress);
-            duelistSelectOpener.open();
-          } else {
-            // go to existing duel
-            dispatchSelectDuel(pactDuelId);
-          }
+        case 'mode':
+          console.log('Mode button clicked! Opening modal...', { opener: modeSelectOpener })
+          modeSelectOpener.open()
           break
         case 'tutorial':
           tutorialOpener.open()
@@ -86,6 +90,12 @@ export default function ScDuelists() {
       }
     }
   }, [itemClicked, timestamp])
+
+  useEffect(() => {
+    if (selectedMode) {
+      (_currentScene as InteractibleScene).setLayerVariant(TextureName.bg_duelists_matchmaking_unranked, selectedMode)
+    }
+  }, [selectedMode])
 
   const [pageNumber, setPageNumber] = useState(0)
   const [isAnimating, setIsAnimating] = useState(false)

@@ -18,6 +18,7 @@ export const initialState = {
   duelSpeedFactor: 1.0,
   completedTutorialLevel: 0,
   quality: 'high',
+  selectedMode: 'unranked',
   // internal
   initialized: false,
 }
@@ -33,6 +34,7 @@ const SettingsActions = {
   DUEL_SPEED_FACTOR: 'settings.DUEL_SPEED_FACTOR',
   TUTORIAL_LEVEL: 'settings.TUTORIAL_LEVEL',
   QUALITY: 'settings.QUALITY',
+  SELECTED_MODE: 'settings.SELECTED_MODE',
 }
 
 //--------------------------------
@@ -51,6 +53,7 @@ type ActionType =
   | { type: 'DUEL_SPEED_FACTOR', payload: number }
   | { type: 'TUTORIAL_LEVEL', payload: number }
   | { type: 'QUALITY', payload: string }
+  | { type: 'SELECTED_MODE', payload: string }
   // internal
   | { type: 'INITIALIZED', payload: boolean }
 
@@ -91,6 +94,7 @@ const SettingsProvider = ({
       [SettingsActions.DUEL_SPEED_FACTOR]: () => setCookie(cookieName, Number(state.duelSpeedFactor), _options),
       [SettingsActions.TUTORIAL_LEVEL]: () => setCookie(cookieName, state.completedTutorialLevel, _options),
       [SettingsActions.QUALITY]: () => setCookie(cookieName, state.quality, _options),
+      [SettingsActions.SELECTED_MODE]: () => setCookie(cookieName, state.selectedMode, _options),
     }
     _setters[cookieName]?.()
   }, [setCookie])
@@ -150,6 +154,11 @@ const SettingsProvider = ({
       case SettingsActions.QUALITY: {
         newState.quality = action.payload as string
         cookieSetter(SettingsActions.QUALITY, newState)
+        break
+      }
+      case SettingsActions.SELECTED_MODE: {
+        newState.selectedMode = action.payload as string
+        cookieSetter(SettingsActions.SELECTED_MODE, newState)
         break
       }
       default:

@@ -8,7 +8,7 @@ import { useDuelistStore } from '/src/stores/duelistStore'
 import { DuelistProfileKey } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { useAccount } from '@starknet-react/core'
-import { useDuelistIdsOwnedByAccount } from '../hooks/useTokenDuelists'
+import { useDuelistsOwnedByPlayer } from '../hooks/useTokenDuelists'
 
 export const useMatchStore = createDojoStore<PistolsSchemaType>();
 
@@ -84,7 +84,7 @@ export const useMatchPlayer = (playerAddress: BigNumberish, queueId: constants.Q
 export const useDuelistsInMatchMaking = (queueId: constants.QueueId) => {
   // get all duelists
   const { address } = useAccount();
-  const { duelistIds: allDuelistIds } = useDuelistIdsOwnedByAccount(address);
+  const { duelistIds: allDuelistIds } = useDuelistsOwnedByPlayer();
   const duelistEntities = useDuelistStore((state) => state.entities);
 
   // filter alive duelists only

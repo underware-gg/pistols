@@ -20,11 +20,13 @@ import NewChallengeModal from '/src/components/modals/NewChallengeModal'
 import SelectDuelistModal from '/src/components/modals/SelectDuelistModal'
 import WalletFinderModal from '/src/components/modals/WalletFinderModal'
 import SettingsModal from '/src/components/modals/SettingsModal'
+import ModeSelectModal from '/src/components/modals/ModeSelectModal'
 import BugReportModal from '/src/components/modals/BugReportModal'
 import ScProfile from '/src/components/scenes/ScProfile'
 import ScTavern from '/src/components/scenes/ScTavern'
 import ScDuelsBoard from '/src/components/scenes/ScDuelsBoard'
 import ScDuelists from '/src/components/scenes/ScDuelists'
+import ScMatchmaking from '/src/components/scenes/ScMatchmaking'
 import ScGraveyard from '/src/components/scenes/ScGraveyard'
 import ScTutorial from '/src/components/scenes/ScTutorial'
 import ScCardPacks from '/src/components/scenes/ScCardPacks'
@@ -39,6 +41,7 @@ import { CustomIcon } from '/src/components/ui/Icons'
 import { NotificationProvider } from '/src/stores/notificationStore'
 import NotificationSystem from '/src/components/notifications/NotificationSystem'
 import ElementPopupNotification, { ElementPopupNotificationRef } from '/src/components/ui/ElementPopupNotification'
+import { useQueueBackgroundWorker } from '/src/hooks/useQueueBackgroundWorker'
 
 // test sdk
 import { helloPistols } from '@underware/pistols-sdk'
@@ -108,10 +111,13 @@ function MainUI() {
   useSyncRouterParams()
   useCheckPendingTransactions()
 
+  // Global background queue worker
+  useQueueBackgroundWorker()
+
   const { gameImpl } = useThreeJsContext()
   const { qualityConfig } = useQuality()
   const { currentDuel, tutorialLevel } = usePistolsContext()
-  const { atGate, atProfile, atTavern, atDuel, atDoor, atDuelsBoard, atDuelists, atGraveyard, atTutorial, atLeaderboards, atCardPacks, atDuelistBook } = usePistolsScene()
+  const { atGate, atProfile, atTavern, atDuel, atDoor, atDuelsBoard, atDuelists, atGraveyard, atTutorial, atLeaderboards, atCardPacks, atDuelistBook, atMatchmaking } = usePistolsScene()
 
   useEffect(() => {
     if (!gameImpl) return;
@@ -156,13 +162,14 @@ function MainUI() {
       else if (atDuelistBook) setCurrentScene(<ScDuelistBook />);
       else if (atDuelsBoard) setCurrentScene(<ScDuelsBoard />);
       else if (atDuelists) setCurrentScene(<ScDuelists />);
+      else if (atMatchmaking) setCurrentScene(<ScMatchmaking />);
       else if (atGraveyard) setCurrentScene(<ScGraveyard />);
       else if (atLeaderboards) setCurrentScene(<ScLeaderboards />);
       else setCurrentScene(<ScTavern />);
     }, SCENE_CHANGE_ANIMATION_DURATION);
 
     return () => clearTimeout(timer);
-  }, [atGate, atDoor, atDuel, atProfile, atTavern, atDuelsBoard, atDuelists, atGraveyard, atLeaderboards, atCardPacks, atDuelistBook, currentDuel, tutorialLevel]);
+  }, [atGate, atDoor, atDuel, atProfile, atTavern, atDuelsBoard, atDuelists, atMatchmaking, atGraveyard, atLeaderboards, atCardPacks, atDuelistBook, currentDuel, tutorialLevel]);
 
   if (!gameImpl) return <></>
 
@@ -202,7 +209,7 @@ function TutorialUI({
 }
 
 function Modals() {
-  const { walletFinderOpener, duelistSelectOpener, settingsOpener, bugReportOpener, tavernRingsOpener } = usePistolsContext()
+  const { walletFinderOpener, duelistSelectOpener, settingsOpener, bugReportOpener, tavernRingsOpener, modeSelectOpener } = usePistolsContext()
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
@@ -227,6 +234,7 @@ function Modals() {
       <SelectDuelistModal opener={duelistSelectOpener} />
       <WalletFinderModal opener={walletFinderOpener} />
       <SettingsModal opener={settingsOpener} />
+      <ModeSelectModal opener={modeSelectOpener} />
       <TutorialPromptModal />
       <ModalNavigator />
     </>

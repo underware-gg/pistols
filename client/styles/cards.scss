@@ -369,6 +369,10 @@
     margin-top: aspect-width(1);
   }
 
+  &.no-margin {
+    margin-top: 0 !important;
+  }
+
   &.big {
     --name-size-multiplier: 0.5;
   }
@@ -962,4 +966,42 @@
 @keyframes soul-particle-7 {
   0% { transform: translate(50%, 50%) scale(0); opacity: 1; }
   100% { transform: translate(30%, -80%) scale(1.6); opacity: 0; }
+}
+
+// Queue status styles
+.queue-status-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+}
+
+.queue-spinner-timer-container {
+  width: 100%;
+  height: 40%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: aspect-width(1);
+}
+
+.queue-timer, .duel-timer {
+  font-size: aspect-width(1.2);
+  color: #fff;
+  text-shadow: 0 0 3px #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+  font-family: Garamond;
+  font-weight: bold;
+  font-variant-numeric: tabular-nums;
+}
+
+.queue-status-text {
+  font-size: aspect-width(1);
+  font-weight: 600;
+  color: $color-medium;
+  text-shadow: 0 0 3px $color-shadow, -1px -1px 0 $color-shadow, 1px -1px 0 $color-shadow, -1px 1px 0 $color-shadow, 1px 1px 0 $color-shadow;
+  font-family: Garamond;
 }
