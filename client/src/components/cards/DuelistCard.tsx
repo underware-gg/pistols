@@ -37,6 +37,7 @@ interface DuelistCardProps extends InteractibleComponentProps {
   queueTimestampStart?: number
   showSeasonRank?: boolean
   isEnlisting?: boolean
+  isWaitingToJoinQueue?: boolean
 
   showDuelDurationTimer?: boolean
   duelDurationTimestamp?: number
@@ -155,6 +156,21 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
     } else {
       // MM:SS format when under 1 hour
       return `${mins.toString().padStart(2, '0')}${colon}${secs.toString().padStart(2, '0')}`
+    }
+  }
+
+  // Simple status color mapping - gradient from orange (waiting) to green (in duel)
+  const getStatusColor = () => {
+    if (props.showDuelDurationTimer) {
+      return '#22c55e' // Green - in duel
+    } else if (props.queueTimestampStart) {
+      return '#84cc16' // Yellow-green - committing
+    } else if (props.isEnlisting || props.isCommitting) {
+      return "#f59e0b"; // Bright yellow - searching
+    } else if (props.isWaitingToJoinQueue) {
+      return "#f97316"; // Dark orange - ready to queue
+    } else {
+      return "#fbbf24"; // Orange - waiting in line
     }
   }
 
@@ -521,7 +537,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
             <ProfileBadge duelistId={props.duelistId} />
           </div>
           <div className="duelist-card-details">
-            {props.isInQueue || props.isCommitting || props.isEnlisting || props.showDuelDurationTimer ? (
+            {props.isInQueue || props.isCommitting || props.isEnlisting || props.showDuelDurationTimer || props.isWaitingToJoinQueue ? (
               // Queue status display
               <div className={`queue-status-container ${props.isSmall ? 'small' : ''}`}>
                 <div className="queue-spinner-timer-container">
@@ -542,8 +558,11 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
                   )}
                 </div>
                 
-                <div className="queue-status-text">
-                  {props.isEnlisting ? 'Enlisting...' : props.isCommitting ? 'Commiting...' : props.queueTimestampStart ? 'Searching for Match...' : props.showDuelDurationTimer ? 'Playing duel...' : 'Waiting in Line'}
+                <div 
+                  className="queue-status-text"
+                  style={{ color: getStatusColor() }}
+                >
+                  {props.isEnlisting ? 'Enlisting...' : props.isCommitting ? 'Commiting...' : props.queueTimestampStart ? 'Searching for Match...' : props.showDuelDurationTimer ? 'Playing duel...' : props.isWaitingToJoinQueue ? 'Ready to queue...' : 'Waiting in Line...'}
                 </div>
 
                 {props.showSeasonRank && (

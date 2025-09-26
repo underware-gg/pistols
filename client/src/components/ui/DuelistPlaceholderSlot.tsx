@@ -317,6 +317,7 @@ export const DuelistPlaceholderSlot = forwardRef<DuelistPlaceholderSlotHandle, D
           isCommitting={isCommitting || isWaitingForCommit}
           isEnlisting={isEnlisting || isWaitingForEnlistment}
           showSeasonRank={Boolean(currentDuellingId && props.matchmakingType === constants.QueueId.Ranked)}
+          isWaitingToJoinQueue={Boolean(currentSelectedId)}
           showDuelDurationTimer={props.showGoToDuelButton}
           duelDurationTimestamp={duelDurationTimestamp}
           queueTimestampStart={rankedPlayer.duelistId === BigInt(currentDuelistId) ? rankedPlayer.timestampEnter :  unrankedPlayer.duelistId === BigInt(currentDuelistId) ? unrankedPlayer.timestampEnter : undefined}
