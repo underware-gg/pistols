@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { useDojoSystem, useDojoSetup } from '@underware/pistols-sdk/dojo'
 import { bigintEquals, isPositiveBigint } from '@underware/pistols-sdk/utils'
+import { erc20_lords_abi } from '@underware/pistols-sdk/abis'
 import {
   getLordsAddress,
   getFameAddress,
@@ -79,6 +80,6 @@ export const useLordsContract = () => {
   return {
     lordsContractAddress: lordsAddress || mockAddress,
     isMock,
-    abi,
+    abi: abi ?? erc20_lords_abi,
   }
 }
