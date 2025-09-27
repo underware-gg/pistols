@@ -25,10 +25,11 @@ export const useQueueBackgroundWorker = () => {
       console.log(`[MATCHMAKING] Account not ready - skipping ${queueId} ${queueMode} queue call`)
       return
     }
+    const needsVrf = (queueId === constants.QueueId.Ranked ? rankedPlayer.needsVrf : unrankedPlayer.needsVrf);
     
     try {
       console.log(`[MATCHMAKING] Calling match_make_me for ${queueId} ${queueMode} queue - duelist ${duelistId}`)
-      await matchmaker.match_make_me(account, duelistId, queueId, queueMode)
+      await matchmaker.match_make_me(account, duelistId, queueId, queueMode, needsVrf)
       console.log(`[MATCHMAKING] Successfully pinged ${queueId} ${queueMode} queue - duelist ${duelistId}`)
     } catch (error) {
       console.error(`[MATCHMAKING] Error pinging ${queueId} ${queueMode} queue:`, error)

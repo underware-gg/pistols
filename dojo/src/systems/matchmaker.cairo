@@ -68,6 +68,7 @@ pub mod matchmaker {
     };
     use pistols::utils::{
         address::{ContractAddressDisplay, ContractAddressIntoU256},
+        hash::{hash_values},
     };
 
     pub mod Errors {
@@ -172,7 +173,7 @@ pub mod matchmaker {
                 // validate mode
                 assert(queue_mode != QueueMode::Undefined, Errors::INVALID_MODE);
                 // Validate duelist and set a slot
-                let (duelist_id, slot): (u128, u8) = self._validate_and_randomize_slot(ref store, @queue, caller, duelist_id);
+                let (duelist_id, slot): (u128, u8) = self._validate_and_randomize_slot(ref store, @queue, caller, duelist_id, 0);
                 // enter queue
                 matching_player.enter_queue(
                     queue_mode,
@@ -189,7 +190,7 @@ pub mod matchmaker {
                     // can stack duelists in SLOW mode only
                     assert(queue_mode == QueueMode::Slow, Errors::INVALID_MODE);
                     // Validate duelist and set a slot
-                    let (duelist_id, slot): (u128, u8) = self._validate_and_randomize_slot(ref store, @queue, caller, duelist_id);
+                    let (duelist_id, slot): (u128, u8) = self._validate_and_randomize_slot(ref store, @queue, caller, duelist_id, matching_player.queue_info.slot);
                     // save it for later...
                     matching_player.stack_duelist(
                         duelist_id,
@@ -251,6 +252,7 @@ pub mod matchmaker {
             queue: @MatchQueue,
             caller: ContractAddress,
             mut duelist_id: u128,
+            previous_slot: u8,
         ) -> (u128, u8) {
             // Validate duelist
             let duelist_dispatcher: IDuelistTokenProtectedDispatcher = store.world.duelist_token_protected_dispatcher();
@@ -263,7 +265,12 @@ pub mod matchmaker {
                 store.enlist_matchmaking(duelist_id, *queue.queue_id);
             }
             // randomize slot
-            let seed: felt252 = store.vrf_dispatcher().consume_random(Source::Nonce(caller));
+            let seed: felt252 =
+                if (previous_slot.is_zero()) {
+                    (store.vrf_dispatcher().consume_random(Source::Nonce(caller)))
+                } else {
+                    (hash_values(array![previous_slot.into(), duelist_id.into()].span()))
+                };
             let slot: u8 = queue.assign_slot(@store, seed);
             // return validated duelist and slot
             (duelist_id, slot)

@@ -65,6 +65,7 @@ export const useMatchPlayer = (playerAddress: BigNumberish, queueId: constants.Q
     expired,
     // all duelists in queue
     inQueueIds,
+    needsVrf: (inQueueIds.length == 0),
   }
 }
 

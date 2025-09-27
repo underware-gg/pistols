@@ -237,6 +237,7 @@ function MatchQueue({ queueId }: { queueId: constants.QueueId }) {
                     queueId={queueId}
                     queueMode={constants.QueueMode.Fast}
                     disabled={!canMatchMakeIds.includes(duelistId)}
+                    needs_vrf={inQueueIds.length == 0}
                   />
                 ))}
               </Cell>
@@ -252,7 +253,8 @@ function MatchQueue({ queueId }: { queueId: constants.QueueId }) {
                   duelistId={duelistId}
                   queueId={queueId}
                   queueMode={constants.QueueMode.Slow}
-                  disabled={!canMatchMakeIds.includes(duelistId)}
+                  disabled={!canMatchMakeIds.includes(duelistId)} 
+                  needs_vrf={inQueueIds.length == 0}
                 />
               ))}
             </Cell>
@@ -305,17 +307,19 @@ function MatchMakeMeButton({
   queueId,
   queueMode,
   disabled,
+  needs_vrf,
 }: {
   duelistId: BigNumberish
   queueId: constants.QueueId
   queueMode: constants.QueueMode
   disabled?: boolean
+  needs_vrf: boolean
 }) {
   const { account } = useAccount();
   const { matchmaker } = useDojoSystemCalls();
   return (
     <Button disabled={disabled} onClick={() => {
-      matchmaker.match_make_me(account, duelistId, queueId, queueMode)
+      matchmaker.match_make_me(account, duelistId, queueId, queueMode, needs_vrf)
     }}>
       {bigintToDecimal(duelistId)}
     </Button>
