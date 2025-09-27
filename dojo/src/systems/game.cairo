@@ -679,8 +679,7 @@ pub mod game {
                 };
                 
                 // transfer rewards
-                let tournament_id: u64 = 0;
-                let (mut rewards_a, mut rewards_b): (RewardValues, RewardValues) = store.world.duelist_token_protected_dispatcher().transfer_rewards(challenge, tournament_id, bonus);
+                let (mut rewards_a, mut rewards_b): (RewardValues, RewardValues) = store.world.duelist_token_protected_dispatcher().transfer_rewards(challenge, bonus);
 
                 // update leaderboards
                 self._update_scoreboards(ref store, @challenge, @round, ref rewards_a, ref rewards_b);

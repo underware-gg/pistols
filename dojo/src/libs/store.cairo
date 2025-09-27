@@ -522,6 +522,10 @@ pub impl StoreImpl of StoreTrait {
         (self.world.read_member_legacy(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("treasury_address")))
     }
     #[inline(always)]
+    fn get_config_realms_address(self: @Store) -> ContractAddress {
+        (self.world.read_member_legacy(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("realms_address")))
+    }
+    #[inline(always)]
     fn get_config_is_paused(self: @Store) -> bool {
         (self.world.read_member_legacy(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("is_paused")))
     }
@@ -663,6 +667,10 @@ pub impl StoreImpl of StoreTrait {
     #[inline(always)]
     fn set_config_treasury_address(ref self: Store, treasury_address: ContractAddress) {
         self.world.write_member_legacy(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("treasury_address"), treasury_address);
+    }
+    #[inline(always)]
+    fn set_config_realms_address(ref self: Store, realms_address: ContractAddress) {
+        self.world.write_member_legacy(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("realms_address"), realms_address);
     }
 
     #[inline(always)]

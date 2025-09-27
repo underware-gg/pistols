@@ -13,8 +13,8 @@ pub enum Rules {
 #[derive(Copy, Drop, Serde, Introspect, Default)]
 pub struct PoolDistribution {
     pub underware_percent: u8,
-    pub creator_percent: u8,
-    pub creator_address: ContractAddress,
+    pub realms_percent: u8,
+    pub realms_address: ContractAddress,
     pub pool_percent: u8,
     pub pool_id: PoolType,
 }
@@ -56,7 +56,6 @@ pub struct DuelistBonus {
 use core::num::traits::Zero;
 use pistols::models::ring::{RingType, RingTypeTrait};
 use pistols::types::constants::{CONST, FAME::{ONE_LIFE}};
-use pistols::utils::address::{ZERO};
 
 #[generate_trait]
 pub impl RulesImpl of RulesTrait {
@@ -125,22 +124,22 @@ pub impl RulesImpl of RulesTrait {
     }
     //
     // Duel distribution of LORDS
-    fn get_rewards_distribution(self: @Rules, season_id: u32, tournament_id: u64) -> @PoolDistribution {
+    fn get_rewards_distribution(self: @Rules, season_id: u32, realms_address: ContractAddress) -> @PoolDistribution {
         let mut result: PoolDistribution = match self {
             Rules::Season |
             Rules::Unranked => PoolDistribution {
-                underware_percent: 30,
-                creator_percent: 30,
-                creator_address: ZERO(), // TODO: find from tournament_id
+                underware_percent: 50,
+                realms_percent: 10,
+                realms_address,
                 pool_percent: 40,
                 pool_id: PoolType::Season(season_id),
             },
             Rules::Undefined => Default::default(),
         };
-        // not a tournament, creator is underware
-        if (result.creator_percent != 0 && result.creator_address.is_zero()) {
-            result.underware_percent += result.creator_percent;
-            result.creator_percent = 0;
+        // if no realms address, creator is underware
+        if (result.realms_percent != 0 && result.realms_address.is_zero()) {
+            result.underware_percent += result.realms_percent;
+            result.realms_percent = 0;
         }
         (@result)
     }
@@ -198,7 +197,7 @@ pub impl PoolDistributionImpl of PoolDistributionTrait {
     fn is_payable(self: @PoolDistribution) -> bool {
         (
             (*self.underware_percent).is_non_zero() ||
-            (*self.creator_percent).is_non_zero() ||
+            (*self.realms_percent).is_non_zero() ||
             (*self.pool_percent).is_non_zero()
         )
     }

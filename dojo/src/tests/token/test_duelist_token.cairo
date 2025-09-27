@@ -866,7 +866,7 @@ fn test_transfer_rewards_invalid_caller() {
     // use mock account
     // let account: ContractAddress = tester::deploy_mock_account();
     // tester::impersonate(account);
-    _protected(@sys).transfer_rewards(challenge, 0, Default::default());
+    _protected(@sys).transfer_rewards(challenge, Default::default());
 }
 
 

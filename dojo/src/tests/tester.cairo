@@ -788,6 +788,11 @@ pub mod tester {
         (*system).set_treasury(new_treasury_address);
         _next_block();
     }
+    pub fn execute_admin_set_realms_address(system: @IAdminDispatcher, sender: ContractAddress, new_realms_address: ContractAddress) {
+        impersonate(sender);
+        (*system).set_realms_address(new_realms_address);
+        _next_block();
+    }
     pub fn execute_admin_set_is_team_member(system: @IAdminDispatcher, sender: ContractAddress, owner_address: ContractAddress, is_team_member: bool, is_admin: bool) {
         impersonate(sender);
         (*system).set_is_team_member(owner_address, is_team_member, is_admin);

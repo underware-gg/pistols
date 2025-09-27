@@ -98,7 +98,7 @@ pub trait IDuelistTokenProtected<TState> {
         lords_amount: u128,
     ) -> Span<u128>;
     fn get_validated_active_duelist_id(ref self: TState, address: ContractAddress, duelist_id: u128, lives_staked: u8) -> u128;
-    fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u64, bonus: DuelBonus) -> (RewardValues, RewardValues);
+    fn transfer_rewards(ref self: TState, challenge: Challenge, bonus: DuelBonus) -> (RewardValues, RewardValues);
 }
 
 #[dojo::contract]
@@ -407,7 +407,6 @@ pub mod duelist_token {
         fn transfer_rewards(
             ref self: ContractState,
             challenge: Challenge,
-            tournament_id: u64,
             bonus: DuelBonus,
         ) -> (RewardValues, RewardValues) {
             // validate caller (game contract only)
@@ -417,7 +416,8 @@ pub mod duelist_token {
             // get fees distribution
             let season_id: u32 = store.get_current_season_id();
             let rules: Rules = challenge.duel_type.get_rules(@store);
-            let distribution: @PoolDistribution = rules.get_rewards_distribution(season_id, tournament_id);
+            let realms_address: ContractAddress = store.get_config_realms_address();
+            let distribution: @PoolDistribution = rules.get_rewards_distribution(season_id, realms_address);
             if (!distribution.is_payable()) {
                 return (Default::default(), Default::default());
             }
@@ -561,12 +561,12 @@ pub mod duelist_token {
                     distribution_due -= amount;
                 }
                 // release LORDS to tournament creator + burn
-                if (*distribution.creator_percent != 0 && distribution.creator_address.is_non_zero()) {
-                    let amount: u128 = MathTrait::percentage(distribution_total, *distribution.creator_percent);
+                if (*distribution.realms_percent != 0 && distribution.realms_address.is_non_zero()) {
+                    let amount: u128 = MathTrait::percentage(distribution_total, *distribution.realms_percent);
                     release_bills.append(LordsReleaseBill {
                         reason: ReleaseReason::FameLostToCreator,
                         duelist_id,
-                        recipient: *distribution.creator_address,
+                        recipient: *distribution.realms_address,
                         pegged_fame: amount,
                         pegged_lords: 0,
                         sponsored_lords: 0,

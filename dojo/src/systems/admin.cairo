@@ -6,6 +6,7 @@ pub trait IAdmin<TState> {
     fn am_i_admin(self: @TState, account_address: ContractAddress) -> bool;
     fn set_paused(ref self: TState, paused: bool); //@description: Admin function
     fn set_treasury(ref self: TState, treasury_address: ContractAddress); //@description: Admin function
+    fn set_realms_address(ref self: TState, realms_address: ContractAddress); //@description: Admin function
     fn set_is_team_member(ref self: TState, account_address: ContractAddress, is_team_member: bool, is_admin: bool); //@description: Admin function
     fn set_is_blocked(ref self: TState, account_address: ContractAddress, is_blocked: bool); //@description: Admin function
     fn disqualify_duelist(ref self: TState, season_id: u32, duelist_id: u128, block_owner: bool) -> bool; //@description: Admin function
@@ -90,6 +91,12 @@ pub mod admin {
             assert(treasury_address.is_non_zero(), Errors::INVALID_TREASURY);
             let mut store: Store = StoreTrait::new(self.world_default());
             store.set_config_treasury_address(treasury_address);
+        }
+
+        fn set_realms_address(ref self: ContractState, realms_address: ContractAddress) {
+            self._assert_caller_is_admin();
+            let mut store: Store = StoreTrait::new(self.world_default());
+            store.set_config_realms_address(realms_address);
         }
 
         fn set_is_team_member(ref self: ContractState, account_address: ContractAddress, is_team_member: bool, is_admin: bool) {

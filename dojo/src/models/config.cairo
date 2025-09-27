@@ -16,6 +16,7 @@ pub struct Config {
     pub vrf_address: ContractAddress,
     pub current_season_id: u32,
     pub is_paused: bool,
+    pub realms_address: ContractAddress,
 }
 
 #[derive(Copy, Drop, Serde)]
@@ -56,6 +57,7 @@ pub impl ConfigManagerImpl of ConfigManagerTrait {
             vrf_address: ZERO(),
             current_season_id: 0,
             is_paused: false,
+            realms_address: ZERO(),
         })
     }
 }
