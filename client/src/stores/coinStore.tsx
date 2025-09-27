@@ -142,17 +142,19 @@ export const useFameBalance = (address: BigNumberish) => {
   }
 }
 
-export const useFoolsBalance = (address: BigNumberish) => {
+export const useFoolsBalance = (address: BigNumberish, fee: BigNumberish = 0n) => {
   const { foolsContractAddress } = useTokenContracts()
   const state = useFoolsCoinStore((state) => state)
   const balance = useMemo(() => state.getBalance(address), [state.accounts, address])
   // fetch if not cached
   const accounts = useMemo(() => [address], [address])
   useFetchAccountsBalances(foolsContractAddress, accounts, balance == null)
+  const { canAffordFee } = _useCalcFee(balance, fee)
   return {
     balance: (balance ?? 0n),
     balance_eth: weiToEth(balance),
     isLoading: (balance == null),
+    canAffordFee,
   }
 }
 

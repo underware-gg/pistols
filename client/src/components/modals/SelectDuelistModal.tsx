@@ -17,7 +17,7 @@ import { Opener } from '/src/hooks/useOpener'
 import { useDuelistsInMatchMaking, useMatchQueue } from '/src/stores/matchStore'
 import { FoolsBalance } from '/src/components/account/LordsBalance'
 import { Balance } from '/src/components/account/Balance'
-import { ActionButton } from '/src/components/ui/Buttons'
+import { ActionButton, BalanceRequiredButton } from '/src/components/ui/Buttons'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { COLORS } from '@underware/pistols-sdk/pistols/constants'
 import { useAccount } from '@starknet-react/core'
@@ -721,7 +721,7 @@ function EnlistmentConfirmationDialog({
         <div
           style={{
             textAlign: "center",
-            fontSize: aspectWidth(1.2),
+            fontSize: aspectWidth(1.4),
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -732,7 +732,7 @@ function EnlistmentConfirmationDialog({
         >
           <span style={{ color: "#c8b6a8" }}>Cost:</span>
           {requiresEnlistment ? (
-            <Balance fools size="large" wei={entryTokenAmount} />
+            <Balance fools size='huge' wei={entryTokenAmount} />
           ) : (
             <span style={{ color: "#90EE90" }}>FREE</span>
           )}
@@ -740,12 +740,13 @@ function EnlistmentConfirmationDialog({
       </Modal.Content>
 
       <Modal.Actions style={{ display: "flex" }}>
-        <ActionButton fill dimmed onClick={handleCancelEnlist} label="Cancel" />
-        <ActionButton
-          fill
-          important
+        <ActionButton large fill dimmed onClick={handleCancelEnlist} label="Cancel" />
+        <BalanceRequiredButton
+          fools large
+          fee={entryTokenAmount}
+          // disabled={!canSubmit}
+          label='Enlist Duelist'
           onClick={handleConfirmEnlist}
-          label="Enlist Duelist"
         />
       </Modal.Actions>
     </Modal>

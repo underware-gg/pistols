@@ -4,12 +4,12 @@ import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
-import { useLordsBalance } from '/src/stores/coinStore'
+import { useFoolsBalance, useLordsBalance } from '/src/stores/coinStore'
 import { usePactSubscription } from '/src/queries/usePact'
 import { useIsMyAccount } from '/src/hooks/useIsYou'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { CustomIcon, IconClick, IconSizeProp } from '/src/components/ui/Icons'
-import { LordsBagIcon } from '/src/components/account/Balance'
+import { LordsBagIcon, FoolsIcon } from '/src/components/account/Balance'
 import { SceneName } from '/src/data/assets'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
@@ -129,6 +129,8 @@ export const BalanceRequiredButton = ({
   loading = false,
   fill = true,
   fillParent = false,
+  large = true,
+  fools = false,
 }: {
   label: string
   fee: BigNumberish
@@ -137,17 +139,20 @@ export const BalanceRequiredButton = ({
   loading?: boolean
   fill?: boolean
   fillParent?: boolean
+    large?: boolean
+  fools?: boolean
 }) => {
   const { address } = useAccount()
-  const { canAffordFee } = useLordsBalance(address, fee)
-  const canSubmit = (canAffordFee !== false)
+  const { canAffordFee: canAffordFeeLords } = useLordsBalance(address, fee)
+  const { canAffordFee: canAffordFeeFools } = useFoolsBalance(address, fee)
+  const canSubmit = fools ? (canAffordFeeFools !== false) : (canAffordFeeLords !== false)
   return (
-    <ActionButton large fill={fill} fillParent={fillParent}
+    <ActionButton large={large} fill={fill} fillParent={fillParent}
       disabled={disabled}
       loading={loading}
       important={canSubmit}
       negative={!canSubmit}
-      label={!canSubmit ? 'No Funds!' : isPositiveBigint(fee) ? <>{label} <LordsBagIcon /></> : label}
+      label={!canSubmit ? 'No Funds!' : isPositiveBigint(fee) ? <>{label} {fools ? <FoolsIcon /> : <LordsBagIcon />}</> : label}
       onClick={() => (canSubmit ? onClick() : {})}
     />
   )
