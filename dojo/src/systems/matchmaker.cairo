@@ -49,6 +49,7 @@ pub mod matchmaker {
             MatchPlayer, MatchPlayerTrait,
             QueueInfo, QueueInfoTrait,
         },
+        events::{Activity, ActivityTrait},
     };
     use pistols::types::{
         duelist_profile::{DuelistProfile, DuelistProfileTrait, BotKey},
@@ -138,6 +139,8 @@ pub mod matchmaker {
                 queue.entry_token_address,
                 queue.entry_token_amount,
             );
+
+            Activity::EnlistedRankedDuelist.emit(ref store.world, caller, duelist_id.into());
 
             // return the enlisted duelist id
             (duelist_id)

@@ -22,6 +22,7 @@ pub enum Activity {
     ClaimedGift,        // 15
     AirdroppedPack,     // 16
     ClaimedRing,        // 17
+    EnlistedRankedDuelist, // 18
 }
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
