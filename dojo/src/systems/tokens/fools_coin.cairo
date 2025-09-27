@@ -25,6 +25,12 @@ pub trait IFoolsCoin<TState> {
 
 // Exposed to world
 #[starknet::interface]
+pub trait IFoolsCoinPublic<TState> {
+    fn approve(ref self: TState, spender: ContractAddress, amount: u256) -> bool; //@description: Approve use of FOOLS (in-game currency)
+}
+
+// Exposed to world
+#[starknet::interface]
 pub trait IFoolsCoinProtected<TState> {
     fn reward_player_fools(ref self: TState, recipient: ContractAddress, amount: u128);
 }

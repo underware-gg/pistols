@@ -87,6 +87,7 @@ export const contractPolicyDescriptions_pistols: ContractPolicyDescriptions = {
   fools_coin: {
     name: 'Fools coin',
     description: '$FOOLS ERC20 contract (Players rewards)',
+    interfaces: ['IFoolsCoinPublic'],
   },
 }
 const contractPolicyDescriptions_mock: ContractPolicyDescriptions = {
