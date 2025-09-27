@@ -1,27 +1,28 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Grid, Segment, Divider, Icon } from 'semantic-ui-react'
-import { useGameplayContext } from '/src/hooks/GameplayContext'
-import { useGetChallenge } from '/src/stores/challengeStore'
-import { AnimationState } from '/src/three/game'
-import { useChallengeDescription } from '/src/hooks/useChallengeDescription'
-import { useGameAspect } from '/src/hooks/useGameAspect'
-import { ActionButton, ChallengeButton } from '/src/components/ui/Buttons'
-import { SceneName } from '/src/data/assets'
-import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
-import { DuelTutorialLevel } from '/src/data/tutorialConstants'
-import { SettingsActions, useSettings } from '/src/hooks/SettingsContext'
-import { usePlayer } from '/src/stores/playerStore'
-import { Balance } from '/src/components/account/Balance'
-import AnimatedText from '/src/components/ui/AnimatedText'
-import { useIsMyAccount } from '/src/hooks/useIsYou'
-import { makeDuelTweetUrl } from '/src/utils/pistols'
-import { constants } from '@underware/pistols-sdk/pistols/gen'
-import { useCanCollectDuel } from '/src/hooks/usePistolsContractCalls'
-import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
+import { useGameplayContext } from '/src/hooks/GameplayContext'
+import { useGetChallenge } from '/src/stores/challengeStore'
+import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
+import { useChallengeDescription } from '/src/hooks/useChallengeDescription'
+import { useGameAspect } from '/src/hooks/useGameAspect'
+import { useCanCollectDuel } from '/src/hooks/usePistolsContractCalls'
 import { useChallengeRewards } from '/src/stores/challengeRewardsStore'
 import { useFetchChallengeRewardsByDuelistIds } from '/src/stores/challengeRewardsStore'
+import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
+import { useIsMyAccount } from '/src/hooks/useIsYou'
+import { usePlayer } from '/src/stores/playerStore'
+import { bigintToNumber } from '@underware/pistols-sdk/utils'
+import { AnimationState } from '/src/three/game'
+import { SceneName } from '/src/data/assets'
+import { DuelTutorialLevel } from '/src/data/tutorialConstants'
+import { ActionButton, ChallengeButton } from '/src/components/ui/Buttons'
+import { SettingsActions, useSettings } from '/src/hooks/SettingsContext'
+import { makeDuelTweetUrl } from '/src/utils/pistols'
+import { Balance } from '/src/components/account/Balance'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
+import AnimatedText from '/src/components/ui/AnimatedText'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -312,7 +313,7 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: aspectHeight(0.5) }}>
                           <div style={{ textAlign: 'left' }}><Icon name='plus' size='tiny' /></div>
                           <div style={{ textAlign: 'right', fontSize: aspectWidth(1) }}>
-                            {Number((winnerIsLeft ? leftRewards?.points_scored : rightRewards?.points_scored) || 0)} Points
+                            {bigintToNumber(leftRewards?.points_scored ?? 0)} Points
                           </div>
                         </div>
                       </RewardRow>
@@ -379,7 +380,7 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: aspectHeight(0.5) }}>
                           <div style={{ textAlign: 'left' }}><Icon name='plus' size='tiny' /></div>
                           <div style={{ textAlign: 'right', fontSize: aspectWidth(1) }}>
-                            {Number((winnerIsRight ? rightRewards?.points_scored : leftRewards?.points_scored) || 0)} Points
+                            {bigintToNumber(rightRewards?.points_scored ?? 0n)} Points
                           </div>
                         </div>
                       </RewardRow>
