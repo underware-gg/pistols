@@ -719,7 +719,7 @@ function EnlistmentConfirmationDialog({
             color: "#ef9758",
             fontWeight: "bold",
             padding: aspectWidth(1),
-            background: "rgba(239, 151, 88, 0.1)",
+            background: "rgba(255, 171, 108, 0.2)",
             borderRadius: aspectWidth(0.5),
             border: "1px solid rgba(239, 151, 88, 0.2)",
           }}
@@ -734,6 +734,7 @@ function EnlistmentConfirmationDialog({
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              gap: aspectWidth(0.6),
               color: COLORS.ACTIVE,
               fontWeight: "bold",
             }}
