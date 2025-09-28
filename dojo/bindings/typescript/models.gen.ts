@@ -70,6 +70,7 @@ export interface Config {
 	vrf_address: string;
 	current_season_id: BigNumberish;
 	is_paused: boolean;
+	realms_address: string;
 }
 
 // Type definition for `pistols::models::config::TokenConfig` struct
@@ -845,6 +846,7 @@ export const activity = [
 	'ClaimedGift',
 	'AirdroppedPack',
 	'ClaimedRing',
+	'EnlistedRankedDuelist',
 ] as const;
 export type Activity = { [key in typeof activity[number]]: string };
 export type ActivityEnum = CairoCustomEnum;
@@ -1105,6 +1107,7 @@ export const schema: SchemaType = {
 			vrf_address: "",
 			current_season_id: 0,
 			is_paused: false,
+			realms_address: "",
 		},
 		TokenConfig: {
 			token_address: "",
@@ -1413,7 +1416,8 @@ export const schema: SchemaType = {
 				ChallengeDraw: undefined,
 				ClaimedGift: undefined,
 				AirdroppedPack: undefined,
-				ClaimedRing: undefined, }),
+				ClaimedRing: undefined,
+				EnlistedRankedDuelist: undefined, }),
 			identifier: 0,
 			is_public: false,
 		},

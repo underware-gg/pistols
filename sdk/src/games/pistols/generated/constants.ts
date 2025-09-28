@@ -9,6 +9,7 @@ export const INTERFACE_DESCRIPTIONS: any = {
   IAdmin: {
     set_paused: 'Admin function',
     set_treasury: 'Admin function',
+    set_realms_address: 'Admin function',
     set_is_team_member: 'Admin function',
     set_is_blocked: 'Admin function',
     disqualify_duelist: 'Admin function',
@@ -56,6 +57,10 @@ export const INTERFACE_DESCRIPTIONS: any = {
     poke: 'Reactivates an inactive Duelist',
     sacrifice: 'Sacrifices a Duelist',
     memorialize: 'Memorializes a Duelist',
+  },
+  // from: ../dojo/src/systems/tokens/fools_coin.cairo
+  IFoolsCoinPublic: {
+    approve: 'Approve use of FOOLS (in-game currency)',
   },
   // from: ../dojo/src/systems/tokens/pack_token.cairo
   IPackTokenPublic: {
@@ -164,6 +169,7 @@ export enum Activity {
   ClaimedGift = 'ClaimedGift', // 15
   AirdroppedPack = 'AirdroppedPack', // 16
   ClaimedRing = 'ClaimedRing', // 17
+  EnlistedRankedDuelist = 'EnlistedRankedDuelist', // 18
 };
 export const getActivityValue = (name: Activity): number | undefined => _indexOrUndefined(Object.keys(Activity).indexOf(name));
 export const getActivityFromValue = (value: number): Activity | undefined => Object.keys(Activity)[value] as Activity;

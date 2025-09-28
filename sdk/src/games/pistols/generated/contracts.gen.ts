@@ -147,6 +147,27 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
+	const build_admin_setRealmsAddress_calldata = (realmsAddress: string): DojoCall => {
+		return {
+			contractName: "admin",
+			entrypoint: "set_realms_address",
+			calldata: [realmsAddress],
+		};
+	};
+
+	const admin_setRealmsAddress = async (snAccount: Account | AccountInterface, realmsAddress: string) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_admin_setRealmsAddress_calldata(realmsAddress),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 	const build_admin_setTreasury_calldata = (treasuryAddress: string): DojoCall => {
 		return {
 			contractName: "admin",
@@ -4496,6 +4517,8 @@ export function setupWorld(provider: DojoProvider) {
 			buildSetIsTeamMemberCalldata: build_admin_setIsTeamMember_calldata,
 			setPaused: admin_setPaused,
 			buildSetPausedCalldata: build_admin_setPaused_calldata,
+			setRealmsAddress: admin_setRealmsAddress,
+			buildSetRealmsAddressCalldata: build_admin_setRealmsAddress_calldata,
 			setTreasury: admin_setTreasury,
 			buildSetTreasuryCalldata: build_admin_setTreasury_calldata,
 			urgentUpdate: admin_urgentUpdate,

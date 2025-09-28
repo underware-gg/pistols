@@ -147,6 +147,27 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
+	const build_admin_setRealmsAddress_calldata = (realmsAddress: string): DojoCall => {
+		return {
+			contractName: "admin",
+			entrypoint: "set_realms_address",
+			calldata: [realmsAddress],
+		};
+	};
+
+	const admin_setRealmsAddress = async (snAccount: Account | AccountInterface, realmsAddress: string) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_admin_setRealmsAddress_calldata(realmsAddress),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 	const build_admin_setTreasury_calldata = (treasuryAddress: string): DojoCall => {
 		return {
 			contractName: "admin",
@@ -1719,19 +1740,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_duelist_token_transferRewards_calldata = (challenge: models.Challenge, tournamentId: BigNumberish, bonus: models.DuelBonus): DojoCall => {
+	const build_duelist_token_transferRewards_calldata = (challenge: models.Challenge, bonus: models.DuelBonus): DojoCall => {
 		return {
 			contractName: "duelist_token",
 			entrypoint: "transfer_rewards",
-			calldata: [challenge, tournamentId, bonus],
+			calldata: [challenge, bonus],
 		};
 	};
 
-	const duelist_token_transferRewards = async (snAccount: Account | AccountInterface, challenge: models.Challenge, tournamentId: BigNumberish, bonus: models.DuelBonus) => {
+	const duelist_token_transferRewards = async (snAccount: Account | AccountInterface, challenge: models.Challenge, bonus: models.DuelBonus) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_duelist_token_transferRewards_calldata(challenge, tournamentId, bonus),
+				build_duelist_token_transferRewards_calldata(challenge, bonus),
 				"pistols",
 			);
 		} catch (error) {
@@ -4496,6 +4517,8 @@ export function setupWorld(provider: DojoProvider) {
 			buildSetIsTeamMemberCalldata: build_admin_setIsTeamMember_calldata,
 			setPaused: admin_setPaused,
 			buildSetPausedCalldata: build_admin_setPaused_calldata,
+			setRealmsAddress: admin_setRealmsAddress,
+			buildSetRealmsAddressCalldata: build_admin_setRealmsAddress_calldata,
 			setTreasury: admin_setTreasury,
 			buildSetTreasuryCalldata: build_admin_setTreasury_calldata,
 			urgentUpdate: admin_urgentUpdate,
