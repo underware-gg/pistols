@@ -215,9 +215,9 @@ export function createSystemCalls(
         ];;
         return await _executeTransaction(signer, calls, key);
       },
-      match_make_me: async (signer: AccountInterface, duelist_id: BigNumberish, queue_id: constants.QueueId, queue_mode: constants.QueueMode, needs_vrf: boolean, key?: string): Promise<boolean> => {
+      match_make_me: async (signer: AccountInterface, duelist_id: BigNumberish, queue_id: constants.QueueId, queue_mode: constants.QueueMode, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
-          needs_vrf ? vrf_request_call('matchmaker', signer.address) : undefined,
+          vrf_request_call('matchmaker', signer.address),
           contractCalls.matchmaker.buildMatchMakeMeCalldata(
             duelist_id,
             makeCustomEnum(queue_id),

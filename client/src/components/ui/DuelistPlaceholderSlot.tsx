@@ -102,10 +102,10 @@ export const DuelistPlaceholderSlot = forwardRef<DuelistPlaceholderSlotHandle, D
     call: commitToQueue,
     isLoading: isCommitting,
     isWaitingForIndexer: isWaitingForCommit,
-  } = useTransactionHandler<boolean, [bigint, constants.QueueId, constants.QueueMode, boolean]>({
+  } = useTransactionHandler<boolean, [bigint, constants.QueueId, constants.QueueMode]>({
     key: slotTransactionKey.current,
-    transactionCall: (duelistId, queueId, queueMode, needsVrf, key) =>
-      matchmaker.match_make_me(account, duelistId, queueId, queueMode, needsVrf, key),
+    transactionCall: (duelistId, queueId, queueMode, key) =>
+      matchmaker.match_make_me(account, duelistId, queueId, queueMode, key),
     indexerCheck: hasIndexed,
     onComplete: (result, args) => {
       const [duelistIdArg] = args
@@ -234,10 +234,9 @@ export const DuelistPlaceholderSlot = forwardRef<DuelistPlaceholderSlotHandle, D
       console.error('Account required for match_make_me')
       return
     }
-    const needsVrf = props.matchmakingType === constants.QueueId.Ranked ? rankedPlayer.needsVrf : unrankedPlayer.needsVrf
     setPendingCommitId(currentSelectedId)
-    commitToQueue(currentSelectedId, props.matchmakingType, props.queueMode, needsVrf)
-  }, [account, commitToQueue, currentSelectedId, props.matchmakingType, props.queueMode, rankedPlayer.needsVrf, unrankedPlayer.needsVrf])
+    commitToQueue(currentSelectedId, props.matchmakingType, props.queueMode)
+  }, [account, commitToQueue, currentSelectedId, props.matchmakingType, props.queueMode])
 
   const handleRemove = useCallback(() => {
     if (!currentSelectedId) return
