@@ -263,6 +263,17 @@
   font-size: aspect-width(2.4);
   font-weight: bold;
   margin-top: aspect-width(1);
+  text-transform: uppercase;
+}
+
+.TableDescriptionDuelType {
+  position: absolute;
+  font-size: aspect-width(1.2);
+  font-weight: bold;
+  top: aspect-width(3.2);
+  left: 50%;
+  transform: translateX(-50%);
+  color: $color-dark;
 }
 
 .DuelInfoContainer {

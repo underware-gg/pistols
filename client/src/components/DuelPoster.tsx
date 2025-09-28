@@ -121,7 +121,7 @@ const DuelPosterSmall = forwardRef<DuelPosterHandle, DuelPosterProps>((props, re
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { leftDuelistId, leftDuelistAddress, rightDuelistId, rightDuelistAddress, leftPlayerName, rightPlayerName, isDead, isYouA, isYouB, isCallToAction, leftAvatarUrl, rightAvatarUrl } = useDuelPosterData(props.duelId)
   const { turnA, turnB } = useDuel(props.duelId)
-  const { seasonName, isFinished } = useChallenge(props.duelId)
+  const { seasonName, isFinished, duelType } = useChallenge(props.duelId)
   const { seasonName: currentSeasonName } = useCurrentSeason()
   const seasonDescription = useMemo(() => (seasonName ?? currentSeasonName), [seasonName, currentSeasonName])
 
@@ -226,6 +226,9 @@ const DuelPosterSmall = forwardRef<DuelPosterHandle, DuelPosterProps>((props, re
           </div>
           <div className='TableDescriptionFooter'>
             {seasonDescription}
+            {duelType && duelType !== constants.DuelType.Undefined && (
+              <> - {duelType}</>
+            )}
           </div>
         </div>
       }
@@ -257,6 +260,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
     message,
     livesStaked,
     needToSyncExpired,
+    duelType,
   } = useChallenge(props.duelId)
   const { endedInBlades, endedInPaces } = useRound(props.duelId)
   const { canCollectDuel } = useCanCollectDuel(props.duelId)
@@ -393,14 +397,25 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
       ref={baseRef}
       childrenInFront={
         <div className='Poster'>
-          <div className='TableDescriptionTitle Important'>
-            {seasonDescription.toUpperCase()}
-            <IconClick name='database' className='AbsoluteRight' style={{ marginTop: aspectWidth(1.4), marginRight: aspectWidth(1.4) }} size={'small'} onClick={() => window?.open(makeDuelDataUrl(props.duelId), '_blank')} />
-            <IconClick name='share' className='AbsoluteRight' style={{ marginTop: aspectWidth(1.4), marginRight: aspectWidth(4.4) }} size={'small'} onClick={() => {
-              const twitterUrl = makeDuelTweetUrl(props.duelId, message, premise, livesStaked, isYouA, isYouB, leftPlayerName, rightPlayerName)
-              window?.open(twitterUrl, '_blank');
-            }} />
-          </div>
+          {duelType && duelType !== constants.DuelType.Undefined ? (
+            <>
+              <div className='TableDescriptionTitle Important'>
+                {duelType}
+              </div>
+              <div className='TableDescriptionDuelType'>
+                {seasonDescription.toUpperCase()}
+              </div>
+            </>
+          ) : (
+            <div className='TableDescriptionTitle Important'>
+              {seasonDescription.toUpperCase()}
+            </div>
+          )}
+          <IconClick name='database' className='AbsoluteRight' style={{ marginTop: aspectWidth(1.4), marginRight: aspectWidth(1.4) }} size={'small'} onClick={() => window?.open(makeDuelDataUrl(props.duelId), '_blank')} />
+          <IconClick name='share' className='AbsoluteRight' style={{ marginTop: aspectWidth(1.4), marginRight: aspectWidth(4.4) }} size={'small'} onClick={() => {
+            const twitterUrl = makeDuelTweetUrl(props.duelId, message, premise, livesStaked, isYouA, isYouB, leftPlayerName, rightPlayerName)
+            window?.open(twitterUrl, '_blank');
+          }} />
           <div className='BookmarkSection'>
             <BookmarkIcon isBookmarked={isBookmarked} size='big' disabled={emitIsDisabled} fitted onClick={emit_player_bookmark} />
           </div>
