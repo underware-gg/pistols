@@ -148,7 +148,7 @@ export const BalanceRequiredButton = ({
   const canSubmit = fools ? (canAffordFeeFools !== false) : (canAffordFeeLords !== false)
   return (
     <ActionButton large={large} fill={fill} fillParent={fillParent}
-      disabled={disabled}
+      disabled={disabled || !canSubmit}
       loading={loading}
       important={canSubmit}
       negative={!canSubmit}
