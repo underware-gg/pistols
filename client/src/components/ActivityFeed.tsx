@@ -55,6 +55,9 @@ const ActivityItem = ({
   if (activity.activity === constants.Activity.DuelistDied) {
     return <ActivityItemDuelistDied activity={activity} clientSeconds={clientSeconds} />
   }
+  if (activity.activity === constants.Activity.EnlistedRankedDuelist) {
+    return <ActivityItemEnlistedRankedDuelist activity={activity} clientSeconds={clientSeconds} />
+  }
   if (activity.activity === constants.Activity.ChallengeCreated) {
     return <ActivityItemChallengeCreated activity={activity} clientSeconds={clientSeconds} />
   }
@@ -132,11 +135,42 @@ const ActivityItemDuelistDied = ({
   )
 }
 
+const ActivityItemEnlistedRankedDuelist = ({
+  activity,
+  clientSeconds,
+}: ActivityItemProps) => {
+  return (
+    <>
+      <PlayerLink address={activity.player_address} />
+      {' enlisted '}
+      <DuelistLink duelistId={activity.identifier} />
+      {' in Ranked!'}
+      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} avoidLargeDelta={true} />
+      <br />
+    </>
+  )
+}
+
 const ActivityItemChallengeCreated = ({
   activity,
   clientSeconds,
 }: ActivityItemProps) => {
-  const { duelistAddressB } = useChallenge(activity.identifier)
+  const { duelType, duelistIdA, duelistAddressB } = useChallenge(activity.identifier)
+  if (duelType === constants.DuelType.Ranked) {
+    return (
+      <>
+        <PlayerLink address={activity.player_address} />
+        {' ready to be matched in '}
+        <ChallengeLink duelId={activity.identifier} />
+        {/* {' has '} */}
+        {/* <DuelistLink duelistId={duelistIdA} /> */}
+        {/* {' matching in Ranked...'} */}
+        {' '}
+        <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} avoidLargeDelta={true} />
+        <br />
+      </>
+    )
+  }
   return (
     <>
       <PlayerLink address={activity.player_address} />

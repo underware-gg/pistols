@@ -85,7 +85,7 @@ export const useChallenge = (duelId: BigNumberish) => {
   const { clientSeconds } = useClientTimestamp()
   let state = useMemo(() => parseEnumVariant<constants.ChallengeState>(challenge?.state), [challenge])
   let needToSyncExpired = useMemo(() => (
-    state == constants.ChallengeState.Awaiting && (timestampEnd < clientSeconds)
+    state == constants.ChallengeState.Awaiting && timestampEnd > 0 && (timestampEnd < clientSeconds)
   ), [state, clientSeconds, timestampEnd])
 
   return {
