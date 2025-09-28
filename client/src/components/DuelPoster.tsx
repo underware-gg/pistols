@@ -124,6 +124,7 @@ const DuelPosterSmall = forwardRef<DuelPosterHandle, DuelPosterProps>((props, re
   const { seasonName, isFinished, duelType } = useChallenge(props.duelId)
   const { seasonName: currentSeasonName } = useCurrentSeason()
   const seasonDescription = useMemo(() => (seasonName ?? currentSeasonName), [seasonName, currentSeasonName])
+  const displayDuelType = useMemo(() => (duelType === constants.DuelType.Unranked ? 'Casual' : duelType), [duelType])
 
   const baseRef = useRef<InteractibleComponentHandle>(null)
   const [cardColor, setCardColor] = useState(CardColor.WHITE)
@@ -227,7 +228,7 @@ const DuelPosterSmall = forwardRef<DuelPosterHandle, DuelPosterProps>((props, re
           <div className='TableDescriptionFooter'>
             {seasonDescription}
             {duelType && duelType !== constants.DuelType.Undefined && (
-              <> - {duelType}</>
+              <> - {displayDuelType}</>
             )}
           </div>
         </div>
@@ -267,6 +268,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
   const { challengeDescription } = useChallengeDescription(props.duelId)
   const { seasonName: currentSeasonName } = useCurrentSeason()
   const seasonDescription = useMemo(() => (seasonName ?? currentSeasonName), [seasonName, currentSeasonName])
+  const displayDuelType = useMemo(() => (duelType === constants.DuelType.Unranked ? 'Casual' : duelType), [duelType])
 
   const { lives } = useDuelistFameBalance(challengingDuelistId)
   const isChallenger = useMemo(() => isYouA, [isYouA])
@@ -397,20 +399,20 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
       ref={baseRef}
       childrenInFront={
         <div className='Poster'>
-          {duelType && duelType !== constants.DuelType.Undefined ? (
-            <>
-              <div className='TableDescriptionTitle Important'>
-                {duelType}
-              </div>
-              <div className='TableDescriptionDuelType'>
-                {seasonDescription.toUpperCase()}
-              </div>
-            </>
-          ) : (
-            <div className='TableDescriptionTitle Important'>
-              {seasonDescription.toUpperCase()}
-            </div>
-          )}
+           {duelType && duelType !== constants.DuelType.Undefined ? (
+             <>
+               <div className='TableDescriptionTitle Important'>
+                  {displayDuelType}
+               </div>
+               <div className='TableDescriptionDuelType'>
+                 {seasonDescription.toUpperCase()}
+               </div>
+             </>
+           ) : (
+             <div className='TableDescriptionTitle Important'>
+               {seasonDescription.toUpperCase()}
+             </div>
+           )}
           <IconClick name='database' className='AbsoluteRight' style={{ marginTop: aspectWidth(1.4), marginRight: aspectWidth(1.4) }} size={'small'} onClick={() => window?.open(makeDuelDataUrl(props.duelId), '_blank')} />
           <IconClick name='share' className='AbsoluteRight' style={{ marginTop: aspectWidth(1.4), marginRight: aspectWidth(4.4) }} size={'small'} onClick={() => {
             const twitterUrl = makeDuelTweetUrl(props.duelId, message, premise, livesStaked, isYouA, isYouB, leftPlayerName, rightPlayerName)
