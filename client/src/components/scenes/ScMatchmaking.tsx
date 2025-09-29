@@ -53,6 +53,10 @@ export default function ScMatchmaking() {
   } = useDuelistsInMatchMaking(matchmakingType);
   const isRankedMode = matchmakingType === constants.QueueId.Ranked
 
+  useEffect(() => {
+    console.log('matchmakingType', canMatchMakeIds, notDuelingIds)
+  }, [matchmakingType, canMatchMakeIds, notDuelingIds])
+
   const queuedFastDuelistId = useMemo(() => {
     // if (!isRankedMode) return undefined
     // return inQueueIds[0]
@@ -659,7 +663,7 @@ export default function ScMatchmaking() {
             >
               <div style={{ marginBottom: aspectWidth(1) }}>
                 <strong style={{ color: "#ce6f2c" }}>Available:</strong>{" "}
-                {canMatchMakeIds.filter((id) => notDuelingIds.includes(id)).length} ready
+                {canMatchMakeIds.filter((id) => notDuelingIds?.map(id => BigInt(id)).includes(BigInt(id))).length} ready
               </div>
 
               <div style={{ marginBottom: aspectWidth(1) }}>
