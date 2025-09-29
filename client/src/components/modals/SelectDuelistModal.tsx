@@ -252,11 +252,18 @@ function _SelectDuelistModal({
     })
   }, [currentDuelists, getCardPositioning])
 
-  const handleNoDuelistsClick = useCallback(() => {    
+  const handleNoDuelistsClick = useCallback(() => {
+    console.log('handleNoDuelistsClick', isEnlistMode, canMatchMakeIds.length, rankedCanEnlistIds.length)
+    if (!isEnlistMode && canMatchMakeIds.length === 0 && rankedCanEnlistIds.length > 0) {
+      setIsEnlistMode(true)
+      return
+    }
+    
+    // All other cases lead to card packs as before
     dispatchSetScene(SceneName.CardPacks)
     opener?.close()
     emitter.emit('hover_description', '')
-  }, [dispatchSetScene, opener])
+  }, [dispatchSetScene, opener, isEnlistMode, canMatchMakeIds.length, rankedCanEnlistIds.length])
 
   // Handle duelist click - either enlist or select based on mode
   const handleDuelistClick = useCallback((duelistId: BigNumberish) => {
@@ -299,9 +306,9 @@ function _SelectDuelistModal({
       
       // Calculate hover offsets based on card angle
       const angleRad = angle * Math.PI / 180
-      const hoverDistance = aspectWidth(6)
+      const hoverDistance = aspectWidth(5)
       const hoverXOffset = Math.sin(angleRad) * hoverDistance
-      const hoverYOffset = -Math.abs(Math.cos(angleRad)) * hoverDistance - aspectWidth(4)
+      const hoverYOffset = -Math.abs(Math.cos(angleRad)) * hoverDistance - aspectWidth(1)
       
       card.setScale(isHovered ? 1 : 1, 400, TWEEN.Easing.Quadratic.Out)
       card.toggleHighlight(isHovered)
@@ -319,7 +326,6 @@ function _SelectDuelistModal({
   }, [getCardPositioning, updateAllCardPositions, currentDuelists, isAnimating])
 
   const handleNoDuelistsHover = useCallback((isHovered: boolean) => {
-    console.log('handleNoDuelistsHover', isHovered, isAnimatingRef.current, noDuelistsCardRef.current)
     if (isAnimatingRef.current || !noDuelistsCardRef.current) {
       clearTimeout(hoverTimeout.current)
       if (isHovered) {
@@ -333,7 +339,7 @@ function _SelectDuelistModal({
     
     // Calculate hover offsets based on card angle
     const angleRad = angle * Math.PI / 180
-    const hoverDistance = 30
+    const hoverDistance = aspectWidth(2.4)
     const hoverXOffset = Math.sin(angleRad) * hoverDistance
     const hoverYOffset = -Math.abs(Math.cos(angleRad)) * hoverDistance - 20
     
@@ -348,11 +354,16 @@ function _SelectDuelistModal({
     )
     
     if (isHovered) {
-      emitter.emit('hover_description', 'Click to go to your card packs to recruit more of your own duelists')
+      // Show appropriate message based on the action that will be taken
+      if (!isEnlistMode && canMatchMakeIds.length === 0 && rankedCanEnlistIds.length > 0) {
+        emitter.emit('hover_description', 'Click to switch to enlist mode and enlist your duelists')
+      } else {
+        emitter.emit('hover_description', 'Click to go to your card packs to recruit more of your own duelists')
+      }
     } else {
       emitter.emit('hover_description', '')
     }
-  }, [getCardPositioning, isAnimating])
+  }, [getCardPositioning, isAnimating, isEnlistMode, canMatchMakeIds.length, rankedCanEnlistIds.length])
 
   // Memoize the duelist cards to prevent unnecessary re-renders
   const duelistCardsMemo = useMemo(() => {
@@ -416,7 +427,7 @@ function _SelectDuelistModal({
         onHover={handleNoDuelistsHover}
         isEnlistMode={isEnlistMode}
         rankedCanEnlistIds={rankedCanEnlistIds}
-        canMatchMakeIds={canMatchMakeIds}
+        canMatchMakeIds={canMatchMakeIds.filter((id) => notDuelingIds.includes(id))}
         matchmakingType={opener.props?.matchmakingType}
       />
     )
@@ -708,44 +719,50 @@ function EnlistmentConfirmationDialog({
             color: "#ef9758",
             fontWeight: "bold",
             padding: aspectWidth(1),
-            background: "rgba(239, 151, 88, 0.1)",
+            background: "rgba(255, 171, 108, 0.2)",
             borderRadius: aspectWidth(0.5),
             border: "1px solid rgba(239, 151, 88, 0.2)",
           }}
         >
           <span style={{ color: "#c8b6a8" }}>Enlist</span> {nameAndId}{" "}
           <span style={{ color: "#c8b6a8" }}>for</span> Season {seasonId}?
-        </div>
-
-        {/* Fee display */}
-        <div
-          style={{
-            textAlign: "center",
-            fontSize: aspectWidth(1.4),
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: aspectWidth(1.6),
-            color: COLORS.ACTIVE,
-            fontWeight: "bold",
-          }}
-        >
-          <span style={{ color: "#c8b6a8" }}>Cost:</span>
-          {requiresEnlistment ? (
-            <Balance fools size='huge' wei={entryTokenAmount} />
-          ) : (
-            <span style={{ color: "#90EE90" }}>FREE</span>
-          )}
+          <br />
+          <div
+            style={{
+              textAlign: "center",
+              fontSize: aspectWidth(1.4),
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: aspectWidth(0.6),
+              color: COLORS.ACTIVE,
+              fontWeight: "bold",
+            }}
+          >
+            <span style={{ color: "#c8b6a8" }}>Cost:</span>
+            {requiresEnlistment ? (
+              <Balance fools size="huge" wei={entryTokenAmount} />
+            ) : (
+              <span style={{ color: "#90EE90" }}>FREE</span>
+            )}
+          </div>
         </div>
       </Modal.Content>
 
       <Modal.Actions style={{ display: "flex" }}>
-        <ActionButton large fill dimmed onClick={handleCancelEnlist} label="Cancel" />
+        <ActionButton
+          large
+          fill
+          dimmed
+          onClick={handleCancelEnlist}
+          label="Cancel"
+        />
         <BalanceRequiredButton
-          fools large
+          fools
+          large
           fee={entryTokenAmount}
           // disabled={!canSubmit}
-          label='Enlist Duelist'
+          label="Enlist Duelist"
           onClick={handleConfirmEnlist}
         />
       </Modal.Actions>
@@ -768,14 +785,12 @@ const CustomEmptyStateSlip = React.forwardRef<NoDuelistsSlipHandle, {
   const { aspectWidth } = useGameAspect()
   
   const getEmptyStateMessage = () => {
-    console.log('getEmptyStateMessage', matchmakingType, isEnlistMode, rankedCanEnlistIds.length, canMatchMakeIds.length)
     if (matchmakingType === constants.QueueId.Ranked) {
       if (isEnlistMode) {
         if (rankedCanEnlistIds.length === 0) {
-          console.log('No duelists to enlist')
           return {
             title: "No duelists to enlist",
-            message: "All your duelists are already enlisted for ranked matches.",
+            message: "All eligible duelists are already enlised in ranked.",
             subtext: "Try switching to selection mode to use enlisted duelists."
           }
         }
@@ -783,7 +798,7 @@ const CustomEmptyStateSlip = React.forwardRef<NoDuelistsSlipHandle, {
         if (canMatchMakeIds.length === 0) {
           return {
             title: "No enlisted duelists",
-            message: "You need to enlist duelists before entering ranked matches.",
+            message: "Enlist duelists before entering ranked matches.",
             subtext: "Switch to enlist mode to enlist your duelists."
           }
         }

@@ -12,6 +12,8 @@ import { useDuelistsInMatchMaking } from '/src/stores/matchStore'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { ExclamationIndicator } from '../ui/ExclamationIndicator'
 import { emitter } from '/src/three/game'
+import { useDuellingDuelists } from '/src/stores/duelistStore'
+import { usePlayerDuelistsOrganized } from '/src/stores/duelistStore'
 
 export default function ScMatchmaking() {
   const { aspectWidth, aspectHeight } = useGameAspect()
@@ -34,6 +36,9 @@ export default function ScMatchmaking() {
   
   // Track individual duelist commit states
   const [committingDuelists, setCommittingDuelists] = useState<Set<bigint>>(new Set())
+
+  const { activeDuelists: duelistIds } = usePlayerDuelistsOrganized();
+  const { notDuelingIds } = useDuellingDuelists(duelistIds);
 
   const {
     // current queue
@@ -386,7 +391,7 @@ export default function ScMatchmaking() {
                     : "CASUAL"}
                 </strong>
                 {matchmakingType === constants.QueueId.Ranked
-                  ? " - Entry fee in FOOLS per duelist, climb the leaderboards for higher rewards!"
+                  ? " - Entry fee in FOOLS per duelist, climb the leaderboards for higher rewards! (Starter duelists not eligible)"
                   : " - Free entry, duel with fellow players for excitement and FOOLS rewards!"}
               </span>
             </div>
@@ -654,7 +659,7 @@ export default function ScMatchmaking() {
             >
               <div style={{ marginBottom: aspectWidth(1) }}>
                 <strong style={{ color: "#ce6f2c" }}>Available:</strong>{" "}
-                {canMatchMakeIds.length} ready
+                {canMatchMakeIds.filter((id) => notDuelingIds.includes(id)).length} ready
               </div>
 
               <div style={{ marginBottom: aspectWidth(1) }}>

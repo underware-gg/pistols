@@ -11,9 +11,12 @@ import { DuelPoster, DuelPosterHandle } from '/src/components/DuelPoster'
 import { _currentScene } from '/src/three/game'
 import { SceneName } from '/src/data/assets'
 import { ActionButton } from '/src/components/ui/Buttons'
+import { useSettings } from '/src/hooks/SettingsContext'
+import { useCurrentSeason } from '/src/stores/seasonStore'
 
 export default function ScDuelsBoard() {
   const [pageNumber, setPageNumber] = useState(0)
+  const [showNoDuelsMessage, setShowNoDuelsMessage] = useState(false)
   const duelsPerPage = 5
 
   const { address } = useAccount()
@@ -25,12 +28,14 @@ export default function ScDuelsBoard() {
     filterChallengeSortColumn,
     filterChallengeSortDirection,
     filterSeason,
+    filterDuelType,
   } = useQueryParams()
   const {
     challengeIds,
     pageCount,
     totalCount,
     queryHash,
+    isLoading,
   } = useQueryChallengeIds(
     filterStatesLiveDuels,
     filterPlayerName,
@@ -39,6 +44,7 @@ export default function ScDuelsBoard() {
     filterChallengeSortColumn,
     filterChallengeSortDirection,
     filterSeason,
+    filterDuelType,
     duelsPerPage,
     Math.max(0, pageNumber - 1),
     3
@@ -48,9 +54,22 @@ export default function ScDuelsBoard() {
     setPageNumber(0)
   }, [queryHash])
 
+  useEffect(() => {
+    if (!isLoading && challengeIds.length === 0) {
+      const timer = setTimeout(() => {
+        setShowNoDuelsMessage(true)
+      }, 500)
+      return () => clearTimeout(timer)
+    } else {
+      setShowNoDuelsMessage(false)
+    }
+  }, [isLoading, challengeIds.length])
+
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSetScene } = usePistolsScene()
   const { dispatchSelectDuel } = usePistolsContext()
+  const { selectedMode } = useSettings()
+  const { seasonName } = useCurrentSeason()
 
   const { value: itemClicked, timestamp } = useGameEvent('scene_click', null)
 
@@ -269,8 +288,74 @@ export default function ScDuelsBoard() {
     </>
   ), [])
 
+  // Get mode display text based on duel type filter
+  const getModeText = () => {
+    switch (filterDuelType) {
+      case 'ranked':
+        return 'RANKED'
+      case 'casual':
+        return 'CASUAL'
+      case 'practice':
+        return 'PRACTICE'
+      case 'all':
+      default:
+        return 'ALL'
+    }
+  }
+
   return (
     <>
+      {/* Board Image - Top Middle */}
+      <div className='NoMouse NoDrag' style={{
+        position: 'absolute',
+        top: aspectHeight(14),
+        left: '50%',
+        transform: 'translateX(-50%) rotate(1.5deg)',
+      }}>
+        <img 
+          src='/images/ui/tavern/board.png' 
+          alt="Game Board"
+          style={{
+            width: aspectWidth(20),
+            height: aspectHeight(15),
+            objectFit: 'cover',
+            filter: 'contrast(1.06) brightness(1.2) saturate(1.1) drop-shadow(-8px 6px 1px rgba(101, 67, 33, 0.6))',
+          }}
+        />
+        
+        {/* Mode Text */}
+        <div style={{
+          position: 'absolute',
+          top: '30%',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          textAlign: 'center',
+          color: '#D4AF37',
+          fontSize: aspectWidth(3),
+          fontWeight: 'bold',
+          textShadow: '2px 2px 4px rgba(0,0,0,0.8), 0 0 8px rgba(255,255,255,0.1)',
+          fontFamily: 'serif',
+        }}>
+          {getModeText()}
+        </div>
+        
+        {/* Season Text */}
+        {/* <div style={{
+          position: 'absolute',
+          top: '55%',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          textAlign: 'center',
+          color: '#F4E4BC',
+          fontSize: aspectWidth(1.8),
+          fontWeight: 'bold',
+          textShadow: '1px 1px 2px rgba(0,0,0,0.8), 0 0 6px rgba(255,255,255,0.2)',
+          fontFamily: 'serif',
+        }}>
+          {seasonName}
+        </div> */}
+      </div>
+
       <div className='NoMouse NoDrag' style={{
         width: aspectWidth(74),
         height: aspectHeight(56),
@@ -280,7 +365,21 @@ export default function ScDuelsBoard() {
         marginTop: aspectHeight(10),
         overflow: 'hidden',
       }}>
-        {posterGrids}
+        {isLoading ? null : challengeIds.length > 0 ? posterGrids : showNoDuelsMessage ? (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '100%',
+            color: '#8B4513',
+            fontSize: aspectWidth(3),
+            fontWeight: 'bold',
+            textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
+            fontFamily: 'serif',
+          }}>
+            No duels available yet
+          </div>
+        ) : null}
       </div>
       <img src='/images/scenes/duels_board/bg_duels_lighting.png' className='NoMouse NoDrag' style={{
         width: '100%',

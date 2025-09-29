@@ -204,13 +204,15 @@ function _ModeSelectModal({ opener }: ModeSelectModalProps) {
       closeOnDimmerClick
     >
       <div className='ModeModalContainer NoMouse NoDrag'>
-        <div className="ModeModal NoMouse NoDrag" style={{
+        <div className="ModeModal YesMouse NoDrag" style={{
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
           height: '100vh',
           gap: aspectWidth(2),
-        }}>
+        }}
+        onClick={() => _close()}
+        >
           {GAME_MODES.map((mode, index) => (
             <div 
               key={mode.id}

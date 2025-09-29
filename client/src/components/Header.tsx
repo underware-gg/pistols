@@ -407,11 +407,13 @@ const CurtainUI = memo(function CurtainUI({
     filterShowBookmarkedDuels,
     filterChallengeSortColumn,
     filterChallengeSortDirection,
+    filterDuelType,
     setFilterShowAllDuels,
     setFilterShowBookmarkedDuels,
     setFilterChallengeSortColumn,
     setFilterChallengeSortDirection,
     setFilterChallengeSortSwitch,
+    setFilterDuelType,
 
     filterStatesLiveDuels,
     filterStatesPastDuels,
@@ -530,6 +532,35 @@ const CurtainUI = memo(function CurtainUI({
                   setStates={setFilterStatesLiveDuels}
                   getLabel={(state) => ChallengeStateNames[state]}
                 />
+              </div>
+              <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '10px'}}>
+                <label style={{marginRight: '10px'}}>Duel Type:</label>
+                <ButtonGroup style={{ overflow: 'visible' }}>
+                  <FilterButton 
+                    label="All" 
+                    state={filterDuelType === 'all'} 
+                    onClick={() => setFilterDuelType('all')} 
+                    grouped 
+                  />
+                  <FilterButton 
+                    label="Ranked" 
+                    state={filterDuelType === 'ranked'} 
+                    onClick={() => setFilterDuelType('ranked')} 
+                    grouped 
+                  />
+                  <FilterButton 
+                    label="Casual" 
+                    state={filterDuelType === 'casual'} 
+                    onClick={() => setFilterDuelType('casual')} 
+                    grouped 
+                  />
+                  <FilterButton 
+                    label="Practice" 
+                    state={filterDuelType === 'practice'} 
+                    onClick={() => setFilterDuelType('practice')} 
+                    grouped 
+                  />
+                </ButtonGroup>
               </div>
               <div>
                 <label style={{marginRight: '10px'}}>Sort By:</label>

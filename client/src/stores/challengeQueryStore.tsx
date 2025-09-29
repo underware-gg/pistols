@@ -42,6 +42,7 @@ export const useQueryChallengeIds = (
   sortColumn: ChallengeColumn,
   sortDirection: SortDirection,
   filterSeason: number,
+  filterDuelType: 'all' | 'ranked' | 'casual' | 'practice' = 'all',
   pageSize = 8,
   pageStartIndex = 0,
   pageFetchCount = 2,
@@ -69,6 +70,17 @@ export const useQueryChallengeIds = (
     }
     filterCondition += `)`;
     conditions.push(filterCondition)
+
+    // filter by duel type
+    if (filterDuelType !== 'all') {
+      if (filterDuelType === 'ranked') {
+        conditions.push(`(A.duel_type = "${constants.DuelType.Ranked}")`)
+      } else if (filterDuelType === 'practice') {
+        conditions.push(`(A.duel_type = "${constants.DuelType.Practice}")`)
+      } else if (filterDuelType === 'casual') {
+        conditions.push(`(A.duel_type not in ("${constants.DuelType.Ranked}", "${constants.DuelType.Practice}"))`)
+      }
+    }
 
     // filter by player address
     if (isPositiveBigint(playerAddress)) {
@@ -113,10 +125,12 @@ export const useQueryChallengeIds = (
       query += `\nlimit ${pageSize * pageFetchCount} offset ${(pageStartIndex ?? 0) * pageSize}`
     }
 
+    console.log('CHALLENGE SQL QUERY:', query)
+
     return {
       query,
     }
-  }, [filterStates, playerAddress, filterName, filterBookmarked, bookmarkedDuels, filterSeason, sortColumn, sortDirection, pageSize, pageStartIndex, pageFetchCount, requiredDuelIds])
+  }, [filterStates, playerAddress, filterName, filterBookmarked, bookmarkedDuels, filterSeason, filterDuelType, sortColumn, sortDirection, pageSize, pageStartIndex, pageFetchCount, requiredDuelIds])
 
   const { data, isLoading, queryHash } = useSdkSqlQuery({
     query,

@@ -16,6 +16,7 @@ import { SceneName } from '/src/data/assets'
 
 export default function ScGraveyard() {
   const [pageNumber, setPageNumber] = useState(0)
+  const [showNoDuelsMessage, setShowNoDuelsMessage] = useState(false)
   const duelsPerPage = 8
 
   const { address } = useAccount()
@@ -33,6 +34,7 @@ export default function ScGraveyard() {
     pageCount,
     totalCount,
     queryHash,
+    isLoading,
   } = useQueryChallengeIds(
     filterStatesPastDuels,
     filterPlayerName,
@@ -41,6 +43,7 @@ export default function ScGraveyard() {
     filterChallengeSortColumn,
     filterChallengeSortDirection,
     filterSeason,
+    "all",
     duelsPerPage,
     Math.max(0, pageNumber - 1),
     3
@@ -49,6 +52,17 @@ export default function ScGraveyard() {
   useEffect(() => {
     setPageNumber(0)
   }, [queryHash])
+
+  useEffect(() => {
+    if (!isLoading && challengeIds.length === 0) {
+      const timer = setTimeout(() => {
+        setShowNoDuelsMessage(true)
+      }, 500)
+      return () => clearTimeout(timer)
+    } else {
+      setShowNoDuelsMessage(false)
+    }
+  }, [isLoading, challengeIds.length])
 
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSetScene } = usePistolsScene()
@@ -259,7 +273,21 @@ export default function ScGraveyard() {
 
   return (
     <>
-      {posterGrids}
+      {isLoading ? null : challengeIds.length > 0 ? posterGrids : showNoDuelsMessage ? (
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          color: '#D4AF37',
+          fontSize: aspectWidth(3),
+          fontWeight: 'bold',
+          textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
+          fontFamily: 'serif',
+        }}>
+          No duels available yet
+        </div>
+      ) : null}
       <div style={{
         position: 'absolute',
         bottom: aspectHeight(2),

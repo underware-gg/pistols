@@ -51,6 +51,7 @@ type State = {
   filterShowAllDuels: boolean
   filterShowBookmarkedDuels: boolean
   filterSeason: number
+  filterDuelType: 'all' | 'ranked' | 'casual' | 'practice'
   // duelist setters
   setFilterDuelistName: (value: string) => void
   setFilterDuelistActive: (value: boolean) => void
@@ -75,6 +76,7 @@ type State = {
   setFilterShowAllDuels: (value: boolean) => void
   setFilterShowBookmarkedDuels: (value: boolean) => void
   setFilterSeason: (value: number) => void
+  setFilterDuelType: (value: 'all' | 'ranked' | 'casual' | 'practice') => void
 }
 
 export const useQueryParams = create<State>((set) => ({
@@ -99,6 +101,7 @@ export const useQueryParams = create<State>((set) => ({
   filterShowAllDuels: false,
   filterShowBookmarkedDuels: false,
   filterSeason: 0,
+  filterDuelType: 'all',
   // duelist setters
   setFilterDuelistName: (value: string) => set({ filterDuelistName: value.toLowerCase() }),
   setFilterDuelistActive: (value: boolean) => set({ filterDuelistActive: value }),
@@ -123,4 +126,5 @@ export const useQueryParams = create<State>((set) => ({
   setFilterShowAllDuels: (value: boolean) => set({ filterShowAllDuels: value }),
   setFilterShowBookmarkedDuels: (value: boolean) => set({ filterShowBookmarkedDuels: value }),
   setFilterSeason: (value: number) => set({ filterSeason: value }),
+  setFilterDuelType: (value: 'all' | 'ranked' | 'casual' | 'practice') => set({ filterDuelType: value }),
 }))
