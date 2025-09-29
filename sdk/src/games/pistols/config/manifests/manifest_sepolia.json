@@ -9398,7 +9398,7 @@
     },
     {
       "address": "0x16f7e3c140b4778e776221c7bb8b880d20d247c3ab0d06fab9a8eb96e7098bb",
-      "class_hash": "0x295d99009b77bc3c45837fedaacb538e6437aab3b0195a1b7ee2e98433cad67",
+      "class_hash": "0x60101a4fe47e7172fd2b01d4c5665b9972a0ba4f16a8434d20358443ef996f6",
       "abi": [
         {
           "type": "impl",
