@@ -308,7 +308,7 @@ export const useFetchChallengeIds = (duelIds: BigNumberish[], retryInterval?: nu
     newDuelIds.length > 0
       ? new PistolsQueryBuilder()
         .withClause(
-          new PistolsClauseBuilder().where("pistols-Challenge", "duel_id", "In", newDuelIds.map(bigintToAddress)).build()
+          new PistolsClauseBuilder().where("pistols-Challenge", "duel_id", "In", newDuelIds.map(bigintToHex128)).build()
         )
         .withEntityModels([
           "pistols-Challenge",
