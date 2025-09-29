@@ -63,8 +63,7 @@ export const DuelistPlaceholderSlot = forwardRef<DuelistPlaceholderSlotHandle, D
   const { aspectWidth } = useGameAspect()
   const { account, address } = useAccount()
   const { matchmaker } = useDojoSystemCalls()
-  const { duelistSelectOpener } = usePistolsContext()
-  const { dispatchSetScene } = usePistolsScene()
+  const { duelistSelectOpener, dispatchSelectDuel } = usePistolsContext()
   const { timestampStart: duelDurationTimestamp } = useChallenge(props.duelId || 0n)
 
   const rankedPlayer = useMatchPlayer(address, constants.QueueId.Ranked)
@@ -251,7 +250,8 @@ export const DuelistPlaceholderSlot = forwardRef<DuelistPlaceholderSlotHandle, D
 
   const handleGoToDuel = useCallback(() => {
     if (!props.duelId) return
-    dispatchSetScene(SceneName.Duel, { duelId: props.duelId });
+    // dispatchSetScene(SceneName.Duel, { duelId: props.duelId });
+    dispatchSelectDuel(props.duelId)
   }, [props.duelId])
 
   useImperativeHandle(
