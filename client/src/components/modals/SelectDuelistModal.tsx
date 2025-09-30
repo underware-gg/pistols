@@ -64,6 +64,9 @@ function _SelectDuelistModal({
   const { entryTokenAmount, requiresEnlistment } = opener.props?.matchmakingType ? useMatchQueue(opener.props?.matchmakingType) : { entryTokenAmount: 0n, requiresEnlistment: false }  
   const { rankedCanEnlistIds, canMatchMakeIds } = opener.props?.matchmakingType ? useDuelistsInMatchMaking(opener.props?.matchmakingType) : { rankedCanEnlistIds: [], canMatchMakeIds: [] }
 
+  const { inQueueIds: rankedQueuedIds } = useDuelistsInMatchMaking(constants.QueueId.Ranked)
+  const { inQueueIds: unrankedQueuedIds } = useDuelistsInMatchMaking(constants.QueueId.Unranked)
+
   const [isEnlistMode, setIsEnlistMode] = useState(opener.props?.enlistMode ?? false)
 
   const availableDuelists = useMemo(() => {
@@ -73,7 +76,7 @@ function _SelectDuelistModal({
       return canMatchMakeIds.filter((id) => !opener.props?.unavailableDuelistIds.has(BigInt(id)) && notDuelingIds?.map(id => BigInt(id)).includes(BigInt(id)));
     }
 
-    return duelistIds;
+    return notDuelingIds.map(id => BigInt(id)).filter((id) => !rankedQueuedIds.includes(id) && !unrankedQueuedIds.includes(id));
   }, [
     isEnlistMode,
     rankedCanEnlistIds,
