@@ -26,8 +26,8 @@ controllers = true
 pending = true
 contracts = [
   "erc721:0x3ff3a551e2727b1df2a5f95ae25c1d9fdefb3e5e695a3f17077554c5fd7142e", # duel_token
-  "erc721:0x7bfe52f63b8df5e77e0928042aae5264bd741e6070753d8eed398bef11d0235", # duelist_token
-  "erc721:0x24da9a51dbb4df154091d560818e1ce97144b04078412b85680175b7a6ae817", # pack_token
+  "erc721:0x4a5910c97941c0ecfe60e8f613f97bcd47bcf8415175fa1425a922f9c28e643", # duelist_token
+  "erc721:0x879a851a72c47c18074d2e0218201500dbfe7c67af65ca2948cd534503075e", # pack_token
   "erc721:0x1737b0e3227ff3b68787653c4be671ff9920082e006d92ae1c486e848e463d7", # ring_token
   # "erc721:$tournament_token", # tournament_token
   "erc20:0x656c2b200b9143942cec1abc19c1bacd039bbc53f77f77016a11983cbf47d95", # fame_coin
