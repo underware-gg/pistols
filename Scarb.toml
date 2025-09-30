@@ -4,6 +4,10 @@
 [workspace]
 members = ["dojo"]
 
+[workspace.package]
+version = "1.2.3"
+edition = "2024_07"
+
 #--------------------------
 # Dojo profiles declaration
 #
