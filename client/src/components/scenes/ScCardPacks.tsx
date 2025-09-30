@@ -11,6 +11,7 @@ import { ActionButton, BalanceRequiredButton } from '/src/components/ui/Buttons'
 import { PackTypeListItem } from '/src/components/ui/PackTypeListItem'
 import { SceneName } from '/src/data/assets'
 import { Divider } from '/src/components/ui/Divider'
+import { LordsBalance } from '/src/components/account/LordsBalance'
 import * as TWEEN from '@tweenjs/tween.js'
 
 // Card pack positioning constants
@@ -299,7 +300,17 @@ export default function ScCardPacks() {
             {isConnected ? (
               <BalanceRequiredButton
                 fee={fee}
-                label="Purchase Pack"
+                hideIcon
+                label={
+                  <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}>
+                    <span>Purchase Pack</span>
+                    {account && (
+                      <div style={{ color: '#efe1d7' }}>
+                        (balance: <LordsBalance address={account.address} />)
+                      </div>
+                    )}
+                  </div>
+                }
                 onClick={handlePurchasePack}
                 disabled={false}
               />

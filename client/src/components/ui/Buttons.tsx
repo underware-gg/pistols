@@ -131,8 +131,9 @@ export const BalanceRequiredButton = ({
   fillParent = false,
   large = true,
   fools = false,
+  hideIcon = false,
 }: {
-  label: string
+  label: string | ReactElement
   fee: BigNumberish
   onClick: Function
   disabled?: boolean
@@ -141,6 +142,7 @@ export const BalanceRequiredButton = ({
   fillParent?: boolean
     large?: boolean
   fools?: boolean
+  hideIcon?: boolean
 }) => {
   const { address } = useAccount()
   const { canAffordFee: canAffordFeeLords } = useLordsBalance(address, fee)
@@ -152,7 +154,7 @@ export const BalanceRequiredButton = ({
       loading={loading}
       important={canSubmit}
       negative={!canSubmit}
-      label={!canSubmit ? 'No Funds!' : isPositiveBigint(fee) ? <>{label} {fools ? <FoolsIcon /> : <LordsBagIcon />}</> : label}
+      label={!canSubmit ? 'No Funds!' : isPositiveBigint(fee) ? <>{label} {hideIcon ? null : fools ? <FoolsIcon /> : <LordsBagIcon />}</> : label}
       onClick={() => (canSubmit ? onClick() : {})}
     />
   )
