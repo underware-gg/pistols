@@ -289,7 +289,7 @@ export function createSystemCalls(
             makeCustomEnum(duel_type),
             duelist_id,
             bigintToHex(challenged_address),
-            lives_staked,
+            (duel_type == constants.DuelType.BotPlayer || duel_type == constants.DuelType.Practice) ? 0 : lives_staked,
             expire_minutes,
             makeCustomEnum(premise),
             message,
