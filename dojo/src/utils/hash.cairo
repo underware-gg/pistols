@@ -1,6 +1,5 @@
 use core::poseidon::{PoseidonTrait, HashState};
 use core::hash::HashStateTrait;
-
 pub use pistols::utils::misc::{FeltToLossy};
 
 pub fn hash_values(values: Span<felt252>) -> felt252 {
@@ -34,7 +33,7 @@ pub fn hash_values(values: Span<felt252>) -> felt252 {
 //     pub sequencer_address: ContractAddress,
 // }
 pub fn make_block_hash() -> felt252 {
-    let block_info = starknet::get_block_info().unbox();
+    let block_info: starknet::BlockInfo = starknet::get_block_info().unbox();
     let hash: felt252 = hash_values([
         block_info.block_number.into(),
         block_info.block_timestamp.into(),
@@ -62,7 +61,7 @@ mod unit {
 
     #[test]
     fn test_make_block_hash() {
-        let h = make_block_hash();
+        let h: felt252 = make_block_hash();
         assert_ne!(h, 0, "block hash");
     }
 
@@ -75,6 +74,7 @@ mod unit {
         let h123: felt252 = hash_values([111, 222, 333].span());
         let h1234: felt252 = hash_values([111, 222, 333, 444].span());
         assert_ne!(h1, 0, "h1");
+        assert_ne!(h1, 111, "h1");
         assert_eq!(h1, h11, "h1 == h11");
         assert_ne!(h1, h12, "h1 != h12");
         assert_ne!(h12, h123, "h12 != h123");
@@ -98,8 +98,8 @@ mod unit {
         let b: felt252 = 0x4d07e40e93398ed3c76981e72dd1fd22557a78ce36c0515f679e27f0bb5bc5f;
         let aa: u256 = a.into();
         let bb: u256 = b.into();
-        let a_b = aa ^ bb;
-        let b_a = bb ^ aa;
+        let a_b: u256 = aa ^ bb;
+        let b_a: u256 = bb ^ aa;
         // xor hashes are EQUAL for (a,b) and (b,a)
         assert_eq!(a_b, b_a, "felt_to_u128");
     }

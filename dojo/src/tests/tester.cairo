@@ -848,8 +848,11 @@ pub mod tester {
         (pack_id)
     }
     pub fn execute_pack_airdrop(sys: @TestSystems, sender: ContractAddress, recipient: ContractAddress, pack_type: PackType, duelist_profile: Option<DuelistProfile>) -> u128 {
+        (*execute_pack_airdrop_multiple(sys, sender, recipient, pack_type, duelist_profile, 1)[0])
+    }
+    pub fn execute_pack_airdrop_multiple(sys: @TestSystems, sender: ContractAddress, recipient: ContractAddress, pack_type: PackType, duelist_profile: Option<DuelistProfile>, quantity: usize) -> Span<u128> {
         impersonate(sender);
-        let pack_id: u128 = (*sys.pack).airdrop(recipient, pack_type, duelist_profile);
+        let pack_id: Span<u128> = (*sys.pack).airdrop(recipient, pack_type, duelist_profile, quantity);
         _next_block();
         (pack_id)
     }

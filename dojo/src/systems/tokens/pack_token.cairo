@@ -64,7 +64,7 @@ pub trait IPackToken<TState> {
     fn claim_starter_pack(ref self: TState) -> Span<u128>;
     fn claim_gift(ref self: TState) -> Span<u128>;
     fn purchase(ref self: TState, pack_type: PackType) -> u128;
-    fn airdrop(ref self: TState, recipient: ContractAddress, pack_type: PackType, duelist_profile: Option<DuelistProfile>) -> u128;
+    fn airdrop(ref self: TState, recipient: ContractAddress, pack_type: PackType, duelist_profile: Option<DuelistProfile>, quantity: usize) -> Span<u128>;
     fn open(ref self: TState, pack_id: u128) -> Span<u128>;
 }
 
@@ -80,7 +80,7 @@ pub trait IPackTokenPublic<TState> {
     fn claim_starter_pack(ref self: TState) -> Span<u128>; //@description: Claim the starter pack, mint Duelists
     fn claim_gift(ref self: TState) -> Span<u128>; //@description: Claim gift pack, if available
     fn purchase(ref self: TState, pack_type: PackType) -> u128; //@description: Purchase a closed pack
-    fn airdrop(ref self: TState, recipient: ContractAddress, pack_type: PackType, duelist_profile: Option<DuelistProfile>) -> u128; //@description: Airdrops a pack (admin)
+    fn airdrop(ref self: TState, recipient: ContractAddress, pack_type: PackType, duelist_profile: Option<DuelistProfile>, quantity: usize) -> Span<u128>; //@description: Airdrops a pack (admin)
     fn open(ref self: TState, pack_id: u128) -> Span<u128>; //@description: Open a pack, mint its contents
 }
 
@@ -164,6 +164,7 @@ pub mod pack_token {
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::short_string::{ShortStringTrait};
     use pistols::utils::byte_arrays::{BoolToStringTrait};
+    use pistols::utils::hash::{hash_values};
     use pistols::utils::address::{ZERO};
 
     pub mod Errors {
@@ -324,8 +325,18 @@ pub mod pack_token {
             recipient: ContractAddress,
             pack_type: PackType,
             duelist_profile: Option<DuelistProfile>,
-        ) -> u128 {
+            quantity: usize,
+        ) -> Span<u128> {
             self._assert_caller_is_admin();
+
+            // need vrf seed if duelist_profile is not provided
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let mut seed: felt252 = match (duelist_profile) {
+                Option::None => {
+                    (store.vrf_dispatcher().consume_random(Source::Nonce(starknet::get_caller_address())))
+                },
+                Option::Some(_) => {(0)},
+            };
 
             // validate pack and contents
             match (pack_type) {
@@ -347,35 +358,33 @@ pub mod pack_token {
                 }
             }
 
-            // need vrf seed if duelist_profile is not provided
-            let mut store: Store = StoreTrait::new(self.world_default());
-            let seed: felt252 = match (duelist_profile) {
-                Option::None => {
-                    (store.vrf_dispatcher().consume_random(Source::Nonce(starknet::get_caller_address())))
-                },
-                Option::Some(_) => {(0)},
-            };
-
             // all free duelists must have a claimable balance
             let mut pool_claimable: Pool = store.get_pool(PoolType::Claimable);
-            let lords_amount: u128 = self.calc_mint_fee(recipient, pack_type);
-            assert(pool_claimable.balance_lords >= lords_amount, Errors::INSUFFICIENT_LORDS);
+            let lords_per_pack: u128 = self.calc_mint_fee(recipient, pack_type);
+            let lords_total: u128 = lords_per_pack * quantity.into();
+            assert(pool_claimable.balance_lords >= lords_total, Errors::INSUFFICIENT_LORDS);
 
             // move lords to purchases pool if needed
             if (pack_type.deposited_pool_type() == PoolType::Purchases) {
                 let mut pool_purchases: Pool = store.get_pool(PoolType::Purchases);
-                pool_claimable.withdraw_lords(lords_amount);
-                pool_purchases.deposit_lords(lords_amount);
+                pool_claimable.withdraw_lords(lords_total);
+                pool_purchases.deposit_lords(lords_total);
                 store.set_pool(@pool_claimable);
                 store.set_pool(@pool_purchases);
             }
 
-            // mint
-            let pack: Pack = self._mint_pack(ref store, pack_type, recipient, seed, lords_amount, duelist_profile);
+            // mint packs
+            let mut pack_ids: Array<u128> = array![];
+            for i in 0..quantity {
+                if (i > 0) {
+                    seed = hash_values(array![seed, seed].span());
+                }
+                let pack: Pack = self._mint_pack(ref store, pack_type, recipient, seed, lords_per_pack, duelist_profile);
+                Activity::AirdroppedPack.emit(ref store.world, recipient, pack.pack_id.into());
+                pack_ids.append(pack.pack_id);
+            };
 
-            Activity::AirdroppedPack.emit(ref store.world, recipient, pack.pack_id.into());
-
-            (pack.pack_id)
+            (pack_ids.span())
         }
 
         //
@@ -394,7 +403,7 @@ pub mod pack_token {
             assert(!pack.is_open, Errors::ALREADY_OPENED);
 
             // open...
-            let token_ids: Span<u128> = self._mint_pack_duelists(ref store, pack, recipient);
+            let token_ids: Span<u128> = self._mint_opened_duelists(ref store, pack, recipient);
             pack.is_open = true;
             store.set_pack(@pack);
 
@@ -438,7 +447,7 @@ pub mod pack_token {
     #[generate_trait]
     impl InternalImpl of InternalTrait {
         fn _assert_caller_is_admin(self: @ContractState) {
-            let mut world = self.world_default();
+            let mut world: WorldStorage = self.world_default();
             assert(world.admin_dispatcher().am_i_admin(starknet::get_caller_address()), Errors::CALLER_NOT_ADMIN);
         }
 
@@ -465,7 +474,7 @@ pub mod pack_token {
             (pack)
         }
 
-        fn _mint_pack_duelists(ref self: ContractState,
+        fn _mint_opened_duelists(ref self: ContractState,
             ref store: Store,
             pack: Pack,
             recipient: ContractAddress,
