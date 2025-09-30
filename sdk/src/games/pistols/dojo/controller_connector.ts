@@ -74,47 +74,36 @@ export const makeControllerPolicies = (
   messageDescriptions: SignedMessagePolicyDescriptions,
 ): SessionPolicies => {
   const policies: SessionPolicies = {
-    contracts: _makeControllerContractPolicies(manifest, namespace, policyDescriptions),
+    // contracts: _makeControllerContractPoliciesFromManifest(manifest, namespace, policyDescriptions),
+    contracts: _makeControllerContractPoliciesFromGeneratedContants(manifest, namespace, policyDescriptions),
     messages: _makeControllerSignMessagePolicies(messageDescriptions),
   }
   return policies
 }
 
-const _makeControllerContractPolicies = (
+const _makeControllerContractPoliciesFromGeneratedContants = (
   manifest: DojoManifest,
   namespace: string,
   policyDescriptions: ContractPolicyDescriptions,
 ): ContractPolicies => {
   const contracts: ContractPolicies = {};
   Object.keys(policyDescriptions).forEach((name) => {
-    let contract_address
-    let methods: Method[] = []
-    // --- parse interfaces from abis
-    const desc = policyDescriptions[name]
+    // find contract
     const c = getContractByName(manifest, namespace, name)
-    // console.log(`CI:`, name, desc, c)
+    let contract_address = c?.address
+
+    // get methods from generated constants
+    let methods: Method[] = []
+    const desc = policyDescriptions[name];
     if (c && desc.interfaces) {
-      contract_address = c.address
-      c.abi.forEach((abi: InterfaceAbi) => {
-        // --- interfaces
-        const interfaceName = abi.name.split('::').slice(-1)[0]
-        // console.log(`CI:`, contractName, interfaceName)
-        if (abi.type == 'interface' && desc.interfaces.includes(interfaceName)) {
-          // --- functions
-          abi.items.forEach((i) => {
-            const entrypoint = i.name
-            if (i.type == 'function' && i.state_mutability == 'external' && !exclusions.includes(entrypoint)) {
-              // console.log(`CI:`, item.name, item)
-              const method = {
-                entrypoint,
-                // name: `${i.name}()`,
-                description: INTERFACE_DESCRIPTIONS[interfaceName]?.[entrypoint] ?? undefined,
-              }
-              methods.push(method)
-            }
+      desc.interfaces?.forEach((interfaceName) => {
+        Object.keys(INTERFACE_DESCRIPTIONS[interfaceName] ?? {}).forEach((entrypoint: string) => {
+          methods.push({
+            entrypoint,
+            description: INTERFACE_DESCRIPTIONS[interfaceName][entrypoint],
           })
-        }
-      })
+        })
+      });
     }
     // --- external contracts
     else if (desc.methods) {
@@ -134,6 +123,61 @@ const _makeControllerContractPolicies = (
   })
   return contracts
 }
+
+// const _makeControllerContractPoliciesFromManifest = (
+//   manifest: DojoManifest,
+//   namespace: string,
+//   policyDescriptions: ContractPolicyDescriptions,
+// ): ContractPolicies => {
+//   const contracts: ContractPolicies = {};
+//   Object.keys(policyDescriptions).forEach((name) => {
+//     let contract_address
+//     let methods: Method[] = []
+//     // --- parse interfaces from abis
+//     const desc = policyDescriptions[name]
+//     const c = getContractByName(manifest, namespace, name)
+//     // console.log(`CI:`, name, desc, c)
+//     if (c && desc.interfaces) {
+//       contract_address = c.address
+//       c.abi.forEach((abi: InterfaceAbi) => {
+//         // --- interfaces
+//         const interfaceName = abi.name.split('::').slice(-1)[0]
+//         // console.log(`CI:`, contractName, interfaceName)
+//         if (abi.type == 'interface' && desc.interfaces.includes(interfaceName)) {
+//           // --- functions
+//           abi.items.forEach((i) => {
+//             const entrypoint = i.name
+//             if (i.type == 'function' && i.state_mutability == 'external' && !exclusions.includes(entrypoint)) {
+//               // console.log(`CI:`, item.name, item)
+//               const method = {
+//                 entrypoint,
+//                 // name: `${i.name}()`,
+//                 description: INTERFACE_DESCRIPTIONS[interfaceName]?.[entrypoint] ?? undefined,
+//               }
+//               methods.push(method)
+//             }
+//           })
+//         }
+//       })
+//     }
+//     // --- external contracts
+//     else if (desc.methods) {
+//       contract_address = desc.contract_address
+//       desc.methods?.forEach((m) => {
+//         methods.push({ ...m })
+//       })
+//     }
+//     // create policy
+//     if (contract_address && methods.length > 0) {
+//       contracts[bigintToAddress(contract_address)] = {
+//         // name: desc.name,
+//         description: desc.description,
+//         methods,
+//       }
+//     }
+//   })
+//   return contracts
+// }
 
 
 //--------------------------------------
