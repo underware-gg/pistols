@@ -76,7 +76,7 @@ export function FormInputNumber({
   className?: string
 }) {
   const maxLength = useMemo(() => (maxValue.toString().length), [maxValue])
-  const style = useMemo(() => ({ width: `${maxLength}em` }), [maxLength])
+  const style = useMemo(() => ({ width: `${maxLength+1}em` }), [maxLength])
   const _setValue = (v: string) => {
     if (isNumber(v)) {
       const n = parseInt(v)

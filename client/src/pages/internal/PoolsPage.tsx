@@ -86,7 +86,7 @@ function Bank() {
   const [packCount, setPackCount] = useState(1)
   const [sponsorLords, setSponsorLords] = useState(1000)
 
-  const { fundedCount, priceLords, balanceLords } = useFundedStarterPackCount()
+  const { fundedCount, priceLords, poolBalanceLords } = useFundedStarterPackCount()
   const fundAmount = useMemo(() => (priceLords * BigInt(packCount)), [priceLords, packCount])
 
   const { fundedCount: duelistPackCount, priceLords: duelistPackPriceLords, balanceLords: duelistPackBalanceLords } = usePurchasedUnopenedDuelistPackCount()
@@ -120,7 +120,7 @@ function Bank() {
             <Balance lords wei={priceLords} size='big' />
           </Cell>
           <Cell className='Code' textAlign='left'>
-            <Balance lords wei={balanceLords} size='big' />
+            <Balance lords wei={poolBalanceLords} size='big' />
           </Cell>
         </Row>
         <Row className='ModalText'>

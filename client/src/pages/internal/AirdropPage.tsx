@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { BigNumberish } from 'starknet'
-import { Button, Checkbox, Container, Dropdown, Tab, Table, TabPane } from 'semantic-ui-react'
+import { Button, Container, Dropdown, Icon, Tab, Table, TabPane } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { bigintToDecimal } from '@underware/pistols-sdk/utils'
 import { useValidateWalletAddress } from '@underware/pistols-sdk/utils/hooks'
@@ -18,10 +18,13 @@ import { useFetchTokenBalancesOwnedByAccount } from '/src/queries/useTokenBalanc
 import { useDuelist, useFetchDuelistIdsOwnedByAccount } from '/src/stores/duelistStore'
 import { useHasClaimedRing } from '/src/hooks/usePistolsContractCalls'
 import { usePacksOwnedByAccount } from '/src/hooks/useTokenPacks'
+import { useFundedPackCount } from '/src/stores/bankStore'
 import { PlayerNameSync } from '/src/stores/sync/PlayerNameSync'
 import { StoreProgressBar } from '/src/stores/sync/StoreProgressBar'
 import { WalletAddressRow } from './AdminPage'
+import { FormInputNumber } from '/src/components/ui/Form'
 import { Address } from '/src/components/ui/Address'
+import { Balance } from '/src/components/account/Balance'
 import { Connect } from '/src/pages/tests/ConnectTestPage'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppDojo from '/src/components/AppDojo'
@@ -110,14 +113,19 @@ function AirDropperDuelists({
     setProfileKey(undefined);
   }, [packType])
 
+  // quantity + pools
+  const [quantity, setQuantity] = useState<number>(1)
+  const { fundedCount, priceLords, poolBalanceLords } = useFundedPackCount(packType)
+  const requiredFundedAmount = useMemo(() => (priceLords * BigInt(quantity)), [priceLords, quantity])
+
   const canAirdrop = useMemo(() => {
-    return address && packType && (
+    return address && packType && quantity > 0 && quantity <= fundedCount && (
       packType != constants.PackType.SingleDuelist || (collection && profileKey)
     )
-  }, [address, packType, collection, profileKey])
+  }, [address, packType, collection, profileKey, quantity, fundedCount])
 
   const _airdrop = useCallback(() => {
-    pack_token.airdrop(account, address, packType, collection, profileKey)
+    pack_token.airdrop(account, address, packType, collection, profileKey, quantity)
   }, [account, address, packType, collection, profileKey])
   return (
     <Table celled striped size='small'>
@@ -147,9 +155,38 @@ function AirDropperDuelists({
           </Cell>
         </Row>
         <Row>
+          <Cell className='Code'>
+            Quantity
+          </Cell>
+          <Cell>
+            <FormInputNumber
+              // label='Amount:'
+              value={quantity}
+              setValue={setQuantity}
+              minValue={1}
+              maxValue={1000}
+              fluid={false}
+            />
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <Icon name='arrow left' />
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <Balance lords wei={requiredFundedAmount} pre='Cost:' size='big' />
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <Icon name='arrow left' />
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <Balance lords wei={poolBalanceLords} pre='Funded:' size='big' />
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <Icon name='arrows alternate horizontal' />
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            ({fundedCount} available)
+          </Cell>
+        </Row>
+        <Row>
           <Cell></Cell>
           <Cell>
-            <Button disabled={!canAirdrop} onClick={_airdrop}>Airdrop...</Button>
+            <Button disabled={!canAirdrop} onClick={_airdrop}>
+              {quantity > fundedCount ? 'Not Funded!' : 'Airdrop...'}
+            </Button>
             &nbsp;&nbsp;
             <span className='Code'>
               [{packType}][{collection}][{profileKey}]

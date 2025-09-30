@@ -330,7 +330,7 @@ export function createSystemCalls(
         ]
         return await _executeTransaction(signer, calls, key)
       },
-      airdrop: async (signer: AccountInterface, recipient: BigNumberish, pack_type: constants.PackType, collection: constants.DuelistProfile | null, profile_key: DuelistProfileKey | null, key?: string): Promise<boolean> => {
+      airdrop: async (signer: AccountInterface, recipient: BigNumberish, pack_type: constants.PackType, collection: constants.DuelistProfile | null, profile_key: DuelistProfileKey | null, quantity: number, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [];
         // random packs need VRF
         if (pack_type == constants.PackType.GenesisDuelists5x || pack_type == constants.PackType.FreeDuelist) {
@@ -347,6 +347,7 @@ export function createSystemCalls(
             bigintToAddress(recipient),
             pack_type_enum,
             duelist_profile_option,
+            quantity,
           ),
         );
         return await _executeTransaction(signer, calls, key)
