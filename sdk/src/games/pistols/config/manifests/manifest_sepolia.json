@@ -4446,7 +4446,7 @@
     },
     {
       "address": "0x7aaa9866750a0db82a54ba8674c38620fa2f967d2fbb31133def48e0527c87f",
-      "class_hash": "0xb19f29c5260521e5de1749dd9d141093f0df1de6f88a239147956e4c0dbf6c",
+      "class_hash": "0x41e902842b8ba58ef98cea465fa71ad3fd1c1692a3e5ed94dfaa4d0a44ead27",
       "abi": [
         {
           "type": "impl",
@@ -7649,7 +7649,7 @@
     },
     {
       "address": "0x2c6a7c98a9dea8322b51018eef7be99ebedd209cebdaacb9f4c5bbf661c1cc9",
-      "class_hash": "0x607f782e7ab49392f13177299eebef0c5fa76783638e0f78af182491bcd2dcf",
+      "class_hash": "0x6c24ab6faab0702273997c240700d694e39b3662e8d1d7c9f7393e8143eac43",
       "abi": [
         {
           "type": "impl",
@@ -9763,7 +9763,7 @@
     },
     {
       "address": "0x71333ac75b7d5ba89a2d0c2b67d5b955258a4d46eb42f3428da6137bbbfdfd9",
-      "class_hash": "0x158b3e7eb75f16125684e373ae0cef3034e99386d54098f4b16bcbbcf6988ce",
+      "class_hash": "0x218dfc9de21d7555cc2c8c91fcf8eb4d4bbba4f09e6e95dfc6065111f454a82",
       "abi": [
         {
           "type": "impl",
@@ -10415,11 +10415,15 @@
                 {
                   "name": "duelist_profile",
                   "type": "core::option::Option::<pistols::types::duelist_profile::DuelistProfile>"
+                },
+                {
+                  "name": "quantity",
+                  "type": "core::integer::u32"
                 }
               ],
               "outputs": [
                 {
-                  "type": "core::integer::u128"
+                  "type": "core::array::Span::<core::integer::u128>"
                 }
               ],
               "state_mutability": "external"
