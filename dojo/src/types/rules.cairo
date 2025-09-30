@@ -109,13 +109,6 @@ pub impl RulesImpl of RulesTrait {
                 if (*bonus.dodge) { result.points_scored += 20; }
                 if (*bonus.kill_pace > 0) { result.points_scored += 10; }
                 else if (*bonus.hit) { result.points_scored += 5; }
-                //--------------------------------
-                // TEMP: zero points when dodge
-                // >> enable: test_calc_rewards_bonus()
-                if (is_winner && *bonus.dodge) {
-                    result.points_scored = 0;
-                }
-                //--------------------------------
             },
             Rules::Unranked |
             Rules::Undefined => {},
@@ -315,7 +308,6 @@ mod unit {
     }
 
     #[test]
-    #[ignore] // dodge points are disabled
     fn test_calc_rewards_bonus() {
         let bonus_paces_1 = DuelistBonus {
             kill_pace: 1,
