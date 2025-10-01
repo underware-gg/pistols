@@ -112,6 +112,21 @@ export const useDuelistCurrentSeasonScore = (duelist_id: BigNumberish) => {
   }
 }
 
+export const useDuelistSeasonScore = (duelist_id: BigNumberish, season_id: number) => {
+  const { seasonScoreboard } = useGetSeasonScoreboard(season_id);
+  const { position, points } = useMemo(() => {
+    const index = seasonScoreboard.findIndex(s => bigintEquals(s.duelistId, duelist_id));
+    return {
+      position: index + 1,
+      points: seasonScoreboard[index]?.points ?? 0,
+    }
+  }, [duelist_id, seasonScoreboard])
+  return {
+    position,
+    points,
+  }
+}
+
 
 
 //----------------------------------------

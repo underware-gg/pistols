@@ -19,7 +19,8 @@ import { ActionButton } from '/src/components/ui/Buttons'
 import { ChallengeTableSelectedDuelist } from '/src/components/ChallengeTable'
 import { DUELIST_CARD_WIDTH } from '/src/data/cardConstants'
 import { emitter } from '/src/three/game'
-import { useDuelistCurrentSeasonScore } from '/src/stores/scoreboardStore'
+import { useDuelistCurrentSeasonScore, useDuelistSeasonScore } from '/src/stores/scoreboardStore'
+import { useCurrentSeason, useSeason } from '/src/stores/seasonStore'
 
 interface DuelistCardProps extends InteractibleComponentProps {
   duelistId: number
@@ -36,6 +37,7 @@ interface DuelistCardProps extends InteractibleComponentProps {
   isCommitting?: boolean
   queueTimestampStart?: number
   showSeasonRank?: boolean
+  seasonId?: number
   isEnlisting?: boolean
   isWaitingToJoinQueue?: boolean
 
@@ -61,7 +63,8 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
   const { isAlive } = useDuelistFameBalance(props.duelistId)
   const { stackedDuelistIds, level } = useDuelistStack(props.duelistId)
 
-  const { points, position } = useDuelistCurrentSeasonScore(props.duelistId)
+  const { seasonName } = props.seasonId ? useSeason(props.seasonId) : useCurrentSeason()
+  const { points, position } = props.seasonId ? useDuelistSeasonScore(props.duelistId, props.seasonId) : useDuelistCurrentSeasonScore(props.duelistId)
   // console.log(`DUELIST SCORE:`, props.duelistId, position, points)
 
   // Animation states
@@ -339,10 +342,52 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
       }
       childrenInFront={
         <>
+          {(props.showSeasonRank || !props.isSmall) && (
+            <div 
+              className={`YesMouse`}
+              style={{
+                position: 'absolute',
+                top: 0,
+                right: 0,
+                transform: 'translate(30%, -35%)',
+                zIndex: 10,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: aspectWidth(props.width * 0.3),
+                height: aspectWidth(props.width * 0.3),
+                backgroundImage: `url("/images/ui/card_rank${position > 0 && position < 4 ? '_' + position : ''}.png")`,
+                backgroundSize: 'contain',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center',
+                filter: 'drop-shadow(0 0 5px rgba(255, 215, 0, 0.2))',
+                cursor: !props.isSmall ? 'pointer' : 'default',
+                transition: 'filter 0.3s ease, transform 0.5s ease'
+              }}
+              onMouseEnter={() => emitter.emit('hover_description', position === 0 ? `Duelist not ranked in ${seasonName}` : `Duelists rank in ${seasonName} is ${position}`)}
+              onMouseLeave={() => emitter.emit('hover_description', null)}
+              
+            >
+              <span className={numberAnimationClass} style={{
+                fontWeight: 'bold',
+                fontSize: aspectWidth(props.width * 0.1),
+                color: 'white',
+                textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000',
+                fontFamily: 'Garamond',
+                position: 'relative',
+                top: aspectWidth(props.width * -0.02),
+                display: 'inline-block',
+                transformOrigin: 'center center',
+                transition: 'text-shadow 0.3s ease, color 0.3s ease',
+              }}>
+                {position === 0 ? '-' : position === 1 ? '1st' : position === 2 ? '2nd' : position === 3 ? '3rd' : position}
+              </span>
+            </div>
+          )}
           {showSouls && (
             isNewDuelist ? (
               <div 
-                className={`duelist-new-badge YesMouse ${newBadgeAnimationClass}`}
+                className={`YesMouse ${newBadgeAnimationClass}`}
                 style={{
                   position: 'absolute',
                   top: 0,
@@ -379,7 +424,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
               </div>
             ) : (
               <div 
-                className={`duelist-card-top-right YesMouse ${soulsAnimationClass}`}
+                className={`YesMouse ${soulsAnimationClass}`}
                 style={{
                   position: 'absolute',
                   top: 0,
@@ -564,12 +609,6 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
                 >
                   {props.isEnlisting ? 'Enlisting...' : props.isCommitting ? 'Commiting...' : props.queueTimestampStart ? 'Searching for Match...' : props.showDuelDurationTimer ? 'Playing duel...' : props.isWaitingToJoinQueue ? 'Ready to queue...' : 'Waiting in Line...'}
                 </div>
-
-                {props.showSeasonRank && (
-                <div className="duelist-name small no-margin" data-contentlength={_nameLength(playerName)}>
-                    {`Rank: ${position}`}
-                  </div>
-                )}
               </div>
             ) : (
               // Regular duelist details
@@ -596,9 +635,6 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
                     <FameLivesDuelist duelistId={props.duelistId} overrideFame={props.overrideFame} fame={props.fame} />
                   </div>
                   <FameProgressBar duelistId={props.duelistId} width={props.width * 0.8} height={props.height * 0.1} hideValue overrideFame={props.overrideFame} fame={props.fame} />
-                  <div className="duelist-name small" data-contentlength={_nameLength(playerName)}>
-                    {props.showSeasonRank ? `Rank: ${position}` : playerName}
-                  </div>
                   </>
                 )
               ) : (
@@ -615,14 +651,12 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
                       <Grid className='NoMargin'>
                         <GridRow>
                           <GridColumn className='Bold' textAlign='left' width={5}>
-                            {props.showSeasonRank ? 'Rank:' : 'Owner:'}
+                            Owner:
                           </GridColumn>
                           <GridColumn className="Anchor Black" textAlign='right' width={11} onClick={() => {
-                            if (!props.showSeasonRank) {
-                              dispatchSelectPlayerAddress(owner)
-                            }
+                            dispatchSelectPlayerAddress(owner)
                           }}>
-                            {props.showSeasonRank ? position : playerName}
+                            {playerName}
                           </GridColumn>
                         </GridRow>
                         <GridRow>
