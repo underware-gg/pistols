@@ -126,7 +126,8 @@ function AirDropperDuelists({
 
   const _airdrop = useCallback(() => {
     pack_token.airdrop(account, address, packType, collection, profileKey, quantity)
-  }, [account, address, packType, collection, profileKey])
+  }, [account, address, packType, collection, profileKey, quantity])
+
   return (
     <Table celled striped size='small'>
       <Body>
