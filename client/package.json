@@ -37,6 +37,7 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/material": "^7.0.2",
+    "@starknet-io/get-starknet-core": "catalog:",
     "@starknet-react/chains": "catalog:",
     "@starknet-react/core": "catalog:",
     "@tanstack/react-query": "catalog:",
@@ -45,7 +46,6 @@
     "dexie": "^4.0.11",
     "dexie-react-hooks": "^1.1.7",
     "event-emitter": "^0.3.5",
-    "@starknet-io/get-starknet-core": "catalog:",
     "immer": "catalog:",
     "lil-gui": "^0.19.2",
     "react": "catalog:",
@@ -80,7 +80,7 @@
     "typescript": "catalog:",
     "vite": "^6.0.5",
     "vite-plugin-glsl": "^1.5.0",
-    "vite-plugin-mkcert": "^1.17.6",
+    "vite-plugin-mkcert": "^1.17.8",
     "vitest": "^3.0.5"
   },
   "engines": {
