@@ -5,6 +5,8 @@ import { useSettings } from '/src/hooks/SettingsContext'
 import { InteractibleComponent, InteractibleComponentHandle } from '/src/components/InteractibleComponent'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { CardColor } from '@underware/pistols-sdk/pistols/constants'
+import { SceneName } from '/src/data/assets'
+import { usePistolsScene } from '/src/hooks/PistolsContext'
 
 export interface ModeSelectModalProps {
   opener: Opener
@@ -182,11 +184,15 @@ export default function ModeSelectModal({ opener }: ModeSelectModalProps) {
 function _ModeSelectModal({ opener }: ModeSelectModalProps) {
   const { selectedMode, dispatchSetting, SettingsActions } = useSettings()
   const { aspectWidth, aspectHeight } = useGameAspect()
-
+  const { dispatchSetScene } = usePistolsScene()
+  
   const handleModeSelect = (modeId: string) => {
     dispatchSetting(SettingsActions.SELECTED_MODE, modeId)
     setTimeout(() => {
       opener.close()
+      if (modeId !== 'singleplayer') {
+        dispatchSetScene(SceneName.Matchmaking)
+      }
     }, 300)
   }
 

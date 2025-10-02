@@ -296,7 +296,7 @@ export const Header = memo(function Header() {
       <VisibilityWrapper visible={show}>
         <>
           <div className='UIHeader NoMouse NoDrag NoSelection' style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <CurtainUI visible={!atTavern && !atTutorial && !atCardPacks && !atLeaderboards && !atMatchmaking} short={true} />
+            <CurtainUI visible={!atTavern && !atTutorial && !atLeaderboards && !atMatchmaking} short={true} />
             <BannerButton button={<SettingsGearButton size='big'/>} visible={atTavern || atProfile} right={true} />
           </div>
           <Image className='NoMouse NoDrag NoSelection' src='/images/ui/tavern/wooden_corners.png' style={{ position: 'absolute' }} />
@@ -397,7 +397,7 @@ const CurtainUI = memo(function CurtainUI({
   visible?: boolean
 }) {
 
-  const { atProfile, atDuelists, atDuelsBoard, atGraveyard, atDuelistBook } = usePistolsScene()
+  const { atProfile, atDuelists, atDuelsBoard, atGraveyard, atDuelistBook, atCardPacks } = usePistolsScene()
   const { aspectWidth } = useGameAspect()
   const {
     walletFinderOpener,
@@ -472,7 +472,7 @@ const CurtainUI = memo(function CurtainUI({
     <div style={{ position: 'absolute', top: aspectWidth(offset), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <Image className='NoMouse NoDrag NoSelection' src='/images/ui/tavern/curtain.png' />
       <div className='YesMouse' style={{ position: 'absolute', bottom: '10%', width: '60%', height: aspectWidth(8), display: 'flex', alignItems: 'center', justifyContent: 'center', paddingBottom: aspectWidth(1) }}>
-        <VisibilityWrapper visible={atProfile}>
+        <VisibilityWrapper visible={atProfile || atCardPacks}>
           <WalletHeader />
         </VisibilityWrapper>
         

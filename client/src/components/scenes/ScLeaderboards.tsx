@@ -374,6 +374,8 @@ const LeaderboardPodium = memo(({
               isVisible instantFlip instantVisible 
               isFlipped isHighlightable 
               duelistId={Number(duelistId)}
+              showSeasonRank={true}
+              seasonId={selectedSeasonId}
               onClick={() => dispatchSelectDuelistId(duelistId)}
             />
           </div>

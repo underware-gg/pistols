@@ -43,6 +43,8 @@ export default function ScDuelists() {
     ))
   }, [matchmakingPlayerAddresses, currentChallenges])
 
+  const lastSelectedModeRef = useRef(selectedMode)
+
   // useEffect(() => {
   //   console.log(`matchmaking:`, matchmakingPlayerIds, challengePlayerMap, availableMatchmakingPlayers)
   // }, [matchmakingPlayerIds, challengePlayerMap, availableMatchmakingPlayers])
@@ -95,6 +97,13 @@ export default function ScDuelists() {
     if (selectedMode) {
       (_currentScene as InteractibleScene).setLayerVariant(TextureName.bg_duelists_matchmaking_unranked, selectedMode)
     }
+    if (selectedMode === 'singleplayer' && lastSelectedModeRef.current !== 'singleplayer') {
+      setTimeout(() => {
+        dispatchChallengingPlayerAddress(botPlayerContractAddress);
+        duelistSelectOpener.open();
+      }, 300)
+    }
+    lastSelectedModeRef.current = selectedMode
   }, [selectedMode])
 
   const [pageNumber, setPageNumber] = useState(0)

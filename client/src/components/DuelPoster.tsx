@@ -473,6 +473,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
                   isHighlightable={true}
                   width={DUELIST_CARD_WIDTH}
                   height={DUELIST_CARD_HEIGHT}
+                  showSeasonRank={duelType === constants.DuelType.Ranked}
                   onClick={() => {
                     if ((leftDuelistId && state != constants.ChallengeState.Awaiting) || isChallenger) {
                       dispatchSelectDuelistId(leftDuelistId)
@@ -554,6 +555,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
                   isHighlightable={true}
                   width={DUELIST_CARD_WIDTH}
                   height={DUELIST_CARD_HEIGHT}
+                  showSeasonRank={duelType === constants.DuelType.Ranked}
                   onClick={() => dispatchSelectDuelistId(rightDuelistId)}
                 />
               ) : null}
