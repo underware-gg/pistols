@@ -11,6 +11,7 @@ export default defineConfig({
     "src/exports/fix.ts",
     "src/exports/hooks.ts",
     "src/exports/pistols.ts",
+    "src/exports/pistols_cached.ts",
     "src/exports/pistols_config.ts",
     "src/exports/pistols_components.ts",
     "src/exports/pistols_constants.ts",

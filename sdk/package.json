@@ -19,6 +19,7 @@
     "publish": "npm publish --access public"
   },
   "bin": {
+    "cache-players": "dist/bin/cachePlayers.mjs",
     "generate-constants": "dist/bin/generateConstants.cjs",
     "generate-controller-preset": "dist/bin/generateControllerPreset.mjs",
     "test-get-events": "dist/bin/testStarknetGetEvents.mjs"
@@ -63,6 +64,10 @@
     "./pistols": {
       "import": "./dist/pistols.js",
       "types": "./dist/pistols.d.ts"
+    },
+    "./pistols/cached": {
+      "import": "./dist/pistols_cached.js",
+      "types": "./dist/pistols_cached.d.ts"
     },
     "./pistols/config": {
       "import": "./dist/pistols_config.js",
@@ -138,10 +143,10 @@
     "@dojoengine/sdk": "catalog:",
     "@dojoengine/torii-client": "catalog:",
     "@dojoengine/utils": "catalog:",
+    "@starknet-io/get-starknet-core": "catalog:",
     "@starknet-react/chains": "catalog:",
     "@starknet-react/core": "catalog:",
     "@tanstack/react-query": "catalog:",
-    "@starknet-io/get-starknet-core": "catalog:",
     "immer": "catalog:",
     "react": "catalog:",
     "starknet": "catalog:",

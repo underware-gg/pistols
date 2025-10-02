@@ -23,6 +23,9 @@
     "jsx": "preserve",
     "outDir": "dist",
     "rootDir": "src",
+    // node typescript support
+    // "noEmit": true,
+    // "allowImportingTsExtensions": true,
     // allow absolute paths: import {} from 'src/*'
     "baseUrl": "./",
     "paths": {
