@@ -5,24 +5,24 @@ use pistols::types::rules::{RewardValues};
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
 pub enum Activity {
     Undefined,          // 0
-    TutorialFinished,   // 1
-    PackStarter,        // 2
-    PackPurchased,      // 3
-    PackOpened,         // 4
-    DuelistSpawned,     // 5
-    DuelistDied,        // 6
-    ChallengeCreated,   // 7
-    ChallengeCanceled,  // 8
-    ChallengeReplied,   // 9
-    MovesCommitted,     // 10
-    MovesRevealed,      // 11
-    PlayerTimedOut,     // 12
-    ChallengeResolved,  // 13
-    ChallengeDraw,      // 14
-    ClaimedGift,        // 15
-    AirdroppedPack,     // 16
-    ClaimedRing,        // 17
-    EnlistedRankedDuelist, // 18
+    TutorialFinished,   // 1        identifier: -
+    PackStarter,        // 2        identifier: pack_id
+    PackPurchased,      // 3        identifier: pack_id
+    PackOpened,         // 4        identifier: pack_id
+    DuelistSpawned,     // 5        identifier: duelist_id
+    DuelistDied,        // 6        identifier: duelist_id
+    ChallengeCreated,   // 7        identifier: duel_id
+    ChallengeCanceled,  // 8        identifier: duel_id
+    ChallengeReplied,   // 9        identifier: duel_id
+    MovesCommitted,     // 10       identifier: duel_id
+    MovesRevealed,      // 11       identifier: duel_id
+    PlayerTimedOut,     // 12       identifier: duel_id
+    ChallengeResolved,  // 13       identifier: duel_id
+    ChallengeDraw,      // 14       identifier: duel_id
+    ClaimedGift,        // 15       identifier: pack_id
+    AirdroppedPack,     // 16       identifier: pack_id
+    ClaimedRing,        // 17       identifier: ring_id
+    EnlistedRankedDuelist, // 18    identifier: duelist_id
 }
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]

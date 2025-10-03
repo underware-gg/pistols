@@ -2,10 +2,33 @@ import React, { useEffect, useMemo } from 'react'
 import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
 import { useAllPlayersActivityFeed, ActivityState } from '/src/stores/eventsHistoricalStore'
 import { useCallToChallenges } from '/src/stores/eventsModelStore'
-import { useChallenge } from '/src/stores/challengeStore'
+import { useChallenge, useFetchChallengeIds } from '/src/stores/challengeStore'
+import { useFetchDuelistsByIds } from '/src/stores/duelistStore'
 import { ChallengeLink, DuelistLink, PlayerLink, TimestampDeltaElapsed } from '/src/components/Links'
 import { ChallengeStateReplyVerbs } from '/src/utils/pistols'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
+
+const activityIdentifiers: Record<constants.Activity, 'pack_id' | 'duelist_id' | 'duel_id' | 'ring_id' | null> = {
+  [constants.Activity.Undefined]: null,
+  [constants.Activity.TutorialFinished]: 'pack_id',
+  [constants.Activity.PackStarter]: 'pack_id',
+  [constants.Activity.PackPurchased]: 'pack_id',
+  [constants.Activity.PackOpened]: 'pack_id',
+  [constants.Activity.DuelistSpawned]: 'duelist_id',
+  [constants.Activity.DuelistDied]: 'duelist_id',
+  [constants.Activity.ChallengeCreated]: 'duel_id',
+  [constants.Activity.ChallengeCanceled]: 'duel_id',
+  [constants.Activity.ChallengeReplied]: 'duel_id',
+  [constants.Activity.MovesCommitted]: 'duel_id',
+  [constants.Activity.MovesRevealed]: 'duel_id',
+  [constants.Activity.PlayerTimedOut]: 'duel_id',
+  [constants.Activity.ChallengeResolved]: 'duel_id',
+  [constants.Activity.ChallengeDraw]: 'duel_id',
+  [constants.Activity.ClaimedGift]: 'pack_id',
+  [constants.Activity.AirdroppedPack]: 'pack_id',
+  [constants.Activity.ClaimedRing]: 'ring_id',
+  [constants.Activity.EnlistedRankedDuelist]: 'duelist_id',
+}
 
 export default function ActivityFeed() {
   const { allPlayersActivity } = useAllPlayersActivityFeed()
@@ -23,6 +46,26 @@ export default function ActivityFeed() {
       isRequired={requiredDuelIds.includes(a.identifier)}
     />)
   ), [allPlayersActivity, clientSeconds, requiredDuelIds])
+
+  // prefetch duels to show them in the activity feed
+  const { currentDuelIds, currentDuelistIds } = useMemo(() => {
+    const currentDuelIds = new Set<bigint>();
+    const currentDuelistIds = new Set<bigint>();
+    allPlayersActivity.forEach((activity) => {
+      if (activityIdentifiers[activity.activity] == 'duel_id') {
+        currentDuelIds.add(activity.identifier)
+      }
+      if (activityIdentifiers[activity.activity] == 'duelist_id') {
+        currentDuelistIds.add(activity.identifier)
+      }
+    });
+    return {
+      currentDuelIds: Array.from(currentDuelIds),
+      currentDuelistIds: Array.from(currentDuelistIds),
+    }
+  }, [allPlayersActivity])
+  useFetchChallengeIds(currentDuelIds);
+  useFetchDuelistsByIds(currentDuelistIds);
 
   return (
     <div className='FillParent'>
