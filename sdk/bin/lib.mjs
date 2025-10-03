@@ -3,16 +3,16 @@
 // misc functions
 //
 export const _log = (...args) => {
-  console.log(`--- `, ...args);
+  console.log(`---`, ...args);
 }
 export const _error = (message) => {
-  console.error(`>>> ${message}`);
+  console.error(`!!! ${message}`);
 }
 export const _exit = (messages = 'Bye') => {
   console.error(``);
-  console.error(`>>> EXIT...`);
+  console.error(`!!! EXIT...`);
   (Array.isArray(messages) ? messages : [messages]).forEach(m => {
-    if (m) console.error(`>>> ${m}`);
+    if (m) console.error(`!!! ${m}`);
   });
   console.error(``);
   process.exit(0);

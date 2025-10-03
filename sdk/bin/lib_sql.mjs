@@ -77,8 +77,26 @@ and B.token_id=T.token_id
 group by T.token_id
 order by B.token_id asc
 `;
-  console.log(`getTokenBalances(${contractAddress}):`, query);
+  console.log(`>>> SQL: getTokenBalances(${contractAddress}):`, query);
   const response = await queryToriiSql(sqlUrl, query, formatFnTokenBalance);
   // console.log(`getTokenBalances(${contractAddress}):`, response);
+  return response;
+};
+
+
+//------------------------------------------------
+// Controller accounts
+//
+
+// export const getTokenBalances = async (contractAddress: string, networkId: NetworkId): Promise<torii_TokenBalance[] | null> => {
+export const getControllerAccounts = async (sqlUrl) => {
+  const query = `
+select username,address
+from controllers
+order by username asc
+`;
+  console.log(`>>> SQL: getControllerAccounts():`, query);
+  const response = await queryToriiSql(sqlUrl, query, (row) => row);
+  // console.log(`getControllerAccounts():`, response);
   return response;
 };

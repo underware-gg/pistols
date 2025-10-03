@@ -3,7 +3,7 @@
 // import { getContractByName } from '@dojoengine/core';
 import { NetworkId, getNetworkConfig, getDuelistTokenAddress, getManifest, NAMESPACE } from '../pistols_config.js';
 import { bigintToAddress, bigintToNumber } from '../utils.js';
-import { getTokenBalances } from './lib_sql.mjs';
+import { getTokenBalances, getControllerAccounts } from './lib_sql.mjs';
 import { _log, _error, _stringify } from './lib.mjs';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -41,9 +41,9 @@ async function cacheTokenBalances(contractName, contractAddress) {
   try {
     token_balances = await getTokenBalances(contractAddress, networkConfig.sqlUrl);
   } catch (error) {
-    _error(`[cachePlayers/${contractName}] error: ${error.toString()}`);
+    _error(`[cacheTokenBalances/${contractName}] error: ${error.toString()}`);
   }
-  _log(`[cachePlayers/${contractName}] token_balances:`, token_balances.length);
+  _log(`[cacheTokenBalances/${contractName}] token_balances:`, token_balances.length);
   //
   // sort by player...
   for (const token_balance of token_balances) {
@@ -60,6 +60,24 @@ async function cacheTokenBalances(contractName, contractAddress) {
   }
 }
 
+async function cacheControllerAccounts() {
+  let controller_accounts = [];
+  try {
+    controller_accounts = await getControllerAccounts(networkConfig.sqlUrl);
+  } catch (error) {
+    _error(`[cacheControllerAccounts] error: ${error.toString()}`);
+  }
+  _log(`[cacheControllerAccounts] controller_accounts:`, controller_accounts.length);
+  //
+  // fill in players...
+  for (const controller_account of controller_accounts) {
+    let player_address = bigintToAddress(controller_account.address);
+    if (player_data[player_address]) {
+      player_data[player_address].username = controller_account.username;
+    }
+  }
+}
+
 
 //--------------------------------
 // Cache data...
@@ -68,9 +86,11 @@ await cacheTokenBalances(
   'duelist_token',
   getDuelistTokenAddress(networkId),
 );
+await cacheControllerAccounts();
 
 // console.log(`[cachePlayers] player_data:`, player_data);
-console.log(`[cachePlayers] player_data:`, Object.keys(player_data).length);
+console.log(`[cachePlayers] players:`, Object.keys(player_data).length);
+console.log(`[cachePlayers] controllers:`, Object.values(player_data).filter(player => player.username !== null).length);
 
 
 
