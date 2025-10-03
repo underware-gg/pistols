@@ -139,6 +139,7 @@ export const useFameBalance = (address: BigNumberish) => {
     balance_eth: weiToEth(balance),
     lives,
     isAlive: (lives > 0),
+    isLoading: (balance == null),
   }
 }
 

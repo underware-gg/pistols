@@ -112,7 +112,7 @@ export function LoadingIcon({
     <Icon
       className={`ViewCentered NoPadding ${className}`}
       loading
-      name='circle notch'
+      name='spinner'
       size={size}
       style={style}
     />)

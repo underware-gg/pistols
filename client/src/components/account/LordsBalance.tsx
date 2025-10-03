@@ -50,9 +50,9 @@ export const LordsBalance = ({
   size = null,
   decimals = undefined,
 }) => {
-  const { balance } = useLordsBalance(address, 0n)
+  const { balance, isLoading } = useLordsBalance(address, 0n)
   return (
-    <Balance lords size={size} wei={balance} pre={pre} post={post} clean={clean} decimals={decimals} />
+    <Balance lords size={size} wei={balance} pre={pre} post={post} clean={clean} decimals={decimals} isLoading={isLoading} />
   )
 }
 
@@ -67,9 +67,9 @@ export const FoolsBalance = ({
   address: BigNumberish
   size?: IconSizeProp
 }) => {
-  const { balance } = useFoolsBalance(address)
+  const { balance, isLoading } = useFoolsBalance(address)
   return (
-    <Balance fools size={size} wei={balance} />
+    <Balance fools size={size} wei={balance} isLoading={isLoading} />
   )
 }
 
@@ -83,9 +83,9 @@ export const FameBalance = ({
   address: BigNumberish
   size?: IconSizeProp
 }) => {
-  const { balance } = useFameBalance(address)
+  const { balance, isLoading } = useFameBalance(address)
   return (
-    <Balance fame size={size} wei={balance} />
+    <Balance fame size={size} wei={balance} isLoading={isLoading} />
   )
 }
 
@@ -99,9 +99,9 @@ export const FameBalanceDuelist = ({
   duelistId: BigNumberish
   size?: IconSizeProp
 }) => {
-  const { balance } = useDuelistFameBalance(duelistId)
+  const { balance, isLoading } = useDuelistFameBalance(duelistId)
   return (
-    <Balance fame size={size} wei={balance} />
+    <Balance fame size={size} wei={balance} isLoading={isLoading} />
   )
 }
 export const FameLivesDuelist = ({
@@ -115,12 +115,12 @@ export const FameLivesDuelist = ({
   overrideFame?: boolean
   fame?: bigint
 }) => {
-  const { balance } = useDuelistFameBalance(duelistId)
+  const { balance, isLoading } = useDuelistFameBalance(duelistId)
   const _fame = useMemo(() => {
     return overrideFame ? fame : balance
   }, [overrideFame, fame, balance])
   return (
-    <Balance fame size={size} wei={_fame / 1000n} />
+    <Balance fame size={size} wei={_fame / 1000n} isLoading={isLoading} />
   )
 }
 

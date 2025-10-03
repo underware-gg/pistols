@@ -1,6 +1,6 @@
 import { ReactNode, useMemo } from 'react'
 import { BigNumberish } from 'starknet'
-import { CustomIcon, EmojiIcon, IconSizeProp } from '/src/components/ui/Icons'
+import { CustomIcon, EmojiIcon, IconSizeProp, LoadingIcon } from '/src/components/ui/Icons'
 import { ethToWei, weiToEthString } from '@underware/pistols-sdk/starknet'
 import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
 import { useGameAspect } from '/src/hooks/useGameAspect'
@@ -57,6 +57,7 @@ export function Balance({
   pre = null,
   post = null,
   children = null,
+  isLoading = false,
   placeholdder = '?',
 }: {
   ether?: boolean
@@ -74,19 +75,21 @@ export function Balance({
   pre?: string
   post?: string
   placeholdder?: string | number
+  isLoading?: boolean
   children?: ReactNode
 }) {
   const { aspectWidth } = useGameAspect()
 
-  const _value = useMemo<string>(() => {
+  const _value = useMemo<string | React.JSX.Element>(() => {
     const _decimals = decimals ?? (ether ? 6 : 0)
     const result = (
-      wei != null ? weiToEthString(wei, _decimals)
-        : eth != null ? weiToEthString(ethToWei(eth), _decimals)
-          : ''
+      isLoading ? <LoadingIcon />
+        : wei != null ? weiToEthString(wei, _decimals)
+          : eth != null ? weiToEthString(ethToWei(eth), _decimals)
+            : ''
     )
     return fools ? result : ((result == '0' || result == '0.0') ? EMOJIS.ZERO : result)
-  }, [decimals, eth, wei])
+  }, [decimals, eth, wei, isLoading])
 
   const classNames = useMemo(() => {
     let result = []

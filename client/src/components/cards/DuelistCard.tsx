@@ -60,7 +60,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
   
   useFetchDuelist(props.duelistId)
   const { nameAndId: name, profilePic, profileType, isInAction, totals, quote, currentDuelId } = useDuelist(props.duelistId)
-  const { isAlive } = useDuelistFameBalance(props.duelistId)
+  const { isAlive, isLoading: isFameLoading } = useDuelistFameBalance(props.duelistId)
   const { stackedDuelistIds, level } = useDuelistStack(props.duelistId)
 
   const { seasonName } = props.seasonId ? useSeason(props.seasonId) : useCurrentSeason()
@@ -337,7 +337,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
               removeShadow 
             />
           </div>
-          <img id='DuelistDeadOverlay' className={ `Left ${!isAlive ? 'visible' : ''}`} src='/textures/cards/card_disabled.png' />
+          <img id='DuelistDeadOverlay' className={ `Left ${(!isAlive && !isFameLoading) ? 'visible' : ''}`} src='/textures/cards/card_disabled.png' />
         </>
       }
       childrenInFront={
