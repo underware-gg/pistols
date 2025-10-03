@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 // import { RpcProvider } from 'starknet';
-import { getContractByName } from '@dojoengine/core';
+// import { getContractByName } from '@dojoengine/core';
 import { NetworkId, getNetworkConfig, getDuelistTokenAddress, getManifest, NAMESPACE } from '../pistols_config.js';
 import { bigintToAddress, bigintToNumber } from '../utils.js';
-import { _log, _error, getTokenBalances } from './lib.mjs';
+import { getTokenBalances } from './lib_sql.mjs';
+import { _log, _error, _stringify } from './lib.mjs';
 import * as path from 'path';
 import * as fs from 'fs';
 
@@ -49,11 +50,13 @@ async function cacheTokenBalances(contractName, contractAddress) {
     let player_address = bigintToAddress(token_balance.account_address);
     if (!player_data[player_address]) {
       player_data[player_address] = {
-        username: undefined,
+        username: null,
         duelist_ids: [],
+        iso_timestamp: '',
       };
     }
     player_data[player_address].duelist_ids.push(bigintToNumber(token_balance.token_id));
+    player_data[player_address].iso_timestamp = token_balance.iso_timestamp;
   }
 }
 
@@ -74,23 +77,12 @@ console.log(`[cachePlayers] player_data:`, Object.keys(player_data).length);
 //--------------------------------
 // Save...
 //
-const outputPath = path.resolve('./src/games/pistols/cached/data/player_data.json');
-fs.writeFile(outputPath, _stringify(player_data), (err) => {
+const playerDataPath = path.resolve('./src/games/pistols/cached/data/player_data.json');
+fs.writeFile(playerDataPath, _stringify(player_data), (err) => {
   if (err) {
     console.error("ERROR: error writing file:", err);
   } else {
-    console.log("Constants file generated successfully:", outputPath);
+    console.log("Constants file generated successfully:", playerDataPath);
   }
 });
 
-function _stringify(obj) {
-  return JSON.stringify(obj, function (k, v) {
-    if (v instanceof Array)
-      return JSON.stringify(v);
-    return v;
-  }, 2).replace(/\\/g, '')
-    .replace(/\"\[/g, '[')
-    .replace(/\]\"/g, ']')
-    .replace(/\"\{/g, '{')
-    .replace(/\}\"/g, '}');
-}

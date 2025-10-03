@@ -2,6 +2,7 @@
   "$schema": "https://turbo.build/schema.json",
   "tasks": {
     "build": {
+      "outputLogs": "errors-only",
       "dependsOn": [
         "^build"
       ],
