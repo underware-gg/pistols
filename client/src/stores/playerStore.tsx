@@ -43,10 +43,12 @@ interface State {
   players_online: OnlineStateByAccount,
   player_bookmarks: PlayerBookmarksByAccount,
   token_bookmarks: TokenBookmarksByAccount,
+  //setters
   updateUsernames: (usernames: Map<string, string>) => void;
+  updateMessages: (entities: PistolsEntity[]) => void;
+  // getters
   getPlayernameFromAddress: (address: BigNumberish) => string | undefined;
   getAddressFromPlayername: (name: string) => BigNumberish | undefined;
-  updateMessages: (entities: PistolsEntity[]) => void;
 }
 
 const _playerKey = (address: BigNumberish | undefined): string | null => (

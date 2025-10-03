@@ -1,8 +1,9 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { lookupAddresses } from '@cartridge/controller'
 import { usePlayersAccounts, usePlayerDataStore } from '/src/stores/playerStore'
 import { useDojoSetup, useConnectedController } from '@underware/pistols-sdk/dojo'
 import { supportedConnetorIds } from '@underware/pistols-sdk/pistols/config'
+import { cachedPlayerData } from '@underware/pistols-sdk/pistols/cached'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { debug } from '@underware/pistols-sdk/pistols'
 
@@ -12,9 +13,21 @@ import { debug } from '@underware/pistols-sdk/pistols'
 //
 export function PlayerNameSync() {
   const updateUsernames = usePlayerDataStore((state) => state.updateUsernames)
-  const players_names = usePlayerDataStore((state) => state.players_names)
-  const { playersAccounts } = usePlayersAccounts()
 
+  const [isInitialized, setIsInitialized] = useState(false)
+  useEffect(() => {
+    const usernames = Object.keys(cachedPlayerData).reduce((acc, player_address) => {
+      const username = cachedPlayerData[player_address].username;
+      if (username) acc.set(player_address, username);
+      return acc
+    }, new Map<string, string>())
+    updateUsernames(usernames)
+    setIsInitialized(true)
+  }, [])
+
+  // fetch names for new players
+  const { playersAccounts } = usePlayersAccounts()
+  const players_names = usePlayerDataStore((state) => state.players_names)
   const newPlayerAddresses = useMemo(() => (
     playersAccounts
       .filter(p => players_names[p] === undefined)
@@ -26,7 +39,7 @@ export function PlayerNameSync() {
   const { selectedNetworkConfig } = useDojoSetup()
 
   useEffect(() => {
-    if (newPlayerAddresses.length == 0) return
+    if (newPlayerAddresses.length == 0 || !isInitialized) return
     if (connectorId == supportedConnetorIds.PREDEPLOYED) {
       // use predeployed accounts
       updateUsernames(
@@ -43,7 +56,7 @@ export function PlayerNameSync() {
         updateUsernames(result)
       })
     } 
-  }, [newPlayerAddresses, connectorId, isControllerConnected, selectedNetworkConfig])
+  }, [newPlayerAddresses, connectorId, isControllerConnected, selectedNetworkConfig, isInitialized])
 
   return (<></>)
 }
