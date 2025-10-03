@@ -22,7 +22,11 @@ interface State {
   tokens: Record<string, TokenState>,
   resetStore: () => void;
   setBalances: (balances: torii.TokenBalance[]) => void;
+  // setter for cached player data
+  addCachedPlayerTokens: (accountAddress: BigNumberish, tokenIds: BigNumberish[]) => void;
+  // setter for queries and subscriptions
   updateBalance: (balance: torii.TokenBalance) => void;
+  // getters
   getTokenIdsOwnedByAccount: (accountAddress: BigNumberish) => bigint[] | undefined | null;
   getTokenIdsOwnedByAccounts: (accountAddresses: BigNumberish[]) => bigint[] | undefined | null;
   getOwnerOfTokenId: (tokenId: BigNumberish) => bigint | undefined | null;
@@ -54,6 +58,14 @@ const createStore = (tokenName: string) => {
       set((state: State) => {
         state.tokens = {}
       })
+    },
+    addCachedPlayerTokens: (accountAddress: BigNumberish, tokenIds: BigNumberish[]) => {
+      set((state: State) => {
+        const owner = BigInt(accountAddress);
+        tokenIds.forEach((tokenId) => {
+          state.tokens[_tokenKey(tokenId)] = { owner }
+        })
+      });
     },
     setBalances: (balances: torii.TokenBalance[]) => {
       // console.log(`tokenStore(${get().tokenName}) SET:`, balances)

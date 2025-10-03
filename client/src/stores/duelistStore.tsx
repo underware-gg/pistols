@@ -18,6 +18,8 @@ import { CharacterType } from '/src/data/assets'
 import { ArchetypeNames } from '/src/utils/pistols'
 import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
 import { debug } from '@underware/pistols-sdk/pistols'
+import { useFetchTokenboundAccountsBalances } from './coinStore'
+import { useTokenContracts } from '../hooks/useTokenContracts'
 
 export const useDuelistStore = createDojoStore<PistolsSchemaType>();
 export const useDuelistStackStore = createDojoStore<PistolsSchemaType>();
@@ -398,6 +400,10 @@ export const useFetchDuelist = (duelist_id: BigNumberish, retryInterval?: number
 }
 
 export const useFetchDuelistsByIds = (duelistIds: BigNumberish[], retryInterval?: number) => {
+  // always fetch duelists fame
+  const { duelistContractAddress, fameContractAddress } = useTokenContracts()
+  useFetchTokenboundAccountsBalances(fameContractAddress, duelistContractAddress, duelistIds, true);
+
   // always fetch rewards for new duelists
   useFetchChallengeRewardsByDuelistIds(duelistIds)
 

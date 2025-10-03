@@ -31,18 +31,17 @@ function formatFn(rows: QueryResponseRaw): torii.TokenBalance[] {
 // Get initial token balances 
 // (to be used use only once, at app start)
 //
-export const useFetchInitialTokenBalancesQuery = () => {
+export const useFetchInitialTokenBalancesQuery = (last_iso_timestamp: string) => {
   const mounted = useMounted()
   const { address } = useAccount();
   const { erc20Tokens, erc721Tokens } = useTokenContracts()
   const [fetched, setFetched] = useState(false);
 
   const query = useMemo(() => {
-    if (!mounted || !address || fetched) return '';
+    if (!mounted || !address || fetched || !last_iso_timestamp) return '';
     const _getAlllBalances = [
       erc721Tokens.duelistContractAddress,
       erc721Tokens.ringContractAddress,
-      erc20Tokens.fameContractAddress,
     ].map(a => `'${bigintToHex(a)}'`);
     const _getPlayerBalances = [
       erc721Tokens.packContractAddress,
@@ -50,20 +49,29 @@ export const useFetchInitialTokenBalancesQuery = () => {
       erc20Tokens.lordsContractAddress,
     ].map(a => `'${bigintToHex(a)}'`);
     let queries = [
-      `select contract_address, account_address, balance, token_id from token_balances where contract_address in (${Object.values(_getAlllBalances).join(',')}) and balance!='${bigintToAddress(0n)}'`,
+      // balances needed for all players (not previously cached)
+      `select contract_address, account_address, balance, token_id`,
+      `from token_balances`,
+      `where contract_address in (${Object.values(_getAlllBalances).join(',')})`,
+      `and balance!='${bigintToAddress(0n)}'`,
+      `and token_id in (select token_id from token_transfers where contract_address in (${Object.values(_getAlllBalances).join(',')}) and executed_at>'${last_iso_timestamp}')`,
       `union all`,
-      `select contract_address, account_address, balance, token_id from token_balances where contract_address in (${Object.values(_getPlayerBalances).join(',')}) and account_address='${bigintToHex(address)}'`,
+      // balances needed for current player
+      `select contract_address, account_address, balance, token_id`,
+      `from token_balances`,
+      `where contract_address in (${Object.values(_getPlayerBalances).join(',')})`,
+      `and account_address='${bigintToHex(address)}'`,
       // `order by 3, 2`,
     ];
     return queries.join(' ');
-  }, [mounted, address, erc20Tokens, erc721Tokens, fetched])
+  }, [mounted, address, erc20Tokens, erc721Tokens, fetched, last_iso_timestamp])
 
   const { data, isLoading } = useSdkSqlQuery({
     query,
     formatFn,
   });
 
-  useEffect(() => debug.log('SQL BALANCES:', fetched, data?.length, !fetched && query), [fetched, data, query])
+  useEffect(() => debug.log('SQL BALANCES:', last_iso_timestamp, fetched, data?.length, query), [fetched, last_iso_timestamp, data, query])
 
   // add balances to token stores
   useAddBalancesToTokenStores(data);

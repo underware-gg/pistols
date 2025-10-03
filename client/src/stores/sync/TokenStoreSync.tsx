@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { useSdkTokenBalancesSub } from '@underware/pistols-sdk/dojo'
@@ -7,6 +7,7 @@ import { useFameCoinStore, useLordsCoinStore, useFoolsCoinStore } from '/src/sto
 import { useFetchInitialTokenBalancesQuery } from '/src/queries/useTokenBalancesQuery'
 import { useProgressStore } from '/src/stores/progressStore'
 import { bigintToHex } from '@underware/pistols-sdk/utils'
+import { cachedPlayerData } from '@underware/pistols-sdk/pistols/cached'
 import { debug } from '@underware/pistols-sdk/pistols'
 import * as torii from '@dojoengine/torii-client'
 
@@ -42,9 +43,30 @@ export function TokenStoreSync() {
 
 
   //----------------------------------------
+  // get cacehd state
+  //
+  const mounted = useMounted()
+  const [last_iso_timestamp, setLastIsoTimestamp] = useState<string>();
+  useEffect(() => {
+    if (mounted) {
+      let iso_timestamp = '';
+      Object.keys(cachedPlayerData).forEach(player_address => {
+        const playerData = cachedPlayerData[player_address];
+        duelist_state.addCachedPlayerTokens(player_address, playerData.duelist_ids);
+        ring_state.addCachedPlayerTokens(player_address, playerData.ring_ids);
+        if (playerData.iso_timestamp > iso_timestamp) {
+          iso_timestamp = playerData.iso_timestamp;
+        }
+      })
+      setLastIsoTimestamp(iso_timestamp)
+    }
+  }, [mounted])
+
+
+  //----------------------------------------
   // get initial state
   //
-  const { initialTokenBalances, isLoading, address } = useFetchInitialTokenBalancesQuery();
+  const { initialTokenBalances, isLoading, address } = useFetchInitialTokenBalancesQuery(last_iso_timestamp);
 
   useEffect(() => {
     if (address) {
@@ -57,7 +79,6 @@ export function TokenStoreSync() {
   //----------------------------------------
   // subscribe for updates
   //
-  const mounted = useMounted()
   const contracts = useMemo(() => Object.values(allTokens).map(bigintToHex), [allTokens])
   useSdkTokenBalancesSub({
     contracts,

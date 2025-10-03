@@ -71,7 +71,7 @@ const createStore = (coinName: string, addOnUpdate: boolean) => {
       });
     },
     setBalances: (balances: torii.TokenBalance[]) => {
-      // console.log(`coinStore(${get().coinName}) SET:`, balances)
+      console.log(`coinStore(${get().coinName}) SET:`, balances)
       set((state: State) => {
         balances.forEach((balance) => {
           _processBalance(state, balance, true)
@@ -79,7 +79,7 @@ const createStore = (coinName: string, addOnUpdate: boolean) => {
       });
     },
     updateBalance: (balance: torii.TokenBalance) => {
-      // console.log(`coinStore(${get().coinName}) UPDATE:`, balance)
+      console.log(`coinStore(${get().coinName}) UPDATE:`, balance)
       set((state: State) => {
         _processBalance(state, balance, addOnUpdate)
       });
@@ -193,7 +193,7 @@ const _useCalcFee = (
 // fetch new balances
 //
 
-export const useFetchTokenboundAccountsBalances = (coinAddress: BigNumberish, tokenAddress: BigNumberish, tokenIds: bigint[], enabled: boolean) => {
+export const useFetchTokenboundAccountsBalances = (coinAddress: BigNumberish, tokenAddress: BigNumberish, tokenIds: BigNumberish[], enabled: boolean) => {
   const tokenBoundAddresses = useMemo(() => (
     tokenIds.map((tokenId) => make_token_bound_address(tokenAddress, tokenId))
   ), [tokenAddress, tokenIds]);
@@ -212,6 +212,7 @@ export const useFetchAccountsBalances = (coinAddress: BigNumberish, accounts: Bi
     setBalances: state.setBalances,
     enabled: (enabled && isPositiveBigint(coinAddress) && newAccounts.length > 0),
   })
+
   return {
     isLoading,
     isFinished: (isLoading === false),
