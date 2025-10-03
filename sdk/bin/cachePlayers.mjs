@@ -1,7 +1,14 @@
 #!/usr/bin/env node
 // import { RpcProvider } from 'starknet';
 // import { getContractByName } from '@dojoengine/core';
-import { NetworkId, getNetworkConfig, getDuelistTokenAddress, getManifest, NAMESPACE } from '../pistols_config.js';
+import {
+  NetworkId,
+  getNetworkConfig,
+  getDuelistTokenAddress,
+  getRingTokenAddress,
+  getManifest,
+  NAMESPACE,
+} from '../pistols_config.js';
 import { bigintToAddress, bigintToNumber } from '../utils.js';
 import { getTokenBalances, getControllerAccounts } from './lib_sql.mjs';
 import { _log, _error, _stringify } from './lib.mjs';
@@ -36,14 +43,14 @@ const player_data = {};
 //--------------------------------
 // Get balances per contract
 //
-async function cacheTokenBalances(contractName, contractAddress) {
+async function cacheTokenBalances(contractAddress, arrayName) {
   let token_balances = [];
   try {
     token_balances = await getTokenBalances(contractAddress, networkConfig.sqlUrl);
   } catch (error) {
-    _error(`[cacheTokenBalances/${contractName}] error: ${error.toString()}`);
+    _error(`[cacheTokenBalances/${arrayName}] error: ${error.toString()}`);
   }
-  _log(`[cacheTokenBalances/${contractName}] token_balances:`, token_balances.length);
+  _log(`[cacheTokenBalances/${arrayName}] token_balances:`, token_balances.length);
   //
   // sort by player...
   for (const token_balance of token_balances) {
@@ -52,11 +59,14 @@ async function cacheTokenBalances(contractName, contractAddress) {
       player_data[player_address] = {
         username: null,
         duelist_ids: [],
+        ring_ids: [],
         iso_timestamp: '',
       };
     }
-    player_data[player_address].duelist_ids.push(bigintToNumber(token_balance.token_id));
-    player_data[player_address].iso_timestamp = token_balance.iso_timestamp;
+    player_data[player_address][arrayName].push(bigintToNumber(token_balance.token_id));
+    if (token_balance.iso_timestamp > player_data[player_address].iso_timestamp) {
+      player_data[player_address].iso_timestamp = token_balance.iso_timestamp;
+    }
   }
 }
 
@@ -83,8 +93,12 @@ async function cacheControllerAccounts() {
 // Cache data...
 //
 await cacheTokenBalances(
-  'duelist_token',
   getDuelistTokenAddress(networkId),
+  'duelist_ids',
+);
+await cacheTokenBalances(
+  getRingTokenAddress(networkId),
+  'ring_ids',
 );
 await cacheControllerAccounts();
 
