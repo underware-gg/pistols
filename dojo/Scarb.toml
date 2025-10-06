@@ -10,8 +10,7 @@ sierra-replace-ids = true
 
 [dependencies]
 starknet = ">=2.12.2"
-dojo = "1.7.0"
-dojo_cairo_macros = "1.7.0"
+dojo = "1.7.1"
 achievement = { git = "https://github.com/cartridge-gg/arcade", rev = "a4de9f4c38814a19716b6c5f9cbd4213645e9cb1" }
 graffiti = { git = "https://github.com/rsodre/graffiti", rev = "url" }
 nft_combo = { git = "https://github.com/underware-gg/cairo-nft-combo", branch = "v1.0.0_scarb_2.12.2" }
@@ -23,7 +22,10 @@ openzeppelin_introspection = { git = "https://github.com/OpenZeppelin/cairo-cont
 
 [dev-dependencies]
 cairo_test = ">=2.12.2"
-dojo_cairo_test = "1.7.0"
+dojo_cairo_test = "1.7.1"
+
+[tool.scarb]
+allow-prebuilt-plugins = ["dojo_cairo_macros"]
 
 # [features]
 # default = ["lords_mock"]
