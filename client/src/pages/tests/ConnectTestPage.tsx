@@ -16,6 +16,7 @@ import { ProfilePic } from '/src/components/account/ProfilePic'
 import { NODE_ENV } from '/src/utils/env'
 import { LordsBalance } from '/src/components/account/LordsBalance'
 import { Address } from '/src/components/ui/Address'
+import { LordsFaucet } from '/src/components/account/LordsFaucet'
 
 //@ts-ignore
 BigInt.prototype.toJSON = function () { return bigintToHex(this) }
@@ -129,7 +130,8 @@ export function Connect({ children }: { children?: React.ReactNode }) {
               <Address address={address} full />
             </Cell>
             <Cell className='Code'>
-              <LordsBalance address={address} size='big' decimals={3} />
+              <LordsFaucet />
+              <LordsBalance address={address} decimals={3} />
             </Cell>
           </Row>
           {children}

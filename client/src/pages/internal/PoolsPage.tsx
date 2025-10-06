@@ -3,7 +3,7 @@ import { Container, Table } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSystem, useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { usePool, useSeasonPool, UsePoolResult, useFundedStarterPackCount, usePurchasedUnopenedDuelistPackCount } from '/src/stores/bankStore'
-import { useFameBalance, useLordsBalance } from '/src/stores/coinStore'
+import { useFameBalance, useFetchAccountsBalances, useLordsBalance } from '/src/stores/coinStore'
 import { useERC20TotalSupply } from '@underware/pistols-sdk/utils/hooks'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { useConfig } from '/src/stores/configStore'
@@ -11,7 +11,6 @@ import { ethToWei, weiToEth } from '@underware/pistols-sdk/starknet'
 import { bigintToDecimal, isBigint } from '@underware/pistols-sdk/utils'
 import { FameBalance, LordsBalance } from '/src/components/account/LordsBalance'
 import { FormInputNumber } from '/src/components/ui/Form'
-import { LordsFaucet } from '/src/components/account/LordsFaucet'
 import { BalanceRequiredButton } from '/src/components/ui/Buttons'
 import { Balance } from '/src/components/account/Balance'
 import { Connect } from '/src/pages/tests/ConnectTestPage'
@@ -20,7 +19,6 @@ import { InternalPageMenu, InternalPageWrapper } from './InternalPageIndex'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import StoreSync from '/src/stores/sync/StoreSync'
 import AppDojo from '/src/components/AppDojo'
-import * as ENV from '/src/utils/env'
 
 const Row = Table.Row
 const Cell = Table.Cell
@@ -37,8 +35,6 @@ export default function PoolsPage() {
 
         <InternalPageWrapper>
           <Connect />
-          <Account />
-          <br />
           <Bank />
           <br />
           <Pools />
@@ -49,35 +45,6 @@ export default function PoolsPage() {
       </Container>
     </AppDojo>
   );
-}
-
-
-function Account() {
-  const { address } = useAccount()
-  return (
-    <>
-      <Table celled striped size='small'>
-        <Header>
-          <Row>
-            <HeaderCell width={3}><h3>Account</h3></HeaderCell>
-            <HeaderCell><h5></h5></HeaderCell>
-            <HeaderCell><h5></h5></HeaderCell>
-          </Row>
-        </Header>
-        <Body className='H5'>
-          <Row className='ModalText'>
-            <Cell>$LORDS balance:</Cell>
-            <Cell className='Code' textAlign='left'>
-              <LordsBalance address={address} size='big' />
-            </Cell>
-            <Cell className='Code' textAlign='right'>
-              <LordsFaucet />
-            </Cell>
-          </Row>
-        </Body>
-      </Table>
-    </>
-  )
 }
 
 
@@ -198,9 +165,10 @@ function Pools() {
   const { fame: fameSupplyIntoLords, percentage: fameSupplyIntoLordsPercentage } = useFameIntoLords(fameSupply)
 
   // Bank balances
-  const { contractAddress } = useDojoSystem('bank')
-  const { balance: bankLordsBalance } = useLordsBalance(contractAddress)
-  const { balance: bankFameBalance } = useFameBalance(contractAddress)
+  const { contractAddress: bankContractAddress } = useDojoSystem('bank')
+  useFetchAccountsBalances(fameContractAddress, [bankContractAddress], true)
+  const { balance: bankLordsBalance } = useLordsBalance(bankContractAddress)
+  const { balance: bankFameBalance } = useFameBalance(bankContractAddress)
   const { fame: balanceFameIntoLords, percentage: balanceFameIntoLordsPercentage } = useFameIntoLords(bankFameBalance)
 
   // Duelists
@@ -236,12 +204,53 @@ function Pools() {
           <HeaderCell width={4}><h3>Balances</h3></HeaderCell>
           <HeaderCell><h3>$LORDS</h3></HeaderCell>
           <HeaderCell><h3>$FAME</h3></HeaderCell>
-          <HeaderCell><h3>%</h3></HeaderCell>
-          <HeaderCell><h3>➡ $LORDS</h3></HeaderCell>
+          <HeaderCell><h3>➡</h3></HeaderCell>
+          <HeaderCell><h3>$LORDS</h3></HeaderCell>
           <HeaderCell><h3>Description</h3></HeaderCell>
         </Row>
       </Header>
       <Body className='H5'>
+
+        <Row className=''>
+          <Cell className='ModalText'>🏦 Bank</Cell>
+          <Cell className='Code' textAlign='left'>
+            <LordsBalance address={bankContractAddress} size='big' />
+          </Cell>
+          <Cell className='Code' textAlign='left'>
+            <FameBalance address={bankContractAddress} size='big' />
+          </Cell>
+          <Cell className='' textAlign='left'>
+            {balanceFameIntoLordsPercentage.toFixed(2)}%
+          </Cell>
+          <Cell className='Code' textAlign='left'>
+            ~<Balance lords wei={balanceFameIntoLords} size='big' />
+          </Cell>
+          <Cell className='' textAlign='left'>
+            Total amount deposited, split into pools
+          </Cell>
+        </Row>
+
+        <Row className='BgDarkest'>
+          <Cell><h3 className='Important TitleCase'>$LORDS Pools</h3></Cell>
+          <Cell></Cell>
+          <Cell></Cell>
+          <Cell></Cell>
+          <Cell></Cell>
+          <Cell></Cell>
+        </Row>
+
+        <PoolRow pool={poolPurchases} description='Unopened purchased packs' />
+        <PoolRow pool={poolClaimable} description='Sponsored free duelists' />
+        <PoolRow pool={poolSeason} displayFame={false} description='Season prizes (sponsored)' />
+
+        <Row className='BgDarkest'>
+          <Cell><h3 className='Important TitleCase'>$FAME Peg</h3></Cell>
+          <Cell></Cell>
+          <Cell></Cell>
+          <Cell></Cell>
+          <Cell></Cell>
+          <Cell></Cell>
+        </Row>
 
         <Row className=''>
           <Cell className='ModalText'>$FAME Supply</Cell>
@@ -277,30 +286,18 @@ function Pools() {
           </Cell>
         </Row>
 
-        <Row className=''>
-          <Cell className='ModalText'>🏦 Bank</Cell>
-          <Cell className='Code' textAlign='left'>
-            <LordsBalance address={contractAddress} size='big' />
-          </Cell>
-          <Cell className='Code' textAlign='left'>
-            <FameBalance address={contractAddress} size='big' />
-          </Cell>
-          <Cell className='' textAlign='left'>
-            {balanceFameIntoLordsPercentage.toFixed(2)}%
-          </Cell>
-          <Cell className='Code' textAlign='left'>
-            ~<Balance lords wei={balanceFameIntoLords} size='big' />
-          </Cell>
-          <Cell className='' textAlign='left'>
-            Total amount deposited, split into pools
-          </Cell>
-        </Row>
-
-        <PoolRow pool={poolClaimable} description='Sponsored free duelists' />
-        <PoolRow pool={poolPurchases} description='Unopened purchased packs' />
-        <PoolRow pool={poolFamePeg} description='Pegged to full FAME supply' />
-        <PoolRow pool={poolSeason} description='Season prizes (dead duelists)' />
+        <PoolRow pool={poolFamePeg} description='Opened packs, pegged to full FAME supply' />
+        <PoolRow pool={poolSeason} displayLords={false} description='Season prizes (dead duelists)' />
         <PoolRow pool={poolSacrifice} description='Reserved for Sacrifice (dead duelists)' />
+
+        <Row className='BgDarkest'>
+          <Cell><h3 className='Important TitleCase'>Totals</h3></Cell>
+          <Cell></Cell>
+          <Cell></Cell>
+          <Cell></Cell>
+          <Cell></Cell>
+          <Cell></Cell>
+        </Row>
 
         <Row className=''>
           <Cell className='ModalText'>Pools Total</Cell>
@@ -336,7 +333,7 @@ function Pools() {
           <Cell></Cell>
           <Cell></Cell>
           <Cell className='' textAlign='left'>
-            Should always be zero
+            Should always be zero (or near zero)
           </Cell>
         </Row>
       </Body>
@@ -365,16 +362,16 @@ function PoolRow({
         🏷️ Pool::{poolType}{seasonId ? `(${seasonId})` : ''}
       </Cell>
       <Cell className='Code' textAlign='left'>
-        {displayLords && <Balance lords wei={balanceLords} size='big' />}
+        <Balance lords wei={displayLords ? balanceLords : 0n} size='big' />
       </Cell>
       <Cell className='Code' textAlign='left'>
-        {displayFame && <Balance fame wei={balanceFame} size='big' />}
+        <Balance fame wei={displayFame ? balanceFame : 0n} size='big' />
       </Cell>
       <Cell className='' textAlign='left'>
-        {fameIntoLordsPercentage > 0 ? `${fameIntoLordsPercentage.toFixed(2)}%` : ''}
+        {displayFame && fameIntoLordsPercentage > 0 ? `${fameIntoLordsPercentage.toFixed(2)}%` : ''}
       </Cell>
       <Cell className='Code' textAlign='left'>
-        ~{displayFame && <Balance lords wei={fameIntoLords} size='big' />}
+        ~<Balance lords wei={displayFame ? fameIntoLords : 0n} size='big' />
       </Cell>
       <Cell className='' textAlign='left'>
         {description}

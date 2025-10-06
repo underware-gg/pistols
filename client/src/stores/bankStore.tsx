@@ -6,6 +6,7 @@ import { feltToString, makeAbiCustomEnum } from '@underware/pistols-sdk/starknet
 import { PistolsSchemaType } from '@underware/pistols-sdk/pistols/sdk'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { usePackType } from '/src/stores/packStore'
+import { bigintToDecimal } from '@underware/pistols-sdk/utils'
 
 export const useBankStore = createDojoStore<PistolsSchemaType>();
 
@@ -31,7 +32,7 @@ const _usePool = (pool_type: string, value?: bigint) => {
 
   return {
     poolType: pool_type,
-    seasonId: value ? feltToString(value) : undefined,
+    seasonId: value ? bigintToDecimal(value) : undefined,
     tournamentId: value,
     balanceLords,
     balanceFame,
