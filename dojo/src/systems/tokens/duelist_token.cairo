@@ -210,7 +210,7 @@ pub mod duelist_token {
         ref self: ContractState,
         base_uri: felt252,
     ) {
-        let mut world = self.world_default();
+        let mut world: WorldStorage = self.world_default();
         self.erc721_combo.initializer(
             TOKEN_NAME(),
             TOKEN_SYMBOL(),
@@ -304,7 +304,7 @@ pub mod duelist_token {
                 // burn fame_dripped
                 survived = self._reactivate_or_sacrifice(duelist_id, Option::Some(fame_dripped), CauseOfDeath::Forsaken);
                 // only duel_token and owner can poke alive duelists
-                let world = self.world_default();
+                let world: WorldStorage = self.world_default();
                 if (survived && !world.caller_is_duel_contract()) {
                     self.erc721_combo._require_owner_of(starknet::get_caller_address(), duelist_id.into());
                 }
@@ -380,7 +380,7 @@ pub mod duelist_token {
 
             // validate duelist ownership
             let mut store: Store = StoreTrait::new(self.world_default());
-            assert(self.is_owner_of(address, duelist_id.into()) == true, Errors::NOT_YOUR_DUELIST);
+            assert(self.is_owner_of(address, duelist_id.into()), Errors::NOT_YOUR_DUELIST);
 
             // bot duelists are always validates
             if (store.world.is_bot_player_contract(address)) {
@@ -391,7 +391,7 @@ pub mod duelist_token {
             let mut active_duelist_id: u128 = store.get_active_duelist_id(address, duelist_id);
             // poke inactivity (it may die!)
 // println!("poke A... {}", duelist_id_a);
-            if (self.poke(active_duelist_id) == false) {
+            if (!self.poke(active_duelist_id)) {
                 // died, get next in line...
                 active_duelist_id = store.get_active_duelist_id(address, duelist_id);
             }
@@ -531,8 +531,11 @@ pub mod duelist_token {
             ref values: RewardValues,
             winners_minted_fame: u128,
         ) {
-            // Burn FAME from duelist
-            if (values.fame_lost != 0) {
+            if (values.fame_lost.is_zero()) {
+                // no fame lost
+                values.survived = true;
+            } else {
+                // Burn FAME from duelist
                 // totals...
                 let mut total_to_burn: u128 = winners_minted_fame; // was minted to winner
                 let mut release_bills: Array<LordsReleaseBill> = array![];
@@ -594,8 +597,6 @@ pub mod duelist_token {
                 values.lords_unlocked += (*bank_protected_dispatcher).release_lords_from_fame_to_be_burned(season_id, duel_id, release_bills.span());
                 IFameCoinDispatcher{contract_address: *fame_protected_dispatcher.contract_address}
                     .burn_from_token(starknet::get_contract_address(), duelist_id, total_to_burn.into());
-            } else {
-                values.survived = true;
             }
         }
 
@@ -612,7 +613,7 @@ pub mod duelist_token {
             let fame_balance: u128 = self._fame_balance(@fame_dispatcher, duelist_id);
             assert(fame_balance != 0, Errors::DUELIST_IS_DEAD);
 
-            let mut due_amount = match fame_dripped {
+            let mut due_amount: u128 = match fame_dripped {
                 // poke: burn dripped fame, but no more than balance
                 Option::Some(fame_dripped) => {core::cmp::min(fame_balance, fame_dripped)},
                 // sacrifice: burn the whole balance
@@ -639,7 +640,7 @@ pub mod duelist_token {
             }
 
             // remaining fame to be burned and released
-            let bill = LordsReleaseBill {
+            let bill: LordsReleaseBill = LordsReleaseBill {
                 reason: ReleaseReason::SacrificedToDeveloper,
                 duelist_id,
                 recipient: store.get_config_treasury_address(),
@@ -667,7 +668,7 @@ pub mod duelist_token {
             killed_by: u128,
             fame_before_death: u128,
         ) {
-            let memorial = DuelistMemorial {
+            let memorial: DuelistMemorial = DuelistMemorial {
                 duelist_id,
                 player_address: self.owner_of(duelist_id.into()),
                 cause_of_death,
@@ -838,7 +839,7 @@ pub mod duelist_token {
             ];
             // return the metadata to be rendered by the component
             // https://docs.opensea.io/docs/metadata-standards#metadata-structure
-            let metadata = TokenMetadata {
+            let metadata: TokenMetadata = TokenMetadata {
                 token_id,
                 name: format!("{} #{}", duelist.duelist_profile.name(), token_id),
                 description: format!("Pistols at Dawn Duelist #{}. https://pistols.gg", token_id),

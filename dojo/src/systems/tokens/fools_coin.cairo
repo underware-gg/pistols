@@ -88,7 +88,7 @@ pub mod fools_coin {
     //*******************************************
 
     fn dojo_init(ref self: ContractState) {
-        let mut world = self.world_default();
+        let mut world: WorldStorage = self.world_default();
         self.erc20.initializer(
             COIN_NAME(),
             COIN_SYMBOL(),
@@ -116,7 +116,7 @@ pub mod fools_coin {
             recipient: ContractAddress,
             amount: u128,
         ) {
-            let mut world = self.world_default();
+            let mut world: WorldStorage = self.world_default();
             assert(world.caller_is_world_contract(), Errors::INVALID_CALLER);
 
             // validate caller

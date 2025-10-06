@@ -181,8 +181,8 @@ mod tests {
     #[should_panic(expected:('DUEL: Invalid challenge', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_reply_invalid() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        let A = OWNER();
-        let B = OTHER();
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Seasonal, EXPIRE_MINUTES, 1);
         tester::execute_reply_duel(@sys, A, ID(A), duel_id + 1, true);
     }
@@ -191,8 +191,8 @@ mod tests {
     #[should_panic(expected:('DUEL: Challenge not Awaiting', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_reply_twice() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        let A = OWNER();
-        let B = OTHER();
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Seasonal, EXPIRE_MINUTES, 1);
         // let _ch = sys.store.get_challenge_value(duel_id);
         let new_state: ChallengeState = tester::execute_reply_duel(@sys, B, ID(B), duel_id, true);
@@ -204,8 +204,8 @@ mod tests {
     #[should_panic(expected:('DUEL: Challenge not Awaiting', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_reply_refused() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        let A = OWNER();
-        let B = OTHER();
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Seasonal, EXPIRE_MINUTES, 1);
         // let _ch = sys.store.get_challenge_value(duel_id);
         let new_state: ChallengeState = tester::execute_reply_duel(@sys, B, ID(B), duel_id, false);
@@ -216,8 +216,8 @@ mod tests {
     #[test]
     fn test_challenge_reply_expired_is_OK() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let A = OWNER();
-        let B = OTHER();
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Practice, EXPIRE_MINUTES, 0);
         tester::assert_pact(@sys, duel_id, true, false, "created");
         assert!(!sys.game.can_collect_duel(duel_id), "!can_collect_duel");
@@ -234,8 +234,8 @@ mod tests {
     #[test]
     fn test_challenge_collect_expired() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let A = OWNER();
-        let B = OTHER();
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Practice, EXPIRE_MINUTES, 0);
 
         tester::assert_pact(@sys, duel_id, true, false, "created");
@@ -261,8 +261,8 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Challenge is active', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_collect_expired_in_progress() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let A = OWNER();
-        let B = OTHER();
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Practice, EXPIRE_MINUTES, 0);
         tester::assert_pact(@sys, duel_id, true, false, "created");
         // elapse time to almost expired...
@@ -275,8 +275,8 @@ mod tests {
     #[should_panic(expected:('DUEL: Reply self', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_owner_accept_self() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        let A = OWNER();
-        let B = OTHER();
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Practice, EXPIRE_MINUTES, 0);
         tester::execute_reply_duel(@sys, A, ID(A), duel_id, true);
     }
@@ -284,8 +284,8 @@ mod tests {
     #[test]
     fn test_challenge_owner_withdraw() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        let A = OWNER();
-        let B = OTHER();
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Seasonal, EXPIRE_MINUTES, 1);
 
         tester::assert_pact(@sys, duel_id, true, false, "created");
@@ -306,8 +306,8 @@ mod tests {
     #[should_panic(expected:('DUEL: Not your challenge', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_reply_impersonator() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        let A = OWNER();
-        let B = OTHER();
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Seasonal, EXPIRE_MINUTES, 1);
         // panic!
         tester::execute_reply_duel(@sys, BUMMER(), ID(BUMMER()), duel_id, false);
@@ -316,8 +316,8 @@ mod tests {
     #[test]
     fn test_challenge_other_refuse_ok() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let A = OWNER();
-        let B = OTHER();
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Practice, EXPIRE_MINUTES, 0);
 
         let ch = sys.store.get_challenge_value(duel_id);
@@ -352,8 +352,8 @@ mod tests {
     #[test]
     fn test_challenge_accept_ok() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let A = OWNER();
-        let B = OTHER();
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
 
         // players not registered
         let player_a: Player = sys.store.get_player(A);
@@ -396,8 +396,8 @@ mod tests {
     #[should_panic(expected:('DUELIST: Not your duelist', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
     fn test_reply_wrong_duelist() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::LORDS | FLAGS::APPROVE);
-        let A = OWNER();
-        let B = OTHER();
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Seasonal, EXPIRE_MINUTES, 1);
         // reply with different TOKEN ID
         // panic!
@@ -408,8 +408,8 @@ mod tests {
     #[should_panic(expected:('DUEL: Not your challenge', 'ENTRYPOINT_FAILED'))]
     fn test_reply_wrong_player() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::LORDS | FLAGS::APPROVE);
-        let A = OWNER();
-        let B = OTHER();
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Seasonal, EXPIRE_MINUTES, 1);
         // reply with different TOKEN ID
         // panic!
@@ -443,8 +443,8 @@ mod tests {
     #[test]
     fn test_stacker_active_OK() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE | FLAGS::DUELIST);
-        let A = STACKER();
-        let B = STACKER2();
+        let A: ContractAddress = STACKER();
+        let B: ContractAddress = STACKER2();
         let (duelist_id_a_active, duelist_id_a_inactive, duelist_id_b_active, duelist_id_b_inactive) = _mint_stacker_duelists(@sys, A, B);
         // use inactive duelist > will swich to active
         let duel_id: u128 = tester::execute_create_duel_ID(@sys, A, duelist_id_a_inactive, B, MESSAGE(), DuelType::Practice, 48, 0);
@@ -465,8 +465,8 @@ mod tests {
     #[ignore] // TEMP: disabled dripping
     fn test_stacker_active_switch_OK() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE | FLAGS::DUELIST);
-        let A = STACKER();
-        let B = STACKER2();
+        let A: ContractAddress = STACKER();
+        let B: ContractAddress = STACKER2();
         let (duelist_id_a_active, duelist_id_a_inactive, duelist_id_b_active, duelist_id_b_inactive) = _mint_stacker_duelists(@sys, A, B);
         // make active
         tester::activate_duelist(ref sys, duelist_id_a_active);
@@ -500,8 +500,8 @@ mod tests {
     #[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
     fn test_stacker_not_stacked_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE | FLAGS::DUELIST);
-        let A = OWNER(); // not a stacker
-        let B = STACKER2();
+        let A: ContractAddress = OWNER(); // not a stacker
+        let B: ContractAddress = STACKER2();
         let (duelist_id_a_active, _duelist_id_a_inactive, _duelist_id_b_active, _duelist_id_b_inactive) = _mint_stacker_duelists(@sys, A, B);
         // make active
         tester::activate_duelist(ref sys, duelist_id_a_active);
@@ -516,8 +516,8 @@ mod tests {
     #[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
     fn test_stacker_not_stacked_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE | FLAGS::DUELIST);
-        let A = STACKER(); // not a stacker
-        let B = OWNER();
+        let A: ContractAddress = STACKER(); // not a stacker
+        let B: ContractAddress = OWNER();
         let (duelist_id_a_active, _duelist_id_a_inactive, duelist_id_b_active, _duelist_id_b_inactive) = _mint_stacker_duelists(@sys, A, B);
         // make active
         tester::activate_duelist(ref sys, duelist_id_b_active);
@@ -537,8 +537,8 @@ mod tests {
     #[test]
     fn test_open_challenge_OK() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        let A = OWNER();
-        let B = OTHER();
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys, A, ZERO(), MESSAGE(), DuelType::Seasonal, 0, 1);
         let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.state, ChallengeState::Awaiting, "state");

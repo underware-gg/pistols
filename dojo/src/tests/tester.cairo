@@ -2,7 +2,10 @@
 pub mod tester {
     use starknet::{ContractAddress, testing};
 
-    use dojo::world::{WorldStorage, IWorldDispatcherTrait};
+    use dojo::world::{
+        WorldStorage, IWorldDispatcherTrait,
+        world::{Event as WorldEvent},
+    };
     use dojo::model::{ModelStorageTest};
     use dojo_cairo_test::{
         spawn_test_world,
@@ -555,11 +558,11 @@ pub mod tester {
         //     world.dispatcher.grant_owner(selector_from_tag!("pistols-tournament_token"), OWNER());
         // }
         if (deploy_lords) {
-            let lords = world.lords_mock_dispatcher();
+            let lords: ILordsMockDispatcher = world.lords_mock_dispatcher();
             execute_lords_faucet(@lords, OWNER());
             execute_lords_faucet(@lords, OTHER());
             if (approve) {
-                let spender = world.bank_address();
+                let spender: ContractAddress = world.bank_address();
                 execute_lords_approve(@lords, OWNER(), spender, 1_000_000 * CONST::ETH_TO_WEI.low);
                 execute_lords_approve(@lords, OTHER(), spender, 1_000_000 * CONST::ETH_TO_WEI.low);
                 execute_lords_approve(@lords, BUMMER(), spender, 1_000_000 * CONST::ETH_TO_WEI.low);
@@ -575,13 +578,13 @@ pub mod tester {
 
     #[inline(always)]
     pub fn get_block_number() -> u64 {
-        let block_info = starknet::get_block_info().unbox();
+        let block_info: starknet::BlockInfo = starknet::get_block_info().unbox();
         (block_info.block_number)
     }
 
     #[inline(always)]
     pub fn get_block_timestamp() -> u64 {
-        let block_info = starknet::get_block_info().unbox();
+        let block_info: starknet::BlockInfo = starknet::get_block_info().unbox();
         (block_info.block_timestamp)
     }
 
@@ -591,13 +594,13 @@ pub mod tester {
     }
 
     pub fn elapse_block_timestamp(delta: u64) -> (u64, u64) {
-        let new_timestamp = starknet::get_block_timestamp() + delta;
+        let new_timestamp: u64 = starknet::get_block_timestamp() + delta;
         (set_block_timestamp(new_timestamp))
     }
 
     pub fn set_block_timestamp(new_timestamp: u64) -> (u64, u64) {
         assert_ge!(new_timestamp, starknet::get_block_timestamp(), "set_block_timestamp() <<< Back in time...");
-        let new_block_number = get_block_number() + 1;
+        let new_block_number: u64 = get_block_number() + 1;
         testing::set_block_number(new_block_number);
         testing::set_block_timestamp(new_timestamp);
         (new_block_number, new_timestamp)
@@ -609,9 +612,9 @@ pub mod tester {
     // https://github.com/cartridge-gg/arcade/blob/7e3a878192708563082eaf2adfd57f4eec0807fb/packages/achievement/src/tests/test_achievable.cairo#L77-L92
     pub fn pop_log<T, +Drop<T>, +starknet::Event<T>>(address: ContractAddress, event_selector: felt252) -> Option<T> {
         let (mut keys, mut data) = testing::pop_log_raw(address)?;
-        let id = keys.pop_front().unwrap(); // Remove the event ID from the keys
-        assert_eq!(id, @event_selector, "Wrong event!");
-        let ret = starknet::Event::deserialize(ref keys, ref data);
+        let id: felt252 = *keys.pop_front().unwrap(); // Remove the event ID from the keys
+        assert_eq!(id, event_selector, "Wrong event!");
+        let ret :Option<T> = starknet::Event::deserialize(ref keys, ref data);
         assert!(data.is_empty(), "Event has extra data (wrong event?)");
         assert!(keys.is_empty(), "Event has extra keys (wrong event?)");
         (ret)
@@ -620,10 +623,8 @@ pub mod tester {
         assert!(testing::pop_log_raw(address).is_none(), "Events remaining on queue");
     }
     pub fn drop_event(address: ContractAddress) {
-        match testing::pop_log_raw(address) {
-            core::option::Option::Some(_) => {},
-            core::option::Option::None => {},
-        };
+        // consume event
+        if let Option::Some(_) = testing::pop_log_raw(address) {};
     }
     pub fn drop_all_events(address: ContractAddress) {
         loop {
@@ -635,7 +636,7 @@ pub mod tester {
     }
     // ERC-721 events
     pub fn assert_event_transfer(emitter: ContractAddress, from: ContractAddress, to: ContractAddress, token_id: u256) {
-        let event = pop_log::<Transfer>(emitter, selector!("Transfer")).unwrap();
+        let event: Transfer = pop_log::<Transfer>(emitter, selector!("Transfer")).unwrap();
         assert_eq!(event.from, from, "Invalid `from`");
         assert_eq!(event.to, to, "Invalid `to`");
         assert_eq!(event.token_id, token_id, "Invalid `token_id`");
@@ -645,7 +646,7 @@ pub mod tester {
         assert_no_events_left(emitter);
     }
     pub fn assert_event_approval(emitter: ContractAddress, owner: ContractAddress, spender: ContractAddress, token_id: u256) {
-        let event = pop_log::<Approval>(emitter, selector!("Approval")).unwrap();
+        let event: Approval = pop_log::<Approval>(emitter, selector!("Approval")).unwrap();
         assert_eq!(event.owner, owner, "Invalid `owner`");
         assert_eq!(event.approved, spender, "Invalid `spender`");
         assert_eq!(event.token_id, token_id, "Invalid `token_id`");
@@ -664,74 +665,62 @@ pub mod tester {
         assert_no_events_left(*sys.world.dispatcher.contract_address);
     }
     pub fn assert_event_trophy(sys: @TestSystems, trophy: Trophy, address: ContractAddress) {
-        let contract_event = testing::pop_log::<dojo::world::world::Event>(*sys.world.dispatcher.contract_address).unwrap();
-        match contract_event {
-            dojo::world::world::Event::EventEmitted(event) => {
-                assert_eq!(event.selector, selector_from_tag!("pistols-TrophyProgression"), "Invalid selector");
-                // compare keys
-                let mut keys = array![];
-                keys.append_serde(trophy.identifier());
-                keys.append_serde(address);
-                ArrayTestUtilsTrait::assert_span_eq(event.keys, keys.span(), "keys");
-            },
-            _ => {},
+        let contract_event: WorldEvent = testing::pop_log::<WorldEvent>(*sys.world.dispatcher.contract_address).unwrap();
+        if let WorldEvent::EventEmitted(event) = contract_event {
+            assert_eq!(event.selector, selector_from_tag!("pistols-TrophyProgression"), "Invalid selector");
+            // compare keys
+            let mut keys: Array<felt252> = array![];
+            keys.append_serde(trophy.identifier());
+            keys.append_serde(address);
+            ArrayTestUtilsTrait::assert_span_eq(event.keys, keys.span(), "keys");
         }
     }
     pub fn assert_event_bookmark(sys: @TestSystems, player_address: ContractAddress, target_address: ContractAddress, target_id: u128, enabled: bool) {
-        let contract_event = testing::pop_log::<dojo::world::world::Event>(*sys.world.dispatcher.contract_address).unwrap();
-        match contract_event {
-            dojo::world::world::Event::EventEmitted(event) => {
-                assert_eq!(event.selector, selector_from_tag!("pistols-PlayerBookmarkEvent"), "Invalid selector");
-                // compare keys
-                let mut keys = array![];
-                keys.append_serde(player_address);
-                keys.append_serde(target_address);
-                keys.append_serde(target_id);
-                ArrayTestUtilsTrait::assert_span_eq(event.keys, keys.span(), "keys");
-                // compare values
-                let mut values = array![];
-                values.append_serde(enabled);
-                ArrayTestUtilsTrait::assert_span_eq(event.values, values.span(), "values");
-            },
-            _ => {},
+        let contract_event: WorldEvent = testing::pop_log::<WorldEvent>(*sys.world.dispatcher.contract_address).unwrap();
+        if let WorldEvent::EventEmitted(event) = contract_event {
+            assert_eq!(event.selector, selector_from_tag!("pistols-PlayerBookmarkEvent"), "Invalid selector");
+            // compare keys
+            let mut keys: Array<felt252> = array![];
+            keys.append_serde(player_address);
+            keys.append_serde(target_address);
+            keys.append_serde(target_id);
+            ArrayTestUtilsTrait::assert_span_eq(event.keys, keys.span(), "keys");
+            // compare values
+            let mut values: Array<felt252> = array![];
+            values.append_serde(enabled);
+            ArrayTestUtilsTrait::assert_span_eq(event.values, values.span(), "values");
         }
     }
     pub fn assert_event_social_link(sys: @TestSystems, player_address: ContractAddress, social_platform: SocialPlatform, user_name: ByteArray, user_id: ByteArray, avatar: ByteArray) {
-        let contract_event = testing::pop_log::<dojo::world::world::Event>(*sys.world.dispatcher.contract_address).unwrap();
-        match contract_event {
-            dojo::world::world::Event::EventEmitted(event) => {
-                assert_eq!(event.selector, selector_from_tag!("pistols-PlayerSocialLinkEvent"), "Invalid selector");
-                // compare keys
-                let mut keys = array![];
-                keys.append_serde(player_address);
-                keys.append_serde(social_platform);
-                ArrayTestUtilsTrait::assert_span_eq(event.keys, keys.span(), "keys");
-                // compare values
-                let mut values = array![];
-                values.append_serde(user_name);
-                values.append_serde(user_id);
-                values.append_serde(avatar);
-                ArrayTestUtilsTrait::assert_span_eq(event.values, values.span(), "values");
-            },
-            _ => {},
+        let contract_event: WorldEvent = testing::pop_log::<WorldEvent>(*sys.world.dispatcher.contract_address).unwrap();
+        if let WorldEvent::EventEmitted(event) = contract_event {
+            assert_eq!(event.selector, selector_from_tag!("pistols-PlayerSocialLinkEvent"), "Invalid selector");
+            // compare keys
+            let mut keys: Array<felt252> = array![];
+            keys.append_serde(player_address);
+            keys.append_serde(social_platform);
+            ArrayTestUtilsTrait::assert_span_eq(event.keys, keys.span(), "keys");
+            // compare values
+            let mut values: Array<felt252> = array![];
+            values.append_serde(user_name);
+            values.append_serde(user_id);
+            values.append_serde(avatar);
+            ArrayTestUtilsTrait::assert_span_eq(event.values, values.span(), "values");
         }
     }
     pub fn assert_event_player_setting(sys: @TestSystems, player_address: ContractAddress, setting: PlayerSetting, value: PlayerSettingValue) {
-        let contract_event = testing::pop_log::<dojo::world::world::Event>(*sys.world.dispatcher.contract_address).unwrap();
-        match contract_event {
-            dojo::world::world::Event::EventEmitted(event) => {
-                assert_eq!(event.selector, selector_from_tag!("pistols-PlayerSettingEvent"), "Invalid selector");
-                // compare keys
-                let mut keys = array![];
-                keys.append_serde(player_address);
-                keys.append_serde(setting);
-                ArrayTestUtilsTrait::assert_span_eq(event.keys, keys.span(), "keys");
-                // compare values
-                let mut values = array![];
-                values.append_serde(value);
-                ArrayTestUtilsTrait::assert_span_eq(event.values, values.span(), "values");
-            },
-            _ => {},
+        let contract_event: WorldEvent = testing::pop_log::<WorldEvent>(*sys.world.dispatcher.contract_address).unwrap();
+        if let WorldEvent::EventEmitted(event) = contract_event {
+            assert_eq!(event.selector, selector_from_tag!("pistols-PlayerSettingEvent"), "Invalid selector");
+            // compare keys
+            let mut keys: Array<felt252> = array![];
+            keys.append_serde(player_address);
+            keys.append_serde(setting);
+            ArrayTestUtilsTrait::assert_span_eq(event.keys, keys.span(), "keys");
+            // compare values
+            let mut values: Array<felt252> = array![];
+            values.append_serde(value);
+            ArrayTestUtilsTrait::assert_span_eq(event.values, values.span(), "values");
         }
     }
 
@@ -748,8 +737,8 @@ pub mod tester {
         (if (input.len() < prefix.len()) {
             (false)
         } else {
-            let mut result = true;
-            let mut i = 0;
+            let mut result: bool = true;
+            let mut i: usize = 0;
             while (i < prefix.len()) {
                 if (input[i] != prefix[i]) {
                     result = false;

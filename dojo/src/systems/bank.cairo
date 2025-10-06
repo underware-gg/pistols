@@ -206,8 +206,8 @@ pub mod bank {
     #[generate_trait]
     impl InternalImpl of InternalTrait {
         fn _assert_caller_is_admin(self: @ContractState) {
-            let mut world = self.world_default();
-            assert(world.admin_dispatcher().am_i_admin(starknet::get_caller_address()) == true, Errors::CALLER_NOT_ADMIN);
+            let mut world: WorldStorage = self.world_default();
+            assert(world.admin_dispatcher().am_i_admin(starknet::get_caller_address()), Errors::CALLER_NOT_ADMIN);
         }
 
         fn _transfer_lords_to_pool(ref self: ContractState,

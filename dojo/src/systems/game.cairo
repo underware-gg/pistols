@@ -549,16 +549,16 @@ pub mod game {
     #[generate_trait]
     impl InternalImpl of InternalTrait {
         fn _assert_caller_is_owner(self: @ContractState) {
-            let mut world = self.world_default();
-            assert(world.dispatcher.is_owner(SELECTORS::GAME, starknet::get_caller_address()) == true, Errors::CALLER_NOT_OWNER);
+            let mut world: WorldStorage = self.world_default();
+            assert(world.dispatcher.is_owner(SELECTORS::GAME, starknet::get_caller_address()), Errors::CALLER_NOT_OWNER);
         }
         fn _assert_caller_is_admin(self: @ContractState) {
-            let mut world = self.world_default();
-            assert(world.admin_dispatcher().am_i_admin(starknet::get_caller_address()) == true, Errors::CALLER_NOT_ADMIN);
+            let mut world: WorldStorage = self.world_default();
+            assert(world.admin_dispatcher().am_i_admin(starknet::get_caller_address()), Errors::CALLER_NOT_ADMIN);
         }
 
         // fn _create_trophies(ref self: ContractState) {
-        //     let mut world = self.world_default();
+        //     let mut world: WorldStorage = self.world_default();
         //     let mut trophy_id: u8 = 1;
         //     while (trophy_id <= TROPHY_ID::COUNT) {
         //         let trophy: Trophy = trophy_id.into();
@@ -644,14 +644,11 @@ pub mod game {
         }
 
         fn _finish_challenge(ref self: ContractState, ref store: Store, ref challenge: Challenge, ref round: Round, winner: Option<u8>, progress: Option<@DuelProgress>) {
-            match winner {
-                Option::Some(winner) => {
-                    challenge.winner = winner;
-                    challenge.state =
-                        if (winner == 0) {ChallengeState::Draw}
-                        else {ChallengeState::Resolved};
-                },
-                Option::None => {}
+            if let Option::Some(winner) = winner {
+                challenge.winner = winner;
+                challenge.state =
+                    if (winner == 0) {ChallengeState::Draw}
+                    else {ChallengeState::Resolved};
             }
             challenge.season_id = store.get_current_season_id();
             challenge.timestamps.end = starknet::get_block_timestamp();

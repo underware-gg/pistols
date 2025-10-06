@@ -18,7 +18,7 @@ pub mod vrf_mock {
     #[abi(embed_v0)]
     impl VRFMockImpl of IVrfProvider<ContractState> {
         fn consume_random(ref self: ContractState, source: Source) -> felt252 {
-            let mut world = self.world_default();
+            let mut world: WorldStorage = self.world_default();
             let seed:felt252 = make_seed(starknet::get_caller_address(), world.dispatcher.uuid().into());
             // println!("vrf_mock::consume_random() > {}", seed);
             (seed)

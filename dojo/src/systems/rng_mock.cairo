@@ -127,7 +127,7 @@ pub mod rng_mock {
             //
             // look for value in stored models
             // (used on tests)
-            let mut world = self.world_default();
+            let mut world: WorldStorage = self.world_default();
             let found: MockedValue = world.read_model(salt);
             if (found.exists && found.value != 0) {
                 // println!("-- get_salt {} {} {}", salt, value.exists, value.value);
@@ -141,7 +141,7 @@ pub mod rng_mock {
             (new_seed)
         }
         fn is_mocked(self: @ContractState, salt: felt252) -> bool {
-            let mut world = self.world_default();
+            let mut world: WorldStorage = self.world_default();
             let found: MockedValue = world.read_model(salt);
             (found.exists)
         }
@@ -150,7 +150,7 @@ pub mod rng_mock {
     #[abi(embed_v0)]
     impl MockerImpl of IMocker<ContractState> {
         fn mock_values(ref self: ContractState, mocked: Span<MockedValue>) {
-            let mut world = self.world_default();
+            let mut world: WorldStorage = self.world_default();
             let mut i: usize = 0;
             while (i < mocked.len()) {
                 world.write_model(mocked.at(i));

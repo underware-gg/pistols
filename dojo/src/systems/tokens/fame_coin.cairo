@@ -103,7 +103,7 @@ pub mod fame_coin {
     //*******************************************
 
     fn dojo_init(ref self: ContractState) {
-        let mut world = self.world_default();
+        let mut world: WorldStorage = self.world_default();
         self.erc20.initializer(
             COIN_NAME(),
             COIN_SYMBOL(),
@@ -130,7 +130,7 @@ pub mod fame_coin {
         fn minted_duelist(ref self: ContractState,
             duelist_id: u128,
         ) {
-            let mut world = self.world_default();
+            let mut world: WorldStorage = self.world_default();
 
             // validate minter (duelist token contract)
             let minter_address: ContractAddress = self.coin.assert_caller_is_minter();
@@ -161,7 +161,7 @@ pub mod fame_coin {
         fn burn(ref self: ContractState,
             amount: u128,
         ) {
-            let mut world = self.world_default();
+            let mut world: WorldStorage = self.world_default();
             assert(world.caller_is_world_contract(), Errors::INVALID_CALLER);
             self.erc20.burn(starknet::get_caller_address(), amount.into());
         }

@@ -194,7 +194,7 @@ pub mod budokan_mock {
             game_address: ContractAddress,
             token_id: u64,
         ) -> Registration {
-            // let mut world = self.world_default();
+            // let mut world: WorldStorage = self.world_default();
             // stored tournament
             let mut tournament_id: u64 = self.get_tournament_id();
             // entry number
@@ -224,7 +224,7 @@ pub mod budokan_mock {
         //
 
         fn set_tournament_id(ref self: ContractState, tournament_id: u64) {
-            let mut world = self.world_default();
+            let mut world: WorldStorage = self.world_default();
             world.write_model(
                 @MockedValueTrait::new(
                     'tournament_id',
@@ -233,7 +233,7 @@ pub mod budokan_mock {
             );
         }
         fn set_settings_id(ref self: ContractState, settings_id: u32) {
-            let mut world = self.world_default();
+            let mut world: WorldStorage = self.world_default();
             world.write_model(
                 @MockedValueTrait::new(
                     'settings_id',
@@ -243,13 +243,13 @@ pub mod budokan_mock {
         }
 
         fn get_tournament_id(self: @ContractState) -> u64 {
-            let mut world = self.world_default();
+            let mut world: WorldStorage = self.world_default();
             // tournament (stored or default)
             let mocked: MockedValue = world.read_model('tournament_id');
             (mocked.value.try_into().unwrap())
         }
         fn get_settings_id(self: @ContractState) -> u32 {
-            let mut world = self.world_default();
+            let mut world: WorldStorage = self.world_default();
             // tournament (stored or default)
             let mocked: MockedValue = world.read_model('settings_id');
             (mocked.value.try_into().unwrap())
