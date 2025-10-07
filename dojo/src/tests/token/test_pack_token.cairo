@@ -24,7 +24,7 @@ use pistols::tests::tester::{
     tester::{
         StoreTrait,
         TestSystems, FLAGS,
-        OWNER, OTHER, BUMMER, SPENDER, SEASON_ID_1,
+        OWNER, OTHER, BUMMER, SPENDER, SEASON_ID_1, ZERO,
     },
 };
 
@@ -61,10 +61,11 @@ fn setup(_fee_amount: u128) -> TestSystems {
     (sys)
 }
 
-fn _assert_minted_count(sys: @TestSystems, minted_count: u128, msg: ByteArray) {
+fn _assert_minted_count(sys: @TestSystems, minted_count: u128, supply_count: u128, msg: ByteArray) {
     let token_config: TokenConfig = (*sys.store).get_token_config((*sys.pack).contract_address);
     assert_eq!(token_config.minted_count, minted_count, "{}", msg);
-    assert_eq!(sys.pack.total_supply(), minted_count.into(), "{}", msg);
+    assert_eq!(sys.pack.last_token_id(), minted_count.into(), "{}", msg);
+    assert_eq!(sys.pack.total_supply(), supply_count.into(), "{}", msg); // minus burned
 }
 fn _assert_duelist_count(sys: @TestSystems, minted_count: u128, msg: ByteArray) {
     let token_config: TokenConfig = (*sys.store).get_token_config((*sys.duelists).contract_address);
@@ -92,9 +93,6 @@ pub fn _protected(sys: @TestSystems) -> IPackTokenProtectedDispatcher {
 fn test_initializer() {
     let mut sys: TestSystems = setup(0); // funds 2 starter packs
     assert_eq!(sys.pack.symbol(), "PACK", "Symbol is wrong");
-
-    _assert_minted_count(@sys, 0, "Should eq 0");
-
     assert!(sys.pack.supports_interface(interface::IERC721_ID), "should support IERC721_ID");
     assert!(sys.pack.supports_interface(interface::IERC721_METADATA_ID), "should support METADATA");
 }
@@ -117,7 +115,7 @@ fn test_token_uri() {
     _purchase(@sys, OWNER());
     _purchase(@sys, OWNER());
 
-    let uri_1 = sys.pack.token_uri(TOKEN_ID_2);
+    let uri_1: ByteArray = sys.pack.token_uri(TOKEN_ID_2);
     assert!(tester::starts_with(uri_1.clone(), "data:"), "token_uri(1) should be a json string");
     println!("___packs.token_uri(1):{}", uri_1);
 
@@ -132,7 +130,7 @@ fn test_token_uri() {
     };
     tester::set_Pack(ref sys.world, @pack_2);
 
-    let uri_2 = sys.pack.token_uri(TOKEN_ID_3);
+    let uri_2: ByteArray = sys.pack.token_uri(TOKEN_ID_3);
     assert!(tester::starts_with(uri_2.clone(), "data:"), "token_uri(2) should be a json string");
     assert_ne!(uri_2, uri_1, "uris should be different");
     println!("___packs.token_uri(2):{}", uri_2);
@@ -153,7 +151,7 @@ fn test_token_uri_invalid() {
 #[test]
 fn test_claim_purchase() {
     let mut sys: TestSystems = setup(0); // funds 2 starter packs
-    _assert_minted_count(@sys, 0, "total_supply init");
+    _assert_minted_count(@sys, 0, 0, "total_supply init");
     assert_eq!(sys.pack.balance_of(OWNER()), 0, "balance_of 0");
 
     let player: Player = sys.store.get_player(OWNER());
@@ -164,13 +162,14 @@ fn test_claim_purchase() {
 
     assert!(sys.pack.can_claim_starter_pack(OWNER()), "can_claim_starter_pack_OWNER");
     let owner_ids: Span<u128> = tester::execute_claim_starter_pack(@sys, OWNER());
-    _assert_minted_count(@sys, 1, "total_supply 1");
+    assert!(!sys.pack.can_claim_starter_pack(OWNER()), "!can_claim_starter_pack_OWNER");
+    _assert_minted_count(@sys, 1, 0, "total_supply 1");
     _assert_duelist_count(@sys, starter_pack_duelist_count.into(), "duelist_supply [starter_pack_duelist_count]");
     assert_eq!(sys.pack.balance_of(OWNER()), 0, "balance_of 0");
 
     let player: Player = sys.store.get_player(OWNER());
-    assert!(player.exists(), "player.exists()");
-    assert!(player.timestamps.claimed_starter_pack, "player.timestamps.claimed_starter_pack");
+    assert!(player.exists(), "player_1.exists()");
+    assert!(player.timestamps.claimed_starter_pack, "player_1.timestamps.claimed_starter_pack");
     let pack_1: Pack = sys.store.get_pack(TOKEN_ID_1.low);
     assert_eq!(pack_1.pack_id, TOKEN_ID_1.low, "pack_1.pack_id");
     assert_eq!(pack_1.pack_type, PackType::StarterPack, "pack_1.pack_type");
@@ -184,7 +183,7 @@ fn test_claim_purchase() {
     assert_ne!(balance_bank_initial, 0, "balance_bank_initial");
 
     let price: u128 = _purchase(@sys, OWNER());
-    _assert_minted_count(@sys, 2, "total_supply 2");
+    _assert_minted_count(@sys, 2, 1, "total_supply 2");
     assert_eq!(sys.pack.balance_of(OWNER()), 1, "balance_of 1");
     assert!(sys.pack.owner_of(TOKEN_ID_2) == OWNER(), "owner_of_2");
 
@@ -200,8 +199,14 @@ fn test_claim_purchase() {
     assert_eq!(balance_owner, balance_owner_initial - price, "balance_owner");
     assert_eq!(balance_bank, balance_bank_initial + price, "balance_bank");
 
+    // claim another starter pack
     assert!(sys.pack.can_claim_starter_pack(OTHER()), "can_claim_starter_pack_OTHER");
     let other_ids: Span<u128> = tester::execute_claim_starter_pack(@sys, OTHER());
+    _assert_minted_count(@sys, 3, 1, "total_supply 3");
+    assert!(!sys.pack.can_claim_starter_pack(OTHER()), "!can_claim_starter_pack_OTHER");
+    let player: Player = sys.store.get_player(OTHER());
+    assert!(player.exists(), "player_2.exists()");
+    assert!(player.timestamps.claimed_starter_pack, "player_2.timestamps.claimed_starter_pack");
 
     // duelists should be the same
     let owner_profile_1: DuelistProfile = sys.store.get_duelist_profile(*owner_ids[0]);
@@ -216,6 +221,30 @@ fn test_claim_purchase() {
     assert_eq!(other_profile_1, DuelistProfile::Genesis(GenesisKey::SerWalker), "other_profile_1");
     assert_eq!(owner_profile_2, DuelistProfile::Genesis(GenesisKey::LadyVengeance), "owner_profile_2");
     assert_eq!(other_profile_2, DuelistProfile::Genesis(GenesisKey::LadyVengeance), "other_profile_2");
+}
+
+#[test]
+fn test_claim_referrer() {
+    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    tester::fund_duelists_pool(@sys, 1);
+
+    // claim without referrer
+    tester::execute_claim_starter_pack_referrer(@sys, OWNER(), ZERO());
+    let player: Player = sys.store.get_player(OWNER());
+    assert!(player.exists(), "player_1.exists()");
+    assert_eq!(player.referrer_address, ZERO(), "player_1.referrer_address");
+    
+    // claim with referrer
+    tester::execute_claim_starter_pack_referrer(@sys, OTHER(), OWNER());
+    let player: Player = sys.store.get_player(OTHER());
+    assert!(player.exists(), "player_2.exists()");
+    assert_eq!(player.referrer_address, OWNER(), "player_2.referrer_address");
+
+    // claim with same referrer
+    tester::execute_claim_starter_pack_referrer(@sys, BUMMER(), BUMMER());
+    let player: Player = sys.store.get_player(BUMMER());
+    assert!(player.exists(), "player_3.exists()");
+    assert_eq!(player.referrer_address, ZERO(), "player_3.referrer_address");
 }
 
 #[test]
@@ -581,7 +610,7 @@ fn test_airdrop_multiple_ok() {
     tester::fund_duelists_pool(@sys, 9);
     // airdrop some...
     let pack_ids: Span<u128> = tester::execute_pack_airdrop_multiple(@sys, OWNER(), OTHER(), PackType::FreeDuelist, Option::None, 2);
-    _assert_minted_count(@sys, 2, "airdrop 1");
+    _assert_minted_count(@sys, 2, 2, "airdrop 1");
     assert_eq!(pack_ids.len(), 2, "airdrop 1");
     assert_eq!(sys.pack.balance_of(OWNER()), 0, "airdrop 1");
     assert_eq!(sys.pack.balance_of(OTHER()), 2, "airdrop 1");
@@ -589,7 +618,7 @@ fn test_airdrop_multiple_ok() {
     assert_eq!(sys.store.get_pack(2).pack_type, PackType::FreeDuelist, "airdrop 1");
     // airdrop more...
     let pack_ids: Span<u128> = tester::execute_pack_airdrop_multiple(@sys, OWNER(), BUMMER(), PackType::GenesisDuelists5x, Option::None, 3);
-    _assert_minted_count(@sys, 5, "airdrop 2");
+    _assert_minted_count(@sys, 5, 5, "airdrop 2");
     assert_eq!(pack_ids.len(), 3, "airdrop 2");
     assert_eq!(sys.pack.balance_of(OWNER()), 0, "airdrop 2");
     assert_eq!(sys.pack.balance_of(OTHER()), 2, "airdrop 2");

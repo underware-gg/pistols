@@ -61,7 +61,7 @@ pub trait IPackToken<TState> {
     fn can_claim_gift(self: @TState, recipient: ContractAddress) -> bool;
     fn can_purchase(self: @TState, recipient: ContractAddress, pack_type: PackType) -> bool;
     fn calc_mint_fee(self: @TState, recipient: ContractAddress, pack_type: PackType) -> u128;
-    fn claim_starter_pack(ref self: TState) -> Span<u128>;
+    fn claim_starter_pack(ref self: TState, referrer_address: ContractAddress) -> Span<u128>;
     fn claim_gift(ref self: TState) -> Span<u128>;
     fn purchase(ref self: TState, pack_type: PackType) -> u128;
     fn airdrop(ref self: TState, recipient: ContractAddress, pack_type: PackType, duelist_profile: Option<DuelistProfile>, quantity: usize) -> Span<u128>;
@@ -77,7 +77,7 @@ pub trait IPackTokenPublic<TState> {
     fn can_purchase(self: @TState, recipient: ContractAddress, pack_type: PackType) -> bool;
     fn calc_mint_fee(self: @TState, recipient: ContractAddress, pack_type: PackType) -> u128;
     // write
-    fn claim_starter_pack(ref self: TState) -> Span<u128>; //@description: Claim the starter pack, mint Duelists
+    fn claim_starter_pack(ref self: TState, referrer_address: ContractAddress) -> Span<u128>; //@description: Claim the starter pack, mint Duelists
     fn claim_gift(ref self: TState) -> Span<u128>; //@description: Claim gift pack, if available
     fn purchase(ref self: TState, pack_type: PackType) -> u128; //@description: Purchase a closed pack
     fn airdrop(ref self: TState, recipient: ContractAddress, pack_type: PackType, duelist_profile: Option<DuelistProfile>, quantity: usize) -> Span<u128>; //@description: Airdrops a pack (admin)
@@ -226,7 +226,7 @@ pub mod pack_token {
             (!player.timestamps.claimed_starter_pack)
         }
 
-        fn claim_starter_pack(ref self: ContractState) -> Span<u128> {
+        fn claim_starter_pack(ref self: ContractState, referrer_address: ContractAddress) -> Span<u128> {
             let recipient: ContractAddress = starknet::get_caller_address();
             assert(self.can_claim_starter_pack(recipient), Errors::INELIGIBLE);
 
@@ -237,7 +237,7 @@ pub mod pack_token {
             let pack: Pack = self._mint_pack(ref store, PackType::StarterPack, recipient, seed, lords_amount, Option::None);
             
             // events
-            PlayerTrait::check_in(ref store, Activity::PackStarter, recipient, pack.pack_id.into());
+            PlayerTrait::check_in(ref store, Activity::PackStarter, recipient, pack.pack_id.into(), referrer_address);
 
             // open immediately
             (self.open(pack.pack_id))
@@ -275,7 +275,7 @@ pub mod pack_token {
             let pack: Pack = self._mint_pack(ref store, PackType::FreeDuelist, recipient, seed, lords_amount, Option::None);
             
             // events
-            PlayerTrait::check_in(ref store, Activity::ClaimedGift, recipient, pack.pack_id.into());
+            PlayerTrait::check_in(ref store, Activity::ClaimedGift, recipient, pack.pack_id.into(), ZERO());
 
             // open immediately
             (self.open(pack.pack_id))
@@ -316,7 +316,7 @@ pub mod pack_token {
             let pack: Pack = self._mint_pack(ref store, pack_type, recipient, seed, lords_amount, Option::None);
             
             // events
-            PlayerTrait::check_in(ref store, Activity::PackPurchased, recipient, pack.pack_id.into());
+            PlayerTrait::check_in(ref store, Activity::PackPurchased, recipient, pack.pack_id.into(), ZERO());
 
             (pack.pack_id)
         }
@@ -411,7 +411,7 @@ pub mod pack_token {
             self.erc721.burn(pack_id.into());
 
             // events
-            PlayerTrait::check_in(ref store, Activity::PackOpened, recipient, pack_id.into());
+            PlayerTrait::check_in(ref store, Activity::PackOpened, recipient, pack_id.into(), ZERO());
 
             (token_ids)
         }

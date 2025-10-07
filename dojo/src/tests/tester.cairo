@@ -818,9 +818,15 @@ pub mod tester {
     }
 
     // ::pack_token
+    pub fn execute_claim_starter_pack_referrer(sys: @TestSystems, sender: ContractAddress, referrer_address: ContractAddress) -> Span<u128> {
+        impersonate(sender);
+        let duelist_ids: Span<u128> = (*sys.pack).claim_starter_pack(referrer_address);
+        _next_block();
+        (duelist_ids)
+    }
     pub fn execute_claim_starter_pack(sys: @TestSystems, sender: ContractAddress) -> Span<u128> {
         impersonate(sender);
-        let duelist_ids: Span<u128> = (*sys.pack).claim_starter_pack();
+        let duelist_ids: Span<u128> = (*sys.pack).claim_starter_pack(ZERO());
         _next_block();
         (duelist_ids)
     }

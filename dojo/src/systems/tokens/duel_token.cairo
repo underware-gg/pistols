@@ -461,7 +461,7 @@ pub mod duel_token {
                 let player_address: ContractAddress = if (caller == challenge.address_a) {challenge.address_a} else {challenge.address_b};
                 Activity::ChallengeCanceled.emit(ref store.world, player_address, challenge.duel_id.into());
             } else {
-                PlayerTrait::check_in(ref store, Activity::ChallengeReplied, challenge.address_b, duel_id.into());
+                PlayerTrait::check_in(ref store, Activity::ChallengeReplied, challenge.address_b, duel_id.into(), ZERO());
             }
             
             // update challenge
@@ -780,7 +780,7 @@ pub mod duel_token {
             }
 
             // events
-            PlayerTrait::check_in(ref store, Activity::ChallengeCreated, challenge.address_a, challenge.duel_id.into());
+            PlayerTrait::check_in(ref store, Activity::ChallengeCreated, challenge.address_a, challenge.duel_id.into(), ZERO());
 
             (challenge)
         }

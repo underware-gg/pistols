@@ -15,7 +15,7 @@ pub struct Player {
     pub totals: Totals,
     pub alive_duelist_count: u16,
     pub active_signet_ring: RingType,
-    // pub referral_code: felt252,
+    pub referrer_address: ContractAddress,
 }
 
 #[derive(Copy, Drop, Serde, PartialEq, IntrospectPacked)]
@@ -119,6 +119,7 @@ use pistols::models::events::{Activity, ActivityTrait};
 use pistols::interfaces::dns::{DnsTrait, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait};
 use pistols::libs::store::{Store, StoreTrait};
 use pistols::utils::arrays::{ArrayUtilsTrait};
+use pistols::utils::address::{ZERO};
 use pistols::utils::math::{MathU16};
 
 mod PlayerErrors {
@@ -127,18 +128,33 @@ mod PlayerErrors {
 
 #[generate_trait]
 pub impl PlayerImpl of PlayerTrait {
-    fn check_in(ref store: Store, activity: Activity, player_address: ContractAddress, identifier: felt252) {
+    fn check_in(ref store: Store, activity: Activity, player_address: ContractAddress, identifier: felt252, referrer_address: ContractAddress) {
         let mut player: Player = store.get_player(player_address);
-        if (!player.exists()) {
-            assert(activity.can_register_player(), PlayerErrors::PLAYER_NOT_REGISTERED);
-            player.timestamps.registered = starknet::get_block_timestamp();
-            player.timestamps.claimed_starter_pack = (activity == Activity::PackStarter);
-            store.set_player(@player);
-        } else if (activity == Activity::PackStarter) {
-            player.timestamps.claimed_starter_pack = true;
-            store.set_player(@player);
-        } else if (activity == Activity::ClaimedGift) {
-            player.timestamps.claimed_gift = starknet::get_block_timestamp();
+        let mut save_player: bool = (
+            // create player if does not exist and this event can register a player
+            if (!player.exists()) {
+                assert(activity.can_register_player(), PlayerErrors::PLAYER_NOT_REGISTERED);
+                player.timestamps.registered = starknet::get_block_timestamp();
+                (true)
+            } else {
+                (false)
+            }
+        );
+        save_player = (
+            if (activity == Activity::PackStarter) {
+                player.timestamps.claimed_starter_pack = true;
+                player.referrer_address =
+                    if (referrer_address.is_non_zero() && referrer_address != player_address) {referrer_address}
+                    else {ZERO()};
+                (true)
+            } else if (activity == Activity::ClaimedGift) {
+                player.timestamps.claimed_gift = starknet::get_block_timestamp();
+                (true)
+            } else {
+                (false)
+            }
+        ) || save_player;
+        if (save_player) {
             store.set_player(@player);
         }
         activity.emit(ref store.world, player_address, identifier);

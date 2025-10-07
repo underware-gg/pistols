@@ -75,6 +75,9 @@ export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType: packTy
   const [revealedDuelists, setRevealedDuelists] = useState<Set<number>>(new Set())
   const previousDuelistIdsRef = useRef<bigint[]>([])
 
+  // TODO: get from cookie
+  const referrerAddress = 0;
+
   const handleCardPackClick = (e: React.MouseEvent, fromInternalElement: boolean = false) => {
     if (fromInternalElement) {
       e.stopPropagation();
@@ -98,7 +101,7 @@ export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType: packTy
     if (packType === constants.PackType.StarterPack) {
       if (fundedCount > 0) {
         setIsClaiming(true)
-        await pack_token.claim_starter_pack(account)
+        await pack_token.claim_starter_pack(account, referrerAddress)
       } else {
         setIsNoFundsModalOpen(true)
       }
