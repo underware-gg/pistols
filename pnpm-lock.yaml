@@ -241,8 +241,8 @@ importers:
         specifier: ^1.5.0
         version: 1.5.3(esbuild@0.25.10)(vite@6.3.6(@types/node@22.18.8)(sass@1.93.2))
       vite-plugin-mkcert:
-        specifier: ^1.17.8
-        version: 1.17.8(vite@6.3.6(@types/node@22.18.8)(sass@1.93.2))
+        specifier: ^1.17.9
+        version: 1.17.9(vite@6.3.6(@types/node@22.18.8)(sass@1.93.2))
       vitest:
         specifier: ^3.0.5
         version: 3.2.4(@types/node@22.18.8)(sass@1.93.2)
@@ -4191,8 +4191,8 @@ packages:
       esbuild:
         optional: true
 
-  vite-plugin-mkcert@1.17.8:
-    resolution: {integrity: sha512-S+4tNEyGqdZQ3RLAG54ETeO2qyURHWrVjUWKYikLAbmhh/iJ+36gDEja4OWwFyXNuvyXcZwNt5TZZR9itPeG5Q==}
+  vite-plugin-mkcert@1.17.9:
+    resolution: {integrity: sha512-SwI7yqp2Cq4r2XItarnHRCj2uzHPqevbxFNMLpyN+LDXd5w1vmZeM4l5X/wCZoP4mjPQYN+9+4kmE6e3nPO5fg==}
     engines: {node: '>=v16.7.0'}
     peerDependencies:
       vite: '>=3'
@@ -9227,7 +9227,7 @@ snapshots:
     optionalDependencies:
       esbuild: 0.25.10
 
-  vite-plugin-mkcert@1.17.8(vite@6.3.6(@types/node@22.18.8)(sass@1.93.2)):
+  vite-plugin-mkcert@1.17.9(vite@6.3.6(@types/node@22.18.8)(sass@1.93.2)):
     dependencies:
       axios: 1.12.2(debug@4.4.3)
       debug: 4.4.3

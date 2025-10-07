@@ -80,7 +80,7 @@
     "typescript": "catalog:",
     "vite": "^6.0.5",
     "vite-plugin-glsl": "^1.5.0",
-    "vite-plugin-mkcert": "^1.17.8",
+    "vite-plugin-mkcert": "^1.17.9",
     "vitest": "^3.0.5"
   },
   "engines": {
