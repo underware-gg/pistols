@@ -84,7 +84,7 @@ importers:
   .:
     devDependencies:
       turbo:
-        specifier: ^2.5.6
+        specifier: ^2.5.8
         version: 2.5.8
 
   client:
