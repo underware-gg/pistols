@@ -876,6 +876,14 @@ export type PlayerSetting = {
 };
 export type PlayerSettingEnum = CairoCustomEnum;
 
+// Type definition for `pistols::models::events::PlayerSettingValue` enum
+export const playerSettingValue = [
+  'Undefined',
+  'Boolean',
+] as const;
+export type PlayerSettingValue = { [key in typeof playerSettingValue[number]]: string };
+export type PlayerSettingValueEnum = CairoCustomEnum;
+
 // Type definition for `pistols::models::events::SocialPlatform` enum
 export const socialPlatform = [
 	'Undefined',
@@ -1001,8 +1009,8 @@ export interface SchemaType extends ISchemaType {
 		RewardValues: RewardValues,
 		BatchMetadataUpdate: BatchMetadataUpdate,
 		MetadataUpdate: MetadataUpdate,
-		Approval: Approval,
-		Transfer: Transfer,
+		// Approval: Approval,
+		// Transfer: Transfer,
 		ApprovalForAll: ApprovalForAll,
 		LeaderboardPosition: LeaderboardPosition,
 		RngWrap: RngWrap,
@@ -1479,31 +1487,31 @@ export const schema: SchemaType = {
 		MetadataUpdate: {
 		token_id: 0,
 		},
-		Approval: {
-			owner: "",
-			spender: "",
-		value: 0,
-		},
-		Transfer: {
-			from: "",
-			to: "",
-		value: 0,
-		},
-		Approval: {
-			owner: "",
-			approved: "",
-		token_id: 0,
-		},
+		// Approval: {
+		// 	owner: "",
+		// 	spender: "",
+		// value: 0,
+		// },
+		// Transfer: {
+		// 	from: "",
+		// 	to: "",
+		// value: 0,
+		// },
+		// Approval: {
+		// 	owner: "",
+		// 	approved: "",
+		// token_id: 0,
+		// },
 		ApprovalForAll: {
 			owner: "",
 			operator: "",
 			approved: false,
 		},
-		Transfer: {
-			from: "",
-			to: "",
-		token_id: 0,
-		},
+		// Transfer: {
+		// 	from: "",
+		// 	to: "",
+		// token_id: 0,
+		// },
 		LeaderboardPosition: {
 			position: 0,
 			duelist_id: 0,

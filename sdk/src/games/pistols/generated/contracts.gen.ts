@@ -311,7 +311,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_bank_releaseLordsFromFameToBeBurned_calldata = (seasonId: BigNumberish, duelId: BigNumberish, bills: Array<LordsReleaseBill>): DojoCall => {
+	const build_bank_releaseLordsFromFameToBeBurned_calldata = (seasonId: BigNumberish, duelId: BigNumberish, bills: Array<models.LordsReleaseBill>): DojoCall => {
 		return {
 			contractName: "bank",
 			entrypoint: "release_lords_from_fame_to_be_burned",
@@ -319,7 +319,7 @@ export function setupWorld(provider: DojoProvider) {
 		};
 	};
 
-	const bank_releaseLordsFromFameToBeBurned = async (snAccount: Account | AccountInterface, seasonId: BigNumberish, duelId: BigNumberish, bills: Array<LordsReleaseBill>) => {
+	const bank_releaseLordsFromFameToBeBurned = async (snAccount: Account | AccountInterface, seasonId: BigNumberish, duelId: BigNumberish, bills: Array<models.LordsReleaseBill>) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -3048,7 +3048,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_pack_token_airdrop_calldata = (recipient: string, packType: CairoCustomEnum, duelistProfile: CairoOption<DuelistProfile>, quantity: BigNumberish): DojoCall => {
+	const build_pack_token_airdrop_calldata = (recipient: string, packType: CairoCustomEnum, duelistProfile: CairoOption<CairoCustomEnum>, quantity: BigNumberish): DojoCall => {
 		return {
 			contractName: "pack_token",
 			entrypoint: "airdrop",
@@ -3056,7 +3056,7 @@ export function setupWorld(provider: DojoProvider) {
 		};
 	};
 
-	const pack_token_airdrop = async (snAccount: Account | AccountInterface, recipient: string, packType: CairoCustomEnum, duelistProfile: CairoOption<DuelistProfile>, quantity: BigNumberish) => {
+  const pack_token_airdrop = async (snAccount: Account | AccountInterface, recipient: string, packType: CairoCustomEnum, duelistProfile: CairoOption<CairoCustomEnum>, quantity: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -4309,7 +4309,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_rng_mock_mockValues_calldata = (mocked: Array<MockedValue>): DojoCall => {
+	const build_rng_mock_mockValues_calldata = (mocked: Array<models.MockedValue>): DojoCall => {
 		return {
 			contractName: "rng_mock",
 			entrypoint: "mock_values",
@@ -4317,7 +4317,7 @@ export function setupWorld(provider: DojoProvider) {
 		};
 	};
 
-	const rng_mock_mockValues = async (snAccount: Account | AccountInterface, mocked: Array<MockedValue>) => {
+	const rng_mock_mockValues = async (snAccount: Account | AccountInterface, mocked: Array<models.MockedValue>) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -4330,7 +4330,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_rng_mock_reseed_calldata = (seed: BigNumberish, salt: BigNumberish, mocked: Array<MockedValue>): DojoCall => {
+	const build_rng_mock_reseed_calldata = (seed: BigNumberish, salt: BigNumberish, mocked: Array<models.MockedValue>): DojoCall => {
 		return {
 			contractName: "rng_mock",
 			entrypoint: "reseed",
@@ -4338,7 +4338,7 @@ export function setupWorld(provider: DojoProvider) {
 		};
 	};
 
-	const rng_mock_reseed = async (seed: BigNumberish, salt: BigNumberish, mocked: Array<MockedValue>) => {
+	const rng_mock_reseed = async (seed: BigNumberish, salt: BigNumberish, mocked: Array<models.MockedValue>) => {
 		try {
 			return await provider.call("pistols", build_rng_mock_reseed_calldata(seed, salt, mocked));
 		} catch (error) {
@@ -4347,7 +4347,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_rng_reseed_calldata = (seed: BigNumberish, salt: BigNumberish, mocked: Array<MockedValue>): DojoCall => {
+	const build_rng_reseed_calldata = (seed: BigNumberish, salt: BigNumberish, mocked: Array<models.MockedValue>): DojoCall => {
 		return {
 			contractName: "rng",
 			entrypoint: "reseed",
@@ -4355,7 +4355,7 @@ export function setupWorld(provider: DojoProvider) {
 		};
 	};
 
-	const rng_reseed = async (seed: BigNumberish, salt: BigNumberish, mocked: Array<MockedValue>) => {
+	const rng_reseed = async (seed: BigNumberish, salt: BigNumberish, mocked: Array<models.MockedValue>) => {
 		try {
 			return await provider.call("pistols", build_rng_reseed_calldata(seed, salt, mocked));
 		} catch (error) {
