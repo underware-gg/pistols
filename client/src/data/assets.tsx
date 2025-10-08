@@ -7,6 +7,7 @@ enum SceneName {
   Profile = 'Profile',
   CardPacks = 'CardPacks',
   DuelistBook = 'DuelistBook',
+  Invite = 'Invite',
   
   Duelists = 'Duelists',
   Matchmaking = 'Matchmaking',
@@ -374,6 +375,11 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
     backgrounds: [
       { texture: TextureName.bg_duelisbook_table, shiftMultiplier: 0, renderOrder: 0 },
       { texture: TextureName.bg_duelisbook_table, shiftMultiplier: 0, renderOrder: 0 },
+    ]
+  },
+  [SceneName.Invite]: {
+    backgrounds: [
+      { texture: TextureName.bg_tavern_background, shiftMultiplier: -0.01, renderOrder: 0 },
     ]
   },
 

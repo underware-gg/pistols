@@ -61,6 +61,7 @@ const router = createBrowserRouter([
       { path: "matchmaking", element: <MainPage /> },
       { path: "duels", element: <MainPage /> },
       { path: "graveyard", element: <MainPage /> },
+      { path: "invite/:referrer_username", element: <MainPage /> },
       { path: "duel/:duel_id", element: <MainPage /> },
       { path: "dueldata/:duel_id", element: <DuelDataPage /> },
       { path: "status", element: <StatusPage /> },

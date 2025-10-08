@@ -5,7 +5,7 @@ import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { createDojoStore } from '@dojoengine/sdk/react'
 import { PistolsEntity, PistolsSchemaType } from '@underware/pistols-sdk/pistols/sdk'
-import { arrayRemoveValue, bigintEquals, bigintToHex, bigintToNumber, formatTimestampDeltaElapsed, isPositiveBigint, sortObjectByValue } from '@underware/pistols-sdk/utils'
+import { arrayRemoveValue, bigintEquals, bigintToAddress, bigintToNumber, formatTimestampDeltaElapsed, isPositiveBigint, sortObjectByValue } from '@underware/pistols-sdk/utils'
 import { useAllStoreModels, useStoreModelsByKeys } from '@underware/pistols-sdk/dojo'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { useDuelistTokenStore } from '/src/stores/tokenStore'
@@ -52,7 +52,7 @@ interface State {
 }
 
 const _playerKey = (address: BigNumberish | undefined): string | null => (
-  isPositiveBigint(address) ? bigintToHex(address) : null
+  isPositiveBigint(address) ? bigintToAddress(address) : null
 )
 
 const createStore = () => {
@@ -78,11 +78,13 @@ const createStore = () => {
         // console.log("updateUsername()[Player] =>", usernames, state.players)
       });
     },
-    getPlayernameFromAddress: (address: BigNumberish) => {
+    getPlayernameFromAddress: (address: BigNumberish): string | undefined => {
+      if (!isPositiveBigint(address)) return undefined;
       const players_names = get().players_names
       return players_names[_playerKey(address)]
     },
-    getAddressFromPlayername: (name: string) => {
+    getAddressFromPlayername: (name: string): BigNumberish | undefined => {
+      if (!name) return undefined;
       const players_names = get().players_names
       return Object.keys(players_names).find((key) => players_names[key] === name)
     },
@@ -217,6 +219,13 @@ export const usePlayer = (address: BigNumberish, onlineClientTimestamp?: number)
     lastSeenTimestamp,
     totals,
   }
+}
+
+export const usePlayerAddressFromUsername = (username: string): BigNumberish | undefined => {
+  const players_names = usePlayerDataStore((state) => state.players_names);
+  const getAddressFromPlayername = usePlayerDataStore((state) => state.getAddressFromPlayername);
+  const address = useMemo(() => (getAddressFromPlayername(username) as BigNumberish), [players_names, username]);
+  return address;
 }
 
 export const usePlayersAccounts = () => {

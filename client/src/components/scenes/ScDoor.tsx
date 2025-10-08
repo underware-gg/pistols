@@ -276,19 +276,21 @@ export function EnterAsGuestButton({
 }
 
 export function ConnectButton({
-  setLoading,
-  large = true,
   label = 'Enter Tavern',
+  large = true,
+  fillParent = false,
   enterScene,
   onButtonHover,
-  onDoorCreak
+  onDoorCreak,
+  setLoading,
 }: {
-  setLoading?: (loading: boolean) => void,
   large?: boolean,
   label?: string,
+  fillParent?: boolean
   enterScene?: SceneName,
   onButtonHover?: () => void,
-  onDoorCreak?: () => void
+  onDoorCreak?: () => void,
+  setLoading?: (loading: boolean) => void,
 }) {
   const { isConnected, isConnecting } = useAccount()
   const { isLoading, isError } = useDojoStatus()
@@ -349,9 +351,10 @@ export function ConnectButton({
   return (
     <ActionButton 
       fill 
-      large={large} 
+      large={large}
+      fillParent={fillParent}
       important 
-      disabled={!canConnect} 
+      disabled={!canConnect || isConnecting} 
       onClick={() => _connect()} 
       label={label} 
       onMouseEnter={handleMouseEnter}

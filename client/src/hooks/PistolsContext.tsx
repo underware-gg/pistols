@@ -448,7 +448,7 @@ export const usePistolsContext = () => {
   const dispatchSelectPlayerAddress = useCallback((newId: BigNumberish) => {
     dispatch({
       type: PistolsActions.SELECT_PLAYER_ADDRESS,
-      payload: BigInt(newId),
+      payload: isPositiveBigint(newId) ? BigInt(newId) : 0n,
     })
   }, [dispatch])
 
@@ -562,6 +562,7 @@ export const sceneRoutes: Record<SceneName, SceneRoute> = {
   [SceneName.DuelistBook]: { baseUrl: '/profile/duelistbook', title: 'Pistols - Duelists' },
   [SceneName.CardPacks]: { baseUrl: '/profile/cardpacks', title: 'Pistols - Card Packs' },
   [SceneName.Profile]: { baseUrl: '/profile', title: 'Pistols - Profile' },
+  [SceneName.Invite]: { baseUrl: '/invite', title: 'Pistols - Invite' },
 
   [SceneName.Duelists]: { baseUrl: '/balcony', title: 'Pistols - Duelists' },
   [SceneName.Matchmaking]: { baseUrl: '/matchmaking', title: 'Pistols - Matchmaking' },
@@ -601,6 +602,7 @@ export const sceneRoutes: Record<SceneName, SceneRoute> = {
 //
 type SceneSlug = {
   duelId?: BigNumberish,
+  username?: string,
 }
 export const usePistolsScene = () => {
   const { currentScene, sceneStack, selectedDuelId, currentDuel, dispatchSetDuel, __dispatchSetScene, __dispatchSceneBack, __dispatchResetValues } = usePistolsContext()
@@ -618,6 +620,8 @@ export const usePistolsScene = () => {
       if (!bigintEquals(slug, currentDuel)) {
         dispatchSetDuel(slug)
       }
+    } else if (setSlug.username) {
+      slug = setSlug.username
     }
     url += slug ? `/${slug}` : ''
     if (url != location.pathname) {
@@ -670,6 +674,7 @@ export const usePistolsScene = () => {
     atProfile: (currentScene == SceneName.Profile),
     atCardPacks: (currentScene == SceneName.CardPacks),
     atDuelistBook: (currentScene == SceneName.DuelistBook),
+    atInvite: (currentScene == SceneName.Invite),
     atDuelists: (currentScene == SceneName.Duelists),
     atMatchmaking: (currentScene == SceneName.Matchmaking),
     atDuelsBoard: (currentScene == SceneName.DuelsBoard),

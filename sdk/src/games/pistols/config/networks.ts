@@ -77,6 +77,7 @@ export type DojoNetworkConfig = {
   networkId: NetworkId
   chainId: ChainId
   chain: Chain
+  isTestnet?: boolean
   name: string
   clientUrl: string
   assetsServerUrl: string
@@ -95,7 +96,6 @@ export type DojoNetworkConfig = {
   connectorIds: string[]
   // starknet Chain
   network?: string
-  testnet?: boolean
   nativeCurrency?: NativeCurrency
   explorers?: ChainExplorers
 }
@@ -259,6 +259,7 @@ const pistolsStagingConfig: DojoNetworkConfig = {
   networkId: undefined, // derive from NETWORKS
   chain: { ...sepolia },
   chainId: ChainId.SN_SEPOLIA,
+  isTestnet: true,
   name: 'Sepolia Staging',
   clientUrl: 'https://stage.pistols.gg',
   assetsServerUrl: 'https://assets.underware.gg',
@@ -284,6 +285,7 @@ const snSepoliaConfig: DojoNetworkConfig = {
   networkId: undefined, // derive from NETWORKS
   chain: { ...sepolia },
   chainId: ChainId.SN_SEPOLIA,
+  isTestnet: true,
   name: 'Sepolia Testnet',
   clientUrl: 'https://testnet.pistols.gg',
   assetsServerUrl: 'https://assets.underware.gg',
@@ -389,7 +391,7 @@ export const getNetworkConfig = (networkId: NetworkId, env?: DojoNetworkEnv): Do
       id: BigInt(stringToFelt(result.chainId)),
       name: result.name,
       network: result.network ?? 'katana',
-      testnet: result.testnet ?? true,
+      testnet: result.isTestnet === true,
       nativeCurrency: result.nativeCurrency,
       rpcUrls: {
         default: { http: [] },

@@ -1,5 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import TWEEN from '@tweenjs/tween.js'
+import { useCookies } from 'react-cookie';
 import { DuelistCard, DuelistCardHandle } from '/src/components/cards/DuelistCard';
 import { useGameAspect } from '/src/hooks/useGameAspect';
 import { CARD_PACK_CARD_SIZE_WIDTH, CARD_PACK_CARD_SIZE_HEIGHT } from '/src/data/cardConstants';
@@ -29,6 +30,7 @@ import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { useFundedStarterPackCount } from '/src/stores/bankStore';
 import { Button } from 'semantic-ui-react';
 import { Modal } from 'semantic-ui-react';
+import { REFERER_ADDRESS_COOKIE_NAME } from '/src/components/modals/InviteModal';
 
 interface CardPack {
   onComplete?: (selectedDuelistId?: number) => void
@@ -75,8 +77,8 @@ export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType: packTy
   const [revealedDuelists, setRevealedDuelists] = useState<Set<number>>(new Set())
   const previousDuelistIdsRef = useRef<bigint[]>([])
 
-  // TODO: get from cookie
-  const referrerAddress = 0;
+  const [cookies] = useCookies([REFERER_ADDRESS_COOKIE_NAME]);
+  const referrerAddress = (cookies[REFERER_ADDRESS_COOKIE_NAME] ?? 0n);
 
   const handleCardPackClick = (e: React.MouseEvent, fromInternalElement: boolean = false) => {
     if (fromInternalElement) {

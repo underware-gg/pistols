@@ -1,5 +1,6 @@
 import React, { forwardRef, useImperativeHandle, useRef, useState, useMemo, useEffect } from 'react'
 import { BigNumberish } from 'starknet'
+import { useAccount } from '@starknet-react/core'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { DUELIST_CARD_WIDTH, DUELIST_CARD_HEIGHT } from '/src/data/cardConstants'
 import { DuelistCard, DuelistCardHandle } from '/src/components/cards/DuelistCard'
@@ -21,6 +22,8 @@ import { ChallengeButton } from '/src/components/ui/Buttons'
 import { useFetchDuelistIdsOwnedByAccount } from '/src/stores/duelistStore'
 import { COLORS } from '@underware/pistols-sdk/pistols/constants'
 import { StampImage } from './StampImage'
+import { ConnectButton } from '../scenes/ScDoor'
+import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -146,7 +149,7 @@ const ProfilePosterSmall = forwardRef<ProfilePosterHandle, ProfilePosterProps>((
 // Full version of the ProfilePoster
 const ProfilePosterFull = forwardRef<ProfilePosterHandle, ProfilePosterProps>((props, ref) => {
   const { aspectWidth, aspectHeight } = useGameAspect()
-  const { dispatchSetScene } = usePistolsScene()
+  const { dispatchSetScene, atInvite } = usePistolsScene()
   const { dispatchSelectDuelistId } = usePistolsContext()
   const { name, isMyAccount, isOnline, isAway, avatarUrl } = useProfilePosterData(props.playerAddress)
   
@@ -177,6 +180,12 @@ const ProfilePosterFull = forwardRef<ProfilePosterHandle, ProfilePosterProps>((p
 
   const handleNext = () => {
     setPageNumber(prev => Math.min(Math.max(0, pageCount - 1), prev + 1))
+  }
+
+  const [linkCopied, setLinkCopied] = useState(false)
+  const handleCopyInviteLink = () => {
+    navigator.clipboard.writeText(window.location.href)
+    setLinkCopied(true)
   }
 
   useEffect(() => {
@@ -290,45 +299,102 @@ const ProfilePosterFull = forwardRef<ProfilePosterHandle, ProfilePosterProps>((p
             <div className={`OnlineStatus ${isOnline ? 'Online' : isAway ? 'Away' : 'Offline'}`} />
           </div>
 
-          <div className='TextDivider WantedDivider'>Duelists:</div>
+          {!atInvite &&
+            <>
+              <div className='TextDivider WantedDivider'>Duelists:</div>
 
-          <div className='DuelistsSection' style={{ height: `${aspectWidth(DUELIST_CARD_HEIGHT * 0.7)}px` }}>
-            <button 
-              className='NavButton YesMouse' 
-              onClick={handlePrev}
-              disabled={pageNumber === 0}
-            >←</button>
-            {deferredLoading ? (
-              <div className='DuelistCard'>Loading...</div>
-            ) : duelistIds.length === 0 ? (
-              <div className='DuelistCard'>No Duelists</div>
-            ) : renderDuelistCards}
-            <button 
-              className='NavButton YesMouse'
-              onClick={handleNext}
-              disabled={pageNumber >= pageCount - 1}
-            >→</button>
-          </div>
+              <div className='DuelistsSection' style={{ height: `${aspectWidth(DUELIST_CARD_HEIGHT * 0.7)}px` }}>
+                <button
+                  className='NavButton YesMouse'
+                  onClick={handlePrev}
+                  disabled={pageNumber === 0}
+                >←</button>
+                {deferredLoading ? (
+                  <div className='DuelistCard'>Loading...</div>
+                ) : duelistIds.length === 0 ? (
+                  <div className='DuelistCard'>No Duelists</div>
+                ) : renderDuelistCards}
+                <button
+                  className='NavButton YesMouse'
+                  onClick={handleNext}
+                  disabled={pageNumber >= pageCount - 1}
+                >→</button>
+              </div>
 
-          <div className='TextDivider WantedDivider'></div>
+              <div className='TextDivider WantedDivider'></div>
 
-          <Grid className='ButtonSection YesMouse' textAlign='center'>
-            <Row columns='equal'>
-              <Col>
-                <ActionButton large fillParent label='Close' onClick={props._close} />
-              </Col>
-              <Col>
-                {isMyAccount ? <ActionButton large fillParent important label='Manage Profile' onClick={() => dispatchSetScene(SceneName.Profile)} />
-                  : <ChallengeButton challengedPlayerAddress={props.playerAddress} fillParent={true} loadingClassName='poster' />
-                }
-              </Col>
-            </Row>
-          </Grid>
+              <Grid className='ButtonSection YesMouse' textAlign='center'>
+                <Row columns='equal'>
+                  <Col>
+                    <ActionButton large fillParent label='Close' onClick={props._close} />
+                  </Col>
+                  <Col>
+                    {isMyAccount ? <ActionButton large fillParent important label='Manage Profile' onClick={() => dispatchSetScene(SceneName.Profile)} />
+                      : <ChallengeButton challengedPlayerAddress={props.playerAddress} fillParent={true} loadingClassName='poster' />
+                    }
+                  </Col>
+                </Row>
+              </Grid>
+            </>
+          }
+
+          {atInvite &&
+            <>
+              <div className='DuelistsSection' style={{ height: `${aspectWidth(DUELIST_CARD_HEIGHT * 0.7)}px` }}>
+                <h1 className='Dark'>
+                  {isMyAccount ? 'Invite someone to a Duel!' : '...have challeged you to a Duel!'}
+                </h1>
+              </div>
+              <div className='TextDivider WantedDivider'></div>
+
+              <Grid className='ButtonSection YesMouse' textAlign='center'>
+                <Row columns='equal'>
+                  <Col>
+                    {isMyAccount ? <ActionButton large fillParent label='Close' onClick={() => dispatchSetScene(SceneName.Profile)} />
+                      : <ActionButton large fillParent label='Explore the Tavern' onClick={props._close} />
+                    }
+                  </Col>
+                  <Col>
+                    {isMyAccount ? <ActionButton large fillParent important label={linkCopied ? 'Copied to Clipboard' : 'Share Invite Link'} onClick={handleCopyInviteLink} />
+                      : <AcceptInviteChallengeButton referrerAddress={props.playerAddress} />
+                    }
+                  </Col>
+                </Row>
+              </Grid>
+            </>
+          }
         </div>
       }
     />
   )
 })
+
+const AcceptInviteChallengeButton = ({
+  referrerAddress,
+}: {
+  referrerAddress: BigNumberish | undefined
+}) => {
+  const { isConnected, isConnecting } = useAccount();
+
+  // challenger not found yet...
+  if (!isPositiveBigint(referrerAddress)) {
+    return <ActionButton large fillParent disabled={true} label='Looking for referrer...' onClick={() => { }} />
+  }
+  // need to be connected...
+  if (!isConnected) {
+    return <ConnectButton large fillParent label='Connect or Register' />
+  }
+
+  // TODO: Remove this...
+  return <ActionButton large fillParent disabled={true} label='TODO...' onClick={() => { }} />
+
+  // TODO: claim starter pack (if new player)
+
+  // TODO: accept challenge (create challenge between players)
+  // return (
+  //   <ChallengeButton challengedPlayerAddress={0n} fillParent={true} loadingClassName='poster' />
+  // )
+}
 
 // Main wrapper component
 export const ProfilePoster = forwardRef<ProfilePosterHandle, ProfilePosterProps>((props: ProfilePosterProps = {
