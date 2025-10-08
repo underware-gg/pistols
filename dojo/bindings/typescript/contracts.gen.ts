@@ -3213,19 +3213,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_pack_token_claimStarterPack_calldata = (): DojoCall => {
+	const build_pack_token_claimStarterPack_calldata = (referrerAddress: string): DojoCall => {
 		return {
 			contractName: "pack_token",
 			entrypoint: "claim_starter_pack",
-			calldata: [],
+			calldata: [referrerAddress],
 		};
 	};
 
-	const pack_token_claimStarterPack = async (snAccount: Account | AccountInterface) => {
+	const pack_token_claimStarterPack = async (snAccount: Account | AccountInterface, referrerAddress: string) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_pack_token_claimStarterPack_calldata(),
+				build_pack_token_claimStarterPack_calldata(referrerAddress),
 				"pistols",
 			);
 		} catch (error) {

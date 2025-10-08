@@ -190,6 +190,7 @@ export interface Player {
 	totals: Totals;
 	alive_duelist_count: BigNumberish;
 	active_signet_ring: RingTypeEnum;
+	referrer_address: string;
 }
 
 // Type definition for `pistols::models::player::PlayerDelegation` struct
@@ -277,6 +278,13 @@ export interface TokenBoundAddress {
 	recipient: string;
 	contract_address: string;
 	token_id: BigNumberish;
+}
+
+// Type definition for `pistols::systems::rng_mock::MockedValue` struct
+export interface MockedValue {
+	salt: BigNumberish;
+	value: BigNumberish;
+	exists: boolean;
 }
 
 // Type definition for `pistols::types::timestamp::Period` struct
@@ -392,6 +400,124 @@ export interface RewardValues {
 	fame_burned: BigNumberish;
 	lords_unlocked: BigNumberish;
 	survived: boolean;
+}
+
+// Type definition for `nft_combo::erc721::erc721_combo::ERC721ComboComponent::BatchMetadataUpdate` struct
+export interface BatchMetadataUpdate {
+	from_token_id: BigNumberish;
+	to_token_id: BigNumberish;
+}
+
+// Type definition for `nft_combo::erc721::erc721_combo::ERC721ComboComponent::MetadataUpdate` struct
+export interface MetadataUpdate {
+	token_id: BigNumberish;
+}
+
+// Type definition for `openzeppelin_token::erc20::erc20::ERC20Component::Approval` struct
+export interface Approval {
+	owner: string;
+	spender: string;
+	value: BigNumberish;
+}
+
+// Type definition for `openzeppelin_token::erc20::erc20::ERC20Component::Transfer` struct
+export interface Transfer {
+	from: string;
+	to: string;
+	value: BigNumberish;
+}
+
+// Type definition for `openzeppelin_token::erc721::erc721::ERC721Component::Approval` struct
+export interface Approval {
+	owner: string;
+	approved: string;
+	token_id: BigNumberish;
+}
+
+// Type definition for `openzeppelin_token::erc721::erc721::ERC721Component::ApprovalForAll` struct
+export interface ApprovalForAll {
+	owner: string;
+	operator: string;
+	approved: boolean;
+}
+
+// Type definition for `openzeppelin_token::erc721::erc721::ERC721Component::Transfer` struct
+export interface Transfer {
+	from: string;
+	to: string;
+	token_id: BigNumberish;
+}
+
+// Type definition for `pistols::models::leaderboard::LeaderboardPosition` struct
+export interface LeaderboardPosition {
+	position: BigNumberish;
+	duelist_id: BigNumberish;
+	points: BigNumberish;
+}
+
+// Type definition for `pistols::systems::rng_mock::RngWrap` struct
+export interface RngWrap {
+	rng_address: string;
+	mocked: CairoOption<Array<MockedValue>>;
+}
+
+// Type definition for `pistols::types::cards::deck::Deck` struct
+export interface Deck {
+	fire_cards: Array<BigNumberish>;
+	dodge_cards: Array<BigNumberish>;
+	tactics_cards: Array<BigNumberish>;
+	blades_cards: Array<BigNumberish>;
+}
+
+// Type definition for `pistols::types::cards::hand::DuelistHand` struct
+export interface DuelistHand {
+	card_fire: PacesCardEnum;
+	card_dodge: PacesCardEnum;
+	card_tactics: TacticsCardEnum;
+	card_blades: BladesCardEnum;
+}
+
+// Type definition for `pistols::types::duel_progress::DuelProgress` struct
+export interface DuelProgress {
+	steps: Array<DuelStep>;
+	winner: BigNumberish;
+	hand_a: DuelistHand;
+	hand_b: DuelistHand;
+}
+
+// Type definition for `pistols::types::duel_progress::DuelStep` struct
+export interface DuelStep {
+	pace: PacesCardEnum;
+	card_env: EnvCardEnum;
+	dice_env: BigNumberish;
+	specials_a: SpecialsDrawn;
+	specials_b: SpecialsDrawn;
+	card_a: DuelistDrawnCardEnum;
+	card_b: DuelistDrawnCardEnum;
+	state_a: DuelistState;
+	state_b: DuelistState;
+}
+
+// Type definition for `pistols::types::duel_progress::SpecialsDrawn` struct
+export interface SpecialsDrawn {
+	tactics: TacticsCardEnum;
+	coin_toss: boolean;
+	reversal: boolean;
+	shots_modifier: EnvCardEnum;
+	tactics_modifier: EnvCardEnum;
+}
+
+// Type definition for `pistols::types::rules::DuelBonus` struct
+export interface DuelBonus {
+	duelist_a: DuelistBonus;
+	duelist_b: DuelistBonus;
+}
+
+// Type definition for `pistols::types::rules::DuelistBonus` struct
+export interface DuelistBonus {
+	kill_pace: BigNumberish;
+	hit: boolean;
+	dodge: boolean;
 }
 
 // Type definition for `pistols::models::challenge::DuelType` enum
@@ -750,14 +876,6 @@ export type PlayerSetting = {
 };
 export type PlayerSettingEnum = CairoCustomEnum;
 
-// Type definition for `pistols::models::events::PlayerSettingValue` enum
-export const playerSettingValue = [
-  'Undefined',
-  'Boolean',
-] as const;
-export type PlayerSettingValue = { [key in typeof playerSettingValue[number]]: string };
-export type PlayerSettingValueEnum = CairoCustomEnum;
-
 // Type definition for `pistols::models::events::SocialPlatform` enum
 export const socialPlatform = [
 	'Undefined',
@@ -778,6 +896,59 @@ export const releaseReason = [
 ] as const;
 export type ReleaseReason = { [key in typeof releaseReason[number]]: string };
 export type ReleaseReasonEnum = CairoCustomEnum;
+
+// Type definition for `pistols::interfaces::vrf::Source` enum
+export const source = [
+	'Nonce',
+	'Salt',
+] as const;
+export type Source = { [key in typeof source[number]]: string };
+export type SourceEnum = CairoCustomEnum;
+
+// Type definition for `pistols::types::cards::env::EnvCard` enum
+export const envCard = [
+	'None',
+	'DamageUp',
+	'DamageDown',
+	'ChancesUp',
+	'ChancesDown',
+	'DoubleDamageUp',
+	'DoubleChancesUp',
+	'SpecialAllShotsHit',
+	'SpecialAllShotsMiss',
+	'SpecialDoubleTactics',
+	'SpecialNoTactics',
+] as const;
+export type EnvCard = { [key in typeof envCard[number]]: string };
+export type EnvCardEnum = CairoCustomEnum;
+
+// Type definition for `pistols::types::cards::tactics::TacticsCard` enum
+export const tacticsCard = [
+	'None',
+	'Insult',
+	'CoinToss',
+	'Vengeful',
+	'ThickCoat',
+	'Reversal',
+	'Bananas',
+] as const;
+export type TacticsCard = { [key in typeof tacticsCard[number]]: string };
+export type TacticsCardEnum = CairoCustomEnum;
+
+// Type definition for `pistols::types::duel_progress::DuelistDrawnCard` enum
+export const duelistDrawnCard = [
+	'None',
+	'Fire',
+	'Dodge',
+	'Blades',
+] as const;
+export type DuelistDrawnCard = { 
+	None: string,
+	Fire: PacesCardEnum,
+	Dodge: PacesCardEnum,
+	Blades: BladesCardEnum,
+};
+export type DuelistDrawnCardEnum = CairoCustomEnum;
 
 export interface SchemaType extends ISchemaType {
 	pistols: {
@@ -814,6 +985,7 @@ export interface SchemaType extends ISchemaType {
 		SeasonConfig: SeasonConfig,
 		SeasonScoreboard: SeasonScoreboard,
 		TokenBoundAddress: TokenBoundAddress,
+		MockedValue: MockedValue,
 		Period: Period,
 		TrophyCreation: TrophyCreation,
 		TrophyProgression: TrophyProgression,
@@ -827,6 +999,20 @@ export interface SchemaType extends ISchemaType {
 		PlayerSocialLinkEvent: PlayerSocialLinkEvent,
 		LordsReleaseBill: LordsReleaseBill,
 		RewardValues: RewardValues,
+		BatchMetadataUpdate: BatchMetadataUpdate,
+		MetadataUpdate: MetadataUpdate,
+		Approval: Approval,
+		Transfer: Transfer,
+		ApprovalForAll: ApprovalForAll,
+		LeaderboardPosition: LeaderboardPosition,
+		RngWrap: RngWrap,
+		Deck: Deck,
+		DuelistHand: DuelistHand,
+		DuelProgress: DuelProgress,
+		DuelStep: DuelStep,
+		SpecialsDrawn: SpecialsDrawn,
+		DuelBonus: DuelBonus,
+		DuelistBonus: DuelistBonus,
 	},
 }
 export const schema: SchemaType = {
@@ -1031,7 +1217,7 @@ export const schema: SchemaType = {
 			seed: 0,
 			lords_amount: 0,
 			is_open: false,
-		duelist_profile: new CairoOption(CairoOptionVariant.None),
+			duelist_profile: new CairoOption(CairoOptionVariant.None),
 		},
 		Pact: {
 		duel_type: new CairoCustomEnum({ 
@@ -1057,6 +1243,7 @@ export const schema: SchemaType = {
 				GoldSignetRing: undefined,
 				SilverSignetRing: undefined,
 				LeadSignetRing: undefined, }),
+			referrer_address: "",
 		},
 		PlayerDelegation: {
 			player_address: "",
@@ -1146,6 +1333,11 @@ export const schema: SchemaType = {
 			recipient: "",
 			contract_address: "",
 			token_id: 0,
+		},
+		MockedValue: {
+			salt: 0,
+			value: 0,
+			exists: false,
 		},
 		Period: {
 			start: 0,
@@ -1280,6 +1472,399 @@ export const schema: SchemaType = {
 			lords_unlocked: 0,
 			survived: false,
 		},
+		BatchMetadataUpdate: {
+		from_token_id: 0,
+		to_token_id: 0,
+		},
+		MetadataUpdate: {
+		token_id: 0,
+		},
+		Approval: {
+			owner: "",
+			spender: "",
+		value: 0,
+		},
+		Transfer: {
+			from: "",
+			to: "",
+		value: 0,
+		},
+		Approval: {
+			owner: "",
+			approved: "",
+		token_id: 0,
+		},
+		ApprovalForAll: {
+			owner: "",
+			operator: "",
+			approved: false,
+		},
+		Transfer: {
+			from: "",
+			to: "",
+		token_id: 0,
+		},
+		LeaderboardPosition: {
+			position: 0,
+			duelist_id: 0,
+			points: 0,
+		},
+		RngWrap: {
+			rng_address: "",
+			mocked: new CairoOption(CairoOptionVariant.None),
+		},
+		Deck: {
+			fire_cards: [0],
+			dodge_cards: [0],
+			tactics_cards: [0],
+			blades_cards: [0],
+		},
+		DuelistHand: {
+		card_fire: new CairoCustomEnum({ 
+					None: "",
+				Paces1: undefined,
+				Paces2: undefined,
+				Paces3: undefined,
+				Paces4: undefined,
+				Paces5: undefined,
+				Paces6: undefined,
+				Paces7: undefined,
+				Paces8: undefined,
+				Paces9: undefined,
+				Paces10: undefined, }),
+		card_dodge: new CairoCustomEnum({ 
+					None: "",
+				Paces1: undefined,
+				Paces2: undefined,
+				Paces3: undefined,
+				Paces4: undefined,
+				Paces5: undefined,
+				Paces6: undefined,
+				Paces7: undefined,
+				Paces8: undefined,
+				Paces9: undefined,
+				Paces10: undefined, }),
+		card_tactics: new CairoCustomEnum({ 
+					None: "",
+				Insult: undefined,
+				CoinToss: undefined,
+				Vengeful: undefined,
+				ThickCoat: undefined,
+				Reversal: undefined,
+				Bananas: undefined, }),
+		card_blades: new CairoCustomEnum({ 
+					None: "",
+				Seppuku: undefined,
+				PocketPistol: undefined,
+				Behead: undefined,
+				Grapple: undefined, }),
+		},
+		DuelProgress: {
+			steps: [{ pace: new CairoCustomEnum({ 
+					None: "",
+				Paces1: undefined,
+				Paces2: undefined,
+				Paces3: undefined,
+				Paces4: undefined,
+				Paces5: undefined,
+				Paces6: undefined,
+				Paces7: undefined,
+				Paces8: undefined,
+				Paces9: undefined,
+				Paces10: undefined, }), card_env: new CairoCustomEnum({ 
+					None: "",
+				DamageUp: undefined,
+				DamageDown: undefined,
+				ChancesUp: undefined,
+				ChancesDown: undefined,
+				DoubleDamageUp: undefined,
+				DoubleChancesUp: undefined,
+				SpecialAllShotsHit: undefined,
+				SpecialAllShotsMiss: undefined,
+				SpecialDoubleTactics: undefined,
+				SpecialNoTactics: undefined, }), dice_env: 0, specials_a: { tactics: new CairoCustomEnum({ 
+					None: "",
+				Insult: undefined,
+				CoinToss: undefined,
+				Vengeful: undefined,
+				ThickCoat: undefined,
+				Reversal: undefined,
+				Bananas: undefined, }), coin_toss: false, reversal: false, shots_modifier: new CairoCustomEnum({ 
+					None: "",
+				DamageUp: undefined,
+				DamageDown: undefined,
+				ChancesUp: undefined,
+				ChancesDown: undefined,
+				DoubleDamageUp: undefined,
+				DoubleChancesUp: undefined,
+				SpecialAllShotsHit: undefined,
+				SpecialAllShotsMiss: undefined,
+				SpecialDoubleTactics: undefined,
+				SpecialNoTactics: undefined, }), tactics_modifier: new CairoCustomEnum({ 
+					None: "",
+				DamageUp: undefined,
+				DamageDown: undefined,
+				ChancesUp: undefined,
+				ChancesDown: undefined,
+				DoubleDamageUp: undefined,
+				DoubleChancesUp: undefined,
+				SpecialAllShotsHit: undefined,
+				SpecialAllShotsMiss: undefined,
+				SpecialDoubleTactics: undefined,
+				SpecialNoTactics: undefined, }), }, specials_b: { tactics: new CairoCustomEnum({ 
+					None: "",
+				Insult: undefined,
+				CoinToss: undefined,
+				Vengeful: undefined,
+				ThickCoat: undefined,
+				Reversal: undefined,
+				Bananas: undefined, }), coin_toss: false, reversal: false, shots_modifier: new CairoCustomEnum({ 
+					None: "",
+				DamageUp: undefined,
+				DamageDown: undefined,
+				ChancesUp: undefined,
+				ChancesDown: undefined,
+				DoubleDamageUp: undefined,
+				DoubleChancesUp: undefined,
+				SpecialAllShotsHit: undefined,
+				SpecialAllShotsMiss: undefined,
+				SpecialDoubleTactics: undefined,
+				SpecialNoTactics: undefined, }), tactics_modifier: new CairoCustomEnum({ 
+					None: "",
+				DamageUp: undefined,
+				DamageDown: undefined,
+				ChancesUp: undefined,
+				ChancesDown: undefined,
+				DoubleDamageUp: undefined,
+				DoubleChancesUp: undefined,
+				SpecialAllShotsHit: undefined,
+				SpecialAllShotsMiss: undefined,
+				SpecialDoubleTactics: undefined,
+				SpecialNoTactics: undefined, }), }, card_a: new CairoCustomEnum({ 
+					None: "",
+				Fire: undefined,
+				Dodge: undefined,
+				Blades: undefined, }), card_b: new CairoCustomEnum({ 
+					None: "",
+				Fire: undefined,
+				Dodge: undefined,
+				Blades: undefined, }), state_a: { chances: 0, damage: 0, health: 0, dice_fire: 0, honour: 0, }, state_b: { chances: 0, damage: 0, health: 0, dice_fire: 0, honour: 0, }, }],
+			winner: 0,
+		hand_a: { card_fire: new CairoCustomEnum({ 
+					None: "",
+				Paces1: undefined,
+				Paces2: undefined,
+				Paces3: undefined,
+				Paces4: undefined,
+				Paces5: undefined,
+				Paces6: undefined,
+				Paces7: undefined,
+				Paces8: undefined,
+				Paces9: undefined,
+				Paces10: undefined, }), card_dodge: new CairoCustomEnum({ 
+					None: "",
+				Paces1: undefined,
+				Paces2: undefined,
+				Paces3: undefined,
+				Paces4: undefined,
+				Paces5: undefined,
+				Paces6: undefined,
+				Paces7: undefined,
+				Paces8: undefined,
+				Paces9: undefined,
+				Paces10: undefined, }), card_tactics: new CairoCustomEnum({ 
+					None: "",
+				Insult: undefined,
+				CoinToss: undefined,
+				Vengeful: undefined,
+				ThickCoat: undefined,
+				Reversal: undefined,
+				Bananas: undefined, }), card_blades: new CairoCustomEnum({ 
+					None: "",
+				Seppuku: undefined,
+				PocketPistol: undefined,
+				Behead: undefined,
+				Grapple: undefined, }), },
+		hand_b: { card_fire: new CairoCustomEnum({ 
+					None: "",
+				Paces1: undefined,
+				Paces2: undefined,
+				Paces3: undefined,
+				Paces4: undefined,
+				Paces5: undefined,
+				Paces6: undefined,
+				Paces7: undefined,
+				Paces8: undefined,
+				Paces9: undefined,
+				Paces10: undefined, }), card_dodge: new CairoCustomEnum({ 
+					None: "",
+				Paces1: undefined,
+				Paces2: undefined,
+				Paces3: undefined,
+				Paces4: undefined,
+				Paces5: undefined,
+				Paces6: undefined,
+				Paces7: undefined,
+				Paces8: undefined,
+				Paces9: undefined,
+				Paces10: undefined, }), card_tactics: new CairoCustomEnum({ 
+					None: "",
+				Insult: undefined,
+				CoinToss: undefined,
+				Vengeful: undefined,
+				ThickCoat: undefined,
+				Reversal: undefined,
+				Bananas: undefined, }), card_blades: new CairoCustomEnum({ 
+					None: "",
+				Seppuku: undefined,
+				PocketPistol: undefined,
+				Behead: undefined,
+				Grapple: undefined, }), },
+		},
+		DuelStep: {
+		pace: new CairoCustomEnum({ 
+					None: "",
+				Paces1: undefined,
+				Paces2: undefined,
+				Paces3: undefined,
+				Paces4: undefined,
+				Paces5: undefined,
+				Paces6: undefined,
+				Paces7: undefined,
+				Paces8: undefined,
+				Paces9: undefined,
+				Paces10: undefined, }),
+		card_env: new CairoCustomEnum({ 
+					None: "",
+				DamageUp: undefined,
+				DamageDown: undefined,
+				ChancesUp: undefined,
+				ChancesDown: undefined,
+				DoubleDamageUp: undefined,
+				DoubleChancesUp: undefined,
+				SpecialAllShotsHit: undefined,
+				SpecialAllShotsMiss: undefined,
+				SpecialDoubleTactics: undefined,
+				SpecialNoTactics: undefined, }),
+			dice_env: 0,
+		specials_a: { tactics: new CairoCustomEnum({ 
+					None: "",
+				Insult: undefined,
+				CoinToss: undefined,
+				Vengeful: undefined,
+				ThickCoat: undefined,
+				Reversal: undefined,
+				Bananas: undefined, }), coin_toss: false, reversal: false, shots_modifier: new CairoCustomEnum({ 
+					None: "",
+				DamageUp: undefined,
+				DamageDown: undefined,
+				ChancesUp: undefined,
+				ChancesDown: undefined,
+				DoubleDamageUp: undefined,
+				DoubleChancesUp: undefined,
+				SpecialAllShotsHit: undefined,
+				SpecialAllShotsMiss: undefined,
+				SpecialDoubleTactics: undefined,
+				SpecialNoTactics: undefined, }), tactics_modifier: new CairoCustomEnum({ 
+					None: "",
+				DamageUp: undefined,
+				DamageDown: undefined,
+				ChancesUp: undefined,
+				ChancesDown: undefined,
+				DoubleDamageUp: undefined,
+				DoubleChancesUp: undefined,
+				SpecialAllShotsHit: undefined,
+				SpecialAllShotsMiss: undefined,
+				SpecialDoubleTactics: undefined,
+				SpecialNoTactics: undefined, }), },
+		specials_b: { tactics: new CairoCustomEnum({ 
+					None: "",
+				Insult: undefined,
+				CoinToss: undefined,
+				Vengeful: undefined,
+				ThickCoat: undefined,
+				Reversal: undefined,
+				Bananas: undefined, }), coin_toss: false, reversal: false, shots_modifier: new CairoCustomEnum({ 
+					None: "",
+				DamageUp: undefined,
+				DamageDown: undefined,
+				ChancesUp: undefined,
+				ChancesDown: undefined,
+				DoubleDamageUp: undefined,
+				DoubleChancesUp: undefined,
+				SpecialAllShotsHit: undefined,
+				SpecialAllShotsMiss: undefined,
+				SpecialDoubleTactics: undefined,
+				SpecialNoTactics: undefined, }), tactics_modifier: new CairoCustomEnum({ 
+					None: "",
+				DamageUp: undefined,
+				DamageDown: undefined,
+				ChancesUp: undefined,
+				ChancesDown: undefined,
+				DoubleDamageUp: undefined,
+				DoubleChancesUp: undefined,
+				SpecialAllShotsHit: undefined,
+				SpecialAllShotsMiss: undefined,
+				SpecialDoubleTactics: undefined,
+				SpecialNoTactics: undefined, }), },
+		card_a: new CairoCustomEnum({ 
+					None: "",
+				Fire: undefined,
+				Dodge: undefined,
+				Blades: undefined, }),
+		card_b: new CairoCustomEnum({ 
+					None: "",
+				Fire: undefined,
+				Dodge: undefined,
+				Blades: undefined, }),
+		state_a: { chances: 0, damage: 0, health: 0, dice_fire: 0, honour: 0, },
+		state_b: { chances: 0, damage: 0, health: 0, dice_fire: 0, honour: 0, },
+		},
+		SpecialsDrawn: {
+		tactics: new CairoCustomEnum({ 
+					None: "",
+				Insult: undefined,
+				CoinToss: undefined,
+				Vengeful: undefined,
+				ThickCoat: undefined,
+				Reversal: undefined,
+				Bananas: undefined, }),
+			coin_toss: false,
+			reversal: false,
+		shots_modifier: new CairoCustomEnum({ 
+					None: "",
+				DamageUp: undefined,
+				DamageDown: undefined,
+				ChancesUp: undefined,
+				ChancesDown: undefined,
+				DoubleDamageUp: undefined,
+				DoubleChancesUp: undefined,
+				SpecialAllShotsHit: undefined,
+				SpecialAllShotsMiss: undefined,
+				SpecialDoubleTactics: undefined,
+				SpecialNoTactics: undefined, }),
+		tactics_modifier: new CairoCustomEnum({ 
+					None: "",
+				DamageUp: undefined,
+				DamageDown: undefined,
+				ChancesUp: undefined,
+				ChancesDown: undefined,
+				DoubleDamageUp: undefined,
+				DoubleChancesUp: undefined,
+				SpecialAllShotsHit: undefined,
+				SpecialAllShotsMiss: undefined,
+				SpecialDoubleTactics: undefined,
+				SpecialNoTactics: undefined, }),
+		},
+		DuelBonus: {
+		duelist_a: { kill_pace: 0, hit: false, dodge: false, },
+		duelist_b: { kill_pace: 0, hit: false, dodge: false, },
+		},
+		DuelistBonus: {
+			kill_pace: 0,
+			hit: false,
+			dodge: false,
+		},
 	},
 };
 export enum ModelsMapping {
@@ -1324,6 +1909,7 @@ export enum ModelsMapping {
 	SeasonPhase = 'pistols-SeasonPhase',
 	SeasonScoreboard = 'pistols-SeasonScoreboard',
 	TokenBoundAddress = 'pistols-TokenBoundAddress',
+	MockedValue = 'pistols-MockedValue',
 	BladesCard = 'pistols-BladesCard',
 	FinalBlow = 'pistols-FinalBlow',
 	PacesCard = 'pistols-PacesCard',
@@ -1354,4 +1940,23 @@ export enum ModelsMapping {
 	LordsReleaseBill = 'pistols-LordsReleaseBill',
 	ReleaseReason = 'pistols-ReleaseReason',
 	RewardValues = 'pistols-RewardValues',
+	BatchMetadataUpdate = 'nft_combo-BatchMetadataUpdate',
+	ContractURIUpdated = 'nft_combo-ContractURIUpdated',
+	MetadataUpdate = 'nft_combo-MetadataUpdate',
+	Approval = 'openzeppelin_token-Approval',
+	Transfer = 'openzeppelin_token-Transfer',
+	ApprovalForAll = 'openzeppelin_token-ApprovalForAll',
+	Source = 'pistols-Source',
+	LeaderboardPosition = 'pistols-LeaderboardPosition',
+	RngWrap = 'pistols-RngWrap',
+	Deck = 'pistols-Deck',
+	EnvCard = 'pistols-EnvCard',
+	DuelistHand = 'pistols-DuelistHand',
+	TacticsCard = 'pistols-TacticsCard',
+	DuelProgress = 'pistols-DuelProgress',
+	DuelStep = 'pistols-DuelStep',
+	DuelistDrawnCard = 'pistols-DuelistDrawnCard',
+	SpecialsDrawn = 'pistols-SpecialsDrawn',
+	DuelBonus = 'pistols-DuelBonus',
+	DuelistBonus = 'pistols-DuelistBonus',
 }

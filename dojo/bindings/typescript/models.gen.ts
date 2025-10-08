@@ -190,6 +190,7 @@ export interface Player {
 	totals: Totals;
 	alive_duelist_count: BigNumberish;
 	active_signet_ring: RingTypeEnum;
+	referrer_address: string;
 }
 
 // Type definition for `pistols::models::player::PlayerDelegation` struct
@@ -1242,6 +1243,7 @@ export const schema: SchemaType = {
 				GoldSignetRing: undefined,
 				SilverSignetRing: undefined,
 				LeadSignetRing: undefined, }),
+			referrer_address: "",
 		},
 		PlayerDelegation: {
 			player_address: "",
