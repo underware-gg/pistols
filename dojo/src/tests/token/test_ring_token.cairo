@@ -58,7 +58,7 @@ fn setup(flags: u16) -> TestSystems {
 fn _make_challenge(ref sys: TestSystems, address_a: ContractAddress, address_b: ContractAddress, season_id: u32) -> u128 {
     tester::set_current_season(ref sys, season_id);
     let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_miss();
-    let duel_id = prefabs::start_new_challenge(@sys, address_a, address_b, DuelType::Practice, 0);
+    let duel_id: u128 = prefabs::start_new_challenge(@sys, address_a, address_b, DuelType::Practice, 0);
     let (challenge, _round): (ChallengeValue, RoundValue) = prefabs::commit_reveal_get(@sys, duel_id, address_a, address_b, mocked, moves_a, moves_b);
     assert_eq!(challenge.state, ChallengeState::Draw, "bad state");
     assert_eq!(challenge.season_id, season_id, "bad season_id");

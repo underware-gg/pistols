@@ -179,8 +179,8 @@ pub mod admin {
         }
         #[inline(always)]
         fn _assert_caller_is_owner(self: @ContractState) {
-            let mut world = self.world_default();
-            assert(world.dispatcher.is_owner(SELECTORS::ADMIN, starknet::get_caller_address()) == true, Errors::CALLER_NOT_OWNER);
+            let mut world: WorldStorage = self.world_default();
+            assert(world.dispatcher.is_owner(SELECTORS::ADMIN, starknet::get_caller_address()), Errors::CALLER_NOT_OWNER);
         }
     }
 }

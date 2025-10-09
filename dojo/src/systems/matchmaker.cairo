@@ -184,40 +184,39 @@ pub mod matchmaker {
                     0,
                     slot,
                 );
+            }
+            //----------------------------------
+            // player ping...
+            //
+            // validate input duelist
+            else if (duelist_id != matching_player.duelist_id) {
+                // can stack duelists in SLOW mode only
+                assert(queue_mode == QueueMode::Slow, Errors::INVALID_MODE);
+                // Validate duelist and set a slot
+                let (duelist_id, slot): (u128, u8) = self._validate_and_randomize_slot(ref store, @queue, caller, duelist_id, seed);
+                // save it for later...
+                matching_player.stack_duelist(
+                    duelist_id,
+                    slot,
+                );
+                // save and return
+                store.set_match_player(@matching_player);
+                return (0);
+            }
+            // validate input mode
+            // can switch from SLOW to FAST only...
+            else if (queue_mode != matching_player.queue_info.queue_mode) {
+                assert(matching_player.queue_info.queue_mode == QueueMode::Slow && queue_mode == QueueMode::Fast, Errors::INVALID_MODE);
+                // re-enter queue with new speed
+                matching_player.enter_queue(
+                    queue_mode,
+                    matching_player.duelist_id,
+                    matching_player.duel_id,
+                    matching_player.queue_info.slot,
+                );
             } else {
-                //----------------------------------
-                // player ping...
-                //
-                // validate input duelist
-                if (duelist_id != matching_player.duelist_id) {
-                    // can stack duelists in SLOW mode only
-                    assert(queue_mode == QueueMode::Slow, Errors::INVALID_MODE);
-                    // Validate duelist and set a slot
-                    let (duelist_id, slot): (u128, u8) = self._validate_and_randomize_slot(ref store, @queue, caller, duelist_id, seed);
-                    // save it for later...
-                    matching_player.stack_duelist(
-                        duelist_id,
-                        slot,
-                    );
-                    // save and return
-                    store.set_match_player(@matching_player);
-                    return (0);
-                }
-                // validate input mode
-                // can switch from SLOW to FAST only...
-                else if (queue_mode != matching_player.queue_info.queue_mode) {
-                    assert(matching_player.queue_info.queue_mode == QueueMode::Slow && queue_mode == QueueMode::Fast, Errors::INVALID_MODE);
-                    // re-enter queue with new speed
-                    matching_player.enter_queue(
-                        queue_mode,
-                        matching_player.duelist_id,
-                        matching_player.duel_id,
-                        matching_player.queue_info.slot,
-                    );
-                } else {
-                    matching_player.queue_info.expired = matching_player.queue_info.expired || matching_player.queue_info.has_expired(starknet::get_block_timestamp());
-                }
-            };
+                matching_player.queue_info.expired = matching_player.queue_info.expired || matching_player.queue_info.has_expired(starknet::get_block_timestamp());
+            }
 
             // match player...
             let matched_duel_id: u128 =
@@ -246,8 +245,8 @@ pub mod matchmaker {
     #[generate_trait]
     impl InternalImpl of InternalTrait {
         fn _assert_caller_is_admin(self: @ContractState) {
-            let mut world = self.world_default();
-            assert(world.admin_dispatcher().am_i_admin(starknet::get_caller_address()) == true, Errors::CALLER_NOT_ADMIN);
+            let mut world: WorldStorage = self.world_default();
+            assert(world.admin_dispatcher().am_i_admin(starknet::get_caller_address()), Errors::CALLER_NOT_ADMIN);
         }
 
         fn _validate_and_randomize_slot(ref self: ContractState,

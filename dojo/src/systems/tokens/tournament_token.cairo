@@ -361,11 +361,11 @@ pub mod tournament_token {
             let mut store: Store = StoreTrait::new(self.world_default());
             // validate entry ownership
             let caller: ContractAddress = starknet::get_caller_address();
-            assert(self.is_owner_of(caller, pass_id.into()) == true, Errors::NOT_YOUR_ENTRY);
+            assert(self.is_owner_of(caller, pass_id.into()), Errors::NOT_YOUR_ENTRY);
             assert(duelist_id.is_non_zero(), Errors::INVALID_DUELIST);
             // validate duelist ownership
             let duelist_dispatcher: IDuelistTokenDispatcher = store.world.duelist_token_dispatcher();
-            assert(duelist_dispatcher.is_owner_of(caller, duelist_id.into()) == true, Errors::NOT_YOUR_DUELIST);
+            assert(duelist_dispatcher.is_owner_of(caller, duelist_id.into()), Errors::NOT_YOUR_DUELIST);
 
             // validate duelist health
             let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(pass_id);
@@ -424,7 +424,7 @@ pub mod tournament_token {
             let mut store: Store = StoreTrait::new(self.world_default());
             // validate ownership
             let caller: ContractAddress = starknet::get_caller_address();
-            assert(self.is_owner_of(caller, pass_id.into()) == true, Errors::NOT_YOUR_ENTRY);
+            assert(self.is_owner_of(caller, pass_id.into()), Errors::NOT_YOUR_ENTRY);
             // verify lifecycle
             let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(pass_id);
             assert(token_metadata.lifecycle.can_start(starknet::get_block_timestamp()), Errors::BUDOKAN_NOT_STARTABLE);
@@ -479,7 +479,7 @@ pub mod tournament_token {
             let mut store: Store = StoreTrait::new(self.world_default());
             // validate ownership
             let caller: ContractAddress = starknet::get_caller_address();
-            assert(self.is_owner_of(caller, pass_id.into()) == true, Errors::NOT_YOUR_ENTRY);
+            assert(self.is_owner_of(caller, pass_id.into()), Errors::NOT_YOUR_ENTRY);
             // budokan must be playable
             let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(pass_id);
             assert(token_metadata.lifecycle.is_playable(starknet::get_block_timestamp()), Errors::BUDOKAN_NOT_PLAYABLE);
@@ -556,7 +556,7 @@ pub mod tournament_token {
             let mut store: Store = StoreTrait::new(self.world_default());
             // validate ownership
             let caller: ContractAddress = starknet::get_caller_address();
-            assert(self.is_owner_of(caller, pass_id.into()) == true, Errors::NOT_YOUR_ENTRY);
+            assert(self.is_owner_of(caller, pass_id.into()), Errors::NOT_YOUR_ENTRY);
             // verify lifecycle
             let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(pass_id);
             let entry: TournamentPassValue = store.get_tournament_pass_value(pass_id);
@@ -630,8 +630,8 @@ pub mod tournament_token {
     #[generate_trait]
     impl InternalImpl of InternalTrait {
         fn _assert_caller_is_owner(self: @ContractState) {
-            let mut world = self.world_default();
-            assert(world.dispatcher.is_owner(SELECTORS::TOURNAMENT_TOKEN, starknet::get_caller_address()) == true, Errors::CALLER_NOT_OWNER);
+            let mut world: WorldStorage = self.world_default();
+            assert(world.dispatcher.is_owner(SELECTORS::TOURNAMENT_TOKEN, starknet::get_caller_address()), Errors::CALLER_NOT_OWNER);
         }
         fn _create_settings(ref self: ContractState) {
             let mut store: Store = StoreTrait::new(self.world_default());

@@ -251,7 +251,7 @@ pub mod ring_token {
         }
         #[inline(always)]
         fn _assert_caller_is_owner(self: @ContractState, store: @Store) {
-            assert((*store.world.dispatcher).is_owner(SELECTORS::RING_TOKEN, starknet::get_caller_address()) == true, Errors::CALLER_NOT_OWNER);
+            assert((*store.world.dispatcher).is_owner(SELECTORS::RING_TOKEN, starknet::get_caller_address()), Errors::CALLER_NOT_OWNER);
         }
 
         fn _has_claimed(self: @ContractState, store: @Store, recipient: ContractAddress, ring_type: RingType) -> bool {

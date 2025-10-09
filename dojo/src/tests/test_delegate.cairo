@@ -33,8 +33,8 @@ mod tests {
     #[test]
     fn test_challenge_reply_delegated_b_ok() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE | FLAGS::MOCK_RNG);
-        let A = OWNER();
-        let B = OTHER();
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Seasonal, EXPIRE_MINUTES, 1);
         // not delegated yet
         assert!(PlayerDelegationTrait::can_play_game(@sys.store, A, A), "trait: A>A");
@@ -71,8 +71,8 @@ mod tests {
     #[test]
     fn test_challenge_reply_delegated_b_first_ok() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE | FLAGS::MOCK_RNG);
-        let A = OWNER();
-        let B = OTHER();
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Seasonal, EXPIRE_MINUTES, 1);
         // delegate...
         tester::execute_delegate_game_actions(@sys, B, DELEGATEE(), true);
@@ -91,8 +91,8 @@ mod tests {
     #[test]
     fn test_challenge_reply_delegated_a_first_ok() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE | FLAGS::MOCK_RNG);
-        let A = OWNER();
-        let B = OTHER();
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Seasonal, EXPIRE_MINUTES, 1);
         tester::execute_reply_duel(@sys, B, ID(B), duel_id, true);
         // delegate...
@@ -113,8 +113,8 @@ mod tests {
     #[test]
     fn test_challenge_reply_delegated_a_ok() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE | FLAGS::MOCK_RNG);
-        let A = OWNER();
-        let B = OTHER();
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Seasonal, EXPIRE_MINUTES, 1);
         tester::execute_reply_duel(@sys, B, ID(B), duel_id, true);
         // delegate...
@@ -136,8 +136,8 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Not your duelist', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_undelegate() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE | FLAGS::MOCK_RNG);
-        let A = OWNER();
-        let B = OTHER();
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Seasonal, EXPIRE_MINUTES, 1);
         // delegate...
         tester::execute_delegate_game_actions(@sys, B, DELEGATEE(), true);
@@ -155,8 +155,8 @@ mod tests {
     #[test]
     fn test_challenge_refuse_delegated_ok() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        let A = OWNER();
-        let B = OTHER();
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Seasonal, EXPIRE_MINUTES, 1);
         // delegate and refuse
         tester::execute_delegate_game_actions(@sys, B, DELEGATEE(), true);
@@ -175,8 +175,8 @@ mod tests {
     #[should_panic(expected:('DUEL: Not your challenge', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_reply_delegated_wrong_player_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        let A = OWNER();
-        let B = OTHER();
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Seasonal, EXPIRE_MINUTES, 1);
         // delegate...
         tester::execute_delegate_game_actions(@sys, A, DELEGATEE(), true);
@@ -187,8 +187,8 @@ mod tests {
     #[should_panic(expected:('DUELIST: Not your duelist', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_reply_delegated_wrong_player_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        let A = OWNER();
-        let B = OTHER();
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Seasonal, EXPIRE_MINUTES, 1);
         // delegate...
         tester::execute_delegate_game_actions(@sys, B, DELEGATEE(), true);
@@ -199,8 +199,8 @@ mod tests {
     #[should_panic(expected:('DUEL: Not your challenge', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_reply_delegated_wrong_duelist_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        let A = OWNER();
-        let B = OTHER();
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Seasonal, EXPIRE_MINUTES, 1);
         // delegate...
         tester::execute_delegate_game_actions(@sys, A, DELEGATEE(), true);
@@ -211,8 +211,8 @@ mod tests {
     #[should_panic(expected:('DUELIST: Not your duelist', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_reply_delegated_wrong_duelist_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        let A = OWNER();
-        let B = OTHER();
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Seasonal, EXPIRE_MINUTES, 1);
         // delegate...
         tester::execute_delegate_game_actions(@sys, B, DELEGATEE(), true);
@@ -223,8 +223,8 @@ mod tests {
     #[should_panic(expected:('DUEL: Reply self', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_delegated_reply_b_to_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        let A = OWNER();
-        let B = OTHER();
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Seasonal, EXPIRE_MINUTES, 1);
         // delegate...
         tester::execute_delegate_game_actions(@sys, B, A, true);
@@ -240,8 +240,8 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Cross delegation', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_delegated_commit_b_to_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE | FLAGS::MOCK_RNG);
-        let A = OWNER();
-        let B = OTHER();
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Seasonal, EXPIRE_MINUTES, 1);
         tester::execute_reply_duel(@sys, B, ID(B), duel_id, true);
         // delegate...
@@ -254,8 +254,8 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Cross delegation', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_delegated_commit_a_to_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE | FLAGS::MOCK_RNG);
-        let A = OWNER();
-        let B = OTHER();
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys, A, B, MESSAGE(), DuelType::Seasonal, EXPIRE_MINUTES, 1);
         tester::execute_reply_duel(@sys, B, ID(B), duel_id, true);
         // delegate...

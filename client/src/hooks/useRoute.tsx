@@ -11,6 +11,7 @@ export const useRoute = () => {
     pathname: location.pathname,
     slugs: {
       duel_id: params['duel_id'],
+      referrer_username: params['referrer_username'],
     },
   }
 }

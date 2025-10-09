@@ -137,6 +137,11 @@ export default function WalletHeader({
             <Col verticalAlign='middle'>
               <ActionButton fill disabled={!openProfile} onClick={() => openProfile()} label='Inventory' />
             </Col>
+            {selectedNetworkConfig.isTestnet &&
+              <Col verticalAlign='middle'>
+                <ActionButton fill disabled={!openProfile} onClick={() => dispatchSetScene(SceneName.Invite, { username })} label='Invite' />
+              </Col>
+            }
             <Col verticalAlign='middle'>
               <ActionButton fill onClick={() => {
                 dispatchSetScene(SceneName.Gate)

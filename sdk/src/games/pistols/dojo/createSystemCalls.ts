@@ -312,9 +312,11 @@ export function createSystemCalls(
     // pack_token
     //
     pack_token: {
-      claim_starter_pack: async (signer: AccountInterface, key?: string): Promise<boolean> => {
+      claim_starter_pack: async (signer: AccountInterface, referrer_address: BigNumberish, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
-          contractCalls.pack_token.buildClaimStarterPackCalldata(),
+          contractCalls.pack_token.buildClaimStarterPackCalldata(
+            bigintToAddress(referrer_address),
+          ),
         ]
         return await _executeTransaction(signer, calls, key)
       },

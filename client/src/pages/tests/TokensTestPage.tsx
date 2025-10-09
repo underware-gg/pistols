@@ -76,7 +76,7 @@ function Purchases() {
       &nbsp;&nbsp;<LordsBalance address={address} size='big' />
       &nbsp;&nbsp;<span className='Code'>(mint test LORDS, if available)</span>
       <br />
-      <Button disabled={!canClaimStarterPack} onClick={() => pack_token.claim_starter_pack(account)}>Claim Starter Pack</Button>
+      <Button disabled={!canClaimStarterPack} onClick={() => pack_token.claim_starter_pack(account, 0n)}>Claim Starter Pack</Button>
       &nbsp;&nbsp;<span className='Code'>(mint PACK + burn PACK + mint 2 DUELISTS)</span>
       <br />
       <Button disabled={canClaimStarterPack} onClick={() => pack_token.purchase(account, constants.PackType.GenesisDuelists5x)}>Purchase Pack</Button>

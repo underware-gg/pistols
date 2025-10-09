@@ -64,11 +64,8 @@ pub mod tests {
         let duelist: Duelist = sys.store.get_duelist(bot_id);
         let collection: CollectionDescriptor = duelist.duelist_profile.collection();
         assert_eq!(collection.folder_name, 'bots', "{}: duelist_profile.folder_name", prefix);
-        match expected_profile {
-            Option::Some(key) => {
-                assert_eq!(duelist.duelist_profile, DuelistProfile::Bot(key), "{}: duelist_profile", prefix);
-            },
-            Option::None => {}
+        if let Option::Some(key) = expected_profile {
+            assert_eq!(duelist.duelist_profile, DuelistProfile::Bot(key), "{}: duelist_profile", prefix);
         }
         // check stack
         let stack: PlayerDuelistStack = sys.store.get_player_duelist_stack_from_id(bot_address, bot_id);

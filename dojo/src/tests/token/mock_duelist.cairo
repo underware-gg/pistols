@@ -58,7 +58,7 @@ pub mod duelist_token {
     #[abi(embed_v0)]
     impl ERC721MockImpl of super::IMockDuelistToken<ContractState> {
         fn transfer_from(ref self: ContractState, from: ContractAddress, to: ContractAddress, token_id: u256) {
-            let mut world = self.world_default();
+            let mut world: WorldStorage = self.world_default();
             world.write_model(
                 @MockDuelistOwners {
                     token_id: token_id.low,
@@ -68,7 +68,7 @@ pub mod duelist_token {
         }
 
         fn owner_of(self: @ContractState, token_id: u256) -> ContractAddress {
-            let mut world = self.world_default();
+            let mut world: WorldStorage = self.world_default();
 
             // OZ always panics on token zero
             assert(token_id.is_non_zero(), 'DUELIS_MOCK: invalid ID');
@@ -108,7 +108,7 @@ pub mod duelist_token {
         fn get_validated_active_duelist_id(ref self: ContractState, address: ContractAddress, duelist_id: u128, lives_staked: u8) -> u128 {
             assert(duelist_id.is_non_zero(), Errors::INVALID_DUELIST);
             // let mut store: Store = StoreTrait::new(self.world_default());
-            assert(self.is_owner_of(address, duelist_id.into()) == true, Errors::NOT_YOUR_DUELIST);
+            assert(self.is_owner_of(address, duelist_id.into()), Errors::NOT_YOUR_DUELIST);
             (duelist_id)
         }
         fn poke(ref self: ContractState, duelist_id: u128) -> bool {

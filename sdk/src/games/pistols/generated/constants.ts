@@ -67,8 +67,9 @@ export const INTERFACE_DESCRIPTIONS: any = {
     claim_starter_pack: 'Claim the starter pack, mint Duelists',
     claim_gift: 'Claim gift pack, if available',
     purchase: 'Purchase a closed pack',
-    airdrop: 'Airdrops a pack (admin)',
     open: 'Open a pack, mint its contents',
+    mint_to: 'Promotional airdrops (admin)',
+    airdrop: 'Airdrops a pack (admin)',
   },
   // from: ../dojo/src/systems/tokens/ring_token.cairo
   IRingTokenPublic: {

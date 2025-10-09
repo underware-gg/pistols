@@ -50,11 +50,7 @@ pub impl DiceImpl of DiceTrait {
             rng: IRngDispatcher{ contract_address: *wrapped.rng_address },
             seed: initial_seed,
             last_dice: 0,
-            mocked: match *wrapped.mocked {
-                // mocked values are used in rng_mock contract (tutorials and tests)
-                Option::Some(mocked) => mocked,
-                Option::None => [].span(),
-            },
+            mocked: (*wrapped.mocked).unwrap_or([].span()),
         })
     }
 

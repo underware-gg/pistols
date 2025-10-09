@@ -14,6 +14,7 @@ import AppGame from '/src/components/AppGame'
 import GameContainer, { TavernAudios } from '/src/components/GameContainer'
 import Background from '/src/components/Background'
 import PlayerModal from '/src/components/modals/PlayerModal'
+import InviteModal from '/src/components/modals/InviteModal'
 import DuelistModal from '/src/components/modals/DuelistModal'
 import ChallengeModal from '/src/components/modals/ChallengeModal'
 import NewChallengeModal from '/src/components/modals/NewChallengeModal'
@@ -117,7 +118,7 @@ function MainUI() {
   const { gameImpl } = useThreeJsContext()
   const { qualityConfig } = useQuality()
   const { currentDuel, tutorialLevel } = usePistolsContext()
-  const { atGate, atProfile, atTavern, atDuel, atDoor, atDuelsBoard, atDuelists, atGraveyard, atTutorial, atLeaderboards, atCardPacks, atDuelistBook, atMatchmaking } = usePistolsScene()
+  const { atGate, atProfile, atInvite, atTavern, atDuel, atDoor, atDuelsBoard, atDuelists, atGraveyard, atTutorial, atLeaderboards, atCardPacks, atDuelistBook, atMatchmaking } = usePistolsScene()
 
   useEffect(() => {
     if (!gameImpl) return;
@@ -165,6 +166,7 @@ function MainUI() {
       else if (atMatchmaking) setCurrentScene(<ScMatchmaking />);
       else if (atGraveyard) setCurrentScene(<ScGraveyard />);
       else if (atLeaderboards) setCurrentScene(<ScLeaderboards />);
+      else if (atInvite) setCurrentScene(<></>);
       else setCurrentScene(<ScTavern />);
     }, SCENE_CHANGE_ANIMATION_DURATION);
 
@@ -229,6 +231,7 @@ function Modals() {
       <ChallengeModal />
       <DuelistModal />
       <PlayerModal />
+      <InviteModal />
       <NewChallengeModal />
       <BugReportModal opener={bugReportOpener} />
       <SelectDuelistModal opener={duelistSelectOpener} />

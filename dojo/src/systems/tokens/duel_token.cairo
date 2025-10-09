@@ -329,7 +329,7 @@ pub mod duel_token {
 
             // calc expiration
             let timestamps: Period = PeriodTrait::new_expiring(
-                if (expire_minutes == 0) {TIMESTAMP::ONE_DAY}
+                if expire_minutes.is_zero() {TIMESTAMP::ONE_DAY}
                 else {TimestampTrait::from_minutes(expire_minutes)},
             );
 
@@ -403,7 +403,7 @@ pub mod duel_token {
 
             if (caller == challenge.address_a) {
                 // same duelist, can only withdraw...
-                assert(accepted == false, Errors::INVALID_REPLY_SELF);
+                assert(!accepted, Errors::INVALID_REPLY_SELF);
                 challenge.state = ChallengeState::Withdrawn;
             } else {
                 // open challenge: anyone can ACCEPT
@@ -461,7 +461,7 @@ pub mod duel_token {
                 let player_address: ContractAddress = if (caller == challenge.address_a) {challenge.address_a} else {challenge.address_b};
                 Activity::ChallengeCanceled.emit(ref store.world, player_address, challenge.duel_id.into());
             } else {
-                PlayerTrait::check_in(ref store, Activity::ChallengeReplied, challenge.address_b, duel_id.into());
+                PlayerTrait::check_in(ref store, Activity::ChallengeReplied, challenge.address_b, duel_id.into(), ZERO());
             }
             
             // update challenge
@@ -780,7 +780,7 @@ pub mod duel_token {
             }
 
             // events
-            PlayerTrait::check_in(ref store, Activity::ChallengeCreated, challenge.address_a, challenge.duel_id.into());
+            PlayerTrait::check_in(ref store, Activity::ChallengeCreated, challenge.address_a, challenge.duel_id.into(), ZERO());
 
             (challenge)
         }
@@ -874,12 +874,12 @@ pub mod duel_token {
             if (challenge.winner != 0) {
                 attributes.append(Attribute {
                     key: "Winner",
-                    value: if(challenge.winner==1){duelist_name_a}else{duelist_name_b},
+                    value: if (challenge.winner==1){duelist_name_a}else{duelist_name_b},
                 });
             }
             // return the metadata to be rendered by the component
             // https://docs.opensea.io/docs/metadata-standards#metadata-structure
-            let metadata = TokenMetadata {
+            let metadata: TokenMetadata = TokenMetadata {
                 token_id,
                 name: format!("Duel #{}", token_id),
                 description: format!("Pistols at Dawn Duel #{}. https://pistols.gg", token_id),
