@@ -605,6 +605,33 @@ fn test_airdrop_ok() {
 }
 
 #[test]
+fn test_promo_mint_to_ok() {
+    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    tester::fund_duelists_pool(@sys, 9);
+    // airdrop some...
+    let pack_id_1: u128 = tester::execute_pack_promo_mint_to(@sys, OWNER(), OTHER());
+    _assert_minted_count(@sys, 1, 1, "airdrop 1");
+    assert_eq!(pack_id_1, 1, "airdrop 1");
+    assert_eq!(sys.pack.balance_of(OWNER()), 0, "airdrop 1");
+    assert_eq!(sys.pack.balance_of(OTHER()), 1, "airdrop 1");
+    assert_eq!(sys.store.get_pack(1).pack_type, PackType::GenesisDuelists5x, "airdrop 1");
+    let pack_1: Pack = sys.store.get_pack(pack_id_1);
+    assert_eq!(pack_1.pack_type, PackType::GenesisDuelists5x, "airdrop 1");
+    assert_ne!(pack_1.seed, 0, "airdrop 1");
+    // airdrop more...
+    let pack_id_2: u128 = tester::execute_pack_promo_mint_to(@sys, OWNER(), BUMMER());
+    _assert_minted_count(@sys, 2, 2, "airdrop 2");
+    assert_eq!(pack_id_2, 2, "airdrop 2");
+    assert_eq!(sys.pack.balance_of(OWNER()), 0, "airdrop 2");
+    assert_eq!(sys.pack.balance_of(OTHER()), 1, "airdrop 2");
+    assert_eq!(sys.pack.balance_of(BUMMER()), 1, "airdrop 2");
+    let pack_2: Pack = sys.store.get_pack(pack_id_2);
+    assert_eq!(pack_2.pack_type, PackType::GenesisDuelists5x, "airdrop 2");
+    assert_ne!(pack_2.seed, 0, "airdrop 2");
+    assert_ne!(pack_2.seed, pack_1.seed, "airdrop 2");
+}
+
+#[test]
 fn test_airdrop_multiple_ok() {
     let mut sys: TestSystems = setup(0); // funds 2 starter packs
     tester::fund_duelists_pool(@sys, 9);
@@ -614,8 +641,13 @@ fn test_airdrop_multiple_ok() {
     assert_eq!(pack_ids.len(), 2, "airdrop 1");
     assert_eq!(sys.pack.balance_of(OWNER()), 0, "airdrop 1");
     assert_eq!(sys.pack.balance_of(OTHER()), 2, "airdrop 1");
-    assert_eq!(sys.store.get_pack(1).pack_type, PackType::FreeDuelist, "airdrop 1");
-    assert_eq!(sys.store.get_pack(2).pack_type, PackType::FreeDuelist, "airdrop 1");
+    let pack_1: Pack = sys.store.get_pack(1);
+    let pack_2: Pack = sys.store.get_pack(2);
+    assert_eq!(pack_1.pack_type, PackType::FreeDuelist, "airdrop 1");
+    assert_eq!(pack_2.pack_type, PackType::FreeDuelist, "airdrop 1");
+    assert_ne!(pack_1.seed, 0, "airdrop 1");
+    assert_ne!(pack_2.seed, 0, "airdrop 1");
+    assert_ne!(pack_1.seed, pack_2.seed, "airdrop 1");
     // airdrop more...
     let pack_ids: Span<u128> = tester::execute_pack_airdrop_multiple(@sys, OWNER(), BUMMER(), PackType::GenesisDuelists5x, Option::None, 3);
     _assert_minted_count(@sys, 5, 5, "airdrop 2");
@@ -623,9 +655,26 @@ fn test_airdrop_multiple_ok() {
     assert_eq!(sys.pack.balance_of(OWNER()), 0, "airdrop 2");
     assert_eq!(sys.pack.balance_of(OTHER()), 2, "airdrop 2");
     assert_eq!(sys.pack.balance_of(BUMMER()), 3, "airdrop 2");
-    assert_eq!(sys.store.get_pack(3).pack_type, PackType::GenesisDuelists5x, "airdrop 2");
-    assert_eq!(sys.store.get_pack(4).pack_type, PackType::GenesisDuelists5x, "airdrop 2");
-    assert_eq!(sys.store.get_pack(5).pack_type, PackType::GenesisDuelists5x, "airdrop 2");
+    let pack_3: Pack = sys.store.get_pack(3);
+    let pack_4: Pack = sys.store.get_pack(4);
+    let pack_5: Pack = sys.store.get_pack(5);
+    assert_eq!(pack_3.pack_type, PackType::GenesisDuelists5x, "airdrop 2");
+    assert_eq!(pack_4.pack_type, PackType::GenesisDuelists5x, "airdrop 2");
+    assert_eq!(pack_5.pack_type, PackType::GenesisDuelists5x, "airdrop 2");
+    assert_ne!(pack_3.seed, 0, "airdrop 2");
+    assert_ne!(pack_4.seed, 0, "airdrop 2");
+    assert_ne!(pack_5.seed, 0, "airdrop 2");
+    assert_ne!(pack_3.seed, pack_1.seed, "airdrop 2");
+    assert_ne!(pack_3.seed, pack_2.seed, "airdrop 2");
+    assert_ne!(pack_3.seed, pack_4.seed, "airdrop 2");
+    assert_ne!(pack_4.seed, pack_5.seed, "airdrop 2");
+}
+
+#[test]
+#[should_panic(expected: ('PACK: Caller not admin', 'ENTRYPOINT_FAILED'))]
+fn test_promo_mint_to_not_admin() {
+    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    tester::execute_pack_promo_mint_to(@sys, OTHER(), BUMMER());
 }
 
 #[test]
@@ -751,6 +800,39 @@ fn test_airdrop_open_purchasable_pool_ok() {
     // airdrop...
     let pack_1: u128 = tester::execute_pack_airdrop(@sys, OWNER(), OTHER(), PackType::GenesisDuelists5x, Option::None);
     let pack_2: u128 = tester::execute_pack_airdrop(@sys, OWNER(), OTHER(), PackType::GenesisDuelists5x, Option::None);
+    // check pool balance
+    let pool_claimable_airdropped: Pool = sys.store.get_pool(PoolType::Claimable);
+    let pool_purchase_airdropped: Pool = sys.store.get_pool(PoolType::Purchases);
+    let pool_fame_peg_airdropped: Pool = sys.store.get_pool(PoolType::FamePeg);
+    assert_eq!(pool_claimable_airdropped.balance_lords, 0, "pool_claimable_airdropped");
+    assert_eq!(pool_purchase_airdropped.balance_lords, pool_claimable_before.balance_lords, "pool_purchase_airdropped");
+    assert_eq!(pool_fame_peg_airdropped.balance_lords, 0, "pool_fame_peg_airdropped");
+    // open...
+    tester::execute_pack_open(@sys, OTHER(), pack_1);
+    tester::execute_pack_open(@sys, OTHER(), pack_2);
+    // check pool balance
+    let pool_claimable_after: Pool = sys.store.get_pool(PoolType::Claimable);
+    let pool_purchase_after: Pool = sys.store.get_pool(PoolType::Purchases);
+    let pool_fame_peg_after: Pool = sys.store.get_pool(PoolType::FamePeg);
+    assert_eq!(pool_claimable_after.balance_lords, 0, "pool_claimable_after");
+    assert_eq!(pool_purchase_after.balance_lords, 0, "pool_purchase_after");
+    assert_eq!(pool_fame_peg_after.balance_lords, pool_claimable_before.balance_lords, "pool_fame_peg_after");
+}
+
+#[test]
+fn test_promo_mint_to_purchasable_pool_ok() {
+    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    tester::fund_duelists_pool(@sys, 3); // 6 more duelists = 10 total
+    // check pool balance
+    let pool_claimable_before: Pool = sys.store.get_pool(PoolType::Claimable);
+    let pool_purchase_before: Pool = sys.store.get_pool(PoolType::Purchases);
+    let pool_fame_peg_before: Pool = sys.store.get_pool(PoolType::FamePeg);
+    assert_gt!(pool_claimable_before.balance_lords, 0, "pool_claimable_before");
+    assert_eq!(pool_purchase_before.balance_lords, 0, "pool_purchase_before");
+    assert_eq!(pool_fame_peg_before.balance_lords, 0, "pool_fame_peg_before");
+    // airdrop...
+    let pack_1: u128 = tester::execute_pack_promo_mint_to(@sys, OWNER(), OTHER());
+    let pack_2: u128 = tester::execute_pack_promo_mint_to(@sys, OWNER(), OTHER());
     // check pool balance
     let pool_claimable_airdropped: Pool = sys.store.get_pool(PoolType::Claimable);
     let pool_purchase_airdropped: Pool = sys.store.get_pool(PoolType::Purchases);

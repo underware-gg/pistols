@@ -64,8 +64,9 @@ pub trait IPackToken<TState> {
     fn claim_starter_pack(ref self: TState, referrer_address: ContractAddress) -> Span<u128>;
     fn claim_gift(ref self: TState) -> Span<u128>;
     fn purchase(ref self: TState, pack_type: PackType) -> u128;
-    fn airdrop(ref self: TState, recipient: ContractAddress, pack_type: PackType, duelist_profile: Option<DuelistProfile>, quantity: usize) -> Span<u128>;
     fn open(ref self: TState, pack_id: u128) -> Span<u128>;
+    fn mint_to(ref self: TState, recipient: ContractAddress) -> u128;
+    fn airdrop(ref self: TState, recipient: ContractAddress, pack_type: PackType, duelist_profile: Option<DuelistProfile>, quantity: usize) -> Span<u128>;
 }
 
 // Exposed to clients
@@ -80,8 +81,10 @@ pub trait IPackTokenPublic<TState> {
     fn claim_starter_pack(ref self: TState, referrer_address: ContractAddress) -> Span<u128>; //@description: Claim the starter pack, mint Duelists
     fn claim_gift(ref self: TState) -> Span<u128>; //@description: Claim gift pack, if available
     fn purchase(ref self: TState, pack_type: PackType) -> u128; //@description: Purchase a closed pack
-    fn airdrop(ref self: TState, recipient: ContractAddress, pack_type: PackType, duelist_profile: Option<DuelistProfile>, quantity: usize) -> Span<u128>; //@description: Airdrops a pack (admin)
     fn open(ref self: TState, pack_id: u128) -> Span<u128>; //@description: Open a pack, mint its contents
+    // admin functions
+    fn mint_to(ref self: TState, recipient: ContractAddress) -> u128; //@description: Promotional airdrops (admin)
+    fn airdrop(ref self: TState, recipient: ContractAddress, pack_type: PackType, duelist_profile: Option<DuelistProfile>, quantity: usize) -> Span<u128>; //@description: Airdrops a pack (admin)
 }
 
 // Exposed to world
@@ -91,7 +94,7 @@ pub trait IPackTokenProtected<TState> {
 }
 
 #[dojo::contract]
-pub mod pack_token {    
+pub mod pack_token {
     use starknet::{ContractAddress};
     use dojo::world::{WorldStorage};
 
@@ -162,9 +165,10 @@ pub mod pack_token {
         constants::{METADATA},
     };
     use pistols::libs::store::{Store, StoreTrait};
+    use pistols::libs::seeder::{make_seed};
+    use pistols::utils::hash::{hash_values};
     use pistols::utils::short_string::{ShortStringTrait};
     use pistols::utils::byte_arrays::{BoolToStringTrait};
-    use pistols::utils::hash::{hash_values};
     use pistols::utils::address::{ZERO};
 
     pub mod Errors {
@@ -321,6 +325,32 @@ pub mod pack_token {
             (pack.pack_id)
         }
 
+        fn mint_to(ref self: ContractState,
+            recipient: ContractAddress,
+        ) -> u128 {
+            self._assert_caller_is_admin();
+
+            // default promo type
+            let pack_type: PackType = PackType::GenesisDuelists5x;
+            let quantity: usize = 1;
+
+            // move lords to purchases pool if needed
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let (lords_per_pack, _): (u128, u128) = self._assert_airdrop_pools(ref store, recipient, pack_type, quantity);
+
+            // make some seed
+            let seed: felt252 = make_seed(
+                starknet::get_contract_address(),
+                self.last_token_id().low.into(),
+            );
+
+            // mint
+            let pack: Pack = self._mint_pack(ref store, pack_type, recipient, seed, lords_per_pack, Option::None);
+            Activity::AirdroppedPack.emit(ref store.world, recipient, pack.pack_id.into());
+            
+            (pack.pack_id)
+        }
+
         fn airdrop(ref self: ContractState,
             recipient: ContractAddress,
             pack_type: PackType,
@@ -358,20 +388,8 @@ pub mod pack_token {
                 }
             }
 
-            // all free duelists must have a claimable balance
-            let mut pool_claimable: Pool = store.get_pool(PoolType::Claimable);
-            let lords_per_pack: u128 = self.calc_mint_fee(recipient, pack_type);
-            let lords_total: u128 = lords_per_pack * quantity.into();
-            assert(pool_claimable.balance_lords >= lords_total, Errors::INSUFFICIENT_LORDS);
-
             // move lords to purchases pool if needed
-            if (pack_type.deposited_pool_type() == PoolType::Purchases) {
-                let mut pool_purchases: Pool = store.get_pool(PoolType::Purchases);
-                pool_claimable.withdraw_lords(lords_total);
-                pool_purchases.deposit_lords(lords_total);
-                store.set_pool(@pool_claimable);
-                store.set_pool(@pool_purchases);
-            }
+            let (lords_per_pack, _): (u128, u128) = self._assert_airdrop_pools(ref store, recipient, pack_type, quantity);
 
             // mint packs
             let mut pack_ids: Array<u128> = array![];
@@ -472,6 +490,30 @@ pub mod pack_token {
             };
             store.set_pack(@pack);
             (pack)
+        }
+
+        fn _assert_airdrop_pools(ref self: ContractState,
+            ref store: Store,
+            recipient: ContractAddress,
+            pack_type: PackType,
+            quantity: usize,
+        ) -> (u128, u128) {
+            // all free duelists must have a claimable balance
+            let mut pool_claimable: Pool = store.get_pool(PoolType::Claimable);
+            let lords_per_pack: u128 = self.calc_mint_fee(recipient, pack_type);
+            let lords_total: u128 = lords_per_pack * quantity.into();
+            assert(pool_claimable.balance_lords >= lords_total, Errors::INSUFFICIENT_LORDS);
+
+            // move lords to purchases pool if needed
+            if (pack_type.deposited_pool_type() == PoolType::Purchases) {
+                let mut pool_purchases: Pool = store.get_pool(PoolType::Purchases);
+                pool_claimable.withdraw_lords(lords_total);
+                pool_purchases.deposit_lords(lords_total);
+                store.set_pool(@pool_claimable);
+                store.set_pool(@pool_purchases);
+            }
+
+            (lords_per_pack, lords_total)
         }
 
         fn _mint_opened_duelists(ref self: ContractState,

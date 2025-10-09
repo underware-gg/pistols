@@ -851,6 +851,12 @@ pub mod tester {
         _next_block();
         (pack_id)
     }
+    pub fn execute_pack_promo_mint_to(sys: @TestSystems, sender: ContractAddress, recipient: ContractAddress) -> u128 {
+        impersonate(sender);
+        let pack_id: u128 = (*sys.pack).mint_to(recipient);
+        _next_block();
+        (pack_id)
+    }
     pub fn execute_pack_open(sys: @TestSystems, sender: ContractAddress, pack_id: u128) -> Span<u128> {
         impersonate(sender);
         let duelist_ids: Span<u128> = (*sys.pack).open(pack_id);
