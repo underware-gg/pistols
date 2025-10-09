@@ -89,16 +89,17 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
     console.log("commitToQueue complete", result, args);
     const [duelistIdArg] = args;
     if (result instanceof Error || result === false) {
+      const errorMessage = result instanceof Error ? result.message : "Failed to commit duelist. Please try again.";
       console.error("match_make_me failed", duelistIdArg?.toString() ?? "unknown");
       setCommitmentState((prev) => ({
         ...prev,
         isCommitting: false,
         isWaitingForCommit: false,
-        commitError: "Failed to commit duelist. Please try again.",
+        commitError: errorMessage,
       }));
       // Notify parent that commit failed
       if (duelistIdArg) {
-        props.onActionComplete?.(false, duelistIdArg, "Failed to commit duelist. Please try again.");
+        props.onActionComplete?.(false, duelistIdArg, errorMessage);
       }
       return;
     }
@@ -130,17 +131,18 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
   const onCompleteEnlistDuelist = useCallback((result: boolean | Error, args: [bigint, constants.QueueId]) => {
     const [duelistIdArg] = args;
     if (result instanceof Error || result === false) {
+      const errorMessage = result instanceof Error ? result.message : "Failed to enlist duelist. Please try again.";
       console.error("enlist_duelist failed", duelistIdArg?.toString() ?? "unknown");
       setEnlistmentState((prev) => ({
         ...prev,
         isEnlisting: false,
         isWaitingForEnlistment: false,
-        enlistError: "Failed to enlist duelist. Please try again.",
+        enlistError: errorMessage,
       }));
       
       // Notify parent that enlist failed
       if (duelistIdArg) {
-        props.onActionComplete?.(false, duelistIdArg, "Failed to enlist duelist. Please try again.");
+        props.onActionComplete?.(false, duelistIdArg, errorMessage);
       }
       return;
     }
@@ -311,6 +313,7 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
         isEnlisting={isEnlisting || isWaitingForEnlistment}
         isError={!!commitmentState.commitError || !!enlistmentState.enlistError}
         onError={commitmentState.commitError ? () => handleCommitDuelist(commitmentState.committedDuelistId) : () => handleEnlistDuelist(enlistmentState.enlistedDuelistId)}
+        errorMessage={commitmentState.commitError || enlistmentState.enlistError}
         handleRemove={handleRemove}
       />
     );

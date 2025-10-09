@@ -10,6 +10,7 @@ import { useChallenge } from '/src/stores/challengeStore'
 import { useIsMyAccount } from '/src/hooks/useIsYou'
 import { useDuelCallToAction } from '/src/stores/eventsModelStore'
 import { CardColor } from '@underware/pistols-sdk/pistols/constants'
+import { emitter } from '/src/three/game'
 
 interface DuelistMatchmakingSlotProps {
   width?: number
@@ -24,6 +25,7 @@ interface DuelistMatchmakingSlotProps {
   isCommitting?: boolean
   isEnlisting?: boolean
   isError?: boolean
+  errorMessage?: string | null
   onDuelistPromoted?: (duelistId: bigint) => void
   onRequeueDuelist?: (duelistId: bigint) => void
   onError?: () => void
@@ -81,7 +83,7 @@ export const DuelistMatchmakingSlot = forwardRef<DuelistMatchmakingSlotHandle, D
     }
 
     if (props.isError) {
-      return { message: "Error occurred", buttonText: null, color: "#ef4444", showTimer: false };
+      return { message: "Error", buttonText: null, color: "#ef4444", showTimer: false };
     }
 
     if (currentDuelistId && (rankedPlayer.duelistId === BigInt(currentDuelistId) || unrankedPlayer.duelistId === BigInt(currentDuelistId)) && challenge.isAwaiting) {
@@ -151,13 +153,12 @@ export const DuelistMatchmakingSlot = forwardRef<DuelistMatchmakingSlotHandle, D
   );
 
   useEffect(() => {
-    if (currentDuelistId && isPlayerTurn) {
+    if (currentDuelistId && (isPlayerTurn || props.isError)) {
       duelistCardRef?.current?.toggleBlink(true);
     } else {
       duelistCardRef?.current?.toggleBlink(false);
     }
-  }, [currentDuelistId, duelistCardRef, isPlayerTurn]);
-
+  }, [currentDuelistId, duelistCardRef, isPlayerTurn, props.isError]);
   
   const disableButtons = props.isCommitting || props.isEnlisting;
 
@@ -183,7 +184,7 @@ export const DuelistMatchmakingSlot = forwardRef<DuelistMatchmakingSlotHandle, D
         isHanging={false}
         isHighlightable
         defaultHighlightColor={
-          isPlayerTurn ? CardColor.PURPLE : CardColor.WHITE
+          props.isError ? CardColor.RED : isPlayerTurn ? CardColor.PURPLE : CardColor.WHITE
         }
         width={props.width || 100}
         height={props.height || 140}
@@ -202,6 +203,13 @@ export const DuelistMatchmakingSlot = forwardRef<DuelistMatchmakingSlotHandle, D
             : challenge?.timestampStart || null
         }
         showTimer={duelStateInfo.showTimer}
+        onHover={(isHovered) => {
+          if (isHovered) {
+            emitter.emit('hover_description', props.errorMessage);
+          } else {
+            emitter.emit('hover_description', null);
+          }
+        }}
       />
 
       {/* TODO */}
