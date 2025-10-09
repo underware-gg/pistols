@@ -269,7 +269,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
   const { challengeDescription } = useChallengeDescription(props.duelId)
   const { seasonName: currentSeasonName } = useCurrentSeason()
   const seasonDescription = useMemo(() => (seasonName ?? currentSeasonName), [seasonName, currentSeasonName])
-  const displayDuelType = useMemo(() => (duelType === constants.DuelType.Unranked ? 'Casual' : duelType), [duelType])
+  const displayDuelType = useMemo(() => (duelType === constants.DuelType.Unranked ? 'Casual' : duelType === constants.DuelType.Seasonal ? 'Challenge' : duelType), [duelType])
 
   const { lives } = useDuelistFameBalance(challengingDuelistId)
   const isChallenger = useMemo(() => isYouA, [isYouA])
