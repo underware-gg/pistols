@@ -1,12 +1,13 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
+import { useDelay } from '@underware/pistols-sdk/utils/hooks'
 import { useSdkCallPromise, useDojoContractCalls } from '@underware/pistols-sdk/dojo'
-import { makeCustomEnum, stringToFelt } from '@underware/pistols-sdk/starknet'
-import { isPositiveBigint } from '@underware/pistols-sdk/utils'
+import { useChallenge } from '/src/stores/challengeStore'
+import { makeCustomEnum } from '@underware/pistols-sdk/starknet'
+import { isPositiveBigint, bigintToHex } from '@underware/pistols-sdk/utils'
 import { convert_duel_progress } from '@underware/pistols-sdk/pistols'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
-import { useChallenge } from '/src/stores/challengeStore'
 
 
 //------------------------------------------
@@ -15,13 +16,14 @@ import { useChallenge } from '/src/stores/challengeStore'
 
 export const useDuelProgress = (duel_id: bigint) => {
   const { isFinished } = useChallenge(duel_id)
+  const enabled = useDelay(isFinished, 1000)
   const { game: { getDuelProgress } } = useDojoContractCalls()
   const options = useMemo(() => ({
     call: getDuelProgress,
-    args: [duel_id],
-    enabled: isFinished,
+    args: [bigintToHex(duel_id)],
+    enabled,
     defaultValue: null,
-  }), [duel_id, isFinished])
+  }), [duel_id, enabled])
   const { value, isLoading } = useSdkCallPromise<any>(options)
   const duelProgress = useMemo(() => (value ? convert_duel_progress(value) : null), [value])
   return {

@@ -130,7 +130,7 @@ const ActionItem = ({
     return (
       <>
         <Icon name='circle' className='Positive' />
-        {'Shoot at '}
+        {'Shoot '}
         <DuelOpponentNameLink duelId={duelId} />
         {' in '}
         <ChallengeLink duelId={duelId} />
