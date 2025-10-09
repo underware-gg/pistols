@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { BigNumberish } from 'starknet'
 import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
-import { bigintToAddress, bigintToHex, isPositiveBigint } from 'src/utils/misc/types'
+import { bigintToAddress, isPositiveBigint } from 'src/utils/misc/types'
 import { SubscriptionCallbackArgs } from '@dojoengine/sdk'
 import { Page } from '@dojoengine/torii-client'
 import * as torii from '@dojoengine/torii-client'
@@ -53,7 +53,7 @@ export const useSdkTokenBalancesGet = ({
     let _mounted = true
     const _get = async () => {
       const _contract = bigintToAddress(contract)
-      const _accounts = accounts?.map(a => bigintToHex(a)) ?? []
+      const _accounts = accounts?.map(a => bigintToAddress(a)) ?? []
       // debug.log("useSdkTokenBalancesGet() GET........", enabled, _contract, _accounts, tokenIds)
       setIsLoading(true)
       updateProgress?.(0);

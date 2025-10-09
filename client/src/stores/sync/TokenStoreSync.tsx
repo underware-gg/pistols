@@ -6,7 +6,7 @@ import { useDuelistTokenStore, useDuelTokenStore, usePackTokenStore, useRingToke
 import { useFameCoinStore, useLordsCoinStore, useFoolsCoinStore } from '/src/stores/coinStore'
 import { useFetchInitialTokenBalancesQuery } from '/src/queries/useTokenBalancesQuery'
 import { useProgressStore } from '/src/stores/progressStore'
-import { bigintToHex } from '@underware/pistols-sdk/utils'
+import { bigintToAddress } from '@underware/pistols-sdk/utils'
 import { cachedPlayerData } from '@underware/pistols-sdk/pistols/cached'
 import { debug } from '@underware/pistols-sdk/pistols'
 import * as torii from '@dojoengine/torii-client'
@@ -79,11 +79,11 @@ export function TokenStoreSync() {
   //----------------------------------------
   // subscribe for updates
   //
-  const contracts = useMemo(() => Object.values(allTokens).map(bigintToHex), [allTokens])
+  const contracts = useMemo(() => Object.values(allTokens).map(bigintToAddress), [allTokens])
   useSdkTokenBalancesSub({
     contracts,
     updateBalance: (balance: torii.TokenBalance) => {
-      const _contract = bigintToHex(balance.contract_address)
+      const _contract = bigintToAddress(balance.contract_address)
       // debug.log("TOKENS SUB >>>", balance, contracts.includes(_contract), contracts.includes(_contract))
       if (_contract == allTokens.lordsContractAddress) {
         lords_state.updateBalance(balance)

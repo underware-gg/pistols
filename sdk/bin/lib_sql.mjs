@@ -1,4 +1,4 @@
-import { queryToriiSql, bigintToHex } from '../utils.js';
+import { queryToriiSql, bigintToHex, bigintToAddress } from '../utils.js';
 
 //------------------------------------------------
 // Tokens Metadata
@@ -28,7 +28,7 @@ export const getTokensMetadata = async (contractAddress, sqlUrl) => {
   const query = `
 select contract_address,token_id,metadata
 from tokens
-where contract_address="${contractAddress}"
+where contract_address="${bigintToAddress(contractAddress)}"
 order by token_id asc
 `;
   // console.log(`getTokensMetadata(${contractAddress}):`, query);
@@ -71,7 +71,7 @@ export const getTokenBalances = async (contractAddress, sqlUrl) => {
   const query = `
 select B.contract_address,B.account_address,B.token_id,B.balance,max(T.executed_at) as iso_timestamp
 from token_balances B, token_transfers T
-where B.contract_address="${contractAddress}"
+where B.contract_address="${bigintToAddress(contractAddress)}"
 and B.balance!="0x0000000000000000000000000000000000000000000000000000000000000000"
 and B.token_id=T.token_id
 group by T.token_id

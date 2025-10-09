@@ -20,8 +20,8 @@ type QueryResponseRaw = Array<{
 // format we need
 function formatFn(rows: QueryResponseRaw): torii.TokenBalance[] {
   return rows.map((row) => ({
-    contract_address: bigintToHex(row.contract_address),
-    account_address: bigintToHex(row.account_address),
+    contract_address: bigintToAddress(row.contract_address),
+    account_address: bigintToAddress(row.account_address),
     balance: bigintToHex(row.balance),
     token_id: bigintToHex(row.token_id.split(':')[1] ?? 0n),
   }));
@@ -42,12 +42,12 @@ export const useFetchInitialTokenBalancesQuery = (last_iso_timestamp: string) =>
     const _getAlllBalances = [
       erc721Tokens.duelistContractAddress,
       erc721Tokens.ringContractAddress,
-    ].map(a => `'${bigintToHex(a)}'`);
+    ].map(a => `'${bigintToAddress(a)}'`);
     const _getPlayerBalances = [
       erc721Tokens.packContractAddress,
       erc20Tokens.foolsContractAddress,
       erc20Tokens.lordsContractAddress,
-    ].map(a => `'${bigintToHex(a)}'`);
+    ].map(a => `'${bigintToAddress(a)}'`);
     let queries = [
       // balances needed for all players (not previously cached)
       `select contract_address, account_address, balance, token_id`,
@@ -60,7 +60,7 @@ export const useFetchInitialTokenBalancesQuery = (last_iso_timestamp: string) =>
       `select contract_address, account_address, balance, token_id`,
       `from token_balances`,
       `where contract_address in (${Object.values(_getPlayerBalances).join(',')})`,
-      `and account_address='${bigintToHex(address)}'`,
+      `and account_address='${bigintToAddress(address)}'`,
       // `order by 3, 2`,
     ];
     return queries.join(' ');
@@ -98,7 +98,7 @@ export const useFetchInitialTokenBalancesQuery = (last_iso_timestamp: string) =>
 export const useFetchTokenBalancesOwnedByAccount = (accountAddress: BigNumberish) => {
   const query = useMemo(() => {
     if (!isPositiveBigint(accountAddress)) return '';
-    return `select contract_address, account_address, balance, token_id from token_balances where account_address='${bigintToHex(accountAddress)}'`;
+    return `select contract_address, account_address, balance, token_id from token_balances where account_address='${bigintToAddress(accountAddress)}'`;
   }, [accountAddress])
   const { data, isLoading } = useSdkSqlQuery({
     query,
