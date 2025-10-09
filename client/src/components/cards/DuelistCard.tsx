@@ -21,6 +21,7 @@ import { DUELIST_CARD_WIDTH } from '/src/data/cardConstants'
 import { emitter } from '/src/three/game'
 import { useDuelistCurrentSeasonScore, useDuelistSeasonScore } from '/src/stores/scoreboardStore'
 import { useCurrentSeason, useSeason } from '/src/stores/seasonStore'
+import { QueueTimer } from '/src/components/ui/QueueTimer'
 
 interface DuelistCardProps extends InteractibleComponentProps {
   duelistId: number
@@ -33,16 +34,13 @@ interface DuelistCardProps extends InteractibleComponentProps {
   hideSouls?: boolean
   shouldAnimateIncrease?: boolean
 
-  isInQueue?: boolean
-  isCommitting?: boolean
-  queueTimestampStart?: number
+  showQueueInformation?: boolean
   showSeasonRank?: boolean
   seasonId?: number
-  isEnlisting?: boolean
-  isWaitingToJoinQueue?: boolean
-
-  showDuelDurationTimer?: boolean
-  duelDurationTimestamp?: number
+  queueMessage?: string
+  queueColor?: string
+  queueTime?: number
+  showTimer?: boolean
 
   showBack?: boolean
   animateFlip?: (showBack: boolean) => void
@@ -95,87 +93,6 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
       setAnimationCompleted(false)
     }
   }, [animationCompleted, level])
-
-  // Queue timer functionality
-  const [queueTimeElapsed, setQueueTimeElapsed] = useState(0)
-  const [colonVisible, setColonVisible] = useState(true)
-  const [duelTimeElapsed, setDuelTimeElapsed] = useState(0)
-  
-  useEffect(() => {
-    if ((props.isInQueue && props.queueTimestampStart) || (props.showDuelDurationTimer && props.duelDurationTimestamp)) {
-      const updateTimer = () => {
-        const now = Date.now()
-        const elapsed = Math.floor((now - (props.queueTimestampStart * 1000)) / 1000)
-        setQueueTimeElapsed(elapsed)
-
-        const elapsedDuel = Math.floor((now - (props.duelDurationTimestamp * 1000)) / 1000)
-        setDuelTimeElapsed(elapsedDuel);
-      }
-      
-      // Update immediately
-      updateTimer()
-      
-      // Update every second
-      const interval = setInterval(updateTimer, 1000)
-      
-      return () => clearInterval(interval)
-    } else {
-      setQueueTimeElapsed(0)
-      setDuelTimeElapsed(0)
-    }
-  }, [props.isInQueue, props.queueTimestampStart])
-
-  // Blinking colon effect
-  useEffect(() => {
-    if ((props.isInQueue && props.queueTimestampStart) || (props.showDuelDurationTimer && props.duelDurationTimestamp)) {
-      const updateColonVisibility = () => {
-        // Use current time to determine if colon should be visible
-        // Even seconds = visible, odd seconds = hidden
-        const currentSecond = Math.floor(Date.now() / 1000)
-        setColonVisible(currentSecond % 2 === 0)
-      }
-      
-      // Update immediately
-      updateColonVisibility()
-      
-      // Update every second
-      const colonInterval = setInterval(updateColonVisibility, 1000)
-      
-      return () => clearInterval(colonInterval)
-    } else {
-      setColonVisible(true)
-    }
-  }, [props.isInQueue, props.queueTimestampStart])
-
-  const formatQueueTime = (seconds: number, showColon: boolean) => {
-    const hours = Math.floor(seconds / 3600)
-    const mins = Math.floor((seconds % 3600) / 60)
-    const secs = seconds % 60
-    const colon = showColon ? ':' : ' '
-    
-    if (hours > 0) {
-      // HH:MM format when over 1 hour - NO SECONDS!
-      return `${hours.toString().padStart(2, '0')}${colon}${mins.toString().padStart(2, '0')}`
-    } else {
-      // MM:SS format when under 1 hour
-      return `${mins.toString().padStart(2, '0')}${colon}${secs.toString().padStart(2, '0')}`
-    }
-  }
-
-  // Simple status color mapping - gradient from orange (waiting) to green (in duel)
-  const getStatusColor = () => {
-    if (props.showDuelDurationTimer) {
-      return '#22c55e' // Green - in duel
-    } else if (props.queueTimestampStart) {
-      return '#84cc16' // Yellow-green - committing
-    } else if (props.isEnlisting || props.isCommitting) {
-      return "#f59e0b"; // Bright yellow - searching
-    } else if (props.isWaitingToJoinQueue) {
-      return "#f97316"; // Dark orange - ready to queue
-    } else {
-      return "#fbbf24"; // Orange - waiting in line
-    }
-  }
 
   const { owner } = useOwnerOfDuelist(props.duelistId)
   const { name: playerName } = usePlayer(isPositiveBigint(props.address) ? props.address : owner)
@@ -582,7 +499,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
             <ProfileBadge duelistId={props.duelistId} />
           </div>
           <div className="duelist-card-details">
-            {props.isInQueue || props.isCommitting || props.isEnlisting || props.showDuelDurationTimer || props.isWaitingToJoinQueue ? (
+            {props.showQueueInformation ? (
               // Queue status display
               <div className={`queue-status-container ${props.isSmall ? 'small' : ''}`}>
                 <div className="queue-spinner-timer-container">
@@ -590,24 +507,20 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
                     <div className='dialog-spinner'></div>
                   </div>
                   
-                  {props.queueTimestampStart && (
-                    <div className="queue-timer">
-                      {formatQueueTime(queueTimeElapsed, colonVisible)}
-                    </div>
-                  )}
+                  <QueueTimer 
+                    queueTime={props.queueTime || 0}
+                    showTimer={props.showTimer || false}
+                  />
 
-                  {props.showDuelDurationTimer && !props.isInQueue && (
-                    <div className="duel-timer">
-                      {formatQueueTime(duelTimeElapsed, colonVisible)}
-                    </div>
-                  )}
                 </div>
                 
                 <div 
                   className="queue-status-text"
-                  style={{ color: getStatusColor() }}
+                  style={{ 
+                    color: props.queueColor
+                  }}
                 >
-                  {props.isEnlisting ? 'Enlisting...' : props.isCommitting ? 'Commiting...' : props.queueTimestampStart ? 'Searching for Match...' : props.showDuelDurationTimer ? 'Playing duel...' : props.isWaitingToJoinQueue ? 'Ready to queue...' : 'Waiting in Line...'}
+                  {props.queueMessage}
                 </div>
               </div>
             ) : (

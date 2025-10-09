@@ -316,7 +316,7 @@ function RingClaimItem({ ring, disabled, isVisible, onClaimComplete, onClaiming 
   
   const buttonRef = useRef<HTMLDivElement>(null)
 
-  const { call: claimRing, isLoading, isWaitingForIndexer } = useTransactionHandler<boolean, [bigint, constants.RingType]>({
+  const { call: claimRing, isLoading } = useTransactionHandler<boolean, [bigint, constants.RingType]>({
     key: `claim_ring_${ring.ringType}`,
     transactionCall: (duelId: bigint, ringType: constants.RingType, key: string) => {
       return claim_season_ring(account, duelId, ringType, key)
@@ -332,13 +332,10 @@ function RingClaimItem({ ring, disabled, isVisible, onClaimComplete, onClaiming 
       }
     },
     indexerCheck: ring.hasClaimed,
+    messageTargetRef: buttonRef,
+    waitingMessage: "Transaction successful! Waiting for indexer...",
+    messageDelay: 1000,
   })
-
-  useEffect(() => {
-    if (isWaitingForIndexer && buttonRef.current) {
-      showElementPopupNotification(buttonRef, "Transaction successful! Waiting for indexer...")
-    }
-  }, [isWaitingForIndexer])
 
   const handleClaimClick = useCallback(() => {
     if (isLoading) return

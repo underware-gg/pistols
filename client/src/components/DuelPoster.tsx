@@ -295,32 +295,35 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
     if (accepted) _gotoDuel()
   }, [_gotoDuel])
   
-  const { call: submitChallengeResponse, isLoading: isLoadingSubmit, isWaitingForIndexer: isWaitingForIndexerSubmit, meta } = useTransactionHandler<boolean, [bigint, BigNumberish?, boolean?]>({
+  const { call: submitChallengeResponse, isLoading: isLoadingSubmit, meta } = useTransactionHandler<boolean, [bigint, BigNumberish?, boolean?]>({
     transactionCall: (duelId, duelistId, accepted, key) => duel_token.reply_duel(account, duelId, duelistId, accepted, key),
     onComplete: onCompleteSubmitCallback,
     indexerCheck: state != constants.ChallengeState.Awaiting,
     key: `submit_challenge_response${props.duelId}`,
+    messageTargetRef: buttonsRowRef,
+    waitingMessage: "Transaction successful! Waiting for indexer...",
+    messageDelay: 1000,
   })
 
-  const { call: revalFinalDuelResult, isLoading: isLoadingFinalResult, isWaitingForIndexer: isWaitingForIndexerFinalResult } = useTransactionHandler<boolean, [bigint]>({
+  const { call: revalFinalDuelResult, isLoading: isLoadingFinalResult } = useTransactionHandler<boolean, [bigint]>({
     transactionCall: (duelId, key) => game.clear_call_to_challenge(account, duelId, key),
     indexerCheck: !isCallToAction,
     key: `reveal_final_duel_result${props.duelId}`,
+    messageTargetRef: buttonsRowRef,
+    waitingMessage: "Transaction successful! Waiting for indexer...",
+    messageDelay: 1000,
   })
 
-  const { call: collectDuel, isLoading: isLoadingCollect, isWaitingForIndexer: isWaitingForIndexerCollect } = useTransactionHandler<boolean, [bigint]>({
+  const { call: collectDuel, isLoading: isLoadingCollect } = useTransactionHandler<boolean, [bigint]>({
     transactionCall: (duelId, key) => game.collect_duel(account, duelId, key),
     indexerCheck: !canCollectDuel,
     key: `collect_duel${props.duelId}`,
+    messageTargetRef: buttonsRowRef,
+    waitingMessage: "Transaction successful! Waiting for indexer...",
+    messageDelay: 1000,
   })
 
   const isSubmitting = useMemo(() => isLoadingSubmit || isLoadingCollect || isLoadingFinalResult, [isLoadingSubmit, isLoadingCollect, isLoadingFinalResult])
-
-  useEffect(() => {
-    if (isWaitingForIndexerSubmit || isWaitingForIndexerCollect) {
-      showElementPopupNotification(buttonsRowRef, "Transaction successfull! Waiting for indexer...")
-    }
-  }, [isWaitingForIndexerSubmit, isWaitingForIndexerCollect])
 
   useEffect(() => {
     if (isSubmitting) {

@@ -378,15 +378,15 @@ export function ChallengeButton({
   const { hasPact, pactDuelId } = usePactSubscription(constants.DuelType.Seasonal, address, challengedPlayerAddress, true)
   const canChallenge = (!hasPact && !isMyAccount)
 
-  const { isLoading, isWaitingForIndexer } = useTransactionObserver({ key: `create_duel${challengedPlayerAddress}`, indexerCheck: hasPact })
-
   const buttonRef = useRef<HTMLDivElement>(null)
-  
-  useEffect(() => {
-    if (isWaitingForIndexer) {
-      showElementPopupNotification(buttonRef, "Transaction successfull! Waiting for indexer...", "🔄")
-    }
-  }, [isWaitingForIndexer])
+
+  const { isLoading } = useTransactionObserver({ 
+    key: `create_duel${challengedPlayerAddress}`, 
+    indexerCheck: hasPact,
+    messageTargetRef: buttonRef,
+    waitingMessage: "Transaction successful! Waiting for indexer...",
+    messageDelay: 1000,
+  })
 
   return (
     <>

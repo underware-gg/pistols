@@ -91,18 +91,15 @@ function _NewChallengeModal({
   const { canJoin } = useCanJoin(currentSeasonId, challengingDuelistId)
   const { rewards } = useCalcSeasonReward(currentSeasonId, challengingDuelistId, args?.lives_staked)
 
-  const { call: createDuel, isLoading, isWaitingForIndexer, meta } = useTransactionHandler<boolean, [constants.DuelType, BigNumberish, BigNumberish, number, number, constants.Premise, string]>({
+  const { call: createDuel, isLoading, meta } = useTransactionHandler<boolean, [constants.DuelType, BigNumberish, BigNumberish, number, number, constants.Premise, string]>({
     key: `create_duel${challengingAddress}`,
     transactionCall: (duelType, duelistId, challengedAddr, livesStaked, expireMinutes, premise, message, key) =>
       duel_token.create_duel(account, duelType, duelistId, challengedAddr, livesStaked, expireMinutes, premise, message, key),
     indexerCheck: hasPact,
+    messageTargetRef: buttonRef,
+    waitingMessage: "Transaction successful! Waiting for indexer...",
+    messageDelay: 1000,
   })
-
-  useEffect(() => {
-    if (isWaitingForIndexer) {
-      showElementPopupNotification(buttonRef, "Transaction successfull! Waiting for indexer...")
-    }
-  }, [isWaitingForIndexer])
 
   useEffect(() => {
     if (hasPact) {

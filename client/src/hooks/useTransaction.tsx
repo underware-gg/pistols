@@ -1,11 +1,15 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTransactionStore, useTransaction as useTransactionState, Transaction } from '../stores/transactionStore';
+import { showElementPopupNotification } from '../components/ui/ElementPopupNotification';
 
 interface UseTransactionHandlerProps<T, Args extends any[] = []> {
   key: string;
   transactionCall: (...args: [...Args, string]) => Promise<T>;
   indexerCheck?: boolean;
   onComplete?: (result: T | Error, args: Args) => void;
+  messageTargetRef?: React.RefObject<HTMLElement>;
+  waitingMessage?: string;
+  messageDelay?: number;
 }
 
 interface UseTransactionHandlerReturn<T, Args extends any[] = []> {
@@ -21,71 +25,76 @@ export function useTransactionHandler<T, Args extends any[] = []>({
   transactionCall,
   indexerCheck,
   onComplete,
+  messageTargetRef,
+  waitingMessage,
+  messageDelay,
 }: UseTransactionHandlerProps<T, Args>): UseTransactionHandlerReturn<T, Args> {
+  const transactionStore = useTransactionStore((state) => state);
+  
+  const transaction = useTransactionState(key);
+  
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isWaitingForIndexer, setIsWaitingForIndexer] = useState<boolean>(false);
   const [meta, setMeta] = useState<Args>([] as Args);
-  const transactionStore = useTransactionStore((state) => state);
 
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  
-  const transaction = useTransactionState(key);
 
   useEffect(() => {
-    let mounted = true
+    if (!transaction) {
+      reset()
+      return
+    }
 
-    const checkPersisted = async () => {
-      if (!transaction) {
-        setIsLoading(false)
-        return
-      }
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+      timeoutRef.current = null
+    }
 
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-        timeoutRef.current = null
-      }
-
+    if (!isLoading) {
       setIsLoading(true)
       setMeta(transaction.meta)
+    }
 
-      if (transaction.status === 'completed' && mounted) {
-        const canComplete = indexerCheck === undefined ? true : indexerCheck
-        
-        if (canComplete) {
-          setIsLoading(false)
-          setIsWaitingForIndexer(false)
-          onComplete?.(transaction.result as T, transaction.meta as Args || [] as Args)
-          transactionStore.removeTransaction(key)
-        } else {
-          setIsLoading(true)
-          if (!isWaitingForIndexer) {
-            timeoutRef.current = setTimeout(() => {
-              if (mounted) {
-                setIsWaitingForIndexer(true)
-              }
-            }, 1000)
-          }
+    if (transaction.status === 'completed') {
+      setIsWaitingForIndexer(true)
+    } else if (transaction.status === 'failed') {
+      onComplete?.(new Error(transaction.error || 'Transaction failed'), transaction.meta as Args || [] as Args)
+      transactionStore.removeTransaction(key)
+    }    
+  }, [transaction, onComplete])
+
+  useEffect(() => {
+    if (isWaitingForIndexer) {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+        timeoutRef.current = null
+      }
+      
+      if (waitingMessage && messageTargetRef) {
+        timeoutRef.current = setTimeout(() => {
+          showElementPopupNotification(messageTargetRef, waitingMessage)
+        }, messageDelay || 0)
+      }
+
+      const canComplete = indexerCheck === undefined ? true : indexerCheck
+      
+      if (canComplete && transaction) {
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current)
+          timeoutRef.current = null
         }
-      } else if (transaction.status === 'failed' && mounted) {
-        setIsLoading(false)
-        setIsWaitingForIndexer(false)
-        onComplete?.(new Error(transaction.error || 'Transaction failed'), transaction.meta as Args || [] as Args)
+        onComplete?.(transaction.result as T, transaction.meta as Args || [] as Args)
         transactionStore.removeTransaction(key)
-      } else if (transaction.status === 'pending' && mounted) {
-        setIsLoading(true)
       }
     }
-    
-    checkPersisted()
 
     return () => {
-      mounted = false
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current)
         timeoutRef.current = null
       }
     }
-  }, [transaction, indexerCheck, onComplete, key, transactionStore])
+  }, [isWaitingForIndexer, indexerCheck, transaction, onComplete, messageTargetRef, waitingMessage, messageDelay])
 
   const call = useCallback(async (...args: Args) => {
     setIsLoading(true)
@@ -98,11 +107,16 @@ export function useTransactionHandler<T, Args extends any[] = []>({
       await transactionCall(...args, key)
     } catch (error) {
       transactionStore.setTransactionError(key, error instanceof Error ? error.message : 'Transaction failed')
-      setIsLoading(false)
-      setIsWaitingForIndexer(false)
+      reset()
       onComplete?.(error as Error, args)
     }
-  }, [transactionCall, key, onComplete, transactionStore])
+  }, [transactionCall, key, transactionStore])
+
+  const reset = useCallback(() => {
+    setIsLoading(false)
+    setIsWaitingForIndexer(false)
+    setMeta([] as Args)
+  }, [])
 
   return { call, isLoading, isWaitingForIndexer, meta, transaction };
 }
@@ -111,6 +125,9 @@ export function useTransactionHandler<T, Args extends any[] = []>({
 interface UseTransactionObserverProps {
   key: string;
   indexerCheck?: boolean;
+  messageTargetRef?: React.RefObject<HTMLElement>;
+  waitingMessage?: string;
+  messageDelay?: number;
 }
 
 interface UseTransactionObserverReturn {
@@ -120,67 +137,77 @@ interface UseTransactionObserverReturn {
   transaction?: Transaction;
 }
 
-export function useTransactionObserver({ key, indexerCheck }: UseTransactionObserverProps): UseTransactionObserverReturn {
+export function useTransactionObserver({ key, indexerCheck, messageTargetRef, waitingMessage, messageDelay }: UseTransactionObserverProps): UseTransactionObserverReturn {
   const transactionStore = useTransactionStore((state) => state);
+  
+  const transaction = useTransactionState(key);
+  
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isWaitingForIndexer, setIsWaitingForIndexer] = useState<boolean>(false);
   const [meta, setMeta] = useState<any>(null);
 
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const transaction = useTransactionState(key);
-
   useEffect(() => {
-    let mounted = true
+    if (!transaction) {
+      reset()
+      return
+    }
 
-    const check = async () => {
-      if (!transaction) {
-        setIsLoading(false)
-        return
-      }
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+      timeoutRef.current = null
+    }
 
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-        timeoutRef.current = null
-      }
-
+    if (!isLoading) {
       setIsLoading(true)
       setMeta(transaction.meta)
+    }
 
-      if (transaction.status === 'completed' && mounted) {
-        const canComplete = indexerCheck === undefined ? true : indexerCheck
-        
-        if (canComplete) {
-          transactionStore.removeTransaction(key)
-          setIsLoading(false)
-          setIsWaitingForIndexer(false)
-        } else {
-          setIsLoading(true)
-          if (!isWaitingForIndexer) {
-            timeoutRef.current = setTimeout(() => {
-              if (mounted) {
-                setIsWaitingForIndexer(true)
-              }
-            }, 1000)
-          }
+    if (transaction.status === 'completed') {
+      setIsWaitingForIndexer(true)
+    } else if (transaction.status === 'failed') {
+      transactionStore.removeTransaction(key)
+    }
+  }, [transaction])
+
+  useEffect(() => {
+    if (isWaitingForIndexer) {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+        timeoutRef.current = null
+      }
+      
+      if (waitingMessage && messageTargetRef) {
+        timeoutRef.current = setTimeout(() => {
+          showElementPopupNotification(messageTargetRef, waitingMessage)
+        }, messageDelay || 0)
+      }
+
+      const canComplete = indexerCheck === undefined ? true : indexerCheck
+      
+      if (canComplete && transaction) {
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current)
+          timeoutRef.current = null
         }
-      } else if (transaction.status === 'failed' && mounted) {
         transactionStore.removeTransaction(key)
-        setIsLoading(false)
-        setIsWaitingForIndexer(false)
       }
     }
 
-    check()
-
     return () => {
-      mounted = false
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current)
         timeoutRef.current = null
       }
     }
-  }, [transaction, indexerCheck, key, transactionStore])
+  }, [isWaitingForIndexer, indexerCheck, transaction, messageTargetRef, waitingMessage, messageDelay])
+
+  const reset = useCallback(() => {
+    setIsLoading(false);
+    setIsWaitingForIndexer(false);
+    setMeta([] as any);
+  }, []);
 
   return { isLoading, isWaitingForIndexer, meta, transaction };
 }

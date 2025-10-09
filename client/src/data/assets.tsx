@@ -416,7 +416,7 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
       { texture: TextureName.bg_matchmaking_bell, shiftMultiplier: 0, renderOrder: 1 },
     ],
     items: [
-      { name: 'bell', color: 'ff0000', description: 'Commit Duelists to Matchmaking!', mask: TextureName.bg_matchmaking_bell_mask, renderOrder: 1 },
+      { name: 'bell', color: 'ff0000', description: 'Enlist, Commit or Retry duelist for matchmaking!', mask: TextureName.bg_matchmaking_bell_mask, renderOrder: 1 },
     ]
   },
   [SceneName.DuelsBoard]: {

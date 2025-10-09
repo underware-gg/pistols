@@ -107,20 +107,17 @@ function _CommitPacesModal({
     _closeModal()
   }, [_closeModal])
 
-  const { call: commitPaces, isLoading: isLoadingCommit, isWaitingForIndexer } = useTransactionHandler<boolean, [bigint, bigint, bigint]>({
+  const { call: commitPaces, isLoading: isLoadingCommit } = useTransactionHandler<boolean, [bigint, bigint, bigint]>({
     transactionCall: (duelistId, duelId, hash, key) => game.commit_moves(account, duelistId, duelId, hash, key),
     indexerCheck: completedStagesLeft[DuelStage.Round1Commit],
     onComplete: onCompleteCallback,
     key: `commit_paces${duelId}`,
+    messageTargetRef: buttonsRowRef,
+    waitingMessage: "Transaction successful! Waiting for indexer...",
+    messageDelay: 1000,
   })
 
   const isSimpleTutorial = tutorialLevel === DuelTutorialLevel.SIMPLE
-
-  useEffect(() => {
-    if (isWaitingForIndexer) {
-      showElementPopupNotification(buttonsRowRef, "Transaction successfull! Waiting for indexer...")
-    }
-  }, [isWaitingForIndexer])
 
   useEffect(() => {
     clearCardSelections();

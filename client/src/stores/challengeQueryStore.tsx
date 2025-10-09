@@ -6,7 +6,7 @@ import { useTokenContracts } from '../hooks/useTokenContracts';
 import { useFetchChallengeIds } from './challengeStore';
 import { usePlayer } from '/src/stores/playerStore';
 import { useCurrentSeason } from '/src/stores/seasonStore';
-import { bigintToAddress, isPositiveBigint } from '@underware/pistols-sdk/utils';
+import { bigintToAddress, bigintToHex128, isPositiveBigint } from '@underware/pistols-sdk/utils';
 import { ChallengeColumn, SortDirection } from '/src/stores/queryParamsStore';
 import { constants } from '@underware/pistols-sdk/pistols/gen';
 import { useCallToChallenges } from './eventsModelStore';
@@ -34,6 +34,59 @@ function formatFn(rows: UseQueryChallengeIdsResponseRaw): UseQueryChallengeIdsRe
   };
 }
 
+export const useQueryChallengeIdsForMatchmaking = (
+  duelType: constants.DuelType,
+) => {
+  const { requiredDuelIds } = useCallToChallenges();
+
+  const { query } = useMemo(() => {
+    const columns = ["A.duel_id", "COUNT(*) OVER() AS count"];
+    const tables = [`'pistols-Challenge' A`];
+    const conditions = [];
+
+    // filter by duel type - handle both ranked and unranked modes
+    conditions.push(`(A.duel_type = "${duelType}")`);
+
+    // filter to only include duel IDs that are in requiredDuelIds
+    conditions.push(
+      `A.duel_id in (${requiredDuelIds
+        .map((id) => `"${bigintToHex128(id)}"`)
+        .join(",")})`
+    );
+
+    // build query
+    let query = `select ${columns.join(", ")}`;
+    query += `\nfrom ${tables.join(", ")}`;
+    if (conditions.length > 0) {
+      query += `\nwhere ${conditions.join(" and ")}`;
+    }
+
+    return { query };
+  }, [duelType, requiredDuelIds]);
+
+  const { data, isLoading, queryHash } = useSdkSqlQuery({
+    query,
+    formatFn,
+  });
+
+  // If no required duel IDs, return empty results immediately
+  if (requiredDuelIds.length === 0) {
+    return {
+      challengeIds: [],
+      totalCount: 0,
+      isLoading: false,
+      queryHash: 0n,
+    };
+  }
+
+  return {
+    challengeIds: data?.duelIds ?? [],
+    totalCount: data?.totalCount ?? 0,
+    isLoading,
+    queryHash,
+  };
+}
+
 export const useQueryChallengeIds = (
   filterStates: constants.ChallengeState[],
   filterName: string,
@@ -53,6 +106,8 @@ export const useQueryChallengeIds = (
   const { seasonId: currentSeasonId } = useCurrentSeason()
   const { requiredDuelIds } = useCallToChallenges()
 
+  console.log('useQueryChallengeIds() =>', requiredDuelIds)
+
   const { query } = useMemo(() => {
     const columns = ['A.duel_id', 'COUNT(*) OVER() AS count']
     const tables = [`'pistols-Challenge' A`]
@@ -63,9 +118,9 @@ export const useQueryChallengeIds = (
     // handle required action duels
     if (requiredDuelIds.length > 0) {
       if (filterStates.includes(constants.ChallengeState.InProgress)) {
-        filterCondition += ` or A.duel_id in (${requiredDuelIds.map((id) => `"${bigintToAddress(id)}"`).join(',')})`;
+        filterCondition += ` or A.duel_id in (${requiredDuelIds.map((id) => `"${bigintToHex128(id)}"`).join(',')})`;
       } else if (filterStates.includes(constants.ChallengeState.Resolved)) {
-        filterCondition += ` and A.duel_id not in (${requiredDuelIds.map((id) => `"${bigintToAddress(id)}"`).join(',')})`;
+        filterCondition += ` and A.duel_id not in (${requiredDuelIds.map((id) => `"${bigintToHex128(id)}"`).join(',')})`;
       }
     }
     filterCondition += `)`;
@@ -136,6 +191,8 @@ export const useQueryChallengeIds = (
     query,
     formatFn,
   });
+
+  console.log('useQueryChallengeIds() DATA =>', data?.duelIds)
 
   // fetch only NEW duels (not already in the store)
   useFetchChallengeIds(data?.duelIds ?? []);
