@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { useSettings } from '/src/hooks/SettingsContext'
+import { SettingsActions, useSettings } from '/src/hooks/SettingsContext'
 import { useGameEvent } from '/src/hooks/useGameEvent'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { DUELIST_CARD_HEIGHT, DUELIST_CARD_WIDTH } from '/src/data/cardConstants'
@@ -16,10 +16,13 @@ import { usePlayerDuelistsOrganized } from '/src/stores/duelistStore'
 import { useQueryChallengeIdsForMatchmaking } from '/src/stores/challengeQueryStore'
 import { DuelistEmptySlot, DuelistEmptySlotHandle } from '../ui/DuelistEmptySlot'
 import { AudioName } from '/src/data/audioAssets'
+import { usePistolsContext } from '/src/hooks/PistolsContext'
+import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 
 export default function ScMatchmaking() {
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { selectedMode, dispatchSetting } = useSettings()
+  const { selectedDuelistId, dispatchSelectDuelistId } = usePistolsContext()
   
   const [matchmakingType, setMatchmakingType] = useState<constants.QueueId>(constants.QueueId.Unranked);
   const [showModeInfo, setShowModeInfo] = useState(false);
@@ -37,6 +40,8 @@ export default function ScMatchmaking() {
   
   // Track individual duelist commit states
   const [duelistInAction, setDuelistInAction] = useState<{ duelistId: bigint; status: boolean | null; error: string | null; action: 'commit' | 'enlist' } | null>(null)
+  
+  const [hasAutoSelected, setHasAutoSelected] = useState(false)
 
   const { activeDuelists: duelistIds } = usePlayerDuelistsOrganized();
   const { notDuelingIds } = useDuellingDuelists(duelistIds);
@@ -190,6 +195,19 @@ export default function ScMatchmaking() {
     }
   }, [selectedMode])
 
+  useEffect(() => {
+    if (isPositiveBigint(selectedDuelistId) && !hasAutoSelected && notDuelingIds?.includes(BigInt(selectedDuelistId))) {
+      const emptySlot = isRankedMode ? emptySlowSlotRankedRef.current : emptySlowSlotUnrankedRef.current
+      
+      if (emptySlot) {
+        emptySlot.commitToQueue(BigInt(selectedDuelistId))
+        setHasAutoSelected(true)
+        
+        dispatchSelectDuelistId(0n)
+      }
+    }
+  }, [selectedDuelistId, hasAutoSelected, notDuelingIds, isRankedMode, dispatchSelectDuelistId])
+
   // Memoize empty slot to preserve state between mode changes
   const emptySlotRanked = useMemo(() => (
     <DuelistEmptySlot
@@ -296,7 +314,7 @@ export default function ScMatchmaking() {
               active={matchmakingType === constants.QueueId.Unranked}
               onClick={() => {
                 setIsAnimating(true);
-                dispatchSetting("settings.SELECTED_MODE", "unranked");
+                dispatchSetting(SettingsActions.SELECTED_MODE, "unranked");
                 setTimeout(() => setIsAnimating(false), 300);
               }}
             />
@@ -306,7 +324,7 @@ export default function ScMatchmaking() {
               active={matchmakingType === constants.QueueId.Ranked}
               onClick={() => {
                 setIsAnimating(true);
-                dispatchSetting("settings.SELECTED_MODE", "ranked");
+                dispatchSetting(SettingsActions.SELECTED_MODE, "ranked");
                 setTimeout(() => setIsAnimating(false), 300);
               }}
             />

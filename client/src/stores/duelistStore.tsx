@@ -20,6 +20,7 @@ import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
 import { debug } from '@underware/pistols-sdk/pistols'
 import { useFetchTokenboundAccountsBalances } from './coinStore'
 import { useTokenContracts } from '../hooks/useTokenContracts'
+import { useDuelistsInMatchMaking } from './matchStore'
 
 export const useDuelistStore = createDojoStore<PistolsSchemaType>();
 export const useDuelistStackStore = createDojoStore<PistolsSchemaType>();
@@ -180,6 +181,9 @@ export const useDuellingDuelists = (duelistIds: BigNumberish[]) => {
 
   const entityIds = useEntityIds(duelistIds.map(id => [id]))
 
+  const { inQueueIds: rankedQueuedIds } = useDuelistsInMatchMaking(constants.QueueId.Ranked)
+  const { inQueueIds: unrankedQueuedIds } = useDuelistsInMatchMaking(constants.QueueId.Unranked)
+
   // filter alive duelists from duelistIds
   const alive_entities = useMemo(() => (
     Object.keys(entities).filter(e => (
@@ -187,9 +191,10 @@ export const useDuellingDuelists = (duelistIds: BigNumberish[]) => {
     ))
   ), [entities, entityIds])
 
-  const { notDuelingIds, duellingIds, duelPerDuelists } = useMemo(() => {
+  const { notDuelingIds, duellingIds, queuedIds, duelPerDuelists } = useMemo(() => {
     const notDuelingIds: BigNumberish[] = []
     const duellingIds: BigNumberish[] = []
+    const queuedIds: BigNumberish[] = []
     const duelPerDuelists: Record<string, BigNumberish> = {}
     alive_entities.forEach(entityId => {
       const assignment = getEntityModel(entities[entityId], 'DuelistAssignment')
@@ -197,6 +202,8 @@ export const useDuellingDuelists = (duelistIds: BigNumberish[]) => {
       if (isPositiveBigint(assignment?.duel_id)) {
         duellingIds.push(duelist_id)
         duelPerDuelists[duelist_id] = bigintToHex(assignment.duel_id)
+      } else if (rankedQueuedIds.includes(BigInt(duelist_id)) || unrankedQueuedIds.includes(BigInt(duelist_id))) {
+        queuedIds.push(duelist_id)
       } else {
         notDuelingIds.push(duelist_id)
       }
@@ -204,6 +211,7 @@ export const useDuellingDuelists = (duelistIds: BigNumberish[]) => {
     return {
       notDuelingIds: notDuelingIds.sort((a, b) => Number(BigInt(a) - BigInt(b))),
       duellingIds: duellingIds.sort((a, b) => Number(BigInt(a) - BigInt(b))),
+      queuedIds: queuedIds.sort((a, b) => Number(BigInt(a) - BigInt(b))),
       duelPerDuelists,
     }
   }, [alive_entities])
@@ -211,6 +219,7 @@ export const useDuellingDuelists = (duelistIds: BigNumberish[]) => {
   return {
     notDuelingIds,    // duelist_ids who are not duelling
     duellingIds,      // duelist_ids who are duelling
+    queuedIds,        // duelist_ids who are queued (in any queue)
     duelPerDuelists,  // duel_ids per (duelling) duelist_id
   }
 }
