@@ -7,13 +7,13 @@ import { useProgressStore } from '/src/stores/progressStore'
 import { debug } from '@underware/pistols-sdk/pistols'
 
 const query: PistolsHistoricalQueryBuilder = new PistolsHistoricalQueryBuilder()
-  .withClause(
-    new PistolsClauseBuilder().keys(
-      ['pistols-PlayerActivityEvent'],
-      [],
-      "VariableLen"
-    ).build()
-  )
+  // .withClause(
+  //   new PistolsClauseBuilder().keys(
+  //     ['pistols-PlayerActivityEvent'],
+  //     [],
+  //     "VariableLen"
+  //   ).build()
+  // )
   .withEntityModels([
     'pistols-PlayerActivityEvent',
   ])
