@@ -5,7 +5,7 @@ import { createDojoStore } from '@dojoengine/sdk/react'
 import { PistolsSchemaType } from '@underware/pistols-sdk/pistols/sdk'
 import { useStoreModelsByKeys } from '@underware/pistols-sdk/dojo';
 import { parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/starknet';
-import { bigintToHex } from '@underware/pistols-sdk/utils';
+import { bigintEquals, bigintToHex } from '@underware/pistols-sdk/utils';
 import { models, constants } from '@underware/pistols-sdk/pistols/gen';
 
 export const useEventsStore = createDojoStore<PistolsSchemaType>();
@@ -32,6 +32,7 @@ export type CallToChallengeDuel = {
   timestamp: number;
 }
 export function useCallToChallenges() {
+  const { address } = useAccount()
   const entities = useEventsStore((state) => state.entities)
   const activeChallenges = useMemo(() => (
     Object.values(entities)
@@ -40,7 +41,9 @@ export function useCallToChallenges() {
         if (callToAction) {
           const duelId = BigInt(callToAction?.duel_id ?? 0);
           const action = parseEnumVariant<constants.ChallengeAction>(callToAction.action);
-          if (!_ignoredActions.includes(action)) {
+          if (!_ignoredActions.includes(action)
+            && bigintEquals(callToAction.player_address, address)
+          ) {
             acc.push({
               duelId,
               action,
