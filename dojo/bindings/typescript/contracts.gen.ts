@@ -3391,6 +3391,27 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
+	const build_pack_token_mintTo_calldata = (recipient: string): DojoCall => {
+		return {
+			contractName: "pack_token",
+			entrypoint: "mint_to",
+			calldata: [recipient],
+		};
+	};
+
+	const pack_token_mintTo = async (snAccount: Account | AccountInterface, recipient: string) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_pack_token_mintTo_calldata(recipient),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 	const build_pack_token_name_calldata = (): DojoCall => {
 		return {
 			contractName: "pack_token",
@@ -4883,6 +4904,8 @@ export function setupWorld(provider: DojoProvider) {
 			buildMaxSupplyCalldata: build_pack_token_maxSupply_calldata,
 			mintBotDuelist: pack_token_mintBotDuelist,
 			buildMintBotDuelistCalldata: build_pack_token_mintBotDuelist_calldata,
+			mintTo: pack_token_mintTo,
+			buildMintToCalldata: build_pack_token_mintTo_calldata,
 			name: pack_token_name,
 			buildNameCalldata: build_pack_token_name_calldata,
 			open: pack_token_open,
