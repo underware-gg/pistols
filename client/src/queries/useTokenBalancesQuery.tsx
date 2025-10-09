@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useAccount } from '@starknet-react/core';
 import { useMounted } from '@underware/pistols-sdk/utils/hooks';
-import { useSdkSqlQuery } from '@underware/pistols-sdk/dojo/sql';
+import { useSdkSqlQuery, useSqlQuery } from '@underware/pistols-sdk/dojo/sql';
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { useDuelistTokenStore, useDuelTokenStore, usePackTokenStore, useRingTokenStore, useTournamentTokenStore } from '/src/stores/tokenStore'
 import { useFameCoinStore, useLordsCoinStore, useFoolsCoinStore } from '/src/stores/coinStore'
-import { bigintToAddress, bigintToHex, isPositiveBigint } from '@underware/pistols-sdk/utils';
+import { bigintToAddress, bigintToHex, bigintToDecimal, isPositiveBigint } from '@underware/pistols-sdk/utils';
 import { debug } from '@underware/pistols-sdk/pistols'
 import { BigNumberish } from 'starknet';
 import * as torii from '@dojoengine/torii-client'
@@ -23,7 +23,7 @@ function formatFn(rows: QueryResponseRaw): torii.TokenBalance[] {
     contract_address: bigintToAddress(row.contract_address),
     account_address: bigintToAddress(row.account_address),
     balance: bigintToHex(row.balance),
-    token_id: bigintToHex(row.token_id.split(':')[1] ?? 0n),
+    token_id: bigintToDecimal(row.token_id.split(':')[1] ?? 0n),
   }));
 }
 
@@ -40,14 +40,14 @@ export const useFetchInitialTokenBalancesQuery = (last_iso_timestamp: string) =>
   const query = useMemo(() => {
     if (!mounted || !address || fetched || !last_iso_timestamp) return '';
     const _getAlllBalances = [
-      erc721Tokens.duelistContractAddress,
-      erc721Tokens.ringContractAddress,
-    ].map(a => `'${bigintToAddress(a)}'`);
+      `'${erc721Tokens.duelistContractAddress}'`,
+      `'${erc721Tokens.ringContractAddress}'`,
+    ];
     const _getPlayerBalances = [
-      erc721Tokens.packContractAddress,
-      erc20Tokens.foolsContractAddress,
-      erc20Tokens.lordsContractAddress,
-    ].map(a => `'${bigintToAddress(a)}'`);
+      `'${erc721Tokens.packContractAddress}'`,
+      `'${erc20Tokens.foolsContractAddress}'`,
+      `'${erc20Tokens.lordsContractAddress}'`,
+    ];
     let queries = [
       // balances needed for all players (not previously cached)
       `select contract_address, account_address, balance, token_id`,
@@ -55,8 +55,8 @@ export const useFetchInitialTokenBalancesQuery = (last_iso_timestamp: string) =>
       `where contract_address in (${Object.values(_getAlllBalances).join(',')})`,
       `and balance!='${bigintToAddress(0n)}'`,
       `and token_id in (select token_id from token_transfers where contract_address in (${Object.values(_getAlllBalances).join(',')}) and executed_at>'${last_iso_timestamp}')`,
-      `union all`,
       // balances needed for current player
+      `union all`,
       `select contract_address, account_address, balance, token_id`,
       `from token_balances`,
       `where contract_address in (${Object.values(_getPlayerBalances).join(',')})`,
@@ -66,12 +66,13 @@ export const useFetchInitialTokenBalancesQuery = (last_iso_timestamp: string) =>
     return queries.join(' ');
   }, [mounted, address, erc20Tokens, erc721Tokens, fetched, last_iso_timestamp])
 
-  const { data, isLoading } = useSdkSqlQuery({
+  // const { data, isLoading } = useSdkSqlQuery({ // dojo.js / tanstack
+  const { data, isLoading } = useSqlQuery({ // pistols
     query,
     formatFn,
   });
 
-  useEffect(() => debug.log('SQL BALANCES:', last_iso_timestamp, fetched, data?.length, query), [fetched, last_iso_timestamp, data, query])
+  useEffect(() => debug.log('SQL BALANCES:', last_iso_timestamp, isLoading, fetched, data?.length, query, data), [last_iso_timestamp, isLoading, fetched, data, query])
 
   // add balances to token stores
   useAddBalancesToTokenStores(data);

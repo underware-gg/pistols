@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
-import { useSdkTokenBalancesSub } from '@underware/pistols-sdk/dojo'
+import { useDojoSetup, useSdkTokenBalancesSub } from '@underware/pistols-sdk/dojo'
 import { useDuelistTokenStore, useDuelTokenStore, usePackTokenStore, useRingTokenStore, useTournamentTokenStore } from '/src/stores/tokenStore'
 import { useFameCoinStore, useLordsCoinStore, useFoolsCoinStore } from '/src/stores/coinStore'
 import { useFetchInitialTokenBalancesQuery } from '/src/queries/useTokenBalancesQuery'
@@ -10,6 +10,8 @@ import { bigintToAddress } from '@underware/pistols-sdk/utils'
 import { cachedPlayerData } from '@underware/pistols-sdk/pistols/cached'
 import { debug } from '@underware/pistols-sdk/pistols'
 import * as torii from '@dojoengine/torii-client'
+import { E } from 'node_modules/@underware/pistols-sdk/dist/constants-4wqnDmKJ'
+import { NetworkId } from '@underware/pistols-sdk/pistols/config'
 
 
 export function TokenStoreSync() {
@@ -46,21 +48,28 @@ export function TokenStoreSync() {
   // get cacehd state
   //
   const mounted = useMounted()
+  const { selectedNetworkId } = useDojoSetup()
   const [last_iso_timestamp, setLastIsoTimestamp] = useState<string>();
   useEffect(() => {
-    if (mounted) {
-      let iso_timestamp = '';
-      Object.keys(cachedPlayerData).forEach(player_address => {
-        const playerData = cachedPlayerData[player_address];
-        duelist_state.addCachedPlayerTokens(player_address, playerData.duelist_ids);
-        ring_state.addCachedPlayerTokens(player_address, playerData.ring_ids);
-        if (playerData.iso_timestamp > iso_timestamp) {
-          iso_timestamp = playerData.iso_timestamp;
-        }
-      })
-      setLastIsoTimestamp(iso_timestamp)
+    if (mounted && selectedNetworkId) {
+      if (selectedNetworkId == NetworkId.MAINNET) {
+        // load cached players on mainnet only
+        let iso_timestamp = '';
+        Object.keys(cachedPlayerData).forEach(player_address => {
+          const playerData = cachedPlayerData[player_address];
+          duelist_state.addCachedPlayerTokens(player_address, playerData.duelist_ids);
+          ring_state.addCachedPlayerTokens(player_address, playerData.ring_ids);
+          if (playerData.iso_timestamp > iso_timestamp) {
+            iso_timestamp = playerData.iso_timestamp;
+          }
+        })
+        setLastIsoTimestamp(iso_timestamp)
+      } else {
+        // not mainnet...
+        setLastIsoTimestamp('0000-00-00')
+      }
     }
-  }, [mounted])
+  }, [mounted, selectedNetworkId])
 
 
   //----------------------------------------
@@ -69,9 +78,9 @@ export function TokenStoreSync() {
   const { initialTokenBalances, isLoading, address } = useFetchInitialTokenBalancesQuery(last_iso_timestamp);
 
   useEffect(() => {
-    if (address) {
+    if (address && isLoading !== undefined) {
       const pageNumber = (isLoading ? 0 : 1);
-      const finished = !isLoading;
+      const finished = (isLoading === false);
       updateProgress('token_balances', pageNumber, finished);
     }
   }, [address, isLoading])

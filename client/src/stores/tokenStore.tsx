@@ -3,7 +3,7 @@ import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
-import { bigintEquals, bigintToDecimal, isPositiveBigint } from '@underware/pistols-sdk/utils'
+import { bigintEquals, bigintToAddress, bigintToDecimal, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import * as torii from '@dojoengine/torii-client'
 
@@ -108,15 +108,16 @@ export const useTournamentTokenStore = createStore('tournament');
 export function useTokenStore(contractAddress: BigNumberish) {
   const { erc721Tokens } = useTokenContracts()
   const store = useMemo(() => {
-    if (bigintEquals(contractAddress, erc721Tokens.duelistContractAddress)) {
+    const _contractAddress = bigintToAddress(contractAddress)
+    if (_contractAddress == erc721Tokens.duelistContractAddress) {
       return useDuelistTokenStore
-    } else if (bigintEquals(contractAddress, erc721Tokens.duelContractAddress)) {
+    } else if (_contractAddress == erc721Tokens.duelContractAddress) {
       return useDuelTokenStore
-    } else if (bigintEquals(contractAddress, erc721Tokens.packContractAddress)) {
+    } else if (_contractAddress == erc721Tokens.packContractAddress) {
       return usePackTokenStore
-    } else if (bigintEquals(contractAddress, erc721Tokens.ringContractAddress)) {
+    } else if (_contractAddress == erc721Tokens.ringContractAddress) {
       return useRingTokenStore
-    } else if (bigintEquals(contractAddress, erc721Tokens.tournamentContractAddress)) {
+    } else if (_contractAddress == erc721Tokens.tournamentContractAddress) {
       return useTournamentTokenStore
     }
     return null
