@@ -24,7 +24,7 @@ export type UseSdkTokenBalancesGetProps = {
   accounts?: BigNumberish[]
   tokenIds?: BigNumberish[]
   enabled?: boolean
-  // initBalances?: (accounts: BigNumberish[]) => void
+  initBalances?: (accounts: BigNumberish[]) => void
   setBalances: (balances: torii.TokenBalance[]) => void
   updateProgress?: (currentPage: number, finished?: boolean) => void  // called page by page to report progress
 }
@@ -41,7 +41,7 @@ export const useSdkTokenBalancesGet = ({
   contract,
   accounts,
   tokenIds,
-  // initBalances,
+  initBalances,
   setBalances,
   updateProgress,
   enabled = true,
@@ -54,16 +54,15 @@ export const useSdkTokenBalancesGet = ({
     const _get = async () => {
       const _contract = bigintToAddress(contract)
       const _accounts = accounts?.map(a => bigintToAddress(a)) ?? []
-      // debug.log("useSdkTokenBalancesGet() GET........", enabled, _contract, _accounts, tokenIds)
+      debug.log("useSdkTokenBalancesGet() GET........", enabled, _accounts.length, _contract, tokenIds)
       setIsLoading(true)
       updateProgress?.(0);
-      // initBalances?.(_accounts);
+      initBalances?.(_accounts);
       await sdk.getTokenBalances({
         contractAddresses: [_contract],
         accountAddresses: _accounts,
         tokenIds: tokenIds?.map(a => toToriiTokenId(a)) ?? []
       }).then((balances: Page<torii.TokenBalance>) => {
-        if (!_mounted) return
         // debug.log("useSdkTokenBalancesGet() GOT:", balances)
         if (balances.items.length > 0) {
           setBalances(balances.items)
@@ -82,10 +81,9 @@ export const useSdkTokenBalancesGet = ({
           console.warn("useSdkTokenBalancesGet() LOST PAGE!!!! ", contract, _accounts, tokenIds)
         }
       }).catch((error: Error) => {
-        if (!_mounted) return
         console.error("useSdkTokenBalancesGet().sdk.get() error:", error, contract, _accounts, tokenIds)
       }).finally(() => {
-        setIsLoading(false)
+        if (!_mounted) setIsLoading(false)
         updateProgress?.(1, true);
       })
       // debug.log("useSdkTokenBalancesGet() done!", account)

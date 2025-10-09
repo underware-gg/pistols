@@ -22,48 +22,40 @@ export function EventsModelStoreSync() {
   const mounted = useMounted()
 
   // get for all players
-  const query_get_player = useMemo<PistolsQueryBuilder>(() => (
+  const query_get_players = useMemo<PistolsQueryBuilder>(() => (
     isPositiveBigint(address)
       ? new PistolsQueryBuilder()
         .withClause(
-          new PistolsClauseBuilder().keys(
-            [
-              'pistols-CallToChallengeEvent',
-              'pistols-PlayerSettingEvent',
-              'pistols-PlayerBookmarkEvent',
-            ],
-            // VariableLen means: must have at least the address key...
-            [bigintToAddress(address)],
-            "VariableLen"
-          ).build()
+          // !!! not working in torii 1.8.0 + dojo.js 1.7
+          // new PistolsClauseBuilder().keys(
+          //   [
+          //     'pistols-CallToChallengeEvent',
+          //     'pistols-PlayerSettingEvent',
+          //     'pistols-PlayerBookmarkEvent',
+          //   ],
+          //   // VariableLen means: must have at least the address key...
+          //   [bigintToAddress(address)],
+          //   "VariableLen"
+          // ).build()
+          //
+          // this is better, we can include more queries here...
+          new PistolsClauseBuilder().compose().or([
+            new PistolsClauseBuilder().where("pistols-CallToChallengeEvent", "player_address", "Eq", bigintToAddress(address)),
+            new PistolsClauseBuilder().where("pistols-PlayerSettingEvent", "player_address", "Eq", bigintToAddress(address)),
+            new PistolsClauseBuilder().where("pistols-PlayerBookmarkEvent", "player_address", "Eq", bigintToAddress(address)),
+            new PistolsClauseBuilder().where("pistols-PlayerSocialLinkEvent", "player_address", "Neq", bigintToAddress(0)),
+          ]).build()
         )
         .withEntityModels([
           'pistols-CallToChallengeEvent',
           'pistols-PlayerSettingEvent',
           'pistols-PlayerBookmarkEvent',
+          'pistols-PlayerSocialLinkEvent', // get all
         ])
-        .withLimit(1000)
+        .withLimit(999)
         .includeHashedKeys()
       : undefined
   ), [address])
-
-  // get for all players
-  const query_get_all = useMemo<PistolsQueryBuilder>(() => (
-    new PistolsQueryBuilder()
-      .withClause(
-        new PistolsClauseBuilder().keys(
-          // get everyone's social links
-          ['pistols-PlayerSocialLinkEvent'],
-          [undefined],
-          "VariableLen"
-        ).build()
-      )
-      .withEntityModels([
-        'pistols-PlayerSocialLinkEvent',
-      ])
-      .withLimit(1000)
-      .includeHashedKeys()
-  ), [])
 
   // get for current player only
   const query_sub = useMemo<PistolsQueryBuilder>(() => (
@@ -110,26 +102,16 @@ export function EventsModelStoreSync() {
   // Initial fetch
   //
   useSdkEventsGet({
-    query: query_get_player,
-    enabled: (mounted && Boolean(query_get_player)),
+    query: query_get_players,
+    enabled: (mounted && Boolean(query_get_players)),
     updateProgress: (currentPage: number, finished?: boolean) => {
-      updateProgress('events_get_player', currentPage, finished)
+      updateProgress('events_get_players', currentPage, finished)
     },
     setEntities: (entities: PistolsEntity[]) => {
       debug.log(`GET EventsModelStoreSync() ======> [Player]`, entities)
-      eventsState.setEntities(filterEntitiesByModels(entities, ['CallToChallengeEvent', 'PlayerSettingEvent']))
-      playerDataState.updateMessages(filterEntitiesByModels(entities, ['PlayerBookmarkEvent']))
-    },
-  })
-  useSdkEventsGet({
-    query: query_get_all,
-    enabled: (mounted && Boolean(query_get_all)),
-    updateProgress: (currentPage: number, finished?: boolean) => {
-      updateProgress('events_get_all', currentPage, finished)
-    },
-    setEntities: (entities: PistolsEntity[]) => {
       debug.log(`GET EventsModelStoreSync() ======> [PlayerSocialLinkEvent]`, entities)
-      eventsState.setEntities(entities)
+      eventsState.setEntities(filterEntitiesByModels(entities, ['CallToChallengeEvent', 'PlayerSettingEvent', 'PlayerSocialLinkEvent']))
+      playerDataState.updateMessages(filterEntitiesByModels(entities, ['PlayerBookmarkEvent']))
     },
   })
 

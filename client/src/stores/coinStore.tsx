@@ -11,6 +11,7 @@ import { bigintEquals, bigintToHex, isPositiveBigint } from '@underware/pistols-
 import { weiToEth } from '@underware/pistols-sdk/starknet'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import * as torii from '@dojoengine/torii-client'
+import { useAccount } from '@starknet-react/core'
 
 // interface totii.TokenBalance {
 //   balance: string;
@@ -202,18 +203,21 @@ export const useFetchTokenboundAccountsBalances = (coinAddress: BigNumberish, to
 }
 
 export const useFetchAccountsBalances = (coinAddress: BigNumberish, accounts: BigNumberish[], enabled: boolean) => {
+  const { address } = useAccount() // do not fetch connected player (done by sql)
   const state = useCoinStore(coinAddress)((state) => state)
   const newAccounts = useMemo(() => (
-    accounts.filter((a) => (isPositiveBigint(a) && !state.hasBalance(a)))
-  ), [accounts, state.accounts])
+    (enabled && isPositiveBigint(coinAddress))
+      ? accounts.filter((a) => (isPositiveBigint(a) && !state.hasBalance(a) && !bigintEquals(a, address)))
+      : []
+  ), [enabled, coinAddress, accounts, state.accounts, address])
+  // fetch...
   const { isLoading } = useSdkTokenBalancesGet({
     contract: coinAddress,
     accounts: newAccounts,
-    // initBalances: state.initBalances, // breaks fetch!!
+    initBalances: state.initBalances,
     setBalances: state.setBalances,
-    enabled: (enabled && isPositiveBigint(coinAddress) && newAccounts.length > 0),
+    enabled: (newAccounts.length > 0),
   })
-
   return {
     isLoading,
     isFinished: (isLoading === false),
