@@ -9,8 +9,10 @@ const _env = (name: string) => (
 
 // required
 export const CLIENT_URL = _env('VITE_CLIENT_URL') || 'https://play.pistols.gg';
+// optional
 export const DEFAULT_NETWORK_ID = _env('VITE_NETWORK_ID') || _env('VITE_DEFAULT_NETWORK_ID') ||  'MAINNET';
 export const PUBLISH_ONLINE_STATUS = _env('VITE_PUBLISH_ONLINE_STATUS') === 'true';
+export const MAINTENANCE_MODE = _env('VITE_MAINTENANCE_MODE') === 'true';
 // dojo config overrides
 export const ASSETS_SERVER_URL = _env('VITE_ASSETS_SERVER_URL') || null;
 export const SLOT_NAME = _env('VITE_SLOT_NAME') || null;

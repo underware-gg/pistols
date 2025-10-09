@@ -8,6 +8,7 @@ import { SettingsProvider } from '/src/hooks/SettingsContext'
 import { PistolsProvider } from '/src/hooks/PistolsContext'
 import ErrorModal from '/src/components/modals/ErrorModal'
 import MainPage from '/src/pages/MainPage'
+import MaintenancePage from '/src/pages/MaintenancePage'
 import InternalPageIndex from '/src/pages/internal/InternalPageIndex'
 import AdminPage from '/src/pages/internal/AdminPage'
 import AirdropPage from '/src/pages/internal/AirdropPage'
@@ -30,16 +31,21 @@ import ProfilesTestPage from '/src/pages/tests/ProfilesTestPage'
 import TutorialTestPage from '/src/pages/tests/TutorialTestPage'
 import ChainSwitchPage from '/src/pages/tests/ChainSwitchPage'
 import SocialsTestPage from '/src/pages/tests/SocialsTestPage'
+import * as ENV from '/src/utils/env'
 
 //
 // REF:
 // https://reactrouter.com/6.28.1/routers/create-browser-router
 // https://api.reactrouter.com/v7/functions/react_router.createBrowserRouter.html
 //
-const router = createBrowserRouter([
-  {
+const router = createBrowserRouter(
+  [{
     path: '/',
-    children: [
+    children: ENV.MAINTENANCE_MODE ? [
+      { path: '', element: <MaintenancePage /> },
+      { path: '*', element: <MaintenancePage /> },
+      { path: "status", element: <StatusPage /> },
+    ] : [
       { path: "", element: <MainPage /> },
       { path: "gate", element: <MainPage /> },
       { path: "door", element: <MainPage /> },
