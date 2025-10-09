@@ -4,7 +4,7 @@ import { useGameEvent } from '/src/hooks/useGameEvent'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { DUELIST_CARD_HEIGHT, DUELIST_CARD_WIDTH } from '/src/data/cardConstants'
 import { InteractibleScene } from '/src/three/InteractibleScene'
-import { _currentScene } from '/src/three/game'
+import { _currentScene, playAudio } from '/src/three/game'
 import { TextureName } from '/src/data/assets'
 import { ActionButton } from '/src/components/ui/Buttons'
 import { DuelistMatchmakingSlot, DuelistMatchmakingSlotHandle } from '/src/components/ui/DuelistMatchmakingSlot'
@@ -15,6 +15,7 @@ import { useDuellingDuelists } from '/src/stores/duelistStore'
 import { usePlayerDuelistsOrganized } from '/src/stores/duelistStore'
 import { useQueryChallengeIdsForMatchmaking } from '/src/stores/challengeQueryStore'
 import { DuelistEmptySlot, DuelistEmptySlotHandle } from '../ui/DuelistEmptySlot'
+import { AudioName } from '/src/data/audioAssets'
 
 export default function ScMatchmaking() {
   const { aspectWidth, aspectHeight } = useGameAspect()
@@ -118,6 +119,7 @@ export default function ScMatchmaking() {
 
   const handleBellClick = () => {    
     if (duelistInAction && duelistInAction.status === null) {
+      playAudio(AudioName.BELL_CLICK_BROKEN)
       return
     }
     
@@ -125,9 +127,11 @@ export default function ScMatchmaking() {
     const emptySlot = isRankedMode ? emptySlowSlotRankedRef.current : emptySlowSlotUnrankedRef.current
     
     if (!emptySlot) {
+      playAudio(AudioName.BELL_CLICK_BROKEN)
       return
     }
     
+    playAudio(AudioName.BELL_CLICK)
     emptySlot.openDuelistSelect()
   }
 

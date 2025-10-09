@@ -17,6 +17,8 @@ enum AudioName {
   // UI
   NOTIFICATION = 'NOTIFICATION',
   // UI_BUTTON_CLICK = 'UI_BUTTON_CLICK',
+  BELL_CLICK = 'BELL_CLICK',
+  BELL_CLICK_BROKEN = 'BELL_CLICK_BROKEN',
 
   // environment
   DOOR_KNOCKING = 'DOOR_KNOCKING',
@@ -178,6 +180,16 @@ let AUDIO_ASSETS: AudioAssets = {
   },
   NOTIFICATION: {
     path: '/audio/sfx/env/notification.mp3',
+    volume: 0.7,
+    type: AudioType.SFX,
+  },
+  BELL_CLICK: {
+    path: '/audio/sfx/bell-click.mp3',
+    volume: 0.7,
+    type: AudioType.SFX,
+  },
+  BELL_CLICK_BROKEN: {
+    path: '/audio/sfx/bell-click-broken.mp3',
     volume: 0.7,
     type: AudioType.SFX,
   },
