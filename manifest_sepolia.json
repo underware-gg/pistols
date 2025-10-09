@@ -9763,7 +9763,7 @@
     },
     {
       "address": "0x71333ac75b7d5ba89a2d0c2b67d5b955258a4d46eb42f3428da6137bbbfdfd9",
-      "class_hash": "0x68976d92a766289abb8fb78ffff308eb213d1f675149d4155bba914a20b7555",
+      "class_hash": "0x7f294ef370cace9e03e1dd1fdea6b9aee393134136671a8672f76186795c907",
       "abi": [
         {
           "type": "impl",
@@ -10407,6 +10407,38 @@
             },
             {
               "type": "function",
+              "name": "open",
+              "inputs": [
+                {
+                  "name": "pack_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::array::Span::<core::integer::u128>"
+                }
+              ],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "mint_to",
+              "inputs": [
+                {
+                  "name": "recipient",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u128"
+                }
+              ],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
               "name": "airdrop",
               "inputs": [
                 {
@@ -10424,22 +10456,6 @@
                 {
                   "name": "quantity",
                   "type": "core::integer::u32"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::array::Span::<core::integer::u128>"
-                }
-              ],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "open",
-              "inputs": [
-                {
-                  "name": "pack_id",
-                  "type": "core::integer::u128"
                 }
               ],
               "outputs": [
@@ -11430,8 +11446,9 @@
         "claim_starter_pack",
         "claim_gift",
         "purchase",
-        "airdrop",
         "open",
+        "mint_to",
+        "airdrop",
         "mint_bot_duelist",
         "upgrade",
         "safe_transfer_from",
