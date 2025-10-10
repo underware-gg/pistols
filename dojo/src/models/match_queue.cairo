@@ -204,6 +204,16 @@ pub impl MatchPlayerImpl of MatchPlayerTrait {
             slot,
         });
     }
+    fn is_duelist_stacked(self: @MatchPlayer,
+        duelist_id: u128,
+    ) -> bool {
+        for next_duelist in self.next_duelists {
+            if (*next_duelist.duelist_id == duelist_id) {
+                return true;
+            }
+        }
+        (false)
+    }
     // unstack a duelist to re-enter queue, or clear this player
     // return true if a duelist was unstacked and player re-entered queue
     fn unstack_duelist_or_clear(ref self: MatchPlayer) -> bool {

@@ -188,23 +188,26 @@ pub mod matchmaker {
             //----------------------------------
             // player ping...
             //
-            // validate input duelist
+            // >> adding a new duelist to the stack...
             else if (duelist_id != matching_player.duelist_id) {
                 // can stack duelists in SLOW mode only
                 assert(queue_mode == QueueMode::Slow, Errors::INVALID_MODE);
-                // Validate duelist and set a slot
-                let (duelist_id, slot): (u128, u8) = self._validate_and_randomize_slot(ref store, @queue, caller, duelist_id, seed);
-                // save it for later...
-                matching_player.stack_duelist(
-                    duelist_id,
-                    slot,
-                );
-                // save and return
-                store.set_match_player(@matching_player);
+                // avoiding stacking the same duelist twice
+                if (!matching_player.is_duelist_stacked(duelist_id)) {
+                    // Validate duelist and set a slot
+                    let (duelist_id, slot): (u128, u8) = self._validate_and_randomize_slot(ref store, @queue, caller, duelist_id, seed);
+                    // save it for later...
+                    matching_player.stack_duelist(
+                        duelist_id,
+                        slot,
+                    );
+                    // save and return
+                    store.set_match_player(@matching_player);
+                }
                 return (0);
             }
+            // >> switching from SLOW to FAST mode...
             // validate input mode
-            // can switch from SLOW to FAST only...
             else if (queue_mode != matching_player.queue_info.queue_mode) {
                 assert(matching_player.queue_info.queue_mode == QueueMode::Slow && queue_mode == QueueMode::Fast, Errors::INVALID_MODE);
                 // re-enter queue with new speed
@@ -215,6 +218,8 @@ pub mod matchmaker {
                     matching_player.queue_info.slot,
                 );
             } else {
+                // >>> pinging with duelist in queue...
+                // check if expired
                 matching_player.queue_info.expired = matching_player.queue_info.expired || matching_player.queue_info.has_expired(starknet::get_block_timestamp());
             }
 

@@ -1721,6 +1721,11 @@ mod tests {
         _assert_match_queue(@sys, queue_id, [A].span(), "match_A_2");
         _assert_next_duelists(@sys, queue_id, A, ID_A_1, [ID_A_2].span(), "next_A_2");
         assert_eq!(sys.store.get_match_player(A, queue_id).queue_info.slot, 4);
+        // stack again, must not change...
+        let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A_2, queue_id, QueueMode::Slow);
+        assert_eq!(duel_id, 0, "match_A_2_again");
+        _assert_match_queue(@sys, queue_id, [A].span(), "match_A_2_again");
+        _assert_next_duelists(@sys, queue_id, A, ID_A_1, [ID_A_2].span(), "next_A_2_again");
         //
         // matchmake B
         let duel_id: u128 = tester::execute_match_make_me(@sys, B, ID_B, queue_id, QueueMode::Slow);
