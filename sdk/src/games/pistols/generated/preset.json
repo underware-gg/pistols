@@ -430,12 +430,16 @@
                 "description": "Purchase a closed pack"
               },
               {
-                "entrypoint": "airdrop",
-                "description": "Airdrops a pack (admin)"
-              },
-              {
                 "entrypoint": "open",
                 "description": "Open a pack, mint its contents"
+              },
+              {
+                "entrypoint": "mint_to",
+                "description": "Promotional airdrops (admin)"
+              },
+              {
+                "entrypoint": "airdrop",
+                "description": "Airdrops a pack (admin)"
               }
             ]
           },
