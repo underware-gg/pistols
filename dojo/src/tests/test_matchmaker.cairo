@@ -1778,6 +1778,11 @@ mod tests {
         assert_eq!(duel_id, 0, "match_A_2");
         _assert_match_queue(@sys, queue_id, [A].span(), "match_A_2");
         _assert_next_duelists(@sys, queue_id, A, ID_A_1, [ID_A_2].span(), "next_A_2");
+        // stack again, must not change...
+        let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A_2, queue_id, QueueMode::Slow);
+        assert_eq!(duel_id, 0, "match_A_2_again");
+        _assert_match_queue(@sys, queue_id, [A].span(), "match_A_2_again");
+        _assert_next_duelists(@sys, queue_id, A, ID_A_1, [ID_A_2].span(), "next_A_2_again");
         //
         // matchmake B > unstack next duelist
         let duel_id: u128 = tester::execute_match_make_me(@sys, B, ID_B, queue_id, QueueMode::Slow);
@@ -1840,13 +1845,15 @@ mod tests {
         _assert_next_duelists(@sys, queue_id, A, ID_A_2, [].span(), "next_A_NEXT");
         assert_eq!(sys.store.get_match_player(A, queue_id).queue_info.slot, 5);
         //
-        // ping A: mint a duelist...
+        // ping A: mint a duel...
         assert!(!sys.store.get_match_player(A, queue_id).queue_info.has_minted_duel, "!has_minted_duel");
+        assert_eq!(sys.store.get_match_player(A, queue_id).queue_info.timestamp_ping, 0, "!timestamp_ping");
         let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A_2, queue_id, QueueMode::Slow);
         assert_eq!(duel_id, 0, "match_A_2+mint");
         _assert_match_queue(@sys, queue_id, [A].span(), "match_A_2+mint");
         _assert_next_duelists(@sys, queue_id, A, ID_A_2, [].span(), "match_A_2+mint");
-        assert!(sys.store.get_match_player(A, queue_id).queue_info.has_minted_duel, "has_minted_duel");
+        assert!(sys.store.get_match_player(A, queue_id).queue_info.has_minted_duel, "match_A_2+mint");
+        assert_gt!(sys.store.get_match_player(A, queue_id).queue_info.timestamp_ping, 0, "match_A_2+mint");
         let duel_id_2: u128 = _assert_match_created(@sys, queue_id, QueueMode::Slow, A, ID_A_2, "match_created_A_2");
         //
         // matchmake C > match A

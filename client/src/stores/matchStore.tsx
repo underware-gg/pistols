@@ -54,6 +54,9 @@ export const useMatchPlayer = (playerAddress: BigNumberish, queueId: constants.Q
   const timestampPing = useMemo(() => Number(player?.queue_info.timestamp_ping ?? 0), [player])
   const expired = useMemo(() => Boolean(player?.queue_info.expired ?? false), [player])
 
+  // de-stacked duelist have no timestamp_ping, can call match_make_me()
+  const canTryToMatch = useMemo(() => (duelistId > 0n && timestampPing == 0), [duelistId, timestampPing])
+
   return {
     queueId,
     // Current queue
@@ -65,6 +68,7 @@ export const useMatchPlayer = (playerAddress: BigNumberish, queueId: constants.Q
     timestampEnter,
     timestampPing,
     expired,
+    canTryToMatch,
     // all duelists in queue
     inQueueIds,
   }
