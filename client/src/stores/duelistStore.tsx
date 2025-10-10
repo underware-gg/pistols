@@ -404,9 +404,6 @@ export const useFetchDuelistsByIds = (duelistIds: BigNumberish[], retryInterval?
   const { duelistContractAddress, fameContractAddress } = useTokenContracts()
   useFetchTokenboundAccountsBalances(fameContractAddress, duelistContractAddress, duelistIds, true);
 
-  // always fetch rewards for new duelists
-  useFetchChallengeRewardsByDuelistIds(duelistIds)
-
   const setEntities = useDuelistStore((state) => state.setEntities);
 
   const existingDuelistIds = useDuelistIdsStore((state) => state.duelistIds)

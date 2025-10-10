@@ -29,7 +29,7 @@ import { useCanCollectDuel } from '/src/hooks/usePistolsContractCalls'
 import { useDuelCallToAction } from '/src/stores/eventsModelStore'
 import { useDuelistFameBalance } from '/src/stores/coinStore'
 import { useExecuteEmitPlayerBookmark } from '/src/hooks/usePistolsSystemCalls'
-import { useDuelistFameOnDuel } from '/src/stores/challengeRewardsStore'
+import { useDuelistFameOnDuel, useFetchChallengeRewardsByDuelistIds } from '/src/stores/challengeRewardsStore'
 import { useTransactionHandler } from '/src/hooks/useTransaction'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { showElementPopupNotification } from '/src/components/ui/ElementPopupNotification'
@@ -246,6 +246,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
   const { account } = useAccount()
   const { duelistSelectOpener } = usePistolsContext()
   const { leftDuelistId, rightDuelistId, leftDuelistAddress, rightDuelistAddress, leftPlayerName, rightPlayerName, isDead, isYouA, isYouB, isCallToAction, leftAvatarUrl, rightAvatarUrl } = useDuelPosterData(props.duelId)
+  useFetchChallengeRewardsByDuelistIds([leftDuelistId, rightDuelistId])
   const { fameBefore: fameBeforeA, fameAfter: fameAfterA } = useDuelistFameOnDuel(props.duelId, leftDuelistId)
   const { fameBefore: fameBeforeB, fameAfter: fameAfterB } = useDuelistFameOnDuel(props.duelId, rightDuelistId)
 
