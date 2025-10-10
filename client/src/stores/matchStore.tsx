@@ -4,11 +4,12 @@ import { createDojoStore } from '@dojoengine/sdk/react'
 import { keysToEntityId, useStoreModelsByKeys } from '@underware/pistols-sdk/dojo'
 import { PistolsSchemaType, getEntityModel } from '@underware/pistols-sdk/pistols/sdk'
 import { parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/starknet'
-import { useDuelistStore } from '/src/stores/duelistStore'
+import { useDuelistStore, useFetchDuelistIdsOwnedByAccount } from '/src/stores/duelistStore'
 import { DuelistProfileKey } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { useAccount } from '@starknet-react/core'
-import { useDuelistsOwnedByPlayer } from '../hooks/useTokenDuelists'
+import { useDuelistIdsOwnedByAccount } from '../hooks/useTokenDuelists'
+import { arrayUnique } from '@underware/pistols-sdk/utils'
 
 export const useMatchStore = createDojoStore<PistolsSchemaType>();
 
@@ -46,7 +47,7 @@ export const useMatchPlayer = (playerAddress: BigNumberish, queueId: constants.Q
   const duelistId = useMemo(() => BigInt(player?.duelist_id ?? 0), [player])
   const duelId = useMemo(() => BigInt(player?.duel_id ?? 0), [player])
   const nextDuelists = useMemo(() => Object.values(player?.next_duelists ?? {}).map(v => BigInt(v.duelist_id)), [player])
-  const inQueueIds = useMemo(() => (duelistId ? [duelistId, ...nextDuelists] : []), [duelistId, nextDuelists])
+  const inQueueIds = useMemo(() => arrayUnique(duelistId ? [duelistId, ...nextDuelists] : []), [duelistId, nextDuelists])
 
   const slot = useMemo(() => Number(player?.queue_info.slot ?? 0), [player])
   const timestampEnter = useMemo(() => Number(player?.queue_info.timestamp_enter ?? 0), [player])
@@ -57,8 +58,9 @@ export const useMatchPlayer = (playerAddress: BigNumberish, queueId: constants.Q
     queueId,
     // Current queue
     slot,
-    duelistId,
     duelId,
+    duelistId,
+    nextDuelists,
     queueMode,
     timestampEnter,
     timestampPing,
@@ -82,9 +84,13 @@ export const useMatchPlayer = (playerAddress: BigNumberish, queueId: constants.Q
 // - next duelists in queue
 
 export const useDuelistsInMatchMaking = (queueId: constants.QueueId) => {
-  // get all duelists
   const { address } = useAccount();
-  const { duelistIds: allDuelistIds } = useDuelistsOwnedByPlayer();
+  return _useDuelistsInMatchMakingByAddress(queueId, address);
+}
+
+export const _useDuelistsInMatchMakingByAddress = (queueId: constants.QueueId, address: BigNumberish) => {
+  useFetchDuelistIdsOwnedByAccount(address) // fetch duelists in the store, if not already fetched
+  const { duelistIds: allDuelistIds } = useDuelistIdsOwnedByAccount(address);
   const duelistEntities = useDuelistStore((state) => state.entities);
 
   // filter alive duelists only
@@ -119,6 +125,7 @@ export const useDuelistsInMatchMaking = (queueId: constants.QueueId) => {
       const assigned_queue_id = assignment ? parseEnumVariant<constants.QueueId>(assignment.queue_id) : constants.QueueId.Undefined;
       const assigned_duel_id = BigInt(assignment?.duel_id ?? 0);
       const isUnassigned = (assigned_queue_id == constants.QueueId.Undefined && assigned_duel_id === 0n);
+      // console.log(`ASSIGNMENT:`, duelistId, isUnassigned, assigned_queue_id, assigned_duel_id, assignment)
 
       // Ranked
       if (queueId == constants.QueueId.Ranked) {

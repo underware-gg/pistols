@@ -1,14 +1,13 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button, Container, Tab, Table, TabPane } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
-import { useDuelistsOwnedByPlayer } from '/src/hooks/useTokenDuelists'
-import { useMatchQueue, useMatchPlayer, useDuelistsInMatchMaking } from '/src/stores/matchStore'
-import { usePlayersAvailableForMatchmaking, getPlayernameFromAddress } from '/src/stores/playerStore'
-import { useFoolsBalance } from '/src/stores/coinStore'
+import { useMatchQueue, useMatchPlayer, _useDuelistsInMatchMakingByAddress } from '/src/stores/matchStore'
+import { usePlayersAvailableForMatchmaking, getPlayernameFromAddress, useUsernameFromPlayerAddress } from '/src/stores/playerStore'
+import { useFetchAccountsBalances, useFoolsBalance } from '/src/stores/coinStore'
 import { PublishOnlineStatusButton } from '/src/stores/sync/PlayerOnlineSync'
-import { bigintToDecimal } from '@underware/pistols-sdk/utils'
+import { bigintToDecimal, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { FoolsBalance } from '/src/components/account/LordsBalance'
 import { Balance } from '/src/components/account/Balance'
@@ -20,6 +19,8 @@ import ChallengeModal from '/src/components/modals/ChallengeModal'
 import StoreSync from '/src/stores/sync/StoreSync'
 import ActivityOnline from '/src/components/ActivityOnline'
 import AppDojo from '/src/components/AppDojo'
+import { WalletAddressRow } from './AdminPage'
+import { useTokenContracts } from '/src/hooks/useTokenContracts'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -43,16 +44,38 @@ export default function MatchmakingTestPage() {
         {/* <br /> */}
         {/* <OnlineStatus /> */}
 
-        <br />
-        <Tab panes={[
-          { menuItem: 'Unranked', render: () => <TabPane className='NoBorder'><MatchQueue queueId={constants.QueueId.Unranked} /></TabPane> },
-          { menuItem: 'Ranked', render: () => <TabPane className='NoBorder'><MatchQueue queueId={constants.QueueId.Ranked} /></TabPane> },
-        ]} />
+        <Matchmaking />
 
         <StoreSync />
         <ChallengeModal />
       </Container>
     </AppDojo>
+  );
+}
+
+function Matchmaking() {
+  const { address } = useAccount()
+  const [playerAddress, setPlayerAddress] = useState<string>()
+  const playerName = useUsernameFromPlayerAddress(playerAddress)
+  // init from connected account
+  useEffect(() => setPlayerAddress(address), [address])
+  // fetch balances
+  const { foolsContractAddress } = useTokenContracts()
+  useFetchAccountsBalances(foolsContractAddress, [playerAddress], isPositiveBigint(playerAddress))
+  return (
+    <>
+      <Table celled stackable size='small' color='green'>
+        <Body>
+          <WalletAddressRow address={playerAddress} setAddress={setPlayerAddress} label='Player' />
+        </Body>
+      </Table>
+
+      <br />
+      <Tab panes={[
+        { menuItem: 'Unranked', render: () => <TabPane className='NoBorder'><MatchQueue queueId={constants.QueueId.Unranked} playerAddress={playerAddress} playerName={playerName} /></TabPane> },
+        { menuItem: 'Ranked', render: () => <TabPane className='NoBorder'><MatchQueue queueId={constants.QueueId.Ranked} playerAddress={playerAddress} playerName={playerName} /></TabPane> },
+      ]} />
+    </>
   );
 }
 
@@ -107,9 +130,17 @@ function OnlineStatus() {
 }
 
 
-function MatchQueue({ queueId }: { queueId: constants.QueueId }) {
-  const { account, address } = useAccount();
-  const { balance: foolsBalance } = useFoolsBalance(address)
+function MatchQueue({
+  queueId,
+  playerAddress,
+  playerName,
+}: {
+  queueId: constants.QueueId
+  playerAddress: string
+  playerName: string
+}) {
+  const { account } = useAccount();
+  const { balance: foolsBalance } = useFoolsBalance(playerAddress)
   const { slotSize, requiresEnlistment, entryTokenAddress, entryTokenAmount, players } = useMatchQueue(queueId);
   const {
     // current queue
@@ -125,7 +156,7 @@ function MatchQueue({ queueId }: { queueId: constants.QueueId }) {
     duelsByDuelistId,
     // all duelist ids
     duelistIds,
-  } = useDuelistsInMatchMaking(queueId);
+  } = _useDuelistsInMatchMakingByAddress(queueId, playerAddress);
   const { matchmaker } = useDojoSystemCalls();
   return (
     <>
@@ -159,9 +190,9 @@ function MatchQueue({ queueId }: { queueId: constants.QueueId }) {
               </Button>
               &nbsp;&nbsp;&nbsp;
               <Button onClick={() => {
-                matchmaker.clear_player_queue(account, queueId, address)
+                matchmaker.clear_player_queue(account, queueId, playerAddress)
               }}>
-                Clear Player Queue
+                Clear [{playerName}]
               </Button>
             </Cell>
           </Row>
@@ -172,7 +203,7 @@ function MatchQueue({ queueId }: { queueId: constants.QueueId }) {
         <Body className='H5'>
 
           <Row>
-            <Cell className='ModalText' width={3}>In Queue</Cell>
+            <Cell className='ModalText' width={3}>In Queue ({inQueueIds.length})</Cell>
             <Cell className='Code'>
               {inQueueIds.map((duelistId) => (
                 <Button key={duelistId} disabled={true}>
@@ -183,7 +214,7 @@ function MatchQueue({ queueId }: { queueId: constants.QueueId }) {
           </Row>
 
           <Row>
-            <Cell className='ModalText' width={3}>Dueling</Cell>
+            <Cell className='ModalText' width={3}>Dueling ({duellingIds.length})</Cell>
             <Cell className='Code'>
               {duellingIds.map((duelistId) => (
                 <Button key={duelistId} onClick={() => window.open(`/duel/${duelsByDuelistId[duelistId.toString()]}`, '_blank')}>
@@ -195,10 +226,11 @@ function MatchQueue({ queueId }: { queueId: constants.QueueId }) {
 
           {queueId == constants.QueueId.Ranked && <>
             <Row>
-              <Cell className='ModalText Important'>
-                Enlist Duelists
+              <Cell className='ModalText'>
+                <span className='Important'>Enlist Duelists ({duelistIds.length})</span>
+                <br />Balance: 
                 <span className={(foolsBalance < entryTokenAmount) ? 'Negative' : 'Positive'}>
-                  <FoolsBalance address={address} size='big' />
+                  <FoolsBalance address={playerAddress} size='big' />
                 </span>
               </Cell>
               <Cell className='Code'>
@@ -214,7 +246,7 @@ function MatchQueue({ queueId }: { queueId: constants.QueueId }) {
             </Row>
             <Row>
               <Cell className='ModalText Important'>
-                Enlisted Duelists
+                Enlisted Duelists ({rankedEnlistedIds.length})
               </Cell>
               <Cell className='Code'>
                 {rankedEnlistedIds.map((duelistId) => (
@@ -228,7 +260,7 @@ function MatchQueue({ queueId }: { queueId: constants.QueueId }) {
               </Cell>
             </Row>
             <Row>
-              <Cell className='ModalText' width={3}>Enter {queueId} FAST</Cell>
+              <Cell className='ModalText' width={3}>Enter {queueId} FAST ({duelistIds.length})</Cell>
               <Cell className='Code'>
                 {duelistIds.map((duelistId) => (
                   <MatchMakeMeButton
@@ -244,7 +276,7 @@ function MatchQueue({ queueId }: { queueId: constants.QueueId }) {
           </>}
 
           <Row>
-            <Cell className='ModalText' width={3}>Enter {queueId} SLOW</Cell>
+            <Cell className='ModalText' width={3}>Enter {queueId} SLOW ({duelistIds.length})</Cell>
             <Cell className='Code'>
               {duelistIds.map((duelistId) => (
                 <MatchMakeMeButton
@@ -252,7 +284,7 @@ function MatchQueue({ queueId }: { queueId: constants.QueueId }) {
                   duelistId={duelistId}
                   queueId={queueId}
                   queueMode={constants.QueueMode.Slow}
-                  disabled={!canMatchMakeIds.includes(duelistId)} 
+                  disabled={!canMatchMakeIds.includes(duelistId)}
                 />
               ))}
             </Cell>
@@ -270,12 +302,12 @@ function MatchPlayer({
   queueId: constants.QueueId
   playerAddress: BigNumberish
 }) {
-  const { slot, duelistId, duelId } = useMatchPlayer(playerAddress, queueId)
+  const { slot, duelistId, duelId, nextDuelists } = useMatchPlayer(playerAddress, queueId)
   return (
     <li>
       {getPlayernameFromAddress(playerAddress)}:
       <Address address={playerAddress} />
-      / Duelist#{Number(duelistId)} / Duel#{duelId ? Number(duelId) : '-'} / SLOT: {slot}
+      / Duel#{duelId ? Number(duelId) : '-'} / Duelist#{Number(duelistId)}{nextDuelists.length > 0 ? `+${nextDuelists.length}(${nextDuelists.map(id => Number(id)).join(',')})` : ''} / SLOT: {slot}
     </li>
   )
 }

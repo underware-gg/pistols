@@ -228,6 +228,13 @@ export const usePlayerAddressFromUsername = (username: string): BigNumberish | u
   return address;
 }
 
+export const useUsernameFromPlayerAddress = (address: BigNumberish): string | undefined => {
+  const players_names = usePlayerDataStore((state) => state.players_names);
+  const getPlayernameFromAddress = usePlayerDataStore((state) => state.getPlayernameFromAddress);
+  const username = useMemo(() => (getPlayernameFromAddress(address) as string), [players_names, address]);
+  return username;
+}
+
 export const usePlayersAccounts = () => {
   const entities = usePlayerEntityStore((state) => state.entities)
   const players = useAllStoreModels<models.Player>(entities, 'Player')

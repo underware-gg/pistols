@@ -131,7 +131,7 @@ export function Connect({ children }: { children?: React.ReactNode }) {
             </Cell>
             <Cell className='Code'>
               <LordsFaucet />
-              <LordsBalance address={address} decimals={3} />
+              <LordsBalance address={address} />
             </Cell>
           </Row>
           {children}

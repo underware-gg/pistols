@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { BigNumberish } from 'starknet'
-import { Button, Checkbox, Container, Icon, Input, Table } from 'semantic-ui-react'
+import { Button, Checkbox, Container, Icon, Input, SemanticWIDTHS, Table } from 'semantic-ui-react'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { ExplorerLink } from '@underware/pistols-sdk/starknet/components'
 import { useConfig } from '/src/stores/configStore'
@@ -63,10 +63,12 @@ export function WalletAddressRow({
   address,
   setAddress,
   label = 'Wallet Address',
+  width = 3,
 }: {
   address: string
   setAddress: (address: string) => void
   label?: string
+  width?: number
 }) {
   // const { username: foundUsername } = usePlayer(address)
   const [username, setUsername] = useState('')
@@ -80,20 +82,20 @@ export function WalletAddressRow({
   useEffect(() => {
     // find username from address
     const foundUsername = getPlayernameFromAddress(address) || ''
-    if (foundUsername !== username) {
+    if (foundUsername && foundUsername !== username) {
       setUsername(foundUsername)
     }
   }, [address])
   return (
     <Row>
-      <Cell className='Code'>
+      <Cell className='ModalText' width={width as SemanticWIDTHS}>
         {label}
       </Cell>
       <Cell>
         <Input fluid className='Code'
           value={username ?? ''}
           onChange={(e) => setUsername(e.target.value)}
-          maxLength={20}
+          maxLength={50}
           placeholder={null}
           label='Controller Name:'
         />
@@ -164,7 +166,7 @@ function Config() {
             <ExplorerLink address={treasuryAddress} voyager />
           </Cell>
           <Cell>
-            <LordsBalance address={treasuryAddress} decimals={3} />
+            <LordsBalance address={treasuryAddress} />
           </Cell>
         </Row>
         <Row className='H5'>
@@ -196,7 +198,7 @@ function Config() {
             <ExplorerLink address={deployerAddress} voyager />
           </Cell>
           <Cell>
-            <StrkBalance address={deployerAddress} decimals={6} />
+            <StrkBalance address={deployerAddress} decimals={3} />
           </Cell>
         </Row>
         <Row className='H5'>
@@ -208,7 +210,7 @@ function Config() {
             <ExplorerLink address={botAddress} voyager />
           </Cell>
           <Cell>
-            <StrkBalance address={botAddress} decimals={6} />
+            <StrkBalance address={botAddress} decimals={3} />
           </Cell>
         </Row>
       </Body>
