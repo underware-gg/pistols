@@ -7,7 +7,7 @@ import { useSdkTokenBalancesGet, useDojoSetup } from '@underware/pistols-sdk/doj
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { useDuelistTokenBoundAddress } from '/src/hooks/useTokenBound'
 import { make_token_bound_address } from '@underware/pistols-sdk/pistols'
-import { bigintEquals, bigintToHex, isPositiveBigint } from '@underware/pistols-sdk/utils'
+import { bigintEquals, bigintToAddress, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { weiToEth } from '@underware/pistols-sdk/starknet'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import * as torii from '@dojoengine/torii-client'
@@ -37,7 +37,7 @@ interface State {
 
 const createStore = (coinName: string, addOnUpdate: boolean) => {
   const _accountKey = (account: BigNumberish | undefined): string | null => (
-    isPositiveBigint(account) ? bigintToHex(account) : null
+    isPositiveBigint(account) ? bigintToAddress(account) : null
   )
   const _processBalance = (state: State, balance: torii.TokenBalance, insert: boolean) => {
     const _key = _accountKey(balance.account_address);
@@ -98,7 +98,7 @@ const createStore = (coinName: string, addOnUpdate: boolean) => {
 
 export const useFameCoinStore = createStore('fame', true);
 export const useFoolsCoinStore = createStore('fools', true);
-export const useLordsCoinStore = createStore('lords', false);
+export const useLordsCoinStore = createStore('lords', true);
 
 export function useCoinStore(contractAddress: BigNumberish) {
   const {
