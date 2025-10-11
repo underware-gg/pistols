@@ -61,7 +61,7 @@ catalogs:
       specifier: ^18.3.1
       version: 18.3.1
     starknet:
-      specifier: ^8.1.2
+      specifier: ^8.5.4
       version: 8.5.4
     starknetid.js:
       specifier: ^5.0.0

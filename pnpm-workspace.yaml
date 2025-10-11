@@ -25,7 +25,7 @@ catalog:
   "@starknet-react/chains": ^5.0.1
   "@tanstack/react-query": ^5.62.16
   "@starknet-io/get-starknet-core": 4.0.7
-  starknet: ^8.1.2
+  starknet: ^8.5.4
   immer: ^10.1.1
   zustand: ^4.5.6
   "@types/react": ^18.3.1
