@@ -68,9 +68,9 @@ function _SelectDuelistModal({
 
   const availableDuelists = useMemo(() => {
     if (isEnlistMode) {
-      return rankedCanEnlistIds.filter((id) => notDuelingIds?.map((id) => BigInt(id)).includes(BigInt(id)));
+      return rankedCanEnlistIds;
     } else if (isEnlistMode !== undefined) {
-      return canMatchMakeIds.filter((id) => notDuelingIds?.map(id => BigInt(id)).includes(BigInt(id)));
+      return canMatchMakeIds;
     }
 
     return notDuelingIds;
