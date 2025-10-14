@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { SettingsActions, useSettings } from '/src/hooks/SettingsContext'
 import { useGameEvent } from '/src/hooks/useGameEvent'
 import { useGameAspect } from '/src/hooks/useGameAspect'
@@ -127,7 +127,7 @@ export default function ScMatchmaking() {
     setCurrentPage(prev => Math.min(totalPages - 1, prev + 1))
   }
 
-  const handleBellClick = () => {    
+  const handleBellClick = useCallback(() => {    
     if (duelistInAction && duelistInAction.status === null) {
       playAudio(AudioName.BELL_CLICK_BROKEN)
       return
@@ -143,13 +143,13 @@ export default function ScMatchmaking() {
     
     playAudio(AudioName.BELL_CLICK)
     emptySlot.openDuelistSelect()
-  }
+  }, [duelistInAction, isRankedMode])
 
-  const handleDuelistRemoved = (duelistId: bigint) => {
+  const handleDuelistRemoved = useCallback((duelistId: bigint) => {
     setDuelistInAction(null)
-  }
+  }, [])
 
-  const handleRequeueDuelist = (duelistId: bigint) => {
+  const handleRequeueDuelist = useCallback((duelistId: bigint) => {
     const emptySlot = isRankedMode ? emptySlowSlotRankedRef.current : emptySlowSlotUnrankedRef.current
     
     if (!emptySlot) {
@@ -157,19 +157,19 @@ export default function ScMatchmaking() {
     }
     
     emptySlot.commitToQueue(duelistId)
-  }
+  }, [isRankedMode])
 
-  const handlePromoteDuelist = (duelistId: bigint) => {
+  const handlePromoteDuelist = useCallback((duelistId: bigint) => {
     //TODO
-  }
+  }, [])
 
-  const handleActionStart = (duelistId: bigint, action: 'commit' | 'enlist') => {
+  const handleActionStart = useCallback((duelistId: bigint, action: 'commit' | 'enlist') => {
     setDuelistInAction({ duelistId, status: null, error: null, action })
-  }
+  }, [])
 
-  const handleActionComplete = (status: boolean, duelistId: bigint, error: string | null) => {
+  const handleActionComplete = useCallback((status: boolean, duelistId: bigint, error: string | null) => {
     setDuelistInAction({ duelistId, status, error, action: duelistInAction?.action })
-  }
+  }, [])
 
   // Handle scene clicks
   const { value: itemClicked, timestamp } = useGameEvent('scene_click', null)
@@ -533,13 +533,14 @@ export default function ScMatchmaking() {
         >
           {slowSlots}
 
-          {currentPage == totalPages - 1 && (
-            <div
-              style={{ display: 'flex', justifyContent: 'center' }}
-            >
-              {isRankedMode ? emptySlotRanked : emptySlotUnranked}
-            </div>
-          )}
+          <div
+            style={{ 
+              display: currentPage == totalPages - 1 ? 'flex' : 'none', 
+              justifyContent: 'center' 
+            }}
+          >
+            {isRankedMode ? emptySlotRanked : emptySlotUnranked}
+          </div>
 
           {/* Pagination Controls - Minimal and Flat */}
           <div
