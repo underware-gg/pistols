@@ -86,7 +86,6 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
   }, [commitmentState, enlistmentState]);
 
   const onCompleteCommitToQueue = useCallback((result: boolean | Error, args: [bigint, constants.QueueId, constants.QueueMode]) => {
-    console.log("commitToQueue complete", result, args);
     const [duelistIdArg] = args;
     if (result instanceof Error || result === false) {
       const errorMessage = result instanceof Error ? result.message : "Failed to commit duelist. Please try again.";

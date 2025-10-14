@@ -187,8 +187,6 @@ export const useDuellingDuelists = (duelistIds: BigNumberish[]) => {
     ))
   ), [entities, entityIds])
 
-  console.log(`useDuellingDuelists() =>`, duelistIds, alive_entities)
-
   const { notDuelingIds, duellingIds, queuedIds, duelPerDuelists } = useMemo(() => {
     const notDuelingIds: BigNumberish[] = []
     const duellingIds: BigNumberish[] = []
