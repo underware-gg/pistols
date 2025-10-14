@@ -81,27 +81,32 @@ export default function ScMatchmaking() {
       slots.push({ slotIndex: currentSlotIndex++, duelId: duelId })
     })
 
-    const duellingDuelists = duellingIds.filter(id => !inQueueIds.includes(id))
     // Sort duelling duelists by their duelId to maintain consistent order
-    duellingDuelists.sort((a, b) => {
-      const duelIdA = duelsByDuelistId[a.toString()]
-      const duelIdB = duelsByDuelistId[b.toString()]
-      if (!duelIdA && !duelIdB) return 0
-      if (!duelIdA) return 1
-      if (!duelIdB) return -1
-      return BigInt(duelIdA) < BigInt(duelIdB) ? -1 : BigInt(duelIdA) > BigInt(duelIdB) ? 1 : 0
-    })
-    duellingDuelists.forEach((duelistId) => {
-      const duelId = duelsByDuelistId[duelistId.toString()]
-      slots.push({ 
-        slotIndex: currentSlotIndex++, 
-        duelistId: duelistId, 
-        duelId: duelId ? BigInt(duelId) : undefined 
-      })
-    })
+    const sortedDuellingIds = duellingIds.sort((a, b) => {
+      const duelIdA = duelsByDuelistId[a.toString()];
+      const duelIdB = duelsByDuelistId[b.toString()];
+      if (!duelIdA && !duelIdB) return 0;
+      if (!duelIdA) return 1;
+      if (!duelIdB) return -1;
+      return BigInt(duelIdA) < BigInt(duelIdB)
+        ? -1
+        : BigInt(duelIdA) > BigInt(duelIdB)
+        ? 1
+        : 0;
+    });
+    sortedDuellingIds.forEach((duelistId) => {
+      const duelId = duelsByDuelistId[duelistId.toString()];
+      slots.push({
+        slotIndex: currentSlotIndex++,
+        duelistId: duelistId,
+        duelId: duelId ? BigInt(duelId) : undefined,
+      });
+    });
+
+    console.log(`slowSlotsData() =>`, duelsByDuelistId, challengeIds, sortedDuellingIds, duellingIds, inQueueIds);
     
     // Then add queued duelists
-    inQueueIds.forEach((duelistId) => {
+    inQueueIds.filter(id => !sortedDuellingIds.includes(id)).forEach((duelistId) => {
       slots.push({ 
         slotIndex: currentSlotIndex++, 
         duelistId: duelistId, 
@@ -109,6 +114,8 @@ export default function ScMatchmaking() {
       })
     })
     
+    // console.log(`slowSlotsData() =>`, challengeIds.filter(id => !duellingDuelIds.includes(id)), sortedDuellingIds, inQueueIds, slots);
+
     return slots
   }, [totalUsedSlowSlots, inQueueIds, duellingIds, duelsByDuelistId, challengeIds])
 

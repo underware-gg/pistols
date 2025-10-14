@@ -21,7 +21,7 @@ import { debug } from '@underware/pistols-sdk/pistols'
 //
 const _modelsGet = [
   // admin
-  "pistols-Config",
+  // "pistols-Config",
   "pistols-TokenConfig",
   "pistols-Pool",
   // season
