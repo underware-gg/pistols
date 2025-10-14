@@ -6,7 +6,7 @@ import { useOwnerOfDuelist } from './useTokenDuelists'
 import { usePlayer } from '/src/stores/playerStore'
 
 export const useChallengeDescription = (duelId: bigint) => {
-  const { state, duelistIdA, duelistIdB, duelistAddressA, duelistAddressB, winner, winnerDuelistId, isTutorial } = useGetChallenge(duelId)
+  const { state, duelistIdA, duelistIdB, duelistAddressA, duelistAddressB, winner, winnerDuelistId, isTutorial, isAwaiting, isMatchmaking } = useGetChallenge(duelId)
   const { endedInAbandon } = useRound(duelId)
   const { name: nameDuelistA } = useDuelist(duelistIdA)
   const { name: nameDuelistB } = useDuelist(duelistIdB)
@@ -18,6 +18,8 @@ export const useChallengeDescription = (duelId: bigint) => {
     let result = '';
     if (endedInAbandon && winner != 0) {
       result = `Abandoned by ${winner == 1 ? nameB : nameA}`
+    } else if (isAwaiting && isMatchmaking) {
+      result = 'Waiting to be matched...'
     } else {
       result = ChallengeStateDescriptions[state]
       if (winnerDuelistId > 0 && winnerDuelistId == duelistIdA) result += ' in favor of Challenger'

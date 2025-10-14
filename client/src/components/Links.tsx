@@ -102,6 +102,7 @@ export const DuelOpponentNameLink = ({
     bigintEquals(address, duelistAddressB) ? duelistAddressA : duelistAddressB
   ), [address, duelistAddressA, duelistAddressB]);
   const { username } = usePlayer(challengedAddress)
+  if (!username && !challengedAddress) return <></>
   return (
     <span
       className='AnchorLink'

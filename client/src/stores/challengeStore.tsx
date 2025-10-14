@@ -67,6 +67,7 @@ export const useChallenge = (duelId: BigNumberish) => {
   const seasonName = useMemo(() => (seasonId ? `Season ${seasonId}` : undefined), [seasonId])
   const duelType = useMemo(() => (parseEnumVariant<constants.DuelType>(challenge?.duel_type) ?? constants.DuelType.Undefined), [challenge])
   const isTutorial = useMemo(() => (duelType === constants.DuelType.Tutorial), [duelType])
+  const isMatchmaking = useMemo(() => (duelType === constants.DuelType.Ranked || duelType === constants.DuelType.Unranked), [duelType])
   const tutorialLevel = useMemo(() => (isTutorial ? Number(BigInt(duelId) & 0xffn) : null), [isTutorial, duelId])
 
   const duelistAddressA = useMemo(() => BigInt(challenge?.address_a ?? 0), [challenge])
@@ -95,6 +96,7 @@ export const useChallenge = (duelId: BigNumberish) => {
     seasonId,
     seasonName,
     isTutorial,
+    isMatchmaking,
     tutorialLevel,
     state,
     duelistAddressA,
