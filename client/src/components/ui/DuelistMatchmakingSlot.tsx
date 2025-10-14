@@ -168,7 +168,7 @@ export const DuelistMatchmakingSlot = forwardRef<DuelistMatchmakingSlotHandle, D
         width: aspectWidth(props.width || 100),
         height: aspectWidth(props.height || 140),
         borderRadius: aspectWidth(1),
-        boxShadow: "0 2px 10px 10px rgba(0, 0, 0, 0.5)",
+        boxShadow: "0 2px 10px 6px rgba(0, 0, 0, 0.5)",
         position: "relative",
       }}
     >

@@ -43,8 +43,6 @@ export default function ScMatchmaking() {
   
   const [hasAutoSelected, setHasAutoSelected] = useState(false)
 
-  const { activeDuelists: duelistIds } = usePlayerDuelistsOrganized();
-  const { notDuelingIds } = useDuellingDuelists(duelistIds);
   const { challengeIds } = useQueryChallengeIdsForMatchmaking(matchmakingType === constants.QueueId.Ranked ? constants.DuelType.Ranked : constants.DuelType.Unranked);
 
   const {
@@ -73,7 +71,7 @@ export default function ScMatchmaking() {
   const totalPages = useMemo(() => Math.max(1, Math.ceil((totalUsedSlowSlots + 1) / duelistsPerPage)), [totalUsedSlowSlots, duelistsPerPage])
 
   const slowSlotsData = useMemo(() => {
-    const slots: Array<{ slotIndex: number; queuedId?: bigint; selectedId?: bigint; duellingId?: bigint; duelId?: bigint }> = []
+    const slots: Array<{ slotIndex: number; duelistId?: bigint; duelId?: bigint }> = []
     let currentSlotIndex = 0
     
     //TODO handle fast queue later!
@@ -97,7 +95,7 @@ export default function ScMatchmaking() {
       const duelId = duelsByDuelistId[duelistId.toString()]
       slots.push({ 
         slotIndex: currentSlotIndex++, 
-        duellingId: duelistId, 
+        duelistId: duelistId, 
         duelId: duelId ? BigInt(duelId) : undefined 
       })
     })
@@ -106,7 +104,7 @@ export default function ScMatchmaking() {
     inQueueIds.forEach((duelistId) => {
       slots.push({ 
         slotIndex: currentSlotIndex++, 
-        queuedId: duelistId, 
+        duelistId: duelistId, 
         duelId: duelsByDuelistId[duelistId.toString()] ? BigInt(duelsByDuelistId[duelistId.toString()]) : undefined 
       })
     })
@@ -177,7 +175,7 @@ export default function ScMatchmaking() {
         handleBellClick()
         break
     }
-  }, [itemClicked, timestamp])
+  }, [itemClicked, handleBellClick])
 
   useEffect(() => {
     if (selectedMode && selectedMode !== 'singleplayer') {
@@ -196,7 +194,7 @@ export default function ScMatchmaking() {
   }, [selectedMode])
 
   useEffect(() => {
-    if (isPositiveBigint(selectedDuelistId) && !hasAutoSelected && notDuelingIds?.includes(BigInt(selectedDuelistId))) {
+    if (isPositiveBigint(selectedDuelistId) && !hasAutoSelected) {
       const emptySlot = isRankedMode ? emptySlowSlotRankedRef.current : emptySlowSlotUnrankedRef.current
       
       if (emptySlot) {
@@ -206,7 +204,7 @@ export default function ScMatchmaking() {
         dispatchSelectDuelistId(0n)
       }
     }
-  }, [selectedDuelistId, hasAutoSelected, notDuelingIds, isRankedMode, dispatchSelectDuelistId])
+  }, [selectedDuelistId, hasAutoSelected, isRankedMode, dispatchSelectDuelistId])
 
   // Memoize empty slot to preserve state between mode changes
   const emptySlotRanked = useMemo(() => (
@@ -237,6 +235,35 @@ export default function ScMatchmaking() {
     />
   ), [matchmakingType, isAnimating, duelistInAction])
 
+  const slowSlots = useMemo(() => {
+    return slowSlotsData.slice(currentPage * duelistsPerPage, (currentPage + 1) * duelistsPerPage).map(({ slotIndex, duelistId, duelId }) => {
+            return (
+              <div
+                key={slotIndex}
+                style={{ display: 'flex', justifyContent: 'center' }}
+              >
+                <DuelistMatchmakingSlot
+                  ref={instance => {
+                    if (instance) {
+                      slowSlotRefs.current.set(slotIndex, instance)
+                    } else {
+                      slowSlotRefs.current.delete(slotIndex)
+                    }
+                  }}
+                  matchmakingType={matchmakingType}
+                  queueMode={constants.QueueMode.Slow}
+                  duelistId={duelistId}
+                  duelId={duelId}
+                  width={DUELIST_CARD_WIDTH * 1.1}
+                  height={DUELIST_CARD_HEIGHT * 1.1}
+                  mouseDisabled={isAnimating || (duelistInAction && duelistInAction.status === null)}
+                  onDuelistPromoted={handlePromoteDuelist}
+                  onRequeueDuelist={handleRequeueDuelist}
+                />
+              </div>
+            )
+          })
+  }, [currentPage, duelistsPerPage, matchmakingType, isAnimating, duelistInAction, handlePromoteDuelist, handleRequeueDuelist, slowSlotsData])
   return (
     <>
       {/* Matchmaking Info Modal */}
@@ -394,7 +421,7 @@ export default function ScMatchmaking() {
             >
               <div style={{ marginBottom: aspectWidth(1) }}>
                 <strong style={{ color: "#ce6f2c" }}>Available:</strong>{" "}
-                {canMatchMakeIds.filter((id) => notDuelingIds?.map(id => BigInt(id)).includes(BigInt(id))).length} ready
+                {canMatchMakeIds.length} ready
               </div>
 
               <div style={{ marginBottom: aspectWidth(1) }}>
@@ -497,33 +524,7 @@ export default function ScMatchmaking() {
               "filter 0.3s ease, left 0.3s ease, width 0.3s ease, grid-template-columns 0.3s ease",
           }}
         >
-          {slowSlotsData.slice(currentPage * duelistsPerPage, (currentPage + 1) * duelistsPerPage).map(({ slotIndex, queuedId, selectedId, duellingId, duelId }) => {
-            return (
-              <div
-                key={slotIndex}
-                style={{ display: 'flex', justifyContent: 'center' }}
-              >
-                <DuelistMatchmakingSlot
-                  ref={instance => {
-                    if (instance) {
-                      slowSlotRefs.current.set(slotIndex, instance)
-                    } else {
-                      slowSlotRefs.current.delete(slotIndex)
-                    }
-                  }}
-                  matchmakingType={matchmakingType}
-                  queueMode={constants.QueueMode.Slow}
-                  duelistId={queuedId}
-                  duelId={duelId}
-                  width={DUELIST_CARD_WIDTH * 1.1}
-                  height={DUELIST_CARD_HEIGHT * 1.1}
-                  mouseDisabled={isAnimating || (duelistInAction && duelistInAction.status === null)}
-                  onDuelistPromoted={handlePromoteDuelist}
-                  onRequeueDuelist={handleRequeueDuelist}
-                />
-              </div>
-            )
-          })}
+          {slowSlots}
 
           {currentPage == totalPages - 1 && (
             <div

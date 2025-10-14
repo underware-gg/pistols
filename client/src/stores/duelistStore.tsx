@@ -20,7 +20,6 @@ import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
 import { debug } from '@underware/pistols-sdk/pistols'
 import { useFetchTokenboundAccountsBalances } from './coinStore'
 import { useTokenContracts } from '../hooks/useTokenContracts'
-import { useDuelistsInMatchMaking } from './matchStore'
 
 export const useDuelistStore = createDojoStore<PistolsSchemaType>();
 export const useDuelistStackStore = createDojoStore<PistolsSchemaType>();
@@ -181,15 +180,14 @@ export const useDuellingDuelists = (duelistIds: BigNumberish[]) => {
 
   const entityIds = useEntityIds(duelistIds.map(id => [id]))
 
-  const { inQueueIds: rankedQueuedIds } = useDuelistsInMatchMaking(constants.QueueId.Ranked)
-  const { inQueueIds: unrankedQueuedIds } = useDuelistsInMatchMaking(constants.QueueId.Unranked)
-
   // filter alive duelists from duelistIds
   const alive_entities = useMemo(() => (
     Object.keys(entities).filter(e => (
       entityIds.includes(e) && !Boolean(getEntityModel(entities[e], 'DuelistMemorial'))
     ))
   ), [entities, entityIds])
+
+  console.log(`useDuellingDuelists() =>`, duelistIds, alive_entities)
 
   const { notDuelingIds, duellingIds, queuedIds, duelPerDuelists } = useMemo(() => {
     const notDuelingIds: BigNumberish[] = []
@@ -199,10 +197,11 @@ export const useDuellingDuelists = (duelistIds: BigNumberish[]) => {
     alive_entities.forEach(entityId => {
       const assignment = getEntityModel(entities[entityId], 'DuelistAssignment')
       const duelist_id = bigintToHex(assignment?.duelist_id ?? getEntityModel(entities[entityId], 'Duelist').duelist_id)
+      const queue_id = assignment ? parseEnumVariant<constants.QueueId>(assignment.queue_id) : constants.QueueId.Undefined
       if (isPositiveBigint(assignment?.duel_id)) {
         duellingIds.push(duelist_id)
         duelPerDuelists[duelist_id] = bigintToHex(assignment.duel_id)
-      } else if (rankedQueuedIds.includes(BigInt(duelist_id)) || unrankedQueuedIds.includes(BigInt(duelist_id))) {
+      } else if (queue_id !== constants.QueueId.Undefined) {
         queuedIds.push(duelist_id)
       } else {
         notDuelingIds.push(duelist_id)

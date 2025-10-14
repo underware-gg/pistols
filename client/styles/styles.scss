@@ -2030,6 +2030,43 @@ td {
 }
 .ui.modal>.actions {
   border-top: $border-hr;
+  
+  // Fix button scaling in modals - tentacles need responsive sizing! 🐙
+  .ui.button.LargeButton {
+    margin: 0 aspect-width(0.1);
+    padding: aspect-width(1) aspect-width(2);
+    font-size: aspect-width(1.5) !important; // Use responsive sizing instead of fixed 1.5em
+    min-height: aspect-width(1.2) !important;
+    
+    // Ensure buttons can shrink on smaller screens
+    @media (max-width: 768px) {
+      font-size: aspect-width(1.2) !important;
+      padding: aspect-width(0.8) aspect-width(1.5);
+    }
+    
+    @media (max-width: 480px) {
+      font-size: aspect-width(1) !important;
+      padding: aspect-width(0.6) aspect-width(1.2);
+    }
+  }
+  
+  // Also fix BalanceRequiredButton scaling
+  .ui.button.BalanceRequiredButton {
+    margin: 0 aspect-width(0.1);
+    padding: aspect-width(1) aspect-width(2);
+    font-size: aspect-width(1.5) !important;
+    min-height: aspect-width(1.2) !important;
+    
+    @media (max-width: 768px) {
+      font-size: aspect-width(1.2) !important;
+      padding: aspect-width(0.8) aspect-width(1.5);
+    }
+    
+    @media (max-width: 480px) {
+      font-size: aspect-width(1) !important;
+      padding: aspect-width(0.6) aspect-width(1.2);
+    }
+  }
 }
 .ui.modal,
 .ui.modal>.header,

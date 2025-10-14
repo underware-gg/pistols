@@ -384,8 +384,10 @@ const PistolsProvider = ({
   ])
 
 
-  return (
-    <PistolsContext.Provider value={{ dispatch, state: {
+  // Memoize context value to prevent unnecessary re-renders
+  const contextValue = useMemo(() => ({
+    dispatch,
+    state: {
       ...state,
       connectOpener,
       shopOpener,
@@ -401,7 +403,28 @@ const PistolsProvider = ({
       ringAnimationOpener,
       tutorialPromptOpener,
       modeSelectOpener,
-    } }}>
+    }
+  }), [
+    dispatch,
+    state,
+    connectOpener,
+    shopOpener,
+    tutorialOpener,
+    bookOpener,
+    duelistSelectOpener,
+    walletFinderOpener,
+    settingsOpener,
+    errorModalOpener,
+    bugReportOpener,
+    barkeepModalOpener,
+    tavernRingsOpener,
+    ringAnimationOpener,
+    tutorialPromptOpener,
+    modeSelectOpener,
+  ]);
+
+  return (
+    <PistolsContext.Provider value={contextValue}>
       {children}
     </PistolsContext.Provider>
   )

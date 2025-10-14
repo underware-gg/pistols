@@ -152,26 +152,44 @@ function MainUI() {
   }, [gameImpl, qualityConfig]);
 
   const [currentScene, setCurrentScene] = useState<JSX.Element | null>(null);
+  
+  // Memoize scene components to prevent unnecessary re-renders
+  const sceneComponents = useMemo(() => ({
+    gate: <ScGate />,
+    door: <ScDoor />,
+    profile: <ScProfile />,
+    cardPacks: <ScCardPacks />,
+    duelistBook: <ScDuelistBook />,
+    duelsBoard: <ScDuelsBoard />,
+    duelists: <ScDuelists />,
+    matchmaking: <ScMatchmaking />,
+    graveyard: <ScGraveyard />,
+    leaderboards: <ScLeaderboards />,
+    tavern: <ScTavern />,
+    tutorial: <TutorialUI />,
+    invite: <></>,
+  }), []);
+
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (atGate) setCurrentScene(<ScGate />);
-      else if (atDoor) setCurrentScene(<ScDoor />);
+      if (atGate) setCurrentScene(sceneComponents.gate);
+      else if (atDoor) setCurrentScene(sceneComponents.door);
       else if (atDuel && currentDuel > 0n) setCurrentScene(<Duel duelId={currentDuel} tutorial={tutorialLevel} />);
-      else if (atTutorial) setCurrentScene(<TutorialUI />);
-      else if (atProfile) setCurrentScene(<ScProfile />);
-      else if (atCardPacks) setCurrentScene(<ScCardPacks />);
-      else if (atDuelistBook) setCurrentScene(<ScDuelistBook />);
-      else if (atDuelsBoard) setCurrentScene(<ScDuelsBoard />);
-      else if (atDuelists) setCurrentScene(<ScDuelists />);
-      else if (atMatchmaking) setCurrentScene(<ScMatchmaking />);
-      else if (atGraveyard) setCurrentScene(<ScGraveyard />);
-      else if (atLeaderboards) setCurrentScene(<ScLeaderboards />);
-      else if (atInvite) setCurrentScene(<></>);
-      else setCurrentScene(<ScTavern />);
+      else if (atTutorial) setCurrentScene(sceneComponents.tutorial);
+      else if (atProfile) setCurrentScene(sceneComponents.profile);
+      else if (atCardPacks) setCurrentScene(sceneComponents.cardPacks);
+      else if (atDuelistBook) setCurrentScene(sceneComponents.duelistBook);
+      else if (atDuelsBoard) setCurrentScene(sceneComponents.duelsBoard);
+      else if (atDuelists) setCurrentScene(sceneComponents.duelists);
+      else if (atMatchmaking) setCurrentScene(sceneComponents.matchmaking);
+      else if (atGraveyard) setCurrentScene(sceneComponents.graveyard);
+      else if (atLeaderboards) setCurrentScene(sceneComponents.leaderboards);
+      else if (atInvite) setCurrentScene(sceneComponents.invite);
+      else setCurrentScene(sceneComponents.tavern);
     }, SCENE_CHANGE_ANIMATION_DURATION);
 
     return () => clearTimeout(timer);
-  }, [atGate, atDoor, atDuel, atProfile, atTavern, atDuelsBoard, atDuelists, atMatchmaking, atGraveyard, atLeaderboards, atCardPacks, atDuelistBook, currentDuel, tutorialLevel]);
+  }, [atGate, atDoor, atDuel, atProfile, atTavern, atDuelsBoard, atDuelists, atMatchmaking, atGraveyard, atLeaderboards, atCardPacks, atDuelistBook, currentDuel, tutorialLevel, sceneComponents]);
 
   if (!gameImpl) return <></>
 

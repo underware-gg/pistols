@@ -212,8 +212,9 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
   const handleDuelistSelected = useCallback((rawId: bigint, enlistMode: boolean) => {
     if (enlistMode) {
       handleEnlistDuelist(rawId);
+    } else {
+      handleCommitDuelist(rawId);
     }
-    handleCommitDuelist(rawId);
   }, [handleCommitDuelist, handleEnlistDuelist]);
 
   const handleOpenDuelistSelect = useCallback(() => {
@@ -230,6 +231,16 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
       handleEnlistDuelist(enlistmentState.enlistedDuelistId);
       return;
     }
+
+    console.log(
+      "openDuelistSelect",
+      props.matchmakingType,
+      canMatchMakeIds,
+      props.matchmakingType,
+      props.queueMode,
+      props.matchmakingType === constants.QueueId.Ranked &&
+        canMatchMakeIds.length === 0
+    );
 
     duelistSelectOpener.open({
       enlistMode:

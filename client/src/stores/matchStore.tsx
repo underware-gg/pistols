@@ -4,12 +4,12 @@ import { createDojoStore } from '@dojoengine/sdk/react'
 import { keysToEntityId, useStoreModelsByKeys } from '@underware/pistols-sdk/dojo'
 import { PistolsSchemaType, getEntityModel } from '@underware/pistols-sdk/pistols/sdk'
 import { parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/starknet'
-import { useDuelistStore, useFetchDuelistIdsOwnedByAccount } from '/src/stores/duelistStore'
+import { useDuelistStore, useFetchDuelistIdsOwnedByAccount, usePlayerDuelistsOrganized } from '/src/stores/duelistStore'
 import { DuelistProfileKey } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { useAccount } from '@starknet-react/core'
-import { useDuelistIdsOwnedByAccount } from '../hooks/useTokenDuelists'
 import { arrayUnique } from '@underware/pistols-sdk/utils'
+import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 
 export const useMatchStore = createDojoStore<PistolsSchemaType>();
 
@@ -20,7 +20,7 @@ export const useMatchStore = createDojoStore<PistolsSchemaType>();
 export const useMatchQueue = (queueId: constants.QueueId) => {
   const entities = useMatchStore((state) => state.entities);
   const queue = useStoreModelsByKeys<models.MatchQueue>(entities, 'MatchQueue', [constants.getQueueIdValue(queueId)])
-  useEffect(() => console.log(`useMatchQueue() =>`, queue), [queue])
+  // useEffect(() => console.log(`useMatchQueue() =>`, queue), [queue])
 
   const slotSize = useMemo(() => Number(queue?.slot_size ?? 0), [queue])
   const players = useMemo(() => (queue?.players ?? []), [queue])
@@ -41,7 +41,7 @@ export const useMatchQueue = (queueId: constants.QueueId) => {
 export const useMatchPlayer = (playerAddress: BigNumberish, queueId: constants.QueueId) => {
   const entities = useMatchStore((state) => state.entities);
   const player = useStoreModelsByKeys<models.MatchPlayer>(entities, 'MatchPlayer', [playerAddress, constants.getQueueIdValue(queueId)])
-  useEffect(() => console.log(`useMatchPlayer() =>`, queueId, player), [queueId, player])
+  // useEffect(() => console.log(`useMatchPlayer() =>`, queueId, player), [queueId, player])
 
   const queueMode = useMemo(() => player ? parseEnumVariant<constants.QueueMode>(player.queue_info.queue_mode) : undefined, [player])
   const duelistId = useMemo(() => BigInt(player?.duelist_id ?? 0), [player])
@@ -94,12 +94,13 @@ export const useDuelistsInMatchMaking = (queueId: constants.QueueId) => {
 
 export const _useDuelistsInMatchMakingByAddress = (queueId: constants.QueueId, address: BigNumberish) => {
   useFetchDuelistIdsOwnedByAccount(address) // fetch duelists in the store, if not already fetched
-  const { duelistIds: allDuelistIds } = useDuelistIdsOwnedByAccount(address);
+
+  const { activeDuelists: allDuelistIds } = usePlayerDuelistsOrganized();
   const duelistEntities = useDuelistStore((state) => state.entities);
 
   // filter alive duelists only
   const duelistIds = useMemo(() => {
-    return allDuelistIds.filter(id => (
+    return allDuelistIds.map(id => BigInt(id)).filter(id => (
       !Boolean(getEntityModel<models.DuelistMemorial>(duelistEntities[keysToEntityId([id])], 'DuelistMemorial'))
     ));
   }, [allDuelistIds, duelistEntities]);
@@ -120,7 +121,7 @@ export const _useDuelistsInMatchMakingByAddress = (queueId: constants.QueueId, a
       const duelistEntityId = keysToEntityId([duelistId]);
       const duelist = getEntityModel<models.Duelist>(duelistEntities[duelistEntityId], 'Duelist');
       if (!duelist) {
-        console.warn(`useDuelistsInMatchMaking() => duelist not found:`, duelistId)
+        // console.warn(`useDuelistsInMatchMaking() => duelist not found:`, duelistId)
         return;
       }
       
@@ -148,8 +149,8 @@ export const _useDuelistsInMatchMakingByAddress = (queueId: constants.QueueId, a
         // All Enlisted (paid)
         else if (assigned_queue_id == constants.QueueId.Ranked) {
           rankedEnlistedIds.push(duelistId);
-          // Free to match_make_me() -- only enlisted!
-          if (!inQueueIds.includes(duelistId)) {
+          // Free to match_make_me() -- only enlisted and not dueling!
+          if (!inQueueIds.includes(duelistId) && !isPositiveBigint(assignment?.duel_id)) {
             canMatchMakeIds.push(duelistId);
           }
         }
@@ -157,8 +158,8 @@ export const _useDuelistsInMatchMakingByAddress = (queueId: constants.QueueId, a
 
       // Unranked
       if (queueId == constants.QueueId.Unranked) {
-        // Free to match_make_me() -- any free duelist
-        if (isUnassigned) {
+        // Free to match_make_me() -- any free duelist and not dueling
+        if (assigned_queue_id == constants.QueueId.Undefined && !isPositiveBigint(assignment?.duel_id)) {
           canMatchMakeIds.push(duelistId);
         }
       }
@@ -185,9 +186,9 @@ export const _useDuelistsInMatchMakingByAddress = (queueId: constants.QueueId, a
     };
   }, [queueId, duelistIds, duelistEntities, inQueueIds]);
 
-  useEffect(() => {
-    console.log(`useDuelistsInMatchMaking() =>`, queueId, inQueueIds, result)
-  }, [queueId, inQueueIds, result])
+  // useEffect(() => {
+  //   console.log(`useDuelistsInMatchMaking() =>`, queueId, inQueueIds, result)
+  // }, [queueId, inQueueIds, result])
 
   return {
     ...result,

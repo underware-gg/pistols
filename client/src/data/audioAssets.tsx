@@ -184,12 +184,12 @@ let AUDIO_ASSETS: AudioAssets = {
     type: AudioType.SFX,
   },
   BELL_CLICK: {
-    path: '/audio/sfx/bell-click.mp3',
+    path: '/audio/sfx/bell-working.mp3',
     volume: 0.7,
     type: AudioType.SFX,
   },
   BELL_CLICK_BROKEN: {
-    path: '/audio/sfx/bell-click-broken.mp3',
+    path: '/audio/sfx/bell-broken.mp3',
     volume: 0.7,
     type: AudioType.SFX,
   },
