@@ -1,13 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Container, Table } from 'semantic-ui-react'
 import { useApiSlotServiceStatus } from '@underware/pistols-sdk/api'
-import { useToriiBlockHead } from '/src/queries/useToriiStatusQueries'
+import { useToriiBlockHead, useToriiTransactionCount } from '/src/queries/useToriiStatusQueries'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
 import { PlayerNameSync } from '/src/stores/sync/PlayerNameSync'
-import AppDojo from '/src/components/AppDojo'
 import { useBlockNumber } from '@starknet-react/core'
 import { useDojoSetup } from '@underware/pistols-sdk/dojo'
 import { NetworkId } from '@underware/pistols-sdk/pistols/config'
+import AppDojo from '/src/components/AppDojo'
 
 const Row = Table.Row
 const Cell = Table.Cell
@@ -41,8 +41,11 @@ function Status() {
             <HeaderCell width={1}>Status</HeaderCell>
             <HeaderCell width={1}>Latency</HeaderCell>
             <HeaderCell width={3}>Version</HeaderCell>
-            <HeaderCell width={5}>Block/Head</HeaderCell>
-            <HeaderCell width={1}></HeaderCell>
+            <HeaderCell width={4}>Block/Head</HeaderCell>
+            <HeaderCell width={1}>Txs</HeaderCell>
+            <HeaderCell width={1}>Entts</HeaderCell>
+            <HeaderCell width={1}>Ctrls</HeaderCell>
+            <HeaderCell width={1}>SQL</HeaderCell>
           </Row>
         </Header>
         <Body className='Smaller'>
@@ -84,6 +87,8 @@ function ToriiStatusRow({
     }
   }, [newBlockHead, isLoadingBlockHead])
 
+  const { transactionCount, entityCount, controllerCount, isLoading: isLoadingTransactionCount } = useToriiTransactionCount({ toriiUrl, enabled: isOnline })
+
   const blockOffset = (blockNumber && blockHead ? (blockHead - blockNumber) : null);
   const percent = Math.floor(blockHead && blockNumber ? (blockHead / blockNumber) * 10000 : 0);
 
@@ -114,6 +119,9 @@ function ToriiStatusRow({
                 : <span className={headClass}>{blockOffset}</span>
           })
         </Cell>
+        <Cell><b>{transactionCount}</b></Cell>
+        <Cell><b>{entityCount}</b></Cell>
+        <Cell><b>{controllerCount}</b></Cell>
         <Cell singleLine={false}><a href={`${toriiUrl}/sql`} target='_blank'>sql</a></Cell>
       </Row>
     </>

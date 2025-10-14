@@ -8,10 +8,9 @@ import { useFetchInitialTokenBalancesQuery } from '/src/queries/useTokenBalances
 import { useProgressStore } from '/src/stores/progressStore'
 import { bigintToAddress } from '@underware/pistols-sdk/utils'
 import { cachedPlayerData } from '@underware/pistols-sdk/pistols/cached'
+import { NetworkId } from '@underware/pistols-sdk/pistols/config'
 import { debug } from '@underware/pistols-sdk/pistols'
 import * as torii from '@dojoengine/torii-client'
-import { E } from 'node_modules/@underware/pistols-sdk/dist/constants-4wqnDmKJ'
-import { NetworkId } from '@underware/pistols-sdk/pistols/config'
 
 
 export function TokenStoreSync() {
