@@ -461,7 +461,7 @@ pub mod game {
                     let wrapped: @RngWrap = RngWrapTrait::new(store.world.rng_address());
                     (GameLoopContractTrait::execute(@store.world, wrapped, @challenge.get_deck(), ref round))
                 } else {
-                    {Default::default()}
+                    (Default::default())
                 }
             }
         }

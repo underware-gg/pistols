@@ -221,7 +221,7 @@ pub mod tutorial {
                 let wrapped = RngWrapTrait::wrap(store.world.rng_mock_address(), Option::Some(mocked));
                 (GameLoopContractTrait::execute(@store.world, wrapped, @challenge.get_deck(), ref round))
             } else {
-                {Default::default()}
+                (Default::default())
             }
         }
 

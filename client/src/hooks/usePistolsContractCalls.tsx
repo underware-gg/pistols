@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useDelay } from '@underware/pistols-sdk/utils/hooks'
@@ -15,24 +15,47 @@ import { constants } from '@underware/pistols-sdk/pistols/gen'
 //
 
 export const useDuelProgress = (duel_id: bigint) => {
-  const { isFinished } = useChallenge(duel_id)
-  const enabled = useDelay(isFinished, 1000)
   const { game: { getDuelProgress } } = useDojoContractCalls()
+  const [forceCounter, setForceCounter] = useState(0)
+  // enable when the challenge is finished
+  const { isFinished, state } = useChallenge(duel_id)
+  const enabled = useDelay(isFinished, 1000) // wait a bit to fetch 1st time...
+  // prepare call
   const options = useMemo(() => ({
     call: getDuelProgress,
     args: [bigintToHex(duel_id)],
     enabled,
     defaultValue: null,
-  }), [duel_id, enabled])
+    forceCounter,
+  }), [duel_id, enabled, forceCounter])
   const { value, isLoading } = useSdkCallPromise<any>(options)
-  const duelProgress = useMemo(() => (value ? convert_duel_progress(value) : null), [value])
+  // retry if result is empty...
+  // (the block may take some time to confirm...)
+  const success = useMemo(() => (value?.steps != undefined ? (value.steps.length > 0) : undefined), [value])
+  useEffect(() => {
+    let _mounted = true
+    if (success === false) {
+      setTimeout(() => {
+        if (_mounted) {
+          console.log('useDuelProgress() retry...', forceCounter + 1);
+          setForceCounter(forceCounter + 1);
+        }
+      }, 1000);
+    }
+    return () => {
+      _mounted = false
+    }
+  }, [value])
+  // return result when available...
+  const duelProgress = useMemo(() => (success === true ? convert_duel_progress(value) : null), [success, value])
+  // console.log('duelProgress >>>>', duel_id, isFinished, enabled, state, value, duelProgress)
   return {
     duelProgress,
     isLoading,
   }
 }
 
-export const useGetDuelDeck = (duel_id: BigNumberish) => {
+export const useGetDuelDeck = (duel_id: bigint) => {
   const { game: { getDuelDeck } } = useDojoContractCalls()
   const options = useMemo(() => ({
     call: getDuelDeck,
@@ -125,6 +148,7 @@ export const useGameTimestamp = () => {
   const options = useMemo(() => ({
     call: getTimestamp,
     args: [],
+    enabled: true,
     defaultValue: null,
   }), [])
   const { value, isLoading } = useSdkCallPromise<bigint>(options)
