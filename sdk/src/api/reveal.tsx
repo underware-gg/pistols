@@ -26,23 +26,33 @@ export const apiAutoReveal = async (
   serverUrl: string,
   duelId: BigNumberish,
   chainId: string,
+  retries: number = 5,
 ): Promise<boolean> => {
-  let result = false
-  const url = `${serverUrl}/api/pistols/reveal/${bigintToDecimal(duelId)}?` + new URLSearchParams({ chain_id : chainId });
-  try {
-    console.log(`apiAutoReveal() URL:`, url)
-    const resp = await fetch(url);
-    const response: AutoRevealResponse = await resp.json();
-    console.log(`apiAutoReveal() data:`, response)
-    if (response.reveal_a || response.reveal_b) {
-      result = true;
-    } else if (response.error) {
-      console.error("apiAutoReveal() ERROR:", response.error);
-    } else {
-      console.error("apiAutoReveal() Invalid response:", response);
+  const url = `${serverUrl}/api/pistols/reveal/${bigintToDecimal(duelId)}?` + new URLSearchParams({ chain_id: chainId });
+  console.log(`apiAutoReveal() URL:`, url)
+
+  const _reveal = async (retryCounter: number): Promise<boolean> => {
+    try {
+      const resp = await fetch(url);
+      const response: AutoRevealResponse = await resp.json();
+      console.log(`apiAutoReveal() data [${retryCounter}/${retries}]:`, response)
+      if (response.reveal_a || response.reveal_b) {
+        return true;
+      } else if (response.error) {
+        console.error(`apiAutoReveal() ERROR [${retryCounter}/${retries}]:`, response);
+      } else {
+        console.error(`apiAutoReveal() Invalid response [${retryCounter}/${retries}]:`, response);
+      }
+    } catch (error) {
+      console.error(`apiAutoReveal() EXCEPTION [${retryCounter}/${retries}]:`, error);
     }
-  } catch (error) {
-    console.error("apiAutoReveal() EXCEPTION:", error);
+    return false;
+  }
+
+  let result = false
+  for (let i = 0; i < retries; i++) {
+    result = await _reveal(i + 1)
+    if (result) break
   }
 
   return result;

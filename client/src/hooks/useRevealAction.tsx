@@ -10,7 +10,7 @@ import { PLAYER_CHARACTER_ID } from '/src/utils/pistols'
 export function useSignAndRestoreMovesFromHash(duelId: bigint, duelistId: bigint, hash: bigint) {
   const { account } = useAccount()
   const { starknetDomain, selectedNetworkConfig } = useDojoSetup()
-  const { decks } = useGetDuelDeck(duelId)
+  const { decks } = useGetDuelDeck((duelId && duelistId && hash) ? duelId : 0n)
 
   const messageToSign = useMemo<CommitMoveMessage>(() => ((duelId && duelistId) ? {
     duelId: BigInt(duelId),
