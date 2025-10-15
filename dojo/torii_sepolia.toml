@@ -18,8 +18,8 @@ historical = [
 # subscription_buffer_size = 10000
 
 [indexing]
-world_block = 23920
-# blocks_chunk_size = 10240 # default: 10240
+# world_block = 23920
+blocks_chunk_size = 1024 # default: 10240
 max_concurrent_tasks = 40
 transactions = true
 controllers = true
