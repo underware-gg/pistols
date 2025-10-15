@@ -68,8 +68,6 @@ export default function ScDuelsBoard() {
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSetScene } = usePistolsScene()
   const { dispatchSelectDuel } = usePistolsContext()
-  const { selectedMode } = useSettings()
-  const { seasonName } = useCurrentSeason()
 
   const { value: itemClicked, timestamp } = useGameEvent('scene_click', null)
 

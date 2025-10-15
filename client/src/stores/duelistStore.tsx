@@ -187,16 +187,20 @@ export const useDuellingDuelists = (duelistIds: BigNumberish[]) => {
     ))
   ), [entities, entityIds])
 
-  const { notDuelingIds, duellingIds, duelPerDuelists } = useMemo(() => {
+  const { notDuelingIds, duellingIds, queuedIds, duelPerDuelists } = useMemo(() => {
     const notDuelingIds: BigNumberish[] = []
     const duellingIds: BigNumberish[] = []
+    const queuedIds: BigNumberish[] = []
     const duelPerDuelists: Record<string, BigNumberish> = {}
     alive_entities.forEach(entityId => {
       const assignment = getEntityModel(entities[entityId], 'DuelistAssignment')
       const duelist_id = bigintToHex(assignment?.duelist_id ?? getEntityModel(entities[entityId], 'Duelist').duelist_id)
+      const queue_id = assignment ? parseEnumVariant<constants.QueueId>(assignment.queue_id) : constants.QueueId.Undefined
       if (isPositiveBigint(assignment?.duel_id)) {
         duellingIds.push(duelist_id)
         duelPerDuelists[duelist_id] = bigintToHex(assignment.duel_id)
+      } else if (queue_id !== constants.QueueId.Undefined) {
+        queuedIds.push(duelist_id)
       } else {
         notDuelingIds.push(duelist_id)
       }
@@ -204,6 +208,7 @@ export const useDuellingDuelists = (duelistIds: BigNumberish[]) => {
     return {
       notDuelingIds: notDuelingIds.sort((a, b) => Number(BigInt(a) - BigInt(b))),
       duellingIds: duellingIds.sort((a, b) => Number(BigInt(a) - BigInt(b))),
+      queuedIds: queuedIds.sort((a, b) => Number(BigInt(a) - BigInt(b))),
       duelPerDuelists,
     }
   }, [alive_entities])
@@ -211,6 +216,7 @@ export const useDuellingDuelists = (duelistIds: BigNumberish[]) => {
   return {
     notDuelingIds,    // duelist_ids who are not duelling
     duellingIds,      // duelist_ids who are duelling
+    queuedIds,        // duelist_ids who are queued (in any queue)
     duelPerDuelists,  // duel_ids per (duelling) duelist_id
   }
 }

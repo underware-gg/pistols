@@ -1,4 +1,4 @@
-import React, { ReactNode, createContext, useReducer, useContext } from 'react'
+import React, { ReactNode, createContext, useReducer, useContext, useMemo } from 'react'
 import * as game from '/src/three/game'
 
 type ThreeJsGame = typeof game;
@@ -76,8 +76,13 @@ const ThreeJsProvider = ({
     return newState
   }, initialState)
 
+  const contextValue = useMemo(() => ({
+    state,
+    dispatch
+  }), [state, dispatch]);
+
   return (
-    <ThreeJsContext.Provider value={{ state, dispatch }}>
+    <ThreeJsContext.Provider value={contextValue}>
       {children}
     </ThreeJsContext.Provider>
   )

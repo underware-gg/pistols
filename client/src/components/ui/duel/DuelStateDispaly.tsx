@@ -23,6 +23,7 @@ import { makeDuelTweetUrl } from '/src/utils/pistols'
 import { Balance } from '/src/components/account/Balance'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import AnimatedText from '/src/components/ui/AnimatedText'
+import { useDuellingDuelists } from '/src/stores/duelistStore'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -34,12 +35,12 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
 
   const { dispatchSetting } = useSettings()
   const { dispatchSetScene, dispatchSceneBack } = usePistolsScene()
-  const { dispatchSetTutorialLevel } = usePistolsContext()
+  const { dispatchSetTutorialLevel, dispatchSelectDuelistId } = usePistolsContext()
 
   const { account } = useAccount()
   
   const { challengeDescription } = useChallengeDescription(duelId)
-  const { isFinished, isTutorial, tutorialLevel, duelistIdA, duelistIdB, winnerDuelistId, duelistAddressA, duelistAddressB, isCanceled, isExpired, premise, livesStaked, needToSyncExpired, state, message } = useGetChallenge(duelId)
+  const { isFinished, isTutorial, tutorialLevel, duelistIdA, duelistIdB, winnerDuelistId, duelistAddressA, duelistAddressB, isCanceled, isExpired, premise, livesStaked, needToSyncExpired, state, message, duelType } = useGetChallenge(duelId)
   const { canCollectDuel } = useCanCollectDuel(duelId)
   const { duel_token, game } = useDojoSystemCalls()
 
@@ -48,6 +49,8 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
 
   const { isMyAccount: isYouA } = useIsMyAccount(duelistAddressA)
   const { isMyAccount: isYouB } = useIsMyAccount(duelistAddressB)
+
+  const { notDuelingIds } = useDuellingDuelists([duelistIdA, duelistIdB])
 
   useFetchChallengeRewardsByDuelistIds(isFinished ? [duelistIdA, duelistIdB] : [])
   const rewardsA = useChallengeRewards(duelId, duelistIdA)
@@ -67,6 +70,8 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
     isLeftMe: shouldSwap ? isYouB : isYouA,
     isRightMe: shouldSwap ? isYouA : isYouB
   }), [shouldSwap, playerNameA, playerNameB, duelistIdA, duelistIdB, rewardsA, rewardsB, isYouA, isYouB])
+
+  const myDuelist = useMemo(() => (isYouA ? duelistIdA : duelistIdB), [isYouA, duelistIdA, duelistIdB])
 
   const winnerIsLeft = useMemo(() => (winnerDuelistId == leftDuelistId), [winnerDuelistId, leftDuelistId])
   const winnerIsRight = useMemo(() => (winnerDuelistId == rightDuelistId), [winnerDuelistId, rightDuelistId])
@@ -453,11 +458,20 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
                           <Col>
                             <ActionButton large fillParent important label='Expired, Collect Duel' onClick={() => _submit(0n, false)} />
                           </Col>
-                        ) : (
-                          <Col>
-                            <ChallengeButton challengedPlayerAddress={isYouA ? duelistAddressB : duelistAddressA} customLabel='Rematch!' fillParent />
-                          </Col>
-                        )
+                        ) : (duelType === constants.DuelType.Ranked || duelType === constants.DuelType.Unranked) ? (
+                            <Col>
+                              <ActionButton large fillParent disabled={!notDuelingIds.includes(myDuelist)} label={notDuelingIds.includes(myDuelist) ? 'Requeue' : 'Duelist busy!'} onClick={() => {
+                                  dispatchSetting(SettingsActions.SELECTED_MODE, duelType === constants.DuelType.Ranked ? constants.QueueId.Ranked : constants.QueueId.Unranked)
+                                  dispatchSelectDuelistId(myDuelist)
+                                  dispatchSetScene(SceneName.Matchmaking)
+                                }}
+                              />
+                            </Col>
+                          ) : (
+                            <Col>
+                              <ChallengeButton challengedPlayerAddress={isYouA ? duelistAddressB : duelistAddressA} customLabel='Rematch!' fillParent />
+                            </Col>
+                          )
                       )}
                     </Row>
                   </Grid>

@@ -72,6 +72,7 @@ const useDuelPosterData = (duelId?: bigint) => {
     duelistIdB,
     isFinished,
     winnerDuelistId,
+    duelType,
   } = useChallenge(duelId)
   const isCallToAction = useDuelCallToAction(duelId)
   
@@ -100,6 +101,8 @@ const useDuelPosterData = (duelId?: bigint) => {
     return duelistId !== Number(winnerDuelistId) && isFinished && !isCallToAction
   }
 
+  const displayDuelType = useMemo(() => (duelType === constants.DuelType.Unranked ? 'Casual' : duelType === constants.DuelType.Seasonal ? 'Challenge' : duelType), [duelType])
+
   return {
     leftDuelistId,
     leftDuelistAddress,
@@ -113,18 +116,19 @@ const useDuelPosterData = (duelId?: bigint) => {
     isYouA,
     isYouB,
     isCallToAction,
+    displayDuelType,
+    duelType,
   }
 }
 
 // Small version of the DuelPoster
 const DuelPosterSmall = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref) => {
   const { aspectWidth, aspectHeight } = useGameAspect()
-  const { leftDuelistId, leftDuelistAddress, rightDuelistId, rightDuelistAddress, leftPlayerName, rightPlayerName, isDead, isYouA, isYouB, isCallToAction, leftAvatarUrl, rightAvatarUrl } = useDuelPosterData(props.duelId)
+  const { leftDuelistId, leftDuelistAddress, rightDuelistId, rightDuelistAddress, leftPlayerName, rightPlayerName, isDead, isYouA, isYouB, isCallToAction, leftAvatarUrl, rightAvatarUrl, displayDuelType, duelType } = useDuelPosterData(props.duelId)
   const { turnA, turnB } = useDuel(props.duelId)
-  const { seasonName, isFinished, duelType } = useChallenge(props.duelId)
+  const { seasonName, isFinished } = useChallenge(props.duelId)
   const { seasonName: currentSeasonName } = useCurrentSeason()
   const seasonDescription = useMemo(() => (seasonName ?? currentSeasonName), [seasonName, currentSeasonName])
-  const displayDuelType = useMemo(() => (duelType === constants.DuelType.Unranked ? 'Casual' : duelType), [duelType])
 
   const baseRef = useRef<InteractibleComponentHandle>(null)
   const [cardColor, setCardColor] = useState(CardColor.WHITE)
@@ -226,10 +230,8 @@ const DuelPosterSmall = forwardRef<DuelPosterHandle, DuelPosterProps>((props, re
             </div>
           </div>
           <div className='TableDescriptionFooter'>
-            {seasonDescription}
-            {duelType && duelType !== constants.DuelType.Undefined && (
-              <> - {displayDuelType}</>
-            )}
+            {duelType === constants.DuelType.Ranked ? <>{seasonDescription} - </> : ''}
+            {duelType && duelType !== constants.DuelType.Undefined && displayDuelType}
           </div>
         </div>
       }
@@ -245,7 +247,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
   const { duel_token, game } = useDojoSystemCalls()
   const { account } = useAccount()
   const { duelistSelectOpener } = usePistolsContext()
-  const { leftDuelistId, rightDuelistId, leftDuelistAddress, rightDuelistAddress, leftPlayerName, rightPlayerName, isDead, isYouA, isYouB, isCallToAction, leftAvatarUrl, rightAvatarUrl } = useDuelPosterData(props.duelId)
+  const { leftDuelistId, rightDuelistId, leftDuelistAddress, rightDuelistAddress, leftPlayerName, rightPlayerName, isDead, isYouA, isYouB, isCallToAction, leftAvatarUrl, rightAvatarUrl, displayDuelType, duelType } = useDuelPosterData(props.duelId)
   useFetchChallengeRewardsByDuelistIds([leftDuelistId, rightDuelistId])
   const { fameBefore: fameBeforeA, fameAfter: fameAfterA } = useDuelistFameOnDuel(props.duelId, leftDuelistId)
   const { fameBefore: fameBeforeB, fameAfter: fameAfterB } = useDuelistFameOnDuel(props.duelId, rightDuelistId)
@@ -262,7 +264,6 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
     message,
     livesStaked,
     needToSyncExpired,
-    duelType,
     isMatchmaking,
   } = useChallenge(props.duelId)
   const { endedInBlades, endedInPaces } = useRound(props.duelId)
@@ -270,7 +271,6 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
   const { challengeDescription } = useChallengeDescription(props.duelId)
   const { seasonName: currentSeasonName } = useCurrentSeason()
   const seasonDescription = useMemo(() => (seasonName ?? currentSeasonName), [seasonName, currentSeasonName])
-  const displayDuelType = useMemo(() => (duelType === constants.DuelType.Unranked ? 'Casual' : duelType), [duelType])
 
   const { lives } = useDuelistFameBalance(challengingDuelistId)
   const isChallenger = useMemo(() => isYouA, [isYouA])
@@ -296,32 +296,35 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
     if (accepted) _gotoDuel()
   }, [_gotoDuel])
   
-  const { call: submitChallengeResponse, isLoading: isLoadingSubmit, isWaitingForIndexer: isWaitingForIndexerSubmit, meta } = useTransactionHandler<boolean, [bigint, BigNumberish?, boolean?]>({
+  const { call: submitChallengeResponse, isLoading: isLoadingSubmit, meta } = useTransactionHandler<boolean, [bigint, BigNumberish?, boolean?]>({
     transactionCall: (duelId, duelistId, accepted, key) => duel_token.reply_duel(account, duelId, duelistId, accepted, key),
     onComplete: onCompleteSubmitCallback,
     indexerCheck: state != constants.ChallengeState.Awaiting,
     key: `submit_challenge_response${props.duelId}`,
+    messageTargetRef: buttonsRowRef,
+    waitingMessage: "Transaction successful! Waiting for indexer...",
+    messageDelay: 1000,
   })
 
-  const { call: revalFinalDuelResult, isLoading: isLoadingFinalResult, isWaitingForIndexer: isWaitingForIndexerFinalResult } = useTransactionHandler<boolean, [bigint]>({
+  const { call: revalFinalDuelResult, isLoading: isLoadingFinalResult } = useTransactionHandler<boolean, [bigint]>({
     transactionCall: (duelId, key) => game.clear_call_to_challenge(account, duelId, key),
     indexerCheck: !isCallToAction,
     key: `reveal_final_duel_result${props.duelId}`,
+    messageTargetRef: buttonsRowRef,
+    waitingMessage: "Transaction successful! Waiting for indexer...",
+    messageDelay: 1000,
   })
 
-  const { call: collectDuel, isLoading: isLoadingCollect, isWaitingForIndexer: isWaitingForIndexerCollect } = useTransactionHandler<boolean, [bigint]>({
+  const { call: collectDuel, isLoading: isLoadingCollect } = useTransactionHandler<boolean, [bigint]>({
     transactionCall: (duelId, key) => game.collect_duel(account, duelId, key),
     indexerCheck: !canCollectDuel,
     key: `collect_duel${props.duelId}`,
+    messageTargetRef: buttonsRowRef,
+    waitingMessage: "Transaction successful! Waiting for indexer...",
+    messageDelay: 1000,
   })
 
   const isSubmitting = useMemo(() => isLoadingSubmit || isLoadingCollect || isLoadingFinalResult, [isLoadingSubmit, isLoadingCollect, isLoadingFinalResult])
-
-  useEffect(() => {
-    if (isWaitingForIndexerSubmit || isWaitingForIndexerCollect) {
-      showElementPopupNotification(buttonsRowRef, "Transaction successfull! Waiting for indexer...")
-    }
-  }, [isWaitingForIndexerSubmit, isWaitingForIndexerCollect])
 
   useEffect(() => {
     if (isSubmitting) {
