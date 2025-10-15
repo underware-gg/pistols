@@ -7,6 +7,7 @@ pub mod tests {
         duelist::{Duelist, Archetype, DuelistAssignment},
         player::{PlayerDuelistStack},
         pool::{Pool, PoolType},
+        match_queue::{QueueId},
     };
     use pistols::types::{
         cards::deck::{Deck},
@@ -247,7 +248,7 @@ pub mod tests {
     fn test_bot_summon_duelist_invalid_caller() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER);
         tester::impersonate(OTHER());
-        _protected(@sys).summon_duelist(DuelistProfile::Bot(BotKey::Pro), 1);
+        _protected(@sys).summon_duelist(DuelistProfile::Bot(BotKey::Pro), QueueId::Ranked);
     }
 
     #[test]

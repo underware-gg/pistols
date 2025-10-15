@@ -94,9 +94,10 @@ pub impl DuelistImpl of DuelistTrait {
 
 #[generate_trait]
 pub impl DuelistAssignmentImpl of DuelistAssignmentTrait {
+    // must enlist before entering a matchmaking challenge
     fn enlist_matchmaking(ref self: Store, duelist_id: u128, queue_id: QueueId) {
         let mut assignment: DuelistAssignment = self.get_duelist_assignment(duelist_id);
-        assignment.assert_is_available(Option::None);
+        assignment.assert_can_assign_challenge(Option::None);
         assignment.queue_id = queue_id; // this is permanent!!!
         self.set_duelist_assignment(@assignment);
     }
@@ -105,7 +106,7 @@ pub impl DuelistAssignmentImpl of DuelistAssignmentTrait {
     }
     fn assign_challenge(ref self: Store, duelist_id: u128, duel_id: u128, queue_id: Option<QueueId>) {
         let mut assignment: DuelistAssignment = self.get_duelist_assignment(duelist_id);
-        assignment.assert_is_available(queue_id);
+        assignment.assert_can_assign_challenge(queue_id);
         assignment.duel_id = duel_id;
         self.set_duelist_assignment(@assignment);
     }
@@ -134,7 +135,7 @@ pub impl DuelistAssignmentImpl of DuelistAssignmentTrait {
         assignment.pass_id = 0;
         self.set_duelist_assignment(@assignment);
     }
-    fn assert_is_available(self: @DuelistAssignment, queue_id: Option<QueueId>) {
+    fn assert_can_assign_challenge(self: @DuelistAssignment, queue_id: Option<QueueId>) {
         // must not be in another challenge
         assert(*self.duel_id == 0, DuelErrors::DUELIST_IN_CHALLENGE);
         // must be the same queue or not in a queue
@@ -145,6 +146,26 @@ pub impl DuelistAssignmentImpl of DuelistAssignmentTrait {
             Option::Some(queue_id) => {
                 assert(*self.queue_id == queue_id, DuelErrors::DUELIST_WRONG_QUEUE);
             },
+        }
+    }
+    fn is_bot_duelist_available_for_challenge(self: @Store, duelist_id: u128, queue_id: Option<QueueId>) -> bool {
+        let assignment: DuelistAssignment = self.get_duelist_assignment(duelist_id);
+        // must not be in another challenge
+        if (assignment.duel_id > 0) {
+            (false)
+        } else {
+            (match queue_id {
+                Option::None => {
+                    (assignment.queue_id == QueueId::Undefined)
+                },
+                Option::Some(queue_id) => {
+                    if (self.get_match_queue(queue_id).requires_enlistment()) {
+                        (assignment.queue_id == queue_id)
+                    } else {
+                        (assignment.queue_id == QueueId::Undefined)
+                    }
+                },
+            })
         }
     }
 }
@@ -411,7 +432,7 @@ mod unit {
         sys.store.unassign_challenge(DUELIST_ID);
         assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).duel_id, 0);
         assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).queue_id, QueueId::Undefined);
-        sys.store.get_duelist_assignment(DUELIST_ID).assert_is_available(Option::None);
+        sys.store.get_duelist_assignment(DUELIST_ID).assert_can_assign_challenge(Option::None);
     }
     #[test]
     #[should_panic(expected: ('DUEL: Duelist in a challenge',))]
@@ -435,7 +456,7 @@ mod unit {
         sys.store.unassign_challenge(DUELIST_ID);
         assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).duel_id, 0);
         assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).queue_id, QueueId::Ranked);
-        sys.store.get_duelist_assignment(DUELIST_ID).assert_is_available(Option::Some(QueueId::Ranked));
+        sys.store.get_duelist_assignment(DUELIST_ID).assert_can_assign_challenge(Option::Some(QueueId::Ranked));
     }
     #[test]
     fn test_assignment_enlist_matchmaking_unranked() {
@@ -451,7 +472,7 @@ mod unit {
         sys.store.unassign_challenge(DUELIST_ID);
         assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).duel_id, 0);
         assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).queue_id, QueueId::Undefined);
-        sys.store.get_duelist_assignment(DUELIST_ID).assert_is_available(Option::None);
+        sys.store.get_duelist_assignment(DUELIST_ID).assert_can_assign_challenge(Option::None);
     }
     #[test]
     #[should_panic(expected: ('DUEL: Duelist matchmaking',))]

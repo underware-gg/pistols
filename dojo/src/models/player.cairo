@@ -115,6 +115,8 @@ pub struct PlayerOnline {
 // Traits
 //
 use core::num::traits::Zero;
+use pistols::models::match_queue::{QueueId};
+use pistols::models::duelist::{DuelistAssignmentTrait};
 use pistols::models::events::{Activity, ActivityTrait};
 use pistols::interfaces::dns::{DnsTrait, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait};
 use pistols::libs::store::{Store, StoreTrait};
@@ -199,22 +201,18 @@ pub impl PlayerDuelistStackImpl of PlayerDuelistStackTrait {
         }
     }
     // for bots only (no active duelist)
-    fn get_first_available_duelist_id(self: @PlayerDuelistStack, store: @Store, lives_staked: u8) -> u128 {
+    fn get_first_available_bot_duelist_id(self: @PlayerDuelistStack, store: @Store, lives_staked: u8, queue_id: Option<QueueId>) -> Option<u128> {
         let duelist_dispatcher: IDuelistTokenDispatcher = store.world.duelist_token_dispatcher();
-        let mut result: u128 = 0;
-        let mut i: usize = 0;
-        while (i < self.stacked_ids.len()) {
+        for i in 0..self.stacked_ids.len() {
             let duelist_id: u128 = *self.stacked_ids[i];
             if (
-                store.get_duelist_assigned_duel_id(duelist_id).is_zero() &&
+                DuelistAssignmentTrait::is_bot_duelist_available_for_challenge(store, duelist_id, queue_id) &&
                 duelist_dispatcher.life_count(duelist_id) >= lives_staked
             ) {
-                result = duelist_id;
-                break;
+                return Option::Some(duelist_id);
             }
-            i += 1;
         };
-        (result)
+        (Option::None)
     }
 }
 

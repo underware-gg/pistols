@@ -511,7 +511,7 @@ pub mod matchmaker {
                 return (0);
             }
             // summon bot duelist
-            let bot_duelist_id: u128 = bot_player_dispatcher.summon_duelist(DuelistProfile::Bot(BotKey::Pro), queue_id.get_lives_staked());
+            let bot_duelist_id: u128 = bot_player_dispatcher.summon_duelist(DuelistProfile::Bot(BotKey::Pro), queue_id);
             // Duel expects the bot duelist to be in the queue
             store.enlist_matchmaking(bot_duelist_id, queue_id);
             // mint duel if needed
