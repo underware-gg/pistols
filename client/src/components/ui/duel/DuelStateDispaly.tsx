@@ -35,7 +35,7 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
 
   const { dispatchSetting } = useSettings()
   const { dispatchSetScene, dispatchSceneBack } = usePistolsScene()
-  const { dispatchSetTutorialLevel, dispatchSelectDuelistId } = usePistolsContext()
+  const { dispatchSetTutorialLevel, dispatchRequeueDuelist } = usePistolsContext()
 
   const { account } = useAccount()
   
@@ -462,7 +462,7 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
                             <Col>
                               <ActionButton large fillParent disabled={!notDuelingIds.includes(myDuelist)} label={notDuelingIds.includes(myDuelist) ? 'Requeue' : 'Duelist busy!'} onClick={() => {
                                   dispatchSetting(SettingsActions.SELECTED_MODE, duelType === constants.DuelType.Ranked ? constants.QueueId.Ranked : constants.QueueId.Unranked)
-                                  dispatchSelectDuelistId(myDuelist)
+                                  dispatchRequeueDuelist(myDuelist, duelType === constants.DuelType.Ranked ? constants.QueueId.Ranked : constants.QueueId.Unranked)
                                   dispatchSetScene(SceneName.Matchmaking)
                                 }}
                               />

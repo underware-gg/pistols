@@ -8,6 +8,7 @@ import { SceneName } from '/src/data/assets'
 import { SCENE_CHANGE_ANIMATION_DURATION } from '/src/three/game'
 
 import { emitter } from '/src/three/game'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 //
 // React + Typescript + Context
@@ -36,6 +37,9 @@ export const initialState = {
   // new challenge modal
   challengingAddress: 0n,
   challengingDuelistId: 0n,
+
+  //matchmaking
+  requeueDuelist: {duelistId: 0n, matchType: constants.QueueId.Unranked},
 
   // selection history stack
   selectionHistory: [] as Array<SelectionState>,
@@ -71,6 +75,7 @@ const PistolsActions = {
   SELECT_PLAYER_ADDRESS: 'SELECT_PLAYER_ADDRESS',
   SELECT_CHALLENGING_ADDRESS: 'SELECT_CHALLENGING_ADDRESS',
   SELECT_CHALLENGING_DUELIST_ID: 'SELECT_CHALLENGING_DUELIST_ID',
+  REQUEUE_DUELIST: 'REQUEUE_DUELIST',
   SET_TUTORIAL_LEVEL: 'SET_TUTORIAL_LEVEL',
   RESET_VALUES: 'RESET_VALUES',
   POP_SELECTION: 'POP_SELECTION',
@@ -93,6 +98,7 @@ type ActionType =
   | { type: 'SELECT_PLAYER_ADDRESS', payload: bigint }
   | { type: 'SELECT_CHALLENGING_ADDRESS', payload: bigint }
   | { type: 'SELECT_CHALLENGING_DUELIST_ID', payload: bigint }
+  | { type: 'REQUEUE_DUELIST', payload: {duelistId: bigint, matchType: constants.QueueId} }
   | { type: 'RESET_VALUES', payload: null }
   | { type: 'SET_TUTORIAL_LEVEL', payload: DuelTutorialLevel }
   | { type: 'POP_SELECTION', payload: null }
@@ -262,6 +268,10 @@ const PistolsProvider = ({
         if (newDuelistId == 0n && state.selectionHistory.length > 0) {
           newState = restoreFromHistory(newState)
         }
+        break
+      }
+      case PistolsActions.REQUEUE_DUELIST: {
+        newState.requeueDuelist = action.payload as {duelistId: bigint, matchType: constants.QueueId}
         break
       }
       case PistolsActions.SELECT_PLAYER_ADDRESS: {
@@ -468,6 +478,13 @@ export const usePistolsContext = () => {
     }
   }, [dispatch])
 
+  const dispatchRequeueDuelist = useCallback((duelistId: BigNumberish, matchType: constants.QueueId) => {
+    dispatch({
+      type: PistolsActions.REQUEUE_DUELIST,
+      payload: {duelistId: BigInt(duelistId), matchType: matchType},
+    })
+  }, [dispatch])
+
   const dispatchSelectPlayerAddress = useCallback((newId: BigNumberish) => {
     dispatch({
       type: PistolsActions.SELECT_PLAYER_ADDRESS,
@@ -549,6 +566,7 @@ export const usePistolsContext = () => {
     dispatchSetDuel,
     dispatchSelectDuel,
     dispatchSelectDuelistId,
+    dispatchRequeueDuelist,
     dispatchSelectPlayerAddress,
     dispatchChallengingPlayerAddress,
     dispatchChallengingDuelistId,
