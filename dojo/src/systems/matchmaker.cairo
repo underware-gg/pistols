@@ -79,6 +79,7 @@ pub mod matchmaker {
         pub const INELIGIBLE_DUELIST: felt252       = 'MATCHMAKER: Ineligible duelist';
         pub const NOT_ENLISTED: felt252             = 'MATCHMAKER: Not enlisted';
         pub const INVALID_SIZE: felt252             = 'MATCHMAKER: Invalid size';
+        pub const UNFINISHED_IMP_DUEL: felt252      = 'MATCHMAKER: Unfinished Imp duel';
     }
 
     fn dojo_init(ref self: ContractState) {
@@ -206,6 +207,7 @@ pub mod matchmaker {
                 }
                 return (0);
             }
+            //
             // >> switching from SLOW to FAST mode...
             // validate input mode
             else if (queue_mode != matching_player.queue_info.queue_mode) {
@@ -217,21 +219,45 @@ pub mod matchmaker {
                     matching_player.duel_id,
                     matching_player.queue_info.slot,
                 );
-            } else {
-                // >>> pinging with duelist in queue...
+            }
+            //
+            // >>> pinging with duelist currently in queue...
+            else if (!matching_player.queue_info.expired) {
                 // check if expired
-                matching_player.queue_info.expired = matching_player.queue_info.expired || matching_player.queue_info.has_expired(starknet::get_block_timestamp());
+                matching_player.queue_info.expired = matching_player.queue_info.has_expired(starknet::get_block_timestamp());
             }
 
+            //----------------------------------
             // match player...
+            //
             let matched_duel_id: u128 =
-                if (matching_player.queue_info.timestamp_ping.is_zero() || matching_player.queue_info.expired) {
+                //
+                // match the queue only once
+                if (matching_player.queue_info.timestamp_ping.is_zero()) {
+                    // return the duel, if matched
                     (self._match_or_enqueue(
                         ref store,
                         ref queue,
                         ref matching_player,
                     ))
-                } else {(0)};
+                }
+                //
+                // expired, match with an imp
+                else if (matching_player.queue_info.expired) {
+                    // create duel
+                    let duel_id: u128 = self._start_match_with_imp(ref store, ref matching_player, queue_id);
+                    // assert(duel_id.is_non_zero(), Errors::UNFINISHED_IMP_DUEL);
+                    // unstack duelist, if available
+                    if (duel_id.is_non_zero()) {
+                        let stay_in_queue: bool = matching_player.unstack_duelist_or_clear();
+                        queue.resolve_player(@matching_player.player_address, stay_in_queue);
+                    }
+                    // return the duel_id
+                    (duel_id)
+                }
+                //
+                // do nothing
+                else {(0)};
 
             // save queue and player state
             store.set_match_queue(@queue);
@@ -240,7 +266,6 @@ pub mod matchmaker {
             // return the created duel id (never zero)
             (matched_duel_id)
         }
-
     }
 
 
@@ -283,77 +308,67 @@ pub mod matchmaker {
         ) -> u128 {
             let mut matched_player_address: Option<ContractAddress> = Option::None;
             let mut expired_players: Array<ContractAddress> = array![];
-            let player_position: Option<usize> = queue.player_position(@matching_player.player_address);
             let duel_type: DuelType = queue.queue_id.into();
 
             // update ping timestamp
+            // ensures duelist can match the queue only once
             let timestamp: u64 = starknet::get_block_timestamp();
             matching_player.queue_info.timestamp_ping = timestamp;
+
             // queue is not empty, try to match if...
+// println!("queue.players.len(): {}", queue.players.len());
             if (queue.players.len() > 0) {
                 // get all players in queue
                 let mut keys: Array<(ContractAddress, QueueId)> = array![];
-                let mut i: usize = 0;
-                while (i < queue.players.len()) {
+                for i in 0..queue.players.len() {
                     keys.append((*queue.players[i], queue.queue_id),);
-                    i += 1;
-                };
+                }
                 let players_info: Span<QueueInfo> = store.get_match_players_info_batch(keys.span()).span();
 
-                let player_slot: u8 = matching_player.queue_info.slot + 
-                    (match player_position {
-                        // not in the queue yet
-                        Option::None => {(players_info.len())},
-                        // in the queue, compose slot with its position
-                        Option::Some(position) => {(position)},
-                    }).try_into().unwrap();
+                // compose slot with queue size
+                let player_slot: u8 = matching_player.queue_info.slot + players_info.len().try_into().unwrap();
 
+                //----------------------------------
                 // find candidates in queue
+                //
                 let mut candidates: Array<ContractAddress> = array![];
-                let mut i: usize = 0;
-                while (i < players_info.len()) {
+                for i in 0..players_info.len() {
                     let candidate_address: ContractAddress = *queue.players[i];
-                    if (candidate_address != matching_player.player_address) {
-                        // get candidate queue info
-                        let mut candidate_info: QueueInfo = *players_info[i];
-                        // expired player, need to be removed...
-                        if (candidate_info.has_expired(timestamp)) {
-                            // expire player
-                            candidate_info.expired = true;
-                            store.set_match_player_queue_info(candidate_address, queue.queue_id, candidate_info);
-                            // mark for removal
-                            expired_players.append(candidate_address);
-                        }
-                        // validate candidate...
-                        else if (
-                            candidate_info.queue_mode == matching_player.queue_info.queue_mode && // players have the same speed
-                            !store.get_has_pact(duel_type, matching_player.player_address.into(), candidate_address.into()) && // dont have a pact
-                            !(matching_player.queue_info.has_minted_duel && candidate_info.has_minted_duel) // cant both have minted duel
-                        ) {
-                            // compare slots...
-                            match player_position {
-                                // player not in the queue yet
-                                Option::None => {
-                                    if (candidate_info.slot < player_slot) {
-                                        candidates.append(candidate_address);
-                                    }
-                                },
-                                // player already in the queue, running again....
-                                Option::Some(position) => {
-                                    if (
-                                        // candidate is BEFORE the player
-                                        (i < position && candidate_info.slot < player_slot) ||
-                                        // candidate is AFTER the player
-                                        (i > position && player_slot < (candidate_info.slot + i.try_into().unwrap()))
-                                    ) {
-                                        candidates.append(candidate_address);
-                                    }
-                                }, // in the queue, compose slot with its position
-                            };
-                        }
+                    // skip if self...
+                    if (candidate_address == matching_player.player_address) {
+                        continue;
                     }
-                    i += 1;
-                };
+                    // get candidate queue info
+                    let mut candidate_info: QueueInfo = *players_info[i];
+                    // expired player, need to be removed...
+                    if (candidate_info.has_expired(timestamp)) {
+                        // expire player
+                        candidate_info.expired = true;
+                        store.set_match_player_queue_info(candidate_address, queue.queue_id, candidate_info);
+                        // mark for removal
+                        expired_players.append(candidate_address);
+                        // try next...
+                        continue;
+                    }
+                    // skip if not same speed...
+                    if (candidate_info.queue_mode != matching_player.queue_info.queue_mode) {
+                        continue;
+                    }
+                    // skip if have pact...
+                    if (store.get_has_pact(duel_type, matching_player.player_address.into(), candidate_address.into())) {
+                        continue;
+                    }
+                    // skip if both have a minted duel...
+                    if (matching_player.queue_info.has_minted_duel && candidate_info.has_minted_duel) {
+                        continue;
+                    }
+                    // >>> valid candidate! 
+                    // compare slots...
+// println!("slots... {} < {}", candidate_info.slot, player_slot);
+                    if (candidate_info.slot < player_slot) {
+                        candidates.append(candidate_address);
+                    }
+                }
                 
                 // choose a candidate, if any
                 if (candidates.len() == 1) {
@@ -362,75 +377,58 @@ pub mod matchmaker {
                     // tie breaker is number of duels between player and candidates
                     // get duel count batch...
                     let mut keys: Array<(DuelType, u128)> = array![];
-                    let mut i: usize = 0;
-                    while (i < candidates.len()) {
+                    for i in 0..candidates.len() {
                         keys.append((duel_type, PactTrait::make_pair(matching_player.player_address.into(), (*candidates[i]).into())));
-                        i += 1;
-                    };
+                    }
                     let duel_counts: Span<u32> = store.get_pacts_duel_counts_batch(keys.span()).span();
                     // choose the candidate with the least duels
                     let mut candidate_index: usize = 0;
-                    let mut i: usize = 1;
-                    while (i < candidates.len()) {
+                    for i in 1..candidates.len() {
                         if (duel_counts[i] < duel_counts[candidate_index]) {
                             candidate_index = i;
                         }
-                        i += 1;
-                    };
+                    }
                     matched_player_address = Option::Some(*candidates[candidate_index]);
                 }
             }
 
             // check if matched...
             let matched_duel_id: u128 = match matched_player_address {
-                Option::Some(address) => {
+                Option::Some(matched_player_address) => {
                     //----------------------------------
                     // MATCHED!!!
                     //
-                    // start duel...
-                    let mut matched_player: MatchPlayer = store.get_match_player(address, queue.queue_id);
+                    let mut matched_player: MatchPlayer = store.get_match_player(matched_player_address, queue.queue_id);
                     let duel_id: u128 = self._start_match(ref store, ref matching_player, ref matched_player, queue.queue_id);
+                    // Resolve matched player
+// println!("matched!!");
                     // unstack next duelist, if any
                     let stay_in_queue: bool = matched_player.unstack_duelist_or_clear();
-                    if (!stay_in_queue) {
-                        queue.remove_player(@matched_player.player_address);
-                    }
-                    // save matched_player (matching_player is saved at the end)
+                    queue.resolve_player(@matched_player.player_address, stay_in_queue);
                     store.set_match_player(@matched_player);
+                    //
+                    // Resolve matching player
+                    let stay_in_queue: bool = matching_player.unstack_duelist_or_clear();
+                    queue.resolve_player(@matching_player.player_address, stay_in_queue);
                     // return the matched duel
+// println!("_start_match...");
                     (duel_id)
                 },
                 Option::None => {
                     //----------------------------------
                     // NO MATCH!!!
                     //
-                    // if expired match, an Imp!
-                    (if (matching_player.queue_info.expired) {
-                        (self._start_match_with_imp(ref store, ref matching_player, queue.queue_id))
-                    } else {
-                        // new SLOW players must have a duel created to be able to pre-commit
-                        if (matching_player.queue_info.queue_mode == QueueMode::Slow) {
-                            self._mint_match_to_player(ref store, ref matching_player, queue.queue_id);
-                        }
-                        // not matched
-                        (0)
-                    })
+                    // player is new, add to queue...
+// println!("not matched!!");
+                    queue.resolve_player(@matching_player.player_address, true);
+                    // new SLOW players must have a duel created to be able to pre-commit
+                    if (matching_player.queue_info.queue_mode == QueueMode::Slow) {
+                        self._mint_match_to_player(ref store, ref matching_player, @queue.queue_id);
+                    }
+                    // not matched
+                    (0)
                 },
             };
-
-            // matched player...
-            if (matched_duel_id > 0) {
-                let stay_in_queue: bool = matching_player.unstack_duelist_or_clear();
-                if (!stay_in_queue && player_position.is_some()) {
-                    queue.remove_player(@matching_player.player_address);
-                } else if (stay_in_queue && player_position.is_none()) {
-                    queue.append_player(@matching_player.player_address);
-                }
-            }
-            // player is new, add to queue...
-            else if (player_position.is_none()) {
-                queue.append_player(@matching_player.player_address);
-            }
 
             // remove expired players...
             loop {
@@ -449,13 +447,13 @@ pub mod matchmaker {
         fn _mint_match_to_player(ref self: ContractState,
             ref store: Store,
             ref matching_player: MatchPlayer,
-            queue_id: QueueId,
+            queue_id: @QueueId,
         ) -> u128 {
             if (!matching_player.queue_info.has_minted_duel) {
                 matching_player.duel_id = store.world.duel_token_protected_dispatcher().create_match(
                     matching_player.player_address,
                     matching_player.duelist_id,
-                    queue_id,
+                    *queue_id,
                 );
                 matching_player.queue_info.has_minted_duel = true;
             }
@@ -471,6 +469,7 @@ pub mod matchmaker {
             let duel_id: u128 = if (matching_player.queue_info.has_minted_duel) {
                 // was-SLOW player matching a FAST player
                 // (use pre-minted duel)
+// println!("start_match... 1 matched_player.duelist_id: {}", matched_player.duelist_id);
                 store.world.duel_token_protected_dispatcher().start_match(
                     // matched player duel
                     matching_player.duel_id,
@@ -484,7 +483,9 @@ pub mod matchmaker {
             } else {
                 // new SLOW player matching existing SLOW player (duel exists)
                 // new FAST player matching existing FAST player (mint duel)
-                self._mint_match_to_player(ref store, ref matched_player, queue_id);
+// println!("mint... 2");
+                self._mint_match_to_player(ref store, ref matched_player, @queue_id);
+// println!("start_match... 2 matching_player.duelist_id: {}", matching_player.duelist_id);
                 store.world.duel_token_protected_dispatcher().start_match(
                     // matched player duel
                     matched_player.duel_id,
@@ -514,7 +515,7 @@ pub mod matchmaker {
             // Duel expects the bot duelist to be in the queue
             store.enlist_matchmaking(bot_duelist_id, queue_id);
             // mint duel if needed
-            self._mint_match_to_player(ref store, ref matching_player, queue_id);
+            self._mint_match_to_player(ref store, ref matching_player, @queue_id);
             // start duel with an imp!
             store.world.duel_token_protected_dispatcher().start_match(
                 matching_player.duel_id,
@@ -593,10 +594,8 @@ pub mod matchmaker {
             let mut store: Store = StoreTrait::new(self.world_default());
             // remove from queue...
             let mut queue: MatchQueue = store.get_match_queue(queue_id);
-            if (queue.is_player_in_queue(@player_address)) {
-                queue.remove_player(@player_address);
-                store.set_match_queue(@queue);
-            }
+            queue.resolve_player(@player_address, false);
+            store.set_match_queue(@queue);
             // clear player
             let mut match_player: MatchPlayer = store.get_match_player(player_address, queue_id);
             self._clear_player_queue(ref store, queue_id, ref match_player);

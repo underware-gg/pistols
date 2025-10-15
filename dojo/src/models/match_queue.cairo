@@ -168,6 +168,15 @@ pub impl MatchQueueImpl of MatchQueueTrait {
     fn remove_player(ref self: MatchQueue, player_address: @ContractAddress) {
         self.players = self.players.remove(player_address);
     }
+    #[inline(always)]
+    fn resolve_player(ref self: MatchQueue, player_address: @ContractAddress, stay_in_queue: bool) {
+        let is_player_in_queue: bool = self.is_player_in_queue(player_address);
+        if (!stay_in_queue && is_player_in_queue) {
+            self.remove_player(player_address);
+        } else if (stay_in_queue && !is_player_in_queue) {
+            self.append_player(player_address);
+        }
+    }
 }
 
 #[generate_trait]
