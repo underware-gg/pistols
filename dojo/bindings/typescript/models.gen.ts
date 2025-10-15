@@ -571,6 +571,7 @@ export const packType = [
 	'FreeDuelist',
 	'SingleDuelist',
 	'BotDuelist',
+	'FreeGenesis5x',
 ] as const;
 export type PackType = { [key in typeof packType[number]]: string };
 export type PackTypeEnum = CairoCustomEnum;
@@ -1213,7 +1214,8 @@ export const schema: SchemaType = {
 				GenesisDuelists5x: undefined,
 				FreeDuelist: undefined,
 				SingleDuelist: undefined,
-				BotDuelist: undefined, }),
+				BotDuelist: undefined,
+				FreeGenesis5x: undefined, }),
 			seed: 0,
 			lords_amount: 0,
 			is_open: false,

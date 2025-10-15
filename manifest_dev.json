@@ -1479,8 +1479,8 @@
   },
   "contracts": [
     {
-      "address": "0x13fd5cac481829243c3d5dda30874840e7328b9db94f89a44c0905c75aaa5b",
-      "class_hash": "0x37d58c3e2f9bc5359afa2bacc6b68bec51aa6d611f53591926138b3a1794572",
+      "address": "0x56cfb954701575dfcf57a7996409d68ecaeacea93bb3b9a956e508dcef1dc26",
+      "class_hash": "0x825aed8148ca931ce73b4b75805994f9ad979dbdba99df92ac18acc4d797a9",
       "abi": [
         {
           "type": "impl",
@@ -2348,8 +2348,8 @@
       ]
     },
     {
-      "address": "0x7e255ee521b3dbafc1243bee59548bf0363d32696466c5d5f2912d2f101d93",
-      "class_hash": "0x2d7e0c281b045a97795727e6f1b06c50fb973d9860bfdaa9768b4a753dfd56c",
+      "address": "0x60c02a74bfd30997447ebdf2c9bbed17bb4186597a5419ac3eb53132fa2fea1",
+      "class_hash": "0x5c780d2143a107c7e959c0e31cc872f1f1ae4a2fefff84c14bf2b7b263ec8d6",
       "abi": [
         {
           "type": "impl",
@@ -2832,6 +2832,24 @@
           ]
         },
         {
+          "type": "enum",
+          "name": "pistols::models::match_queue::QueueId",
+          "variants": [
+            {
+              "name": "Undefined",
+              "type": "()"
+            },
+            {
+              "name": "Unranked",
+              "type": "()"
+            },
+            {
+              "name": "Ranked",
+              "type": "()"
+            }
+          ]
+        },
+        {
           "type": "interface",
           "name": "pistols::systems::bot_player::IBotPlayerProtected",
           "items": [
@@ -2861,15 +2879,15 @@
             },
             {
               "type": "function",
-              "name": "summon_duelist",
+              "name": "summon_bot_duelist",
               "inputs": [
                 {
                   "name": "duelist_profile",
                   "type": "pistols::types::duelist_profile::DuelistProfile"
                 },
                 {
-                  "name": "lives_staked",
-                  "type": "core::integer::u8"
+                  "name": "queue_id",
+                  "type": "pistols::models::match_queue::QueueId"
                 }
               ],
               "outputs": [
@@ -3023,14 +3041,14 @@
         "reveal_moves",
         "reply_duel",
         "commit_moves",
-        "summon_duelist",
+        "summon_bot_duelist",
         "transfer_to_winner",
         "upgrade"
       ]
     },
     {
-      "address": "0x2fc6e45cc271ccfe25c605e7248b2fa0f2aed60e66a2438ac5893aaeddf3971",
-      "class_hash": "0x5088a0aa91513956cd334a2207decf893a4ddb75836441196d2261e059f1479",
+      "address": "0xe2c27af43d371f2d1f70c331b60853bdd10265f7b7c455a2a709d7aab8a9b0",
+      "class_hash": "0x196d3c51a3de86a5b127f3de83d4bbf8629f97d546ac523088fab7cf7d66edd",
       "abi": [
         {
           "type": "impl",
@@ -7648,8 +7666,8 @@
       ]
     },
     {
-      "address": "0x1ae687f1f84b9ee44b3618e16dc384cff245b77b1ca8c50f54bee568728c1c0",
-      "class_hash": "0x5d1aece001b218dd2890b11f44c70eedd4ebefa0d33eefce63d505f8bf7d25",
+      "address": "0x12b6434f06448efc24cf415ea2438ec021850b37b9b13d40a5ead5f0c690e40",
+      "class_hash": "0xf74ed7db9eca77375278bf44bc1f869896aa143f0bc658ee741b856a3aab37",
       "abi": [
         {
           "type": "impl",
@@ -9937,8 +9955,8 @@
       ]
     },
     {
-      "address": "0x6b7b73f26877ecf92e0940dcc48028bfc6506a11f7d2494b13bee131c395fc9",
-      "class_hash": "0x4c9b0bbffc2e96d9acc68bc65f272a101a0b3cea2e7dd0cc2592d53083a78f7",
+      "address": "0x1538bd7bdc139ca3288a0b8c3015c2fed19a759e2875f5bec191f0232500674",
+      "class_hash": "0x8dd27fa7ad89088084b198b6df18e5186ff3dab61740c2701cd72637f687f8",
       "abi": [
         {
           "type": "impl",
@@ -10302,8 +10320,8 @@
       ]
     },
     {
-      "address": "0x7f7da24e0e58795305e24e4191c5e4fffcad12fce7719042fcf71762a1f4501",
-      "class_hash": "0x7f294ef370cace9e03e1dd1fdea6b9aee393134136671a8672f76186795c907",
+      "address": "0x7582fdbb40233a408c839a04dbc4fef9859a7cc19820302b8f14e29035f3a51",
+      "class_hash": "0x7cf4ee3234b9101051a245a2b82cdf322fc3ffecc2cd15819ce73661cdbabde",
       "abi": [
         {
           "type": "impl",
@@ -10412,6 +10430,10 @@
             },
             {
               "name": "BotDuelist",
+              "type": "()"
+            },
+            {
+              "name": "FreeGenesis5x",
               "type": "()"
             }
           ]
@@ -14706,7 +14728,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x3c77f8c8deb967ffbd633bdeccf2598924ee000f0a12aab2fab0357e9e1794c",
+      "class_hash": "0x64eedb7e54453f5fe776c3441d1eaf9a86cd63f7e18244b4a574fdd5deb3778",
       "tag": "pistols-Pack",
       "selector": "0x64159b4947adcdc7a87b41f7889ba33495ac8e3a3a333305c7712806763fa2d"
     },

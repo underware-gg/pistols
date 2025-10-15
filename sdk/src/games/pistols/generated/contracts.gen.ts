@@ -475,19 +475,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_bot_player_summonDuelist_calldata = (duelistProfile: CairoCustomEnum, livesStaked: BigNumberish): DojoCall => {
+	const build_bot_player_summonBotDuelist_calldata = (duelistProfile: CairoCustomEnum, queueId: CairoCustomEnum): DojoCall => {
 		return {
 			contractName: "bot_player",
-			entrypoint: "summon_duelist",
-			calldata: [duelistProfile, livesStaked],
+			entrypoint: "summon_bot_duelist",
+			calldata: [duelistProfile, queueId],
 		};
 	};
 
-	const bot_player_summonDuelist = async (snAccount: Account | AccountInterface, duelistProfile: CairoCustomEnum, livesStaked: BigNumberish) => {
+	const bot_player_summonBotDuelist = async (snAccount: Account | AccountInterface, duelistProfile: CairoCustomEnum, queueId: CairoCustomEnum) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_bot_player_summonDuelist_calldata(duelistProfile, livesStaked),
+				build_bot_player_summonBotDuelist_calldata(duelistProfile, queueId),
 				"pistols",
 			);
 		} catch (error) {
@@ -4574,8 +4574,8 @@ export function setupWorld(provider: DojoProvider) {
 			buildReplyDuelCalldata: build_bot_player_replyDuel_calldata,
 			revealMoves: bot_player_revealMoves,
 			buildRevealMovesCalldata: build_bot_player_revealMoves_calldata,
-			summonDuelist: bot_player_summonDuelist,
-			buildSummonDuelistCalldata: build_bot_player_summonDuelist_calldata,
+			summonBotDuelist: bot_player_summonBotDuelist,
+			buildSummonBotDuelistCalldata: build_bot_player_summonBotDuelist_calldata,
 			transferToWinner: bot_player_transferToWinner,
 			buildTransferToWinnerCalldata: build_bot_player_transferToWinner_calldata,
 		},

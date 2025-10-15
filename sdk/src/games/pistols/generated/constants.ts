@@ -247,6 +247,7 @@ export enum PackType {
   FreeDuelist = 'FreeDuelist', // 3
   SingleDuelist = 'SingleDuelist', // 4
   BotDuelist = 'BotDuelist', // 5
+  FreeGenesis5x = 'FreeGenesis5x', // 6
 };
 export const getPackTypeValue = (name: PackType): number | undefined => _indexOrUndefined(Object.keys(PackType).indexOf(name));
 export const getPackTypeFromValue = (value: number): PackType | undefined => Object.keys(PackType)[value] as PackType;
@@ -898,6 +899,7 @@ type type_PACK_TYPES = {
   FreeDuelist: PackDescriptor, // cairo: PackDescriptor
   SingleDuelist: PackDescriptor, // cairo: PackDescriptor
   BotDuelist: PackDescriptor, // cairo: PackDescriptor
+  FreeGenesis5x: PackDescriptor, // cairo: PackDescriptor
 };
 export const PACK_TYPES: type_PACK_TYPES = {
   Unknown: {
@@ -959,6 +961,16 @@ export const PACK_TYPES: type_PACK_TYPES = {
     price_lords: (10n * CONST.ETH_TO_WEI),
     quantity: 1,
     contents: 'One Bot Duelist',
+  },
+  FreeGenesis5x: {
+    id: 'FreeGenesis5x',
+    name: 'Free Genesis Duelists 5-pack',
+    image_file_closed: 'GenesisDuelists5x.png',
+    image_file_open: 'GenesisDuelists5x.png',
+    can_purchase: false,
+    price_lords: (50n * CONST.ETH_TO_WEI),
+    quantity: 5,
+    contents: 'Five Random Genesis Duelists',
   },
 };
 
