@@ -1480,7 +1480,7 @@
   "contracts": [
     {
       "address": "0x610423526de7adfd8c18bd027111fcb7d1bc0de329f28fb651a34752273328a",
-      "class_hash": "0x37d58c3e2f9bc5359afa2bacc6b68bec51aa6d611f53591926138b3a1794572",
+      "class_hash": "0x825aed8148ca931ce73b4b75805994f9ad979dbdba99df92ac18acc4d797a9",
       "abi": [
         {
           "type": "impl",
@@ -2349,7 +2349,7 @@
     },
     {
       "address": "0x5d9c9168e6bf86f250a813d38ad5a95c67cb3ca42ab93411a184c9c731fa69a",
-      "class_hash": "0x2d7e0c281b045a97795727e6f1b06c50fb973d9860bfdaa9768b4a753dfd56c",
+      "class_hash": "0x5c780d2143a107c7e959c0e31cc872f1f1ae4a2fefff84c14bf2b7b263ec8d6",
       "abi": [
         {
           "type": "impl",
@@ -2832,6 +2832,24 @@
           ]
         },
         {
+          "type": "enum",
+          "name": "pistols::models::match_queue::QueueId",
+          "variants": [
+            {
+              "name": "Undefined",
+              "type": "()"
+            },
+            {
+              "name": "Unranked",
+              "type": "()"
+            },
+            {
+              "name": "Ranked",
+              "type": "()"
+            }
+          ]
+        },
+        {
           "type": "interface",
           "name": "pistols::systems::bot_player::IBotPlayerProtected",
           "items": [
@@ -2861,15 +2879,15 @@
             },
             {
               "type": "function",
-              "name": "summon_duelist",
+              "name": "summon_bot_duelist",
               "inputs": [
                 {
                   "name": "duelist_profile",
                   "type": "pistols::types::duelist_profile::DuelistProfile"
                 },
                 {
-                  "name": "lives_staked",
-                  "type": "core::integer::u8"
+                  "name": "queue_id",
+                  "type": "pistols::models::match_queue::QueueId"
                 }
               ],
               "outputs": [
@@ -3023,14 +3041,14 @@
         "reveal_moves",
         "reply_duel",
         "commit_moves",
-        "summon_duelist",
+        "summon_bot_duelist",
         "transfer_to_winner",
         "upgrade"
       ]
     },
     {
       "address": "0x2e9c711b1a7e2784570b1bda5082a92606044e836ba392d2b977d280fb74b3c",
-      "class_hash": "0x5088a0aa91513956cd334a2207decf893a4ddb75836441196d2261e059f1479",
+      "class_hash": "0x196d3c51a3de86a5b127f3de83d4bbf8629f97d546ac523088fab7cf7d66edd",
       "abi": [
         {
           "type": "impl",
@@ -7649,7 +7667,7 @@
     },
     {
       "address": "0x2c6a7c98a9dea8322b51018eef7be99ebedd209cebdaacb9f4c5bbf661c1cc9",
-      "class_hash": "0x5d1aece001b218dd2890b11f44c70eedd4ebefa0d33eefce63d505f8bf7d25",
+      "class_hash": "0xf74ed7db9eca77375278bf44bc1f869896aa143f0bc658ee741b856a3aab37",
       "abi": [
         {
           "type": "impl",
@@ -9398,7 +9416,7 @@
     },
     {
       "address": "0x16f7e3c140b4778e776221c7bb8b880d20d247c3ab0d06fab9a8eb96e7098bb",
-      "class_hash": "0x4c9b0bbffc2e96d9acc68bc65f272a101a0b3cea2e7dd0cc2592d53083a78f7",
+      "class_hash": "0x8dd27fa7ad89088084b198b6df18e5186ff3dab61740c2701cd72637f687f8",
       "abi": [
         {
           "type": "impl",
@@ -9763,7 +9781,7 @@
     },
     {
       "address": "0x71333ac75b7d5ba89a2d0c2b67d5b955258a4d46eb42f3428da6137bbbfdfd9",
-      "class_hash": "0x7f294ef370cace9e03e1dd1fdea6b9aee393134136671a8672f76186795c907",
+      "class_hash": "0x7cf4ee3234b9101051a245a2b82cdf322fc3ffecc2cd15819ce73661cdbabde",
       "abi": [
         {
           "type": "impl",
@@ -9872,6 +9890,10 @@
             },
             {
               "name": "BotDuelist",
+              "type": "()"
+            },
+            {
+              "name": "FreeGenesis5x",
               "type": "()"
             }
           ]
@@ -13932,7 +13954,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x3c77f8c8deb967ffbd633bdeccf2598924ee000f0a12aab2fab0357e9e1794c",
+      "class_hash": "0x64eedb7e54453f5fe776c3441d1eaf9a86cd63f7e18244b4a574fdd5deb3778",
       "tag": "pistols-Pack",
       "selector": "0x64159b4947adcdc7a87b41f7889ba33495ac8e3a3a333305c7712806763fa2d"
     },
