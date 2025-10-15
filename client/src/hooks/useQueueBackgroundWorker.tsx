@@ -1,128 +1,103 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useCallback, useState } from 'react'
 import { useAccount } from '@starknet-react/core'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { useMatchPlayer } from '/src/stores/matchStore'
+import { useTransactionHandler } from '/src/hooks/useTransaction'
 
 // Background queue management system with automatic match_make_me calls
+// 🐙 Tentacle tip: When duelists are ready to matchmake, they join the queue like tentacles reaching for snacks!
 
-const QUEUE_TIMING = {
-  fastIntervalMs: 5 * 60 * 1000, // 5 minutes
-  slowIntervalMs: 24 * 60 * 60 * 1000, // 24 hours
+interface QueueItem {
+  queueId: constants.QueueId
+  queueMode: constants.QueueMode
+  duelistId: bigint
 }
 
 export const useQueueBackgroundWorker = () => {
   const { account, address } = useAccount()
   const { matchmaker } = useDojoSystemCalls()
-  const timeoutRefs = useRef<Record<string, NodeJS.Timeout>>({})
+  const transactionQueueRef = useRef<QueueItem[]>([])
+  const [isProcessing, setIsProcessing] = useState(false)
 
   // Get match player data for both ranked and unranked queues
   const rankedPlayer = useMatchPlayer(address, constants.QueueId.Ranked)
   const unrankedPlayer = useMatchPlayer(address, constants.QueueId.Unranked)
 
-  const callMatchMakeMe = async (queueId: constants.QueueId, queueMode: constants.QueueMode, duelistId: bigint) => {
-    if (!account || !address) {
-      console.log(`[MATCHMAKING] Account not ready - skipping ${queueId} ${queueMode} queue call`)
-      return
-    }
-    
-    try {
-      console.log(`[MATCHMAKING] Calling match_make_me for ${queueId} ${queueMode} queue - duelist ${duelistId}`)
-      await matchmaker.match_make_me(account, duelistId, queueId, queueMode)
-      console.log(`[MATCHMAKING] Successfully pinged ${queueId} ${queueMode} queue - duelist ${duelistId}`)
-    } catch (error) {
-      console.error(`[MATCHMAKING] Error pinging ${queueId} ${queueMode} queue:`, error)
-    }
-  }
+  // Handler for transaction completion
+  const handleTransactionComplete = useCallback(() => {
+    setIsProcessing(false)
+  }, [])
 
-  const setupQueueTimeout = (queueId: constants.QueueId, queueMode: constants.QueueMode, duelistId: bigint, timestampEnter: number) => {
-    const queueKey = `${queueId}_${queueMode}_${duelistId}`
-    
-    // Clear existing timeout for this queue
-    if (timeoutRefs.current[queueKey]) {
-      clearTimeout(timeoutRefs.current[queueKey])
-      delete timeoutRefs.current[queueKey]
-    }
+  // Single transaction handler for all match_make_me calls
+  const { call: executeMatchMakeMe, isLoading } = useTransactionHandler<boolean, [bigint, constants.QueueId, constants.QueueMode]>({
+    key: `backgroundMatchmakeMe`,
+    transactionCall: (duelistId, queueId, queueMode, key) => matchmaker.match_make_me(account!, duelistId, queueId, queueMode, key),
+    onComplete: handleTransactionComplete,
+  })
 
-    const now = Date.now()
-    const timeEntered = timestampEnter * 1000 // Convert to milliseconds
-    const intervalMs = queueMode === constants.QueueMode.Fast 
-      ? QUEUE_TIMING.fastIntervalMs 
-      : QUEUE_TIMING.slowIntervalMs
-    
-    const timeRemaining = Math.max(0, intervalMs - (now - timeEntered))
-    
-    if (timeRemaining > 0) {
-      console.log(`[MATCHMAKING] Setting timeout for ${queueId} ${queueMode} queue - ${Math.round(timeRemaining / 1000)}s remaining`)
-      
-      timeoutRefs.current[queueKey] = setTimeout(() => {
-        callMatchMakeMe(queueId, queueMode, duelistId)
-        delete timeoutRefs.current[queueKey]
-      }, timeRemaining)
-    } else {
-      // Time already expired, call immediately
-      console.log(`[MATCHMAKING] Time expired for ${queueId} ${queueMode} queue - calling immediately`)
-      callMatchMakeMe(queueId, queueMode, duelistId)
-    }
-  }
+  // Process the next item in the queue
+  const processNextInQueue = useCallback(() => {
+    if (transactionQueueRef.current.length === 0 || isProcessing || isLoading) return
 
-  // Setup timeouts for all active queues
+    const nextItem = transactionQueueRef.current.shift()
+    if (!nextItem || !account) return
+
+    const { queueId, queueMode, duelistId } = nextItem
+
+    setIsProcessing(true)
+    
+    executeMatchMakeMe(duelistId, queueId, queueMode)
+  }, [isProcessing, isLoading, account, executeMatchMakeMe])
+
+  // Add item to transaction queue
+  const addToQueue = useCallback((queueId: constants.QueueId, queueMode: constants.QueueMode, duelistId: bigint) => {    
+    const alreadyQueued = transactionQueueRef.current.some(item => item.duelistId === duelistId)
+    if (alreadyQueued) return
+
+    transactionQueueRef.current.push({ queueId, queueMode, duelistId })
+
+    if (!isProcessing && !isLoading) {
+      processNextInQueue()
+    }
+  }, [isProcessing, isLoading, processNextInQueue])
+
+  // Watch for ranked player ready to matchmake
   useEffect(() => {
-    if (!address || !account) {
-      console.log('[MATCHMAKING] Account not ready - skipping queue timeout setup')
-      return
-    }
+    if (!account || !address) return
 
-    // Clear all existing timeouts
-    Object.values(timeoutRefs.current).forEach(timeout => clearTimeout(timeout))
-    timeoutRefs.current = {}
-
-    // Setup timeout for ranked queue (Fast or Slow)
-    if (rankedPlayer.queueMode && rankedPlayer.duelistId && rankedPlayer.timestampEnter > 0) {
-      setupQueueTimeout(
-        constants.QueueId.Ranked, 
-        rankedPlayer.queueMode, 
-        rankedPlayer.duelistId, 
-        rankedPlayer.timestampEnter
-      )
+    if (rankedPlayer.canTryToMatch && rankedPlayer.queueMode && rankedPlayer.duelistId) {
+      console.log(`[MATCHMAKING] Ranked player can try to match - adding to queue`)
+      addToQueue(constants.QueueId.Ranked, rankedPlayer.queueMode, rankedPlayer.duelistId)
     }
+  }, [account, address, rankedPlayer.canTryToMatch, rankedPlayer.queueMode, rankedPlayer.duelistId, addToQueue])
 
-    // Setup timeout for unranked queue (Fast or Slow)
-    if (unrankedPlayer.queueMode && unrankedPlayer.duelistId && unrankedPlayer.timestampEnter > 0) {
-      setupQueueTimeout(
-        constants.QueueId.Unranked, 
-        unrankedPlayer.queueMode, 
-        unrankedPlayer.duelistId, 
-        unrankedPlayer.timestampEnter
-      )
-    }
+  // Watch for unranked player ready to matchmake
+  useEffect(() => {
+    if (!account || !address) return
 
-    // Cleanup on unmount or when dependencies change
-    return () => {
-      Object.values(timeoutRefs.current).forEach(timeout => clearTimeout(timeout))
-      timeoutRefs.current = {}
+    if (unrankedPlayer.canTryToMatch && unrankedPlayer.queueMode && unrankedPlayer.duelistId) {
+      console.log(`[MATCHMAKING] Unranked player can try to match - adding to queue`)
+      addToQueue(constants.QueueId.Unranked, unrankedPlayer.queueMode, unrankedPlayer.duelistId)
     }
-  }, [
-    address,
-    account,
-    rankedPlayer.queueMode,
-    rankedPlayer.duelistId, 
-    rankedPlayer.timestampEnter,
-    unrankedPlayer.queueMode,
-    unrankedPlayer.duelistId,
-    unrankedPlayer.timestampEnter
-  ])
+  }, [account, address, unrankedPlayer.canTryToMatch, unrankedPlayer.queueMode, unrankedPlayer.duelistId, addToQueue])
+
+  // Effect to process queue when state changes
+  useEffect(() => {
+    if (!isProcessing && !isLoading && transactionQueueRef.current.length > 0) {
+      processNextInQueue()
+    }
+  }, [isProcessing, isLoading, processNextInQueue])
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      Object.values(timeoutRefs.current).forEach(timeout => clearTimeout(timeout))
-      timeoutRefs.current = {}
+      transactionQueueRef.current = []
     }
   }, [])
 
   return {
-    isActive: Object.keys(timeoutRefs.current).length > 0,
+    isActive: transactionQueueRef.current.length > 0 || isProcessing,
     rankedInQueue: rankedPlayer.inQueueIds.length > 0,
     unrankedInQueue: unrankedPlayer.inQueueIds.length > 0,
   }
