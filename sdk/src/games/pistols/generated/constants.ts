@@ -171,6 +171,8 @@ export enum Activity {
   AirdroppedPack = 'AirdroppedPack', // 16
   ClaimedRing = 'ClaimedRing', // 17
   EnlistedRankedDuelist = 'EnlistedRankedDuelist', // 18
+  DuelistMatchingRanked = 'DuelistMatchingRanked', // 19
+  DuelistMatchingUnranked = 'DuelistMatchingUnranked', // 20
 };
 export const getActivityValue = (name: Activity): number | undefined => _indexOrUndefined(Object.keys(Activity).indexOf(name));
 export const getActivityFromValue = (value: number): Activity | undefined => Object.keys(Activity)[value] as Activity;

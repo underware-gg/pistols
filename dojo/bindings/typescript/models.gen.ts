@@ -849,6 +849,8 @@ export const activity = [
 	'AirdroppedPack',
 	'ClaimedRing',
 	'EnlistedRankedDuelist',
+	'DuelistMatchingRanked',
+	'DuelistMatchingUnranked',
 ] as const;
 export type Activity = { [key in typeof activity[number]]: string };
 export type ActivityEnum = CairoCustomEnum;
@@ -1421,7 +1423,9 @@ export const schema: SchemaType = {
 				ClaimedGift: undefined,
 				AirdroppedPack: undefined,
 				ClaimedRing: undefined,
-				EnlistedRankedDuelist: undefined, }),
+				EnlistedRankedDuelist: undefined,
+				DuelistMatchingRanked: undefined,
+				DuelistMatchingUnranked: undefined, }),
 			identifier: 0,
 			is_public: false,
 		},
