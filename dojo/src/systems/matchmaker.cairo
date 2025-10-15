@@ -185,6 +185,7 @@ pub mod matchmaker {
                     0,
                     slot,
                 );
+                self._emit_duelist_matchmaking(ref store, caller, duelist_id, queue_id);
             }
             //----------------------------------
             // player ping...
@@ -204,6 +205,8 @@ pub mod matchmaker {
                     );
                     // save and return
                     store.set_match_player(@matching_player);
+                    // events...
+                    self._emit_duelist_matchmaking(ref store, caller, duelist_id, queue_id);
                 }
                 return (0);
             }
@@ -277,6 +280,23 @@ pub mod matchmaker {
         fn _assert_caller_is_admin(self: @ContractState) {
             let mut world: WorldStorage = self.world_default();
             assert(world.admin_dispatcher().am_i_admin(starknet::get_caller_address()), Errors::CALLER_NOT_ADMIN);
+        }
+
+        fn _emit_duelist_matchmaking(ref self: ContractState,
+            ref store: Store,
+            caller: ContractAddress,
+            duelist_id: u128,
+            queue_id: QueueId,
+        ) {
+            match queue_id {
+                QueueId::Ranked => {
+                    Activity::DuelistMatchingRanked.emit(ref store.world, caller, duelist_id.into());
+                },
+                QueueId::Unranked => {
+                    Activity::DuelistMatchingUnranked.emit(ref store.world, caller, duelist_id.into());
+                },
+                QueueId::Undefined => {},
+            }
         }
 
         fn _validate_and_randomize_slot(ref self: ContractState,

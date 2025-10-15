@@ -7,6 +7,7 @@ import { useFetchDuelistsByIds } from '/src/stores/duelistStore'
 import { ChallengeLink, DuelistLink, PlayerLink, TimestampDeltaElapsed } from '/src/components/Links'
 import { ChallengeStateReplyVerbs } from '/src/utils/pistols'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
+import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 
 const activityIdentifiers: Record<constants.Activity, 'pack_id' | 'duelist_id' | 'duel_id' | 'ring_id' | null> = {
   [constants.Activity.Undefined]: null,
@@ -28,6 +29,12 @@ const activityIdentifiers: Record<constants.Activity, 'pack_id' | 'duelist_id' |
   [constants.Activity.AirdroppedPack]: 'pack_id',
   [constants.Activity.ClaimedRing]: 'ring_id',
   [constants.Activity.EnlistedRankedDuelist]: 'duelist_id',
+  [constants.Activity.DuelistMatchingRanked]: 'duelist_id',
+  [constants.Activity.DuelistMatchingUnranked]: 'duelist_id',
+}
+
+const _queueName = (queueId: constants.QueueId): string => {
+  return queueId == constants.QueueId.Ranked ? 'Ranked' : 'Casual'
 }
 
 export default function ActivityFeed() {
@@ -38,13 +45,28 @@ export default function ActivityFeed() {
     updateTimestamp()
   }, [allPlayersActivity])
 
-  const items = useMemo(() => ([...allPlayersActivity].reverse().map((a, index) =>
-    <ActivityItem
-      key={`${a.activity}-${a.identifier.toString()}-${a.timestamp}-${index}`}
-      clientSeconds={clientSeconds}
-      activity={a}
-      isRequired={requiredDuelIds.includes(a.identifier)}
-    />)
+  // console.log(`ActivityFeed() =>`, allPlayersActivity.map((a) => a.activity))
+
+  const items = useMemo(() => (
+    [...allPlayersActivity]
+      .reverse()
+      .map((a, index) => {
+        const item = (<ActivityItem
+          key={`${a.activity}-${a.identifier.toString()}-${a.timestamp}-${index}`}
+          activity={a}
+          isRequired={requiredDuelIds.includes(a.identifier)}
+        />)
+        if (!item) return null;
+        return (
+          <>
+            {item}
+            {' '}
+            <TimestampDeltaElapsed timestamp={a.timestamp} clientSeconds={clientSeconds} avoidLargeDelta={true} />
+            <br />
+          </>
+        )
+      })
+      .filter(Boolean)
   ), [allPlayersActivity, clientSeconds, requiredDuelIds])
 
   // prefetch duels to show them in the activity feed
@@ -77,140 +99,153 @@ export default function ActivityFeed() {
 
 interface ActivityItemProps {
   activity: ActivityState
-  clientSeconds: number
+  queueId?: constants.QueueId
   isRequired?: boolean
 }
 
 const ActivityItem = ({
   activity,
-  clientSeconds,
   isRequired,
-}: ActivityItemProps) => {
+}: ActivityItemProps): JSX.Element | null => {
   if (!activity.is_public) {
-    return <></>
+    return null
   }
   if (activity.activity === constants.Activity.PackStarter) {
-    return <ActivityItemPackStarter activity={activity} clientSeconds={clientSeconds} />
+    return <ActivityItemPackStarter activity={activity} />
   }
   if (activity.activity === constants.Activity.DuelistSpawned) {
-    return <ActivityItemDuelistSpawned activity={activity} clientSeconds={clientSeconds} />
+    return <ActivityItemDuelistSpawned activity={activity} />
   }
   if (activity.activity === constants.Activity.DuelistDied) {
-    return <ActivityItemDuelistDied activity={activity} clientSeconds={clientSeconds} />
+    return <ActivityItemDuelistDied activity={activity} />
   }
   if (activity.activity === constants.Activity.EnlistedRankedDuelist) {
-    return <ActivityItemEnlistedRankedDuelist activity={activity} clientSeconds={clientSeconds} />
+    return <ActivityItemEnlistedRankedDuelist activity={activity} />
+  }
+  if (activity.activity === constants.Activity.DuelistMatchingRanked) {
+    return <ActivityItemDuelistMatched activity={activity} queueId={constants.QueueId.Ranked} />
+  }
+  if (activity.activity === constants.Activity.DuelistMatchingUnranked) {
+    return <ActivityItemDuelistMatched activity={activity} queueId={constants.QueueId.Unranked} />
   }
   if (activity.activity === constants.Activity.ChallengeCreated) {
-    return <ActivityItemChallengeCreated activity={activity} clientSeconds={clientSeconds} />
+    return <ActivityItemChallengeCreated activity={activity} />
   }
   if (activity.activity === constants.Activity.ChallengeReplied) {
-    return <ActivityItemChallengeReplied activity={activity} clientSeconds={clientSeconds} />
+    return <ActivityItemChallengeReplied activity={activity} />
   }
   if (activity.activity === constants.Activity.MovesCommitted) {
-    return <ActivityItemMovesCommitted activity={activity} clientSeconds={clientSeconds} />
+    return <ActivityItemMovesCommitted activity={activity} />
   }
   if (activity.activity === constants.Activity.MovesRevealed) {
-    return <ActivityItemMovesRevealed activity={activity} clientSeconds={clientSeconds} />
+    return <ActivityItemMovesRevealed activity={activity} />
   }
   if (activity.activity === constants.Activity.ChallengeResolved) {
     return (isRequired
-      ? <ActivityItemChallengeEnded activity={activity} clientSeconds={clientSeconds} />
-      : <ActivityItemChallengeResolved activity={activity} clientSeconds={clientSeconds} />
+      ? <ActivityItemChallengeEnded activity={activity} />
+      : <ActivityItemChallengeResolved activity={activity} />
     )
   }
   if (activity.activity === constants.Activity.ChallengeDraw) {
     return (isRequired
-      ? <ActivityItemChallengeEnded activity={activity} clientSeconds={clientSeconds} />
-      : <ActivityItemChallengeDraw activity={activity} clientSeconds={clientSeconds} />
+      ? <ActivityItemChallengeEnded activity={activity} />
+      : <ActivityItemChallengeDraw activity={activity} />
     )
   }
   if (activity.activity === constants.Activity.ChallengeCanceled) {
-    return <ActivityItemChallengeCanceled activity={activity} clientSeconds={clientSeconds} />
+    return <ActivityItemChallengeCanceled activity={activity} />
   }
   if (activity.activity === constants.Activity.PlayerTimedOut) {
-    return <ActivityItemPlayerTimedOut activity={activity} clientSeconds={clientSeconds} />
+    return <ActivityItemPlayerTimedOut activity={activity} />
   }
-  return <></>
+  return null
 }
 
 const ActivityItemPackStarter = ({
   activity,
-  clientSeconds,
 }: ActivityItemProps) => {
   return (
     <>
       <PlayerLink address={activity.player_address} />
-      {' entered the game! '}
-      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} avoidLargeDelta={true} />
-      <br />
+      {' entered the game!'}
     </>
   )
 }
 
 const ActivityItemDuelistSpawned = ({
   activity,
-  clientSeconds,
 }: ActivityItemProps) => {
   return (
     <>
       <PlayerLink address={activity.player_address} />
       {' spawned '}
       <DuelistLink duelistId={activity.identifier} />
-      {' '}
-      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} avoidLargeDelta={true} />
-      <br />
     </>
   )
 }
 
 const ActivityItemDuelistDied = ({
   activity,
-  clientSeconds,
 }: ActivityItemProps) => {
   return (
     <>
       <DuelistLink duelistId={activity.identifier} />
-      {' is dead! '}
-      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} avoidLargeDelta={true} />
-      <br />
+      {' is dead!'}
     </>
   )
 }
 
 const ActivityItemEnlistedRankedDuelist = ({
   activity,
-  clientSeconds,
 }: ActivityItemProps) => {
   return (
     <>
       <PlayerLink address={activity.player_address} />
       {' enlisted '}
       <DuelistLink duelistId={activity.identifier} />
-      {' in Ranked!'}
-      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} avoidLargeDelta={true} />
-      <br />
+      {' in Ranked'}
+    </>
+  )
+}
+
+const ActivityItemDuelistMatched = ({
+  activity,
+  queueId,
+}: ActivityItemProps) => {
+  return (
+    <>
+      <PlayerLink address={activity.player_address} />
+      {' queued '}
+      <DuelistLink duelistId={activity.identifier} />
+      {' in '}
+      {_queueName(queueId)}
     </>
   )
 }
 
 const ActivityItemChallengeCreated = ({
   activity,
-  clientSeconds,
 }: ActivityItemProps) => {
   const { duelType, duelistIdA, duelistAddressB } = useChallenge(activity.identifier)
-  if (duelType === constants.DuelType.Ranked) {
+  if (duelType === constants.DuelType.Ranked || duelType === constants.DuelType.Unranked) {
+    if (!isPositiveBigint(duelistAddressB)) {
+      return (
+        <>
+          <PlayerLink address={activity.player_address} />
+          {' matching '}
+          <ChallengeLink duelId={activity.identifier} />
+          {' in '}
+          {_queueName(duelType === constants.DuelType.Ranked ? constants.QueueId.Ranked : constants.QueueId.Unranked)}
+        </>
+      )
+    }
     return (
       <>
         <PlayerLink address={activity.player_address} />
-        {' ready to be matched in '}
+        {' matched with '}
+        <PlayerLink address={duelistAddressB} />
+        {' on '}
         <ChallengeLink duelId={activity.identifier} />
-        {/* {' has '} */}
-        {/* <DuelistLink duelistId={duelistIdA} /> */}
-        {/* {' matching in Ranked...'} */}
-        {' '}
-        <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} avoidLargeDelta={true} />
-        <br />
       </>
     )
   }
@@ -221,16 +256,12 @@ const ActivityItemChallengeCreated = ({
       <PlayerLink address={duelistAddressB} />
       {' for '}
       <ChallengeLink duelId={activity.identifier} />
-      {' '}
-      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} avoidLargeDelta={true} />
-      <br />
     </>
   )
 }
 
 const ActivityItemChallengeReplied = ({
   activity,
-  clientSeconds,
 }: ActivityItemProps) => {
   const { state } = useChallenge(activity.identifier)
   return (
@@ -240,121 +271,94 @@ const ActivityItemChallengeReplied = ({
       {ChallengeStateReplyVerbs[state]}
       {' '}
       <ChallengeLink duelId={activity.identifier} />
-      {' '}
-      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} avoidLargeDelta={true} />
-      <br />
     </>
   )
 }
 
 const ActivityItemMovesCommitted = ({
   activity,
-  clientSeconds,
 }: ActivityItemProps) => {
   return (
     <>
       <PlayerLink address={activity.player_address} />
       {' moved in '}
       <ChallengeLink duelId={activity.identifier} />
-      {' '}
-      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} avoidLargeDelta={true} />
-      <br />
     </>
   )
 }
 
 const ActivityItemMovesRevealed = ({
   activity,
-  clientSeconds,
 }: ActivityItemProps) => {
   return (
     <>
       <PlayerLink address={activity.player_address} />
       {' revealed in '}
       <ChallengeLink duelId={activity.identifier} />
-      {' '}
-      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} avoidLargeDelta={true} />
-      <br />
     </>
   )
 }
 
 const ActivityItemChallengeEnded = ({
   activity,
-  clientSeconds,
 }: ActivityItemProps) => {
   return (
     <>
       <ChallengeLink duelId={activity.identifier} />
-      {' has ended... '}
-      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} avoidLargeDelta={true} />
-      <br />
+      {' has ended...'}
     </>
   )
 }
 
 const ActivityItemChallengeResolved = ({
   activity,
-  clientSeconds,
 }: ActivityItemProps) => {
   return (
     <>
       <PlayerLink address={activity.player_address} />
       {' won '}
       <ChallengeLink duelId={activity.identifier} />
-      {'! '}
-      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} avoidLargeDelta={true} />
-      <br />
+      {'!'}
     </>
   )
 }
 
 const ActivityItemChallengeDraw = ({
   activity,
-  clientSeconds,
 }: ActivityItemProps) => {
   return (
     <>
       <ChallengeLink duelId={activity.identifier} />
-      {' ended in a draw! '}
-      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} avoidLargeDelta={true} />
-      <br />
+      {' ended in a draw!'}
     </>
   )
 }
 
 const ActivityItemChallengeCanceled = ({
   activity,
-  clientSeconds,
 }: ActivityItemProps) => {
   const { state } = useChallenge(activity.identifier)
   return (
     <>
       <ChallengeLink duelId={activity.identifier} />
       {
-        state == constants.ChallengeState.Expired ? ' expired '
-          : state == constants.ChallengeState.Withdrawn ? ' withdrawn '
-            : state == constants.ChallengeState.Refused ? ' refused '
-              : ' canceled '
+        state == constants.ChallengeState.Expired ? ' expired'
+          : state == constants.ChallengeState.Withdrawn ? ' withdrawn'
+            : state == constants.ChallengeState.Refused ? ' refused'
+              : ' canceled'
       }
-      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} avoidLargeDelta={true} />
-      <br />
     </>
   )
 }
 
 const ActivityItemPlayerTimedOut = ({
   activity,
-  clientSeconds,
 }: ActivityItemProps) => {
   return (
     <>
       <PlayerLink address={activity.player_address} />
       {' abandoned '}
       <ChallengeLink duelId={activity.identifier} />
-      {' '}
-      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} avoidLargeDelta={true} />
-      <br />
     </>
   )
 }

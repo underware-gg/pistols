@@ -22,7 +22,9 @@ pub enum Activity {
     ClaimedGift,        // 15       identifier: pack_id
     AirdroppedPack,     // 16       identifier: pack_id
     ClaimedRing,        // 17       identifier: ring_id
-    EnlistedRankedDuelist, // 18    identifier: duelist_id
+    EnlistedRankedDuelist,      // 18    identifier: duelist_id
+    DuelistMatchingRanked,      // 19    identifier: duelist_id
+    DuelistMatchingUnranked,    // 20    identifier: duelist_id
 }
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
