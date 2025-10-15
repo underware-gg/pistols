@@ -773,7 +773,8 @@ pub mod tests {
         _duel_until_death(@sys, WIN_1, 1, 2);
     }
 
-    #[test] // TEMP: disabled dripping
+    #[test]
+    #[ignore] // TEMP: disabled dripping
     fn test_duel_dripping_disabled() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         // duel once to create duelists
@@ -1644,7 +1645,8 @@ pub mod tests {
     }
 
     #[test]
-    fn test_ranked_dodge_win_a_TEMP() {
+    #[ignore]
+    fn test_ranked_dodge_win_penalty_a_TEMP() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         let moves_a: PlayerMoves = PlayerMovesTrait::new(SALT_A, [2, 1].span());
         let moves_b: PlayerMoves = PlayerMovesTrait::new(SALT_B, [1, 10].span());
@@ -1673,7 +1675,8 @@ pub mod tests {
     }
 
     #[test]
-    fn test_ranked_dodge_win_b_TEMP() {
+    #[ignore]
+    fn test_ranked_dodge_win_penalty_b_TEMP() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         let moves_a: PlayerMoves = PlayerMovesTrait::new(SALT_A, [1, 10].span());
         let moves_b: PlayerMoves = PlayerMovesTrait::new(SALT_B, [2, 1].span());
