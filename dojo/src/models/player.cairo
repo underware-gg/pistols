@@ -206,12 +206,12 @@ pub impl PlayerDuelistStackImpl of PlayerDuelistStackTrait {
         for i in 0..self.stacked_ids.len() {
             let duelist_id: u128 = *self.stacked_ids[i];
             if (
-                DuelistAssignmentTrait::is_bot_duelist_available_for_challenge(store, duelist_id, queue_id) &&
+                store.is_available_for(duelist_id, queue_id) &&
                 duelist_dispatcher.life_count(duelist_id) >= lives_staked
             ) {
                 return Option::Some(duelist_id);
             }
-        };
+        }
         (Option::None)
     }
 }

@@ -61,6 +61,7 @@ default = "pistols"
   # "pistols-tournament_token",
   "pistols-bank",
   "pistols-matchmaker",
+  "pistols-bot_player",
 ]
 # ERC-20
 "pistols-CoinConfig" = [

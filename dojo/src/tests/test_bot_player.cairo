@@ -60,18 +60,18 @@ pub mod tests {
         let bot_address: ContractAddress = *sys.bot_player.contract_address;
         if (stack_len > 0) {
             // dead duelists are transferred to player
-            assert_eq!((*sys).duelists.owner_of(bot_id.into()), bot_address, "{}: owner_of(bot_address)", prefix);
+            assert_eq!((*sys).duelists.owner_of(bot_id.into()), bot_address, "_assert_bot_duelist[{}]: owner_of(bot_address)", prefix);
         }
         let duelist: Duelist = sys.store.get_duelist(bot_id);
         let collection: CollectionDescriptor = duelist.duelist_profile.collection();
-        assert_eq!(collection.folder_name, 'bots', "{}: duelist_profile.folder_name", prefix);
+        assert_eq!(collection.folder_name, 'bots', "_assert_bot_duelist[{}]: duelist_profile.folder_name", prefix);
         if let Option::Some(key) = expected_profile {
-            assert_eq!(duelist.duelist_profile, DuelistProfile::Bot(key), "{}: duelist_profile", prefix);
+            assert_eq!(duelist.duelist_profile, DuelistProfile::Bot(key), "_assert_bot_duelist[{}]: duelist_profile", prefix);
         }
         // check stack
         let stack: PlayerDuelistStack = sys.store.get_player_duelist_stack_from_id(bot_address, bot_id);
 // println!("{}: id[{}], {:?} stacked:{}", prefix, bot_id, duelist.duelist_profile, stack.stacked_ids.len());
-        assert_eq!(stack.stacked_ids.len(), stack_len, "stack.len()");
+        assert_eq!(stack.stacked_ids.len(), stack_len, "_assert_bot_duelist[{}]: stack.len()", prefix);
     }
 
     #[test]
@@ -245,10 +245,10 @@ pub mod tests {
 
     #[test]
     #[should_panic(expected: ('BOT_PLAYER: Invalid caller', 'ENTRYPOINT_FAILED'))]
-    fn test_bot_summon_duelist_invalid_caller() {
+    fn test_bot_summon_bot_duelist_invalid_caller() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER);
         tester::impersonate(OTHER());
-        _protected(@sys).summon_duelist(DuelistProfile::Bot(BotKey::Pro), QueueId::Ranked);
+        _protected(@sys).summon_bot_duelist(DuelistProfile::Bot(BotKey::Pro), QueueId::Ranked);
     }
 
     #[test]

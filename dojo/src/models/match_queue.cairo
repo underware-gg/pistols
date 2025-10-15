@@ -112,6 +112,13 @@ pub impl QueueIdImpl of QueueIdTrait {
             QueueId::Unranked => Premise::Honour,
         }
     }
+    fn permanent_enlistment(self: @QueueId) -> bool {
+        match self {
+            QueueId::Undefined => false,
+            QueueId::Ranked => true,
+            QueueId::Unranked => false,
+        }
+    }
 }
 
 #[generate_trait]
@@ -142,9 +149,6 @@ pub impl MatchQueueImpl of MatchQueueTrait {
             entry_token_address: store.world.fools_coin_address(),
             entry_token_amount: (5 * CONST::ETH_TO_WEI.low),
         });
-    }
-    fn requires_enlistment(self: @MatchQueue) -> bool {
-        (self.entry_token_address.is_non_zero() && self.entry_token_amount.is_non_zero())
     }
     // assign slot to new player
     fn assign_slot(self: @MatchQueue, store: @Store, seed: felt252) -> u8 {

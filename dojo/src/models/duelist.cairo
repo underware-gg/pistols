@@ -1,5 +1,5 @@
 use starknet::{ContractAddress};
-use pistols::models::match_queue::{QueueId};
+use pistols::models::match_queue::{QueueId, QueueIdTrait};
 pub use pistols::types::duelist_profile::{DuelistProfile, DuelistProfileTrait, GenesisKey, BotKey};
 
 //---------------------
@@ -77,7 +77,6 @@ pub enum CauseOfDeath {
 use core::num::traits::Zero;
 use pistols::systems::tokens::duel_token::duel_token::{Errors as DuelErrors};
 // use pistols::systems::tokens::tournament_token::tournament_token::{Errors as TournamentErrors};
-use pistols::models::match_queue::{MatchQueueTrait};
 use pistols::types::rules::{RewardValues};
 use pistols::types::constants::{HONOUR};
 use pistols::libs::store::{Store, StoreTrait};
@@ -94,11 +93,11 @@ pub impl DuelistImpl of DuelistTrait {
 
 #[generate_trait]
 pub impl DuelistAssignmentImpl of DuelistAssignmentTrait {
-    // must enlist before entering a matchmaking challenge
+    // must enlist before entering a matchmaking queue
     fn enlist_matchmaking(ref self: Store, duelist_id: u128, queue_id: QueueId) {
         let mut assignment: DuelistAssignment = self.get_duelist_assignment(duelist_id);
-        assignment.assert_can_assign_challenge(Option::None);
-        assignment.queue_id = queue_id; // this is permanent!!!
+        assignment.assert_is_available_for(Option::None);
+        assignment.queue_id = queue_id; // this is permanent for Ranked
         self.set_duelist_assignment(@assignment);
     }
     fn is_enlisted_matchmaking(self: @Store, duelist_id: u128, queue_id: QueueId) -> bool {
@@ -106,8 +105,9 @@ pub impl DuelistAssignmentImpl of DuelistAssignmentTrait {
     }
     fn assign_challenge(ref self: Store, duelist_id: u128, duel_id: u128, queue_id: Option<QueueId>) {
         let mut assignment: DuelistAssignment = self.get_duelist_assignment(duelist_id);
-        assignment.assert_can_assign_challenge(queue_id);
+        assignment.assert_is_available_for(queue_id);
         assignment.duel_id = duel_id;
+        assignment.queue_id = queue_id.unwrap_or(QueueId::Undefined);
         self.set_duelist_assignment(@assignment);
     }
     fn unassign_challenge(ref self: Store, duelist_id: u128) {
@@ -115,9 +115,8 @@ pub impl DuelistAssignmentImpl of DuelistAssignmentTrait {
             let mut assignment: DuelistAssignment = self.get_duelist_assignment(duelist_id);
             assignment.duel_id = 0;
             assignment.pass_id = 0;
-            // clear matchmaking queue
-            // but only if the duelist was not enlisted (paid ranked)
-            if (assignment.queue_id != QueueId::Undefined && !self.get_match_queue(assignment.queue_id).requires_enlistment()) {
+            // clear queue if not enlisted (paid ranked)
+            if (!assignment.queue_id.permanent_enlistment()) {
                 assignment.queue_id = QueueId::Undefined;
             }
             self.set_duelist_assignment(@assignment);
@@ -135,38 +134,34 @@ pub impl DuelistAssignmentImpl of DuelistAssignmentTrait {
         assignment.pass_id = 0;
         self.set_duelist_assignment(@assignment);
     }
-    fn assert_can_assign_challenge(self: @DuelistAssignment, queue_id: Option<QueueId>) {
+    fn assert_is_available_for(self: @DuelistAssignment, queue_id: Option<QueueId>) {
         // must not be in another challenge
-        assert(*self.duel_id == 0, DuelErrors::DUELIST_IN_CHALLENGE);
+        assert(self.duel_id.is_zero(), DuelErrors::DUELIST_IN_CHALLENGE);
         // must be the same queue or not in a queue
-        match queue_id {
-            Option::None => {
-                assert(*self.queue_id == QueueId::Undefined, DuelErrors::DUELIST_MATCHMAKING);
-            },
-            Option::Some(queue_id) => {
-                assert(*self.queue_id == queue_id, DuelErrors::DUELIST_WRONG_QUEUE);
-            },
-        }
+        let expected_queue_id: QueueId = queue_id.unwrap_or(QueueId::Undefined);
+        assert(*self.queue_id == expected_queue_id,
+            if (expected_queue_id == QueueId::Undefined)
+                {DuelErrors::DUELIST_MATCHMAKING}
+                else {DuelErrors::DUELIST_WRONG_QUEUE}
+        );
     }
-    fn is_bot_duelist_available_for_challenge(self: @Store, duelist_id: u128, queue_id: Option<QueueId>) -> bool {
+    fn is_available_for(self: @Store, duelist_id: u128, queue_id: Option<QueueId>) -> bool {
         let assignment: DuelistAssignment = self.get_duelist_assignment(duelist_id);
-        // must not be in another challenge
-        if (assignment.duel_id > 0) {
-            (false)
-        } else {
-            (match queue_id {
-                Option::None => {
-                    (assignment.queue_id == QueueId::Undefined)
-                },
-                Option::Some(queue_id) => {
-                    if (self.get_match_queue(queue_id).requires_enlistment()) {
-                        (assignment.queue_id == queue_id)
-                    } else {
-                        (assignment.queue_id == QueueId::Undefined)
-                    }
-                },
-            })
-        }
+        (
+            // must not be in another challenge
+            assignment.duel_id.is_zero() && 
+            // must be on a permanentqueue (or none)
+            assignment.queue_id == Self::_expected_queue_for(queue_id)
+        )
+    }
+    fn _expected_queue_for(queue_id: Option<QueueId>) -> QueueId {
+        (match queue_id {
+            Option::None => {(QueueId::Undefined)},
+            Option::Some(queue_id) => {
+                if (queue_id.permanent_enlistment()) {(queue_id)}
+                else {(QueueId::Undefined)}
+            },
+        })
     }
 }
 
@@ -293,7 +288,7 @@ mod unit {
         Totals, TotalsTrait,
         DuelistAssignmentTrait,
     };
-    use pistols::models::match_queue::{QueueId, MatchQueueTrait};
+    use pistols::models::match_queue::{QueueId, QueueIdTrait, MatchQueueTrait};
     use pistols::tests::tester::{tester, tester::{StoreTrait, FLAGS}};
 
     #[test]
@@ -432,7 +427,7 @@ mod unit {
         sys.store.unassign_challenge(DUELIST_ID);
         assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).duel_id, 0);
         assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).queue_id, QueueId::Undefined);
-        sys.store.get_duelist_assignment(DUELIST_ID).assert_can_assign_challenge(Option::None);
+        sys.store.get_duelist_assignment(DUELIST_ID).assert_is_available_for(Option::None);
     }
     #[test]
     #[should_panic(expected: ('DUEL: Duelist in a challenge',))]
@@ -442,12 +437,13 @@ mod unit {
         sys.store.assign_challenge(DUELIST_ID, 2, Option::None);
     }
     #[test]
-    #[ignore] // queue initializer not working???
     fn test_assignment_enlist_matchmaking_ranked() {
         let mut sys: tester::TestSystems = tester::setup_world(FLAGS::OWNER);
         MatchQueueTrait::initialize(ref sys.store);
-        assert!(sys.store.get_match_queue(QueueId::Unranked).requires_enlistment(), "requires_enlistment()");
+        assert!(QueueId::Ranked.permanent_enlistment(), "permanent_enlistment()");
+        sys.store.get_duelist_assignment(DUELIST_ID).assert_is_available_for(Option::None);
         sys.store.enlist_matchmaking(DUELIST_ID, QueueId::Ranked);
+        sys.store.get_duelist_assignment(DUELIST_ID).assert_is_available_for(Option::Some(QueueId::Ranked));
         assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).duel_id, 0);
         assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).queue_id, QueueId::Ranked);
         sys.store.assign_challenge(DUELIST_ID, 1, Option::Some(QueueId::Ranked));
@@ -456,14 +452,16 @@ mod unit {
         sys.store.unassign_challenge(DUELIST_ID);
         assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).duel_id, 0);
         assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).queue_id, QueueId::Ranked);
-        sys.store.get_duelist_assignment(DUELIST_ID).assert_can_assign_challenge(Option::Some(QueueId::Ranked));
+        sys.store.get_duelist_assignment(DUELIST_ID).assert_is_available_for(Option::Some(QueueId::Ranked));
     }
     #[test]
     fn test_assignment_enlist_matchmaking_unranked() {
         let mut sys: tester::TestSystems = tester::setup_world(FLAGS::OWNER);
         MatchQueueTrait::initialize(ref sys.store);
-        assert!(!sys.store.get_match_queue(QueueId::Unranked).requires_enlistment(), "requires_enlistment()");
+        assert!(!QueueId::Unranked.permanent_enlistment(), "permanent_enlistment()");
+        sys.store.get_duelist_assignment(DUELIST_ID).assert_is_available_for(Option::None);
         sys.store.enlist_matchmaking(DUELIST_ID, QueueId::Unranked);
+        sys.store.get_duelist_assignment(DUELIST_ID).assert_is_available_for(Option::Some(QueueId::Unranked));
         assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).duel_id, 0);
         assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).queue_id, QueueId::Unranked);
         sys.store.assign_challenge(DUELIST_ID, 1, Option::Some(QueueId::Unranked));
@@ -472,7 +470,8 @@ mod unit {
         sys.store.unassign_challenge(DUELIST_ID);
         assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).duel_id, 0);
         assert_eq!(sys.store.get_duelist_assignment(DUELIST_ID).queue_id, QueueId::Undefined);
-        sys.store.get_duelist_assignment(DUELIST_ID).assert_can_assign_challenge(Option::None);
+        // available again...
+        sys.store.get_duelist_assignment(DUELIST_ID).assert_is_available_for(Option::None);
     }
     #[test]
     #[should_panic(expected: ('DUEL: Duelist matchmaking',))]

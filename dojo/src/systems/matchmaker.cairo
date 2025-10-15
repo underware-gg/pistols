@@ -116,8 +116,7 @@ pub mod matchmaker {
             let mut store: Store = StoreTrait::new(self.world_default());
 
             // validate queue
-            let queue: MatchQueue = store.get_match_queue(queue_id);
-            assert(queue.requires_enlistment(), Errors::ENLISTMENT_NOT_REQUIRED);
+            assert(queue_id.permanent_enlistment(), Errors::ENLISTMENT_NOT_REQUIRED);
 
             // Validate duelist
             let caller: ContractAddress = starknet::get_caller_address();
@@ -134,6 +133,7 @@ pub mod matchmaker {
             store.enlist_matchmaking(duelist_id, queue_id);
 
             // charge entry fee, if any...
+            let queue: MatchQueue = store.get_match_queue(queue_id);
             IErc20Trait::asserted_transfer_from_to(
                 caller,
                 starknet::get_contract_address(),
@@ -291,7 +291,7 @@ pub mod matchmaker {
             duelist_id = (duelist_dispatcher.get_validated_active_duelist_id(caller, duelist_id, (*queue.queue_id).get_lives_staked()));
             assert(duelist_id > 0, Errors::INVALID_DUELIST);
             // verify enlistment
-            if (queue.requires_enlistment()) {
+            if (queue.queue_id.permanent_enlistment()) {
                 assert(store.is_enlisted_matchmaking(duelist_id, *queue.queue_id), Errors::NOT_ENLISTED);
             } else {
                 store.enlist_matchmaking(duelist_id, *queue.queue_id);
@@ -511,9 +511,11 @@ pub mod matchmaker {
                 return (0);
             }
             // summon bot duelist
-            let bot_duelist_id: u128 = bot_player_dispatcher.summon_duelist(DuelistProfile::Bot(BotKey::Pro), queue_id);
+            let bot_duelist_id: u128 = bot_player_dispatcher.summon_bot_duelist(DuelistProfile::Bot(BotKey::Pro), queue_id);
             // Duel expects the bot duelist to be in the queue
-            store.enlist_matchmaking(bot_duelist_id, queue_id);
+            if (!queue_id.permanent_enlistment()) {
+                store.enlist_matchmaking(bot_duelist_id, queue_id);
+            }
             // mint duel if needed
             self._mint_match_to_player(ref store, ref matching_player, @queue_id);
             // start duel with an imp!
@@ -530,7 +532,7 @@ pub mod matchmaker {
         fn _clear_player_queue(ref self: ContractState, ref store: Store, queue_id: QueueId, ref match_player: MatchPlayer) {
             for next_duelist in match_player.next_duelists.clone() {
                 DuelistAssignmentTrait::unassign_challenge(ref store, next_duelist.duelist_id);
-            };
+            }
             if (match_player.duel_id.is_zero()) {
                 // no duel, just unassign duelist
                 DuelistAssignmentTrait::unassign_challenge(ref store, match_player.duelist_id);
@@ -583,7 +585,7 @@ pub mod matchmaker {
             for player in queue.players {
                 let mut match_player: MatchPlayer = store.get_match_player(player, queue_id);
                 self._clear_player_queue(ref store, queue_id, ref match_player);
-            };
+            }
             queue.players = array![];
             store.set_match_queue(@queue);
         }

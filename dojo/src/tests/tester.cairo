@@ -364,6 +364,7 @@ pub mod tester {
             resources.append(TestResource::Contract(bot_player::TEST_CLASS_HASH.into()));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"bot_player")
+                    .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
             );
         }
 

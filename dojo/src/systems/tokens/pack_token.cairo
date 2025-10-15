@@ -400,7 +400,7 @@ pub mod pack_token {
                 let pack: Pack = self._mint_pack(ref store, pack_type, recipient, seed, lords_per_pack, duelist_profile);
                 Activity::AirdroppedPack.emit(ref store.world, recipient, pack.pack_id.into());
                 pack_ids.append(pack.pack_id);
-            };
+            }
 
             (pack_ids.span())
         }
@@ -453,7 +453,6 @@ pub mod pack_token {
                 PoolType::Claimable,
                 PackType::BotDuelist.mint_fee(),
             );
-
             (*token_ids[0])
         }
     }
