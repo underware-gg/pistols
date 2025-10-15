@@ -331,7 +331,7 @@ pub mod pack_token {
             self._assert_caller_is_admin();
 
             // default promo type
-            let pack_type: PackType = PackType::GenesisDuelists5x;
+            let pack_type: PackType = PackType::FreeGenesis5x;
             let quantity: usize = 1;
 
             // move lords to purchases pool if needed
@@ -541,7 +541,8 @@ pub mod pack_token {
                     )
                 },
                 PackType::FreeDuelist |
-                PackType::GenesisDuelists5x => {
+                PackType::GenesisDuelists5x |
+                PackType::FreeGenesis5x => {
                     (store.world.duelist_token_protected_dispatcher()
                         .mint_duelists(
                             recipient,

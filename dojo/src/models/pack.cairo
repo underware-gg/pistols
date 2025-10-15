@@ -8,6 +8,7 @@ pub enum PackType {
     FreeDuelist,        // 3
     SingleDuelist,      // 4
     BotDuelist,         // 5
+    FreeGenesis5x,      // 6
 }
 
 //------------------------
@@ -110,6 +111,16 @@ mod PACK_TYPES {
         quantity: 1,
         contents: 'One Bot Duelist',
     };
+    pub const FreeGenesis5x: PackDescriptor = PackDescriptor {
+        id: 'FreeGenesis5x',
+        name: 'Free Genesis Duelists 5-pack',
+        image_file_closed: 'GenesisDuelists5x.png',
+        image_file_open: 'GenesisDuelists5x.png',
+        can_purchase: false,
+        price_lords: (50 * CONST::ETH_TO_WEI.low),
+        quantity: 5,
+        contents: 'Five Random Genesis Duelists',
+    };
 }
 
 
@@ -143,7 +154,8 @@ pub impl PackTypeImpl of PackTypeTrait {
             PackType::GenesisDuelists5x     => PACK_TYPES::GenesisDuelists5x,
             PackType::FreeDuelist           => PACK_TYPES::FreeDuelist,
             PackType::SingleDuelist         => PACK_TYPES::SingleDuelist,
-            PackType::BotDuelist             => PACK_TYPES::BotDuelist,
+            PackType::BotDuelist            => PACK_TYPES::BotDuelist,
+            PackType::FreeGenesis5x         => PACK_TYPES::FreeGenesis5x,
         }
     }
     #[inline(always)]
