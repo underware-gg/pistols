@@ -51,19 +51,17 @@ export default function ActivityFeed() {
     [...allPlayersActivity]
       .reverse()
       .map((a, index) => {
-        const item = (<ActivityItem
-          key={`${a.activity}-${a.identifier.toString()}-${a.timestamp}-${index}`}
-          activity={a}
-          isRequired={requiredDuelIds.includes(a.identifier)}
-        />)
-        if (!item) return null;
-        return (
-          <>
+        const item = _ActivityItem({
+          activity: a,
+          isRequired: requiredDuelIds.includes(a.identifier)
+        })
+        return !item ? null : (
+          <React.Fragment key={`${a.activity}-${a.identifier.toString()}-${a.timestamp}-${index}`}>
             {item}
             {' '}
             <TimestampDeltaElapsed timestamp={a.timestamp} clientSeconds={clientSeconds} avoidLargeDelta={true} />
             <br />
-          </>
+          </React.Fragment>
         )
       })
       .filter(Boolean)
@@ -103,7 +101,7 @@ interface ActivityItemProps {
   isRequired?: boolean
 }
 
-const ActivityItem = ({
+const _ActivityItem = ({
   activity,
   isRequired,
 }: ActivityItemProps): JSX.Element | null => {

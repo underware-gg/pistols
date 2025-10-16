@@ -129,12 +129,14 @@ function DiscordSocialPlatform({
           }}>
             <div style={{ display: 'flex' }}>
               <Image src={avatarUrl} alt='avatar' style={avatarStyle} />
+              stored
             </div>
             <div style={{ display: 'flex' }}>
               <Icon name='arrow right' size='huge' />
             </div>
             <div style={{ display: 'flex' }}>
               <Image src={apiAvatarUrl} alt='api avatar' style={avatarStyle} />
+              current
             </div>
             <div style={{ display: 'flex' }}>
               <Icon name='arrow right' size='huge' />
@@ -146,6 +148,7 @@ function DiscordSocialPlatform({
                   currentTarget.src = apiAvatarUrl;
                 }}
               />
+              corrected
             </div>
           </div>
 
