@@ -49,7 +49,7 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
   const { matchmaker } = useDojoSystemCalls();
   const { duelistSelectOpener } = usePistolsContext();
 
-  const { rankedEnlistedIds, canMatchMakeIds, inQueueIds } = useDuelistsInMatchMaking(props.matchmakingType);
+  const { rankedEnlistedIds, canMatchMakeIds, inQueueIds, duellingIds } = useDuelistsInMatchMaking(props.matchmakingType);
 
   const [commitmentState, setCommitmentState] = useState<CommitmentState>({
     isCommitting: false,
@@ -73,8 +73,12 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
 
   const hasIndexed = useMemo(() => {
     if (!commitmentState.committedDuelistId) return true;
-    return inQueueIds.includes(commitmentState.committedDuelistId);
-  }, [inQueueIds, commitmentState.committedDuelistId]);
+    return (
+      (inQueueIds.includes(commitmentState.committedDuelistId) || 
+      duellingIds.includes(commitmentState.committedDuelistId)) && 
+      !canMatchMakeIds.includes(commitmentState.committedDuelistId)
+    );
+  }, [inQueueIds, commitmentState.committedDuelistId, canMatchMakeIds, duellingIds]);
 
   const enlistmentHasIndexed = useMemo(() => {
     if (!enlistmentState.enlistedDuelistId) return true;

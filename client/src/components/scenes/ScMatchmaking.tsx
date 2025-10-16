@@ -11,8 +11,6 @@ import { DuelistMatchmakingSlot, DuelistMatchmakingSlotHandle } from '/src/compo
 import { MatchmakingInfoModal } from '/src/components/modals/MatchmakingInfoModal'
 import { useDuelistsInMatchMaking } from '/src/stores/matchStore'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
-import { useDuellingDuelists } from '/src/stores/duelistStore'
-import { usePlayerDuelistsOrganized } from '/src/stores/duelistStore'
 import { useQueryChallengeIdsForMatchmaking } from '/src/stores/challengeQueryStore'
 import { DuelistEmptySlot, DuelistEmptySlotHandle } from '../ui/DuelistEmptySlot'
 import { AudioName } from '/src/data/audioAssets'
@@ -22,7 +20,7 @@ import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 export default function ScMatchmaking() {
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { selectedMode, dispatchSetting } = useSettings()
-  const { selectedDuelistId, dispatchSelectDuelistId } = usePistolsContext()
+  const { requeueDuelist, dispatchRequeueDuelist } = usePistolsContext()
   
   const [matchmakingType, setMatchmakingType] = useState<constants.QueueId>(constants.QueueId.Unranked);
   const [showModeInfo, setShowModeInfo] = useState(false);
@@ -201,17 +199,17 @@ export default function ScMatchmaking() {
   }, [selectedMode])
 
   useEffect(() => {
-    if (isPositiveBigint(selectedDuelistId) && !hasAutoSelected) {
+    if (isPositiveBigint(requeueDuelist.duelistId) && !hasAutoSelected) {
       const emptySlot = isRankedMode ? emptySlowSlotRankedRef.current : emptySlowSlotUnrankedRef.current
       
       if (emptySlot) {
-        emptySlot.commitToQueue(BigInt(selectedDuelistId))
+        emptySlot.commitToQueue(BigInt(requeueDuelist.duelistId))
         setHasAutoSelected(true)
         
-        dispatchSelectDuelistId(0n)
+        dispatchRequeueDuelist(0n, requeueDuelist.matchType)
       }
     }
-  }, [selectedDuelistId, hasAutoSelected, isRankedMode, dispatchSelectDuelistId])
+  }, [requeueDuelist, hasAutoSelected, isRankedMode, dispatchRequeueDuelist])
 
   // Memoize empty slot to preserve state between mode changes
   const emptySlotRanked = useMemo(() => (
