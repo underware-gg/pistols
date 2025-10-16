@@ -72,3 +72,13 @@ fi
 # game::create_trophies
 # sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait game create_trophies
 
+
+#------------------------------------------------------------------------------
+# matchmaker::
+#
+
+# matchmaker::create_trophies
+# # export QUEUE_ID=0x1 # Unranked
+# export QUEUE_ID=0x2 # Ranked
+# sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait matchmaker set_queue_size $QUEUE_ID 3
+# sozo -P $PROFILE model get pistols-MatchQueue $QUEUE_ID
