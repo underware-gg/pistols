@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 import { BigNumberish } from 'starknet'
 import { Button, Container, Dropdown, Icon, Tab, Table, TabPane } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
-import { bigintToDecimal } from '@underware/pistols-sdk/utils'
+import { bigintToDecimal, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { useValidateWalletAddress } from '@underware/pistols-sdk/utils/hooks'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { ExplorerLink } from '@underware/pistols-sdk/starknet/components'
@@ -124,6 +124,10 @@ function AirDropperDuelists({
     )
   }, [address, packType, collection, profileKey, quantity, fundedCount])
 
+  const _mintTo = useCallback(() => {
+    pack_token.mint_to(account, address)
+  }, [account, address])
+
   const _airdrop = useCallback(() => {
     pack_token.airdrop(account, address, packType, collection, profileKey, quantity)
   }, [account, address, packType, collection, profileKey, quantity])
@@ -183,7 +187,11 @@ function AirDropperDuelists({
           </Cell>
         </Row>
         <Row>
-          <Cell></Cell>
+          <Cell textAlign='right'>
+            <Button disabled={!isPositiveBigint(address)} onClick={_mintTo} className='Important'>
+              Free Duelist Pack...
+            </Button>
+          </Cell>
           <Cell>
             <Button disabled={!canAirdrop} onClick={_airdrop}>
               {quantity > fundedCount ? 'Not Funded!' : 'Airdrop...'}
@@ -405,7 +413,7 @@ function PackTypeSelector({
   setPackType: (packType: constants.PackType) => void
 }) {
   const options = useMemo(() => [
-    constants.PackType.GenesisDuelists5x,
+    constants.PackType.FreeGenesis5x,
     constants.PackType.FreeDuelist,
     constants.PackType.SingleDuelist,
   ].map((p) => ({

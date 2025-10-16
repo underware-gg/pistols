@@ -323,6 +323,12 @@ export function createSystemCalls(
         ]
         return await _executeTransaction(signer, calls, key)
       },
+      claim_gift: async (signer: AccountInterface, key?: string): Promise<boolean> => {
+        const calls: DojoCalls = [
+          contractCalls.pack_token.buildClaimGiftCalldata(),
+        ]
+        return await _executeTransaction(signer, calls, key)
+      },
       purchase: async (signer: AccountInterface, pack_type: constants.PackType, key?: string): Promise<boolean> => {
         const pack_type_enum = makeCustomEnum(pack_type)
         const value = await contractCalls.pack_token.calcMintFee(signer.address, pack_type_enum) as BigNumberish
@@ -335,10 +341,21 @@ export function createSystemCalls(
         ]
         return await _executeTransaction(signer, calls, key)
       },
+      open: async (signer: AccountInterface, pack_id: BigNumberish, key?: string): Promise<boolean> => {
+        const calls: DojoCalls = [
+          contractCalls.pack_token.buildOpenCalldata(
+            pack_id,
+          ),
+        ]
+        return await _executeTransaction(signer, calls, key)
+      },
+      //
+      // ADMIN
+      //
       airdrop: async (signer: AccountInterface, recipient: BigNumberish, pack_type: constants.PackType, collection: constants.DuelistProfile | null, profile_key: DuelistProfileKey | null, quantity: number, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [];
         // random packs need VRF
-        if (pack_type == constants.PackType.GenesisDuelists5x || pack_type == constants.PackType.FreeDuelist) {
+        if (pack_type != constants.PackType.SingleDuelist) {
           calls.push(vrf_request_call('pack_token', signer.address));
         }
         // airdrop call
@@ -357,10 +374,10 @@ export function createSystemCalls(
         );
         return await _executeTransaction(signer, calls, key)
       },
-      open: async (signer: AccountInterface, pack_id: BigNumberish, key?: string): Promise<boolean> => {
+      mint_to: async (signer: AccountInterface, recipient: BigNumberish, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
-          contractCalls.pack_token.buildOpenCalldata(
-            pack_id,
+          contractCalls.pack_token.buildMintToCalldata(
+            bigintToAddress(recipient),
           ),
         ]
         return await _executeTransaction(signer, calls, key)
