@@ -24,7 +24,7 @@ export default function DuelProfile({
   const { name, isBlocked, isTeamMember, activeSignetRing } = usePlayer(playerAddress)
   const { aspectWidth } = useGameAspect()
   const { dispatchSelectPlayerAddress } = usePistolsContext()
-  const { avatarUrl } = usePlayerAvatar(playerAddress)
+  const { avatarUrl, apiAvatarUrl } = usePlayerAvatar(playerAddress)
 
   const { profilePic, profileType, nameAndId: duelistName } = useDuelist(duelistId)
 
@@ -47,6 +47,7 @@ export default function DuelProfile({
             circle 
             profilePic={isTutorial ? profilePic : (avatarUrl ? undefined : 0)} 
             profilePicUrl={isTutorial ? undefined : avatarUrl} 
+            fallbackPicUrl={isTutorial ? undefined : apiAvatarUrl}
             profileType={isTutorial ? profileType : constants.DuelistProfile.Character} 
             className='NoMouse NoDrag' 
           />

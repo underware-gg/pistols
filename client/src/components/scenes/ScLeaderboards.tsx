@@ -155,7 +155,7 @@ const PlayerRow = memo(({
   const { name: playerName } = usePlayer(owner);
   const { isMyAccount: isMe } = useIsMyAccount(owner);
   const { isActive } = useSeason(selectedSeasonId || 0);
-  const { avatarUrl } = usePlayerAvatar(owner);
+  const { avatarUrl, apiAvatarUrl } = usePlayerAvatar(owner);
 
   const poolSeason = useSeasonPool(selectedSeasonId || 0);
   const reward = useMemo(() => {
@@ -190,7 +190,7 @@ const PlayerRow = memo(({
         </Grid.Column>
         
         <Grid.Column width={4} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => dispatchSelectPlayerAddress(owner)}>
-          <ProfilePic profilePic={avatarUrl ? undefined : 0} profilePicUrl={avatarUrl} width={2.5} removeBorder circle />
+          <ProfilePic profilePic={avatarUrl ? undefined : 0} profilePicUrl={avatarUrl} fallbackPicUrl={apiAvatarUrl} width={2.5} removeBorder circle />
           <div style={{ marginLeft: aspectWidth(1), fontSize: aspectWidth(1.2), color: isMe ? '#00ff00' : 'lightskyblue', overflow: 'hidden', textOverflow: 'ellipsis' }}>{playerName}</div>
         </Grid.Column>
 

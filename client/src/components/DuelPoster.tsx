@@ -80,22 +80,22 @@ const useDuelPosterData = (duelId?: bigint) => {
   const { name: playerNameB } = usePlayer(duelistAddressB)
   const { isMyAccount: isYouA } = useIsMyAccount(duelistAddressA)
   const { isMyAccount: isYouB } = useIsMyAccount(duelistAddressB)
-  const { avatarUrl: avatarUrlA } = usePlayerAvatar(duelistAddressA)
-  const { avatarUrl: avatarUrlB } = usePlayerAvatar(duelistAddressB)
+  const { avatarUrl: avatarUrlA, apiAvatarUrl: apiAvatarUrlA } = usePlayerAvatar(duelistAddressA)
+  const { avatarUrl: avatarUrlB, apiAvatarUrl: apiAvatarUrlB } = usePlayerAvatar(duelistAddressB)
   
-  const [leftDuelistId, leftDuelistAddress, leftPlayerName, leftAvatarUrl] = useMemo(() => {
+  const [leftDuelistId, leftDuelistAddress, leftPlayerName, leftAvatarUrl, leftApiAvatarUrl] = useMemo(() => {
     if (isYouB) {
-      return [duelistIdB, duelistAddressB, playerNameB, avatarUrlB]
+      return [duelistIdB, duelistAddressB, playerNameB, avatarUrlB, apiAvatarUrlB]
     }
-    return [duelistIdA, duelistAddressA, playerNameA, avatarUrlA]
-  }, [isYouB, duelistIdA, duelistIdB, duelistAddressA, duelistAddressB, playerNameA, playerNameB, avatarUrlA, avatarUrlB])
+    return [duelistIdA, duelistAddressA, playerNameA, avatarUrlA, apiAvatarUrlA]
+  }, [isYouB, duelistIdA, duelistIdB, duelistAddressA, duelistAddressB, playerNameA, playerNameB, avatarUrlA, avatarUrlB, apiAvatarUrlA, apiAvatarUrlB])
   
-  const [rightDuelistId, rightDuelistAddress, rightPlayerName, rightAvatarUrl] = useMemo(() => {
+  const [rightDuelistId, rightDuelistAddress, rightPlayerName, rightAvatarUrl, rightApiAvatarUrl] = useMemo(() => {
     if (isYouB) {
-      return [duelistIdA, duelistAddressA, playerNameA, avatarUrlA]
+      return [duelistIdA, duelistAddressA, playerNameA, avatarUrlA, apiAvatarUrlA]
     }
-    return [duelistIdB, duelistAddressB, playerNameB, avatarUrlB]
-  }, [isYouB, duelistIdA, duelistIdB, duelistAddressA, duelistAddressB, playerNameA, playerNameB, avatarUrlA, avatarUrlB])
+    return [duelistIdB, duelistAddressB, playerNameB, avatarUrlB, apiAvatarUrlB]
+  }, [isYouB, duelistIdA, duelistIdB, duelistAddressA, duelistAddressB, playerNameA, playerNameB, avatarUrlA, avatarUrlB, apiAvatarUrlA, apiAvatarUrlB])
 
   const isDead = (duelistId: number) => {
     return duelistId !== Number(winnerDuelistId) && isFinished && !isCallToAction
@@ -108,10 +108,12 @@ const useDuelPosterData = (duelId?: bigint) => {
     leftDuelistAddress,
     leftPlayerName,
     leftAvatarUrl,
+    leftApiAvatarUrl,
     rightDuelistId,
     rightDuelistAddress,
     rightPlayerName,
     rightAvatarUrl,
+    rightApiAvatarUrl,
     isDead,
     isYouA,
     isYouB,
@@ -124,7 +126,7 @@ const useDuelPosterData = (duelId?: bigint) => {
 // Small version of the DuelPoster
 const DuelPosterSmall = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref) => {
   const { aspectWidth, aspectHeight } = useGameAspect()
-  const { leftDuelistId, leftDuelistAddress, rightDuelistId, rightDuelistAddress, leftPlayerName, rightPlayerName, isDead, isYouA, isYouB, isCallToAction, leftAvatarUrl, rightAvatarUrl, displayDuelType, duelType } = useDuelPosterData(props.duelId)
+  const { leftDuelistId, leftDuelistAddress, rightDuelistId, rightDuelistAddress, leftPlayerName, rightPlayerName, isDead, isYouA, isYouB, isCallToAction, leftAvatarUrl, leftApiAvatarUrl, rightAvatarUrl, rightApiAvatarUrl, displayDuelType, duelType } = useDuelPosterData(props.duelId)
   const { turnA, turnB } = useDuel(props.duelId)
   const { seasonName, isFinished } = useChallenge(props.duelId)
   const { seasonName: currentSeasonName } = useCurrentSeason()
@@ -200,6 +202,7 @@ const DuelPosterSmall = forwardRef<DuelPosterHandle, DuelPosterProps>((props, re
               <ProfilePic 
                 profilePic={leftAvatarUrl ? undefined : 0} 
                 profilePicUrl={leftAvatarUrl} 
+                fallbackPicUrl={leftApiAvatarUrl}
                 width={6} 
                 disabled={isDead(Number(leftDuelistId))} 
                 removeBorder 
@@ -213,6 +216,7 @@ const DuelPosterSmall = forwardRef<DuelPosterHandle, DuelPosterProps>((props, re
               <ProfilePic 
                 profilePic={rightAvatarUrl ? undefined : 0} 
                 profilePicUrl={rightAvatarUrl} 
+                fallbackPicUrl={rightApiAvatarUrl}
                 width={6} 
                 disabled={isDead(Number(rightDuelistId))} 
                 removeBorder 
@@ -247,7 +251,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
   const { duel_token, game } = useDojoSystemCalls()
   const { account } = useAccount()
   const { duelistSelectOpener } = usePistolsContext()
-  const { leftDuelistId, rightDuelistId, leftDuelistAddress, rightDuelistAddress, leftPlayerName, rightPlayerName, isDead, isYouA, isYouB, isCallToAction, leftAvatarUrl, rightAvatarUrl, displayDuelType, duelType } = useDuelPosterData(props.duelId)
+  const { leftDuelistId, rightDuelistId, leftDuelistAddress, rightDuelistAddress, leftPlayerName, rightPlayerName, isDead, isYouA, isYouB, isCallToAction, leftAvatarUrl, rightAvatarUrl, leftApiAvatarUrl, rightApiAvatarUrl, displayDuelType, duelType } = useDuelPosterData(props.duelId)
   useFetchChallengeRewardsByDuelistIds([leftDuelistId, rightDuelistId])
   const { fameBefore: fameBeforeA, fameAfter: fameAfterA } = useDuelistFameOnDuel(props.duelId, leftDuelistId)
   const { fameBefore: fameBeforeB, fameAfter: fameAfterB } = useDuelistFameOnDuel(props.duelId, rightDuelistId)
@@ -434,7 +438,8 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
             <div className='ProfilePicChallengeContainer Left Large'>
               <ProfilePic 
                 profilePic={leftAvatarUrl ? undefined : 0} 
-                profilePicUrl={leftAvatarUrl} 
+                profilePicUrl={leftAvatarUrl}
+                fallbackPicUrl={leftApiAvatarUrl}
                 width={15} 
                 height={13} 
                 dimmed={isDead(Number(leftDuelistId))} 
@@ -448,7 +453,8 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
             <div className='ProfilePicChallengeContainer Right Large'>
               <ProfilePic 
                 profilePic={rightAvatarUrl ? undefined : 0} 
-                profilePicUrl={rightAvatarUrl} 
+                profilePicUrl={rightAvatarUrl}
+                fallbackPicUrl={rightApiAvatarUrl}
                 width={15} 
                 height={13} 
                 dimmed={isDead(Number(rightDuelistId))} 

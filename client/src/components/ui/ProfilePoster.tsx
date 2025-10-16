@@ -58,20 +58,21 @@ export interface ProfilePosterHandle extends InteractibleComponentHandle {}
 const useProfilePosterData = (playerAddress?: BigNumberish) => {
   const { name, isOnline, isAway } = usePlayer(playerAddress)
   const { isMyAccount } = useIsMyAccount(playerAddress)
-  const { avatarUrl } = usePlayerAvatar(playerAddress)
+  const { avatarUrl, apiAvatarUrl } = usePlayerAvatar(playerAddress)
   return {
     name,
     isMyAccount,
     isOnline,
     isAway,
-    avatarUrl
+    avatarUrl,
+    apiAvatarUrl,
   }
 }
 
 // Small version of the ProfilePoster
 const ProfilePosterSmall = forwardRef<ProfilePosterHandle, ProfilePosterProps>((props, ref) => {
   const { aspectWidth, aspectHeight } = useGameAspect()
-  const { name, isOnline, isAway, avatarUrl } = useProfilePosterData(props.playerAddress)
+  const { name, isOnline, isAway, avatarUrl, apiAvatarUrl } = useProfilePosterData(props.playerAddress)
 
   const baseRef = useRef<InteractibleComponentHandle>(null)
 
@@ -127,6 +128,7 @@ const ProfilePosterSmall = forwardRef<ProfilePosterHandle, ProfilePosterProps>((
             <ProfilePic 
               profilePic={avatarUrl ? undefined : 0} 
               profilePicUrl={avatarUrl}
+              fallbackPicUrl={apiAvatarUrl}
               width={9} 
               removeCorners 
               borderColor={COLORS.DARK}
@@ -151,7 +153,7 @@ const ProfilePosterFull = forwardRef<ProfilePosterHandle, ProfilePosterProps>((p
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSetScene, atInvite } = usePistolsScene()
   const { dispatchSelectDuelistId } = usePistolsContext()
-  const { name, isMyAccount, isOnline, isAway, avatarUrl } = useProfilePosterData(props.playerAddress)
+  const { name, isMyAccount, isOnline, isAway, avatarUrl, apiAvatarUrl } = useProfilePosterData(props.playerAddress)
   
   // Full-specific data
   useFetchDuelistIdsOwnedByAccount(props.playerAddress) // fetch duelists in the store, if not already fetched
@@ -279,6 +281,7 @@ const ProfilePosterFull = forwardRef<ProfilePosterHandle, ProfilePosterProps>((p
             <ProfilePic 
               profilePic={avatarUrl ? undefined : 0} 
               profilePicUrl={avatarUrl}
+              fallbackPicUrl={apiAvatarUrl}
               width={22} 
               height={22} 
               removeCorners 

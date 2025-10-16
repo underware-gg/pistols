@@ -3,10 +3,11 @@ import { BigNumberish } from 'starknet';
 import { useAccount } from '@starknet-react/core';
 import { createDojoStore } from '@dojoengine/sdk/react'
 import { PistolsSchemaType } from '@underware/pistols-sdk/pistols/sdk'
-import { useStoreModelsByKeys } from '@underware/pistols-sdk/dojo';
+import { useDojoSetup, useStoreModelsByKeys } from '@underware/pistols-sdk/dojo';
 import { parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/starknet';
 import { bigintEquals, bigintToHex } from '@underware/pistols-sdk/utils';
 import { models, constants } from '@underware/pistols-sdk/pistols/gen';
+import * as ENV from '/src/utils/env'
 
 export const useEventsStore = createDojoStore<PistolsSchemaType>();
 
@@ -132,16 +133,28 @@ export const usePlayerDiscordSocialLink = () => {
   return useDiscordSocialLink(address)
 }
 export const useDiscordSocialLink = (address: BigNumberish) => {
+  const { selectedNetworkConfig } = useDojoSetup()
   const { userName, userId, avatar, isLinked, optedOut } = useSocialLink(constants.SocialPlatform.Discord, address)
   const avatarUrl = useMemo(() => (
     (userId && avatar) ? `https://cdn.discordapp.com/avatars/${userId}/${avatar}.png` : ''
   ), [userId, avatar])
+  // get a new version of the avatar url from the assets server
+  // must be used only if avatarUrl is not available
+  const apiAvatarUrl = useMemo(() => (
+    (userId ? `${selectedNetworkConfig.assetsServerUrl}/api/discord/avatar/${userId}/` : '')
+  ), [userId])
+  // get the user data from the assets server
+  const apiUserDatarUrl = useMemo(() => (
+    (userId ? `${selectedNetworkConfig.assetsServerUrl}/api/discord/user/${userId}/` : '')
+  ), [userId])
   return {
     isLinked,
     userName,
     userId,
     avatar,
     avatarUrl,
+    apiAvatarUrl,
+    apiUserDatarUrl,
     optedOut,
   }
 }

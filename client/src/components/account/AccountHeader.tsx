@@ -12,7 +12,7 @@ export default function AccountHeader() {
   const { dispatchSetScene } = usePistolsScene()
   const { address } = useAccount()
   const { username } = useConnectedController()
-  const { avatarUrl } = usePlayerAvatar(address)
+  const { avatarUrl, apiAvatarUrl } = usePlayerAvatar(address)
 
   const handleClick = () => {
     dispatchSetScene(SceneName.Profile)
@@ -44,6 +44,7 @@ export default function AccountHeader() {
         <ProfilePic 
           profilePic={avatarUrl ? undefined : 0} 
           profilePicUrl={avatarUrl} 
+          fallbackPicUrl={apiAvatarUrl}
           medium 
           borderColor="rgba(120, 60, 190, 0.8)"
           borderWidth={0.15}

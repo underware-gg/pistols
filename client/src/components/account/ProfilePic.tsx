@@ -8,6 +8,7 @@ import { COLORS } from '@underware/pistols-sdk/pistols/constants'
 export function ProfilePic({
   profilePic = null,
   profilePicUrl = null,
+  fallbackPicUrl = null,
   profileType = constants.DuelistProfile.Genesis,
   small = false,
   medium = false,
@@ -31,6 +32,7 @@ export function ProfilePic({
 }: {
   profilePic?: number
   profilePicUrl?: string
+  fallbackPicUrl?: string
   profileType?: constants.DuelistProfile
   small?: boolean
   medium?: boolean
@@ -100,10 +102,15 @@ export function ProfilePic({
     imageRef.current.style.setProperty('--profile-pic-shadow', removeShadow ? 'none' : 'unset');
 
   }, [small, medium, large, duel, width, height, aspectWidth, circle, removeCorners, borderRadius, removeBorder, borderWidth, borderColor, removeShadow]);
-
+  
   return (
     <>
-      <Image ref={imageRef} src={url} className={classNames.join(' ')} floated={floated} onClick={() => _click()} />
+      <Image ref={imageRef} src={url} className={classNames.join(' ')} floated={floated} onClick={() => _click()}
+        onError={!fallbackPicUrl ? undefined : ({ currentTarget }) => {
+          currentTarget.onerror = null; // prevents looping
+          currentTarget.src = fallbackPicUrl;
+        }}
+      />
     </>
   )
 }

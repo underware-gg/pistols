@@ -300,9 +300,10 @@ export const useIsBookmarked = (target_address: BigNumberish, target_id: BigNumb
 export const usePlayerAvatar = (address: BigNumberish) => {
   const players_avatars = usePlayerDataStore((state) => state.players_avatars)
   const avatarUrl = useMemo(() => (players_avatars[_playerKey(address)] ?? null), [players_avatars, address])
-  const { avatarUrl: discordAvatarUrl } = useDiscordSocialLink(address)
+  const { avatarUrl: discordAvatarUrl, apiAvatarUrl } = useDiscordSocialLink(address)
   return {
     avatarUrl: (discordAvatarUrl || avatarUrl),
+    apiAvatarUrl,
   }
 }
 

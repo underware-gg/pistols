@@ -32,9 +32,11 @@ const can_link = (client_id && redirect_uri)
 //
 
 export function DiscordLinkButton({
+  disabled = false,
   openNewTab = true,
   className = '',
 }: {
+  disabled?: boolean
   openNewTab?: boolean
   className?: string
 }) {
@@ -104,7 +106,7 @@ export function DiscordLinkButton({
 
   if (isLinked) {
     return (
-      <Button fluid className={className} disabled={isDisabled} onClick={() => clear_player_social_link()}>
+      <Button fluid className={className} disabled={isDisabled || disabled} onClick={() => clear_player_social_link()}>
         Unlink Discord
       </Button>
     )
@@ -117,7 +119,7 @@ export function DiscordLinkButton({
     )
   }
   return (
-    <Button fluid className={className} disabled={!isConnected || isLinking} onClick={() => _initiate()}>
+    <Button fluid className={className} disabled={!isConnected || isLinking || disabled} onClick={() => _initiate()}>
       {isLinking ? 'Linking...' : 'Link to Discord'}
     </Button>
   )
