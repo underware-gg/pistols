@@ -711,7 +711,7 @@ pub mod tournament_token {
             // let mut store: Store = StoreTrait::new(self.world_default());
             // return the metadata to be rendered by the component
             // https://docs.opensea.io/docs/contract-level-metadata
-            let metadata = ContractMetadata {
+            let metadata: ContractMetadata = ContractMetadata {
                 name: self.name(),
                 symbol: self.symbol(),
                 description: "Pistols at Dawn Tournament Entry",
