@@ -44,6 +44,7 @@ pub struct DuelistAssignment {
     pub duel_id: u128,      // current Challenge a Duelist is in
     pub pass_id: u64,       // current Tournament a Duelist is in
     pub queue_id: QueueId,  // current Match Queue a Duelist is in
+    pub season_id: u32,     // current Ranked season
 }
 
 // created for dead duelists
@@ -98,6 +99,9 @@ pub impl DuelistAssignmentImpl of DuelistAssignmentTrait {
         let mut assignment: DuelistAssignment = self.get_duelist_assignment(duelist_id);
         assignment.assert_is_available_for(Option::None);
         assignment.queue_id = queue_id; // this is permanent for Ranked
+        if (queue_id.permanent_enlistment()) {
+            assignment.season_id = self.get_current_season_id(); // this is permanent for Ranked
+        }
         self.set_duelist_assignment(@assignment);
     }
     fn is_enlisted_matchmaking(self: @Store, duelist_id: u128, queue_id: QueueId) -> bool {

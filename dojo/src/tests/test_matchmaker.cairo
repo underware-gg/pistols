@@ -91,6 +91,11 @@ mod tests {
         let assignment_a: DuelistAssignment = (*sys.store).get_duelist_assignment(duelist_id_a);
         assert_eq!(assignment_a.queue_id, queue_id, "created:[{}] assignment_a.queue_id", prefix);
         assert_eq!(assignment_a.duel_id, duel_id, "created:[{}] assignment_a.duel_id", prefix);
+        if (queue_id == QueueId::Ranked) {
+            assert_gt!(assignment_a.season_id, 0, "created:[{}] assignment_a.season_id > 0", prefix);
+        } else {
+            assert_eq!(assignment_a.season_id, 0, "created:[{}] assignment_a.season_id == 0", prefix);
+        }
         // return the created duel_id
         (duel_id)
     }
@@ -2196,14 +2201,17 @@ mod tests {
         //
         // assignments
         let assignment_a_1: DuelistAssignment = sys.store.get_duelist_assignment(ID_A_1);
-        assert_eq!(assignment_a_1.queue_id, queue_id, "assignment_a_1.queue_id");
         assert_gt!(assignment_a_1.duel_id, 0, "assignment_a_1.duel_id");
+        assert_eq!(assignment_a_1.queue_id, queue_id, "assignment_a_1.queue_id");
+        assert_eq!(assignment_a_1.season_id, 0, "assignment_a_1.season_id");
         let assignment_a_2: DuelistAssignment = sys.store.get_duelist_assignment(ID_A_2);
-        assert_eq!(assignment_a_2.queue_id, queue_id, "assignment_a_2.queue_id");
         assert_eq!(assignment_a_2.duel_id, 0, "assignment_a_2.duel_id");
+        assert_eq!(assignment_a_2.queue_id, queue_id, "assignment_a_2.queue_id");
+        assert_eq!(assignment_a_2.season_id, 0, "assignment_a_2.season_id");
         let assignment_b: DuelistAssignment = sys.store.get_duelist_assignment(ID_B);
-        assert_eq!(assignment_b.queue_id, queue_id, "assignment_b.queue_id");
         assert_gt!(assignment_b.duel_id, 0, "assignment_b.duel_id");
+        assert_eq!(assignment_b.queue_id, queue_id, "assignment_b.queue_id");
+        assert_eq!(assignment_b.season_id, 0, "assignment_b.season_id");
         //
         // clear queue...
         tester::impersonate(OWNER());
@@ -2260,14 +2268,17 @@ mod tests {
         //
         // assignments
         let assignment_a_1: DuelistAssignment = sys.store.get_duelist_assignment(ID_A_1);
-        assert_eq!(assignment_a_1.queue_id, queue_id, "assignment_a_1.queue_id");
         assert_gt!(assignment_a_1.duel_id, 0, "assignment_a_1.duel_id");
+        assert_eq!(assignment_a_1.queue_id, queue_id, "assignment_a_1.queue_id");
+        assert_eq!(assignment_a_1.season_id, 0, "assignment_a_1.season_id");
         let assignment_a_2: DuelistAssignment = sys.store.get_duelist_assignment(ID_A_2);
-        assert_eq!(assignment_a_2.queue_id, queue_id, "assignment_a_2.queue_id");
         assert_eq!(assignment_a_2.duel_id, 0, "assignment_a_2.duel_id");
+        assert_eq!(assignment_a_2.queue_id, queue_id, "assignment_a_2.queue_id");
+        assert_eq!(assignment_a_2.season_id, 0, "assignment_a_2.season_id");
         let assignment_b: DuelistAssignment = sys.store.get_duelist_assignment(ID_B);
-        assert_eq!(assignment_b.queue_id, queue_id, "assignment_b.queue_id");
         assert_gt!(assignment_b.duel_id, 0, "assignment_b.duel_id");
+        assert_eq!(assignment_b.queue_id, queue_id, "assignment_b.queue_id");
+        assert_eq!(assignment_b.season_id, 0, "assignment_b.season_id");
         //
         // clear A...
         tester::impersonate(OWNER());
@@ -2320,11 +2331,13 @@ mod tests {
         //
         // assignments
         let assignment_a_1: DuelistAssignment = sys.store.get_duelist_assignment(ID_A_1);
-        assert_eq!(assignment_a_1.queue_id, queue_id, "assignment_a_1.queue_id");
         assert_eq!(assignment_a_1.duel_id, 0, "assignment_a_1.duel_id");
+        assert_eq!(assignment_a_1.queue_id, queue_id, "assignment_a_1.queue_id");
+        assert_gt!(assignment_a_1.season_id, 0, "assignment_a_1.season_id");
         let assignment_b: DuelistAssignment = sys.store.get_duelist_assignment(ID_B);
-        assert_eq!(assignment_b.queue_id, queue_id, "assignment_b.queue_id");
         assert_eq!(assignment_b.duel_id, 0, "assignment_b.duel_id");
+        assert_eq!(assignment_b.queue_id, queue_id, "assignment_b.queue_id");
+        assert_gt!(assignment_b.season_id, 0, "assignment_b.season_id");
         //
         // clear queue...
         tester::impersonate(OWNER());
