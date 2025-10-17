@@ -340,8 +340,6 @@ pub mod tournament_token {
         fn can_enlist_duelist(self: @ContractState, pass_id: u64, duelist_id: u128) -> bool {
             let store: Store = StoreTrait::new(self.world_default());
             // get updates duelist lives
-            let duelist_dispatcher: IDuelistTokenDispatcher = store.world.duelist_token_dispatcher();
-            duelist_dispatcher.poke(duelist_id);
             let lives: u8 = duelist_dispatcher.life_count(duelist_id);
             // get tournament settings
             let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(pass_id);
@@ -370,7 +368,6 @@ pub mod tournament_token {
             // validate duelist health
             let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(pass_id);
             let rules: TournamentRules = store.get_tournament_settings_rules(token_metadata.settings_id);
-            duelist_dispatcher.poke(duelist_id);
             let lives: u8 = duelist_dispatcher.life_count(duelist_id);
             assert(lives > 0, Errors::DUELIST_IS_DEAD);
             assert(lives >= rules.min_lives, Errors::INSUFFICIENT_LIVES);

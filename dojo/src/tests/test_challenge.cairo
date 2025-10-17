@@ -19,7 +19,6 @@ mod tests {
             TestSystems, FLAGS,
             IGameDispatcherTrait,
             IDuelTokenDispatcherTrait,
-            IDuelistTokenDispatcherTrait,
             ID, ZERO, OWNER, OTHER, BUMMER, STACKER, STACKER2,
             FAKE_OWNER_OF_1, OWNED_BY_OWNER, MESSAGE,
         }
@@ -459,74 +458,6 @@ mod tests {
         let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.state, ChallengeState::InProgress, "ChallengeState::InProgress");
         assert_eq!(ch.duelist_id_b, duelist_id_b_active, "challenged_id_ok");   // << UPDATED!!!
-    }
-
-    #[test]
-    #[ignore] // TEMP: disabled dripping
-    fn test_stacker_active_switch_OK() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE | FLAGS::DUELIST);
-        let A: ContractAddress = STACKER();
-        let B: ContractAddress = STACKER2();
-        let (duelist_id_a_active, duelist_id_a_inactive, duelist_id_b_active, duelist_id_b_inactive) = _mint_stacker_duelists(@sys, A, B);
-        // make active
-        tester::activate_duelist(ref sys, duelist_id_a_active);
-        tester::activate_duelist(ref sys, duelist_id_b_active);
-        // death by inactivity
-        tester::make_duelist_inactive(@sys, duelist_id_a_active, 3000);
-        tester::make_duelist_inactive(@sys, duelist_id_b_active, 3000);
-
-        let duel_id: u128 = tester::execute_create_duel_ID(@sys, A, duelist_id_a_inactive, B, MESSAGE(), DuelType::Practice, 48, 0);
-        let ch = sys.store.get_challenge_value(duel_id);
-        assert_eq!(ch.state, ChallengeState::Awaiting, "state");
-        assert_eq!(ch.address_a, A, "challenger");
-        assert_eq!(ch.address_b, B, "challenged");
-        assert_eq!(ch.duelist_id_a, duelist_id_a_inactive, "challenger_id");
-        assert_eq!(ch.duelist_id_b, 0, "challenged_id"); // challenged an address, id is empty
-        assert!(!sys.duelists.is_alive(duelist_id_a_active), "duelist_id_a_active dead");
-        assert!(sys.duelists.is_alive(duelist_id_a_inactive), "duelist_id_a_inactive alive");
-        assert_eq!(sys.store.get_player_alive_duelist_count(A), 1, "alive_duelist_count::died_a");
-        // reply...
-        tester::execute_reply_duel(@sys, B, duelist_id_b_inactive, duel_id, true);
-        let ch = sys.store.get_challenge_value(duel_id);
-        assert_eq!(ch.state, ChallengeState::InProgress, "ChallengeState::InProgress");
-        assert_eq!(ch.duelist_id_b, duelist_id_b_inactive, "challenged_id_ok");   // << UPDATED!!!
-        assert!(!sys.duelists.is_alive(duelist_id_b_active), "duelist_id_b_active dead");
-        assert!(sys.duelists.is_alive(duelist_id_b_inactive), "duelist_id_b_inactive alive");
-        assert_eq!(sys.store.get_player_alive_duelist_count(B), 1, "alive_duelist_count::died_b");
-    }
-
-    #[test]
-    #[ignore] // TEMP: disabled dripping
-    #[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
-    fn test_stacker_not_stacked_a() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE | FLAGS::DUELIST);
-        let A: ContractAddress = OWNER(); // not a stacker
-        let B: ContractAddress = STACKER2();
-        let (duelist_id_a_active, _duelist_id_a_inactive, _duelist_id_b_active, _duelist_id_b_inactive) = _mint_stacker_duelists(@sys, A, B);
-        // make active
-        tester::activate_duelist(ref sys, duelist_id_a_active);
-        // death by inactivity
-        tester::make_duelist_inactive(@sys, duelist_id_a_active, 3000);
-
-        let _duel_id: u128 = tester::execute_create_duel_ID(@sys, A, duelist_id_a_active, B, MESSAGE(), DuelType::Practice, 48, 0);
-    }
-
-    #[test]
-    #[ignore] // TEMP: disabled dripping
-    #[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
-    fn test_stacker_not_stacked_b() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE | FLAGS::DUELIST);
-        let A: ContractAddress = STACKER(); // not a stacker
-        let B: ContractAddress = OWNER();
-        let (duelist_id_a_active, _duelist_id_a_inactive, duelist_id_b_active, _duelist_id_b_inactive) = _mint_stacker_duelists(@sys, A, B);
-        // make active
-        tester::activate_duelist(ref sys, duelist_id_b_active);
-        // death by inactivity
-        tester::make_duelist_inactive(@sys, duelist_id_b_active, 3000);
-
-        let duel_id: u128 = tester::execute_create_duel_ID(@sys, A, duelist_id_a_active, B, MESSAGE(), DuelType::Practice, 48, 0);
-        // reply...
-        tester::execute_reply_duel(@sys, B, duelist_id_b_active, duel_id, true);
     }
 
 

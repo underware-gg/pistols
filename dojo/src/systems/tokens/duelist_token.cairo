@@ -64,8 +64,6 @@ pub trait IDuelistToken<TState> {
     fn life_count(self: @TState, duelist_id: u128) -> u8;
     fn is_inactive(self: @TState, duelist_id: u128) -> bool;
     fn inactive_timestamp(self: @TState, duelist_id: u128) -> u64;
-    fn inactive_fame_dripped(self: @TState, duelist_id: u128) -> u128;
-    fn poke(ref self: TState, duelist_id: u128) -> bool;
     fn sacrifice(ref self: TState, duelist_id: u128);
     fn memorialize(ref self: TState, duelist_id: u128);
 }
@@ -79,9 +77,7 @@ pub trait IDuelistTokenPublic<TState> {
     fn life_count(self: @TState, duelist_id: u128) -> u8;
     fn is_inactive(self: @TState, duelist_id: u128) -> bool;
     fn inactive_timestamp(self: @TState, duelist_id: u128) -> u64;
-    fn inactive_fame_dripped(self: @TState, duelist_id: u128) -> u128;
     // write
-    fn poke(ref self: TState, duelist_id: u128) -> bool; //@description: Reactivates an inactive Duelist
     fn sacrifice(ref self: TState, duelist_id: u128); //@description: Sacrifices a Duelist
     fn memorialize(ref self: TState, duelist_id: u128); //@description: Memorializes a Duelist
 }
@@ -271,45 +267,14 @@ pub mod duelist_token {
         fn inactive_timestamp(self: @ContractState,
             duelist_id: u128,
         ) -> u64 {
-            //-----------------------------------
-            // TEMP: disabled dripping
-            // when enabling, also activate tests with "TEMP: disabled dripping"
-            (0)
-            //-----------------------------------
-            // let mut store: Store = StoreTrait::new(self.world_default());
-            // let timestamp_active: u64 = store.get_duelist_timestamps(duelist_id).active;
-            // if (timestamp_active.is_zero()) {
-            //     (0)
-            // } else {
-            //     let timestamp: u64 = starknet::get_block_timestamp();
-            //     (timestamp - timestamp_active)
-            // }
-        }
-
-        #[inline(always)]
-        fn inactive_fame_dripped(self: @ContractState,
-            duelist_id: u128,
-        ) -> u128 {
-            let inactive_timestamp: u64 = self.inactive_timestamp(duelist_id);
-            let fame_dripped: u128 = (MathTrait::sub(inactive_timestamp, FAME::MAX_INACTIVE_TIMESTAMP) / FAME::TIMESTAMP_TO_DRIP_ONE_FAME).into();
-            (fame_dripped * CONST::ETH_TO_WEI.low)
-        }
-        
-        fn poke(ref self: ContractState,
-            duelist_id: u128,
-        ) -> bool {
-            let mut survived: bool = true;
-            let mut fame_dripped: u128 = self.inactive_fame_dripped(duelist_id);
-            if (fame_dripped != 0) {
-                // burn fame_dripped
-                survived = self._reactivate_or_sacrifice(duelist_id, Option::Some(fame_dripped), CauseOfDeath::Forsaken);
-                // only duel_token and owner can poke alive duelists
-                let world: WorldStorage = self.world_default();
-                if (survived && !world.caller_is_duel_contract()) {
-                    self.erc721_combo._require_owner_of(starknet::get_caller_address(), duelist_id.into());
-                }
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let timestamp_active: u64 = store.get_duelist_timestamps(duelist_id).active;
+            if (timestamp_active.is_zero()) {
+                (0)
+            } else {
+                let timestamp: u64 = starknet::get_block_timestamp();
+                (timestamp - timestamp_active)
             }
-            (survived)
         }
 
         fn sacrifice(ref self: ContractState,
@@ -317,7 +282,7 @@ pub mod duelist_token {
         ) {
             assert(false, Errors::NOT_IMPLEMENTED);
             self.erc721_combo._require_owner_of(starknet::get_caller_address(), duelist_id.into());
-            self._reactivate_or_sacrifice(duelist_id, Option::None, CauseOfDeath::Sacrifice);
+            self._memorialize(duelist_id, CauseOfDeath::Sacrifice);
         }
 
         fn memorialize(ref self: ContractState,
@@ -325,7 +290,7 @@ pub mod duelist_token {
         ) {
             assert(false, Errors::NOT_IMPLEMENTED);
             self.erc721_combo._require_owner_of(starknet::get_caller_address(), duelist_id.into());
-            self._reactivate_or_sacrifice(duelist_id, Option::None, CauseOfDeath::Memorize);
+            self._memorialize(duelist_id, CauseOfDeath::Memorize);
         }
     }
 
@@ -389,12 +354,6 @@ pub mod duelist_token {
 
             // get active duelist from stack
             let mut active_duelist_id: u128 = store.get_active_duelist_id(address, duelist_id);
-            // poke inactivity (it may die!)
-// println!("poke A... {}", duelist_id_a);
-            if (!self.poke(active_duelist_id)) {
-                // died, get next in line...
-                active_duelist_id = store.get_active_duelist_id(address, duelist_id);
-            }
 
             // validate duelist health
             let lives: u8 = self.life_count(active_duelist_id);
@@ -600,11 +559,10 @@ pub mod duelist_token {
             }
         }
 
-        fn _reactivate_or_sacrifice(ref self: ContractState,
+        fn _memorialize(ref self: ContractState,
             duelist_id: u128,
-            fame_dripped: Option<u128>,
             cause_of_death: CauseOfDeath,
-        ) -> bool {
+        ) {
             let mut store: Store = StoreTrait::new(self.world_default());
             let fame_dispatcher: IFameCoinDispatcher = store.world.fame_coin_dispatcher();
             let bank_dispatcher: IBankProtectedDispatcher = store.world.bank_protected_dispatcher();
@@ -613,52 +571,37 @@ pub mod duelist_token {
             let fame_balance: u128 = self._fame_balance(@fame_dispatcher, duelist_id);
             assert(fame_balance != 0, Errors::DUELIST_IS_DEAD);
 
-            let mut due_amount: u128 = match fame_dripped {
-                // poke: burn dripped fame, but no more than balance
-                Option::Some(fame_dripped) => {core::cmp::min(fame_balance, fame_dripped)},
-                // sacrifice: burn the whole balance
-                Option::None => {fame_balance}
-            };
-// println!("fame_dripped: {}", fame_dripped.unwrap());
-// println!("fame_balance: {}", fame_balance);
-// println!("due_amount: {}", due_amount);
-            // 60% of one life goes to sacrifice pool
-            let survived: bool = (fame_balance - due_amount) >= FAME::ONE_LIFE;
-// println!("survived: {}", survived);
-            if (!survived) {
-                let amount: u128 = MathTrait::percentage(FAME::ONE_LIFE, FAME::SACRIFICE_PERCENTAGE);
-                bank_dispatcher.duelist_lost_fame_to_pool(starknet::get_contract_address(), duelist_id, amount, PoolType::Sacrifice);
-                // burn the full balance
-                due_amount = fame_balance - amount;
-                // emit event...
-                self._duelist_died(ref store,
-                    duelist_id,
-                    cause_of_death,
-                    if (cause_of_death == CauseOfDeath::Sacrifice) {duelist_id} else {0},
-                    fame_balance,
-                );
-            }
+            // if (!survived) {
+            //     let amount: u128 = MathTrait::percentage(FAME::ONE_LIFE, FAME::SACRIFICE_PERCENTAGE);
+            //     bank_dispatcher.duelist_lost_fame_to_pool(starknet::get_contract_address(), duelist_id, amount, PoolType::Sacrifice);
+            //     // burn the full balance
+            //     due_amount = fame_balance - amount;
+            //     // emit event...
+            //     self._duelist_died(ref store,
+            //         duelist_id,
+            //         cause_of_death,
+            //         if (cause_of_death == CauseOfDeath::Sacrifice) {duelist_id} else {0},
+            //         fame_balance,
+            //     );
+            // }
 
             // remaining fame to be burned and released
             let bill: LordsReleaseBill = LordsReleaseBill {
                 reason: ReleaseReason::SacrificedToDeveloper,
                 duelist_id,
                 recipient: store.get_config_treasury_address(),
-                pegged_fame: due_amount,
+                pegged_fame: fame_balance,
                 pegged_lords: 0,
                 sponsored_lords: 0,
             };
             bank_dispatcher.release_lords_from_fame_to_be_burned(0, 0, array![bill].span());
-            fame_dispatcher.burn_from_token(starknet::get_contract_address(), duelist_id, due_amount.into());
-// println!("remaining: {}", self._fame_balance(@fame_dispatcher, duelist_id));
+            fame_dispatcher.burn_from_token(starknet::get_contract_address(), duelist_id, fame_balance.into());
 
             // update duelist timestamp
             store.set_duelist_timestamp_active(duelist_id, starknet::get_block_timestamp());
             
             // notify indexers to update metadata
             self.erc721_combo._emit_metadata_update(duelist_id.into());
-
-            (survived)
         }
 
         fn _duelist_died(ref self: ContractState,

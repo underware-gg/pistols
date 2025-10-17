@@ -40,8 +40,6 @@ pub mod FAME {
 
     // inactivity timestamps in seconds
     pub const MAX_INACTIVE_TIMESTAMP: u64 = TIMESTAMP::FOUR_WEEKS;
-    // how long it takes to drip 1 FAME
-    pub const TIMESTAMP_TO_DRIP_ONE_FAME: u64 = (10 * TIMESTAMP::ONE_MINUTE);
 
     // residual FAME (<1000) that goes to PoolType::Sacrifice
     pub const SACRIFICE_PERCENTAGE: u8 = 60;

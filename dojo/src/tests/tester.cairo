@@ -1172,12 +1172,6 @@ pub mod tester {
         set_Config(ref sys.world, @config);
     }
 
-    pub fn make_duelist_inactive(sys: @TestSystems, duelist_id: u128, dripped_fame: u64) {
-        let timestamp_active: u64 = (*sys.store).get_duelist_timestamps(duelist_id).active;
-        let elapsed: u64 = FAME::MAX_INACTIVE_TIMESTAMP + (FAME::TIMESTAMP_TO_DRIP_ONE_FAME * dripped_fame);
-        set_block_timestamp(timestamp_active + elapsed);
-    }
-
     //
     // Protected dispatchers
     //

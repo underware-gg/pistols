@@ -23,7 +23,6 @@ pub trait IMockDuelistToken<TState> {
     fn life_count(self: @TState, duelist_id: u128) -> u8;
     fn transfer_rewards(ref self: TState, challenge: Challenge, bonus: DuelBonus) -> (RewardValues, RewardValues);
     fn get_validated_active_duelist_id(ref self: TState, address: ContractAddress, duelist_id: u128, lives_staked: u8) -> u128;
-    fn poke(ref self: TState, duelist_id: u128) -> bool;
     fn sacrifice(ref self: TState, duelist_id: u128);
     fn update_token_metadata(ref self: TState, token_id: u128);
 }
@@ -110,9 +109,6 @@ pub mod duelist_token {
             // let mut store: Store = StoreTrait::new(self.world_default());
             assert(self.is_owner_of(address, duelist_id.into()), Errors::NOT_YOUR_DUELIST);
             (duelist_id)
-        }
-        fn poke(ref self: ContractState, duelist_id: u128) -> bool {
-            (true)
         }
         fn sacrifice(ref self: ContractState, duelist_id: u128) {}
         fn update_token_metadata(ref self: ContractState, token_id: u128) {}
