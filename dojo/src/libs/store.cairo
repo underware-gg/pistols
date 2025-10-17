@@ -75,6 +75,7 @@ pub use pistols::models::{
         PlayerBookmarkEvent,
         PlayerSocialLinkEvent, SocialPlatform,
         PlayerSettingEvent, PlayerSetting, PlayerSettingValue,
+        PurchaseDistributionEvent,
     },
 };
 pub use pistols::systems::components::{
@@ -530,10 +531,6 @@ pub impl StoreImpl of StoreTrait {
         (self.world.read_member_legacy(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("treasury_address")))
     }
     #[inline(always)]
-    fn get_config_realms_address(self: @Store) -> ContractAddress {
-        (self.world.read_member_legacy(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("realms_address")))
-    }
-    #[inline(always)]
     fn get_config_is_paused(self: @Store) -> bool {
         (self.world.read_member_legacy(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("is_paused")))
     }
@@ -741,17 +738,52 @@ pub impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn emit_lords_release(ref self: Store, season_id: u32, duel_id: u128, bill: @LordsReleaseBill) {
+    fn emit_lords_release(ref self: Store,
+        season_id: u32,
+        duel_id: u128,
+        bill: @LordsReleaseBill,
+        timestamp: u64,
+    ) {
         self.world.emit_event(@LordsReleaseEvent {
             season_id,
             duel_id,
             bill: *bill,
-            timestamp: starknet::get_block_timestamp(),
+            timestamp,
         });
     }
 
     #[inline(always)]
-    fn emit_player_bookmark(ref self: Store, player_address: ContractAddress, target_address: ContractAddress, target_id: u128, enabled: bool) {
+    fn emit_purchase_distribution(ref self: Store,
+        season_id: u32,
+        player_address: ContractAddress,
+        token_address: ContractAddress,
+        token_ids: Array<u128>,
+        lords_total: u128,
+        lords_underware: u128,
+        lords_realms: u128,
+        lords_fees: u128,
+        lords_season: u128,
+    ) {
+        self.world.emit_event(@PurchaseDistributionEvent{
+            season_id,
+            player_address,
+            token_address,
+            token_ids,
+            lords_total,
+            lords_underware,
+            lords_realms,
+            lords_fees,
+            lords_season,
+        });
+    }
+
+    #[inline(always)]
+    fn emit_player_bookmark(ref self: Store,
+        player_address: ContractAddress,
+        target_address: ContractAddress,
+        target_id: u128,
+        enabled: bool,
+    ) {
         self.world.emit_event(@PlayerBookmarkEvent {
             player_address,
             target_address,
@@ -760,7 +792,13 @@ pub impl StoreImpl of StoreTrait {
         });
     }
     #[inline(always)]
-    fn emit_player_social_link(ref self: Store, player_address: ContractAddress, social_platform: SocialPlatform, user_name: ByteArray, user_id: ByteArray, avatar: ByteArray) {
+    fn emit_player_social_link(ref self: Store,
+        player_address: ContractAddress,
+        social_platform: SocialPlatform,
+        user_name: ByteArray,
+        user_id: ByteArray,
+        avatar: ByteArray,
+    ) {
         self.world.emit_event(@PlayerSocialLinkEvent {
             player_address,
             social_platform,
@@ -770,7 +808,11 @@ pub impl StoreImpl of StoreTrait {
         });
     }
     #[inline(always)]
-    fn emit_player_setting(ref self: Store, player_address: ContractAddress, setting: PlayerSetting, value: PlayerSettingValue) {
+    fn emit_player_setting(ref self: Store,
+        player_address: ContractAddress,
+        setting: PlayerSetting,
+        value: PlayerSettingValue,
+    ) {
         if (setting != PlayerSetting::Undefined) {
             self.world.emit_event(@PlayerSettingEvent {
                 player_address,

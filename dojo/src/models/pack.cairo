@@ -26,6 +26,7 @@ pub struct Pack {
     pub lords_amount: u128,
     pub is_open: bool,
     pub duelist_profile: Option<DuelistProfile>,
+    pub pegged_lords_amount: u128,
 }
 
 

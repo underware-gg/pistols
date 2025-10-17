@@ -29,6 +29,13 @@ pub mod CHANCES {
     pub const ALWAYS: u8 = 100;
 }
 
+pub mod RULES {
+    pub const UNDERWARE_PERCENT: u8 = 45;
+    pub const REALMS_PERCENT: u8 = 5;
+    pub const FEES_PERCENT: u8 = 10;
+    pub const POOL_PERCENT: u8 = 40;
+}
+
 pub mod FAME {
     use super::CONST;
     use pistols::types::timestamp::{TIMESTAMP};

@@ -13,8 +13,12 @@ pub enum Rules {
 #[derive(Copy, Drop, Serde, Introspect, Default)]
 pub struct PoolDistribution {
     pub underware_percent: u8,
+    pub underware_address: ContractAddress,
     pub realms_percent: u8,
     pub realms_address: ContractAddress,
+    pub fees_percent: u8,
+    pub fees_address: ContractAddress,
+    pub fees_pool_id: PoolType,
     pub pool_percent: u8,
     pub pool_id: PoolType,
 }
@@ -54,8 +58,11 @@ pub struct DuelistBonus {
 // Traits
 //
 use core::num::traits::Zero;
+use pistols::models::config::{Config};
 use pistols::models::ring::{RingType, RingTypeTrait};
-use pistols::types::constants::{CONST, FAME::{ONE_LIFE}};
+use pistols::types::constants::{CONST, RULES, FAME::{ONE_LIFE}};
+use pistols::libs::store::{Store, StoreTrait};
+use pistols::utils::address::{ZERO};
 
 #[generate_trait]
 pub impl RulesImpl of RulesTrait {
@@ -117,23 +124,32 @@ pub impl RulesImpl of RulesTrait {
     }
     //
     // Duel distribution of LORDS
-    fn get_rewards_distribution(self: @Rules, season_id: u32, realms_address: ContractAddress) -> @PoolDistribution {
-        let mut result: PoolDistribution = match self {
-            Rules::Season |
-            Rules::Unranked => PoolDistribution {
-                underware_percent: 50,
-                realms_percent: 10,
-                realms_address,
-                pool_percent: 40,
-                pool_id: PoolType::Season(season_id),
-            },
-            Rules::Undefined => Default::default(),
+    fn get_purchase_distribution(store: @Store) -> @PoolDistribution {
+        let config: Config = store.get_config();
+        let mut result: PoolDistribution = PoolDistribution {
+            underware_percent: RULES::UNDERWARE_PERCENT,
+            underware_address: config.treasury_address,
+            realms_percent: RULES::REALMS_PERCENT,
+            realms_address: config.realms_address,
+            fees_percent: RULES::FEES_PERCENT,
+            fees_address: ZERO(),
+            fees_pool_id: PoolType::Claimable,
+            pool_percent: RULES::POOL_PERCENT,
+            pool_id: PoolType::Purchases,
         };
-        // if no realms address, creator is underware
-        if (result.realms_percent != 0 && result.realms_address.is_zero()) {
+        // if no realms address, to underware
+        if (result.realms_percent.is_non_zero() && result.realms_address.is_zero()) {
             result.underware_percent += result.realms_percent;
             result.realms_percent = 0;
         }
+        // if (result.fees_percent.is_non_zero() && result.fees_address.is_zero() && result.fees_pool_id == PoolType::Undefined) {
+        //     result.underware_percent += result.fees_percent;
+        //     result.fees_percent = 0;
+        // }
+        // if (result.underware_percent.is_non_zero() && result.underware_address.is_zero()) {
+        //     result.pool_percent += result.underware_percent;
+        //     result.underware_percent = 0;
+        // }
         (@result)
     }
     //
@@ -184,19 +200,6 @@ pub impl RulesImpl of RulesTrait {
 }
 
 
-#[generate_trait]
-pub impl PoolDistributionImpl of PoolDistributionTrait {
-    #[inline(always)]
-    fn is_payable(self: @PoolDistribution) -> bool {
-        (
-            (*self.underware_percent).is_non_zero() ||
-            (*self.realms_percent).is_non_zero() ||
-            (*self.pool_percent).is_non_zero()
-        )
-    }
-}
-
-
 
 //---------------------------
 // Converters
@@ -233,41 +236,16 @@ pub impl RulesDebug of core::fmt::Debug<Rules> {
 //
 #[cfg(test)]
 mod unit {
-    use super::{
-        Rules, RulesTrait,
-        RewardDistribution, RewardValues,
-        DuelistBonus,
-        RingType,
-    };
-    use pistols::models::leaderboard::{LeaderboardTrait};
+    use super::*;
     use pistols::utils::misc::{WEI};
 
-    fn _test_season_distribution(rules: Rules) {
-        let mut recipient_count: usize = 12;
-        loop {
-            let distribution: @RewardDistribution = rules.get_season_distribution(recipient_count);
-            let distribution_count: usize = (*distribution.percents).len();
-            assert_le!(distribution_count, LeaderboardTrait::MAX_POSITIONS.into(), "{}: win[{}] distribution.percents.len()", rules, recipient_count);
-            assert_le!(distribution_count, recipient_count, "{}: win[{}] distribution.percents.len()", rules, recipient_count);
-// println!("[{}] > [{}]", recipient_count, (*distribution.percents).len());
-            if (recipient_count == 0 || distribution_count == 0) {
-                break;
-            }
-            // sum must be 100
-            let mut sum: u8 = 0;
-            let mut i: usize  = 0;
-            while (i < distribution_count) {
-                sum += *distribution.percents[i];
-                i += 1;
-            };
-            assert_eq!(sum, 100, "{}: win[{}] sum", rules, recipient_count);
-            recipient_count -= 1;
-        };
-    }
-
     #[test]
-    fn test_season_distribution() {
-        _test_season_distribution(Rules::Season);
+    fn test_distribution_total() {
+        assert_gt!(RULES::UNDERWARE_PERCENT, 0, "underware_percent");
+        assert_gt!(RULES::REALMS_PERCENT, 0, "realms_percent");
+        assert_gt!(RULES::FEES_PERCENT, 0, "fees_percent");
+        assert_gt!(RULES::POOL_PERCENT, 0, "pool_percent");
+        assert_eq!(RULES::UNDERWARE_PERCENT + RULES::REALMS_PERCENT + RULES::FEES_PERCENT + RULES::POOL_PERCENT, 100, "total");
     }
 
     #[test]

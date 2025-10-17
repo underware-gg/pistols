@@ -26,7 +26,7 @@ pub trait IBankPublic<TState> {
 pub trait IBankProtected<TState> {
     // transfer LORDS from payer, adding to PoolType::Purchases
     // (called by pack_token)
-    fn charge_lords_purchase(ref self: TState, payer: ContractAddress, lords_amount: u128);
+    fn charge_lords_purchase(ref self: TState, token_address: ContractAddress, token_ids: Array<u128>, payer: ContractAddress, lords_amount: u128);
     // transfer LORDS from PoolType::Claimable/Purchases to PoolType::FamePeg
     // (called by pack_token)
     fn peg_minted_fame_to_lords(ref self: TState, payer: ContractAddress, lords_amount: u128, fame_amount: u128, from_pool_type: PoolType);
@@ -40,7 +40,7 @@ pub trait IBankProtected<TState> {
 
 #[dojo::contract]
 pub mod bank {
-    // use core::num::traits::Zero;
+    use core::num::traits::Zero;
     use starknet::{ContractAddress};
     use dojo::world::{WorldStorage};
     // use dojo::model::{ModelStorage, ModelValueStorage};
@@ -60,7 +60,7 @@ pub mod bank {
         leaderboard::{LeaderboardTrait, LeaderboardPosition},
     };
     use pistols::types::{
-        rules::{Rules, RulesTrait, RewardDistribution},
+        rules::{Rules, RulesTrait, PoolDistribution, RewardDistribution},
         trophies::{TrophyProgressTrait}
     };
     use pistols::libs::store::{Store, StoreTrait};
@@ -94,20 +94,28 @@ pub mod bank {
             payer: ContractAddress,
             lords_amount: u128,
         ) {
-            assert(lords_amount > 0, Errors::INVALID_LORDS_AMOUNT);
             let mut store: Store = StoreTrait::new(self.world_default());
-            self._transfer_lords_to_pool(store, payer, lords_amount.into(), PoolType::Claimable);
+            self._charge_payer_lords(store,
+                payer, // from
+                starknet::get_contract_address(), // to
+                lords_amount.into(),
+                Option::Some(PoolType::Claimable),
+            );
         }
 
         fn sponsor_season(ref self: ContractState,
             payer: ContractAddress,
             lords_amount: u128,
         ) {
-            assert(lords_amount > 0, Errors::INVALID_LORDS_AMOUNT);
             let mut store: Store = StoreTrait::new(self.world_default());
             let season: SeasonConfig = store.get_current_season();
             assert(season.is_active(), Errors::INVALID_SEASON);
-            self._transfer_lords_to_pool(store, payer, lords_amount.into(), PoolType::Season(season.season_id));
+            self._charge_payer_lords(store,
+                payer, // from
+                starknet::get_contract_address(), // to
+                lords_amount.into(),
+                Option::Some(PoolType::Season(season.season_id)),
+            );
         }
 
         fn sponsor_tournament(ref self: ContractState,
@@ -115,12 +123,16 @@ pub mod bank {
             lords_amount: u128,
             tournament_id: u64,
         ) {
-            assert(lords_amount > 0, Errors::INVALID_LORDS_AMOUNT);
             let mut store: Store = StoreTrait::new(self.world_default());
             // TODO...
             // let tournament: TournamentSettings = store.get_tournament(tournament_id);
             // assert(tournament.is_active(), Errors::INVALID_TOURNAMENT);
-            self._transfer_lords_to_pool(store, payer, lords_amount.into(), PoolType::Tournament(tournament_id));
+            self._charge_payer_lords(store,
+                payer, // from
+                starknet::get_contract_address(), // to
+                lords_amount.into(),
+                Option::Some(PoolType::Tournament(tournament_id)),
+            );
         }
 
         fn can_collect_season(self: @ContractState) -> bool {
@@ -152,31 +164,107 @@ pub mod bank {
     #[abi(embed_v0)]
     impl BankProtectedImpl of super::IBankProtected<ContractState> {
         fn charge_lords_purchase(ref self: ContractState,
+            token_address: ContractAddress,
+            token_ids: Array<u128>,
             payer: ContractAddress,
             lords_amount: u128,
         ) {
             // validate caller
             let mut store: Store = StoreTrait::new(self.world_default());
             assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
-            // transfer...
-            self._transfer_lords_to_pool(store, payer, lords_amount, PoolType::Purchases);
+            // distribute
+            let mut amount_to_distribute: u128 = lords_amount;
+            let distribution: @PoolDistribution = RulesTrait::get_purchase_distribution(@store);
+            //
+            // > % Underware
+            let lords_underware: u128 = MathTrait::percentage(lords_amount, *distribution.underware_percent);
+            if (lords_underware.is_non_zero()) {
+                self._charge_payer_lords(store,
+                    payer, // from
+                    *distribution.underware_address, // to
+                    lords_underware,
+                    Option::None,
+                );
+                amount_to_distribute -= lords_underware;
+            }
+            //
+            // > % Realms
+            let lords_realms: u128 = MathTrait::percentage(lords_amount, *distribution.realms_percent);
+            if (lords_realms.is_non_zero()) {
+                self._charge_payer_lords(store,
+                    payer, // from
+                    *distribution.realms_address, // to
+                    lords_realms,
+                    Option::None,
+                );
+                amount_to_distribute -= lords_realms;
+            }
+            //
+            // > % fees
+            let lords_fees: u128 = MathTrait::percentage(lords_amount, *distribution.fees_percent);
+            if (lords_fees.is_non_zero()) {
+                if ((*distribution.fees_address).is_non_zero()) {
+                    self._charge_payer_lords(store,
+                        payer, // from
+                        *distribution.fees_address, // to
+                        lords_fees,
+                        Option::None,
+                    );
+                } else {
+                    self._charge_payer_lords(store,
+                        payer, // from
+                        starknet::get_contract_address(), // to
+                        lords_fees,
+                        Option::Some(*distribution.fees_pool_id),
+                    );
+                }
+                amount_to_distribute -= lords_fees;
+            }
+            //
+            // > (remaining) season pool
+            let lords_season: u128 = amount_to_distribute;
+            self._charge_payer_lords(store,
+                payer, // from
+                starknet::get_contract_address(), // to
+                lords_season,
+                Option::Some(*distribution.pool_id),
+            );
+            // this one is for history
+            let season_id: u32 = store.get_current_season_id();
+            store.emit_purchase_distribution(
+                season_id,
+                payer,
+                token_address,
+                token_ids,
+                lords_amount,
+                lords_underware,
+                lords_realms,
+                lords_fees,
+                lords_season,
+            );
         }
 
         fn peg_minted_fame_to_lords(ref self: ContractState,
             payer: ContractAddress,
             lords_amount: u128,
             fame_amount: u128,
-            from_pool_type: PoolType,
+            from_pool_type: PoolType, // Purchases or Claimable
         ) {
+            // called when a duelist is minted only
             let mut store: Store = StoreTrait::new(self.world_default());
-            assert(store.world.caller_is_duelist_contract(), Errors::INVALID_CALLER);
-            assert(lords_amount > 0, Errors::INVALID_LORDS_AMOUNT);
-            assert(fame_amount > 0, Errors::INVALID_FAME_AMOUNT);
+            assert(store.world.caller_is_duelist_token_contract(), Errors::INVALID_CALLER);
+            // both amounts must be non-zero, dynamically pegged to each other
+            assert(lords_amount.is_non_zero(), Errors::INVALID_LORDS_AMOUNT);
+            assert(fame_amount.is_non_zero(), Errors::INVALID_FAME_AMOUNT);
+            // get pools
             let mut pool_from: Pool = store.get_pool(from_pool_type);
             let mut pool_peg: Pool = store.get_pool(PoolType::FamePeg);
+            // transfer LORDS from source to peg pool
             pool_from.withdraw_lords(lords_amount);
-            pool_peg.deposit_lords(lords_amount);   // deposited LORDS
-            pool_peg.deposit_fame(fame_amount);     // just for record/de-pegging
+            pool_peg.deposit_lords(lords_amount);
+            // FAME just for record/de-pegging (not transferred)
+            pool_peg.deposit_fame(fame_amount);
+            // store
             store.set_pool(@pool_from);
             store.set_pool(@pool_peg);
         }
@@ -214,23 +302,29 @@ pub mod bank {
             assert(world.admin_dispatcher().am_i_admin(starknet::get_caller_address()), Errors::CALLER_NOT_ADMIN);
         }
 
-        fn _transfer_lords_to_pool(ref self: ContractState,
+        fn _charge_payer_lords(ref self: ContractState,
             mut store: Store,
             payer: ContractAddress,
-            amount: u128,
-            pool_id: PoolType,
+            recipient: ContractAddress,
+            lords_amount: u128,
+            pool_id: Option<PoolType>,
         ) {
+            assert(lords_amount.is_non_zero(), Errors::INVALID_LORDS_AMOUNT);
             // transfer funds...
-            IErc20Trait::asserted_transfer_from_to(
-                payer, // from
-                starknet::get_contract_address(), // to
-                store.get_config_lords_address(), // token_address
-                amount, // token_amount
-            );
+            if (payer != recipient) {
+                IErc20Trait::asserted_transfer_from_to(
+                    payer, // from
+                    recipient, // to
+                    store.get_config_lords_address(), // token_address
+                    lords_amount, // token_amount
+                );
+            }
             // add to pool
-            let mut pool: Pool = store.get_pool(pool_id);
-            pool.deposit_lords(amount);
-            store.set_pool(@pool);
+            if let Some(pool_id) = pool_id {
+                let mut pool: Pool = store.get_pool(pool_id);
+                pool.deposit_lords(lords_amount);
+                store.set_pool(@pool);
+            }
         }
 
         fn _transfer_fame_to_pool(self: @ContractState,
@@ -270,6 +364,7 @@ pub mod bank {
                 i += 1;
             };
             // transfer out
+            let timestamp: u64 = starknet::get_block_timestamp();
             if (lords_released != 0) {
                 let lords_dispatcher: Erc20Dispatcher = store.lords_dispatcher();
                 let mut i: usize = 0;
@@ -277,7 +372,7 @@ pub mod bank {
                     let mut bill: LordsReleaseBill = *(*bills)[i];
                     bill.pegged_lords = (*pegged_lordses[i]);
                     lords_dispatcher.transfer(bill.recipient, (bill.pegged_lords + bill.sponsored_lords).into());
-                    store.emit_lords_release(season_id, duel_id, @bill);
+                    store.emit_lords_release(season_id, duel_id, @bill, timestamp);
                     i += 1;
                 };
                 // remove from pool

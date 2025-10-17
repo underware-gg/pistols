@@ -120,13 +120,14 @@ fn test_token_uri() {
     println!("___packs.token_uri(1):{}", uri_1);
 
     // including duelist...
-    let mut pack_2 = Pack {
+    let mut pack_2: Pack = Pack {
         pack_id: TOKEN_ID_3.low,
         pack_type: PackType::SingleDuelist,
         seed: 0,
         lords_amount: (10 * CONST::ETH_TO_WEI.low),
         is_open: true,
         duelist_profile: Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)),
+        pegged_lords_amount: (4 * CONST::ETH_TO_WEI.low),
     };
     tester::set_Pack(ref sys.world, @pack_2);
 

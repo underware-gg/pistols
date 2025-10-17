@@ -82,6 +82,21 @@ pub struct LordsReleaseEvent {
     pub duel_id: u128,
     pub timestamp: u64,
 }
+#[derive(Clone, Drop, Serde)]
+#[dojo::event(historical:true)]
+pub struct PurchaseDistributionEvent {
+    #[key]
+    pub season_id: u32,
+    //-----------------------
+    pub player_address: ContractAddress,
+    pub token_address: ContractAddress,
+    pub token_ids: Array<u128>,
+    pub lords_total: u128,
+    pub lords_underware: u128,
+    pub lords_realms: u128,
+    pub lords_fees: u128,
+    pub lords_season: u128,
+}
 
 
 
