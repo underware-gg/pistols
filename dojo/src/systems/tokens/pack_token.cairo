@@ -449,9 +449,12 @@ pub mod pack_token {
             assert(starknet::get_caller_address() == bot_address, Errors::INVALID_CALLER);
 
             let token_ids: Span<u128> = store.world.duelist_token_protected_dispatcher().mint_duelists(
-                bot_address, 1, duelist_profile, 0,
+                bot_address,
+                1, // quantity
+                duelist_profile,
+                0, // no seed, use duelist_profile
                 PoolType::Claimable,
-                PackType::BotDuelist.mint_fee(),
+                0, //PackType::BotDuelist.mint_fee(),
             );
             (*token_ids[0])
         }

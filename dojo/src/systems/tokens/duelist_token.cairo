@@ -91,7 +91,7 @@ pub trait IDuelistTokenProtected<TState> {
         profile_type: DuelistProfile,
         seed: felt252,
         pool_type: PoolType,
-        lords_amount: u128,
+        lords_amount_to_peg_to_fame: u128,
     ) -> Span<u128>;
     fn get_validated_active_duelist_id(ref self: TState, address: ContractAddress, duelist_id: u128, lives_staked: u8) -> u128;
     fn transfer_rewards(ref self: TState, challenge: Challenge, bonus: DuelBonus) -> (RewardValues, RewardValues);
@@ -190,6 +190,7 @@ pub mod duelist_token {
 
     pub mod Errors {
         pub const INVALID_CALLER: felt252           = 'DUELIST: Invalid caller';
+        pub const INVALID_QUANTITY: felt252         = 'DUELIST: Invalid quantity';
         pub const INVALID_DUELIST: felt252          = 'DUELIST: Invalid duelist';
         pub const NOT_YOUR_DUELIST: felt252         = 'DUELIST: Not your duelist';
         pub const DUELIST_IS_DEAD: felt252          = 'DUELIST: Duelist is dead!';
@@ -305,15 +306,17 @@ pub mod duelist_token {
             profile_type: DuelistProfile,
             seed: felt252,
             pool_type: PoolType,
-            lords_amount: u128,
+            lords_amount_to_peg_to_fame: u128,
         ) -> Span<u128>{
             let mut store: Store = StoreTrait::new(self.world_default());
             assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
 
             // mint tokens
+            assert(quantity.is_non_zero(), Errors::INVALID_QUANTITY);
             let duelist_ids: Span<u128> = self.token.mint_next_multiple(recipient, quantity);
 
             // create duelists
+            let mut fame_amount: u128 = 0;
             let mut seed: u256 = seed.into();
             let mut i: usize = 0;
             while (i < duelist_ids.len()) {
@@ -323,7 +326,7 @@ pub mod duelist_token {
                     if (seed.is_zero()) {(profile_type)}
                     // randomize based on unknown type
                     else {(ProfileManagerTrait::randomize_profile(profile_type, seed.low.into()))};
-                self._spawn_duelist(ref store,
+                fame_amount += self._spawn_duelist(ref store,
                     recipient,
                     duelist_profile,
                     duelist_id,
@@ -333,7 +336,14 @@ pub mod duelist_token {
             };
 
             // minted fame, peg to paid LORDS
-            store.world.bank_protected_dispatcher().peg_minted_fame_to_lords(recipient, lords_amount.into(), pool_type);
+            if (lords_amount_to_peg_to_fame.is_non_zero()) {
+                store.world.bank_protected_dispatcher().peg_minted_fame_to_lords(
+                    recipient,
+                    lords_amount_to_peg_to_fame,
+                    fame_amount,
+                    pool_type,
+                );
+            }
 
             PlayerTrait::append_alive_duelist(ref store, recipient, quantity.try_into().unwrap());
 
@@ -429,9 +439,9 @@ pub mod duelist_token {
             recipient: ContractAddress,
             duelist_profile: DuelistProfile,
             duelist_id: u128,
-        ) {
+        ) -> u128 {
             // create Duelist
-            let duelist = Duelist {
+            let duelist: Duelist = Duelist {
                 duelist_id,
                 duelist_profile,
                 timestamps: DuelistTimestamps {
@@ -447,10 +457,12 @@ pub mod duelist_token {
             stack.append(duelist.duelist_id);
             store.set_player_duelist_stack(@stack);
             // mint fame
-            store.world.fame_coin_protected_dispatcher().minted_duelist(duelist.duelist_id);
+            let fame_amount: u128 = store.world.fame_coin_protected_dispatcher().minted_duelist(duelist.duelist_id);
 
             // events
             Activity::DuelistSpawned.emit(ref store.world, recipient, duelist.duelist_id.into());
+
+            (fame_amount)
         }
 
         #[inline(always)]
@@ -667,7 +679,7 @@ pub mod duelist_token {
             // let mut store: Store = StoreTrait::new(self.world_default());
             // return the metadata to be rendered by the component
             // https://docs.opensea.io/docs/contract-level-metadata
-            let metadata = ContractMetadata {
+            let metadata: ContractMetadata = ContractMetadata {
                 name: self.name(),
                 symbol: self.symbol(),
                 description: "Pistols at Dawn Duelists",

@@ -367,7 +367,7 @@ pub mod game {
             let mut challenge: Challenge = store.get_challenge(duel_id);
             let mut round: Round = store.get_round(duel_id);
 
-            if (store.world.caller_is_duel_contract()) {
+            if (store.world.caller_is_duel_token_contract()) {
                 // tournament unpaired player > declared winner
                 assert(challenge.duel_type == DuelType::Tournament, Errors::INVALID_DUEL_TYPE);
                 let winner: u8 = if (challenge.address_b.is_zero()) {1} else if (challenge.address_a.is_zero()) {2} else {0};

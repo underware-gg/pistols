@@ -29,7 +29,7 @@ pub trait IBankProtected<TState> {
     fn charge_lords_purchase(ref self: TState, payer: ContractAddress, lords_amount: u128);
     // transfer LORDS from PoolType::Claimable/Purchases to PoolType::FamePeg
     // (called by pack_token)
-    fn peg_minted_fame_to_lords(ref self: TState, payer: ContractAddress, lords_amount: u128, from_pool_type: PoolType);
+    fn peg_minted_fame_to_lords(ref self: TState, payer: ContractAddress, lords_amount: u128, fame_amount: u128, from_pool_type: PoolType);
     // transfer LORDS to recipient, removing from PoolType::FamePeg
     // (called by duelist_token)
     fn release_lords_from_fame_to_be_burned(ref self: TState, season_id: u32, duel_id: u128, bills: Span<LordsReleaseBill>) -> u128;
@@ -69,7 +69,8 @@ pub mod bank {
     pub mod Errors {
         pub const INVALID_CALLER: felt252           = 'BANK: invalid caller';
         pub const CALLER_NOT_ADMIN: felt252         = 'BANK: caller not admin';
-        pub const INVALID_AMOUNT: felt252           = 'BANK: invalid amount';
+        pub const INVALID_LORDS_AMOUNT: felt252     = 'BANK: invalid LORDS amount';
+        pub const INVALID_FAME_AMOUNT: felt252      = 'BANK: invalid FAME amount';
         pub const INVALID_SHARES: felt252           = 'BANK: invalid shares';
         pub const INVALID_TREASURY: felt252         = 'BANK: invalid treasury';
         pub const INSUFFICIENT_LORDS: felt252       = 'BANK: insufficient LORDS pool';
@@ -93,7 +94,7 @@ pub mod bank {
             payer: ContractAddress,
             lords_amount: u128,
         ) {
-            assert(lords_amount != 0, Errors::INVALID_AMOUNT);
+            assert(lords_amount > 0, Errors::INVALID_LORDS_AMOUNT);
             let mut store: Store = StoreTrait::new(self.world_default());
             self._transfer_lords_to_pool(store, payer, lords_amount.into(), PoolType::Claimable);
         }
@@ -102,7 +103,7 @@ pub mod bank {
             payer: ContractAddress,
             lords_amount: u128,
         ) {
-            assert(lords_amount != 0, Errors::INVALID_AMOUNT);
+            assert(lords_amount > 0, Errors::INVALID_LORDS_AMOUNT);
             let mut store: Store = StoreTrait::new(self.world_default());
             let season: SeasonConfig = store.get_current_season();
             assert(season.is_active(), Errors::INVALID_SEASON);
@@ -114,7 +115,7 @@ pub mod bank {
             lords_amount: u128,
             tournament_id: u64,
         ) {
-            assert(lords_amount != 0, Errors::INVALID_AMOUNT);
+            assert(lords_amount > 0, Errors::INVALID_LORDS_AMOUNT);
             let mut store: Store = StoreTrait::new(self.world_default());
             // TODO...
             // let tournament: TournamentSettings = store.get_tournament(tournament_id);
@@ -164,15 +165,18 @@ pub mod bank {
         fn peg_minted_fame_to_lords(ref self: ContractState,
             payer: ContractAddress,
             lords_amount: u128,
+            fame_amount: u128,
             from_pool_type: PoolType,
         ) {
             let mut store: Store = StoreTrait::new(self.world_default());
-            assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
-            assert(lords_amount != 0, Errors::INVALID_AMOUNT);
+            assert(store.world.caller_is_duelist_contract(), Errors::INVALID_CALLER);
+            assert(lords_amount > 0, Errors::INVALID_LORDS_AMOUNT);
+            assert(fame_amount > 0, Errors::INVALID_FAME_AMOUNT);
             let mut pool_from: Pool = store.get_pool(from_pool_type);
             let mut pool_peg: Pool = store.get_pool(PoolType::FamePeg);
             pool_from.withdraw_lords(lords_amount);
-            pool_peg.deposit_lords(lords_amount);
+            pool_peg.deposit_lords(lords_amount);   // deposited LORDS
+            pool_peg.deposit_fame(fame_amount);     // just for record/de-pegging
             store.set_pool(@pool_from);
             store.set_pool(@pool_peg);
         }

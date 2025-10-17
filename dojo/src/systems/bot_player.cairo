@@ -92,7 +92,7 @@ pub mod bot_player {
         fn reply_duel(ref self: ContractState, duel_id: u128) {
             // only duel contract can request a reply
             let mut store: Store = StoreTrait::new(self.world_default());
-            assert(store.world.caller_is_duel_contract(), Errors::INVALID_CALLER);
+            assert(store.world.caller_is_duel_token_contract(), Errors::INVALID_CALLER);
 
             // pick a duelist profile...
             let challenge: ChallengeValue = store.get_challenge_value(duel_id);

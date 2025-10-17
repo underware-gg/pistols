@@ -41,9 +41,9 @@ pub struct PackDescriptor {
     pub image_file_closed: felt252, // @generateContants:shortstring
     pub image_file_open: felt252, // @generateContants:shortstring
     pub can_purchase: bool,
-    pub price_lords: u128,
-    pub quantity: usize,
-    pub contents: felt252, // @generateContants:shortstring
+    pub price_lords: u128,  // amount of LORDS to peg to FAME
+    pub quantity: usize,    // number of items in the pack
+    pub contents: felt252,  // @generateContants:shortstring
 }
 
 // to be exported to typescript by generateConstants
@@ -67,7 +67,7 @@ mod PACK_TYPES {
         image_file_closed: 'StarterPack.jpg',
         image_file_open: 'StarterPack.jpg',
         can_purchase: false,
-        price_lords: (20 * CONST::ETH_TO_WEI.low),
+        price_lords: 0, // will not peg LORDS to FAME
         quantity: 2,
         contents: 'Ser Walker & Lady Vengeance',
     };
@@ -77,7 +77,7 @@ mod PACK_TYPES {
         image_file_closed: 'GenesisDuelists5x.png',
         image_file_open: 'GenesisDuelists5x.png',
         can_purchase: true,
-        price_lords: (50 * CONST::ETH_TO_WEI.low),
+        price_lords: (50 * CONST::ETH_TO_WEI.low), // amount of LORDS to peg to FAME
         quantity: 5,
         contents: 'Five Random Genesis Duelists',
     };
@@ -87,7 +87,7 @@ mod PACK_TYPES {
         image_file_closed: 'FreeDuelist.png',
         image_file_open: 'FreeDuelist.png',
         can_purchase: false,
-        price_lords: (10 * CONST::ETH_TO_WEI.low),
+        price_lords: (10 * CONST::ETH_TO_WEI.low), // amount of LORDS to peg to FAME
         quantity: 1,
         contents: 'One Random Genesis Duelist',
     };
@@ -97,7 +97,7 @@ mod PACK_TYPES {
         image_file_closed: 'SingleDuelist.png',
         image_file_open: 'SingleDuelist.png',
         can_purchase: false,
-        price_lords: (10 * CONST::ETH_TO_WEI.low),
+        price_lords: (10 * CONST::ETH_TO_WEI.low), // amount of LORDS to peg to FAME
         quantity: 1,
         contents: 'One Special Duelist',
     };
@@ -107,7 +107,7 @@ mod PACK_TYPES {
         image_file_closed: 'Unknown.jpg',
         image_file_open: 'Unknown.jpg',
         can_purchase: false,
-        price_lords: (10 * CONST::ETH_TO_WEI.low),
+        price_lords: 0, // will not peg LORDS to FAME
         quantity: 1,
         contents: 'One Bot Duelist',
     };
@@ -117,7 +117,7 @@ mod PACK_TYPES {
         image_file_closed: 'GenesisDuelists5x.png',
         image_file_open: 'GenesisDuelists5x.png',
         can_purchase: false,
-        price_lords: (50 * CONST::ETH_TO_WEI.low),
+        price_lords: (50 * CONST::ETH_TO_WEI.low), // amount of LORDS to peg to FAME
         quantity: 5,
         contents: 'Five Random Genesis Duelists',
     };

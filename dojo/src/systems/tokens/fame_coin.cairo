@@ -34,7 +34,7 @@ pub trait IFameCoin<TState> {
 // Exposed to world
 #[starknet::interface]
 pub trait IFameCoinProtected<TState> {
-    fn minted_duelist(ref self: TState, duelist_id: u128);
+    fn minted_duelist(ref self: TState, duelist_id: u128) -> u128;
     fn reward_duelist_fame(ref self: TState, duelist_id: u128, amount: u128);
     fn burn(ref self: TState, amount: u128);
 }
@@ -129,7 +129,7 @@ pub mod fame_coin {
     impl FameCoinProtectedImpl of super::IFameCoinProtected<ContractState> {
         fn minted_duelist(ref self: ContractState,
             duelist_id: u128,
-        ) {
+        ) -> u128 {
             let mut world: WorldStorage = self.world_default();
 
             // validate minter (duelist token contract)
@@ -143,7 +143,10 @@ pub mod fame_coin {
             self.erc20._approve(token_address, world.bank_address(), Bounded::MAX);
 
             // mint FAME to token
-            self.coin.mint(token_address, FAME::MINT_GRANT_AMOUNT.into());
+            let fame_amount: u128 = FAME::MINT_GRANT_AMOUNT;
+            self.coin.mint(token_address, fame_amount.into());
+
+            (fame_amount)
         }
 
         fn reward_duelist_fame(ref self: ContractState,
