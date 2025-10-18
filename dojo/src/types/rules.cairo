@@ -30,15 +30,15 @@ pub struct RewardDistribution {
 
 #[derive(Copy, Drop, Serde, Introspect, Default)]
 pub struct RewardValues {
-    pub fame_lost: u128,
-    pub fame_gained: u128,
-    pub fools_gained: u128,
-    pub points_scored: u16,
-    pub position: u8,        // position on the leaderboard
+    pub fame_lost: u128,        // FAME lost from Duelist
+    pub fame_gained: u128,      // FAME gained by Duelist
+    pub fools_gained: u128,     // FOOLS gained by Duelist
+    pub points_scored: u16,     // points scored by Duelist
+    pub position: u8,           // position on the leaderboard by Duelist
     // after burning fame...
-    pub fame_burned: u128,
-    pub lords_unlocked: u128,
-    pub survived: bool,
+    pub fame_burned: u128,      // amount of FAME de-pegged
+    pub lords_unlocked: u128,   // amount of lords released from FamePeg
+    pub survived: bool,         // true if Duelist survived
 }
 
 #[derive(Copy, Drop, Serde, Default)]

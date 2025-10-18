@@ -13,7 +13,6 @@ pub use pistols::models::{
     },
     pool::{
         Pool, PoolType,
-        LordsReleaseBill,
     },
     player::{
         Player, PlayerValue,
@@ -429,6 +428,11 @@ pub impl StoreImpl of StoreTrait {
     fn set_duelist_assignment(ref self: Store, model: @DuelistAssignment) {
         self.world.write_model(model);
     }
+    #[inline(always)]
+    fn delete_duelist_assignment(ref self: Store, duelist_id: u128) {
+        let model: DuelistAssignment = self.get_duelist_assignment(duelist_id);
+        self.world.erase_model(@model);
+    }
 
     #[inline(always)]
     fn set_duelist_memorial(ref self: Store, model: @DuelistMemorial) {
@@ -737,20 +741,6 @@ pub impl StoreImpl of StoreTrait {
         }
     }
 
-    #[inline(always)]
-    fn emit_lords_release(ref self: Store,
-        season_id: u32,
-        duel_id: u128,
-        bill: @LordsReleaseBill,
-        timestamp: u64,
-    ) {
-        self.world.emit_event(@LordsReleaseEvent {
-            season_id,
-            duel_id,
-            bill: *bill,
-            timestamp,
-        });
-    }
 
     #[inline(always)]
     fn emit_purchase_distribution(ref self: Store,

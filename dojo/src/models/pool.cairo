@@ -53,16 +53,21 @@ pub struct Pool {
 }
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
-pub enum ReleaseReason {
+pub enum ReleaseReason { // (deprecated)
+    //
+    // DEPRECATED for FamePegV2!!
+    //
     Undefined,              // 0
     FameLostToCreator,      // 1
     FameLostToDeveloper,    // 2
     SacrificedToDeveloper,  // 3
     LeaderboardPrize: u8,   // 4
 }
-
 #[derive(Copy, Drop, Serde, Introspect)]
-pub struct LordsReleaseBill {
+pub struct LordsReleaseBill { // (deprecated)
+    //
+    // DEPRECATED for FamePegV2!!
+    //
     pub reason: ReleaseReason,
     pub duelist_id: u128,
     pub recipient: ContractAddress,
@@ -70,6 +75,7 @@ pub struct LordsReleaseBill {
     pub pegged_lords: u128,     // LORDS pegged to FAME
     pub sponsored_lords: u128,  // LORDS from sponsors (can be zero)
 }
+//---------------------------
 
 
 //---------------------------

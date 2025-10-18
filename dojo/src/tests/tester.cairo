@@ -327,7 +327,6 @@ pub mod tester {
             TestResource::Event(pistols::models::events::e_PlayerActivityEvent::TEST_CLASS_HASH.into()),
             TestResource::Event(pistols::models::events::e_CallToChallengeEvent::TEST_CLASS_HASH.into()),
             TestResource::Event(pistols::models::events::e_ChallengeRewardsEvent::TEST_CLASS_HASH.into()),
-            TestResource::Event(pistols::models::events::e_LordsReleaseEvent::TEST_CLASS_HASH.into()),
             TestResource::Event(pistols::models::events::e_PurchaseDistributionEvent::TEST_CLASS_HASH.into()),
             TestResource::Event(pistols::models::events::e_PlayerBookmarkEvent::TEST_CLASS_HASH.into()),
             TestResource::Event(pistols::models::events::e_PlayerSocialLinkEvent::TEST_CLASS_HASH.into()),

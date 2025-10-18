@@ -74,7 +74,10 @@ pub struct PlayerActivityEvent {
 }
 #[derive(Copy, Drop, Serde)]
 #[dojo::event(historical:true)]
-pub struct LordsReleaseEvent {
+pub struct LordsReleaseEvent { // (deprecated)
+    //
+    // DEPRECATED for FamePegV2!!
+    //
     #[key]
     pub season_id: u32,
     //-----------------------
@@ -82,6 +85,9 @@ pub struct LordsReleaseEvent {
     pub duel_id: u128,
     pub timestamp: u64,
 }
+//
+// FamePegV2
+//
 #[derive(Clone, Drop, Serde)]
 #[dojo::event(historical:true)]
 pub struct PurchaseDistributionEvent {

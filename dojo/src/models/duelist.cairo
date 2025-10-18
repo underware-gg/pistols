@@ -68,7 +68,7 @@ pub enum CauseOfDeath {
     Duelling,   // 1
     Memorize,   // 2
     Sacrifice,  // 3
-    Forsaken,   // 4
+    Forsaken,   // 4 (deprecated)
 }
 
 
@@ -250,6 +250,24 @@ pub impl TotalsImpl of TotalsTrait {
     }
 }
 
+#[generate_trait]
+pub impl CauseOfDeathImpl of CauseOfDeathTrait {
+    #[inline(always)]
+    fn retains_fame(self: @CauseOfDeath) -> bool {
+        match self {
+            CauseOfDeath::None =>       false,
+            CauseOfDeath::Duelling =>   false,
+            CauseOfDeath::Memorize =>   true,
+            CauseOfDeath::Sacrifice =>  false,
+            CauseOfDeath::Forsaken =>   true,
+        }
+    }
+}
+
+
+//------------------------------------------------------
+// converters
+//
 impl ArchetypeIntoByteArray of core::traits::Into<Archetype, ByteArray> {
     fn into(self: Archetype) -> ByteArray {
         match self {
@@ -260,7 +278,6 @@ impl ArchetypeIntoByteArray of core::traits::Into<Archetype, ByteArray> {
         }
     }
 }
-
 impl CauseOfDeathIntoByteArray of core::traits::Into<CauseOfDeath, ByteArray> {
     fn into(self: CauseOfDeath) -> ByteArray {
         match self {
