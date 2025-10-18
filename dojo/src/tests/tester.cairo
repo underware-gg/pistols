@@ -331,6 +331,7 @@ pub mod tester {
             TestResource::Event(pistols::models::events::e_PlayerBookmarkEvent::TEST_CLASS_HASH.into()),
             TestResource::Event(pistols::models::events::e_PlayerSocialLinkEvent::TEST_CLASS_HASH.into()),
             TestResource::Event(pistols::models::events::e_PlayerSettingEvent::TEST_CLASS_HASH.into()),
+            // TestResource::Event(pistols::models::events::e_FamePegEvent::TEST_CLASS_HASH.into()),
             // cartridge arcade
             TestResource::Event(achievement::events::index::e_TrophyCreation::TEST_CLASS_HASH.into()),
             TestResource::Event(achievement::events::index::e_TrophyProgression::TEST_CLASS_HASH.into()),

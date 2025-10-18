@@ -54,6 +54,7 @@ pub mod bank {
     use pistols::models::{
         season::{SeasonConfig, SeasonConfigTrait},
         pool::{Pool, PoolTrait, PoolType},
+        // events::{FamePegEvent, FamePegDirection},
         leaderboard::{LeaderboardTrait, LeaderboardPosition},
     };
     use pistols::types::{
@@ -264,6 +265,13 @@ pub mod bank {
             // store
             store.set_pool(@pool_from);
             store.set_pool(@pool_peg);
+            // emit event
+            // store.emit_fame_peg(@FamePegEvent {
+            //     season_id: store.get_current_season_id(),
+            //     peg_direction: FamePegDirection::LordsToFame,
+            //     lords_amount: lords_amount,
+            //     fame_amount: fame_amount,
+            // });
         }
 
         fn depeg_lords_from_fame_to_be_burned(ref self: ContractState,
@@ -288,6 +296,13 @@ pub mod bank {
             // store
             store.set_pool(@pool_peg);
             store.set_pool(@pool_season);
+            // emit event
+            // store.emit_fame_peg(@FamePegEvent {
+            //     season_id: store.get_current_season_id(),
+            //     peg_direction: FamePegDirection::FameToLords,
+            //     lords_amount: released_lords,
+            //     fame_amount,
+            // });
             // return amount released
             (lords_amount)
         }

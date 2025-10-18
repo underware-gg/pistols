@@ -103,6 +103,24 @@ pub struct PurchaseDistributionEvent {
     pub lords_fees: u128,
     pub lords_season: u128,
 }
+// #[derive(Clone, Drop, Serde)]
+// #[dojo::event(historical:true)]
+// pub struct FamePegEvent {
+//     #[key]
+//     pub season_id: u32,
+//     #[key]
+//     pub peg_direction: FamePegDirection,
+//     //-----------------------
+//     pub lords_amount: u128,
+//     pub fame_amount: u128,
+// }
+
+// #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
+// pub enum FamePegDirection {
+//     Undefined,      // 0
+//     LordsToFame,    // 1
+//     FameToLords,    // 2
+// }
 
 
 
