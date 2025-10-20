@@ -63,7 +63,7 @@ pub trait IPackToken<TState> {
     fn calc_mint_fee(self: @TState, recipient: ContractAddress, pack_type: PackType) -> u128;
     fn claim_starter_pack(ref self: TState, referrer_address: ContractAddress) -> Span<u128>;
     fn claim_gift(ref self: TState) -> Span<u128>;
-    fn purchase(ref self: TState, pack_type: PackType) -> u128;
+    fn purchase(ref self: TState, pack_type: PackType, quantity: usize) -> Span<u128>;
     fn open(ref self: TState, pack_id: u128) -> Span<u128>;
     fn mint_to(ref self: TState, recipient: ContractAddress) -> u128;
     fn airdrop(ref self: TState, recipient: ContractAddress, pack_type: PackType, duelist_profile: Option<DuelistProfile>, quantity: usize) -> Span<u128>;
@@ -80,7 +80,7 @@ pub trait IPackTokenPublic<TState> {
     // write
     fn claim_starter_pack(ref self: TState, referrer_address: ContractAddress) -> Span<u128>; //@description: Claim the starter pack, mint Duelists
     fn claim_gift(ref self: TState) -> Span<u128>; //@description: Claim gift pack, if available
-    fn purchase(ref self: TState, pack_type: PackType) -> u128; //@description: Purchase a closed pack
+    fn purchase(ref self: TState, pack_type: PackType, quantity: usize) -> Span<u128>; //@description: Purchase packs
     fn open(ref self: TState, pack_id: u128) -> Span<u128>; //@description: Open a pack, mint its contents
     // admin functions
     fn mint_to(ref self: TState, recipient: ContractAddress) -> u128; //@description: Promotional airdrops (admin)
@@ -303,7 +303,7 @@ pub mod pack_token {
             (pack_type.mint_fee())
         }
 
-        fn purchase(ref self: ContractState, pack_type: PackType) -> u128 {
+        fn purchase(ref self: ContractState, pack_type: PackType, quantity: usize) -> Span<u128> {
             let mut store: Store = StoreTrait::new(self.world_default());
 
             // validate pack
@@ -316,22 +316,29 @@ pub mod pack_token {
             // create vrf seed
             let seed: felt252 = store.vrf_dispatcher().consume_random(Source::Nonce(recipient));
 
-            // mint
-            let lords_amount: u128 = self.calc_mint_fee(recipient, pack_type);
-            let pack: Pack = self._mint_pack(ref store, pack_type, Option::None, lords_amount, recipient, seed);
-            
+            // calculate price
+            let lords_per_pack: u128 = self.calc_mint_fee(recipient, pack_type);
+
+            // mint packs
+            let pack_ids: Array<u128> = self._mint_multiple_packs(ref store,
+                pack_type,
+                Option::None, // duelist_profile
+                lords_per_pack,
+                quantity,
+                recipient,
+                seed,
+                false,
+            );
+
             // transfer mint fees
             store.world.bank_protected_dispatcher().charge_lords_purchase(
                 starknet::get_contract_address(),
-                array![pack.pack_id],
+                pack_ids.clone(),
                 recipient,
-                lords_amount,
+                (lords_per_pack * quantity.into()),
             );
 
-            // events
-            PlayerTrait::check_in(ref store, Activity::PackPurchased, recipient, pack.pack_id.into(), Option::None);
-
-            (pack.pack_id)
+            (pack_ids.span())
         }
 
         fn mint_to(ref self: ContractState,
@@ -364,7 +371,7 @@ pub mod pack_token {
 
             // need vrf seed if duelist_profile is not provided
             let mut store: Store = StoreTrait::new(self.world_default());
-            let mut seed: felt252 = match (duelist_profile) {
+            let seed: felt252 = match (duelist_profile) {
                 Option::None => {
                     (store.vrf_dispatcher().consume_random(Source::Nonce(starknet::get_caller_address())))
                 },
@@ -449,7 +456,7 @@ pub mod pack_token {
             duelist_profile: Option<DuelistProfile>,
             quantity: usize,
             recipient: ContractAddress,
-            mut seed: felt252,
+            seed: felt252,
         ) -> Span<u128> {
             // only non-puchaseable packs
             assert(!pack_type.can_purchase(), Errors::NOT_FOR_AIRDROP);
@@ -478,17 +485,43 @@ pub mod pack_token {
             let lords_per_pack: u128 = self.calc_mint_fee(recipient, pack_type);
 
             // mint packs
+            let mut pack_ids: Array<u128> = self._mint_multiple_packs(ref store,
+                pack_type,
+                duelist_profile,
+                lords_per_pack,
+                quantity,
+                recipient,
+                seed,
+                true,
+            );
+
+            (pack_ids.span())
+        }
+
+        fn _mint_multiple_packs(ref self: ContractState,
+            ref store: Store,
+            pack_type: PackType,
+            duelist_profile: Option<DuelistProfile>,
+            lords_amount: u128,
+            quantity: usize,
+            recipient: ContractAddress,
+            mut seed: felt252,
+            airdropped: bool,
+        ) -> Array<u128> {
             let mut pack_ids: Array<u128> = array![];
             for i in 0..quantity {
                 if (i > 0) {
                     seed = hash_values(array![seed, seed].span());
                 }
-                let pack: Pack = self._mint_pack(ref store, pack_type, duelist_profile, lords_per_pack, recipient, seed);
-                Activity::AirdroppedPack.emit(ref store.world, recipient, pack.pack_id.into());
+                let pack: Pack = self._mint_pack(ref store, pack_type, duelist_profile, lords_amount, recipient, seed);
+                if (airdropped) {
+                    Activity::AirdroppedPack.emit(ref store.world, recipient, pack.pack_id.into());
+                } else {
+                    PlayerTrait::check_in(ref store, Activity::PackPurchased, recipient, pack.pack_id.into(), Option::None);
+                }
                 pack_ids.append(pack.pack_id);
             }
-
-            (pack_ids.span())
+            (pack_ids)
         }
 
         fn _mint_pack(ref self: ContractState,

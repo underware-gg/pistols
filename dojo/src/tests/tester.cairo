@@ -839,10 +839,14 @@ pub mod tester {
         (duelist_ids)
     }
     pub fn execute_pack_purchase(sys: @TestSystems, sender: ContractAddress, pack_type: PackType) -> u128 {
+        let pack_ids: Span<u128> = execute_pack_purchase_multiple(sys, sender, pack_type, 1);
+        (*pack_ids[0])
+    }
+    pub fn execute_pack_purchase_multiple(sys: @TestSystems, sender: ContractAddress, pack_type: PackType, quantity: usize) -> Span<u128> {
         impersonate(sender);
-        let pack_id: u128 = (*sys.pack).purchase(pack_type);
+        let pack_ids: Span<u128> = (*sys.pack).purchase(pack_type, quantity);
         _next_block();
-        (pack_id)
+        (pack_ids)
     }
     pub fn execute_pack_airdrop(sys: @TestSystems, sender: ContractAddress, recipient: ContractAddress, pack_type: PackType, duelist_profile: Option<DuelistProfile>) -> u128 {
         (*execute_pack_airdrop_multiple(sys, sender, recipient, pack_type, duelist_profile, 1)[0])
