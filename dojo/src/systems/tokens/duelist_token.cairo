@@ -314,6 +314,9 @@ pub mod duelist_token {
             assert(quantity.is_non_zero(), Errors::INVALID_QUANTITY);
             let duelist_ids: Span<u128> = self.token.mint_next_multiple(recipient, quantity);
 
+            // FAME is pegged to LORDS...
+            let fame_pegged: bool = lords_amount_to_peg_to_fame.is_non_zero();
+
             // create duelists
             let mut fame_amount: u128 = 0;
             let mut seed: u256 = seed.into();
@@ -329,13 +332,14 @@ pub mod duelist_token {
                     recipient,
                     duelist_profile,
                     duelist_id,
+                    fame_pegged,
                 );
                 seed /= 0x100;
                 i += 1;
             };
 
             // minted fame, peg to paid LORDS
-            if (lords_amount_to_peg_to_fame.is_non_zero()) {
+            if (fame_pegged) {
                 store.world.bank_protected_dispatcher().peg_minted_fame_to_lords(
                     recipient,
                     fame_amount,
@@ -381,7 +385,6 @@ pub mod duelist_token {
             let mut store: Store = StoreTrait::new(self.world_default());
             assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
 
-            // get fees distribution
             let season_id: u32 = store.get_current_season_id();
             let rules: Rules = challenge.duel_type.get_rules(@store);
 
@@ -390,11 +393,10 @@ pub mod duelist_token {
             let fools_protected_dispatcher: IFoolsCoinProtectedDispatcher = store.world.fools_coin_protected_dispatcher();
             let bank_protected_dispatcher: IBankProtectedDispatcher = store.world.bank_protected_dispatcher();
 
-            // get current balances
             let balance_a: u128 = self._fame_balance(@fame_dispatcher, challenge.duelist_id_a);
             let balance_b: u128 = self._fame_balance(@fame_dispatcher, challenge.duelist_id_b);
 
-            // calculate fees
+            // calculate rewards
             let signet_ring_a: RingType = if (challenge.winner == 1) {store.get_player_active_signet_ring(challenge.address_a)} else {RingType::Unknown};
             let signet_ring_b: RingType = if (challenge.winner == 2) {store.get_player_active_signet_ring(challenge.address_b)} else {RingType::Unknown};
             let mut rewards_a: RewardValues = rules.calc_rewards(balance_a, challenge.lives_staked, challenge.winner == 1, signet_ring_a, @bonus.duelist_a);
@@ -403,8 +405,8 @@ pub mod duelist_token {
             // transfer gains
             self._process_fame_fools_rewards(@fame_protected_dispatcher, @fools_protected_dispatcher, challenge.duelist_id_a, @rewards_a);
             self._process_fame_fools_rewards(@fame_protected_dispatcher, @fools_protected_dispatcher, challenge.duelist_id_b, @rewards_b);
-            self._process_lost_fame(@fame_protected_dispatcher, @bank_protected_dispatcher, season_id, challenge.duelist_id_a, balance_a, rewards_b.fame_gained, ref rewards_a);
-            self._process_lost_fame(@fame_protected_dispatcher, @bank_protected_dispatcher, season_id, challenge.duelist_id_b, balance_b, rewards_a.fame_gained, ref rewards_b);
+            self._process_lost_fame(@store, @fame_protected_dispatcher, @bank_protected_dispatcher, season_id, challenge.duelist_id_a, balance_a, rewards_b.fame_gained, ref rewards_a);
+            self._process_lost_fame(@store, @fame_protected_dispatcher, @bank_protected_dispatcher, season_id, challenge.duelist_id_b, balance_b, rewards_a.fame_gained, ref rewards_b);
 
             // DEAD
             if (!rewards_a.survived) {
@@ -432,6 +434,7 @@ pub mod duelist_token {
             recipient: ContractAddress,
             duelist_profile: DuelistProfile,
             duelist_id: u128,
+            fame_pegged: bool,
         ) -> u128 {
             // create Duelist
             let duelist: Duelist = Duelist {
@@ -442,6 +445,7 @@ pub mod duelist_token {
                     active: 0,
                 },
                 totals: Default::default(),
+                released_fame: !fame_pegged,
             };
             store.set_duelist(@duelist);
 
@@ -485,6 +489,7 @@ pub mod duelist_token {
         }
         
         fn _process_lost_fame(ref self: ContractState,
+            store: @Store,
             fame_protected_dispatcher: @IFameCoinProtectedDispatcher,
             bank_protected_dispatcher: @IBankProtectedDispatcher,
             season_id: u32,
@@ -506,12 +511,13 @@ pub mod duelist_token {
                 }
                 //
                 // de-peg FAME
-                values.fame_burned = (values.fame_lost - winners_minted_fame);
-                values.lords_unlocked = (*bank_protected_dispatcher).depeg_lords_from_fame_to_be_burned(season_id, values.fame_burned);
-                //
-                // burn FAME from duelist
-                IFameCoinDispatcher{contract_address: *fame_protected_dispatcher.contract_address}
-                    .burn_from_token(starknet::get_contract_address(), duelist_id, values.fame_lost.into());
+                if (!store.get_duelist_released_fame(duelist_id)) {
+                    values.fame_burned = (values.fame_lost - winners_minted_fame);
+                    values.lords_unlocked = (*bank_protected_dispatcher).depeg_lords_from_fame_to_be_burned(season_id, values.fame_burned);
+                    // burn FAME from duelist
+                    IFameCoinDispatcher{contract_address: *fame_protected_dispatcher.contract_address}
+                        .burn_from_token(starknet::get_contract_address(), duelist_id, values.fame_lost.into());
+                }
             }
         }
 

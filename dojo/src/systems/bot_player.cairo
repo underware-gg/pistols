@@ -178,6 +178,7 @@ pub mod bot_player {
             (match duelist_id {
                 Option::Some(id) => {(id)},
                 Option::None => {
+                    // only the pack contract can mint duelists
                     let duelist_id: u128 = (store.world.pack_token_protected_dispatcher().mint_bot_duelist(duelist_profile));
                     // enlist in queue if required
                     if let Some(queue_id) = queue_id {

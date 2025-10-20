@@ -116,7 +116,7 @@ fn test_contract_uri() {
 fn test_token_uri() {
     let mut sys: TestSystems = setup(0);
 
-    let duelist = Duelist {
+    let duelist: Duelist = Duelist {
         duelist_id: TOKEN_ID_1_1.low,
         duelist_profile: DuelistProfile::Genesis(GenesisKey::LadyVengeance),
         timestamps: DuelistTimestamps {
@@ -124,17 +124,18 @@ fn test_token_uri() {
             active: 0,
         },
         totals: Default::default(),
+        released_fame: false,
     };
     tester::set_Duelist(ref sys.world, @duelist);
 
-    let scoreboard = SeasonScoreboard {
+    let scoreboard: SeasonScoreboard = SeasonScoreboard {
         holder: TOKEN_ID_1_1.low.into(),
         season_id: SEASON_ID_1,
         points: 777,
     };
     tester::set_SeasonScoreboard(ref sys.world, @scoreboard);
 
-    let stack = PlayerDuelistStack {
+    let stack: PlayerDuelistStack = PlayerDuelistStack {
         player_address: OWNER(),
         duelist_profile: duelist.duelist_profile,
         level: 2,
@@ -143,8 +144,8 @@ fn test_token_uri() {
     };
     tester::set_PlayerDuelistStack(ref sys.world, @stack);
 
-    let uri_1 = sys.duelists.token_uri(TOKEN_ID_1_1);
-    let uri_2 = sys.duelists.token_uri(TOKEN_ID_1_2);
+    let uri_1: ByteArray = sys.duelists.token_uri(TOKEN_ID_1_1);
+    let uri_2: ByteArray = sys.duelists.token_uri(TOKEN_ID_1_2);
     
     println!("___duelist.token_uri(1):{}", uri_1);
     println!("___duelist.token_uri(2):{}", uri_2);

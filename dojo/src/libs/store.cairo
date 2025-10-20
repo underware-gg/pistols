@@ -584,6 +584,10 @@ pub impl StoreImpl of StoreTrait {
         (self.world.read_member_legacy(Model::<Duelist>::ptr_from_keys(duelist_id), selector!("totals")))
     }
     #[inline(always)]
+    fn get_duelist_released_fame(self: @Store, duelist_id: u128) -> bool {
+        (self.world.read_member_legacy(Model::<Duelist>::ptr_from_keys(duelist_id), selector!("released_fame")))
+    }
+    #[inline(always)]
     fn get_duelist_assigned_duel_id(self: @Store, duelist_id: u128) -> u128 {
         (self.world.read_member_legacy(Model::<DuelistAssignment>::ptr_from_keys(duelist_id), selector!("duel_id")))
     }

@@ -23,10 +23,10 @@ pub struct Pack {
     //-----------------------
     pub pack_type: PackType,
     pub seed: felt252,
-    pub lords_amount: u128,
-    pub is_open: bool,
-    pub duelist_profile: Option<DuelistProfile>,
-    pub pegged_lords_amount: u128,
+    pub lords_amount: u128,         // how much LORDS this pack is worth (or paid for it)
+    pub is_open: bool,              // true if the pack has been opened
+    pub duelist_profile: Option<DuelistProfile>,    // used for PackType::SingleDuelist
+    pub pegged_lords_amount: u128,  // amount of LORDS left to peg FAME for minted Duelists
 }
 
 
@@ -201,5 +201,31 @@ pub impl PackTypeDebug of core::fmt::Debug<PackType> {
     fn fmt(self: @PackType, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
         f.buffer.append(@(*self).name());
         Result::Ok(())
+    }
+}
+
+
+
+
+
+
+
+//----------------------------------------
+// Unit  tests
+//
+#[cfg(test)]
+mod unit {
+    use super::*;
+
+    #[test]
+    fn validate_pack_fees() {
+        // free, not pegged
+        assert_eq!(PackType::StarterPack.mint_fee(), 0);
+        assert_eq!(PackType::BotDuelist.mint_fee(), 0);
+        // pegged
+        assert_gt!(PackType::GenesisDuelists5x.mint_fee(), 0);
+        assert_gt!(PackType::FreeGenesis5x.mint_fee(), 0);
+        assert_gt!(PackType::FreeDuelist.mint_fee(), 0);
+        assert_gt!(PackType::SingleDuelist.mint_fee(), 0);
     }
 }

@@ -15,6 +15,7 @@ pub struct Duelist {
     pub duelist_profile: DuelistProfile,
     pub timestamps: DuelistTimestamps,
     pub totals: Totals,
+    pub released_fame: bool,    // this Duelist's FAME is not pegged to LORDS (Free/Bot/Enlisted)
 }
 
 #[derive(Copy, Drop, Serde, PartialEq, IntrospectPacked)]

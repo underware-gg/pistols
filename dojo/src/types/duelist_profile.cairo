@@ -480,6 +480,7 @@ pub impl ProfileManagerImpl of ProfileManagerTrait {
                     active: 0,
                 },
                 totals: Default::default(),
+                released_fame: false,
             });
             i += 1;
         };

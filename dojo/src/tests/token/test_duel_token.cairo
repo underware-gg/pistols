@@ -124,7 +124,7 @@ fn test_contract_uri() {
 fn test_token_uri() {
     let mut sys: TestSystems = setup(0);
 
-    let duelist_a = Duelist {
+    let duelist_a: Duelist = Duelist {
         duelist_id: ID(OWNER()),
         duelist_profile: DuelistProfile::Genesis(GenesisKey::LadyVengeance),
         timestamps: DuelistTimestamps {
@@ -132,8 +132,9 @@ fn test_token_uri() {
             active: 0,
         },
         totals: Default::default(),
+        released_fame: false,
     };
-    let duelist_b = Duelist {
+    let duelist_b: Duelist = Duelist {
         duelist_id: ID(OTHER()),
         duelist_profile: DuelistProfile::Bot(BotKey::Leon),
         timestamps: DuelistTimestamps {
@@ -141,8 +142,9 @@ fn test_token_uri() {
             active: 999999,
         },
         totals: Default::default(),
+        released_fame: false,
     };
-    let challenge = Challenge {
+    let challenge: Challenge = Challenge {
         duel_id: DUEL_ID_1.low,
         duel_type: DuelType::Practice,
         premise: Premise::Honour,
