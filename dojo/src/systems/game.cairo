@@ -173,10 +173,18 @@ pub mod game {
         ) {
             let mut store: Store = StoreTrait::new(self.world_default());
             let mut challenge: Challenge = store.get_challenge(duel_id);
+            let mut round: Round = store.get_round(duel_id);
 
             // route to tutorial
             if (challenge.is_tutorial()) {
                 store.world.tutorial_dispatcher().commit_moves(duelist_id, duel_id, hashed);
+                return;
+            }
+
+            // season-bounded duel expired
+            if (challenge.season_bounded_expired(@store)) {
+                challenge.state = ChallengeState::Expired;
+                self._finish_challenge(ref store, ref challenge, ref round, Option::None, Option::None);
                 return;
             }
 
@@ -202,7 +210,6 @@ pub mod game {
             }
 
             // validate Round state
-            let mut round: Round = store.get_round(duel_id);
             assert(round.state == RoundState::Commit, Errors::ROUND_NOT_IN_COMMIT);
 
             if (duelist_number == 1) {
@@ -275,6 +282,7 @@ pub mod game {
         ) {
             let mut store: Store = StoreTrait::new(self.world_default());
             let mut challenge: Challenge = store.get_challenge(duel_id);
+            let mut round: Round = store.get_round( duel_id);
 
             // route to tutorial
             if (challenge.is_tutorial()) {
@@ -282,11 +290,15 @@ pub mod game {
                 return;
             }
 
-            // validate challenge
-            assert(challenge.state == ChallengeState::InProgress, Errors::CHALLENGE_NOT_IN_PROGRESS);
+            // season-bounded duel expired
+            if (challenge.season_bounded_expired(@store)) {
+                challenge.state = ChallengeState::Expired;
+                self._finish_challenge(ref store, ref challenge, ref round, Option::None, Option::None);
+                return;
+            }
 
-            // validate Round
-            let mut round: Round = store.get_round( duel_id);
+            // validate states
+            assert(challenge.state == ChallengeState::InProgress, Errors::CHALLENGE_NOT_IN_PROGRESS);
             assert(round.state == RoundState::Reveal, Errors::ROUND_NOT_IN_REVEAL);
 
             // reveal is permissionless, as only commiter knows the salt
@@ -392,7 +404,7 @@ pub mod game {
                 // outside call
                 assert(self.can_collect_duel(duel_id), Errors::CHALLENGE_IN_PROGRESS);
                 // collect!
-                if (challenge.state == ChallengeState::Awaiting) {
+                if (challenge.state == ChallengeState::Awaiting || challenge.season_bounded_expired(@store)) {
                     // if pending, set to expired...
                     challenge.state = ChallengeState::Expired;
                     self._finish_challenge(ref store, ref challenge, ref round, Option::None, Option::None);
@@ -480,19 +492,14 @@ pub mod game {
             let mut store: Store = StoreTrait::new(self.world_default());
             let challenge: Challenge = store.get_challenge(duel_id);
             let round: Round = store.get_round(duel_id);
-            if (
-                challenge.state == ChallengeState::Awaiting &&
-                challenge.timestamps.has_expired()
-            ) {
-                (true)
-            } else if (
-                challenge.state == ChallengeState::InProgress && 
-                (round.moves_a.timeout.has_timed_out(@challenge) || round.moves_b.timeout.has_timed_out(@challenge))
-            ) {
-                (true)
-            } else {
-                (false)
-            }
+            (
+                // waiting for reply, expired
+                (challenge.state == ChallengeState::Awaiting && challenge.timestamps.has_expired()) ||
+                // if any player timed out
+                (challenge.state == ChallengeState::InProgress && round.has_timed_out(@challenge)) ||
+                // if in season bound (ranked) and season ended
+                challenge.season_bounded_expired(@store)
+            )
         }
 
         fn calc_season_reward(self: @ContractState,
@@ -650,7 +657,9 @@ pub mod game {
                     if (winner == 0) {ChallengeState::Draw}
                     else {ChallengeState::Resolved};
             }
-            challenge.season_id = store.get_current_season_id();
+            if (challenge.season_id.is_zero()) {
+                challenge.season_id = store.get_current_season_id();
+            }
             challenge.timestamps.end = starknet::get_block_timestamp();
             store.set_challenge(@challenge);
             //end round

@@ -188,7 +188,7 @@ pub mod duel_token {
     use pistols::models::{
         player::{PlayerTrait, PlayerDelegationTrait},
         challenge::{
-            DuelType,
+            DuelType, DuelTypeTrait,
             Challenge, ChallengeTrait, ChallengeValue,
             ChallengeMessage, ChallengeMessageValue,
             Round, RoundTrait,
@@ -504,12 +504,16 @@ pub mod duel_token {
             let duelist_dispatcher: IDuelistTokenProtectedDispatcher = store.world.duelist_token_protected_dispatcher();
             duelist_id_a = (duelist_dispatcher.get_validated_active_duelist_id(address_a, duelist_id_a, lives_staked));
 
+            // Ranked is season bounded
+            let duel_type: DuelType = queue_id.into();
+            let season_id: u32 = if (duel_type.is_season_bounded()) {store.get_current_season_id()} else {0};
+
             // create challenge
             let challenge: Challenge = self._spawn_challenge(
                 ref store,
                 Challenge {
                     duel_id: 0,
-                    duel_type: queue_id.into(),
+                    duel_type,
                     premise: queue_id.get_premise(),
                     lives_staked,
                     // duelists
@@ -519,7 +523,7 @@ pub mod duel_token {
                     duelist_id_b: 0,
                     // progress
                     state: ChallengeState::Awaiting,
-                    season_id: 0,
+                    season_id,
                     winner: 0,
                     // timestamps
                     timestamps: PeriodTrait::new_open(), // no reply timeout

@@ -117,10 +117,17 @@ pub impl SeasonConfigImpl of SeasonConfigTrait {
         (MathU64::sub(*self.period.end, starknet::get_block_timestamp()))
     }
     #[inline(always)]
+    fn has_ended(self: @SeasonConfig) -> bool {
+        (
+            *self.phase == SeasonPhase::Ended ||
+            self.seconds_to_collect() == 0
+        )
+    }
+    #[inline(always)]
     fn can_collect(self: @SeasonConfig) -> bool {
         (
             *self.phase != SeasonPhase::Ended &&
-            (*self).seconds_to_collect() == 0
+            self.seconds_to_collect() == 0
         )
     }
     fn collect(ref self: SeasonConfig, ref store: Store) -> u32 {

@@ -100,7 +100,7 @@ pub struct DuelistState {
 //------------------------------------
 // Traits
 //
-// use core::num::traits::Zero;
+use core::num::traits::Zero;
 use pistols::models::{
     match_queue::{QueueMode, QueueModeTrait},
     season::{SeasonConfigTrait},
@@ -186,6 +186,14 @@ pub impl ChallengeImpl of ChallengeTrait {
     fn get_deck(self: @Challenge) -> Deck {
         (self.get_deck_type().build_deck())
     }
+    #[inline(always)]
+    fn season_bounded_expired(self: @Challenge, store: @Store) -> bool {
+        (
+            *self.state == ChallengeState::InProgress &&
+            self.season_id.is_non_zero() &&
+            !store.get_current_season().has_ended()
+        )
+    }
 }
 
 #[generate_trait]
@@ -229,6 +237,18 @@ pub impl DuelTypeImpl of DuelTypeTrait {
             }
         })
     }
+    fn is_season_bounded(self: @DuelType) -> bool {
+        (match self {
+            DuelType::Ranked => (true),
+            DuelType::Tournament |
+            DuelType::Seasonal |
+            DuelType::Tutorial |
+            DuelType::Practice |
+            DuelType::BotPlayer |
+            DuelType::Unranked |
+            DuelType::Undefined => (false),
+        })
+    }
 }
 
 #[generate_trait]
@@ -258,6 +278,14 @@ pub impl RoundImpl of RoundTrait {
         let timeout: u64 = (current_timestamp + duel_type.get_reply_timeout(Option::None));
         self.moves_a.set_reveal_timeout(timeout);
         self.moves_b.set_reveal_timeout(timeout);
+    }
+    // if any player timed out
+    #[inline(always)]
+    fn has_timed_out(self: @Round, challenge: @Challenge) -> bool {
+        (
+            self.moves_a.timeout.has_timed_out(challenge) ||
+            self.moves_b.timeout.has_timed_out(challenge)
+        )
     }
 }
 
