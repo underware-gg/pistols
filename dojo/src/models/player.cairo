@@ -130,7 +130,7 @@ mod PlayerErrors {
 
 #[generate_trait]
 pub impl PlayerImpl of PlayerTrait {
-    fn check_in(ref store: Store, activity: Activity, player_address: ContractAddress, identifier: felt252, referrer_address: ContractAddress) {
+    fn check_in(ref store: Store, activity: Activity, player_address: ContractAddress, identifier: felt252, referrer_address: Option<ContractAddress>) {
         let mut player: Player = store.get_player(player_address);
         let mut save_player: bool = (
             // create player if does not exist and this event can register a player
@@ -145,9 +145,10 @@ pub impl PlayerImpl of PlayerTrait {
         save_player = (
             if (activity == Activity::PackStarter) {
                 player.timestamps.claimed_starter_pack = true;
-                player.referrer_address =
-                    if (referrer_address.is_non_zero() && referrer_address != player_address) {referrer_address}
-                    else {ZERO()};
+                player.referrer_address = match referrer_address {
+                    Option::Some(address) => {if (address != player_address) {address} else {ZERO()}},
+                    Option::None => {ZERO()},
+                };
                 (true)
             } else if (activity == Activity::ClaimedGift) {
                 player.timestamps.claimed_gift = starknet::get_block_timestamp();

@@ -264,7 +264,7 @@ pub mod game {
             store.set_duelist_timestamp_active(duelist_id, timestamp);
 
             // events
-            PlayerTrait::check_in(ref store, Activity::MovesCommitted, owner, duel_id.into(), ZERO());
+            PlayerTrait::check_in(ref store, Activity::MovesCommitted, owner, duel_id.into(), Option::None);
 
             store.set_round(@round);
 

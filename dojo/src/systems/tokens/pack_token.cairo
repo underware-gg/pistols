@@ -247,7 +247,7 @@ pub mod pack_token {
             let pack: Pack = self._mint_pack(ref store, PackType::StarterPack, Option::None, lords_amount, recipient, seed);
             
             // events
-            PlayerTrait::check_in(ref store, Activity::PackStarter, recipient, pack.pack_id.into(), referrer_address);
+            PlayerTrait::check_in(ref store, Activity::PackStarter, recipient, pack.pack_id.into(), Option::Some(referrer_address));
 
             // open immediately
             (self.open(pack.pack_id))
@@ -285,7 +285,7 @@ pub mod pack_token {
             let pack: Pack = self._mint_pack(ref store, PackType::FreeDuelist, Option::None, lords_amount, recipient, seed);
             
             // events
-            PlayerTrait::check_in(ref store, Activity::ClaimedGift, recipient, pack.pack_id.into(), ZERO());
+            PlayerTrait::check_in(ref store, Activity::ClaimedGift, recipient, pack.pack_id.into(), Option::None);
 
             // open immediately
             (self.open(pack.pack_id))
@@ -329,7 +329,7 @@ pub mod pack_token {
             );
 
             // events
-            PlayerTrait::check_in(ref store, Activity::PackPurchased, recipient, pack.pack_id.into(), ZERO());
+            PlayerTrait::check_in(ref store, Activity::PackPurchased, recipient, pack.pack_id.into(), Option::None);
 
             (pack.pack_id)
         }
@@ -399,7 +399,7 @@ pub mod pack_token {
             self.erc721.burn(pack_id.into());
 
             // events
-            PlayerTrait::check_in(ref store, Activity::PackOpened, recipient, pack_id.into(), ZERO());
+            PlayerTrait::check_in(ref store, Activity::PackOpened, recipient, pack_id.into(), Option::None);
 
             (token_ids)
         }
