@@ -14,7 +14,7 @@ mod tests {
             IPackTokenDispatcherTrait,
             ILordsMockDispatcherTrait,
             IAdminDispatcherTrait,
-            OWNER, OTHER, TREASURY,
+            OWNER, OTHER,
         }
     };
     use pistols::libs::admin_fix::{AdminFixTrait};
@@ -127,11 +127,10 @@ mod tests {
     }
 
     #[test]
-    fn test_fix_player_bookmark() {
+    #[should_panic(expected: ('ADMIN: Caller not admin', 'ENTRYPOINT_FAILED'))]
+    fn test_urgent_update_caller() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN | FLAGS::OWNER);
-        tester::impersonate(OWNER());
-        tester::drop_dojo_events(@sys);
-        sys.admin.fix_player_bookmark(OTHER(), TREASURY(), 123, true);
-        tester::assert_event_bookmark(@sys, OTHER(), TREASURY(), 123, true);
+        tester::impersonate(OTHER());
+        sys.admin.urgent_update();
     }
 }
