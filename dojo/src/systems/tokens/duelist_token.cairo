@@ -1,6 +1,7 @@
 use starknet::{ContractAddress};
 use dojo::world::IWorldDispatcher;
 use pistols::models::challenge::{Challenge};
+use pistols::models::duelist::{CauseOfDeath};
 use pistols::models::pool::{PoolType};
 use pistols::types::duelist_profile::{DuelistProfile};
 use pistols::types::rules::{RewardValues, DuelBonus};
@@ -95,6 +96,7 @@ pub trait IDuelistTokenProtected<TState> {
     ) -> Span<u128>;
     fn get_validated_active_duelist_id(ref self: TState, address: ContractAddress, duelist_id: u128, lives_staked: u8) -> u128;
     fn depeg_fame_to_season_pool(ref self: TState, duelist_id: u128);
+    fn memorialize_duelists(ref self: TState, duelist_ids: Array<u128>, cause_of_death: CauseOfDeath);
     fn transfer_rewards(ref self: TState, challenge: Challenge, bonus: DuelBonus) -> (RewardValues, RewardValues);
 }
 
@@ -283,7 +285,8 @@ pub mod duelist_token {
         ) {
             assert(false, Errors::NOT_IMPLEMENTED);
             self.erc721_combo._require_owner_of(starknet::get_caller_address(), duelist_id.into());
-            self._memorialize(duelist_id, CauseOfDeath::Sacrifice);
+            let mut store: Store = StoreTrait::new(self.world_default());
+            self._memorialize(ref store, duelist_id, CauseOfDeath::Sacrifice);
         }
 
         fn memorialize(ref self: ContractState,
@@ -291,7 +294,8 @@ pub mod duelist_token {
         ) {
             assert(false, Errors::NOT_IMPLEMENTED);
             self.erc721_combo._require_owner_of(starknet::get_caller_address(), duelist_id.into());
-            self._memorialize(duelist_id, CauseOfDeath::Memorize);
+            let mut store: Store = StoreTrait::new(self.world_default());
+            self._memorialize(ref store, duelist_id, CauseOfDeath::Memorize);
         }
     }
 
@@ -395,6 +399,20 @@ pub mod duelist_token {
             store.world.bank_protected_dispatcher().depeg_lords_from_fame_to_be_burned(store.get_current_season_id(), fame_balance);
             // mark this duelist FAME as released, so it will not de-peg after when lost
             store.set_duelist_released_fame(duelist_id, true);
+        }
+
+        fn memorialize_duelists(
+            ref self: ContractState,
+            duelist_ids: Array<u128>,
+            cause_of_death: CauseOfDeath,
+        ) {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
+            for duelist_id in duelist_ids {
+                if (!store.get_duelist_is_memorialized(duelist_id)) {
+                    self._memorialize(ref store, duelist_id, cause_of_death);
+                }
+            }
         }
 
         fn transfer_rewards(
@@ -542,10 +560,10 @@ pub mod duelist_token {
         }
 
         fn _memorialize(ref self: ContractState,
+            ref store: Store,
             duelist_id: u128,
             cause_of_death: CauseOfDeath,
         ) {
-            let mut store: Store = StoreTrait::new(self.world_default());
             let fame_dispatcher: IFameCoinDispatcher = store.world.fame_coin_dispatcher();
             let bank_dispatcher: IBankProtectedDispatcher = store.world.bank_protected_dispatcher();
 
@@ -598,10 +616,14 @@ pub mod duelist_token {
             stack.remove(duelist_id);
             store.set_player_duelist_stack(@stack);
             PlayerTrait::remove_alive_duelist(ref store, memorial.player_address, 1);
-            // delete DuelistAssignment model
-            store.delete_duelist_assignment(duelist_id);
+            // // delete DuelistAssignment model (needs to find past Ranked duelists)
+            // store.delete_duelist_assignment(duelist_id);
             // events
-            Activity::DuelistDied.emit(ref store.world, memorial.player_address, duelist_id.into());
+            if (cause_of_death.retains_fame()) {
+                Activity::DuelistMemorialized.emit(ref store.world, memorial.player_address, duelist_id.into());
+            } else {
+                Activity::DuelistDied.emit(ref store.world, memorial.player_address, duelist_id.into());
+            }
         }
     }
 

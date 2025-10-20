@@ -12,7 +12,7 @@ pub use pistols::systems::{
     game::{IGameDispatcher, IGameDispatcherTrait},
     game_loop::{IGameLoopDispatcher, IGameLoopDispatcherTrait},
     bot_player::{IBotPlayerDispatcher, IBotPlayerDispatcherTrait, IBotPlayerProtectedDispatcher, IBotPlayerProtectedDispatcherTrait},
-    matchmaker::{IMatchMakerDispatcher, IMatchMakerDispatcherTrait},
+    matchmaker::{IMatchMakerDispatcher, IMatchMakerDispatcherTrait, IMatchMakerProtectedDispatcher, IMatchMakerProtectedDispatcherTrait},
     tutorial::{ITutorialDispatcher, ITutorialDispatcherTrait},
     rng::{IRngDispatcher, IRngDispatcherTrait},
     rng_mock::{IRngMockDispatcher, IRngMockDispatcherTrait},
@@ -249,6 +249,10 @@ pub impl DnsImpl of DnsTrait {
     #[inline(always)]
     fn matchmaker_dispatcher(self: @WorldStorage) -> IMatchMakerDispatcher {
         (IMatchMakerDispatcher{ contract_address: self.matchmaker_address() })
+    }
+    #[inline(always)]
+    fn matchmaker_protected_dispatcher(self: @WorldStorage) -> IMatchMakerProtectedDispatcher {
+        (IMatchMakerProtectedDispatcher{ contract_address: self.matchmaker_address() })
     }
     #[inline(always)]
     fn tutorial_dispatcher(self: @WorldStorage) -> ITutorialDispatcher {

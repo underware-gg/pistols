@@ -37,7 +37,7 @@ pub struct SeasonScoreboard {
 //---------------------------
 // Season Manager
 //
-use pistols::systems::game::game::{Errors as ErrorsGame};
+use pistols::systems::bank::bank::{Errors as ErrorsBank};
 use pistols::models::leaderboard::{LeaderboardTrait};
 use pistols::types::rules::{RewardDistribution, RewardValues};
 use pistols::libs::store::{Store, StoreTrait};
@@ -132,8 +132,8 @@ pub impl SeasonConfigImpl of SeasonConfigTrait {
     }
     fn collect(ref self: SeasonConfig, ref store: Store) -> u32 {
         // must sync with Self::collect()
-        assert(self.phase == SeasonPhase::InProgress, ErrorsGame::SEASON_IS_NOT_ACTIVE);
-        assert(self.seconds_to_collect() == 0, ErrorsGame::SEASON_IS_ACTIVE);
+        assert(self.phase == SeasonPhase::InProgress, ErrorsBank::SEASON_IS_NOT_ACTIVE);
+        assert(self.seconds_to_collect() == 0, ErrorsBank::SEASON_IS_ACTIVE);
         // collect!
         self.phase = SeasonPhase::Ended;
         self.period.end = starknet::get_block_timestamp();

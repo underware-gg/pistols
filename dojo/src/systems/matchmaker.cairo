@@ -29,6 +29,7 @@ pub trait IMatchMakerPublic<TState> {
 pub trait IMatchMakerProtected<TState> {
     fn set_queue_size(ref self: TState, queue_id: QueueId, size: u8);
     fn set_queue_entry_token(ref self: TState, queue_id: QueueId, entry_token_address: ContractAddress, entry_token_amount: u128);
+    fn close_season(ref self: TState, queue_id: QueueId);
     fn clear_queue(ref self: TState, queue_id: QueueId);
     fn clear_player_queue(ref self: TState, queue_id: QueueId, player_address: ContractAddress);
 }
@@ -41,7 +42,7 @@ pub mod matchmaker {
 
     use pistols::models::{
         challenge::{DuelType},
-        duelist::{DuelistAssignmentTrait},
+        duelist::{DuelistAssignmentTrait, CauseOfDeath},
         pact::{PactTrait},
         match_queue::{
             QueueId, QueueIdTrait, QueueMode,
@@ -50,6 +51,7 @@ pub mod matchmaker {
             QueueInfo, QueueInfoTrait,
         },
         events::{Activity, ActivityTrait},
+        season::{SeasonConfigTrait},
     };
     use pistols::types::{
         duelist_profile::{DuelistProfile, DuelistProfileTrait, BotKey},
@@ -72,6 +74,7 @@ pub mod matchmaker {
 
     pub mod Errors {
         pub const CALLER_NOT_ADMIN: felt252         = 'MATCHMAKER: Caller not admin';
+        pub const INVALID_CALLER: felt252           = 'MATCHMAKER: Invalid caller';
         pub const INVALID_QUEUE: felt252            = 'MATCHMAKER: Invalid queue';
         pub const INVALID_MODE: felt252             = 'MATCHMAKER: Invalid mode';
         pub const INVALID_DUELIST: felt252          = 'MATCHMAKER: Invalid duelist';
@@ -567,7 +570,19 @@ pub mod matchmaker {
             (matching_player.duel_id)
         }
 
-        fn _clear_player_queue(ref self: ContractState, ref store: Store, queue_id: QueueId, ref match_player: MatchPlayer) {
+        //------------------------------------
+        // cleanup
+        //
+
+        fn _clear_season(ref self: ContractState, ref store: Store, ref queue: MatchQueue, season_ended: bool) {
+            for player in queue.players {
+                let mut match_player: MatchPlayer = store.get_match_player(player, queue.queue_id);
+                self._clear_player_queue(ref store, queue.queue_id, ref match_player, season_ended);
+            }
+            queue.players = array![];
+        }
+
+        fn _clear_player_queue(ref self: ContractState, ref store: Store, queue_id: QueueId, ref match_player: MatchPlayer, season_ended: bool) {
             for next_duelist in match_player.next_duelists.clone() {
                 DuelistAssignmentTrait::unassign_challenge(ref store, next_duelist.duelist_id);
             }
@@ -576,7 +591,9 @@ pub mod matchmaker {
                 DuelistAssignmentTrait::unassign_challenge(ref store, match_player.duelist_id);
             }
             // if has a duel, wipe it...
-            if (match_player.duel_id.is_non_zero()) {
+            if (match_player.duel_id.is_non_zero() && !season_ended) {
+                // has a duel, wipe it...
+                // (if season ended, the duel will be expired)
                 store.world.duel_token_protected_dispatcher().wipe_duel(match_player.duel_id);
             }
             store.delete_match_player(@match_player);
@@ -616,16 +633,31 @@ pub mod matchmaker {
             store.set_match_queue(@queue);
         }
 
+        // called by collect_season()
+        fn close_season(ref self: ContractState, queue_id: QueueId) {
+            // validate caller
+            let mut store: Store = StoreTrait::new(self.world_default());
+            assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
+            //
+            // memorialize duelists
+            let mut queue: MatchQueue = store.get_match_queue(queue_id);
+            store.world.duelist_token_protected_dispatcher().memorialize_duelists(queue.enlisted_duelist_ids, CauseOfDeath::Ranked);
+            queue.enlisted_duelist_ids = array![];
+            //
+            // clear the queue
+            self._clear_season(ref store, ref queue, true);
+            store.set_match_queue(@queue);
+        }
+
         fn clear_queue(ref self: ContractState, queue_id: QueueId) {
             self._assert_caller_is_admin();
             assert(queue_id != QueueId::Undefined, Errors::INVALID_QUEUE);
             let mut store: Store = StoreTrait::new(self.world_default());
+            //
+            // clear the queue
             let mut queue: MatchQueue = store.get_match_queue(queue_id);
-            for player in queue.players {
-                let mut match_player: MatchPlayer = store.get_match_player(player, queue_id);
-                self._clear_player_queue(ref store, queue_id, ref match_player);
-            }
-            queue.players = array![];
+            let season_ended: bool = store.get_current_season().can_collect();
+            self._clear_season(ref store, ref queue, season_ended);
             store.set_match_queue(@queue);
         }
 
@@ -633,13 +665,16 @@ pub mod matchmaker {
             self._assert_caller_is_admin();
             assert(queue_id != QueueId::Undefined, Errors::INVALID_QUEUE);
             let mut store: Store = StoreTrait::new(self.world_default());
+            //
             // remove from queue...
             let mut queue: MatchQueue = store.get_match_queue(queue_id);
             queue.resolve_player(@player_address, false);
             store.set_match_queue(@queue);
+            //
             // clear player
             let mut match_player: MatchPlayer = store.get_match_player(player_address, queue_id);
-            self._clear_player_queue(ref store, queue_id, ref match_player);
+            let season_ended: bool = store.get_current_season().can_collect();
+            self._clear_player_queue(ref store, queue_id, ref match_player, season_ended);
         }
     }
 

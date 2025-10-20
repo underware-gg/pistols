@@ -47,6 +47,7 @@ pub mod bank {
         Erc20Dispatcher, Erc20DispatcherTrait,
         IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
         IAdminDispatcherTrait,
+        IMatchMakerProtectedDispatcherTrait,
     };
     use pistols::interfaces::ierc20::{IErc20Trait};
     use pistols::models::{
@@ -54,6 +55,7 @@ pub mod bank {
         pool::{Pool, PoolTrait, PoolType},
         // events::{FamePegEvent, FamePegDirection},
         leaderboard::{LeaderboardTrait, LeaderboardPosition},
+        match_queue::{QueueId},
     };
     use pistols::types::{
         rules::{Rules, RulesTrait, PoolDistribution, RewardDistribution},
@@ -74,6 +76,8 @@ pub mod bank {
         pub const INVALID_SEASON: felt252           = 'BANK: invalid season';
         pub const INVALID_TOURNAMENT: felt252       = 'BANK: invalid tournament';
         pub const IS_PAUSED: felt252                = 'BANK: is paused';
+        pub const SEASON_IS_NOT_ACTIVE: felt252     = 'BANK: Season is not active';
+        pub const SEASON_IS_ACTIVE: felt252         = 'BANK: Season is active';
     }
 
     #[generate_trait]
@@ -144,11 +148,13 @@ pub mod bank {
             self._assert_caller_is_admin();
             let mut store: Store = StoreTrait::new(self.world_default());
             assert(!store.get_config_is_paused(), Errors::IS_PAUSED);
+            // close Ranked queue
+            store.world.matchmaker_protected_dispatcher().close_season(QueueId::Ranked);
             // collect season if permitted
             let mut season: SeasonConfig = store.get_current_season();
             let new_season_id: u32 = season.collect(ref store);
             store.set_config_season_id(new_season_id);
-            // release...
+            // release leaderboard prizes...
             self._release_season_pool(store, season.season_id);
             // arcade
             TrophyProgressTrait::collected_season(@store.world, @starknet::get_caller_address());

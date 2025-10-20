@@ -70,6 +70,7 @@ pub enum CauseOfDeath {
     Memorize,   // 2
     Sacrifice,  // 3
     Forsaken,   // 4 (deprecated)
+    Ranked,     // 5
 }
 
 
@@ -261,6 +262,7 @@ pub impl CauseOfDeathImpl of CauseOfDeathTrait {
             CauseOfDeath::Memorize =>   true,
             CauseOfDeath::Sacrifice =>  false,
             CauseOfDeath::Forsaken =>   true,
+            CauseOfDeath::Ranked =>     true,
         }
     }
 }
@@ -287,6 +289,7 @@ impl CauseOfDeathIntoByteArray of core::traits::Into<CauseOfDeath, ByteArray> {
             CauseOfDeath::Memorize =>   "Memorize",
             CauseOfDeath::Sacrifice =>  "Sacrifice",
             CauseOfDeath::Forsaken =>   "Forsaken",
+            CauseOfDeath::Ranked =>     "Ranked",
         }
     }
 }

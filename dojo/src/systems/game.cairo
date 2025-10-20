@@ -139,8 +139,6 @@ pub mod game {
         pub const INVALID_SALT: felt252              = 'PISTOLS: Invalid salt';
         pub const INVALID_MOVES_COUNT: felt252       = 'PISTOLS: Invalid moves count';
         pub const MOVES_HASH_MISMATCH: felt252       = 'PISTOLS: Moves hash mismatch';
-        pub const SEASON_IS_NOT_ACTIVE: felt252      = 'PISTOLS: Season is not active';
-        pub const SEASON_IS_ACTIVE: felt252          = 'PISTOLS: Season is active';
         pub const BAD_SHUFFLE_SEED: felt252          = 'PISTOLS: Bad shuffle seed';
         pub const INVALID_DUEL_TYPE: felt252         = 'PISTOLS: Invalid duel type';
         pub const IMPOSSIBLE_ERROR: felt252          = 'PISTOLS: Impossible error';

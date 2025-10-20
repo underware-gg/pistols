@@ -31,11 +31,11 @@ pub struct MatchQueue {
     #[key]
     pub queue_id: QueueId,
     //-----------------------
-    pub players: Array<ContractAddress>,
+    pub players: Array<ContractAddress>,        // active players in the queue (not matched)
     pub slot_size: u8,
-    pub entry_token_address: ContractAddress,
-    pub entry_token_amount: u128,
-    pub enlisted_duelist_ids: Array<u128>,
+    pub entry_token_address: ContractAddress,   // token to pay to enlist a Duelist
+    pub entry_token_amount: u128,               // amount to pay to enlist a Duelist
+    pub enlisted_duelist_ids: Array<u128>,      // used to clear duelists on season end
 }
 
 //

@@ -25,6 +25,7 @@ pub enum Activity {
     EnlistedRankedDuelist,      // 18    identifier: duelist_id
     DuelistMatchingRanked,      // 19    identifier: duelist_id
     DuelistMatchingUnranked,    // 20    identifier: duelist_id
+    DuelistMemorialized,        // 21    identifier: duelist_id
 }
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
