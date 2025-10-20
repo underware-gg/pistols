@@ -94,6 +94,7 @@ pub trait IDuelistTokenProtected<TState> {
         lords_amount_to_peg_to_fame: u128,
     ) -> Span<u128>;
     fn get_validated_active_duelist_id(ref self: TState, address: ContractAddress, duelist_id: u128, lives_staked: u8) -> u128;
+    fn depeg_fame_to_season_pool(ref self: TState, duelist_id: u128);
     fn transfer_rewards(ref self: TState, challenge: Challenge, bonus: DuelBonus) -> (RewardValues, RewardValues);
 }
 
@@ -360,7 +361,7 @@ pub mod duelist_token {
             let mut store: Store = StoreTrait::new(self.world_default());
             assert(self.is_owner_of(address, duelist_id.into()), Errors::NOT_YOUR_DUELIST);
 
-            // bot duelists are always validates
+            // bot duelists are always validated on summon_bot_duelist()
             if (store.world.is_bot_player_contract(address)) {
                 return (duelist_id);
             }
@@ -373,7 +374,27 @@ pub mod duelist_token {
             assert(lives > 0, Errors::DUELIST_IS_DEAD);
             assert(lives >= lives_staked, Errors::INSUFFICIENT_LIVES);
 
+            // must not be memorialized
+            // NOT NECESSARY: memorialized duelists are never active
+            //assert(!store.get_duelist_is_memorialized(active_duelist_id), Errors::DUELIST_IS_MEMORIALIZED);
+
             (active_duelist_id)
+        }
+
+        fn depeg_fame_to_season_pool(
+            ref self: ContractState,
+            duelist_id: u128,
+        ) {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
+            // get FAME balance (must be positive)
+            let fame_dispatcher: IFameCoinDispatcher = store.world.fame_coin_dispatcher();
+            let fame_balance: u128 = self._fame_balance(@fame_dispatcher, duelist_id);
+            assert(fame_balance > 0, Errors::DUELIST_IS_DEAD);
+            // transfer FAME to season pool
+            store.world.bank_protected_dispatcher().depeg_lords_from_fame_to_be_burned(store.get_current_season_id(), fame_balance);
+            // mark this duelist FAME as released, so it will not de-peg after when lost
+            store.set_duelist_released_fame(duelist_id, true);
         }
 
         fn transfer_rewards(
@@ -381,7 +402,6 @@ pub mod duelist_token {
             challenge: Challenge,
             bonus: DuelBonus,
         ) -> (RewardValues, RewardValues) {
-            // validate caller (game contract only)
             let mut store: Store = StoreTrait::new(self.world_default());
             assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
 
@@ -525,10 +545,6 @@ pub mod duelist_token {
             duelist_id: u128,
             cause_of_death: CauseOfDeath,
         ) {
-            //
-            // NEEDS REVIEW!!!
-            //
-
             let mut store: Store = StoreTrait::new(self.world_default());
             let fame_dispatcher: IFameCoinDispatcher = store.world.fame_coin_dispatcher();
             let bank_dispatcher: IBankProtectedDispatcher = store.world.bank_protected_dispatcher();
@@ -537,19 +553,22 @@ pub mod duelist_token {
             let fame_balance: u128 = self._fame_balance(@fame_dispatcher, duelist_id);
             assert(fame_balance != 0, Errors::DUELIST_IS_DEAD);
 
+            // remaining fame to be burned and released
+            bank_dispatcher.depeg_lords_from_fame_to_be_burned(store.get_current_season_id(), fame_balance);
+            if (cause_of_death.retains_fame()) {
+                store.set_duelist_released_fame(duelist_id, true);
+            } else {
+                fame_dispatcher.burn_from_token(starknet::get_contract_address(), duelist_id, fame_balance.into());
+            }
+
             // kill...
+            let killed_by: u128 = if (cause_of_death == CauseOfDeath::Sacrifice) {duelist_id} else {0};
             self._duelist_died(ref store,
                 duelist_id,
                 cause_of_death,
-                if (cause_of_death == CauseOfDeath::Sacrifice) {duelist_id} else {0},
+                killed_by,
                 fame_balance,
             );
-
-            // remaining fame to be burned and released
-            bank_dispatcher.depeg_lords_from_fame_to_be_burned(store.get_current_season_id(), fame_balance);
-            if (!cause_of_death.retains_fame()) {
-                fame_dispatcher.burn_from_token(starknet::get_contract_address(), duelist_id, fame_balance.into());
-            }
 
             // last time active
             store.set_duelist_timestamp_active(duelist_id, starknet::get_block_timestamp());

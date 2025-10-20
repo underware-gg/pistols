@@ -44,6 +44,7 @@ pub use pistols::models::{
         Duelist, DuelistValue, DuelistTimestamps,
         DuelistAssignment, DuelistAssignmentValue,
         DuelistMemorial, DuelistMemorialValue,
+        CauseOfDeath,
         Totals,
     },
     leaderboard::{
@@ -595,6 +596,11 @@ pub impl StoreImpl of StoreTrait {
     fn get_duelist_assigned_queue_id(self: @Store, duelist_id: u128) -> QueueId {
         (self.world.read_member_legacy(Model::<DuelistAssignment>::ptr_from_keys(duelist_id), selector!("queue_id")))
     }
+    #[inline(always)]
+    fn get_duelist_is_memorialized(self: @Store, duelist_id: u128) -> bool {
+        let cause_of_death: CauseOfDeath = self.world.read_member_legacy(Model::<DuelistMemorial>::ptr_from_keys(duelist_id), selector!("cause_of_death"));
+        (cause_of_death != CauseOfDeath::None)
+    }
 
     #[inline(always)]
     fn get_player_is_admin(self: @Store, player_address: ContractAddress) -> bool {
@@ -696,6 +702,10 @@ pub impl StoreImpl of StoreTrait {
     #[inline(always)]
     fn set_duelist_totals(ref self: Store, duelist_id: u128, totals: Totals) {
         self.world.write_member_legacy(Model::<Duelist>::ptr_from_keys(duelist_id), selector!("totals"), totals);
+    }
+    #[inline(always)]
+    fn set_duelist_released_fame(ref self: Store, duelist_id: u128, released_fame: bool) {
+        self.world.write_member_legacy(Model::<Duelist>::ptr_from_keys(duelist_id), selector!("released_fame"), released_fame);
     }
 
     #[inline(always)]

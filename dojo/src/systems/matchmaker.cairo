@@ -132,6 +132,9 @@ pub mod matchmaker {
 
             // must be a fresh duelist (3K FAME)
             assert(store.get_duelist_totals(duelist_id).total_duels == 0, Errors::NOT_A_NEW_DUELIST);
+            
+            //----------------------------------
+            // can enlist...
 
             // assign queue
             // will panic if already enlisted or not in another duel
@@ -145,6 +148,9 @@ pub mod matchmaker {
                 queue.entry_token_address,
                 queue.entry_token_amount,
             );
+
+            // de-peg FAME to season pool
+            duelist_dispatcher.depeg_fame_to_season_pool(duelist_id);
 
             Activity::EnlistedRankedDuelist.emit(ref store.world, caller, duelist_id.into());
 
