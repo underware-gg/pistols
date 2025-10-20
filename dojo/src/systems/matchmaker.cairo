@@ -136,12 +136,12 @@ pub mod matchmaker {
             //----------------------------------
             // can enlist...
 
-            // assign queue
+            // assign Duelist to queue (permanent)
             // will panic if already enlisted or not in another duel
             store.enlist_matchmaking(duelist_id, queue_id);
 
             // charge entry fee, if any...
-            let queue: MatchQueue = store.get_match_queue(queue_id);
+            let mut queue: MatchQueue = store.get_match_queue(queue_id);
             IErc20Trait::asserted_transfer_from_to(
                 caller,
                 starknet::get_contract_address(),
@@ -151,6 +151,10 @@ pub mod matchmaker {
 
             // de-peg FAME to season pool
             duelist_dispatcher.depeg_fame_to_season_pool(duelist_id);
+
+            // add to enlisted duelist ids
+            queue.enlisted_duelist_ids.append(duelist_id);
+            store.set_match_queue(@queue);
 
             Activity::EnlistedRankedDuelist.emit(ref store.world, caller, duelist_id.into());
 

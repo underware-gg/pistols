@@ -35,6 +35,7 @@ pub struct MatchQueue {
     pub slot_size: u8,
     pub entry_token_address: ContractAddress,
     pub entry_token_amount: u128,
+    pub enlisted_duelist_ids: Array<u128>,
 }
 
 //
@@ -141,6 +142,7 @@ pub impl MatchQueueImpl of MatchQueueTrait {
             players: array![],
             entry_token_address: ZERO(),
             entry_token_amount: 0,
+            enlisted_duelist_ids: array![],
         });
         store.set_match_queue(@MatchQueue {
             queue_id: QueueId::Ranked,
@@ -148,6 +150,7 @@ pub impl MatchQueueImpl of MatchQueueTrait {
             players: array![],
             entry_token_address: store.world.fools_coin_address(),
             entry_token_amount: (5 * CONST::ETH_TO_WEI.low),
+            enlisted_duelist_ids: array![],
         });
     }
     // assign slot to new player
