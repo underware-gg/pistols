@@ -60,8 +60,8 @@ pub trait IDuelistToken<TState> {
 
     // IDuelistTokenPublic
     fn fame_balance(self: @TState, duelist_id: u128) -> u128;
-    fn is_alive(self: @TState, duelist_id: u128) -> bool;
     fn life_count(self: @TState, duelist_id: u128) -> u8;
+    fn is_alive(self: @TState, duelist_id: u128) -> bool;
     fn is_inactive(self: @TState, duelist_id: u128) -> bool;
     fn inactive_timestamp(self: @TState, duelist_id: u128) -> u64;
     fn sacrifice(ref self: TState, duelist_id: u128);
@@ -73,8 +73,8 @@ pub trait IDuelistToken<TState> {
 pub trait IDuelistTokenPublic<TState> {
     // view
     fn fame_balance(self: @TState, duelist_id: u128) -> u128;
-    fn is_alive(self: @TState, duelist_id: u128) -> bool;
     fn life_count(self: @TState, duelist_id: u128) -> u8;
+    fn is_alive(self: @TState, duelist_id: u128) -> bool;
     fn is_inactive(self: @TState, duelist_id: u128) -> bool;
     fn inactive_timestamp(self: @TState, duelist_id: u128) -> u64;
     // write
@@ -241,14 +241,6 @@ pub mod duelist_token {
             (self._fame_balance(@fame_dispatcher, duelist_id))
         }
 
-        #[inline(always)]
-        fn is_alive(
-            self: @ContractState,
-            duelist_id: u128,
-        ) -> bool {
-            (self.life_count(duelist_id) != 0)
-        }
-        
         fn life_count(self: @ContractState,
             duelist_id: u128,
         ) -> u8 {
@@ -257,6 +249,14 @@ pub mod duelist_token {
             (fame_balance / FAME::ONE_LIFE).try_into().unwrap()
         }
 
+        #[inline(always)]
+        fn is_alive(
+            self: @ContractState,
+            duelist_id: u128,
+        ) -> bool {
+            (self.life_count(duelist_id) != 0)
+        }
+        
         #[inline(always)]
         fn is_inactive(self: @ContractState,
             duelist_id: u128,

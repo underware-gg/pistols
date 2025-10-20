@@ -78,6 +78,7 @@ pub mod matchmaker {
         pub const DUELIST_UNAVAILABLE: felt252      = 'MATCHMAKER: Duelist unavailable';
         pub const ENLISTMENT_NOT_REQUIRED: felt252  = 'MATCHMAKER: Not required';
         pub const INELIGIBLE_DUELIST: felt252       = 'MATCHMAKER: Ineligible duelist';
+        pub const NOT_A_NEW_DUELIST: felt252        = 'MATCHMAKER: Not a new duelist';
         pub const NOT_ENLISTED: felt252             = 'MATCHMAKER: Not enlisted';
         pub const INVALID_SIZE: felt252             = 'MATCHMAKER: Invalid size';
         pub const UNFINISHED_IMP_DUEL: felt252      = 'MATCHMAKER: Unfinished Imp duel';
@@ -119,15 +120,18 @@ pub mod matchmaker {
             // validate queue
             assert(queue_id.permanent_enlistment(), Errors::ENLISTMENT_NOT_REQUIRED);
 
+            // No starter duelists...
+            let duelist_profile: DuelistProfile = store.get_duelist_profile(duelist_id);
+            assert(!duelist_profile.is_starter_duelist(), Errors::INELIGIBLE_DUELIST);
+
             // Validate duelist
             let caller: ContractAddress = starknet::get_caller_address();
             let duelist_dispatcher: IDuelistTokenProtectedDispatcher = store.world.duelist_token_protected_dispatcher();
             duelist_id = (duelist_dispatcher.get_validated_active_duelist_id(caller, duelist_id, queue_id.get_lives_staked()));
             assert(duelist_id > 0, Errors::INVALID_DUELIST);
 
-            // No starter duelists...
-            let duelist_profile: DuelistProfile = store.get_duelist_profile(duelist_id);
-            assert(!duelist_profile.is_starter_duelist(), Errors::INELIGIBLE_DUELIST);
+            // must be a fresh duelist (3K FAME)
+            assert(store.get_duelist_totals(duelist_id).total_duels == 0, Errors::NOT_A_NEW_DUELIST);
 
             // assign queue
             // will panic if already enlisted or not in another duel
