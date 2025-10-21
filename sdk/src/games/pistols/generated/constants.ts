@@ -51,6 +51,7 @@ export const INTERFACE_DESCRIPTIONS: any = {
     create_match: 'Create an official ranked Duel',
     start_match: 'Match an official ranked Duel',
     transfer_to_winner: 'Transfer a Duel token to its winner',
+    wipe_duel: 'Admin function',
   },
   // from: ../dojo/src/systems/tokens/duelist_token.cairo
   IDuelistTokenPublic: {

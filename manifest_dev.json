@@ -3047,8 +3047,8 @@
       ]
     },
     {
-      "address": "0x19e7fc86648bbdaef5313cfa12cbb4e114ad2b009b0be0ec730eb286c6efb86",
-      "class_hash": "0xd5638d498a0a2ca6b0970aa86f39c8249efe6cb4446e524860ee4dfeb2eea8",
+      "address": "0x1aa5d8535a12328e12f3ea0ee6b0c139fa8c496d1dfe1a3bb10f074b1323a25",
+      "class_hash": "0x9f5e30c25b1d476dddaf8a4bc783707341076852724bbdb60ce3ed0f69632c",
       "abi": [
         {
           "type": "impl",
@@ -3483,6 +3483,18 @@
             {
               "type": "function",
               "name": "transfer_to_winner",
+              "inputs": [
+                {
+                  "name": "duel_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "wipe_duel",
               "inputs": [
                 {
                   "name": "duel_id",
@@ -4449,6 +4461,7 @@
         "create_match",
         "start_match",
         "transfer_to_winner",
+        "wipe_duel",
         "upgrade",
         "safe_transfer_from",
         "transfer_from",
@@ -9955,8 +9968,8 @@
       ]
     },
     {
-      "address": "0x64ea2f3222284537a604239bb0937d92223b961d88cf1840318d81179e2cab4",
-      "class_hash": "0x4d3ef388974b11441e53fc754e38605338fe599148fae40d0358f6efd5d7d29",
+      "address": "0x272a2c2d966a0e095b64ca23fd58fe467744099ad9375f95bc043b0f4bfeec8",
+      "class_hash": "0x192549075bd129770b39306eb4d98deed13f0d7b7e947436aed43d100d14e78",
       "abi": [
         {
           "type": "impl",
