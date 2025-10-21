@@ -42,7 +42,6 @@ pub mod matchmaker {
     use pistols::models::{
         challenge::{DuelType},
         duelist::{DuelistAssignmentTrait},
-        challenge::{Round, MovesTrait},
         pact::{PactTrait},
         match_queue::{
             QueueId, QueueIdTrait, QueueMode,
@@ -76,6 +75,7 @@ pub mod matchmaker {
         pub const INVALID_QUEUE: felt252            = 'MATCHMAKER: Invalid queue';
         pub const INVALID_MODE: felt252             = 'MATCHMAKER: Invalid mode';
         pub const INVALID_DUELIST: felt252          = 'MATCHMAKER: Invalid duelist';
+        pub const DUELIST_UNAVAILABLE: felt252      = 'MATCHMAKER: Duelist unavailable';
         pub const ENLISTMENT_NOT_REQUIRED: felt252  = 'MATCHMAKER: Not required';
         pub const INELIGIBLE_DUELIST: felt252       = 'MATCHMAKER: Ineligible duelist';
         pub const NOT_ENLISTED: felt252             = 'MATCHMAKER: Not enlisted';
@@ -314,9 +314,12 @@ pub mod matchmaker {
             // verify enlistment
             if (queue.queue_id.permanent_enlistment()) {
                 assert(store.is_enlisted_matchmaking(duelist_id, *queue.queue_id), Errors::NOT_ENLISTED);
+                assert(store.is_available_for(duelist_id, Option::Some(*queue.queue_id)), Errors::DUELIST_UNAVAILABLE);
             } else {
+                assert(store.is_available_for(duelist_id, Option::Some(*queue.queue_id)), Errors::DUELIST_UNAVAILABLE);
                 store.enlist_matchmaking(duelist_id, *queue.queue_id);
             }
+            // randomize slot...
             let slot: u8 = queue.assign_slot(@store, seed);
             // return validated duelist and slot
             (duelist_id, slot)
