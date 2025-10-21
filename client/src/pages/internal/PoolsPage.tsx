@@ -32,9 +32,9 @@ export default function PoolsPage() {
       <Container>
         <InternalPageMenu />
         <CurrentChainHint />
+        <Connect />
 
         <InternalPageWrapper>
-          <Connect />
           <Bank />
           <br />
           <Pools />

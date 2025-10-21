@@ -13,7 +13,7 @@ import { FoolsBalance } from '/src/components/account/LordsBalance'
 import { Balance } from '/src/components/account/Balance'
 import { Address } from '/src/components/ui/Address'
 import { Connect } from '/src/pages/tests/ConnectTestPage'
-import { InternalPageMenu } from '/src/pages/internal/InternalPageIndex'
+import { InternalPageMenu, InternalPageWrapper } from '/src/pages/internal/InternalPageIndex'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import ChallengeModal from '/src/components/modals/ChallengeModal'
 import StoreSync from '/src/stores/sync/StoreSync'
@@ -44,7 +44,9 @@ export default function MatchmakingTestPage() {
         {/* <br /> */}
         {/* <OnlineStatus /> */}
 
-        <Matchmaking />
+        <InternalPageWrapper>
+          <Matchmaking />
+        </InternalPageWrapper>
 
         <StoreSync />
         <ChallengeModal />
