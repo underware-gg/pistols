@@ -421,7 +421,7 @@ mod tests {
     //
 
     fn _mint_stacker_duelists(sys: @TestSystems, acc1: ContractAddress, acc2: ContractAddress) -> (u128, u128, u128, u128) {
-        tester::fund_duelists_pool(sys, 2);
+        // tester::fund_duelists_pool(sys, 2);
         let tokens1: Span<u128> = tester::execute_claim_starter_pack(sys, acc1);
         let tokens2: Span<u128> = tester::execute_claim_starter_pack(sys, acc2);
         let duelist_1_1: Duelist = sys.store.get_duelist(*tokens1[0]);
@@ -431,7 +431,7 @@ mod tests {
         assert_eq!(sys.store.get_player_alive_duelist_count(acc1), 2, "acc1:claimed_starter_pack:alive_duelist_count (2)");
         assert_eq!(sys.store.get_player_alive_duelist_count(acc2), 2, "acc2:claimed_starter_pack:alive_duelist_count (2)");
         // mint to stack
-        tester::fund_duelists_pool(sys, 1);
+        tester::fund_duelists_pool(sys, 2);
         let duelist_id_1_3: u128 = _airdrop_open(sys, acc1, PackType::SingleDuelist, Option::Some(duelist_1_1.duelist_profile), "SingleDuelist_acc1");
         let duelist_id_2_3: u128 = _airdrop_open(sys, acc2, PackType::SingleDuelist, Option::Some(duelist_2_1.duelist_profile), "SingleDuelist_acc2");
         assert_eq!(sys.store.get_player_alive_duelist_count(acc1), 3, "acc1:claimed_starter_pack:alive_duelist_count (3)");

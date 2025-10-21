@@ -54,7 +54,7 @@ fn setup(_fee_amount: u128) -> TestSystems {
 
     tester::set_current_season(ref sys, SEASON_ID_1);
 
-    tester::fund_duelists_pool(@sys, 5);
+    tester::fund_duelists_pool(@sys, 10);
 
     // initialize contracts
     tester::execute_claim_starter_pack(@sys, OWNER());

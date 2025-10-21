@@ -127,7 +127,7 @@ pub mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         sys.rng.mock_values(mocked);
 
-        tester::fund_duelists_pool(@sys, 2);
+        // tester::fund_duelists_pool(@sys, 2);
         let duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, OWNER())[0];
         let duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, OTHER())[0];
 
@@ -252,7 +252,7 @@ pub mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         sys.rng.mock_values(mocked);
 
-        tester::fund_duelists_pool(@sys, 2);
+        // tester::fund_duelists_pool(@sys, 2);
         let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, OWNER())[0];
         let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, OTHER())[0];
 
@@ -472,7 +472,7 @@ pub mod tests {
     #[test]
     fn test_unranked_duel() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
-        tester::fund_duelists_pool(@sys, 2);
+        // tester::fund_duelists_pool(@sys, 2);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
@@ -559,7 +559,7 @@ pub mod tests {
         let mut duelist_id_a: u128 = 0;
         let mut duelist_id_b: u128 = 0;
         if ((*sys).duelists.total_supply() == 0) {
-            tester::fund_duelists_pool(sys, 2);
+            // tester::fund_duelists_pool(sys, 2);
             duelist_id_a = *tester::execute_claim_starter_pack(sys, OWNER())[0];
             duelist_id_b = *tester::execute_claim_starter_pack(sys, OTHER())[0];
             if (to_death) {
@@ -726,7 +726,7 @@ pub mod tests {
     #[test]
     fn test_duel_honour_a_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
-        tester::fund_duelists_pool(@sys, 2);
+        // tester::fund_duelists_pool(@sys, 2);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
@@ -768,7 +768,7 @@ pub mod tests {
     #[test]
     fn test_duel_honour_b_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
-        tester::fund_duelists_pool(@sys, 2);
+        // tester::fund_duelists_pool(@sys, 2);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
@@ -810,7 +810,7 @@ pub mod tests {
     #[test]
     fn test_duel_honour_zero_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
-        tester::fund_duelists_pool(@sys, 2);
+        // tester::fund_duelists_pool(@sys, 2);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
@@ -858,7 +858,7 @@ pub mod tests {
     #[test]
     fn test_duel_honour_zero_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
-        tester::fund_duelists_pool(@sys, 2);
+        // tester::fund_duelists_pool(@sys, 2);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
@@ -906,7 +906,7 @@ pub mod tests {
     #[test]
     fn test_duel_honour_seppuku() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
-        tester::fund_duelists_pool(@sys, 2);
+        // tester::fund_duelists_pool(@sys, 2);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
@@ -1531,7 +1531,7 @@ pub mod tests {
                 MockedValueTrait::shuffled('env', [ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL].span()),
             ].span()
         );
-        tester::fund_duelists_pool(@sys, 2);
+        // tester::fund_duelists_pool(@sys, 2);
         let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, OWNER())[0];
         let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, OTHER())[0];
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
@@ -1560,7 +1560,7 @@ pub mod tests {
                 MockedValueTrait::shuffled('env', [ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL].span()),
             ].span()
         );
-        tester::fund_duelists_pool(@sys, 2);
+        // tester::fund_duelists_pool(@sys, 2);
         let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, OWNER())[0];
         let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, OTHER())[0];
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
@@ -1590,7 +1590,7 @@ pub mod tests {
                 MockedValueTrait::shuffled('env', [ENV_CARD_CRIT, ENV_CARD_CRIT].span()),
             ].span()
         );
-        tester::fund_duelists_pool(@sys, 2);
+        // tester::fund_duelists_pool(@sys, 2);
         let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, OWNER())[0];
         let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, OTHER())[0];
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
@@ -1620,7 +1620,7 @@ pub mod tests {
                 MockedValueTrait::shuffled('env', [ENV_CARD_CRIT, ENV_CARD_CRIT].span()),
             ].span()
         );
-        tester::fund_duelists_pool(@sys, 2);
+        // tester::fund_duelists_pool(@sys, 2);
         let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, OWNER())[0];
         let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, OTHER())[0];
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
@@ -1641,7 +1641,7 @@ pub mod tests {
     #[test]
     fn test_ranked_score_bonus_rings() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::MOCK_RNG | FLAGS::RINGS);
-        tester::fund_duelists_pool(@sys, 2);
+        // tester::fund_duelists_pool(@sys, 2);
         tester::execute_claim_starter_pack(@sys, OWNER());
         tester::execute_claim_starter_pack(@sys, OTHER());
         //
@@ -1702,7 +1702,7 @@ pub mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         sys.rng.mock_values(mocked);
 
-        tester::fund_duelists_pool(@sys, 2);
+        // tester::fund_duelists_pool(@sys, 2);
         let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, OWNER())[0];
         let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, OTHER())[0];
 
@@ -1796,7 +1796,7 @@ pub mod tests {
         // create duelists
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
-        tester::fund_duelists_pool(@sys, 2);
+        // tester::fund_duelists_pool(@sys, 2);
         let duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
         let duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
         // just draw...
@@ -1859,7 +1859,7 @@ pub mod tests {
         let B: ContractAddress = OTHER();
         tester::execute_admin_set_is_team_member(@sys.admin, OWNER(), A, true, true);
         // create duelists
-        tester::fund_duelists_pool(@sys, 2);
+        // tester::fund_duelists_pool(@sys, 2);
         let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
         let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
         // just draw...
@@ -1884,7 +1884,7 @@ pub mod tests {
         let B: ContractAddress = OTHER();
         tester::execute_admin_set_is_team_member(@sys.admin, OWNER(), B, true, true);
         // create duelists
-        tester::fund_duelists_pool(@sys, 2);
+        // tester::fund_duelists_pool(@sys, 2);
         let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
         let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
         // just draw...
@@ -1909,7 +1909,7 @@ pub mod tests {
         let B: ContractAddress = OTHER();
         tester::execute_admin_set_is_blocked(@sys.admin, OWNER(), A, true);
         // create duelists
-        tester::fund_duelists_pool(@sys, 2);
+        // tester::fund_duelists_pool(@sys, 2);
         let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
         let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
         // just draw...
@@ -1934,7 +1934,7 @@ pub mod tests {
         let B: ContractAddress = OTHER();
         tester::execute_admin_set_is_blocked(@sys.admin, OWNER(), B, true);
         // create duelists
-        tester::fund_duelists_pool(@sys, 2);
+        // tester::fund_duelists_pool(@sys, 2);
         let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
         let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
         // just draw...
@@ -1960,7 +1960,7 @@ pub mod tests {
         tester::execute_admin_set_is_blocked(@sys.admin, OWNER(), A, true);
         tester::execute_admin_set_is_blocked(@sys.admin, OWNER(), B, true);
         // create duelists
-        tester::fund_duelists_pool(@sys, 2);
+        // tester::fund_duelists_pool(@sys, 2);
         let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
         let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
         // just draw...

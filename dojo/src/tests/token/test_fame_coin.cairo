@@ -30,7 +30,7 @@ const TOKEN_ID_3_2: u256 = 6;
 fn setup(_fee_amount: u128) -> TestSystems {
     let mut sys: TestSystems = tester::setup_world(FLAGS::FAME | FLAGS::DUELIST | FLAGS::LORDS);
 
-    tester::fund_duelists_pool(@sys, 2);
+    tester::fund_duelists_pool(@sys, 4);
 
     // initialize contracts
     tester::execute_claim_starter_pack(@sys, OWNER());

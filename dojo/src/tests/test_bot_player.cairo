@@ -96,7 +96,7 @@ pub mod tests {
     fn test_mint_bot_duelists() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER | FLAGS::MOCK_RNG);
         // mint players
-        tester::fund_duelists_pool(@sys, 10);
+        tester::fund_duelists_pool(@sys, 6);
         let duelist_id_1: u128 = *tester::execute_claim_starter_pack(@sys, OWNER())[0];
         let duelist_id_2: u128 = *tester::execute_claim_starter_pack(@sys, OTHER())[0];
         let duelist_id_3: u128 = *tester::execute_claim_starter_pack(@sys, BUMMER())[0];
@@ -338,7 +338,7 @@ pub mod tests {
     fn test_bot_to_death() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER | FLAGS::MOCK_RNG);
         let bot_address: ContractAddress = sys.bot_player.contract_address;
-        tester::fund_duelists_pool(@sys, 8);
+        tester::fund_duelists_pool(@sys, 6);
         tester::execute_claim_starter_pack(@sys, OWNER());
         // store initial pool balances
         let fame_supply_init: u256 = sys.fame.total_supply();
@@ -473,7 +473,7 @@ pub mod tests {
     fn test_bot_ranked_stake_3() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER | FLAGS::MOCK_RNG);
         let bot_address: ContractAddress = sys.bot_player.contract_address;
-        tester::fund_duelists_pool(@sys, 8);
+        tester::fund_duelists_pool(@sys, 6);
         tester::execute_claim_starter_pack(@sys, OWNER());
         //
         // A wins, Bot loses
@@ -499,7 +499,7 @@ pub mod tests {
     fn test_bot_ranked_stake_4() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER | FLAGS::MOCK_RNG);
         let bot_address: ContractAddress = sys.bot_player.contract_address;
-        tester::fund_duelists_pool(@sys, 8);
+        tester::fund_duelists_pool(@sys, 1);
         tester::execute_claim_starter_pack(@sys, OWNER());
         tester::execute_create_duel_ID(@sys, OWNER(), ID(OWNER()), bot_address, MESSAGE(), DuelType::Seasonal, 0, 4);
     }
@@ -514,7 +514,7 @@ pub mod tests {
     fn test_bot_skip_busy_bot_duelist() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER | FLAGS::MOCK_RNG);
         // let bot_address: ContractAddress = sys.bot_player.contract_address;
-        tester::fund_duelists_pool(@sys, 8);
+        tester::fund_duelists_pool(@sys, 2);
         tester::execute_claim_starter_pack(@sys, OWNER());
         tester::execute_claim_starter_pack(@sys, OTHER());
         //
@@ -545,7 +545,7 @@ pub mod tests {
     fn test_bot_skip_unhealthy_bot_duelist() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER | FLAGS::MOCK_RNG);
         let bot_address: ContractAddress = sys.bot_player.contract_address;
-        tester::fund_duelists_pool(@sys, 8);
+        tester::fund_duelists_pool(@sys, 4);
         tester::execute_claim_starter_pack(@sys, OWNER());
         tester::execute_claim_starter_pack(@sys, OTHER());
         //

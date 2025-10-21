@@ -80,7 +80,7 @@ pub mod tester {
         challenge_state::{ChallengeState},
         duelist_profile::{DuelistProfile},
         trophies::{Trophy, TrophyTrait},
-        constants::{CONST, FAME},
+        constants::{CONST, FAME, RULES},
         rules::{Rules, RulesTrait},
     };
     use pistols::utils::{
@@ -89,6 +89,7 @@ pub mod tester {
         address::{ContractAddressIntoU256},
         short_string::{ShortString},
         serde::{SerializedAppend},
+        math::{MathTrait},
     };
     pub use pistols::interfaces::dns::{DnsTrait};
     pub use pistols::libs::store::{Store, StoreTrait};
@@ -1081,7 +1082,7 @@ pub mod tester {
         (*sys.bank).sponsor_duelists(sender, amount);
         _next_block();
     }
-    pub fn fund_duelists_pool(sys: @TestSystems, stater_pack_quantity: u8) -> u128 {
+    pub fn fund_duelists_pool(sys: @TestSystems, duelists_quantity: u128) -> u128 {
         // mint lords
         let sponsor: ContractAddress = 0x12178517312.try_into().unwrap();
         execute_lords_faucet(sys.lords, sponsor);
@@ -1089,8 +1090,8 @@ pub mod tester {
         let balance: u256 = (*sys.lords).balance_of(sponsor);
         execute_lords_approve(sys.lords, sponsor, *sys.bank.contract_address, balance.low);
         // fund pool
-        let price_per_pack: u128 = PackType::StarterPack.descriptor().price_lords;
-        let amount_sponsored: u128 = price_per_pack * stater_pack_quantity.into();
+        let price_per_duelist: u128 = PackType::SingleDuelist.descriptor().price_lords;
+        let amount_sponsored: u128 = price_per_duelist * duelists_quantity;
         execute_sponsor_duelists(sys, sponsor, amount_sponsored);
         (amount_sponsored)
     }
@@ -1099,6 +1100,12 @@ pub mod tester {
         let new_season_id: u32 = (*sys.bank).collect_season();
         _next_block();
         (new_season_id)
+    }
+    pub fn purchase_share_pools(sys: @TestSystems, lords_amount: u128) -> u128 {
+        (MathTrait::percentage(lords_amount, RULES::FEES_PERCENT + RULES::POOL_PERCENT))
+    }
+    pub fn purchase_share_revenue(sys: @TestSystems, lords_amount: u128) -> u128 {
+        (MathTrait::percentage(lords_amount, RULES::REALMS_PERCENT + RULES::UNDERWARE_PERCENT))
     }
 
     //

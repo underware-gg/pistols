@@ -50,7 +50,7 @@ fn setup(_fee_amount: u128) -> TestSystems {
     tester::execute_lords_faucet(@sys.lords, OWNER());
     tester::execute_lords_faucet(@sys.lords, OTHER());
 
-    tester::fund_duelists_pool(@sys, 2); // 4 duelists
+    // tester::fund_duelists_pool(@sys, 4); // 4 duelists
 
     // drop all events
     tester::drop_all_events(sys.world.dispatcher.contract_address);
@@ -91,7 +91,7 @@ pub fn _protected(sys: @TestSystems) -> IPackTokenProtectedDispatcher {
 
 #[test]
 fn test_initializer() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
     assert_eq!(sys.pack.symbol(), "PACK", "Symbol is wrong");
     assert!(sys.pack.supports_interface(interface::IERC721_ID), "should support IERC721_ID");
     assert!(sys.pack.supports_interface(interface::IERC721_METADATA_ID), "should support METADATA");
@@ -99,7 +99,7 @@ fn test_initializer() {
 
 #[test]
 fn test_contract_uri() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
     let uri: ByteArray = sys.pack.contract_uri();
     let uri_camel: ByteArray = sys.pack.contractURI();
     println!("___pack.contract_uri():{}", uri);
@@ -109,7 +109,7 @@ fn test_contract_uri() {
 
 #[test]
 fn test_token_uri() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
 
     tester::execute_claim_starter_pack(@sys, OWNER());
     _purchase(@sys, OWNER());
@@ -140,7 +140,7 @@ fn test_token_uri() {
 #[test]
 #[should_panic(expected: ('ERC721: invalid token ID', 'ENTRYPOINT_FAILED'))]
 fn test_token_uri_invalid() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
     sys.pack.token_uri(999);
 }
 
@@ -151,7 +151,7 @@ fn test_token_uri_invalid() {
 
 #[test]
 fn test_claim_purchase() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
     _assert_minted_count(@sys, 0, 0, "total_supply init");
     assert_eq!(sys.pack.balance_of(OWNER()), 0, "balance_of 0");
 
@@ -181,9 +181,10 @@ fn test_claim_purchase() {
     let balance_owner_initial: u128 = sys.lords.balance_of(OWNER()).low;
     let balance_bank_initial: u128 = sys.lords.balance_of(sys.bank.contract_address).low;
     assert_ne!(balance_owner_initial, 0, "balance_owner_initial");
-    assert_ne!(balance_bank_initial, 0, "balance_bank_initial");
+    assert_eq!(balance_bank_initial, 0, "balance_bank_initial");
 
     let price: u128 = _purchase(@sys, OWNER());
+    let share_pools: u128 = tester::purchase_share_pools(@sys, price);
     _assert_minted_count(@sys, 2, 1, "total_supply 2");
     assert_eq!(sys.pack.balance_of(OWNER()), 1, "balance_of 1");
     assert!(sys.pack.owner_of(TOKEN_ID_2) == OWNER(), "owner_of_2");
@@ -198,7 +199,7 @@ fn test_claim_purchase() {
     let balance_owner: u128 = sys.lords.balance_of(OWNER()).low;
     let balance_bank: u128 = sys.lords.balance_of(sys.bank.contract_address).low;
     assert_eq!(balance_owner, balance_owner_initial - price, "balance_owner");
-    assert_eq!(balance_bank, balance_bank_initial + price, "balance_bank");
+    assert_eq!(balance_bank, share_pools, "balance_bank");
 
     // claim another starter pack
     assert!(sys.pack.can_claim_starter_pack(OTHER()), "can_claim_starter_pack_OTHER");
@@ -226,8 +227,8 @@ fn test_claim_purchase() {
 
 #[test]
 fn test_claim_referrer() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
-    tester::fund_duelists_pool(@sys, 1);
+    let mut sys: TestSystems = setup(0);
+    // tester::fund_duelists_pool(@sys, 1);
 
     // claim without referrer
     tester::execute_claim_starter_pack_referrer(@sys, OWNER(), ZERO());
@@ -249,9 +250,10 @@ fn test_claim_referrer() {
 }
 
 #[test]
+#[ignore] // not sponsored anymore
 #[should_panic(expected: ('BANK: insufficient LORDS pool', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
 fn test_claim_not_sponsored() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
     assert!(sys.pack.can_claim_starter_pack(OWNER()), "can_claim_starter_pack_OWNER");
     tester::execute_claim_starter_pack(@sys, OWNER());
     assert!(sys.pack.can_claim_starter_pack(OTHER()), "can_claim_starter_pack_OTHER");
@@ -263,7 +265,7 @@ fn test_claim_not_sponsored() {
 #[test]
 #[should_panic(expected: ('IERC20: insufficient balance', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
 fn test_mint_no_balance() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
     assert!(sys.pack.can_claim_starter_pack(BUMMER()), "can_claim_starter_pack_BUMMER");
     tester::execute_claim_starter_pack(@sys, BUMMER());
     tester::execute_pack_purchase(@sys, BUMMER(), PackType::GenesisDuelists5x);
@@ -272,7 +274,7 @@ fn test_mint_no_balance() {
 #[test]
 #[should_panic(expected: ('IERC20: insufficient allowance', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
 fn test_mint_zero_allowance() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
     assert!(sys.pack.can_claim_starter_pack(OWNER()), "can_claim_starter_pack_OWNER");
     tester::execute_claim_starter_pack(@sys, OWNER());
     tester::execute_pack_purchase(@sys, OWNER(), PackType::GenesisDuelists5x);
@@ -281,7 +283,7 @@ fn test_mint_zero_allowance() {
 #[test]
 #[should_panic(expected: ('IERC20: insufficient allowance', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
 fn test_mint_no_allowance_half() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
     tester::execute_claim_starter_pack(@sys, OWNER());
     let price: u128 = sys.pack.calc_mint_fee(OWNER(), PackType::GenesisDuelists5x);
     tester::execute_lords_approve(@sys.lords, OWNER(), sys.bank.contract_address, price / 2);
@@ -291,7 +293,7 @@ fn test_mint_no_allowance_half() {
 #[test]
 #[should_panic(expected: ('PACK: Ineligible', 'ENTRYPOINT_FAILED'))]
 fn test_claim_twice() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
     assert!(sys.pack.can_claim_starter_pack(OWNER()), "can_claim_starter_pack_OWNER");
     tester::execute_claim_starter_pack(@sys, OWNER());
     assert!(!sys.pack.can_claim_starter_pack(OWNER()), "can_claim_starter_pack_OWNER");
@@ -301,14 +303,14 @@ fn test_claim_twice() {
 #[test]
 #[should_panic(expected: ('PACK: Claim duelists first', 'ENTRYPOINT_FAILED'))]
 fn test_no_claim() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
     _purchase(@sys, OWNER());
 }
 
 #[test]
 #[should_panic(expected: ('PACK: Not for sale', 'ENTRYPOINT_FAILED'))]
 fn test_mint_not_for_sale() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
     tester::execute_claim_starter_pack(@sys, OWNER());
     tester::execute_pack_purchase(@sys, OWNER(), PackType::StarterPack);
 }
@@ -316,7 +318,7 @@ fn test_mint_not_for_sale() {
 #[test]
 #[should_panic(expected: ('PACK: Invalid caller', 'ENTRYPOINT_FAILED'))]
 fn test_mint_bot_duelist_invalid_caller() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
     tester::impersonate(OWNER());
     _protected(@sys).mint_bot_duelist(DuelistProfile::Bot(BotKey::Leon));
 }
@@ -326,8 +328,9 @@ fn test_mint_bot_duelist_invalid_caller() {
 //
 
 #[test]
-fn test_claim_gift() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+fn test_claim_gift_ok() {
+    let mut sys: TestSystems = setup(0);
+    tester::fund_duelists_pool(@sys, 2);
     // 1: claim starter pack
     assert!(!sys.pack.can_claim_gift(OWNER()), "!can_claim_gift_1");
     tester::execute_claim_starter_pack(@sys, OWNER());
@@ -363,27 +366,10 @@ fn test_claim_gift() {
 }
 
 #[test]
-#[should_panic(expected: ('BANK: insufficient LORDS pool', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
-fn test_claim_gift_not_sponsored() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+fn test_claim_gift_sponsored_ok() {
+    let mut sys: TestSystems = setup(0);
     // 1: claim starter pack -- DRAIN ALL LORDS
     tester::execute_claim_starter_pack(@sys, OWNER());
-    tester::execute_claim_starter_pack(@sys, OTHER());
-    // 2: no alive duelists
-    tester::impersonate(OWNER());
-    sys.duelists.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
-    sys.duelists.transfer_from(OWNER(), OTHER(), TOKEN_ID_2);
-    // claim!
-    assert!(sys.pack.can_claim_gift(OWNER()), "can_claim_gift_CLAIM");
-    tester::execute_claim_gift(@sys, OWNER());
-}
-
-#[test]
-fn test_claim_gift_sponsored() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
-    // 1: claim starter pack -- DRAIN ALL LORDS
-    tester::execute_claim_starter_pack(@sys, OWNER());
-    tester::execute_claim_starter_pack(@sys, OTHER());
     // 2: no alive duelists
     tester::impersonate(OWNER());
     sys.duelists.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
@@ -396,9 +382,24 @@ fn test_claim_gift_sponsored() {
 }
 
 #[test]
+#[should_panic(expected: ('BANK: insufficient LORDS pool', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
+fn test_claim_gift_not_sponsored() {
+    let mut sys: TestSystems = setup(0);
+    // 1: claim starter pack -- DRAIN ALL LORDS
+    tester::execute_claim_starter_pack(@sys, OWNER());
+    // 2: no alive duelists
+    tester::impersonate(OWNER());
+    sys.duelists.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
+    sys.duelists.transfer_from(OWNER(), OTHER(), TOKEN_ID_2);
+    // claim!
+    assert!(sys.pack.can_claim_gift(OWNER()), "can_claim_gift_CLAIM");
+    tester::execute_claim_gift(@sys, OWNER());
+}
+
+#[test]
 #[should_panic(expected: ('PACK: Ineligible', 'ENTRYPOINT_FAILED'))]
 fn test_claim_gift_ineligible() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
     assert!(!sys.pack.can_claim_gift(OWNER()), "can_claim_gift_OWNER");
     tester::execute_claim_gift(@sys, OWNER());
 }
@@ -410,7 +411,7 @@ fn test_claim_gift_ineligible() {
 
 #[test]
 fn test_open() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
 
     let starter_pack_count: usize = PackType::StarterPack.descriptor().quantity;
     assert_eq!(starter_pack_count, 2, "starter_pack_count");
@@ -441,7 +442,7 @@ fn test_open() {
 #[test]
 #[should_panic(expected: ('ERC721: invalid token ID', 'ENTRYPOINT_FAILED'))]
 fn test_open_invalid() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
     tester::impersonate(OWNER());
     tester::execute_pack_open(@sys, OWNER(), TOKEN_ID_2.low);
 }
@@ -450,7 +451,7 @@ fn test_open_invalid() {
 #[should_panic(expected: ('ERC721: invalid token ID', 'ENTRYPOINT_FAILED'))] // burn!
 // #[should_panic(expected: ('PACK: Already opened', 'ENTRYPOINT_FAILED'))] // no burn
 fn test_already_opened() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
     tester::execute_claim_starter_pack(@sys, OWNER());
     tester::impersonate(OWNER());
     tester::execute_pack_open(@sys, OWNER(), TOKEN_ID_1.low);
@@ -459,7 +460,7 @@ fn test_already_opened() {
 #[test]
 #[should_panic(expected: ('PACK: Not owner', 'ENTRYPOINT_FAILED'))]
 fn test_open_not_owner() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
     tester::execute_claim_starter_pack(@sys, OWNER());
     _purchase(@sys, OWNER());
     tester::execute_pack_open(@sys, OTHER(), TOKEN_ID_2.low);
@@ -474,7 +475,7 @@ fn test_open_not_owner() {
 #[should_panic(expected: ('ERC721: invalid token ID', 'ENTRYPOINT_FAILED'))] // burn!
 // #[should_panic(expected: ('PACK: Already opened', 'ENTRYPOINT_FAILED'))] // no burn
 fn test_transfer_opened() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
     tester::execute_claim_starter_pack(@sys, OWNER());
     // try to transfer already opened
     tester::impersonate(OWNER());
@@ -485,7 +486,7 @@ fn test_transfer_opened() {
 #[should_panic(expected: ('ERC721: invalid token ID', 'ENTRYPOINT_FAILED'))] // burn!
 // #[should_panic(expected: ('PACK: Already opened', 'ENTRYPOINT_FAILED'))] // no burn
 fn test_transfer_opened_allowed() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
     tester::execute_claim_starter_pack(@sys, OWNER());
     // approve
     tester::impersonate(OWNER());
@@ -499,7 +500,7 @@ fn test_transfer_opened_allowed() {
 #[should_panic(expected: ('ERC721: invalid token ID', 'ENTRYPOINT_FAILED'))] // burn!
 // #[should_panic(expected: ('ERC721: unauthorized caller', 'ENTRYPOINT_FAILED'))] // no burn
 fn test_transfer_opened_no_allowance() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
     tester::execute_claim_starter_pack(@sys, OWNER());
     // try to transfer from unauthorized
     tester::impersonate(SPENDER());
@@ -508,7 +509,7 @@ fn test_transfer_opened_no_allowance() {
 
 #[test]
 fn test_transfer_unopened_ok() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
     tester::execute_claim_starter_pack(@sys, OWNER());
     _purchase(@sys, OWNER());
     assert_eq!(sys.pack.balance_of(OWNER()), 1, "balance_of(OWNER) 1");
@@ -524,7 +525,7 @@ fn test_transfer_unopened_ok() {
 
 #[test]
 fn test_transfer_unopened_allowed_ok() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
     tester::execute_claim_starter_pack(@sys, OWNER());
     _purchase(@sys, OWNER());
     assert_eq!(sys.pack.balance_of(OWNER()), 1, "balance_of(OWNER) 1");
@@ -544,7 +545,7 @@ fn test_transfer_unopened_allowed_ok() {
 #[test]
 #[should_panic(expected: ('ERC721: unauthorized caller', 'ENTRYPOINT_FAILED'))]
 fn test_transfer_unopened_no_allowance() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
     tester::execute_claim_starter_pack(@sys, OWNER());
     _purchase(@sys, OWNER());
     // try to transfer from unauthorized
@@ -596,13 +597,13 @@ pub fn _airdrop_open(sys: @TestSystems, recipient: ContractAddress, pack_type: P
 
 #[test]
 fn test_airdrop_ok() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
-    tester::fund_duelists_pool(@sys, 7);
+    let mut sys: TestSystems = setup(0);
+    tester::fund_duelists_pool(@sys, 13);
     // randomize mock VRF
     sys.world.dispatcher.uuid();
     _airdrop_open(@sys, OTHER(), PackType::StarterPack, Option::None, "StarterPack");
     _airdrop_open(@sys, OTHER(), PackType::FreeDuelist, Option::None, "FreeDuelist");
-    _airdrop_open(@sys, OTHER(), PackType::GenesisDuelists5x, Option::None, "GenesisDuelists5x");
+    _airdrop_open(@sys, OTHER(), PackType::FreeGenesis5x, Option::None, "FreeGenesis5x");
     _airdrop_open(@sys, OTHER(), PackType::FreeGenesis5x, Option::None, "FreeGenesis5x");
     _airdrop_open(@sys, OTHER(), PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "GenesisKey::Duke");
     _airdrop_open(@sys, OTHER(), PackType::SingleDuelist, Option::Some(DuelistProfile::Legends(LegendsKey::TGC1)), "LegendsKey::TGC1");
@@ -610,8 +611,8 @@ fn test_airdrop_ok() {
 
 #[test]
 fn test_promo_mint_to_ok() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
-    tester::fund_duelists_pool(@sys, 9);
+    let mut sys: TestSystems = setup(0);
+    tester::fund_duelists_pool(@sys, 10);
     // airdrop some...
     let pack_id_1: u128 = tester::execute_pack_promo_mint_to(@sys, OWNER(), OTHER());
     _assert_minted_count(@sys, 1, 1, "airdrop 1");
@@ -637,8 +638,8 @@ fn test_promo_mint_to_ok() {
 
 #[test]
 fn test_airdrop_multiple_ok() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
-    tester::fund_duelists_pool(@sys, 9);
+    let mut sys: TestSystems = setup(0);
+    tester::fund_duelists_pool(@sys, 10);
     // airdrop some...
     let pack_ids: Span<u128> = tester::execute_pack_airdrop_multiple(@sys, OWNER(), OTHER(), PackType::FreeDuelist, Option::None, 2);
     _assert_minted_count(@sys, 2, 2, "airdrop 1");
@@ -653,7 +654,7 @@ fn test_airdrop_multiple_ok() {
     assert_ne!(pack_2.seed, 0, "airdrop 1");
     assert_ne!(pack_1.seed, pack_2.seed, "airdrop 1");
     // airdrop more...
-    let pack_ids: Span<u128> = tester::execute_pack_airdrop_multiple(@sys, OWNER(), BUMMER(), PackType::GenesisDuelists5x, Option::None, 3);
+    let pack_ids: Span<u128> = tester::execute_pack_airdrop_multiple(@sys, OWNER(), BUMMER(), PackType::FreeGenesis5x, Option::None, 3);
     _assert_minted_count(@sys, 5, 5, "airdrop 2");
     assert_eq!(pack_ids.len(), 3, "airdrop 2");
     assert_eq!(sys.pack.balance_of(OWNER()), 0, "airdrop 2");
@@ -662,9 +663,9 @@ fn test_airdrop_multiple_ok() {
     let pack_3: Pack = sys.store.get_pack(3);
     let pack_4: Pack = sys.store.get_pack(4);
     let pack_5: Pack = sys.store.get_pack(5);
-    assert_eq!(pack_3.pack_type, PackType::GenesisDuelists5x, "airdrop 2");
-    assert_eq!(pack_4.pack_type, PackType::GenesisDuelists5x, "airdrop 2");
-    assert_eq!(pack_5.pack_type, PackType::GenesisDuelists5x, "airdrop 2");
+    assert_eq!(pack_3.pack_type, PackType::FreeGenesis5x, "airdrop 2");
+    assert_eq!(pack_4.pack_type, PackType::FreeGenesis5x, "airdrop 2");
+    assert_eq!(pack_5.pack_type, PackType::FreeGenesis5x, "airdrop 2");
     assert_ne!(pack_3.seed, 0, "airdrop 2");
     assert_ne!(pack_4.seed, 0, "airdrop 2");
     assert_ne!(pack_5.seed, 0, "airdrop 2");
@@ -677,28 +678,36 @@ fn test_airdrop_multiple_ok() {
 #[test]
 #[should_panic(expected: ('PACK: Caller not admin', 'ENTRYPOINT_FAILED'))]
 fn test_promo_mint_to_not_admin() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
     tester::execute_pack_promo_mint_to(@sys, OTHER(), BUMMER());
 }
 
 #[test]
 #[should_panic(expected: ('PACK: Caller not admin', 'ENTRYPOINT_FAILED'))]
 fn test_airdrop_not_admin() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
     tester::execute_pack_airdrop(@sys, OTHER(), BUMMER(), PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)));
+}
+
+#[test]
+#[should_panic(expected: ('PACK: Not for airdrop', 'ENTRYPOINT_FAILED'))]
+fn test_airdrop_purchaseable() {
+    let mut sys: TestSystems = setup(0);
+    tester::fund_duelists_pool(@sys, 5);
+    _airdrop_open(@sys, OTHER(), PackType::GenesisDuelists5x, Option::None, "GenesisDuelists5x");
 }
 
 #[test]
 #[should_panic(expected: ('PACK: Missing duelist', 'ENTRYPOINT_FAILED'))]
 fn test_airdrop_missing_profile() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
     tester::execute_pack_airdrop(@sys, OWNER(), OTHER(), PackType::SingleDuelist, Option::None);
 }
 
 #[test]
 #[should_panic(expected: ('PACK: Invalid duelist', 'ENTRYPOINT_FAILED'))]
 fn test_airdrop_undefined_profile() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
     let duelist_profile: DuelistProfile = DuelistProfile::Undefined;
     tester::execute_pack_airdrop(@sys, OWNER(), OTHER(), PackType::SingleDuelist, Option::Some(duelist_profile));
 }
@@ -706,7 +715,7 @@ fn test_airdrop_undefined_profile() {
 #[test]
 #[should_panic(expected: ('PACK: Invalid duelist', 'ENTRYPOINT_FAILED'))]
 fn test_airdrop_invalid_profile() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
     let duelist_profile: DuelistProfile = DuelistProfile::Genesis(GenesisKey::Unknown);
     tester::execute_pack_airdrop(@sys, OWNER(), OTHER(), PackType::SingleDuelist, Option::Some(duelist_profile));
 }
@@ -714,7 +723,7 @@ fn test_airdrop_invalid_profile() {
 #[test]
 #[should_panic(expected: ('PACK: Invalid duelist', 'ENTRYPOINT_FAILED'))]
 fn test_airdrop_invalid_bot() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
     let duelist_profile: DuelistProfile = DuelistProfile::Bot(BotKey::Leon);
     tester::execute_pack_airdrop(@sys, OWNER(), OTHER(), PackType::SingleDuelist, Option::Some(duelist_profile));
 }
@@ -722,7 +731,7 @@ fn test_airdrop_invalid_bot() {
 #[test]
 #[should_panic(expected: ('PACK: Invalid duelist', 'ENTRYPOINT_FAILED'))]
 fn test_airdrop_invalid_character() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
     let duelist_profile: DuelistProfile = DuelistProfile::Character(CharacterKey::Bartender);
     tester::execute_pack_airdrop(@sys, OWNER(), OTHER(), PackType::SingleDuelist, Option::Some(duelist_profile));
 }
@@ -730,14 +739,15 @@ fn test_airdrop_invalid_character() {
 #[test]
 #[should_panic(expected: ('PACK: Invalid duelist', 'ENTRYPOINT_FAILED'))]
 fn test_airdrop_invalid_free() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
     let duelist_profile: DuelistProfile = DuelistProfile::Legends(LegendsKey::TGC1);
     tester::execute_pack_airdrop(@sys, OWNER(), OTHER(), PackType::FreeDuelist, Option::Some(duelist_profile));
 }
 
 #[test]
 fn test_airdrop_open_free_pool_ok() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
+    tester::fund_duelists_pool(@sys, 4);
     let duelist_profile: DuelistProfile = DuelistProfile::Legends(LegendsKey::TGC1);
     // check pool balance
     let pool_claimable_before: Pool = sys.store.get_pool(PoolType::Claimable);
@@ -752,13 +762,14 @@ fn test_airdrop_open_free_pool_ok() {
     // no panic!
     let pool_claimable_after: Pool = sys.store.get_pool(PoolType::Claimable);
     let pool_fame_peg_after: Pool = sys.store.get_pool(PoolType::FamePeg);
-    assert_eq!(pool_claimable_after.balance_lords, 0, "pool_claimable_after");
-    assert_eq!(pool_fame_peg_after.balance_lords, pool_claimable_before.balance_lords, "pool_fame_peg_after");
+    assert_lt!(pool_claimable_after.balance_lords, pool_claimable_before.balance_lords, "pool_claimable_after");
+    assert_gt!(pool_fame_peg_after.balance_lords, pool_fame_peg_before.balance_lords, "pool_fame_peg_after");
 }
 
 #[test]
 fn test_airdrop_multiple_open_free_pool_ok() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
+    tester::fund_duelists_pool(@sys, 4);
     // check pool balance
     let pool_claimable_before: Pool = sys.store.get_pool(PoolType::Claimable);
     let pool_fame_peg_before: Pool = sys.store.get_pool(PoolType::FamePeg);
@@ -773,121 +784,71 @@ fn test_airdrop_multiple_open_free_pool_ok() {
     // no panic!
     let pool_claimable_after: Pool = sys.store.get_pool(PoolType::Claimable);
     let pool_fame_peg_after: Pool = sys.store.get_pool(PoolType::FamePeg);
-    assert_eq!(pool_claimable_after.balance_lords, 0, "pool_claimable_after");
-    assert_eq!(pool_fame_peg_after.balance_lords, pool_claimable_before.balance_lords, "pool_fame_peg_after");
+    assert_lt!(pool_claimable_after.balance_lords, pool_claimable_before.balance_lords, "pool_claimable_after");
+    assert_gt!(pool_fame_peg_after.balance_lords, pool_fame_peg_before.balance_lords, "pool_fame_peg_after");
 }
 
 #[test]
-#[should_panic(expected: ('PACK: insufficient LORDS pool', 'ENTRYPOINT_FAILED'))]
+#[should_panic(expected: ('BANK: insufficient LORDS pool', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
 fn test_airdrop_open_free_pool_insufficient() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
     let duelist_profile: DuelistProfile = DuelistProfile::Legends(LegendsKey::TGC1);
-    _airdrop_open(@sys, OTHER(), PackType::SingleDuelist, Option::Some(duelist_profile), "pack 1");
-    _airdrop_open(@sys, OTHER(), PackType::SingleDuelist, Option::Some(duelist_profile), "pack 2");
-    _airdrop_open(@sys, OTHER(), PackType::SingleDuelist, Option::Some(duelist_profile), "pack 3");
-    _airdrop_open(@sys, OTHER(), PackType::SingleDuelist, Option::Some(duelist_profile), "pack 4");
     // panic!
     _airdrop_open(@sys, OTHER(), PackType::SingleDuelist, Option::Some(duelist_profile), "pack 5");
 }
 
 #[test]
-fn test_airdrop_open_purchasable_pool_ok() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
-    tester::fund_duelists_pool(@sys, 3); // 6 more duelists = 10 total
+fn test_airdrop_open_claimable_pool_ok() {
+    let mut sys: TestSystems = setup(0);
+    tester::fund_duelists_pool(@sys, 10);
     // check pool balance
     let pool_claimable_before: Pool = sys.store.get_pool(PoolType::Claimable);
-    let pool_purchase_before: Pool = sys.store.get_pool(PoolType::Purchases);
     let pool_fame_peg_before: Pool = sys.store.get_pool(PoolType::FamePeg);
     assert_gt!(pool_claimable_before.balance_lords, 0, "pool_claimable_before");
-    assert_eq!(pool_purchase_before.balance_lords, 0, "pool_purchase_before");
     assert_eq!(pool_fame_peg_before.balance_lords, 0, "pool_fame_peg_before");
     // airdrop...
-    let pack_1: u128 = tester::execute_pack_airdrop(@sys, OWNER(), OTHER(), PackType::GenesisDuelists5x, Option::None);
-    let pack_2: u128 = tester::execute_pack_airdrop(@sys, OWNER(), OTHER(), PackType::GenesisDuelists5x, Option::None);
+    let pack_1: u128 = tester::execute_pack_airdrop(@sys, OWNER(), OTHER(), PackType::FreeGenesis5x, Option::None);
+    let pack_2: u128 = tester::execute_pack_airdrop(@sys, OWNER(), OTHER(), PackType::FreeGenesis5x, Option::None);
     // check pool balance
     let pool_claimable_airdropped: Pool = sys.store.get_pool(PoolType::Claimable);
-    let pool_purchase_airdropped: Pool = sys.store.get_pool(PoolType::Purchases);
     let pool_fame_peg_airdropped: Pool = sys.store.get_pool(PoolType::FamePeg);
-    assert_eq!(pool_claimable_airdropped.balance_lords, 0, "pool_claimable_airdropped");
-    assert_eq!(pool_purchase_airdropped.balance_lords, pool_claimable_before.balance_lords, "pool_purchase_airdropped");
+    assert_eq!(pool_claimable_airdropped.balance_lords, pool_claimable_before.balance_lords, "pool_claimable_airdropped");
     assert_eq!(pool_fame_peg_airdropped.balance_lords, 0, "pool_fame_peg_airdropped");
     // open...
     tester::execute_pack_open(@sys, OTHER(), pack_1);
     tester::execute_pack_open(@sys, OTHER(), pack_2);
     // check pool balance
     let pool_claimable_after: Pool = sys.store.get_pool(PoolType::Claimable);
-    let pool_purchase_after: Pool = sys.store.get_pool(PoolType::Purchases);
     let pool_fame_peg_after: Pool = sys.store.get_pool(PoolType::FamePeg);
-    assert_eq!(pool_claimable_after.balance_lords, 0, "pool_claimable_after");
-    assert_eq!(pool_purchase_after.balance_lords, 0, "pool_purchase_after");
-    assert_eq!(pool_fame_peg_after.balance_lords, pool_claimable_before.balance_lords, "pool_fame_peg_after");
-}
-
-#[test]
-#[ignore] // now minting free packs, not from purchases pool
-fn test_promo_mint_to_purchase_pool_ok() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
-    tester::fund_duelists_pool(@sys, 3); // 6 more duelists = 10 total
-    // check pool balance
-    let pool_claimable_before: Pool = sys.store.get_pool(PoolType::Claimable);
-    let pool_purchase_before: Pool = sys.store.get_pool(PoolType::Purchases);
-    let pool_fame_peg_before: Pool = sys.store.get_pool(PoolType::FamePeg);
-    assert_gt!(pool_claimable_before.balance_lords, 0, "pool_claimable_before");
-    assert_eq!(pool_purchase_before.balance_lords, 0, "pool_purchase_before");
-    assert_eq!(pool_fame_peg_before.balance_lords, 0, "pool_fame_peg_before");
-    // airdrop...
-    let pack_1: u128 = tester::execute_pack_promo_mint_to(@sys, OWNER(), OTHER());
-    let pack_2: u128 = tester::execute_pack_promo_mint_to(@sys, OWNER(), BUMMER());
-    // check pool balance
-    let pool_claimable_airdropped: Pool = sys.store.get_pool(PoolType::Claimable);
-    let pool_purchase_airdropped: Pool = sys.store.get_pool(PoolType::Purchases);
-    let pool_fame_peg_airdropped: Pool = sys.store.get_pool(PoolType::FamePeg);
-    assert_eq!(pool_claimable_airdropped.balance_lords, 0, "pool_claimable_airdropped");
-    assert_eq!(pool_purchase_airdropped.balance_lords, pool_claimable_before.balance_lords, "pool_purchase_airdropped");
-    assert_eq!(pool_fame_peg_airdropped.balance_lords, 0, "pool_fame_peg_airdropped");
-    // open...
-    tester::execute_pack_open(@sys, OTHER(), pack_1);
-    tester::execute_pack_open(@sys, BUMMER(), pack_2);
-    // check pool balance
-    let pool_claimable_after: Pool = sys.store.get_pool(PoolType::Claimable);
-    let pool_purchase_after: Pool = sys.store.get_pool(PoolType::Purchases);
-    let pool_fame_peg_after: Pool = sys.store.get_pool(PoolType::FamePeg);
-    assert_eq!(pool_claimable_after.balance_lords, 0, "pool_claimable_after");
-    assert_eq!(pool_purchase_after.balance_lords, 0, "pool_purchase_after");
-    assert_eq!(pool_fame_peg_after.balance_lords, pool_claimable_before.balance_lords, "pool_fame_peg_after");
+    assert_lt!(pool_claimable_after.balance_lords, pool_claimable_before.balance_lords, "pool_claimable_after");
+    assert_gt!(pool_fame_peg_after.balance_lords, pool_fame_peg_before.balance_lords, "pool_fame_peg_after");
 }
 
 #[test]
 fn test_promo_mint_to_claimable_pool_ok() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
-    tester::fund_duelists_pool(@sys, 3); // 6 more duelists = 10 total, or 2 airdrops
+    let mut sys: TestSystems = setup(0);
+    tester::fund_duelists_pool(@sys, 6);
     // check pool balance
     let pool_claimable_before: Pool = sys.store.get_pool(PoolType::Claimable);
-    let pool_purchase_before: Pool = sys.store.get_pool(PoolType::Purchases);
     let pool_fame_peg_before: Pool = sys.store.get_pool(PoolType::FamePeg);
     assert_gt!(pool_claimable_before.balance_lords, 0, "pool_claimable_before");
-    assert_eq!(pool_purchase_before.balance_lords, 0, "pool_purchase_before");
     assert_eq!(pool_fame_peg_before.balance_lords, 0, "pool_fame_peg_before");
     // make 2 airdrops...
     let pack_1: u128 = tester::execute_pack_promo_mint_to(@sys, OWNER(), OTHER());
     let pack_2: u128 = tester::execute_pack_promo_mint_to(@sys, OWNER(), BUMMER());
     // check pool balance
     let pool_claimable_airdropped: Pool = sys.store.get_pool(PoolType::Claimable);
-    let pool_purchase_airdropped: Pool = sys.store.get_pool(PoolType::Purchases);
     let pool_fame_peg_airdropped: Pool = sys.store.get_pool(PoolType::FamePeg);
     assert_eq!(pool_claimable_airdropped.balance_lords, pool_claimable_before.balance_lords, "pool_claimable_airdropped");
-    assert_eq!(pool_purchase_airdropped.balance_lords, 0, "pool_purchase_airdropped");
     assert_eq!(pool_fame_peg_airdropped.balance_lords, 0, "pool_fame_peg_airdropped");
     // open...
     tester::execute_pack_open(@sys, OTHER(), pack_1);
     tester::execute_pack_open(@sys, BUMMER(), pack_2);
     // check pool balance
     let pool_claimable_after: Pool = sys.store.get_pool(PoolType::Claimable);
-    let pool_purchase_after: Pool = sys.store.get_pool(PoolType::Purchases);
     let pool_fame_peg_after: Pool = sys.store.get_pool(PoolType::FamePeg);
-    assert_eq!(pool_claimable_after.balance_lords, 0, "pool_claimable_after");
-    assert_eq!(pool_purchase_after.balance_lords, 0, "pool_purchase_after");
-    assert_eq!(pool_fame_peg_after.balance_lords, pool_claimable_before.balance_lords, "pool_fame_peg_after");
+    assert_lt!(pool_claimable_after.balance_lords, pool_claimable_before.balance_lords, "pool_claimable_after");
+    assert_gt!(pool_fame_peg_after.balance_lords, pool_fame_peg_before.balance_lords, "pool_fame_peg_after");
 }
 
 
@@ -897,14 +858,14 @@ fn test_promo_mint_to_claimable_pool_ok() {
 //
 #[test]
 fn test_update_contract_metadata() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
     tester::drop_all_events(sys.pack.contract_address);
     sys.pack.update_contract_metadata();
     let _event = tester::pop_log::<combo::ContractURIUpdated>(sys.pack.contract_address, selector!("ContractURIUpdated")).unwrap();
 }
 #[test]
 fn test_update_token_metadata() {
-    let mut sys: TestSystems = setup(0); // funds 2 starter packs
+    let mut sys: TestSystems = setup(0);
     tester::drop_all_events(sys.pack.contract_address);
     sys.pack.update_token_metadata(TOKEN_ID_1.low);
     let event = tester::pop_log::<combo::MetadataUpdate>(sys.pack.contract_address, selector!("MetadataUpdate")).unwrap();
@@ -912,7 +873,7 @@ fn test_update_token_metadata() {
 }
 // #[test]
 // fn test_update_tokens_metadata() {
-//     let mut sys: TestSystems = setup(0); // funds 2 starter packs
+//     let mut sys: TestSystems = setup(0);
 //     tester::drop_all_events(sys.pack.contract_address);
 //     sys.pack.update_tokens_metadata(TOKEN_ID_1.low, TOKEN_ID_2.low);
 //     let event = tester::pop_log::<combo::BatchMetadataUpdate>(sys.pack.contract_address, selector!("BatchMetadataUpdate")).unwrap();

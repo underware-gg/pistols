@@ -44,7 +44,7 @@ mod tests {
         assert_eq!(balance_peg_init, 0, "balance_peg INIT");
 
         // fund 10 starters...
-        tester::fund_duelists_pool(@sys, 10);
+        tester::fund_duelists_pool(@sys, 35);
         // claim 2 starters...
         tester::execute_claim_starter_pack(@sys, OWNER());
         tester::execute_claim_starter_pack(@sys, OTHER());

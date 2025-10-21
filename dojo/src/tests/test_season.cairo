@@ -110,7 +110,7 @@ mod tests {
         tester::set_block_timestamp(season_1.period.end - TIMESTAMP::ONE_HOUR);
         assert!(!season_1.can_collect(), "!season_1.can_collect");
         // fund duelists
-        tester::fund_duelists_pool(@sys, 4);
+        // tester::fund_duelists_pool(@sys, 4);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         let C: ContractAddress = BUMMER();

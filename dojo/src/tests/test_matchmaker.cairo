@@ -373,7 +373,7 @@ mod tests {
     fn test_enlistment_not_enlisted() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
         let A: ContractAddress = OWNER();
-        tester::fund_duelists_pool(@sys, 2);
+        // tester::fund_duelists_pool(@sys, 2);
         let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
         let queue_id: QueueId = QueueId::Ranked;
         let _duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, QueueMode::Fast);
@@ -384,7 +384,7 @@ mod tests {
     fn test_enlistment_twice() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
         let A: ContractAddress = OWNER();
-        tester::fund_duelists_pool(@sys, 2);
+        tester::fund_duelists_pool(@sys, 1);
         let ID_A: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_A");
         let queue_id: QueueId = QueueId::Ranked;
         _setup_ranked_lords(@sys, [A].span(), 2);
@@ -397,7 +397,7 @@ mod tests {
     fn test_enlistment_not_required() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
         let A: ContractAddress = OWNER();
-        tester::fund_duelists_pool(@sys, 2);
+        // tester::fund_duelists_pool(@sys, 2);
         let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
         let queue_id: QueueId = QueueId::Unranked;
         tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
@@ -408,7 +408,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
-        tester::fund_duelists_pool(@sys, 2);
+        // tester::fund_duelists_pool(@sys, 2);
         let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
         let ID_B: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
         let queue_id: QueueId = QueueId::Unranked;
@@ -437,7 +437,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
-        tester::fund_duelists_pool(@sys, 2);
+        // tester::fund_duelists_pool(@sys, 2);
         let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
         let ID_B: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
         let queue_id: QueueId = QueueId::Unranked;
@@ -478,7 +478,7 @@ mod tests {
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         let C: ContractAddress = BUMMER();
-        tester::fund_duelists_pool(@sys, 3);
+        // tester::fund_duelists_pool(@sys, 3);
         let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
         let ID_B: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
         let ID_C: u128 = *tester::execute_claim_starter_pack(@sys, C)[0];
@@ -516,7 +516,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
-        tester::fund_duelists_pool(@sys, 3);
+        // tester::fund_duelists_pool(@sys, 3);
         let ID_A_1: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
         let ID_B_1: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
         let ID_A_2: u128 = ID_A_1 + 1;
@@ -552,7 +552,7 @@ mod tests {
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         let C: ContractAddress = BUMMER();
-        tester::fund_duelists_pool(@sys, 3);
+        // tester::fund_duelists_pool(@sys, 3);
         let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
         let ID_B: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
         let ID_C: u128 = *tester::execute_claim_starter_pack(@sys, C)[0];
@@ -590,7 +590,7 @@ mod tests {
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         let C: ContractAddress = BUMMER();
-        tester::fund_duelists_pool(@sys, 3);
+        // tester::fund_duelists_pool(@sys, 3);
         let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
         let ID_B: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
         let ID_C: u128 = *tester::execute_claim_starter_pack(@sys, C)[0];
@@ -632,7 +632,7 @@ mod tests {
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         let C: ContractAddress = BUMMER();
-        tester::fund_duelists_pool(@sys, 3);
+        // tester::fund_duelists_pool(@sys, 3);
         let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
         let ID_B: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
         let ID_C: u128 = *tester::execute_claim_starter_pack(@sys, C)[0];
@@ -677,7 +677,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
-        tester::fund_duelists_pool(@sys, 2);
+        // tester::fund_duelists_pool(@sys, 2);
         let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
         let ID_B: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
         let queue_id: QueueId = QueueId::Unranked;
@@ -785,7 +785,7 @@ mod tests {
     #[should_panic(expected: ('MATCHMAKER: Ineligible duelist', 'ENTRYPOINT_FAILED'))]
     fn test_ranked_ineligible_duelist() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::ADMIN | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
-        tester::fund_duelists_pool(@sys, 2);
+        // tester::fund_duelists_pool(@sys, 2);
         let A: ContractAddress = OWNER();
         let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
         let queue_id: QueueId = QueueId::Ranked;
@@ -913,7 +913,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
-        tester::fund_duelists_pool(@sys, 3);
+        tester::fund_duelists_pool(@sys, 6);
         let ID_A: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_A");
         let ID_B: u128 = _airdrop_open(@sys, B, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_B");
         let queue_id: QueueId = QueueId::Ranked;
@@ -954,7 +954,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
-        tester::fund_duelists_pool(@sys, 3);
+        tester::fund_duelists_pool(@sys, 6);
         let ID_A: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_A");
         let ID_B: u128 = _airdrop_open(@sys, B, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_B");
         let queue_id: QueueId = QueueId::Ranked;
@@ -1002,7 +1002,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
-        tester::fund_duelists_pool(@sys, 3);
+        tester::fund_duelists_pool(@sys, 6);
         let ID_A: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_A");
         let ID_B: u128 = _airdrop_open(@sys, B, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_B");
         let queue_id: QueueId = QueueId::Ranked;
@@ -1042,7 +1042,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
-        tester::fund_duelists_pool(@sys, 3);
+        tester::fund_duelists_pool(@sys, 6);
         let ID_A: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_A");
         let ID_B: u128 = _airdrop_open(@sys, B, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_B");
         let queue_id: QueueId = QueueId::Ranked;
@@ -1085,7 +1085,7 @@ mod tests {
     fn test_slow_to_fast_queue_expire_bot_player() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER);
         let A: ContractAddress = OWNER();
-        tester::fund_duelists_pool(@sys, 3);
+        tester::fund_duelists_pool(@sys, 6);
         let ID_A: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_A");
         let queue_id: QueueId = QueueId::Ranked;
         // setup lords
@@ -1120,7 +1120,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
-        tester::fund_duelists_pool(@sys, 3);
+        tester::fund_duelists_pool(@sys, 6);
         let ID_A: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_A");
         let ID_B: u128 = _airdrop_open(@sys, B, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_B");
         let queue_id: QueueId = QueueId::Ranked;
@@ -1154,7 +1154,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
-        tester::fund_duelists_pool(@sys, 3);
+        tester::fund_duelists_pool(@sys, 6);
         let ID_A: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_A");
         let ID_B: u128 = _airdrop_open(@sys, B, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_B");
         let queue_id: QueueId = QueueId::Ranked;
@@ -1191,7 +1191,7 @@ mod tests {
     #[test]
     fn test_ranked_and_unranked_a_ok() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::ADMIN | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
-        tester::fund_duelists_pool(@sys, 2);
+        tester::fund_duelists_pool(@sys, 4);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         let C: ContractAddress = BUMMER();
@@ -1237,7 +1237,7 @@ mod tests {
     #[test]
     fn test_ranked_and_unranked_b_ok() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::ADMIN | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
-        tester::fund_duelists_pool(@sys, 2);
+        tester::fund_duelists_pool(@sys, 4);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         let C: ContractAddress = BUMMER();
@@ -1325,7 +1325,7 @@ mod tests {
     // #[should_panic(expected: ('MATCHMAKER: Unfinished Imp duel', 'ENTRYPOINT_FAILED'))]
     fn test_unranked_expire_bot_player_skip_has_pact() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER);
-        tester::fund_duelists_pool(@sys, 2);
+        // tester::fund_duelists_pool(@sys, 2);
         let A: ContractAddress = OWNER();
         let ID_A_1: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
         let ID_A_2: u128 = ID_A_1 + 1;
@@ -1376,7 +1376,7 @@ mod tests {
     #[test]
     fn test_unranked_bot_player_multiple_matches() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER);
-        tester::fund_duelists_pool(@sys, 3);
+        tester::fund_duelists_pool(@sys, 2);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
@@ -1424,7 +1424,7 @@ mod tests {
     #[test]
     fn test_ranked_unranked_bot_player_switch_duelist() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER);
-        tester::fund_duelists_pool(@sys, 2);
+        tester::fund_duelists_pool(@sys, 4);
         let A: ContractAddress = OWNER();
         let ID_A_ranked: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_A_1");
         let ID_A_unranked: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duella)), "airdrop_A_2");
@@ -1521,7 +1521,7 @@ mod tests {
     #[test]
     fn test_unranked_duelist_stack() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::ADMIN | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
-        tester::fund_duelists_pool(@sys, 2);
+        tester::fund_duelists_pool(@sys, 4);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         let ID_A_1: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_A_1");
@@ -1544,7 +1544,7 @@ mod tests {
     #[test]
     fn test_ranked_duelist_stack() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::ADMIN | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
-        tester::fund_duelists_pool(@sys, 2);
+        tester::fund_duelists_pool(@sys, 4);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
         let ID_A_1: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_A_1");

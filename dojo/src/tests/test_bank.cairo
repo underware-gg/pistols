@@ -324,7 +324,7 @@ mod tests {
     #[test]
     fn test_bank_resolved_draw_alive() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST |  FLAGS::FAME | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
-        tester::fund_duelists_pool(@sys, 2);
+        // tester::fund_duelists_pool(@sys, 4);
         tester::execute_claim_starter_pack(@sys, OWNER());
         tester::execute_claim_starter_pack(@sys, OTHER());
         _test_bank_resolved(ref sys, OWNER(), OTHER(), 0);
@@ -339,7 +339,7 @@ mod tests {
     fn test_bank_resolved_draw_dead() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST |  FLAGS::FAME | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
 // tester::print_pools(@sys, 1, "INIT");
-        tester::fund_duelists_pool(@sys, 2);
+        // tester::fund_duelists_pool(@sys, 4);
 // tester::print_pools(@sys, 1, "FUNDED");
         tester::execute_claim_starter_pack(@sys, OWNER());
         tester::execute_claim_starter_pack(@sys, OTHER());
@@ -383,7 +383,7 @@ tester::print_pools(@sys, 1, "COLLECTED");
     #[test]
     fn test_bank_resolved_win_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST |  FLAGS::FAME | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
-        tester::fund_duelists_pool(@sys, 3);
+        // tester::fund_duelists_pool(@sys, 6);
         tester::execute_claim_starter_pack(@sys, OWNER());
         tester::execute_claim_starter_pack(@sys, OTHER());
         tester::execute_claim_starter_pack(@sys, BUMMER());
@@ -400,7 +400,7 @@ tester::print_pools(@sys, 1, "COLLECTED");
     #[test]
     fn test_bank_resolved_win_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST |  FLAGS::FAME | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
-        tester::fund_duelists_pool(@sys, 3);
+        // tester::fund_duelists_pool(@sys, 6);
         tester::execute_claim_starter_pack(@sys, OWNER());
         tester::execute_claim_starter_pack(@sys, OTHER());
         tester::execute_claim_starter_pack(@sys, BUMMER());
@@ -439,7 +439,7 @@ tester::print_pools(@sys, 1, "COLLECTED");
         assert_eq!(pool_peg, 0, "pool_peg INIT");
 
         // fund PoolType::Purchases
-        tester::fund_duelists_pool(@sys, 1);
+        tester::fund_duelists_pool(@sys, 2);
         balance_bank = tester::assert_lords_balance(sys.lords, bank_address, balance_bank, 0, price_starter, "balance_bank FUND");
         pool_claimable = tester::assert_balance(sys.store.get_pool(PoolType::Claimable).balance_lords, pool_claimable, 0, price_starter, "pool_claimable FUND");
         pool_purchases = tester::assert_balance(sys.store.get_pool(PoolType::Purchases).balance_lords, pool_purchases, 0, 0, "pool_purchases FUND");
@@ -496,7 +496,7 @@ tester::print_pools(@sys, 1, "COLLECTED");
         assert_eq!(pool_peg.balance_fame, 0, "pool_peg fame INIT");
 
         // sponsor...
-        let amount: u128 = tester::fund_duelists_pool(@sys, 2);
+        let amount: u128 = tester::fund_duelists_pool(@sys, 4);
         assert_gt!(amount, 0, "amount sponsored");
 
         // balances
