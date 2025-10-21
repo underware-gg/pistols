@@ -42,6 +42,7 @@ pub mod matchmaker {
     use pistols::models::{
         challenge::{DuelType},
         duelist::{DuelistAssignmentTrait},
+        challenge::{Round, MovesTrait},
         pact::{PactTrait},
         match_queue::{
             QueueId, QueueIdTrait, QueueMode,
@@ -559,6 +560,12 @@ pub mod matchmaker {
             } else {
                 // has a duel, do something with it
                 self._start_match_with_imp(ref store, ref match_player, queue_id);
+                // clear players commit, if committed
+                let mut round: Round = store.get_round(match_player.duel_id);
+                if (round.moves_a.has_comitted()) {
+                    round.moves_a.commit(0);
+                    store.set_round(@round);
+                }
             }
             store.delete_match_player(@match_player);
         }
