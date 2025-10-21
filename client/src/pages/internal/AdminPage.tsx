@@ -94,7 +94,7 @@ export function WalletAddressRow({
       <Cell>
         <Input fluid className='Code'
           value={username ?? ''}
-          onChange={(e) => setUsername(e.target.value)}
+          onChange={(e) => setUsername(e.target.value.toLowerCase())}
           maxLength={50}
           placeholder={null}
           label='Controller Name:'
