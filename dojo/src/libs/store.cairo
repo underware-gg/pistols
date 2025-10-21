@@ -400,6 +400,10 @@ pub impl StoreImpl of StoreTrait {
     fn set_challenge(ref self: Store, model: @Challenge) {
         self.world.write_model(model);
     }
+    #[inline(always)]
+    fn delete_challenge(ref self: Store, model: @Challenge) {
+        self.world.erase_model(model);
+    }
 
     #[inline(always)]
     fn set_challenge_message(ref self: Store, model: @ChallengeMessage) {
@@ -409,6 +413,10 @@ pub impl StoreImpl of StoreTrait {
     #[inline(always)]
     fn set_round(ref self: Store, model: @Round) {
         self.world.write_model(model);
+    }
+    #[inline(always)]
+    fn delete_round(ref self: Store, model: @Round) {
+        self.world.erase_model(model);
     }
 
     #[inline(always)]

@@ -25,6 +25,7 @@ mod tests {
         tester::{
             TestSystems, StoreTrait, DnsTrait,
             IMatchMakerDispatcherTrait,
+            IDuelTokenDispatcherTrait,
             IDuelTokenProtectedDispatcherTrait,
             IBotPlayerDispatcherTrait,
             IRngMockDispatcherTrait,
@@ -2142,12 +2143,13 @@ mod tests {
         _assert_next_duelists(@sys, queue_id, A, 0, [].span(), "cleared_queue_next_A");
         _assert_next_duelists(@sys, queue_id, B, 0, [].span(), "cleared_queue_next_B");
         //
-        // assignments
-        tester::assert_pact_queue(@sys, assignment_a_1.duel_id, true, true, queue_id, "assignment_a_1");
-        let assignment_a_2: DuelistAssignment = sys.store.get_duelist_assignment(ID_A_2);
-        assert_eq!(assignment_a_2.queue_id, QueueId::Undefined, "assignment_a_2.queue_id");
-        assert_eq!(assignment_a_2.duel_id, 0, "assignment_a_2.duel_id");
-        tester::assert_pact_queue(@sys, assignment_b.duel_id, true, true, queue_id, "assignment_b");
+        // duels wiped out
+        assert!(!sys.duels.token_exists(assignment_a_1.duel_id.into()), "cleared_assignment_a_1.wiped");
+        assert!(!sys.duels.token_exists(assignment_b.duel_id.into()), "cleared_assignment_b.wiped");
+        // assignments cleared
+        tester::assert_assignment(@sys, ID_A_1, 0, QueueId::Undefined, "cleared_assignment_a_1");
+        tester::assert_assignment(@sys, ID_A_2, 0, QueueId::Undefined, "cleared_assignment_a_2");
+        tester::assert_assignment(@sys, ID_B, 0, QueueId::Undefined, "cleared_assignment_b");
     }
 
     #[test]
@@ -2263,11 +2265,7 @@ mod tests {
         _assert_next_duelists(@sys, queue_id, B, 0, [].span(), "cleared_queue_next_B");
         //
         // assignments
-        let assignment_a_1: DuelistAssignment = sys.store.get_duelist_assignment(ID_A_1);
-        assert_eq!(assignment_a_1.queue_id, queue_id, "assignment_a_1.queue_id");
-        assert_eq!(assignment_a_1.duel_id, 0, "assignment_a_1.duel_id");
-        let assignment_b: DuelistAssignment = sys.store.get_duelist_assignment(ID_B);
-        assert_eq!(assignment_b.queue_id, queue_id, "assignment_b.queue_id");
-        assert_eq!(assignment_b.duel_id, 0, "assignment_b.duel_id");
+        tester::assert_assignment(@sys, ID_A_1, 0, queue_id, "cleared_assignment_a_1");
+        tester::assert_assignment(@sys, ID_B, 0, queue_id, "cleared_assignment_b");
     }
 }

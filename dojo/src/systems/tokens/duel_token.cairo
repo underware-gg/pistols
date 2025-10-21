@@ -120,6 +120,10 @@ pub trait IDuelTokenProtected<TState> {
     //     rules: TournamentRules,
     //     timestamp_end: u64,
     // ) -> u128;
+    fn wipe_duel( //@description: Admin function
+        ref self: TState,
+        duel_id: u128,
+    );
 }
 
 #[dojo::contract]
@@ -731,6 +735,18 @@ pub mod duel_token {
 
 //             (duel_id)
 //         }
+
+        fn wipe_duel(ref self: ContractState,
+            duel_id: u128,
+        ) {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
+            if (self.token_exists(duel_id.into())) {
+                self.erc721.burn(duel_id.into());
+                store.delete_challenge(@store.get_challenge(duel_id));
+                store.delete_round(@store.get_round(duel_id));
+            }
+        }
     }
 
 

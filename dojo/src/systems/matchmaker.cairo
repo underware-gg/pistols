@@ -554,18 +554,13 @@ pub mod matchmaker {
             for next_duelist in match_player.next_duelists.clone() {
                 DuelistAssignmentTrait::unassign_challenge(ref store, next_duelist.duelist_id);
             }
-            if (match_player.duel_id.is_zero()) {
-                // no duel, just unassign duelist
+            // unassign main duelist
+            if (match_player.duelist_id.is_non_zero()) {
                 DuelistAssignmentTrait::unassign_challenge(ref store, match_player.duelist_id);
-            } else {
-                // has a duel, do something with it
-                self._start_match_with_imp(ref store, ref match_player, queue_id);
-                // clear players commit, if committed
-                let mut round: Round = store.get_round(match_player.duel_id);
-                if (round.moves_a.has_comitted()) {
-                    round.moves_a.commit(0);
-                    store.set_round(@round);
-                }
+            }
+            // if has a duel, wipe it...
+            if (match_player.duel_id.is_non_zero()) {
+                store.world.duel_token_protected_dispatcher().wipe_duel(match_player.duel_id);
             }
             store.delete_match_player(@match_player);
         }

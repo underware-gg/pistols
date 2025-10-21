@@ -1300,6 +1300,13 @@ pub mod tester {
         (ch)
     }
 
+    pub fn assert_assignment(sys: @TestSystems, duelist_id: u128, duel_id: u128, queue_id: QueueId, prefix: ByteArray) -> DuelistAssignment {
+        let assignment: DuelistAssignment = (*sys.store).get_duelist_assignment(duelist_id);
+        assert_eq!(assignment.duel_id, duel_id, "assert_assignment:[{}] duelist_challenge_a", prefix);
+        assert_eq!(assignment.queue_id, queue_id, "assert_assignment:[{}] queue_id_a", prefix);
+        (assignment)
+    }
+
     pub fn clear_pact(ref sys: TestSystems, duel_type: DuelType, address_a: ContractAddress, address_b: ContractAddress) {
         let p1: felt252 = address_a.into();
         let p2: felt252 = address_b.into();
