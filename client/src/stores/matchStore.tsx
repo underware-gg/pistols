@@ -4,7 +4,7 @@ import { createDojoStore } from '@dojoengine/sdk/react'
 import { keysToEntityId, useStoreModelsByKeys } from '@underware/pistols-sdk/dojo'
 import { PistolsSchemaType, getEntityModel } from '@underware/pistols-sdk/pistols/sdk'
 import { parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/starknet'
-import { useDuelistStore, useFetchDuelistIdsOwnedByAccount, usePlayerDuelistsOrganized } from '/src/stores/duelistStore'
+import { useDuelistsOrganizedByAddress, useDuelistStore, useFetchDuelistIdsOwnedByAccount } from '/src/stores/duelistStore'
 import { DuelistProfileKey } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { useAccount } from '@starknet-react/core'
@@ -95,7 +95,7 @@ export const useDuelistsInMatchMaking = (queueId: constants.QueueId) => {
 export const _useDuelistsInMatchMakingByAddress = (queueId: constants.QueueId, address: BigNumberish) => {
   useFetchDuelistIdsOwnedByAccount(address) // fetch duelists in the store, if not already fetched
 
-  const { activeDuelists: allDuelistIds } = usePlayerDuelistsOrganized();
+  const { activeDuelists: allDuelistIds } = useDuelistsOrganizedByAddress(address);
   const duelistEntities = useDuelistStore((state) => state.entities);
 
   // filter alive duelists only

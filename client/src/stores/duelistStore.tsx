@@ -333,6 +333,9 @@ export function useDuelistStacks(player_address: BigNumberish) {
 
 export const usePlayerDuelistsOrganized = () => {
   const { address } = useAccount();
+  return useDuelistsOrganizedByAddress(address);
+}
+export const useDuelistsOrganizedByAddress = (address: BigNumberish) => {
   const { stacks } = useDuelistStacks(address)
   const { duelistIds } = useDuelistsOwnedByPlayer()
   const entities = useDuelistStore((state) => state.entities)
