@@ -191,7 +191,7 @@ pub impl ChallengeImpl of ChallengeTrait {
         (
             *self.state == ChallengeState::InProgress &&
             self.season_id.is_non_zero() &&
-            !store.get_current_season().has_ended()
+            store.get_current_season().has_ended()
         )
     }
 }

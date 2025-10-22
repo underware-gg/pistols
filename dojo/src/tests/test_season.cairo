@@ -168,15 +168,15 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('PISTOLS: Season is active', 'ENTRYPOINT_FAILED'))]
-    fn test_collect_still_active() {
+    #[should_panic(expected:('BANK: Season is active', 'ENTRYPOINT_FAILED'))]
+    fn test_collect_season_still_active() {
         let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME | FLAGS::MATCHMAKER);
         let _season: SeasonConfig = sys.store.get_current_season();
         tester::execute_collect_season(@sys, OWNER());
     }
 
     #[test]
-    #[should_panic(expected:('PISTOLS: Season is active', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('BANK: Season is active', 'ENTRYPOINT_FAILED'))]
     fn test_collect_season_ended() {
         let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME | FLAGS::MATCHMAKER);
         let season: SeasonConfig = sys.store.get_current_season();

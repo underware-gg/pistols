@@ -36,7 +36,7 @@ pub mod tests {
             IFameCoinDispatcherTrait,
             TestSystems, FLAGS,
             OWNER, OTHER, BUMMER, RECIPIENT, SPENDER, STACKER, TREASURY,
-            ZERO, ID, MESSAGE, ETH, SEASON_ID_1,
+            ZERO, ID, MESSAGE, SEASON_ID_1,
         }
     };
     use pistols::tests::prefabs::{prefabs, prefabs::{PlayerMoves}};
@@ -74,20 +74,14 @@ pub mod tests {
         assert_eq!(stack.stacked_ids.len(), stack_len, "_assert_bot_duelist[{}]: stack.len()", prefix);
     }
 
-    #[test]
-    #[should_panic(expected: ('BANK: insufficient LORDS pool', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
-    fn test_mint_bot_insufficient_lords() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER);
-        tester::execute_claim_starter_pack(@sys, OWNER());
-        tester::execute_create_duel_ID(@sys, OWNER(), TOKEN_ID_1, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 0);
-    }
-
     fn _assert_mint_pools_after_mint(sys: @TestSystems, peg_before: Pool, claimable_before: Pool, fame_supply_before: u256, prefix: ByteArray) -> (Pool, Pool, u256) {
         let pool_peg_after: Pool = sys.store.get_pool(PoolType::FamePeg);
         let pool_claimable_after: Pool = sys.store.get_pool(PoolType::Claimable);
         let fame_supply_after: u256 = (*sys.fame).total_supply();
-        assert_gt!(pool_peg_after.balance_lords, peg_before.balance_lords, "[{}] pool_peg_after", prefix);
-        assert_lt!(pool_claimable_after.balance_lords, claimable_before.balance_lords, "[{}] pool_claimable_after", prefix);
+        // bots do not peg!
+        assert_eq!(pool_peg_after.balance_lords, peg_before.balance_lords, "[{}] pool_peg_after", prefix);
+        assert_eq!(pool_claimable_after.balance_lords, claimable_before.balance_lords, "[{}] pool_claimable_after", prefix);
+        // fame supply increases
         assert_gt!(fame_supply_after, fame_supply_before, "[{}] fame_supply_after", prefix);
         (pool_peg_after, pool_claimable_after, fame_supply_after)
     }
@@ -111,32 +105,32 @@ pub mod tests {
         sys.rng.mock_values([MockedValueTrait::new('bot_archetype', MOCKED_VILLAIN)].span());
         let bot_id_1: u128 = sys.store.get_challenge_value(tester::execute_create_duel_ID(@sys, OWNER(), duelist_id_1, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 0)).duelist_id_b;
         _assert_bot_duelist(@sys, bot_id_1, "bot_1", Option::Some(BotKey::TinMan), 1);
-        let (pool_peg_1, claimable_1, fame_supply_1) = _assert_mint_pools_after_mint(@sys, pool_peg_init, claimable_init, fame_supply_init, "pools_1");
+        let (pool_peg_1, claimable_1, fame_supply_1): (Pool, Pool, u256) = _assert_mint_pools_after_mint(@sys, pool_peg_init, claimable_init, fame_supply_init, "pools_1");
         // 2
         sys.rng.mock_values([MockedValueTrait::new('bot_archetype', MOCKED_TRICKSTER)].span());
         let bot_id_2: u128 = sys.store.get_challenge_value(tester::execute_create_duel_ID(@sys, OTHER(), duelist_id_2, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 0)).duelist_id_b;
         _assert_bot_duelist(@sys, bot_id_2, "bot_2", Option::Some(BotKey::Scarecrow), 1);
-        let (pool_peg_2, claimable_2, fame_supply_2) = _assert_mint_pools_after_mint(@sys, pool_peg_1, claimable_1, fame_supply_1, "pools_2");
+        let (pool_peg_2, claimable_2, fame_supply_2): (Pool, Pool, u256) = _assert_mint_pools_after_mint(@sys, pool_peg_1, claimable_1, fame_supply_1, "pools_2");
         // 3
         sys.rng.mock_values([MockedValueTrait::new('bot_archetype', MOCKED_LORD)].span());
         let bot_id_3: u128 = sys.store.get_challenge_value(tester::execute_create_duel_ID(@sys, BUMMER(), duelist_id_3, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 0)).duelist_id_b;
         _assert_bot_duelist(@sys, bot_id_3, "bot_3", Option::Some(BotKey::Leon), 1);
-        let (pool_peg_3, claimable_3, fame_supply_3) = _assert_mint_pools_after_mint(@sys, pool_peg_2, claimable_2, fame_supply_2, "pools_3");
+        let (pool_peg_3, claimable_3, fame_supply_3): (Pool, Pool, u256) = _assert_mint_pools_after_mint(@sys, pool_peg_2, claimable_2, fame_supply_2, "pools_3");
         // 4
         sys.rng.mock_values([MockedValueTrait::new('bot_archetype', MOCKED_VILLAIN)].span());
         let bot_id_4: u128 = sys.store.get_challenge_value(tester::execute_create_duel_ID(@sys, RECIPIENT(), duelist_id_4, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 0)).duelist_id_b;
         _assert_bot_duelist(@sys, bot_id_4, "bot_4", Option::Some(BotKey::TinMan), 2);
-        let (pool_peg_4, claimable_4, fame_supply_4) = _assert_mint_pools_after_mint(@sys, pool_peg_3, claimable_3, fame_supply_3, "pools_4");
+        let (pool_peg_4, claimable_4, fame_supply_4): (Pool, Pool, u256) = _assert_mint_pools_after_mint(@sys, pool_peg_3, claimable_3, fame_supply_3, "pools_4");
         // 5
         sys.rng.mock_values([MockedValueTrait::new('bot_archetype', MOCKED_TRICKSTER)].span());
         let bot_id_5: u128 = sys.store.get_challenge_value(tester::execute_create_duel_ID(@sys, SPENDER(), duelist_id_5, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 0)).duelist_id_b;
         _assert_bot_duelist(@sys, bot_id_5, "bot_5", Option::Some(BotKey::Scarecrow), 2);
-        let (pool_peg_5, claimable_5, fame_supply_5) = _assert_mint_pools_after_mint(@sys, pool_peg_4, claimable_4, fame_supply_4, "pools_5");
+        let (pool_peg_5, claimable_5, fame_supply_5): (Pool, Pool, u256) = _assert_mint_pools_after_mint(@sys, pool_peg_4, claimable_4, fame_supply_4, "pools_5");
         // 6
         sys.rng.mock_values([MockedValueTrait::new('bot_archetype', MOCKED_PRO)].span());
         let bot_id_6: u128 = sys.store.get_challenge_value(tester::execute_create_duel_ID(@sys, STACKER(), duelist_id_6, ZERO(), MESSAGE(), DuelType::BotPlayer, 0, 0)).duelist_id_b;
         _assert_bot_duelist(@sys, bot_id_6, "bot_6", Option::Some(BotKey::Pro), 1);
-        let (_pool_peg_6, _claimable_6, _fame_supply_6) = _assert_mint_pools_after_mint(@sys, pool_peg_5, claimable_5, fame_supply_5, "pools_6");
+        let (_pool_peg_6, _claimable_6, _fame_supply_6): (Pool, Pool, u256) = _assert_mint_pools_after_mint(@sys, pool_peg_5, claimable_5, fame_supply_5, "pools_6");
     }
 
 
@@ -350,10 +344,10 @@ pub mod tests {
         assert_eq!(sys.duelists.life_count(bot_id_1), 2, "life_count after duel 1");
         assert!(sys.duelists.is_alive(bot_id_1), "alive after duel 1");
         _assert_bot_duelist(@sys, bot_id_1, "duel_1", Option::Some(BotKey::Pro), 1);
-        // minted bot increases pool_peg
+        // minted bot has FAME but do not increase pool_peg
         let fame_supply_minted: u256 = sys.fame.total_supply();
         let pool_peg_minted: Pool = sys.store.get_pool(PoolType::FamePeg);
-        assert_gt!(ETH(pool_peg_minted.balance_lords), ETH(pool_peg_init.balance_lords), "pool_peg_minted");
+        assert_eq!(pool_peg_minted.balance_lords, pool_peg_init.balance_lords, "pool_peg_minted");
         assert_gt!(fame_supply_minted, fame_supply_init, "fame_supply_minted");
         //
         // duel 2
@@ -377,9 +371,9 @@ pub mod tests {
         let fame_supply_dead: u256 = sys.fame.total_supply();
         let treasury_dead: u128 = sys.lords.balance_of(TREASURY()).low;
         let pool_peg_dead: Pool = sys.store.get_pool(PoolType::FamePeg);
-        assert_gt!(ETH(pool_peg_dead.balance_lords), ETH(pool_peg_init.balance_lords), "pool_peg_dead");
         assert_lt!(fame_supply_dead, fame_supply_minted, "fame_supply_dead");
-        assert_gt!(treasury_dead, treasury_init, "treasury_dead");
+        assert_eq!(pool_peg_dead.balance_lords, pool_peg_init.balance_lords, "pool_peg_dead");
+        assert_eq!(treasury_dead, treasury_init, "treasury_dead");
         //
         // new duelist...
         let bot_id_4: u128 = _duel_bot_crit_a(@sys, OWNER(), TOKEN_ID_1, 1, "duel_4").duelist_id_b;

@@ -24,6 +24,14 @@ mod tests {
     //
 
     #[test]
+    #[should_panic(expected: ('ADMIN: Caller not admin', 'ENTRYPOINT_FAILED'))]
+    fn test_urgent_update_caller() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN | FLAGS::OWNER);
+        tester::impersonate(OTHER());
+        sys.admin.urgent_update();
+    }
+    #[test]
+    #[ignore] // deployed! this is just an example...
     fn test_fix_claimable_pool() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::OWNER | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE);
 
@@ -126,11 +134,4 @@ mod tests {
         assert_eq!(balance_peg_still, balance_peg_OK, "balance_peg STILL");
     }
 
-    #[test]
-    #[should_panic(expected: ('ADMIN: Caller not admin', 'ENTRYPOINT_FAILED'))]
-    fn test_urgent_update_caller() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN | FLAGS::OWNER);
-        tester::impersonate(OTHER());
-        sys.admin.urgent_update();
-    }
 }

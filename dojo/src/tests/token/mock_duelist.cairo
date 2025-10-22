@@ -1,5 +1,6 @@
 use starknet::{ContractAddress};
 use pistols::models::challenge::{Challenge};
+use pistols::models::duelist::{CauseOfDeath};
 use pistols::types::rules::{RewardValues, DuelBonus};
 
 #[derive(Copy, Drop, Serde)]
@@ -25,6 +26,8 @@ pub trait IMockDuelistToken<TState> {
     fn get_validated_active_duelist_id(ref self: TState, address: ContractAddress, duelist_id: u128, lives_staked: u8) -> u128;
     fn sacrifice(ref self: TState, duelist_id: u128);
     fn update_token_metadata(ref self: TState, token_id: u128);
+    fn depeg_fame_to_season_pool(ref self: TState, duelist_id: u128);
+    fn memorialize_duelists(ref self: TState, duelist_ids: Array<u128>, cause_of_death: CauseOfDeath);
 }
 
 #[dojo::contract]
@@ -36,6 +39,7 @@ pub mod duelist_token {
 
     use super::{MockDuelistOwners};
     use pistols::models::challenge::{Challenge};
+    use pistols::models::duelist::{CauseOfDeath};
     use pistols::types::rules::{RewardValues, DuelBonus};
     use pistols::utils::address::{ZERO};
     use pistols::tests::tester::tester::{
@@ -112,6 +116,8 @@ pub mod duelist_token {
         }
         fn sacrifice(ref self: ContractState, duelist_id: u128) {}
         fn update_token_metadata(ref self: ContractState, token_id: u128) {}
+        fn depeg_fame_to_season_pool(ref self: ContractState, duelist_id: u128) {}
+        fn memorialize_duelists(ref self: ContractState, duelist_ids: Array<u128>, cause_of_death: CauseOfDeath) {}
     }
 
 }
