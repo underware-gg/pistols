@@ -118,6 +118,7 @@ pub mod tester {
     pub fn SPENDER()   -> ContractAddress { 0x333.try_into().unwrap() }
     pub fn TREASURY()  -> ContractAddress { 0x444.try_into().unwrap() }
     pub fn DELEGATEE() -> ContractAddress { 0x555.try_into().unwrap() }
+    pub fn REALMS()    -> ContractAddress { 0x666.try_into().unwrap() }
     pub fn STACKER()   -> ContractAddress { 0x0101.try_into().unwrap() } // owns 2 stacked duelists
     pub fn STACKER2()  -> ContractAddress { 0x0202.try_into().unwrap() } // owns 2 stacked duelists
     // low part is owned token, but different address
@@ -1084,13 +1085,13 @@ pub mod tester {
     }
     pub fn fund_duelists_pool(sys: @TestSystems, duelists_quantity: u128) -> u128 {
         // mint lords
-        let sponsor: ContractAddress = 0x12178517312.try_into().unwrap();
+        let sponsor: ContractAddress = 'SPONSOR'.try_into().unwrap();
         execute_lords_faucet(sys.lords, sponsor);
         // approve lords
         let balance: u256 = (*sys.lords).balance_of(sponsor);
         execute_lords_approve(sys.lords, sponsor, *sys.bank.contract_address, balance.low);
         // fund pool
-        let price_per_duelist: u128 = PackType::SingleDuelist.descriptor().price_lords;
+        let price_per_duelist: u128 = *PackType::SingleDuelist.descriptor().price_lords;
         let amount_sponsored: u128 = price_per_duelist * duelists_quantity;
         execute_sponsor_duelists(sys, sponsor, amount_sponsored);
         (amount_sponsored)
@@ -1100,6 +1101,12 @@ pub mod tester {
         let new_season_id: u32 = (*sys.bank).collect_season();
         _next_block();
         (new_season_id)
+    }
+    pub fn purchase_share_peg_pool(sys: @TestSystems, lords_amount: u128) -> u128 {
+        (MathTrait::percentage(lords_amount, RULES::POOL_PERCENT))
+    }
+    pub fn purchase_share_fees(sys: @TestSystems, lords_amount: u128) -> u128 {
+        (MathTrait::percentage(lords_amount, RULES::FEES_PERCENT))
     }
     pub fn purchase_share_pools(sys: @TestSystems, lords_amount: u128) -> u128 {
         (MathTrait::percentage(lords_amount, RULES::FEES_PERCENT + RULES::POOL_PERCENT))
@@ -1198,21 +1205,6 @@ pub mod tester {
     // Asserts
     //
 
-    pub fn assert_fame_token_balance(sys: @TestSystems, duelist_id: u128, balance_before: u128, subtract: u128, add: u128, prefix: ByteArray) -> u128 {
-        let address: ContractAddress = TokenBoundAddressTrait::address((*sys.duelists).contract_address, duelist_id);
-        (assert_lords_balance(
-            ILordsMockDispatcher{ contract_address: (*sys.fame).contract_address },
-            address, balance_before, subtract, add, prefix,
-        ))
-    }
-
-    pub fn assert_fools_balance(sys: @TestSystems, address: ContractAddress, balance_before: u128, subtract: u128, add: u128, prefix: ByteArray) -> u128 {
-        (assert_lords_balance(
-            ILordsMockDispatcher{ contract_address: (*sys.fools).contract_address },
-            address, balance_before, subtract, add, prefix,
-        ))
-    }
-
     pub fn assert_balance(balance: u128, balance_before: u128, subtract: u128, add: u128, prefix: ByteArray) -> u128 {
         if (subtract > add) {
             assert_lt!(balance, balance_before, "{}__lt", prefix);
@@ -1221,6 +1213,7 @@ pub mod tester {
         } else {
             assert_eq!(balance, balance_before, "{}__eq", prefix);
         }
+        // assert_le!(subtract + add, balance_before, "{}__ge", prefix);
         assert_eq!(balance, balance_before - subtract + add, "{}__sum", prefix);
         (balance)
     }
@@ -1237,34 +1230,44 @@ pub mod tester {
         (balance)
     }
 
-    pub fn assert_lords_balance(lords: ILordsMockDispatcher, address: ContractAddress, balance_before: u128, subtract: u128, add: u128, prefix: ByteArray) -> u128 {
-        let balance: u128 = lords.balance_of(address).low;
+    pub fn assert_lords_balance(sys: @TestSystems, address: ContractAddress, balance_before: u128, subtract: u128, add: u128, prefix: ByteArray) -> u128 {
+        let balance: u128 = (*sys.lords).balance_of(address).low;
         (assert_balance(balance, balance_before, subtract, add, prefix))
     }
-    pub fn assert_lords_balance_up(lords: ILordsMockDispatcher, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
-        let balance: u128 = lords.balance_of(address).low;
+    pub fn assert_lords_balance_up(sys: @TestSystems, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
+        let balance: u128 = (*sys.lords).balance_of(address).low;
         (assert_balance_up(balance, balance_before, prefix))
     }
-    pub fn assert_lords_balance_down(lords: ILordsMockDispatcher, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
-        let balance: u128 = lords.balance_of(address).low;
+    pub fn assert_lords_balance_down(sys: @TestSystems, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
+        let balance: u128 = (*sys.lords).balance_of(address).low;
         (assert_balance_down(balance, balance_before, prefix))
     }
-    pub fn assert_lords_balance_equal(lords: ILordsMockDispatcher, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
-        let balance: u128 = lords.balance_of(address).low;
+    pub fn assert_lords_balance_equal(sys: @TestSystems, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
+        let balance: u128 = (*sys.lords).balance_of(address).low;
         (assert_balance_equal(balance, balance_before, prefix))
     }
 
-    pub fn assert_fame_balance_up(fame: IFameCoinDispatcher, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
-        let balance: u128 = fame.balance_of(address).low;
+    pub fn assert_fame_balance_up(sys: @TestSystems, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
+        let balance: u128 = (*sys.fame).balance_of(address).low;
         (assert_balance_up(balance, balance_before, prefix))
     }
-    pub fn assert_fame_balance_down(fame: IFameCoinDispatcher, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
-        let balance: u128 = fame.balance_of(address).low;
+    pub fn assert_fame_balance_down(sys: @TestSystems, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
+        let balance: u128 = (*sys.fame).balance_of(address).low;
         (assert_balance_down(balance, balance_before, prefix))
     }
-    pub fn assert_fame_balance_equal(fame: IFameCoinDispatcher, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
-        let balance: u128 = fame.balance_of(address).low;
+    pub fn assert_fame_balance_equal(sys: @TestSystems, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
+        let balance: u128 = (*sys.fame).balance_of(address).low;
         (assert_balance_equal(balance, balance_before, prefix))
+    }
+    pub fn assert_fame_tokenbound_balance(sys: @TestSystems, duelist_id: u128, balance_before: u128, subtract: u128, add: u128, prefix: ByteArray) -> u128 {
+        let address: ContractAddress = TokenBoundAddressTrait::address((*sys.duelists).contract_address, duelist_id);
+        let balance: u128 = (*sys.fame).balance_of(address).low;
+        (assert_balance(balance, balance_before, subtract, add, prefix))
+    }
+
+    pub fn assert_fools_balance(sys: @TestSystems, address: ContractAddress, balance_before: u128, subtract: u128, add: u128, prefix: ByteArray) -> u128 {
+        let balance: u128 = (*sys.fools).balance_of(address).low;
+        (assert_balance(balance, balance_before, subtract, add, prefix))
     }
 
     // pub fn assert_winner_balance(lords: ILordsMockDispatcher,
@@ -1325,6 +1328,7 @@ pub mod tester {
     }
 
     pub fn print_pools(sys: @TestSystems, season_id: u32, prefix: ByteArray) {
+        let mut fame_supply: u128 = sys.fame.total_supply().low;
         let mut fame_balance_bank: u128 = (*sys.fame).balance_of(*sys.bank.contract_address).low;
         let mut lords_balance_bank: u128 = (*sys.lords).balance_of(*sys.bank.contract_address).low;
         let mut lords_balance_treasury: u128 = (*sys.lords).balance_of(TREASURY()).low;
@@ -1333,14 +1337,15 @@ pub mod tester {
         let pool_peg: Pool = (*sys.store).get_pool(PoolType::FamePeg);
         let pool_season: Pool = (*sys.store).get_pool(PoolType::Season(season_id));
         let pool_flame: Pool = (*sys.store).get_pool(PoolType::Sacrifice);
-        println!(">>>>>>>>>>>>>>>>>> {}",  prefix);
-        println!("BANK_______________LORDS:{} FAME:{}", ETH(lords_balance_bank), ETH(fame_balance_bank));
+        println!(">>>>>>>>>>>>>>>>> [{}]",  prefix);
+        println!("FAME Supply________LORDS:{}", ETH(fame_supply));
         println!("TREASURY___________LORDS:{}", ETH(lords_balance_treasury));
+        println!("BANK_______________LORDS:{} FAME:{}", ETH(lords_balance_bank), ETH(fame_balance_bank));
         println!("Pool::Claimable____LORDS:{} FAME:{}", ETH(pool_claimable.balance_lords), ETH(pool_claimable.balance_fame));
         println!("Pool::Purchases____LORDS:{} FAME:{}", ETH(pool_purchases.balance_lords), ETH(pool_purchases.balance_fame));
         println!("Pool::FamePeg______LORDS:{} FAME:{}", ETH(pool_peg.balance_lords), ETH(pool_peg.balance_fame));
         println!("Pool::Season_______LORDS:{} FAME:{}", ETH(pool_season.balance_lords), ETH(pool_season.balance_fame));
-        println!("Pool::Sacrifice__LORDS:{} FAME:{}", ETH(pool_flame.balance_lords), ETH(pool_flame.balance_fame));
+        println!("Pool::Sacrifice____LORDS:{} FAME:{}", ETH(pool_flame.balance_lords), ETH(pool_flame.balance_fame));
     }
 
     //------------------------------------

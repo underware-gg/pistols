@@ -28,8 +28,8 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::OWNER | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE);
 
         let bank_address: ContractAddress = sys.bank.contract_address;
-        let price_starter: u128 = PackType::StarterPack.descriptor().price_lords;
-        let price_pack: u128 = PackType::GenesisDuelists5x.descriptor().price_lords;
+        let price_starter: u128 = *PackType::StarterPack.descriptor().price_lords;
+        let price_pack: u128 = *PackType::GenesisDuelists5x.descriptor().price_lords;
         assert_ne!(price_starter, 0, "price_starter");
         assert_ne!(price_pack, 0, "price_pack");
 

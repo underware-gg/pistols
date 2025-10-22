@@ -148,8 +148,8 @@ pub impl PackImpl of PackTrait {
 
 #[generate_trait]
 pub impl PackTypeImpl of PackTypeTrait {
-    fn descriptor(self: @PackType) -> PackDescriptor {
-        match self {
+    fn descriptor(self: @PackType) -> @PackDescriptor {
+        @(match self {
             PackType::Unknown               => PACK_TYPES::Unknown,
             PackType::StarterPack           => PACK_TYPES::StarterPack,
             PackType::GenesisDuelists5x     => PACK_TYPES::GenesisDuelists5x,
@@ -157,15 +157,15 @@ pub impl PackTypeImpl of PackTypeTrait {
             PackType::SingleDuelist         => PACK_TYPES::SingleDuelist,
             PackType::BotDuelist            => PACK_TYPES::BotDuelist,
             PackType::FreeGenesis5x         => PACK_TYPES::FreeGenesis5x,
-        }
+        })
     }
     #[inline(always)]
     fn identifier(self: @PackType) -> felt252 {
-        ((*self).descriptor().id)
+        (*self.descriptor().id)
     }
     #[inline(always)]
     fn name(self: @PackType) -> ByteArray {
-        ((*self).descriptor().name.to_string())
+        (self.descriptor().name.to_string())
     }
     fn image_url(self: @PackType, base_uri: ByteArray, is_open: bool) -> ByteArray {
         (format!("{}/pistols/tokens/packs/{}", base_uri,
@@ -175,7 +175,7 @@ pub impl PackTypeImpl of PackTypeTrait {
     }
     #[inline(always)]
     fn can_purchase(self: @PackType) -> bool {
-        ((*self).descriptor().can_purchase)
+        (*self.descriptor().can_purchase)
     }
     #[inline(always)]
     fn deposited_pool_type(self: @PackType) -> PoolType {
@@ -187,7 +187,7 @@ pub impl PackTypeImpl of PackTypeTrait {
     }
     #[inline(always)]
     fn mint_fee(self: @PackType) -> u128 {
-        ((*self).descriptor().price_lords)
+        (*self.descriptor().price_lords)
     }
 }
 

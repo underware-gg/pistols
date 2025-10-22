@@ -35,7 +35,7 @@ pub enum PoolType {
     Season: u32,            // 3
     Tournament: u64,        // 4
     Sacrifice,              // 5
-    Claimable,           // 6
+    Claimable,              // 6
 }
 impl PoolTypeDefault of Default<PoolType> {
     fn default() -> PoolType {(PoolType::Undefined)}
@@ -126,13 +126,13 @@ pub impl PoolTypeImpl of PoolTypeTrait {
 impl PoolTypeIntoByteArray of core::traits::Into<PoolType, ByteArray> {
     fn into(self: PoolType) -> ByteArray {
         match self {
-            PoolType::Undefined     =>  "Undefined",
-            PoolType::Purchases     =>  "Purchases",
-            PoolType::FamePeg       =>  "FamePeg",
-            PoolType::Season(_)     =>  "Season",
-            PoolType::Tournament(_) =>  "Tournament",
-            PoolType::Sacrifice     =>  "Sacrifice",
-            PoolType::Claimable     =>  "Claimable",
+            PoolType::Undefined         =>  "Undefined",
+            PoolType::Purchases         =>  "Purchases",
+            PoolType::FamePeg           =>  "FamePeg",
+            PoolType::Season(id)        =>  format!("Season({})", id),
+            PoolType::Tournament(id)    =>  format!("Tournament({})", id),
+            PoolType::Sacrifice         =>  "Sacrifice",
+            PoolType::Claimable         =>  "Claimable",
         }
     }
 }

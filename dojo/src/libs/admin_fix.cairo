@@ -36,7 +36,7 @@ pub impl AdminFixImpl of AdminFixTrait {
         // calculate the amount of existing packs that must stay on the Purchases pool
         // (at this moment, all purchases are of PackType::GenesisDuelists5x)
         let packs_supply: u128 = store.world.pack_token_dispatcher().total_supply().low;
-        let price_pack: u128 = PackType::GenesisDuelists5x.descriptor().price_lords;
+        let price_pack: u128 = *PackType::GenesisDuelists5x.descriptor().price_lords;
         let amount_purchases: u128 = (packs_supply * price_pack);
         // check if purchases balance is ok
         let mut pool_purchases: Pool = store.get_pool(PoolType::Purchases);

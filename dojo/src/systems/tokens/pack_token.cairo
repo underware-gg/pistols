@@ -555,7 +555,7 @@ pub mod pack_token {
             recipient: ContractAddress,
         ) -> Span<u128> {
             // pack data
-            let quantity: usize = pack.pack_type.descriptor().quantity;
+            let quantity: usize = *pack.pack_type.descriptor().quantity;
             let pool_type: PoolType = pack.pack_type.deposited_pool_type();
             let pegged_lords_amount: u128 = *pack.pegged_lords_amount;
             // mint...

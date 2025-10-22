@@ -82,7 +82,7 @@ fn test_initializer() {
     let mut sys: TestSystems = setup(0);
     assert_eq!(sys.duelists.symbol(), "DUELIST", "Symbol is wrong");
 
-    let starter_pack_duelist_count: usize = PackType::StarterPack.descriptor().quantity;
+    let starter_pack_duelist_count: usize = *PackType::StarterPack.descriptor().quantity;
 
     _assert_minted_count(@sys, starter_pack_duelist_count, "Should eq [starter_pack_duelist_count]");
     assert_eq!(sys.duelists.balance_of(OWNER()), starter_pack_duelist_count.into(), "Should eq [starter_pack_duelist_count]");
@@ -191,7 +191,7 @@ fn test_approve() {
 fn test_transfer_from() {
     let mut sys: TestSystems = setup(0);
 
-    let starter_pack_duelist_count: usize = PackType::StarterPack.descriptor().quantity;
+    let starter_pack_duelist_count: usize = *PackType::StarterPack.descriptor().quantity;
 
     assert_eq!(sys.duelists.balance_of(OWNER()), starter_pack_duelist_count.into(), "Should eq [starter_pack_duelist_count]");
     assert_eq!(sys.duelists.balance_of(OTHER()), 0, "Should eq 0");
@@ -583,9 +583,9 @@ fn _test_duelist_sacrifice(sys: @TestSystems, token_id: u128, cause_of_death: Ca
     assert_eq!(pool_flame.balance_fame, pool_amount, "AFTER_pool_flame.balance_fame_DEAD");
 
     // bank down
-    tester::assert_lords_balance_down(*sys.lords, (*sys.bank).contract_address, lords_balance_bank, "AFTER_bank_down");
+    tester::assert_lords_balance_down(sys, (*sys.bank).contract_address, lords_balance_bank, "AFTER_bank_down");
     // underware up
-    tester::assert_lords_balance_up(*sys.lords, TREASURY(), lords_balance_treasury, "AFTER_treasury_up");
+    tester::assert_lords_balance_up(sys, TREASURY(), lords_balance_treasury, "AFTER_treasury_up");
 }
 
 #[test]

@@ -10,7 +10,7 @@ mod tests {
         tester::{
             StoreTrait,
             TestSystems, FLAGS,
-            ZERO, OWNER, OTHER, BUMMER, TREASURY,
+            ZERO, OWNER, OTHER, BUMMER, TREASURY, REALMS,
         }
     };
 
@@ -89,7 +89,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
         tester::execute_admin_set_is_team_member(@sys.admin, OWNER(), OTHER(), true, true);
         tester::execute_admin_set_treasury(@sys.admin, OTHER(), BUMMER());
-        tester::execute_admin_set_realms_address(@sys.admin, OTHER(), BUMMER());
+        tester::execute_admin_set_realms_address(@sys.admin, OTHER(), REALMS());
     }
 
     #[test]
@@ -103,7 +103,7 @@ mod tests {
     #[should_panic(expected:('ADMIN: Caller not admin', 'ENTRYPOINT_FAILED'))]
     fn test_caller_not_admin() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
-        tester::execute_admin_set_treasury(@sys.admin, OTHER(), BUMMER());
+        tester::execute_admin_set_treasury(@sys.admin, OTHER(), REALMS());
     }
 
     #[test]
@@ -184,9 +184,9 @@ mod tests {
         tester::execute_admin_set_realms_address(@sys.admin, OWNER(), new_realms);
         let mut config: Config = sys.store.get_config();
         assert_eq!(config.realms_address, new_realms, "set_config_new");
-        tester::execute_admin_set_realms_address(@sys.admin, OWNER(), BUMMER());
+        tester::execute_admin_set_realms_address(@sys.admin, OWNER(), REALMS());
         let config: Config = sys.store.get_config();
-        assert_eq!(config.realms_address, BUMMER(), "realms_address_newer");
+        assert_eq!(config.realms_address, REALMS(), "realms_address_newer");
     }
 
     #[test]
@@ -201,7 +201,7 @@ mod tests {
     #[should_panic(expected:('ADMIN: Caller not admin', 'ENTRYPOINT_FAILED'))]
     fn test_set_realms_address_not_admin() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
-        tester::execute_admin_set_realms_address(@sys.admin, OTHER(), BUMMER());
+        tester::execute_admin_set_realms_address(@sys.admin, OTHER(), REALMS());
     }
 
     //

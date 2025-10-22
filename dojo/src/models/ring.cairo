@@ -119,28 +119,28 @@ pub impl RingTypeImpl of RingTypeTrait {
     }
     //
     // Ring data
-    fn descriptor(self: @RingType) -> RingDescriptor {
-        match self {
+    fn descriptor(self: @RingType) -> @RingDescriptor {
+        @(match self {
             RingType::Unknown           => RING_TYPES::Unknown,
             RingType::GoldSignetRing    => RING_TYPES::GoldSignetRing,
             RingType::SilverSignetRing  => RING_TYPES::SilverSignetRing,
             RingType::LeadSignetRing    => RING_TYPES::LeadSignetRing,
-        }
+        })
     }
     #[inline(always)]
     fn identifier(self: @RingType) -> felt252 {
-        ((*self).descriptor().id)
+        (*self.descriptor().id)
     }
     #[inline(always)]
     fn name(self: @RingType) -> ByteArray {
-        ((*self).descriptor().name.to_string())
+        (self.descriptor().name.to_string())
     }
     #[inline(always)]
     fn description(self: @RingType) -> ByteArray {
-        ((*self).descriptor().description.to_string())
+        (self.descriptor().description.to_string())
     }
     fn image_url(self: @RingType) -> ByteArray {
-        ((*self).descriptor().image_url.to_string())
+        (self.descriptor().image_url.to_string())
     }
     // higher weight, higher value/importance
     fn weight(self: @RingType) -> u8 {

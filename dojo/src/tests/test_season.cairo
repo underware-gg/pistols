@@ -39,8 +39,8 @@ mod tests {
     }
 
     #[test]
-    fn test_season_collect() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME);
+    fn test_collect_season() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME | FLAGS::MATCHMAKER);
         let season_1: SeasonConfig = sys.store.get_current_season();
         assert_eq!(season_1.season_id, 1, "season_id");
         assert_eq!(season_1.phase, SeasonPhase::InProgress, "phase");
@@ -81,8 +81,8 @@ mod tests {
     }
 
     #[test]
-    fn test_season_collect_pending_challenge() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::MOCK_RNG);
+    fn test_collect_season_pending_challenge() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::MOCK_RNG | FLAGS::MATCHMAKER);
         let season_1: SeasonConfig = sys.store.get_current_season();
         tester::set_block_timestamp(season_1.period.end - TIMESTAMP::ONE_HOUR);
         // create a challenge in season 1
@@ -137,7 +137,7 @@ mod tests {
 
     #[test]
     fn test_collect_season_baseline() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME);
+        let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME | FLAGS::MATCHMAKER);
         let season: SeasonConfig = sys.store.get_current_season();
         tester::set_block_timestamp(season.period.end);
         tester::drop_dojo_events(@sys);
@@ -149,7 +149,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('BANK: caller not admin', 'ENTRYPOINT_FAILED'))]
     fn test_collect_season_not_admin() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME);
+        let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME | FLAGS::MATCHMAKER);
         let season: SeasonConfig = sys.store.get_current_season();
         tester::set_block_timestamp(season.period.end);
         tester::drop_dojo_events(@sys);
@@ -159,7 +159,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('BANK: is paused', 'ENTRYPOINT_FAILED'))]
     fn test_collect_season_is_paused() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME);
+        let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME | FLAGS::MATCHMAKER);
         let season: SeasonConfig = sys.store.get_current_season();
         tester::set_block_timestamp(season.period.end);
         tester::drop_dojo_events(@sys);
@@ -170,7 +170,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Season is active', 'ENTRYPOINT_FAILED'))]
     fn test_collect_still_active() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME);
+        let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME | FLAGS::MATCHMAKER);
         let _season: SeasonConfig = sys.store.get_current_season();
         tester::execute_collect_season(@sys, OWNER());
     }
@@ -178,7 +178,7 @@ mod tests {
     #[test]
     #[should_panic(expected:('PISTOLS: Season is active', 'ENTRYPOINT_FAILED'))]
     fn test_collect_season_ended() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME);
+        let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME | FLAGS::MATCHMAKER);
         let season: SeasonConfig = sys.store.get_current_season();
         tester::set_block_timestamp(season.period.end);
         tester::execute_collect_season(@sys, OWNER());

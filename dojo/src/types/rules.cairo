@@ -17,8 +17,8 @@ pub struct PoolDistribution {
     pub realms_percent: u8,
     pub realms_address: ContractAddress,
     pub fees_percent: u8,
-    pub fees_address: ContractAddress,
     pub fees_pool_id: PoolType,
+    pub fees_address: ContractAddress,
     pub pool_percent: u8,
     pub pool_id: PoolType,
 }
@@ -132,8 +132,8 @@ pub impl RulesImpl of RulesTrait {
             realms_percent: RULES::REALMS_PERCENT,
             realms_address: config.realms_address,
             fees_percent: RULES::FEES_PERCENT,
-            fees_address: ZERO(),
-            fees_pool_id: PoolType::Claimable,
+            fees_pool_id: PoolType::Claimable,  // we use this fee to fund Claimable packs
+            fees_address: ZERO(),               // alternatively, we might send to a wallet
             pool_percent: RULES::POOL_PERCENT,
             pool_id: PoolType::Purchases,
         };

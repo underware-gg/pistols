@@ -159,7 +159,7 @@ fn test_claim_purchase() {
     assert!(!player.exists(), "!player.exists()");
     assert!(!player.timestamps.claimed_starter_pack, "!player.timestamps.claimed_starter_pack");
 
-    let starter_pack_duelist_count: usize = PackType::StarterPack.descriptor().quantity;
+    let starter_pack_duelist_count: usize = *PackType::StarterPack.descriptor().quantity;
 
     assert!(sys.pack.can_claim_starter_pack(OWNER()), "can_claim_starter_pack_OWNER");
     let owner_ids: Span<u128> = tester::execute_claim_starter_pack(@sys, OWNER());
@@ -413,7 +413,7 @@ fn test_claim_gift_ineligible() {
 fn test_open() {
     let mut sys: TestSystems = setup(0);
 
-    let starter_pack_count: usize = PackType::StarterPack.descriptor().quantity;
+    let starter_pack_count: usize = *PackType::StarterPack.descriptor().quantity;
     assert_eq!(starter_pack_count, 2, "starter_pack_count");
 
     // claiming opens and mint duelists
@@ -588,7 +588,7 @@ pub fn _airdrop_open(sys: @TestSystems, recipient: ContractAddress, pack_type: P
     }
     // validate new duelist balance
     let duelist_balance_after: u128 = (*sys.duelists).balance_of(recipient).low;
-    assert_eq!(duelist_balance_after, duelist_balance_before + pack_type.descriptor().quantity.into(), "{}:: duelist_balance_after(recipient)", prefix);
+    assert_eq!(duelist_balance_after, duelist_balance_before + (*pack_type.descriptor().quantity).into(), "{}:: duelist_balance_after(recipient)", prefix);
     // falidate duelist FAME
     let duelist_fame_balance: u128 = (*sys.duelists).fame_balance(duelist_id_0.into());
     assert_eq!(duelist_fame_balance, FAME::MINT_GRANT_AMOUNT, "{}:: duelist_fame_balance", prefix);
@@ -744,6 +744,10 @@ fn test_airdrop_invalid_free() {
     tester::execute_pack_airdrop(@sys, OWNER(), OTHER(), PackType::FreeDuelist, Option::Some(duelist_profile));
 }
 
+
+//---------------------------------
+// claimable pools
+//
 #[test]
 fn test_airdrop_open_free_pool_ok() {
     let mut sys: TestSystems = setup(0);
