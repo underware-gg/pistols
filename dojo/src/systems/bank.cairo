@@ -29,7 +29,7 @@ pub trait IBankProtected<TState> {
     fn charge_lords_purchase(ref self: TState, token_address: ContractAddress, token_ids: Array<u128>, payer: ContractAddress, lords_amount: u128);
     // transfer LORDS from PoolType::Claimable/Purchases to PoolType::FamePeg
     // (called by pack_token)
-    fn peg_minted_fame_to_lords(ref self: TState, payer: ContractAddress, fame_amount: u128, lords_amount: u128, from_pool_type: PoolType);
+    fn peg_minted_fame_to_lords(ref self: TState, payer: ContractAddress, fame_amount: u128, lords_amount: u128, source_pool_type: PoolType);
     // transfer LORDS to recipient, removing from PoolType::FamePeg
     // (called by duelist_token)
     fn depeg_lords_from_fame_to_be_burned(ref self: TState, season_id: u32, fame_amount: u128) -> u128;
@@ -250,7 +250,7 @@ pub mod bank {
             payer: ContractAddress,
             fame_amount: u128,
             lords_amount: u128,
-            from_pool_type: PoolType, // Purchases or Claimable
+            source_pool_type: PoolType, // Purchases or Claimable
         ) {
             // called when a duelist is minted only
             let mut store: Store = StoreTrait::new(self.world_default());
@@ -259,15 +259,15 @@ pub mod bank {
             assert(lords_amount.is_non_zero(), Errors::INVALID_LORDS_AMOUNT);
             assert(fame_amount.is_non_zero(), Errors::INVALID_FAME_AMOUNT);
             // get pools
-            let mut pool_from: Pool = store.get_pool(from_pool_type);
+            let mut pool_source: Pool = store.get_pool(source_pool_type);
             let mut pool_peg: Pool = store.get_pool(PoolType::FamePeg);
             // transfer LORDS from source to peg pool
-            pool_from.withdraw_lords(lords_amount);
+            pool_source.withdraw_lords(lords_amount);
             pool_peg.deposit_lords(lords_amount);
             // FAME just for record/de-pegging (not transferred)
             pool_peg.deposit_fame(fame_amount);
             // store
-            store.set_pool(@pool_from);
+            store.set_pool(@pool_source);
             store.set_pool(@pool_peg);
             // emit event
             // store.emit_fame_peg(@FamePegEvent {
@@ -291,9 +291,10 @@ pub mod bank {
             let mut pool_season: Pool = store.get_pool(PoolType::Season(season_id));
             // calculate lords amount
             let lords_amount: u128 = MathTrait::scale(fame_amount, pool_peg.balance_fame, pool_peg.balance_lords);
+// println!("B: de-peg: {} : {} > {} = {}", fame_amount, pool_peg.balance_fame, pool_peg.balance_lords, lords_amount);
             assert(lords_amount.is_non_zero(), Errors::INVALID_LORDS_AMOUNT);
             // remove FAME tracking
-            pool_peg.withdraw_lords(fame_amount);
+            pool_peg.withdraw_fame(fame_amount);
             // transfer LORDS to the season prize pool
             pool_peg.withdraw_lords(lords_amount);
             pool_season.deposit_lords(lords_amount);

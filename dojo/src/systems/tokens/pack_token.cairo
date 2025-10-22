@@ -188,7 +188,6 @@ pub mod pack_token {
         pub const ALREADY_OPENED: felt252       = 'PACK: Already opened';
         pub const MISSING_DUELIST: felt252      = 'PACK: Missing duelist';
         pub const INVALID_DUELIST: felt252      = 'PACK: Invalid duelist';
-        pub const INSUFFICIENT_LORDS: felt252   = 'PACK: insufficient LORDS pool';
     }
 
     //*******************************

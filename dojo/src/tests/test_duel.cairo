@@ -253,8 +253,21 @@ pub mod tests {
         sys.rng.mock_values(mocked);
 
         // tester::fund_duelists_pool(@sys, 2);
-        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, OWNER())[0];
-        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, OTHER())[0];
+        let duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, OWNER())[0];
+        let duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, OTHER())[0];
+
+        let fame_balance_a_init: u128 = tester::fame_balance_of_token(@sys, duelist_id_a);
+        let fame_balance_b_init: u128 = tester::fame_balance_of_token(@sys, duelist_id_b);
+        let fools_balance_a_init: u128 = sys.fools.balance_of(OWNER()).low;
+        let fools_balance_b_init: u128 = sys.fools.balance_of(OTHER()).low;
+        // let timestamp_active_a: u64 = sys.store.get_duelist_timestamps(ID(OWNER())).active;
+        // let timestamp_active_b: u64 = sys.store.get_duelist_timestamps(ID(OTHER())).active;
+        assert_gt!(fame_balance_a_init, 0, "fame_balance_a_init");
+        assert_gt!(fame_balance_b_init, 0, "fame_balance_b_init");
+        assert_eq!(fools_balance_a_init, 0, "fools_balance_a_init");
+        assert_eq!(fools_balance_b_init, 0, "fools_balance_b_init");
+        // assert_eq!(timestamp_active_a, 0, "timestamp_active_a");
+        // assert_eq!(timestamp_active_b, 0, "timestamp_active_b");
 
         let (_challenge, round_1, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         assert_eq!(sys.store.get_challenge(duel_id).get_deck_type(), DeckType::Classic, "challenge.deck_type");
@@ -464,6 +477,22 @@ pub mod tests {
             // assert_eq!(*positions_2[1].points, score_a_2.points, "score_a_2.points ++");
         } else {
             assert!(false, "bad winner")
+        }
+
+        let fame_balance_a: u128 = tester::fame_balance_of_token(@sys, duelist_id_a);
+        let fame_balance_b: u128 = tester::fame_balance_of_token(@sys, duelist_id_b);
+        let fools_balance_a: u128 = sys.fools.balance_of(OWNER()).low;
+        let fools_balance_b: u128 = sys.fools.balance_of(OTHER()).low;
+        if (winner == 1) {
+            assert_gt!(fame_balance_a, fame_balance_a_init, "fame_balance_a_final");
+            assert_lt!(fame_balance_b, fame_balance_b_init, "fame_balance_b_final");
+            assert_gt!(fools_balance_a, 0, "fools_balance_a_final");
+            assert_eq!(fools_balance_b, 0, "fools_balance_b_final");
+        } else if (winner == 2) {
+            assert_lt!(fame_balance_a, fame_balance_a_init, "fame_balance_a_final");
+            assert_gt!(fame_balance_b, fame_balance_b_init, "fame_balance_b_final");
+            assert_eq!(fools_balance_a, 0, "fools_balance_a_final");
+            assert_gt!(fools_balance_b, 0, "fools_balance_b_final");
         }
 
         _assert_duel_progress(@sys, duel_id, moves_a.moves, moves_b.moves);

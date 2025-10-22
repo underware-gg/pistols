@@ -552,10 +552,10 @@ pub mod duelist_token {
                 if (!store.get_duelist_released_fame(duelist_id)) {
                     values.fame_burned = (values.fame_lost - winners_minted_fame);
                     values.lords_unlocked = (*bank_protected_dispatcher).depeg_lords_from_fame_to_be_burned(season_id, values.fame_burned);
-                    // burn FAME from duelist
-                    IFameCoinDispatcher{contract_address: *fame_protected_dispatcher.contract_address}
-                        .burn_from_token(starknet::get_contract_address(), duelist_id, values.fame_lost.into());
                 }
+                // burn FAME from duelist
+                IFameCoinDispatcher{contract_address: *fame_protected_dispatcher.contract_address}
+                    .burn_from_token(starknet::get_contract_address(), duelist_id, values.fame_lost.into());
             }
         }
 
