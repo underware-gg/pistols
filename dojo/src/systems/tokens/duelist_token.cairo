@@ -196,6 +196,7 @@ pub mod duelist_token {
         pub const INVALID_DUELIST: felt252          = 'DUELIST: Invalid duelist';
         pub const NOT_YOUR_DUELIST: felt252         = 'DUELIST: Not your duelist';
         pub const DUELIST_IS_DEAD: felt252          = 'DUELIST: Duelist is dead!';
+        pub const DUELIST_IS_MEMORIALIZED: felt252  = 'DUELIST: Already memorialized';
         pub const INSUFFICIENT_LIVES: felt252       = 'DUELIST: Insufficient lives';
         pub const NOT_IMPLEMENTED: felt252          = 'DUELIST: Not implemented';
     }
@@ -247,9 +248,14 @@ pub mod duelist_token {
         fn life_count(self: @ContractState,
             duelist_id: u128,
         ) -> u8 {
-            let fame_dispatcher: IFameCoinDispatcher = self.world_default().fame_coin_dispatcher();
-            let fame_balance: u128 = self._fame_balance(@fame_dispatcher, duelist_id);
-            (fame_balance / FAME::ONE_LIFE).try_into().unwrap()
+            let store: Store = StoreTrait::new(self.world_default());
+            (if store.get_duelist_is_memorialized(duelist_id) {
+                (0)
+            } else {
+                let fame_dispatcher: IFameCoinDispatcher = store.world.fame_coin_dispatcher();
+                let fame_balance: u128 = self._fame_balance(@fame_dispatcher, duelist_id);
+                (fame_balance / FAME::ONE_LIFE).try_into().unwrap()
+            })
         }
 
         #[inline(always)]
@@ -283,7 +289,7 @@ pub mod duelist_token {
         fn sacrifice(ref self: ContractState,
             duelist_id: u128,
         ) {
-            assert(false, Errors::NOT_IMPLEMENTED);
+            // assert(false, Errors::NOT_IMPLEMENTED);
             self.erc721_combo._require_owner_of(starknet::get_caller_address(), duelist_id.into());
             let mut store: Store = StoreTrait::new(self.world_default());
             self._memorialize(ref store, duelist_id, CauseOfDeath::Sacrifice);
@@ -292,7 +298,7 @@ pub mod duelist_token {
         fn memorialize(ref self: ContractState,
             duelist_id: u128,
         ) {
-            assert(false, Errors::NOT_IMPLEMENTED);
+            // assert(false, Errors::NOT_IMPLEMENTED);
             self.erc721_combo._require_owner_of(starknet::get_caller_address(), duelist_id.into());
             let mut store: Store = StoreTrait::new(self.world_default());
             self._memorialize(ref store, duelist_id, CauseOfDeath::Memorize);
@@ -571,12 +577,17 @@ pub mod duelist_token {
             let fame_balance: u128 = self._fame_balance(@fame_dispatcher, duelist_id);
             assert(fame_balance != 0, Errors::DUELIST_IS_DEAD);
 
-            // remaining fame to be burned and released
-            bank_dispatcher.depeg_lords_from_fame_to_be_burned(store.get_current_season_id(), fame_balance);
-            if (cause_of_death.retains_fame()) {
-                store.set_duelist_released_fame(duelist_id, true);
-            } else {
+            // de-peg FAME
+            let released_fame: bool = store.get_duelist_released_fame(duelist_id);
+            if (!released_fame) {
+                bank_dispatcher.depeg_lords_from_fame_to_be_burned(store.get_current_season_id(), fame_balance);
+            }
+
+            // remaining fame to be burned or released
+            if (!cause_of_death.retains_fame()) {
                 fame_dispatcher.burn_from_token(starknet::get_contract_address(), duelist_id, fame_balance.into());
+            } else if (!released_fame) {
+                store.set_duelist_released_fame(duelist_id, true);
             }
 
             // kill...
@@ -602,6 +613,9 @@ pub mod duelist_token {
             killed_by: u128,
             fame_before_death: u128,
         ) {
+            // should not be memorialized yet
+            assert(!store.get_duelist_is_memorialized(duelist_id), Errors::DUELIST_IS_MEMORIALIZED);
+            // memorialize
             let memorial: DuelistMemorial = DuelistMemorial {
                 duelist_id,
                 player_address: self.owner_of(duelist_id.into()),

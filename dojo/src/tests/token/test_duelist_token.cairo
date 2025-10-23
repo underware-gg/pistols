@@ -17,6 +17,7 @@ use pistols::models::{
 };
 use pistols::interfaces::dns::{
     IDuelistTokenProtectedDispatcher, IDuelistTokenProtectedDispatcherTrait,
+    IPackTokenDispatcherTrait,
 };
 
 // use pistols::interfaces::dns::{DnsTrait};
@@ -30,7 +31,7 @@ use pistols::tests::tester::{
         IDuelistTokenDispatcherTrait,
         IFameCoinDispatcherTrait,
         ILordsMockDispatcherTrait,
-        OWNER, OTHER, RECIPIENT, SPENDER, TREASURY, ZERO, SEASON_ID_1,
+        OWNER, OTHER, RECIPIENT, SPENDER, ZERO, SEASON_ID_1,
     },
 };
 
@@ -49,8 +50,8 @@ const TOKEN_ID_2_2: u256 = 4;
 const TOKEN_ID_3_1: u256 = 5;
 const TOKEN_ID_3_2: u256 = 6;
 
-fn setup(_fee_amount: u128) -> TestSystems {
-    let mut sys: TestSystems = tester::setup_world(FLAGS::DUELIST | FLAGS::FAME | FLAGS::LORDS);
+fn setup(flags: u16) -> TestSystems {
+    let mut sys: TestSystems = tester::setup_world(flags | FLAGS::DUELIST | FLAGS::FAME | FLAGS::LORDS);
 
     tester::set_current_season(ref sys, SEASON_ID_1);
 
@@ -538,90 +539,166 @@ fn test_duelist_inactive() {
 // sacrifice() / memorialize()
 //
 
-fn _test_duelist_sacrifice(sys: @TestSystems, token_id: u128, cause_of_death: CauseOfDeath) {
-    let token_id: u128 = TOKEN_ID_1_1.low;
-    let lords_balance_bank: u128 = (*sys.lords).balance_of((*sys.bank).contract_address).low;
-    let lords_balance_treasury: u128 = (*sys.lords).balance_of(TREASURY()).low;
-    let fame_balance_start: u128 = (*sys.fame).balance_of_token((*sys.duelists).contract_address, token_id).low;
+fn _purchase_and_open(sys: @TestSystems, recipient: ContractAddress) -> Span<u128> {
+    let price: u128 = (*sys.pack).calc_mint_fee(recipient, PackType::GenesisDuelists5x);
+    assert_ne!(price, 0, "_purchase(): invalid price");
+    tester::impersonate(recipient);
+    tester::execute_lords_approve(sys.lords, recipient, (*sys.bank).contract_address, price);
+    let pack_id: u128 = tester::execute_pack_purchase(sys, recipient, PackType::GenesisDuelists5x);
+    (tester::execute_pack_open(sys, OWNER(), pack_id))
+}
+
+fn _test_duelist_sacrifice(sys: @TestSystems, owner: ContractAddress, duelist_id: u128, cause_of_death: CauseOfDeath) {
     let fame_supply_start: u128 = (*sys.fame).total_supply().low;
-    let timestamp_active_start: u64 = (*sys.store).get_duelist_timestamps(token_id).active;
-    // let intial_fame: u128 = FAME::MINT_GRANT_AMOUNT;
+    let fame_balance_start: u128 = (*sys.fame).balance_of_token((*sys.duelists).contract_address, duelist_id).low;
+    let balance_bank_start: u128 = (*sys.lords).balance_of((*sys.bank).contract_address).low;
+    let pool_season_start: Pool = (*sys.store).get_pool(PoolType::Season(SEASON_ID_1));
+    let pool_peg_start: Pool = (*sys.store).get_pool(PoolType::FamePeg);
+    let timestamp_active_start: u64 = (*sys.store).get_duelist_timestamps(duelist_id).active;
 // println!("[] balance     : {}", fame_balance_start/CONST::ETH_TO_WEI.low);
 
-    // reactivate
-    if (cause_of_death == CauseOfDeath::Sacrifice) {    
-        (*sys.duelists).sacrifice(token_id);
-    } else if (cause_of_death == CauseOfDeath::Memorize) {    
-        (*sys.duelists).memorialize(token_id);
-    }
-    assert!(!(*sys.duelists).is_alive(token_id), "AFTER_is_alive()");
-    assert!(!(*sys.duelists).is_inactive(token_id), "AFTER_is_inactive");
-    assert_eq!((*sys.duelists).inactive_timestamp(token_id), 0, "AFTER_inactive_timestamp");
+    let duelist_profile: DuelistProfile = (*sys.store).get_duelist_profile(duelist_id);
+    let stack_start: PlayerDuelistStack = (*sys.store).get_player_duelist_stack(owner, duelist_profile);
+    // assert_gt!(stack_start.level, 0, "stack_start"); // will not work for *_twice()
 
-    let memorial: DuelistMemorialValue = (*sys.store).get_duelist_memorial_value(token_id);
+    // reactivate
+    if (cause_of_death == CauseOfDeath::Sacrifice) {
+        (*sys.duelists).sacrifice(duelist_id);
+    } else if (cause_of_death == CauseOfDeath::Memorize) {
+        (*sys.duelists).memorialize(duelist_id);
+    }
+    assert!(!(*sys.duelists).is_alive(duelist_id), "AFTER_is_alive()");
+    assert!(!(*sys.duelists).is_inactive(duelist_id), "AFTER_is_inactive");
+    assert_eq!((*sys.duelists).inactive_timestamp(duelist_id), 0, "AFTER_inactive_timestamp");
+
+    let memorial: DuelistMemorialValue = (*sys.store).get_duelist_memorial_value(duelist_id);
     assert_eq!(memorial.cause_of_death, cause_of_death, "AFTER_cause_of_death");
     assert_eq!(memorial.fame_before_death, fame_balance_start, "AFTER_fame_before_death");
     if (cause_of_death == CauseOfDeath::Sacrifice) {    
-        assert_eq!(memorial.killed_by, token_id, "AFTER_killed_by");
+        assert_eq!(memorial.killed_by, duelist_id, "AFTER_killed_by");
     } else if (cause_of_death == CauseOfDeath::Memorize) {    
         assert_eq!(memorial.killed_by, 0, "AFTER_killed_by");
     }
 
+    // unstacked
+    let duelist_profile: DuelistProfile = (*sys.store).get_duelist_profile(duelist_id);
+    let stack_end: PlayerDuelistStack = (*sys.store).get_player_duelist_stack(owner, duelist_profile);
+    assert_lt!(stack_end.level, stack_start.level, "stack_end");
+
     // timestamp_active updated
-    let timestamp_active: u64 = (*sys.store).get_duelist_timestamps(token_id).active;
+    let timestamp_active: u64 = (*sys.store).get_duelist_timestamps(duelist_id).active;
     assert_gt!(timestamp_active, timestamp_active_start, "AFTER_timestamp_active");
 
-    // duelist lost fame...
-    let fame_balance: u128 = (*sys.fame).balance_of_token((*sys.duelists).contract_address, token_id).low;
-    // Fame supply down
+    // compare balances...
     let fame_supply: u128 = (*sys.fame).total_supply().low;
-    // Flames up?
-    let pool_flame: Pool = (*sys.store).get_pool(PoolType::Sacrifice);
-    let pool_amount: u128 = ((FAME::ONE_LIFE / 10) * 6);
-    assert_eq!(fame_balance, 0, "AFTER_fame_balance_DEAD");
-    assert_eq!(fame_supply, fame_supply_start - fame_balance_start + pool_amount, "AFTER_fame_supply_DEAD");
-    assert_eq!(pool_flame.balance_fame, pool_amount, "AFTER_pool_flame.balance_fame_DEAD");
+    let fame_balance: u128 = (*sys.fame).balance_of_token((*sys.duelists).contract_address, duelist_id).low;
+    let balance_bank: u128 = (*sys.lords).balance_of((*sys.bank).contract_address).low;
+    let pool_season: Pool = (*sys.store).get_pool(PoolType::Season(SEASON_ID_1));
+    let pool_peg: Pool = (*sys.store).get_pool(PoolType::FamePeg);
 
-    // bank down
-    tester::assert_lords_balance_down(sys, (*sys.bank).contract_address, lords_balance_bank, "AFTER_bank_down");
-    // underware up
-    tester::assert_lords_balance_up(sys, TREASURY(), lords_balance_treasury, "AFTER_treasury_up");
+    assert_eq!(balance_bank, balance_bank_start, "AFTER_balance_bank");
+    if (cause_of_death == CauseOfDeath::Sacrifice) {    
+        assert_lt!(fame_supply, fame_supply_start, "AFTER_fame_supply (sacrificed)");
+        assert_lt!(fame_balance, fame_balance_start, "AFTER_fame_balance (sacrificed)");
+    } else if (cause_of_death == CauseOfDeath::Memorize) {    
+        assert_eq!(fame_supply, fame_supply_start, "AFTER_fame_supply (memorialized)");
+        assert_eq!(fame_balance, fame_balance_start, "AFTER_fame_balance (memorialized)");
+    }
+
+    let has_pegged_fame: bool = (duelist_id > TOKEN_ID_1_2.low);
+    if (has_pegged_fame) {
+        assert_lt!(pool_peg.balance_lords, pool_peg_start.balance_lords, "AFTER_pool_peg.balance_lords (pegged)");
+        assert_lt!(pool_peg.balance_fame, pool_peg_start.balance_fame, "AFTER_pool_peg.balance_fame (pegged)");
+        assert_gt!(pool_season.balance_lords, pool_season_start.balance_lords, "AFTER_pool_season.balance_lords (pegged)");
+    } else {
+        assert_eq!(pool_peg.balance_lords, pool_peg_start.balance_lords, "AFTER_pool_peg.balance_lords (not pegged)");
+        assert_eq!(pool_peg.balance_fame, pool_peg_start.balance_fame, "AFTER_pool_peg.balance_fame (not pegged)");
+        assert_eq!(pool_season.balance_lords, pool_season_start.balance_lords, "AFTER_pool_season.balance_lords (not pegged)");
+    }
 }
 
 #[test]
-#[should_panic(expected:('DUELIST: Not implemented', 'ENTRYPOINT_FAILED'))]
-fn test_duelist_sacrifice_OK() {
-    let mut sys: TestSystems = setup(0);
+fn test_duelist_sacrifice_free_OK() {
+    let mut sys: TestSystems = setup(0); // minted starter pack
     let token_id: u128 = TOKEN_ID_1_1.low;
-    _test_duelist_sacrifice(@sys, token_id, CauseOfDeath::Sacrifice);
+    _test_duelist_sacrifice(@sys, OWNER(), token_id, CauseOfDeath::Sacrifice);
 }
 
 #[test]
-#[should_panic(expected:('DUELIST: Not implemented', 'ENTRYPOINT_FAILED'))]
-// #[should_panic(expected:('ERC721Combo: not owner', 'ENTRYPOINT_FAILED'))]
+fn test_duelist_sacrifice_paid_OK() {
+    let mut sys: TestSystems = setup(0); // minted starter pack
+    let token_id: u128 = *_purchase_and_open(@sys, OWNER())[0];
+    _test_duelist_sacrifice(@sys, OWNER(), token_id, CauseOfDeath::Sacrifice);
+}
+
+#[test]
+#[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
+fn test_duelist_sacrifice_twice() {
+    let mut sys: TestSystems = setup(0); // minted starter pack
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    _test_duelist_sacrifice(@sys, OWNER(), token_id, CauseOfDeath::Sacrifice);
+    _test_duelist_sacrifice(@sys, OWNER(), token_id, CauseOfDeath::Sacrifice);
+}
+
+#[test]
+#[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED'))]
+fn test_duelist_sacrifice_cant_play() {
+    let mut sys: TestSystems = setup(FLAGS::GAME); // minted starter pack
+    let token_id: u128 = TOKEN_ID_1_1.low;
+println!("+++++sacrifice... {}", token_id);
+    _test_duelist_sacrifice(@sys, OWNER(), token_id, CauseOfDeath::Sacrifice);
+println!("+++++duel... {}", token_id);
+    tester::execute_create_duel_ID(@sys, OWNER(), token_id, OTHER(), "", DuelType::Seasonal, 0, 1);
+}
+
+#[test]
+#[should_panic(expected:('ERC721Combo: not owner', 'ENTRYPOINT_FAILED'))]
 fn test_duelist_sacrifice_not_owner() {
-    let mut sys: TestSystems = setup(0);
+    let mut sys: TestSystems = setup(0); // minted starter pack
     let token_id: u128 = TOKEN_ID_1_1.low;
     tester::impersonate(OTHER());
-    _test_duelist_sacrifice(@sys, token_id, CauseOfDeath::Sacrifice);
+    _test_duelist_sacrifice(@sys, OWNER(), token_id, CauseOfDeath::Sacrifice);
 }
 
 #[test]
-#[should_panic(expected:('DUELIST: Not implemented', 'ENTRYPOINT_FAILED'))]
-fn test_duelist_memorialize_OK() {
-    let mut sys: TestSystems = setup(0);
+fn test_duelist_memorialize_free_OK() {
+    let mut sys: TestSystems = setup(0); // minted starter pack
     let token_id: u128 = TOKEN_ID_1_1.low;
-    _test_duelist_sacrifice(@sys, token_id, CauseOfDeath::Memorize);
+    _test_duelist_sacrifice(@sys, OWNER(), token_id, CauseOfDeath::Memorize);
 }
 
 #[test]
-#[should_panic(expected:('DUELIST: Not implemented', 'ENTRYPOINT_FAILED'))]
-// #[should_panic(expected:('ERC721Combo: not owner', 'ENTRYPOINT_FAILED'))]
+fn test_duelist_memorialize_paid_OK() {
+    let mut sys: TestSystems = setup(0); // minted starter pack
+    let token_id: u128 = *_purchase_and_open(@sys, OWNER())[0];
+    _test_duelist_sacrifice(@sys, OWNER(), token_id, CauseOfDeath::Memorize);
+}
+
+#[test]
+#[should_panic(expected:('ERC721Combo: not owner', 'ENTRYPOINT_FAILED'))]
 fn test_duelist_memorialize_not_owner() {
-    let mut sys: TestSystems = setup(0);
+    let mut sys: TestSystems = setup(0); // minted starter pack
     let token_id: u128 = TOKEN_ID_1_1.low;
     tester::impersonate(OTHER());
-    _test_duelist_sacrifice(@sys, token_id, CauseOfDeath::Memorize);
+    _test_duelist_sacrifice(@sys, OWNER(), token_id, CauseOfDeath::Memorize);
+}
+
+#[test]
+#[should_panic(expected:('DUELIST: Already memorialized', 'ENTRYPOINT_FAILED'))]
+fn test_duelist_memorialize_twice() {
+    let mut sys: TestSystems = setup(0); // minted starter pack
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    _test_duelist_sacrifice(@sys, OWNER(), token_id, CauseOfDeath::Memorize);
+    _test_duelist_sacrifice(@sys, OWNER(), token_id, CauseOfDeath::Memorize);
+}
+
+#[test]
+#[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
+fn test_duelist_memorialize_cant_play() {
+    let mut sys: TestSystems = setup(FLAGS::GAME); // minted starter pack
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    _test_duelist_sacrifice(@sys, OWNER(), token_id, CauseOfDeath::Memorize);
+    tester::execute_create_duel_ID(@sys, OWNER(), token_id, OTHER(), "", DuelType::Seasonal, 0, 1);
 }
 
 

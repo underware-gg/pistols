@@ -74,7 +74,7 @@ fn _assert_duelist_count(sys: @TestSystems, minted_count: u128, msg: ByteArray) 
 
 fn _purchase(sys: @TestSystems, recipient: ContractAddress) -> u128 {
     let price: u128 = (*sys.pack).calc_mint_fee(recipient, PackType::GenesisDuelists5x);
-    assert_ne!(price, 0, "invalid price");
+    assert_ne!(price, 0, "_purchase(): invalid price");
     tester::impersonate(recipient);
     tester::execute_lords_approve(sys.lords, recipient, (*sys.bank).contract_address, price);
     tester::execute_pack_purchase(sys, recipient, PackType::GenesisDuelists5x);
@@ -83,6 +83,7 @@ fn _purchase(sys: @TestSystems, recipient: ContractAddress) -> u128 {
 
 fn _purchase_multiple(sys: @TestSystems, recipient: ContractAddress, quantity: usize) -> Span<u128> {
     let price: u128 = (*sys.pack).calc_mint_fee(recipient, PackType::GenesisDuelists5x);
+    assert_ne!(price, 0, "_purchase_multiple(): invalid price");
     tester::impersonate(recipient);
     tester::execute_lords_approve(sys.lords, recipient, (*sys.bank).contract_address, price * quantity.into());
     (tester::execute_pack_purchase_multiple(sys, recipient, PackType::GenesisDuelists5x, quantity))

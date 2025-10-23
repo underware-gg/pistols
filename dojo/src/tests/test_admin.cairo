@@ -178,15 +178,20 @@ mod tests {
     fn test_set_realms_address() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
         let mut config: Config = sys.store.get_config();
-        assert_eq!(config.realms_address, ZERO(), "realms_address_default");
-        // set
+        assert_eq!(config.realms_address, REALMS(), "DEFAULT");
+        // set new
         let new_realms: ContractAddress = 0x121212.try_into().unwrap();
         tester::execute_admin_set_realms_address(@sys.admin, OWNER(), new_realms);
         let mut config: Config = sys.store.get_config();
-        assert_eq!(config.realms_address, new_realms, "set_config_new");
+        assert_eq!(config.realms_address, new_realms, "NEW");
+        // set empty
+        tester::execute_admin_set_realms_address(@sys.admin, OWNER(), ZERO());
+        let config: Config = sys.store.get_config();
+        assert_eq!(config.realms_address, ZERO(), "ZERO");
+        // set new back to default
         tester::execute_admin_set_realms_address(@sys.admin, OWNER(), REALMS());
         let config: Config = sys.store.get_config();
-        assert_eq!(config.realms_address, REALMS(), "realms_address_newer");
+        assert_eq!(config.realms_address, REALMS(), "back to DEFAULT");
     }
 
     #[test]
