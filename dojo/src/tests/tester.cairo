@@ -557,6 +557,7 @@ pub mod tester {
         }
         if (deploy_admin) {
             world.dispatcher.grant_owner(selector_from_tag!("pistols-admin"), OWNER());
+            sys.admin.set_realms_address(REALMS());
         }
         // if (deploy_tournament) {
         //     world.dispatcher.grant_owner(selector_from_tag!("pistols-tournament_token"), OWNER());

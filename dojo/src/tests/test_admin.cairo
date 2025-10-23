@@ -89,7 +89,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
         tester::execute_admin_set_is_team_member(@sys.admin, OWNER(), OTHER(), true, true);
         tester::execute_admin_set_treasury(@sys.admin, OTHER(), BUMMER());
-        tester::execute_admin_set_realms_address(@sys.admin, OTHER(), REALMS());
+        tester::execute_admin_set_realms_address(@sys.admin, OTHER(), BUMMER());
     }
 
     #[test]
@@ -201,7 +201,7 @@ mod tests {
     #[should_panic(expected:('ADMIN: Caller not admin', 'ENTRYPOINT_FAILED'))]
     fn test_set_realms_address_not_admin() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
-        tester::execute_admin_set_realms_address(@sys.admin, OTHER(), REALMS());
+        tester::execute_admin_set_realms_address(@sys.admin, OTHER(), BUMMER());
     }
 
     //

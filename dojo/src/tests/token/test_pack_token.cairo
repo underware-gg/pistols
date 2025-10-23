@@ -24,7 +24,7 @@ use pistols::tests::tester::{
     tester::{
         StoreTrait,
         TestSystems, FLAGS,
-        OWNER, OTHER, BUMMER, SPENDER, SEASON_ID_1, ZERO,
+        OWNER, OTHER, BUMMER, SPENDER, SEASON_ID_1, ZERO, TREASURY, REALMS,
     },
 };
 
@@ -79,6 +79,13 @@ fn _purchase(sys: @TestSystems, recipient: ContractAddress) -> u128 {
     tester::execute_lords_approve(sys.lords, recipient, (*sys.bank).contract_address, price);
     tester::execute_pack_purchase(sys, recipient, PackType::GenesisDuelists5x);
     (price)
+}
+
+fn _purchase_multiple(sys: @TestSystems, recipient: ContractAddress, quantity: usize) -> Span<u128> {
+    let price: u128 = (*sys.pack).calc_mint_fee(recipient, PackType::GenesisDuelists5x);
+    tester::impersonate(recipient);
+    tester::execute_lords_approve(sys.lords, recipient, (*sys.bank).contract_address, price * quantity.into());
+    (tester::execute_pack_purchase_multiple(sys, recipient, PackType::GenesisDuelists5x, quantity))
 }
 
 pub fn _protected(sys: @TestSystems) -> IPackTokenProtectedDispatcher {
@@ -223,6 +230,41 @@ fn test_claim_purchase() {
     assert_eq!(other_profile_1, DuelistProfile::Genesis(GenesisKey::SerWalker), "other_profile_1");
     assert_eq!(owner_profile_2, DuelistProfile::Genesis(GenesisKey::LadyVengeance), "owner_profile_2");
     assert_eq!(other_profile_2, DuelistProfile::Genesis(GenesisKey::LadyVengeance), "other_profile_2");
+}
+
+
+#[test]
+fn test_claim_purchase_multiple() {
+    let mut sys: TestSystems = setup(0);
+    _assert_minted_count(@sys, 0, 0, "total_supply init");
+    assert_eq!(sys.pack.balance_of(OTHER()), 0, "balance_of 0");
+
+    tester::execute_claim_starter_pack(@sys, OTHER());
+    _assert_minted_count(@sys, 1, 0, "total_supply 1");
+
+    // save balances
+    let mut balance_treasury: u128 = sys.lords.balance_of(TREASURY()).low;
+    let mut balance_realms: u128 = sys.lords.balance_of(REALMS()).low;
+    let mut balance_bank: u128 = sys.lords.balance_of(sys.bank.contract_address).low;
+    let mut pool_purchases: u128 = sys.store.get_pool(PoolType::Purchases).balance_lords;
+    let mut pool_peg_lords: u128 = sys.store.get_pool(PoolType::FamePeg).balance_lords;
+    let mut pool_peg_fame: u128 = sys.store.get_pool(PoolType::FamePeg).balance_fame;
+
+    // purchase packs...
+    let pack_ids: Span<u128> = _purchase_multiple(@sys, OTHER(), 3);
+    _assert_minted_count(@sys, 4, 3, "total_supply 4");
+    assert_eq!(sys.pack.balance_of(OTHER()), 3, "balance_of 1");
+    assert!(sys.pack.owner_of((*pack_ids[0]).into()) == OTHER(), "owner_of_2");
+    assert!(sys.pack.owner_of((*pack_ids[1]).into()) == OTHER(), "owner_of_3");
+    assert!(sys.pack.owner_of((*pack_ids[2]).into()) == OTHER(), "owner_of_4");
+
+    // balances after purchase
+    balance_treasury = tester::assert_lords_balance_up(@sys, TREASURY(), balance_treasury, "balance_treasury PURCHASE");
+    balance_realms = tester::assert_lords_balance_up(@sys, REALMS(), balance_realms, "balance_realms PURCHASE");
+    balance_bank = tester::assert_lords_balance_up(@sys, sys.bank.contract_address, balance_bank, "balance_bank PURCHASE");
+    pool_purchases = tester::assert_balance_up(sys.store.get_pool(PoolType::Purchases).balance_lords, pool_purchases, "pool_purchases PURCHASE");
+    pool_peg_lords = tester::assert_balance_equal(sys.store.get_pool(PoolType::FamePeg).balance_lords, pool_peg_lords, "pool_peg_lords PURCHASE");
+    pool_peg_fame = tester::assert_balance_equal(sys.store.get_pool(PoolType::FamePeg).balance_fame, pool_peg_fame, "pool_peg_fame PURCHASE");
 }
 
 #[test]

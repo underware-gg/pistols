@@ -348,6 +348,7 @@ pub mod tests {
         let fame_supply_minted: u256 = sys.fame.total_supply();
         let pool_peg_minted: Pool = sys.store.get_pool(PoolType::FamePeg);
         assert_eq!(pool_peg_minted.balance_lords, pool_peg_init.balance_lords, "pool_peg_minted");
+        assert_eq!(pool_peg_minted.balance_fame, pool_peg_init.balance_fame, "pool_peg_minted");
         assert_gt!(fame_supply_minted, fame_supply_init, "fame_supply_minted");
         //
         // duel 2
@@ -373,6 +374,7 @@ pub mod tests {
         let pool_peg_dead: Pool = sys.store.get_pool(PoolType::FamePeg);
         assert_lt!(fame_supply_dead, fame_supply_minted, "fame_supply_dead");
         assert_eq!(pool_peg_dead.balance_lords, pool_peg_init.balance_lords, "pool_peg_dead");
+        assert_eq!(pool_peg_dead.balance_fame, pool_peg_init.balance_fame, "pool_peg_dead");
         assert_eq!(treasury_dead, treasury_init, "treasury_dead");
         //
         // new duelist...

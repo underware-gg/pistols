@@ -3,7 +3,7 @@ mod tests {
     use starknet::{ContractAddress};
 
     use pistols::models::{
-        challenge::{DuelType},
+        challenge::{ChallengeValue, DuelType},
         pool::{Pool, PoolType},
         pack::{PackType, PackTypeTrait},
         leaderboard::{Leaderboard, LeaderboardTrait, LeaderboardPosition},
@@ -12,6 +12,7 @@ mod tests {
     use pistols::types::{
         rules::{RewardValues},
         duelist_profile::{DuelistProfile, GenesisKey},
+        challenge_state::{ChallengeState},
         constants::{FAME},
     };
     use pistols::utils::math::{MathU8};
@@ -200,7 +201,6 @@ mod tests {
     //-----------------------------------------
     // Draw results
     //
-
 
     #[test]
     fn test_bank_resolved_draw_alive() {
@@ -416,8 +416,6 @@ tester::print_pools(@sys, 1, "COLLECTED");
     fn test_bank_peg_pool() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::ADMIN);
 
-        tester::execute_admin_set_realms_address(@sys.admin, OWNER(), REALMS());
-
         let bank_address: ContractAddress = sys.bank.contract_address;
         let price_single: u128 = *PackType::SingleDuelist.descriptor().price_lords;
         let price_pack: u128 = *PackType::GenesisDuelists5x.descriptor().price_lords;
@@ -539,6 +537,44 @@ tester::print_pools(@sys, 1, "COLLECTED");
         // assert_eq!(pool_peg_fame, 0, "pool_peg_fame END");
     }
 
+
+    //--------------------------------
+    // fame peg
+    //
+
+    #[test]
+    fn test_fame_peg_starter_ok() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::ADMIN | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
+        tester::fund_duelists_pool(@sys, 2);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
+        let ID_B: u128 = _airdrop_open(@sys, B, DuelistProfile::Genesis(GenesisKey::Duke));
+        //
+        // remember peg balance
+        let pool_peg_start: Pool = sys.store.get_pool(PoolType::FamePeg);
+        assert_gt!(pool_peg_start.balance_lords, 0, "pool_peg_lords INIT");
+        assert_gt!(pool_peg_start.balance_fame, 0, "pool_peg_fame INIT");
+        //
+        // duel...
+        let duel_id: u128 = tester::execute_create_duel_ID(@sys, A, ID_A, B, "yo", DuelType::Seasonal, 48, 1);
+        tester::execute_reply_duel(@sys, B, ID_B, duel_id, true);
+        let (mocked, moves_a, moves_b): (Span<MockedValue>, PlayerMoves, PlayerMoves) = prefabs::get_moves_dual_crit();
+        (sys.rng).mock_values(mocked);
+        tester::execute_commit_moves(@sys, A, duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, B, duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(@sys, A, duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_reveal_moves(@sys, B, duel_id, moves_b.salt, moves_b.moves);
+        let ch: ChallengeValue = sys.store.get_challenge_value(duel_id);
+        assert_eq!(ch.state, ChallengeState::Draw);
+        //
+        // check peg > One life only (B), not A, which is starter pack
+        let pool_peg_end: Pool = sys.store.get_pool(PoolType::FamePeg);
+        tester::assert_balance_down(pool_peg_end.balance_lords, pool_peg_start.balance_lords, "pool_peg_lords END");
+        tester::assert_balance(pool_peg_end.balance_fame, pool_peg_start.balance_fame, FAME::ONE_LIFE, 0, "pool_peg_fame END");
+    }
+
+    
     //-----------------------------------------
     // sponsoring
     //
