@@ -224,7 +224,7 @@ function format_ts_value(value, cairo_type, ts_type) {
     if (ts_value.startsWith('selector_from_tag!')) {
       let match = ts_value.match(/"(.*?)"/g)
       if (match) {
-        const stdout = execSync(`cd ../dojo && sozo hash compute ${match}`).toString();
+        const stdout = execSync(`cd ../dojo && sozo --offline hash compute ${match}`).toString();
         const hash = stdout.match(/0x[A-Fa-f0-9]*/g)
         // console.log(`>>> match [${match}] hash [${hash}]`)
         if (hash) {

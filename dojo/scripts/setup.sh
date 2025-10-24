@@ -4,11 +4,12 @@
 #
 if [ $# -lt 1 ]; then
   echo "❌ Error: Missing profile!"
-  echo "usage: $0 <PROFILE> [--offline] [--inspect] [--bindings]"
+  echo "usage: $0 <PROFILE> [--scarb] [--offline] [--inspect] [--bindings] [--verbose]"
   exit 1
 fi
 
 # initialize argument variables
+export SOZO=sozo
 export PROFILE=
 export ARG_BINDINGS=
 export ARG_OFFLINE=
@@ -39,6 +40,8 @@ do
     fi
   elif [[ $arg == "--verbose" ]]; then
     export ARG_VERBOSE="-vvv"
+  elif [[ $arg == "--scarb" ]]; then
+    export SOZO="scarb"
   else
     echo "❌ Error: Invalid argument: $arg"
     exit 1
