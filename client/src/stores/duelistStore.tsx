@@ -102,10 +102,6 @@ export const useDuelist = (duelist_id: BigNumberish) => {
   const inactiveTimestamp = useMemo(() => (clientTimestamp - timestampActive), [timestampActive, clientTimestamp])
   // sync with duelist_token.is_inactive()
   const isInactive = useMemo(() => (timestampActive > 0 && (inactiveTimestamp > constants.FAME.MAX_INACTIVE_TIMESTAMP)), [timestampActive, inactiveTimestamp])
-  // sync with duelist_token.inactive_fame_dripped()
-  const inactiveFameDripped = useMemo(() => (
-    !isInactive ? 0 : ((BigInt(inactiveTimestamp) - constants.FAME.MAX_INACTIVE_TIMESTAMP) / constants.FAME.TIMESTAMP_TO_DRIP_ONE_FAME) * constants.CONST.ETH_TO_WEI
-  ), [isInactive, inactiveTimestamp])
 
   // current duel a duelist is in
   const currentDuelId = useMemo(() => BigInt(duelistChallenge?.duel_id ?? 0), [duelistChallenge])
@@ -152,7 +148,6 @@ export const useDuelist = (duelist_id: BigNumberish) => {
     currentPassId,
     isInAction,
     isInactive,
-    inactiveFameDripped,
     totals,
     // profile
     name: duelistName,

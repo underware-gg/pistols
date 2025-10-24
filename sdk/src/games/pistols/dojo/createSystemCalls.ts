@@ -337,6 +337,7 @@ export function createSystemCalls(
           vrf_request_call('pack_token', signer.address),
           contractCalls.pack_token.buildPurchaseCalldata(
             pack_type_enum,
+            1,
           ),
         ]
         return await _executeTransaction(signer, calls, key)

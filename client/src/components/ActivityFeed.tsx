@@ -31,6 +31,7 @@ const activityIdentifiers: Record<constants.Activity, 'pack_id' | 'duelist_id' |
   [constants.Activity.EnlistedRankedDuelist]: 'duelist_id',
   [constants.Activity.DuelistMatchingRanked]: 'duelist_id',
   [constants.Activity.DuelistMatchingUnranked]: 'duelist_id',
+  [constants.Activity.DuelistMemorialized]: 'duelist_id',
 }
 
 const _queueName = (queueId: constants.QueueId): string => {
@@ -117,6 +118,9 @@ const _ActivityItem = ({
   if (activity.activity === constants.Activity.DuelistDied) {
     return <ActivityItemDuelistDied activity={activity} />
   }
+  if (activity.activity === constants.Activity.DuelistMemorialized) {
+    return <ActivityItemDuelistMemorialized activity={activity} queueId={constants.QueueId.Unranked} />
+  }
   if (activity.activity === constants.Activity.EnlistedRankedDuelist) {
     return <ActivityItemEnlistedRankedDuelist activity={activity} />
   }
@@ -189,6 +193,17 @@ const ActivityItemDuelistDied = ({
     <>
       <DuelistLink duelistId={activity.identifier} />
       {' is dead!'}
+    </>
+  )
+}
+
+const ActivityItemDuelistMemorialized = ({
+  activity,
+}: ActivityItemProps) => {
+  return (
+    <>
+      <DuelistLink duelistId={activity.identifier} />
+      {' was memorialized 💫'}
     </>
   )
 }
