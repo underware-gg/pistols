@@ -81,7 +81,7 @@ pub mod matchmaker {
         pub const DUELIST_UNAVAILABLE: felt252      = 'MATCHMAKER: Duelist unavailable';
         pub const ENLISTMENT_NOT_REQUIRED: felt252  = 'MATCHMAKER: Not required';
         pub const INELIGIBLE_DUELIST: felt252       = 'MATCHMAKER: Ineligible duelist';
-        pub const NOT_A_NEW_DUELIST: felt252        = 'MATCHMAKER: Not a new duelist';
+        pub const NOT_A_NEW_DUELIST: felt252        = 'MATCHMAKER: Only new duelists';
         pub const NOT_ENLISTED: felt252             = 'MATCHMAKER: Not enlisted';
         pub const INVALID_SIZE: felt252             = 'MATCHMAKER: Invalid size';
         pub const UNFINISHED_IMP_DUEL: felt252      = 'MATCHMAKER: Unfinished Imp duel';

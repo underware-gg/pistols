@@ -150,6 +150,7 @@ pub mod bank {
             assert(!store.get_config_is_paused(), Errors::IS_PAUSED);
             // close Ranked queue
             store.world.matchmaker_protected_dispatcher().close_season(QueueId::Ranked);
+            store.world.matchmaker_protected_dispatcher().close_season(QueueId::Unranked);
             // collect season if permitted
             let mut season: SeasonConfig = store.get_current_season();
             let new_season_id: u32 = season.collect(ref store);

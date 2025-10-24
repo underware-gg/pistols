@@ -1,9 +1,9 @@
 #[cfg(test)]
 mod tests {
     use starknet::{ContractAddress};
-    // use core::num::traits::Zero;
+    use core::num::traits::Zero;
     use pistols::models::{
-        challenge::{Challenge, ChallengeValue, DuelType, Round},
+        challenge::{Challenge, ChallengeTrait, ChallengeValue, DuelType, Round},
         duelist::{DuelistAssignment, Archetype},
         match_queue::{
             QueueId, QueueIdTrait,
@@ -13,6 +13,7 @@ mod tests {
             MatchPlayer,
             MATCHMAKER,
         },
+        season::{SeasonConfig},
         pack::{PackType},
     };
     use pistols::types::{
@@ -27,6 +28,8 @@ mod tests {
             IMatchMakerDispatcherTrait,
             IDuelTokenDispatcherTrait,
             IDuelTokenProtectedDispatcherTrait,
+            IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
+            IGameDispatcherTrait,
             IBotPlayerDispatcherTrait,
             IRngMockDispatcherTrait,
             ILordsMockDispatcherTrait,
@@ -43,6 +46,41 @@ mod tests {
     use pistols::utils::address::{ContractAddressDisplay};
     use pistols::utils::arrays::{ArrayTestUtilsTrait};
 
+    use pistols::tests::test_bot_player::tests::{_duel_bot_crit_a};
+
+    fn _make_ranked_duelists_AB(sys: @TestSystems, queue_id: QueueId) -> (ContractAddress, ContractAddress, u128, u128) {
+        tester::fund_duelists_pool(sys, 2);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        let ID_A: u128 = _airdrop_open(sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_A");
+        let ID_B: u128 = _airdrop_open(sys, B, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_B");
+        _setup_ranked_lords(sys, [A, B].span(), 1);
+        tester::execute_enlist_duelist(sys, A, ID_A, queue_id);
+        tester::execute_enlist_duelist(sys, B, ID_B, queue_id);
+        (A, B, ID_A, ID_B)
+    }
+
+    fn _make_unranked_duelists_AB(sys: @TestSystems) -> (ContractAddress, ContractAddress, u128, u128) {
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        // tester::fund_duelists_pool(@sys, 2);
+        let ID_A: u128 = *tester::execute_claim_starter_pack(sys, A)[0];
+        let ID_B: u128 = *tester::execute_claim_starter_pack(sys, B)[0];
+        (A, B, ID_A, ID_B)
+    }
+
+    fn _make_unranked_duelists_ABC(sys: @TestSystems) -> (ContractAddress, ContractAddress, ContractAddress, u128, u128, u128) {
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        let C: ContractAddress = BUMMER();
+        // tester::fund_duelists_pool(@sys, 2);
+        let ID_A: u128 = *tester::execute_claim_starter_pack(sys, A)[0];
+        let ID_B: u128 = *tester::execute_claim_starter_pack(sys, B)[0];
+        let ID_C: u128 = *tester::execute_claim_starter_pack(sys, C)[0];
+        (A, B, C, ID_A, ID_B, ID_C)
+    }
+
+
     fn _get_moves_for_winner(sys: @TestSystems, winner: u8, is_bot: bool) -> (PlayerMoves, PlayerMoves) {
         let (mocked, moves_a, moves_b) = if (is_bot) {
             assert_eq!(winner, 1, "BOT CANNOT WIN NOW..");
@@ -55,6 +93,11 @@ mod tests {
     }
     fn _mock_slot(sys: @TestSystems, slot: u8) {
         (*sys.rng).mock_values([MockedValueTrait::new('queue_slot', slot.into())].span());
+    }
+
+    fn _assert_enlisted_duelists(sys: @TestSystems, queue_id: QueueId, duelists: Span<u128>, prefix: ByteArray) {
+        let queue: MatchQueue = sys.store.get_match_queue(queue_id);
+        ArrayTestUtilsTrait::assert_span_eq(queue.enlisted_duelist_ids.span(), duelists, prefix.clone());
     }
 
     fn _assert_match_created(sys: @TestSystems,
@@ -380,6 +423,16 @@ mod tests {
     }
     
     #[test]
+    #[should_panic(expected: ('MATCHMAKER: Not required', 'ENTRYPOINT_FAILED'))]
+    fn test_enlistment_not_required() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
+        let A: ContractAddress = OWNER();
+        // tester::fund_duelists_pool(@sys, 2);
+        let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
+        let queue_id: QueueId = QueueId::Unranked;
+        tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
+    }
+    #[test]
     #[should_panic(expected: ('DUEL: Duelist matchmaking', 'ENTRYPOINT_FAILED'))]
     fn test_enlistment_twice() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
@@ -393,25 +446,56 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected: ('MATCHMAKER: Not required', 'ENTRYPOINT_FAILED'))]
-    fn test_enlistment_not_required() {
+    #[should_panic(expected: ('MATCHMAKER: Only new duelists', 'ENTRYPOINT_FAILED'))]
+    fn test_enlistment_used_duelist() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER | FLAGS::MOCK_RNG);
+        let A: ContractAddress = OWNER();
+        tester::fund_duelists_pool(@sys, 1);
+        let ID_A: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_A");
+        let queue_id: QueueId = QueueId::Ranked;
+        _setup_ranked_lords(@sys, [A].span(), 2);
+        //
+        // duel...
+        _duel_bot_crit_a(@sys, A, ID_A, 1, "duel_with_bot");
+        // panic!
+        tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
+    }
+
+    #[test]
+    #[should_panic(expected: ('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
+    fn test_enlistment_memorized() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
         let A: ContractAddress = OWNER();
-        // tester::fund_duelists_pool(@sys, 2);
-        let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
-        let queue_id: QueueId = QueueId::Unranked;
+        tester::fund_duelists_pool(@sys, 1);
+        let ID_A: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_A");
+        let queue_id: QueueId = QueueId::Ranked;
+        _setup_ranked_lords(@sys, [A].span(), 2);
+        // memorialize duelist
+        sys.duelists.memorialize(ID_A);
+        // panic!
+        tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
+    }
+
+    #[test]
+    #[should_panic(expected: ('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
+    fn test_enlistment_sacrified() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
+        let A: ContractAddress = OWNER();
+        tester::fund_duelists_pool(@sys, 1);
+        let ID_A: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_A");
+        let queue_id: QueueId = QueueId::Ranked;
+        _setup_ranked_lords(@sys, [A].span(), 2);
+        // memorialize duelist
+        sys.duelists.sacrifice(ID_A);
+        // panic!
         tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
     }
     
     #[test]
     fn test_unranked_slow_ok() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
-        let A: ContractAddress = OWNER();
-        let B: ContractAddress = OTHER();
-        // tester::fund_duelists_pool(@sys, 2);
-        let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
-        let ID_B: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
         let queue_id: QueueId = QueueId::Unranked;
+        let (A, B, ID_A, ID_B) : (ContractAddress, ContractAddress, u128, u128) = _make_unranked_duelists_AB(@sys);
         //
         // matchmake player A
         _mock_slot(@sys, 5);
@@ -430,17 +514,16 @@ mod tests {
         _finish_duel(@sys, duel_id, 1, queue_id, "finished");
         // is unranked!!!
         tester::assert_unranked_duel_results(@sys, duel_id, "unranked_results");
+        // assignments
+        tester::assert_assignment(@sys, ID_A, 0, QueueId::Undefined, "cleared_assignment_a");
+        tester::assert_assignment(@sys, ID_B, 0, QueueId::Undefined, "cleared_assignment_b");
     }
 
     #[test]
     fn test_unranked_slow_pre_commit_ok() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
-        let A: ContractAddress = OWNER();
-        let B: ContractAddress = OTHER();
-        // tester::fund_duelists_pool(@sys, 2);
-        let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
-        let ID_B: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
         let queue_id: QueueId = QueueId::Unranked;
+        let (A, B, ID_A, ID_B) : (ContractAddress, ContractAddress, u128, u128) = _make_unranked_duelists_AB(@sys);
         //
         // matchmake player A
         _mock_slot(@sys, 5);
@@ -475,14 +558,8 @@ mod tests {
     #[test]
     fn test_matchmaker_slot_skip_low_slot() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
-        let A: ContractAddress = OWNER();
-        let B: ContractAddress = OTHER();
-        let C: ContractAddress = BUMMER();
-        // tester::fund_duelists_pool(@sys, 3);
-        let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
-        let ID_B: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
-        let ID_C: u128 = *tester::execute_claim_starter_pack(@sys, C)[0];
         let queue_id: QueueId = QueueId::Unranked;
+        let (A, B, C, ID_A, ID_B, ID_C) : (ContractAddress, ContractAddress, ContractAddress, u128, u128, u128) = _make_unranked_duelists_ABC(@sys);
         //
         // matchmake player A
         _mock_slot(@sys, 5);
@@ -549,14 +626,8 @@ mod tests {
     #[test]
     fn test_matchmaker_choose_least_duels() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
-        let A: ContractAddress = OWNER();
-        let B: ContractAddress = OTHER();
-        let C: ContractAddress = BUMMER();
-        // tester::fund_duelists_pool(@sys, 3);
-        let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
-        let ID_B: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
-        let ID_C: u128 = *tester::execute_claim_starter_pack(@sys, C)[0];
         let queue_id: QueueId = QueueId::Unranked;
+        let (A, B, C, ID_A, ID_B, ID_C) : (ContractAddress, ContractAddress, ContractAddress, u128, u128, u128) = _make_unranked_duelists_ABC(@sys);
         //
         // matchmake player B-A
         _mock_slot(@sys, 5);
@@ -587,14 +658,8 @@ mod tests {
     #[test]
     fn test_fast_no_flipping_slots() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
-        let A: ContractAddress = OWNER();
-        let B: ContractAddress = OTHER();
-        let C: ContractAddress = BUMMER();
-        // tester::fund_duelists_pool(@sys, 3);
-        let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
-        let ID_B: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
-        let ID_C: u128 = *tester::execute_claim_starter_pack(@sys, C)[0];
         let queue_id: QueueId = QueueId::Unranked;
+        let (A, B, C, ID_A, ID_B, ID_C) : (ContractAddress, ContractAddress, ContractAddress, u128, u128, u128) = _make_unranked_duelists_ABC(@sys);
         //
         // matchmake player A
         _mock_slot(@sys, 5);
@@ -629,14 +694,8 @@ mod tests {
     #[test]
     fn test_slow_no_flipping_slots() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
-        let A: ContractAddress = OWNER();
-        let B: ContractAddress = OTHER();
-        let C: ContractAddress = BUMMER();
-        // tester::fund_duelists_pool(@sys, 3);
-        let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
-        let ID_B: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
-        let ID_C: u128 = *tester::execute_claim_starter_pack(@sys, C)[0];
         let queue_id: QueueId = QueueId::Unranked;
+        let (A, B, C, ID_A, ID_B, ID_C) : (ContractAddress, ContractAddress, ContractAddress, u128, u128, u128) = _make_unranked_duelists_ABC(@sys);
         //
         // matchmake player A
         _mock_slot(@sys, 5);
@@ -675,12 +734,8 @@ mod tests {
     #[should_panic(expected: ('DUEL: Invalid duel type', 'ENTRYPOINT_FAILED'))]
     fn test_unranked_reply_duel() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
-        let A: ContractAddress = OWNER();
-        let B: ContractAddress = OTHER();
-        // tester::fund_duelists_pool(@sys, 2);
-        let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
-        let ID_B: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
         let queue_id: QueueId = QueueId::Unranked;
+        let (A, B, ID_A, ID_B) : (ContractAddress, ContractAddress, u128, u128) = _make_unranked_duelists_AB(@sys);
         //
         // matchmake player A
         _mock_slot(@sys, 5);
@@ -714,10 +769,13 @@ mod tests {
         let balance_lords_b: u128 = sys.lords.balance_of(B).low;
         assert_eq!(sys.lords.balance_of(sys.matchmaker.contract_address).low, 0, "balance_lords_MM_1");
         // enter and pay fees
+        _assert_enlisted_duelists(@sys, queue_id, [].span(), "enlisted_duelists_end");
         tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
+        _assert_enlisted_duelists(@sys, queue_id, [ID_A].span(), "enlisted_duelists_end");
         assert_eq!(sys.lords.balance_of(A).low, balance_lords_a - LORDS_PRICE, "balance_lords_a");
         assert_eq!(sys.lords.balance_of(sys.matchmaker.contract_address).low, LORDS_PRICE, "balance_lords_MM_2");
         tester::execute_enlist_duelist(@sys, B, ID_B, queue_id);
+        _assert_enlisted_duelists(@sys, queue_id, [ID_A, ID_B].span(), "enlisted_duelists_end");
         assert_eq!(sys.lords.balance_of(B).low, balance_lords_b - LORDS_PRICE, "balance_lords_b");
         assert_eq!(sys.lords.balance_of(sys.matchmaker.contract_address).low, LORDS_PRICE * 2, "balance_lords_MM_3");
         //
@@ -738,29 +796,18 @@ mod tests {
         _finish_duel(@sys, duel_id, 1, queue_id, "finished");
         // is ranked!!!
         tester::assert_ranked_duel_results(@sys, duel_id, "ranked_results");
+        // assignments
+        tester::assert_assignment(@sys, ID_A, 0, queue_id, "cleared_assignment_a");
+        tester::assert_assignment(@sys, ID_B, 0, queue_id, "cleared_assignment_b");
+        // still enlisted
+        _assert_enlisted_duelists(@sys, queue_id, [ID_A, ID_B].span(), "enlisted_duelists_end");
     }
     
     #[test]
     fn test_ranked_fast_ok() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::ADMIN | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
-        tester::fund_duelists_pool(@sys, 2);
-        let A: ContractAddress = OWNER();
-        let B: ContractAddress = OTHER();
-        let ID_A: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_A");
-        let ID_B: u128 = _airdrop_open(@sys, B, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_B");
         let queue_id: QueueId = QueueId::Ranked;
-        // setup lords
-        _setup_ranked_lords(@sys, [A, B].span(), 1);
-        let balance_lords_a: u128 = sys.lords.balance_of(A).low;
-        let balance_lords_b: u128 = sys.lords.balance_of(B).low;
-        assert_eq!(sys.lords.balance_of(sys.matchmaker.contract_address).low, 0, "balance_lords_MM_1");
-        // enter and pay fees
-        tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
-        assert_eq!(sys.lords.balance_of(A).low, balance_lords_a - LORDS_PRICE, "balance_lords_a");
-        assert_eq!(sys.lords.balance_of(sys.matchmaker.contract_address).low, LORDS_PRICE, "balance_lords_MM_2");
-        tester::execute_enlist_duelist(@sys, B, ID_B, queue_id);
-        assert_eq!(sys.lords.balance_of(B).low, balance_lords_b - LORDS_PRICE, "balance_lords_b");
-        assert_eq!(sys.lords.balance_of(sys.matchmaker.contract_address).low, LORDS_PRICE * 2, "balance_lords_MM_3");
+        let (A, B, ID_A, ID_B) : (ContractAddress, ContractAddress, u128, u128) = _make_ranked_duelists_AB(@sys, queue_id);
         //
         // matchmake player A
         _mock_slot(@sys, 5);
@@ -779,6 +826,8 @@ mod tests {
         _finish_duel(@sys, duel_id, 1, queue_id, "finished");
         // is ranked!!!
         tester::assert_ranked_duel_results(@sys, duel_id, "ranked_results");
+        // still enlisted
+        _assert_enlisted_duelists(@sys, queue_id, [ID_A, ID_B].span(), "enlisted_duelists_end");
     }
     
     #[test]
@@ -837,16 +886,8 @@ mod tests {
     #[should_panic(expected: ('MATCHMAKER: Duelist unavailable', 'ENTRYPOINT_FAILED'))]
     fn test_ranked_enqueue_unavailable() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::ADMIN | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
-        tester::fund_duelists_pool(@sys, 2);
-        let A: ContractAddress = OWNER();
-        let B: ContractAddress = OTHER();
-        let ID_A: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_A");
-        let ID_B: u128 = _airdrop_open(@sys, B, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_B");
         let queue_id: QueueId = QueueId::Ranked;
-        // setup lords
-        _setup_ranked_lords(@sys, [A, B].span(), 1);
-        tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
-        tester::execute_enlist_duelist(@sys, B, ID_B, queue_id);
+        let (A, B, ID_A, ID_B) : (ContractAddress, ContractAddress, u128, u128) = _make_ranked_duelists_AB(@sys, queue_id);
         //
         // matchmake player A
         _mock_slot(@sys, 5);
@@ -901,6 +942,8 @@ mod tests {
         _assert_match_created(@sys, queue_id, QueueMode::Slow, A, ID_A_2, "match_created_A_2");
         // stack... panic!
         tester::execute_match_make_me(@sys, A, ID_A_1, queue_id, QueueMode::Slow);
+        // still enlisted
+        _assert_enlisted_duelists(@sys, queue_id, [ID_A_1, ID_A_2, ID_B].span(), "enlisted_duelists_end");
     }
     
 
@@ -911,16 +954,8 @@ mod tests {
     #[test]
     fn test_ranked_slow_timeout_ping_match_bot_player() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER);
-        let A: ContractAddress = OWNER();
-        let B: ContractAddress = OTHER();
-        tester::fund_duelists_pool(@sys, 6);
-        let ID_A: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_A");
-        let ID_B: u128 = _airdrop_open(@sys, B, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_B");
         let queue_id: QueueId = QueueId::Ranked;
-        // setup lords
-        _setup_ranked_lords(@sys, [A, B].span(), 1);
-        tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
-        tester::execute_enlist_duelist(@sys, B, ID_B, queue_id);
+        let (A, B, ID_A, ID_B) : (ContractAddress, ContractAddress, u128, u128) = _make_ranked_duelists_AB(@sys, queue_id);
         //
         // matchmake player A
         _mock_slot(@sys, 5);
@@ -952,16 +987,8 @@ mod tests {
     #[test]
     fn test_ranked_fast_timeout_ping_match() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER);
-        let A: ContractAddress = OWNER();
-        let B: ContractAddress = OTHER();
-        tester::fund_duelists_pool(@sys, 6);
-        let ID_A: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_A");
-        let ID_B: u128 = _airdrop_open(@sys, B, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_B");
         let queue_id: QueueId = QueueId::Ranked;
-        // setup lords
-        _setup_ranked_lords(@sys, [A, B].span(), 1);
-        tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
-        tester::execute_enlist_duelist(@sys, B, ID_B, queue_id);
+        let (A, B, ID_A, ID_B) : (ContractAddress, ContractAddress, u128, u128) = _make_ranked_duelists_AB(@sys, queue_id);
         //
         // matchmake player A
         _mock_slot(@sys, 5);
@@ -1000,16 +1027,8 @@ mod tests {
     #[should_panic(expected: ('MATCHMAKER: Invalid mode', 'ENTRYPOINT_FAILED'))]
     fn test_fast_to_slow_nope() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
-        let A: ContractAddress = OWNER();
-        let B: ContractAddress = OTHER();
-        tester::fund_duelists_pool(@sys, 6);
-        let ID_A: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_A");
-        let ID_B: u128 = _airdrop_open(@sys, B, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_B");
         let queue_id: QueueId = QueueId::Ranked;
-        // setup lords
-        _setup_ranked_lords(@sys, [A, B].span(), 1);
-        tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
-        tester::execute_enlist_duelist(@sys, B, ID_B, queue_id);
+        let (A, B, ID_A, ID_B) : (ContractAddress, ContractAddress, u128, u128) = _make_ranked_duelists_AB(@sys, queue_id);
         //
         // matchmake player A
         _mock_slot(@sys, 5);
@@ -1040,16 +1059,8 @@ mod tests {
     #[test]
     fn test_slow_to_fast_match() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
-        let A: ContractAddress = OWNER();
-        let B: ContractAddress = OTHER();
-        tester::fund_duelists_pool(@sys, 6);
-        let ID_A: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_A");
-        let ID_B: u128 = _airdrop_open(@sys, B, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_B");
         let queue_id: QueueId = QueueId::Ranked;
-        // setup lords
-        _setup_ranked_lords(@sys, [A, B].span(), 1);
-        tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
-        tester::execute_enlist_duelist(@sys, B, ID_B, queue_id);
+        let (A, B, ID_A, ID_B) : (ContractAddress, ContractAddress, u128, u128) = _make_ranked_duelists_AB(@sys, queue_id);
         //
         // matchmake player A
         _mock_slot(@sys, 5);
@@ -1118,16 +1129,8 @@ mod tests {
     #[test]
     fn test_slow_to_fast_queue_match() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
-        let A: ContractAddress = OWNER();
-        let B: ContractAddress = OTHER();
-        tester::fund_duelists_pool(@sys, 6);
-        let ID_A: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_A");
-        let ID_B: u128 = _airdrop_open(@sys, B, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_B");
         let queue_id: QueueId = QueueId::Ranked;
-        // setup lords
-        _setup_ranked_lords(@sys, [A, B].span(), 1);
-        tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
-        tester::execute_enlist_duelist(@sys, B, ID_B, queue_id);
+        let (A, B, ID_A, ID_B) : (ContractAddress, ContractAddress, u128, u128) = _make_ranked_duelists_AB(@sys, queue_id);
         //
         // matchmake player A: SLOW
         _mock_slot(@sys, 5);
@@ -1152,16 +1155,8 @@ mod tests {
     #[test]
     fn test_slow_to_fast_have_duels_no_match() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
-        let A: ContractAddress = OWNER();
-        let B: ContractAddress = OTHER();
-        tester::fund_duelists_pool(@sys, 6);
-        let ID_A: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_A");
-        let ID_B: u128 = _airdrop_open(@sys, B, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_B");
         let queue_id: QueueId = QueueId::Ranked;
-        // setup lords
-        _setup_ranked_lords(@sys, [A, B].span(), 1);
-        tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
-        tester::execute_enlist_duelist(@sys, B, ID_B, queue_id);
+        let (A, B, ID_A, ID_B) : (ContractAddress, ContractAddress, u128, u128) = _make_ranked_duelists_AB(@sys, queue_id);
         //
         // matchmake player A: SLOW
         _mock_slot(@sys, 5);
@@ -1376,12 +1371,9 @@ mod tests {
     #[test]
     fn test_unranked_bot_player_multiple_matches() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST | FLAGS::BOT_PLAYER);
-        tester::fund_duelists_pool(@sys, 2);
-        let A: ContractAddress = OWNER();
-        let B: ContractAddress = OTHER();
-        let ID_A: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
-        let ID_B: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
         let queue_id: QueueId = QueueId::Unranked;
+        let (A, B, ID_A, ID_B) : (ContractAddress, ContractAddress, u128, u128) = _make_unranked_duelists_AB(@sys);
+        tester::fund_duelists_pool(@sys, 2);
         //
         // matchmake player A
         let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, QueueMode::Slow);
@@ -2351,4 +2343,264 @@ mod tests {
         tester::assert_assignment(@sys, ID_A_1, 0, queue_id, "cleared_assignment_a_1");
         tester::assert_assignment(@sys, ID_B, 0, queue_id, "cleared_assignment_b");
     }
+
+
+
+
+    //------------------------------
+    // End of season
+    //
+
+    fn _end_season(sys: @TestSystems, queue_id: QueueId) {
+        // save queue before end season
+        let old_queue: MatchQueue = sys.store.get_match_queue(queue_id);
+        if (queue_id.permanent_enlistment()) {
+            assert_gt!(old_queue.enlisted_duelist_ids.len(), 0, "OLD_QUEUE: enlisted_duelist_ids.len > 0");
+        } else {
+            assert_eq!(old_queue.enlisted_duelist_ids.len(), 0, "OLD_QUEUE: enlisted_duelist_ids.len == 0");
+        }
+        let mut duel_ids: Array<u128> = array![];
+        for player in old_queue.players.clone() {
+            let match_player: MatchPlayer = sys.store.get_match_player(player, queue_id);
+            if (match_player.duel_id.is_non_zero()) {
+                duel_ids.append(match_player.duel_id);
+                let challenge: Challenge = sys.store.get_challenge(match_player.duel_id);
+                assert!(!challenge.season_bounded_expired(sys.store), "OLD_QUEUE: !challenge.season_bounded_expired({})", match_player.duel_id);
+            }
+        }
+// println!("OLD_QUEUE: enlisted_duelist_ids.len: {}", old_queue.enlisted_duelist_ids.len());
+// println!("OLD_QUEUE: players.len: {}", old_queue.players.len());
+        // end season
+        let season: SeasonConfig = (*sys.store).get_current_season();
+        tester::set_block_timestamp(season.period.end);
+        tester::execute_collect_season(sys, OWNER());
+        // queue is cleared
+        let queue: MatchQueue = sys.store.get_match_queue(queue_id);
+        assert_eq!(queue.players.len(), 0, "NEW_QUEUE: queue.players.len");
+        assert_eq!(queue.enlisted_duelist_ids.len(), 0, "NEW_QUEUE: enlisted_duelist_ids.len");
+        // duelists are memorialized
+        let duelist_dispatcher: IDuelistTokenDispatcher = sys.world.duelist_token_dispatcher();
+        for duelist_id in old_queue.enlisted_duelist_ids.clone() {
+            assert!(sys.store.get_duelist_is_memorialized(duelist_id), "NEW_QUEUE: duelist_id.is_memorialized: {}", duelist_id);
+            assert!(!duelist_dispatcher.is_alive(duelist_id), "NEW_QUEUE: duelist_id.is_alive: {}", duelist_id);
+            assert_eq!(duelist_dispatcher.life_count(duelist_id), 0, "NEW_QUEUE: duelist_id.life_count: {}", duelist_id);
+            assert_gt!(duelist_dispatcher.fame_balance(duelist_id), 0, "NEW_QUEUE: duelist_id.fame_balance: {}", duelist_id);
+        }
+        // players are cleared
+        for player in old_queue.players.clone() {
+            let match_player: MatchPlayer = sys.store.get_match_player(player, queue_id);
+            assert_eq!(match_player.duelist_id, 0, "NEW_QUEUE: match_player.duelist_id: {}", player);
+            assert_eq!(match_player.duel_id, 0, "NEW_QUEUE: match_player.duel_id: {}", player);
+            assert_eq!(match_player.queue_info.slot, 0, "NEW_QUEUE: match_player.queue_info.slot: {}", player);
+            assert_eq!(match_player.queue_info.timestamp_enter, 0, "NEW_QUEUE: match_player.queue_info.timestamp_enter: {}", player);
+            assert_eq!(match_player.queue_info.timestamp_ping, 0, "NEW_QUEUE: match_player.queue_info.timestamp_ping: {}", player);
+            assert_eq!(match_player.next_duelists.len(), 0, "NEW_QUEUE: match_player.next_duelists.len: {}", player);
+        }
+        // duels expired
+        for duel_id in duel_ids {
+            let challenge: Challenge = sys.store.get_challenge(duel_id);
+            let should_be_expired: bool = (queue_id.permanent_enlistment());
+            assert_eq!(challenge.season_bounded_expired(sys.store), should_be_expired, "NEW_QUEUE: challenge.season_bounded_expired({}) == {}", duel_id, should_be_expired);
+        }
+    }
+    
+    #[test]
+    fn test_unranked_end_season_ok() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::ADMIN | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
+        let queue_id: QueueId = QueueId::Unranked;
+        let (A, B, ID_A, ID_B) : (ContractAddress, ContractAddress, u128, u128) = _make_unranked_duelists_AB(@sys);
+        //
+        // matchmake player A <> B
+        _mock_slot(@sys, 5);
+        let _duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, QueueMode::Slow);
+        let duel_id: u128 = tester::execute_match_make_me(@sys, B, ID_B, queue_id, QueueMode::Slow);
+        _finish_duel(@sys, duel_id, 1, queue_id, "finished");
+        // enqueue again, no match...
+        let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, QueueMode::Slow);
+        assert_eq!(duel_id, 0, "duel_id_A");
+        _mock_slot(@sys, 1);
+        let duel_id: u128 = tester::execute_match_make_me(@sys, B, ID_B, queue_id, QueueMode::Slow);
+        assert_eq!(duel_id, 0, "duel_id_B");
+        //
+        // end season
+        _end_season(@sys, queue_id);
+    }
+
+    #[test]
+    fn test_ranked_end_season_ok() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::ADMIN | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
+        let queue_id: QueueId = QueueId::Ranked;
+        let (A, B, ID_A, ID_B) : (ContractAddress, ContractAddress, u128, u128) = _make_ranked_duelists_AB(@sys, queue_id);
+        //
+        // matchmake player A <> B
+        _mock_slot(@sys, 5);
+        let _duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, QueueMode::Slow);
+        let duel_id: u128 = tester::execute_match_make_me(@sys, B, ID_B, queue_id, QueueMode::Slow);
+        _finish_duel(@sys, duel_id, 1, queue_id, "finished");
+        // enqueue again, no match...
+        let duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, QueueMode::Slow);
+        assert_eq!(duel_id, 0, "duel_id_A");
+        _mock_slot(@sys, 1);
+        let duel_id: u128 = tester::execute_match_make_me(@sys, B, ID_B, queue_id, QueueMode::Slow);
+        assert_eq!(duel_id, 0, "duel_id_B");
+        //
+        // end season
+        _end_season(@sys, queue_id);
+    }
+
+    #[test]
+    #[should_panic(expected: ('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
+    fn test_ranked_end_season_re_enlist() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::ADMIN | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
+        let queue_id: QueueId = QueueId::Ranked;
+        let (A, _B, ID_A, _ID_B) : (ContractAddress, ContractAddress, u128, u128) = _make_ranked_duelists_AB(@sys, queue_id);
+        //
+        // end season
+        _end_season(@sys, queue_id);
+        // panic!
+        tester::execute_enlist_duelist(@sys, A, ID_A, queue_id);
+    }
+
+    #[test]
+    fn test_ranked_end_season_expired_collect_a() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::ADMIN | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
+        let queue_id: QueueId = QueueId::Ranked;
+        let (A, B, ID_A, ID_B) : (ContractAddress, ContractAddress, u128, u128) = _make_ranked_duelists_AB(@sys, queue_id);
+        //
+        // matchmake player A <> B
+        _mock_slot(@sys, 5);
+        let _duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, QueueMode::Slow);
+        let duel_id: u128 = tester::execute_match_make_me(@sys, B, ID_B, queue_id, QueueMode::Slow);
+        //
+        // end season
+        assert!(!sys.game.can_collect_duel(duel_id), "!can_collect_duel()");
+        _end_season(@sys, queue_id);
+        assert!(sys.game.can_collect_duel(duel_id), "can_collect_duel()");
+        // collect...
+        tester::execute_collect_duel(@sys, A, duel_id);
+        let ch: ChallengeValue = sys.store.get_challenge_value(duel_id);
+        assert_eq!(ch.state, ChallengeState::Expired, "challenge.state_EXPIRED");
+    }
+
+    #[test]
+    fn test_ranked_end_season_expired_collect_b() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::ADMIN | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
+        let queue_id: QueueId = QueueId::Ranked;
+        let (A, B, ID_A, ID_B) : (ContractAddress, ContractAddress, u128, u128) = _make_ranked_duelists_AB(@sys, queue_id);
+        //
+        // matchmake player A <> B
+        _mock_slot(@sys, 5);
+        let _duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, QueueMode::Slow);
+        let duel_id: u128 = tester::execute_match_make_me(@sys, B, ID_B, queue_id, QueueMode::Slow);
+        //
+        // end season
+        assert!(!sys.game.can_collect_duel(duel_id), "!can_collect_duel()");
+        _end_season(@sys, queue_id);
+        assert!(sys.game.can_collect_duel(duel_id), "can_collect_duel()");
+        // collect...
+        tester::execute_collect_duel(@sys, B, duel_id);
+        let ch: ChallengeValue = sys.store.get_challenge_value(duel_id);
+        assert_eq!(ch.state, ChallengeState::Expired, "challenge.state_EXPIRED");
+    }
+
+    #[test]
+    fn test_ranked_end_season_expired_commit_a() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::ADMIN | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
+        let queue_id: QueueId = QueueId::Ranked;
+        let (A, B, ID_A, ID_B) : (ContractAddress, ContractAddress, u128, u128) = _make_ranked_duelists_AB(@sys, queue_id);
+        //
+        // matchmake player A <> B
+        _mock_slot(@sys, 5);
+        let _duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, QueueMode::Slow);
+        let duel_id: u128 = tester::execute_match_make_me(@sys, B, ID_B, queue_id, QueueMode::Slow);
+        let ch: ChallengeValue = sys.store.get_challenge_value(duel_id);
+        let (moves_a, _moves_b) = _get_moves_for_winner(@sys, 0, false);
+        //
+        // end season
+        assert!(!sys.game.can_collect_duel(duel_id), "!can_collect_duel()");
+        _end_season(@sys, queue_id);
+        assert!(sys.game.can_collect_duel(duel_id), "can_collect_duel()");
+        // commit...
+        tester::execute_commit_moves_ID(@sys, ch.address_a, ch.duelist_id_a, duel_id, moves_a.hashed);
+        let ch: ChallengeValue = sys.store.get_challenge_value(duel_id);
+        assert_eq!(ch.state, ChallengeState::Expired, "challenge.state_EXPIRED");
+    }
+
+    #[test]
+    fn test_ranked_end_season_expired_commit_b() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::ADMIN | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
+        let queue_id: QueueId = QueueId::Ranked;
+        let (A, B, ID_A, ID_B) : (ContractAddress, ContractAddress, u128, u128) = _make_ranked_duelists_AB(@sys, queue_id);
+        //
+        // matchmake player A <> B
+        _mock_slot(@sys, 5);
+        let _duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, QueueMode::Slow);
+        let duel_id: u128 = tester::execute_match_make_me(@sys, B, ID_B, queue_id, QueueMode::Slow);
+        let ch: ChallengeValue = sys.store.get_challenge_value(duel_id);
+        let (moves_a, moves_b) = _get_moves_for_winner(@sys, 0, false);
+        tester::execute_commit_moves_ID(@sys, ch.address_a, ch.duelist_id_a, duel_id, moves_a.hashed);
+        //
+        // end season
+        assert!(!sys.game.can_collect_duel(duel_id), "!can_collect_duel()");
+        _end_season(@sys, queue_id);
+        assert!(sys.game.can_collect_duel(duel_id), "can_collect_duel()");
+        // commit...
+        tester::execute_commit_moves_ID(@sys, ch.address_b, ch.duelist_id_b, duel_id, moves_b.hashed);
+        let ch: ChallengeValue = sys.store.get_challenge_value(duel_id);
+        assert_eq!(ch.state, ChallengeState::Expired, "challenge.state_EXPIRED");
+    }
+
+    #[test]
+    fn test_ranked_end_season_expired_reveal_a() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::ADMIN | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
+        let queue_id: QueueId = QueueId::Ranked;
+        let (A, B, ID_A, ID_B) : (ContractAddress, ContractAddress, u128, u128) = _make_ranked_duelists_AB(@sys, queue_id);
+        //
+        // matchmake player A <> B
+        _mock_slot(@sys, 5);
+        let _duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, QueueMode::Slow);
+        let duel_id: u128 = tester::execute_match_make_me(@sys, B, ID_B, queue_id, QueueMode::Slow);
+        let ch: ChallengeValue = sys.store.get_challenge_value(duel_id);
+        let (moves_a, moves_b) = _get_moves_for_winner(@sys, 0, false);
+        tester::execute_commit_moves_ID(@sys, ch.address_a, ch.duelist_id_a, duel_id, moves_a.hashed);
+        tester::execute_commit_moves_ID(@sys, ch.address_b, ch.duelist_id_b, duel_id, moves_b.hashed);
+        //
+        // end season
+        assert!(!sys.game.can_collect_duel(duel_id), "!can_collect_duel()");
+        _end_season(@sys, queue_id);
+        assert!(sys.game.can_collect_duel(duel_id), "can_collect_duel()");
+        // reveal...
+        tester::execute_reveal_moves_ID(@sys, ch.address_a, ch.duelist_id_a, duel_id, moves_a.salt, moves_a.moves);
+        let ch: ChallengeValue = sys.store.get_challenge_value(duel_id);
+        assert_eq!(ch.state, ChallengeState::Expired, "challenge.state_EXPIRED");
+    }
+
+    #[test]
+    fn test_ranked_end_season_expired_reveal_b() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::ADMIN | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
+        let queue_id: QueueId = QueueId::Ranked;
+        let (A, B, ID_A, ID_B) : (ContractAddress, ContractAddress, u128, u128) = _make_ranked_duelists_AB(@sys, queue_id);
+        //
+        // matchmake player A <> B
+        _mock_slot(@sys, 5);
+        let _duel_id: u128 = tester::execute_match_make_me(@sys, A, ID_A, queue_id, QueueMode::Slow);
+        let duel_id: u128 = tester::execute_match_make_me(@sys, B, ID_B, queue_id, QueueMode::Slow);
+        let ch: ChallengeValue = sys.store.get_challenge_value(duel_id);
+        let (moves_a, moves_b) = _get_moves_for_winner(@sys, 0, false);
+        tester::execute_commit_moves_ID(@sys, ch.address_a, ch.duelist_id_a, duel_id, moves_a.hashed);
+        tester::execute_commit_moves_ID(@sys, ch.address_b, ch.duelist_id_b, duel_id, moves_b.hashed);
+        tester::execute_reveal_moves_ID(@sys, ch.address_a, ch.duelist_id_a, duel_id, moves_a.salt, moves_a.moves);
+        //
+        // end season
+        assert!(!sys.game.can_collect_duel(duel_id), "!can_collect_duel()");
+        _end_season(@sys, queue_id);
+        assert!(sys.game.can_collect_duel(duel_id), "can_collect_duel()");
+        // reveal...
+        tester::execute_reveal_moves_ID(@sys, ch.address_b, ch.duelist_id_b, duel_id, moves_b.salt, moves_b.moves);
+        let ch: ChallengeValue = sys.store.get_challenge_value(duel_id);
+        assert_eq!(ch.state, ChallengeState::Expired, "challenge.state_EXPIRED");
+    }
+
+
+
 }

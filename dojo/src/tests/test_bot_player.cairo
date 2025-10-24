@@ -315,7 +315,7 @@ pub mod tests {
         (duel_id, moves_a)
     }
 
-    fn _duel_bot_crit_a(sys: @TestSystems, challenger: ContractAddress, duelist_id: u128, lives_staked: u8, prefix: ByteArray) -> ChallengeValue {
+    pub fn _duel_bot_crit_a(sys: @TestSystems, challenger: ContractAddress, duelist_id: u128, lives_staked: u8, prefix: ByteArray) -> ChallengeValue {
         let (duel_id, moves_a) = _create_duel_bot_crit_a(sys, challenger, duelist_id, lives_staked);
         // commits
         tester::execute_commit_moves(sys, challenger, duel_id, moves_a.hashed);

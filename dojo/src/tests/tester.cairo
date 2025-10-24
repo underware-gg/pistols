@@ -56,7 +56,7 @@ pub mod tester {
             DuelistMemorial, DuelistMemorialValue,
             CauseOfDeath,
         },
-        match_queue::{MatchPlayer, QueueId, QueueMode},
+        match_queue::{MatchPlayer, QueueId, QueueMode, QueueIdTrait},
         pact::{Pact, PactTrait},
         leaderboard::{Leaderboard, LeaderboardTrait, LeaderboardPosition},
         config::{Config, TokenConfig, CoinConfig, CONFIG},
@@ -1314,6 +1314,12 @@ pub mod tester {
         let assignment: DuelistAssignment = (*sys.store).get_duelist_assignment(duelist_id);
         assert_eq!(assignment.duel_id, duel_id, "assert_assignment:[{}] duelist_challenge_a", prefix);
         assert_eq!(assignment.queue_id, queue_id, "assert_assignment:[{}] queue_id_a", prefix);
+        if (queue_id.permanent_enlistment()) {
+            let season_id: u32 = (*sys.store).get_current_season_id();
+            assert_eq!(assignment.season_id, season_id, "assert_assignment:[{}] get_current_season_id", prefix);
+        } else {
+            assert_eq!(assignment.season_id, 0, "assert_assignment:[{}] season_id == 0", prefix);
+        }
         (assignment)
     }
 
