@@ -15,7 +15,7 @@ export const INTERFACE_DESCRIPTIONS: any = {
     disqualify_duelist: 'Admin function',
     qualify_duelist: 'Admin function',
     urgent_update: 'Admin function',
-    fix_player_bookmark: 'Admin function',
+    velords_migration: 'Admin function',
   },
   // from: ../dojo/src/systems/bank.cairo
   IBankPublic: {
@@ -55,7 +55,6 @@ export const INTERFACE_DESCRIPTIONS: any = {
   },
   // from: ../dojo/src/systems/tokens/duelist_token.cairo
   IDuelistTokenPublic: {
-    poke: 'Reactivates an inactive Duelist',
     sacrifice: 'Sacrifices a Duelist',
     memorialize: 'Memorializes a Duelist',
   },
@@ -67,7 +66,7 @@ export const INTERFACE_DESCRIPTIONS: any = {
   IPackTokenPublic: {
     claim_starter_pack: 'Claim the starter pack, mint Duelists',
     claim_gift: 'Claim gift pack, if available',
-    purchase: 'Purchase a closed pack',
+    purchase: 'Purchase packs',
     open: 'Open a pack, mint its contents',
     mint_to: 'Promotional airdrops (admin)',
     airdrop: 'Airdrops a pack (admin)',
@@ -135,6 +134,7 @@ export enum CauseOfDeath {
   Memorize = 'Memorize', // 2
   Sacrifice = 'Sacrifice', // 3
   Forsaken = 'Forsaken', // 4
+  Ranked = 'Ranked', // 5
 };
 export const getCauseOfDeathValue = (name: CauseOfDeath): number | undefined => _indexOrUndefined(Object.keys(CauseOfDeath).indexOf(name));
 export const getCauseOfDeathFromValue = (value: number): CauseOfDeath | undefined => Object.keys(CauseOfDeath)[value] as CauseOfDeath;
@@ -174,6 +174,7 @@ export enum Activity {
   EnlistedRankedDuelist = 'EnlistedRankedDuelist', // 18
   DuelistMatchingRanked = 'DuelistMatchingRanked', // 19
   DuelistMatchingUnranked = 'DuelistMatchingUnranked', // 20
+  DuelistMemorialized = 'DuelistMemorialized', // 21
 };
 export const getActivityValue = (name: Activity): number | undefined => _indexOrUndefined(Object.keys(Activity).indexOf(name));
 export const getActivityFromValue = (value: number): Activity | undefined => Object.keys(Activity)[value] as Activity;
@@ -803,18 +804,30 @@ export const CHANCES: type_CHANCES = {
 };
 
 // from: ../dojo/src/types/constants.cairo
+type type_RULES = {
+  UNDERWARE_PERCENT: number, // cairo: u8
+  REALMS_PERCENT: number, // cairo: u8
+  FEES_PERCENT: number, // cairo: u8
+  POOL_PERCENT: number, // cairo: u8
+};
+export const RULES: type_RULES = {
+  UNDERWARE_PERCENT: 45,
+  REALMS_PERCENT: 5,
+  FEES_PERCENT: 10,
+  POOL_PERCENT: 40,
+};
+
+// from: ../dojo/src/types/constants.cairo
 type type_FAME = {
   MINT_GRANT_AMOUNT: bigint, // cairo: u128
   ONE_LIFE: bigint, // cairo: u128
   MAX_INACTIVE_TIMESTAMP: bigint, // cairo: u64
-  TIMESTAMP_TO_DRIP_ONE_FAME: bigint, // cairo: u64
   SACRIFICE_PERCENTAGE: number, // cairo: u8
 };
 export const FAME: type_FAME = {
   MINT_GRANT_AMOUNT: (3000n * CONST.ETH_TO_WEI),
   ONE_LIFE: (1000n * CONST.ETH_TO_WEI),
   MAX_INACTIVE_TIMESTAMP: TIMESTAMP.FOUR_WEEKS,
-  TIMESTAMP_TO_DRIP_ONE_FAME: (10n * TIMESTAMP.ONE_MINUTE),
   SACRIFICE_PERCENTAGE: 60,
 };
 
@@ -921,7 +934,7 @@ export const PACK_TYPES: type_PACK_TYPES = {
     image_file_closed: 'StarterPack.jpg',
     image_file_open: 'StarterPack.jpg',
     can_purchase: false,
-    price_lords: (20n * CONST.ETH_TO_WEI),
+    price_lords: 0n,
     quantity: 2,
     contents: 'Ser Walker & Lady Vengeance',
   },
@@ -961,7 +974,7 @@ export const PACK_TYPES: type_PACK_TYPES = {
     image_file_closed: 'Unknown.jpg',
     image_file_open: 'Unknown.jpg',
     can_purchase: false,
-    price_lords: (10n * CONST.ETH_TO_WEI),
+    price_lords: 0n,
     quantity: 1,
     contents: 'One Bot Duelist',
   },

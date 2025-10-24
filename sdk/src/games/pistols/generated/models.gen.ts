@@ -86,6 +86,7 @@ export interface Duelist {
 	duelist_profile: DuelistProfileEnum;
 	timestamps: DuelistTimestamps;
 	totals: Totals;
+	released_fame: boolean;
 }
 
 // Type definition for `pistols::models::duelist::DuelistAssignment` struct
@@ -94,6 +95,7 @@ export interface DuelistAssignment {
 	duel_id: BigNumberish;
 	pass_id: BigNumberish;
 	queue_id: QueueIdEnum;
+	season_id: BigNumberish;
 }
 
 // Type definition for `pistols::models::duelist::DuelistMemorial` struct
@@ -147,6 +149,7 @@ export interface MatchQueue {
 	slot_size: BigNumberish;
 	entry_token_address: string;
 	entry_token_amount: BigNumberish;
+	enlisted_duelist_ids: Array<BigNumberish>;
 }
 
 // Type definition for `pistols::models::match_queue::QueueInfo` struct
@@ -173,6 +176,7 @@ export interface Pack {
 	lords_amount: BigNumberish;
 	is_open: boolean;
 	duelist_profile: CairoOption<DuelistProfileEnum>;
+	pegged_lords_amount: BigNumberish;
 }
 
 // Type definition for `pistols::models::pact::Pact` struct
@@ -380,6 +384,19 @@ export interface PlayerSocialLinkEvent {
 	avatar: string;
 }
 
+// Type definition for `pistols::models::events::PurchaseDistributionEvent` struct
+export interface PurchaseDistributionEvent {
+	season_id: BigNumberish;
+	player_address: string;
+	token_address: string;
+	token_ids: Array<BigNumberish>;
+	lords_total: BigNumberish;
+	lords_underware: BigNumberish;
+	lords_realms: BigNumberish;
+	lords_fees: BigNumberish;
+	lords_season: BigNumberish;
+}
+
 // Type definition for `pistols::models::pool::LordsReleaseBill` struct
 export interface LordsReleaseBill {
 	reason: ReleaseReasonEnum;
@@ -541,6 +558,7 @@ export const causeOfDeath = [
 	'Memorize',
 	'Sacrifice',
 	'Forsaken',
+	'Ranked',
 ] as const;
 export type CauseOfDeath = { [key in typeof causeOfDeath[number]]: string };
 export type CauseOfDeathEnum = CairoCustomEnum;
@@ -851,6 +869,7 @@ export const activity = [
 	'EnlistedRankedDuelist',
 	'DuelistMatchingRanked',
 	'DuelistMatchingUnranked',
+	'DuelistMemorialized',
 ] as const;
 export type Activity = { [key in typeof activity[number]]: string };
 export type ActivityEnum = CairoCustomEnum;
@@ -878,14 +897,6 @@ export type PlayerSetting = {
 	OptOutNotifications: SocialPlatformEnum,
 };
 export type PlayerSettingEnum = CairoCustomEnum;
-
-// Type definition for `pistols::models::events::PlayerSettingValue` enum
-export const playerSettingValue = [
-  'Undefined',
-  'Boolean',
-] as const;
-export type PlayerSettingValue = { [key in typeof playerSettingValue[number]]: string };
-export type PlayerSettingValueEnum = CairoCustomEnum;
 
 // Type definition for `pistols::models::events::SocialPlatform` enum
 export const socialPlatform = [
@@ -1008,12 +1019,13 @@ export interface SchemaType extends ISchemaType {
 		PlayerBookmarkEvent: PlayerBookmarkEvent,
 		PlayerSettingEvent: PlayerSettingEvent,
 		PlayerSocialLinkEvent: PlayerSocialLinkEvent,
+		PurchaseDistributionEvent: PurchaseDistributionEvent,
 		LordsReleaseBill: LordsReleaseBill,
 		RewardValues: RewardValues,
 		BatchMetadataUpdate: BatchMetadataUpdate,
 		MetadataUpdate: MetadataUpdate,
-		// Approval: Approval,
-		// Transfer: Transfer,
+		Approval: Approval,
+		Transfer: Transfer,
 		ApprovalForAll: ApprovalForAll,
 		LeaderboardPosition: LeaderboardPosition,
 		RngWrap: RngWrap,
@@ -1136,6 +1148,7 @@ export const schema: SchemaType = {
 				Legends: undefined, }),
 		timestamps: { registered: 0, active: 0, },
 		totals: { total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour: 0, honour_log: 0, },
+			released_fame: false,
 		},
 		DuelistAssignment: {
 			duelist_id: 0,
@@ -1145,6 +1158,7 @@ export const schema: SchemaType = {
 					Undefined: "",
 				Unranked: undefined,
 				Ranked: undefined, }),
+			season_id: 0,
 		},
 		DuelistMemorial: {
 			duelist_id: 0,
@@ -1153,7 +1167,8 @@ export const schema: SchemaType = {
 				Duelling: undefined,
 				Memorize: undefined,
 				Sacrifice: undefined,
-				Forsaken: undefined, }),
+				Forsaken: undefined,
+				Ranked: undefined, }),
 			killed_by: 0,
 			fame_before_death: 0,
 			player_address: "",
@@ -1200,6 +1215,7 @@ export const schema: SchemaType = {
 			slot_size: 0,
 			entry_token_address: "",
 			entry_token_amount: 0,
+			enlisted_duelist_ids: [0],
 		},
 		QueueInfo: {
 		queue_mode: new CairoCustomEnum({ 
@@ -1230,6 +1246,7 @@ export const schema: SchemaType = {
 			lords_amount: 0,
 			is_open: false,
 			duelist_profile: new CairoOption(CairoOptionVariant.None),
+			pegged_lords_amount: 0,
 		},
 		Pact: {
 		duel_type: new CairoCustomEnum({ 
@@ -1433,7 +1450,8 @@ export const schema: SchemaType = {
 				ClaimedRing: undefined,
 				EnlistedRankedDuelist: undefined,
 				DuelistMatchingRanked: undefined,
-				DuelistMatchingUnranked: undefined, }),
+				DuelistMatchingUnranked: undefined,
+				DuelistMemorialized: undefined, }),
 			identifier: 0,
 			is_public: false,
 		},
@@ -1462,6 +1480,17 @@ export const schema: SchemaType = {
 		user_name: "",
 		user_id: "",
 		avatar: "",
+		},
+		PurchaseDistributionEvent: {
+			season_id: 0,
+			player_address: "",
+			token_address: "",
+			token_ids: [0],
+			lords_total: 0,
+			lords_underware: 0,
+			lords_realms: 0,
+			lords_fees: 0,
+			lords_season: 0,
 		},
 		LordsReleaseBill: {
 		reason: new CairoCustomEnum({ 
@@ -1493,31 +1522,31 @@ export const schema: SchemaType = {
 		MetadataUpdate: {
 		token_id: 0,
 		},
-		// Approval: {
-		// 	owner: "",
-		// 	spender: "",
-		// value: 0,
-		// },
-		// Transfer: {
-		// 	from: "",
-		// 	to: "",
-		// value: 0,
-		// },
-		// Approval: {
-		// 	owner: "",
-		// 	approved: "",
-		// token_id: 0,
-		// },
+		Approval: {
+			owner: "",
+			spender: "",
+		value: 0,
+		},
+		Transfer: {
+			from: "",
+			to: "",
+		value: 0,
+		},
+		Approval: {
+			owner: "",
+			approved: "",
+		token_id: 0,
+		},
 		ApprovalForAll: {
 			owner: "",
 			operator: "",
 			approved: false,
 		},
-		// Transfer: {
-		// 	from: "",
-		// 	to: "",
-		// token_id: 0,
-		// },
+		Transfer: {
+			from: "",
+			to: "",
+		token_id: 0,
+		},
 		LeaderboardPosition: {
 			position: 0,
 			duelist_id: 0,
@@ -1950,6 +1979,7 @@ export enum ModelsMapping {
 	PlayerSetting = 'pistols-PlayerSetting',
 	PlayerSettingEvent = 'pistols-PlayerSettingEvent',
 	PlayerSocialLinkEvent = 'pistols-PlayerSocialLinkEvent',
+	PurchaseDistributionEvent = 'pistols-PurchaseDistributionEvent',
 	SocialPlatform = 'pistols-SocialPlatform',
 	LordsReleaseBill = 'pistols-LordsReleaseBill',
 	ReleaseReason = 'pistols-ReleaseReason',
