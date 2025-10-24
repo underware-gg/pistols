@@ -808,13 +808,13 @@ type type_RULES = {
   UNDERWARE_PERCENT: number, // cairo: u8
   REALMS_PERCENT: number, // cairo: u8
   FEES_PERCENT: number, // cairo: u8
-  POOL_PERCENT: number, // cairo: u8
+  SEASON_PERCENT: number, // cairo: u8
 };
 export const RULES: type_RULES = {
   UNDERWARE_PERCENT: 45,
   REALMS_PERCENT: 5,
   FEES_PERCENT: 10,
-  POOL_PERCENT: 40,
+  SEASON_PERCENT: 40,
 };
 
 // from: ../dojo/src/types/constants.cairo

@@ -534,7 +534,7 @@ pub mod pack_token {
             // mint!
             let token_id: u128 = self.token.mint_next(recipient);
             // calculate pegged amount
-            let pegged_lords_amount: u128 = MathTrait::percentage(lords_amount, RULES::POOL_PERCENT);
+            let pegged_lords_amount: u128 = MathTrait::percentage(lords_amount, RULES::SEASON_PERCENT);
             // create Pack
             let mut pack: Pack = Pack {
                 pack_id: token_id,

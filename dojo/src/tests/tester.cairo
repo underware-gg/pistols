@@ -1104,13 +1104,13 @@ pub mod tester {
         (new_season_id)
     }
     pub fn purchase_share_peg_pool(sys: @TestSystems, lords_amount: u128) -> u128 {
-        (MathTrait::percentage(lords_amount, RULES::POOL_PERCENT))
+        (MathTrait::percentage(lords_amount, RULES::SEASON_PERCENT))
     }
     pub fn purchase_share_fees(sys: @TestSystems, lords_amount: u128) -> u128 {
         (MathTrait::percentage(lords_amount, RULES::FEES_PERCENT))
     }
     pub fn purchase_share_pools(sys: @TestSystems, lords_amount: u128) -> u128 {
-        (MathTrait::percentage(lords_amount, RULES::FEES_PERCENT + RULES::POOL_PERCENT))
+        (MathTrait::percentage(lords_amount, RULES::FEES_PERCENT + RULES::SEASON_PERCENT))
     }
     pub fn purchase_share_revenue(sys: @TestSystems, lords_amount: u128) -> u128 {
         (MathTrait::percentage(lords_amount, RULES::REALMS_PERCENT + RULES::UNDERWARE_PERCENT))

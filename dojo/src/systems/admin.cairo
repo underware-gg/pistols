@@ -13,7 +13,10 @@ pub trait IAdmin<TState> {
     fn qualify_duelist(ref self: TState, season_id: u32, duelist_id: u128) -> u8; //@description: Admin function
     // maintenance functions
     fn urgent_update(ref self: TState); //@description: Admin function
-    fn velords_migration(ref self: TState, enlisted_duelist_ids: Span<u128>); //@description: Admin function
+    fn velords_migration(ref self: TState); //@description: Admin function
+    fn velords_migrate_ranked_challenges(ref self: TState, duel_ids: Array<u128>); //@description: Admin function
+    fn velords_migrate_ranked_duelists(ref self: TState, duelist_ids: Array<u128>); //@description: Admin function
+    fn velords_migrate_packs(ref self: TState, pack_ids: Array<u128>); //@description: Admin function
 }
 
 #[dojo::contract]
@@ -33,7 +36,7 @@ pub mod admin {
         IDuelistTokenDispatcherTrait,
     };
     use pistols::libs::store::{Store, StoreTrait};
-    // use pistols::libs::admin_fix::{AdminFixTrait};
+    use pistols::libs::admin_fix::{AdminFixTrait};
 
     mod Errors {
         pub const CALLER_NOT_OWNER: felt252     = 'ADMIN: Caller not owner';
@@ -160,20 +163,30 @@ pub mod admin {
         //
         fn urgent_update(ref self: ContractState) {
             self._assert_caller_is_admin();
-            // let mut store: Store = StoreTrait::new(self.world_default());
-            // post release fix: Introducing Claimable pool
-            // AdminFixTrait::fix_claimable_pool(ref store);
-        }
-        fn velords_migration(ref self: ContractState, enlisted_duelist_ids: Span<u128>) {
-            self._assert_caller_is_admin();
-            // let mut store: Store = StoreTrait::new(self.world_default());
             //
-            // 1.  Clear queues
-            // TODO...
-            // 
-            // Memorize enlisted Duelists, not playable anymore
-            // AdminFixTrait::memorize_enlisted_duelist_ids(ref store, enlisted_duelist_ids);
-            // TODO...
+            // implement update here...
+            // let mut store: Store = StoreTrait::new(self.world_default());
+            // AdminFixTrait::urgent_update(ref store);
+        }
+        fn velords_migration(ref self: ContractState) {
+            self._assert_caller_is_admin();
+            let mut store: Store = StoreTrait::new(self.world_default());
+            AdminFixTrait::velords_migration(ref store);
+        }
+        fn velords_migrate_ranked_challenges(ref self: ContractState, duel_ids: Array<u128>) {
+            self._assert_caller_is_admin();
+            let mut store: Store = StoreTrait::new(self.world_default());
+            AdminFixTrait::velords_migrate_ranked_challenges(ref store, duel_ids);
+        }
+        fn velords_migrate_ranked_duelists(ref self: ContractState, duelist_ids: Array<u128>) {
+            self._assert_caller_is_admin();
+            let mut store: Store = StoreTrait::new(self.world_default());
+            AdminFixTrait::velords_migrate_ranked_duelists(ref store, duelist_ids);
+        }
+        fn velords_migrate_packs(ref self: ContractState, pack_ids: Array<u128>) {
+            self._assert_caller_is_admin();
+            let mut store: Store = StoreTrait::new(self.world_default());
+            AdminFixTrait::velords_migrate_packs(ref store, pack_ids);
         }
     }
 

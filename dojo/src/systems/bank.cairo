@@ -33,6 +33,8 @@ pub trait IBankProtected<TState> {
     // transfer LORDS to recipient, removing from PoolType::FamePeg
     // (called by duelist_token)
     fn depeg_lords_from_fame_to_be_burned(ref self: TState, season_id: u32, fame_amount: u128) -> u128;
+    // pool migration
+    fn transfer_lords(ref self: TState, recipient: ContractAddress, amount: u128);
 }
 
 #[dojo::contract]
@@ -67,6 +69,8 @@ pub mod bank {
     pub mod Errors {
         pub const INVALID_CALLER: felt252           = 'BANK: invalid caller';
         pub const CALLER_NOT_ADMIN: felt252         = 'BANK: caller not admin';
+        pub const INVALID_PAYER: felt252            = 'BANK: invalid payer';
+        pub const INVALID_RECIPIENT: felt252        = 'BANK: invalid recipient';
         pub const INVALID_LORDS_AMOUNT: felt252     = 'BANK: invalid LORDS amount';
         pub const INVALID_FAME_AMOUNT: felt252      = 'BANK: invalid FAME amount';
         pub const INVALID_SHARES: felt252           = 'BANK: invalid shares';
@@ -230,7 +234,7 @@ pub mod bank {
                 payer, // from
                 starknet::get_contract_address(), // to
                 lords_season,
-                Option::Some(*distribution.pool_id),
+                Option::Some(*distribution.season_pool_id),
             );
             // this one is for history
             let season_id: u32 = store.get_current_season_id();
@@ -244,6 +248,18 @@ pub mod bank {
                 lords_realms,
                 lords_fees,
                 lords_season,
+            );
+        }
+
+        // pool migration
+        fn transfer_lords(ref self: ContractState, recipient: ContractAddress, amount: u128) {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            assert(store.world.caller_is_duelist_token_contract(), Errors::INVALID_CALLER);
+            self._charge_payer_lords(store,
+                starknet::get_contract_address(), // from
+                recipient, // to
+                amount,
+                Option::None,
             );
         }
 
@@ -328,6 +344,8 @@ pub mod bank {
             lords_amount: u128,
             pool_id: Option<PoolType>,
         ) {
+            assert(payer.is_non_zero(), Errors::INVALID_PAYER);
+            assert(recipient.is_non_zero(), Errors::INVALID_RECIPIENT);
             assert(lords_amount.is_non_zero(), Errors::INVALID_LORDS_AMOUNT);
             // transfer funds...
             if (payer != recipient) {

@@ -19,8 +19,8 @@ pub struct PoolDistribution {
     pub fees_percent: u8,
     pub fees_pool_id: PoolType,
     pub fees_address: ContractAddress,
-    pub pool_percent: u8,
-    pub pool_id: PoolType,
+    pub season_percent: u8,
+    pub season_pool_id: PoolType,
 }
 
 #[derive(Copy, Drop, Serde, Introspect, Default)]
@@ -134,8 +134,8 @@ pub impl RulesImpl of RulesTrait {
             fees_percent: RULES::FEES_PERCENT,
             fees_pool_id: PoolType::Claimable,  // we use this fee to fund Claimable packs
             fees_address: ZERO(),               // alternatively, we might send to a wallet
-            pool_percent: RULES::POOL_PERCENT,
-            pool_id: PoolType::Purchases,
+            season_percent: RULES::SEASON_PERCENT,
+            season_pool_id: PoolType::Purchases,
         };
         // if no realms address, to underware
         if (result.realms_percent.is_non_zero() && result.realms_address.is_zero()) {
@@ -147,7 +147,7 @@ pub impl RulesImpl of RulesTrait {
         //     result.fees_percent = 0;
         // }
         // if (result.underware_percent.is_non_zero() && result.underware_address.is_zero()) {
-        //     result.pool_percent += result.underware_percent;
+        //     result.season_percent += result.underware_percent;
         //     result.underware_percent = 0;
         // }
         (@result)
@@ -244,8 +244,8 @@ mod unit {
         assert_gt!(RULES::UNDERWARE_PERCENT, 0, "underware_percent");
         assert_gt!(RULES::REALMS_PERCENT, 0, "realms_percent");
         assert_gt!(RULES::FEES_PERCENT, 0, "fees_percent");
-        assert_gt!(RULES::POOL_PERCENT, 0, "pool_percent");
-        assert_eq!(RULES::UNDERWARE_PERCENT + RULES::REALMS_PERCENT + RULES::FEES_PERCENT + RULES::POOL_PERCENT, 100, "total");
+        assert_gt!(RULES::SEASON_PERCENT, 0, "season_percent");
+        assert_eq!(RULES::UNDERWARE_PERCENT + RULES::REALMS_PERCENT + RULES::FEES_PERCENT + RULES::SEASON_PERCENT, 100, "total");
     }
 
     #[test]
