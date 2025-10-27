@@ -2602,5 +2602,37 @@ mod tests {
     }
 
 
+    //--------------------------------
+    // paused matchmaker
+    //
+    #[test]
+    #[should_panic(expected: ('MATCHMAKER: Game is paused', 'ENTRYPOINT_FAILED'))]
+    fn test_paused_enlistment() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
+        let A: ContractAddress = OWNER();
+        tester::fund_duelists_pool(@sys, 1);
+        let ID_A_1: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_A_1");
+        let queue_id: QueueId = QueueId::Ranked;
+        _setup_ranked_lords(@sys, [A].span(), 2);
+        // pause + panic...
+        tester::execute_admin_set_paused(@sys.admin, OWNER(), true);
+        tester::execute_enlist_duelist(@sys, A, ID_A_1, queue_id);
+    }
+
+    #[test]
+    #[should_panic(expected: ('MATCHMAKER: Game is paused', 'ENTRYPOINT_FAILED'))]
+    fn test_paused_match_make_me() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MATCHMAKER | FLAGS::MOCK_RNG | FLAGS::GAME | FLAGS::DUELIST);
+        let A: ContractAddress = OWNER();
+        tester::fund_duelists_pool(@sys, 1);
+        let ID_A_1: u128 = _airdrop_open(@sys, A, PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "airdrop_A_1");
+        let queue_id: QueueId = QueueId::Ranked;
+        _setup_ranked_lords(@sys, [A].span(), 2);
+        tester::execute_enlist_duelist(@sys, A, ID_A_1, queue_id);
+        // pause + panic...
+        tester::execute_admin_set_paused(@sys.admin, OWNER(), true);
+        tester::execute_match_make_me(@sys, A, ID_A_1, queue_id, QueueMode::Fast);
+    }
+
 
 }

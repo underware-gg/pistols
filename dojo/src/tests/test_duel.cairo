@@ -2005,4 +2005,68 @@ pub mod tests {
         assert_eq!(positions.len(), 0, "positions.len()");
     }
 
+    //--------------------------------
+    // paused game
+    //
+
+    #[test]
+    #[should_panic(expected:('DUEL: Game is paused', 'ENTRYPOINT_FAILED'))]
+    fn test_paused_create_duel() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        let duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
+        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
+        // pause + panic...
+        tester::execute_admin_set_paused(@sys.admin, OWNER(), true);
+        let _duel_id: u128 = tester::execute_create_duel_ID(@sys, A, duelist_id_a, B, MESSAGE(), DuelType::Seasonal, 48, 1);
+    }
+
+    #[test]
+    #[should_panic(expected:('DUEL: Game is paused', 'ENTRYPOINT_FAILED'))]
+    fn test_paused_reply_duel() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        let duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
+        let duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
+        let duel_id: u128 = tester::execute_create_duel_ID(@sys, A, duelist_id_a, B, MESSAGE(), DuelType::Seasonal, 48, 1);
+        // pause + panic...
+        tester::execute_admin_set_paused(@sys.admin, OWNER(), true);
+        tester::execute_reply_duel(@sys, B, duelist_id_b, duel_id, true);
+    }
+
+    #[test]
+    #[should_panic(expected:('PISTOLS: Game is paused', 'ENTRYPOINT_FAILED'))]
+    fn test_paused_create_commit() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        let duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
+        let duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
+        let duel_id: u128 = tester::execute_create_duel_ID(@sys, A, duelist_id_a, B, MESSAGE(), DuelType::Seasonal, 48, 1);
+        tester::execute_reply_duel(@sys, B, duelist_id_b, duel_id, true);
+        let (_mocked, moves_a, _moves_b) = prefabs::get_moves_dual_crit();
+        // pause + panic...
+        tester::execute_admin_set_paused(@sys.admin, OWNER(), true);
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
+    }
+
+    #[test]
+    #[should_panic(expected:('PISTOLS: Game is paused', 'ENTRYPOINT_FAILED'))]
+    fn test_paused_create_reveal() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE);
+        let A: ContractAddress = OWNER();
+        let B: ContractAddress = OTHER();
+        let duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys, A)[0];
+        let duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys, B)[0];
+        let duel_id: u128 = tester::execute_create_duel_ID(@sys, A, duelist_id_a, B, MESSAGE(), DuelType::Seasonal, 48, 1);
+        tester::execute_reply_duel(@sys, B, duelist_id_b, duel_id, true);
+        let (_mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
+        tester::execute_commit_moves(@sys, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys, OTHER(), duel_id, moves_b.hashed);
+        // pause + panic...
+        tester::execute_admin_set_paused(@sys.admin, OWNER(), true);
+        tester::execute_reveal_moves(@sys, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+    }
 }

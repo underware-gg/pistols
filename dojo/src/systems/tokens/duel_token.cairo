@@ -221,6 +221,7 @@ pub mod duel_token {
     use graffiti::url::{UrlImpl};
 
     pub mod Errors {
+        pub const IS_PAUSED: felt252                = 'DUEL: Game is paused';
         pub const CALLER_NOT_ADMIN: felt252         = 'DUEL: Caller not admin';
         pub const INVALID_CALLER: felt252           = 'DUEL: Invalid caller';
         pub const INVALID_DUELIST_A_NULL: felt252   = 'DUEL: Duelist A null';
@@ -300,6 +301,7 @@ pub mod duel_token {
             message: ByteArray,
         ) -> u128 {
             let mut store: Store = StoreTrait::new(self.world_default());
+            assert(!store.get_config_is_paused(), Errors::IS_PAUSED);
 
             // validate challenged
             let address_a: ContractAddress = starknet::get_caller_address();
@@ -380,7 +382,8 @@ pub mod duel_token {
             accepted: bool,
         ) -> ChallengeState {
             let mut store: Store = StoreTrait::new(self.world_default());
-            
+            assert(!store.get_config_is_paused(), Errors::IS_PAUSED);
+
             // validate chalenge
             let mut challenge: Challenge = store.get_challenge(duel_id);
             assert(challenge.exists(), Errors::INVALID_CHALLENGE);

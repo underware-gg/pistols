@@ -122,6 +122,7 @@ pub mod game {
     };
 
     pub mod Errors {
+        pub const IS_PAUSED: felt252                 = 'PISTOLS: Game is paused';
         pub const CALLER_NOT_OWNER: felt252          = 'PISTOLS: Caller not owner';
         pub const CALLER_NOT_ADMIN: felt252          = 'PISTOLS: Caller not admin';
         pub const CHALLENGE_EXISTS: felt252          = 'PISTOLS: Challenge exists';
@@ -170,6 +171,8 @@ pub mod game {
             hashed: u128,
         ) {
             let mut store: Store = StoreTrait::new(self.world_default());
+            assert(!store.get_config_is_paused(), Errors::IS_PAUSED);
+
             let mut challenge: Challenge = store.get_challenge(duel_id);
             let mut round: Round = store.get_round(duel_id);
 
@@ -279,6 +282,8 @@ pub mod game {
             moves: Span<u8>,
         ) {
             let mut store: Store = StoreTrait::new(self.world_default());
+            assert(!store.get_config_is_paused(), Errors::IS_PAUSED);
+
             let mut challenge: Challenge = store.get_challenge(duel_id);
             let mut round: Round = store.get_round( duel_id);
 

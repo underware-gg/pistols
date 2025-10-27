@@ -73,6 +73,7 @@ pub mod matchmaker {
     };
 
     pub mod Errors {
+        pub const IS_PAUSED: felt252                = 'MATCHMAKER: Game is paused';
         pub const CALLER_NOT_ADMIN: felt252         = 'MATCHMAKER: Caller not admin';
         pub const INVALID_CALLER: felt252           = 'MATCHMAKER: Invalid caller';
         pub const INVALID_QUEUE: felt252            = 'MATCHMAKER: Invalid queue';
@@ -119,6 +120,7 @@ pub mod matchmaker {
             queue_id: QueueId,
         ) -> u128 {
             let mut store: Store = StoreTrait::new(self.world_default());
+            assert(!store.get_config_is_paused(), Errors::IS_PAUSED);
 
             // validate queue
             assert(queue_id.permanent_enlistment(), Errors::ENLISTMENT_NOT_REQUIRED);
@@ -171,6 +173,7 @@ pub mod matchmaker {
             queue_mode: QueueMode,  // only used to enter queue, can change to to match
         ) -> u128 {
             let mut store: Store = StoreTrait::new(self.world_default());
+            assert(!store.get_config_is_paused(), Errors::IS_PAUSED);
 
             // validate and get queue
             // Ranked: any mode is permitted
