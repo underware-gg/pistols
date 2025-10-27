@@ -465,13 +465,6 @@ export interface Transfer {
 	token_id: BigNumberish;
 }
 
-// Type definition for `pistols::models::leaderboard::LeaderboardPosition` struct
-export interface LeaderboardPosition {
-	position: BigNumberish;
-	duelist_id: BigNumberish;
-	points: BigNumberish;
-}
-
 // Type definition for `pistols::systems::rng_mock::RngWrap` struct
 export interface RngWrap {
 	rng_address: string;
@@ -1027,7 +1020,6 @@ export interface SchemaType extends ISchemaType {
 		Approval: Approval,
 		Transfer: Transfer,
 		ApprovalForAll: ApprovalForAll,
-		LeaderboardPosition: LeaderboardPosition,
 		RngWrap: RngWrap,
 		Deck: Deck,
 		DuelistHand: DuelistHand,
@@ -1547,11 +1539,6 @@ export const schema: SchemaType = {
 			to: "",
 		token_id: 0,
 		},
-		LeaderboardPosition: {
-			position: 0,
-			duelist_id: 0,
-			points: 0,
-		},
 		RngWrap: {
 			rng_address: "",
 			mocked: new CairoOption(CairoOptionVariant.None),
@@ -1991,7 +1978,6 @@ export enum ModelsMapping {
 	Transfer = 'openzeppelin_token-Transfer',
 	ApprovalForAll = 'openzeppelin_token-ApprovalForAll',
 	Source = 'pistols-Source',
-	LeaderboardPosition = 'pistols-LeaderboardPosition',
 	RngWrap = 'pistols-RngWrap',
 	Deck = 'pistols-Deck',
 	EnvCard = 'pistols-EnvCard',

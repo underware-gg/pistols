@@ -15,7 +15,10 @@ export const INTERFACE_DESCRIPTIONS: any = {
     disqualify_duelist: 'Admin function',
     qualify_duelist: 'Admin function',
     urgent_update: 'Admin function',
-    velords_migration: 'Admin function',
+    velords_migrate_pools: 'Admin function',
+    velords_migrate_ranked_challenges: 'Admin function',
+    velords_migrate_ranked_duelists: 'Admin function',
+    velords_migrate_packs: 'Admin function',
   },
   // from: ../dojo/src/systems/bank.cairo
   IBankPublic: {
@@ -811,8 +814,8 @@ type type_RULES = {
   SEASON_PERCENT: number, // cairo: u8
 };
 export const RULES: type_RULES = {
-  UNDERWARE_PERCENT: 45,
-  REALMS_PERCENT: 5,
+  UNDERWARE_PERCENT: 40,
+  REALMS_PERCENT: 10,
   FEES_PERCENT: 10,
   SEASON_PERCENT: 40,
 };

@@ -1479,8 +1479,8 @@
   },
   "contracts": [
     {
-      "address": "0x25c429f318da4f71cd67627c4cb3430371bd6f97db110c298649a2c18ce9f00",
-      "class_hash": "0x1f66acc3060316a94716718c09f706902b511eced34fdbf3cad79f2ed556706",
+      "address": "0x460f434280fad8587049d56845c4d996d248ae1695afbea901fe2f2c7cc51b9",
+      "class_hash": "0x6ccc1eb9d2e8b252d4b4449c6723bb08a21b2fb90e425891762bfe09fd66054",
       "abi": [
         {
           "type": "impl",
@@ -1568,16 +1568,6 @@
             {
               "name": "True",
               "type": "()"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "core::array::Span::<core::integer::u128>",
-          "members": [
-            {
-              "name": "snapshot",
-              "type": "@core::array::Array::<core::integer::u128>"
             }
           ]
         },
@@ -1726,11 +1716,42 @@
             },
             {
               "type": "function",
-              "name": "velords_migration",
+              "name": "velords_migrate_pools",
+              "inputs": [],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "velords_migrate_ranked_challenges",
               "inputs": [
                 {
-                  "name": "enlisted_duelist_ids",
-                  "type": "core::array::Span::<core::integer::u128>"
+                  "name": "duel_ids",
+                  "type": "core::array::Array::<core::integer::u128>"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "velords_migrate_ranked_duelists",
+              "inputs": [
+                {
+                  "name": "duelist_ids",
+                  "type": "core::array::Array::<core::integer::u128>"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "velords_migrate_packs",
+              "inputs": [
+                {
+                  "name": "pack_ids",
+                  "type": "core::array::Array::<core::integer::u128>"
                 }
               ],
               "outputs": [],
@@ -1863,13 +1884,16 @@
         "disqualify_duelist",
         "qualify_duelist",
         "urgent_update",
-        "velords_migration",
+        "velords_migrate_pools",
+        "velords_migrate_ranked_challenges",
+        "velords_migrate_ranked_duelists",
+        "velords_migrate_packs",
         "upgrade"
       ]
     },
     {
-      "address": "0x7ba00e55881878bf153317ab9b1514b6b5fdb3371cfa324af5468a3fe200b34",
-      "class_hash": "0x159ec4f113ffd49ca92c77e3adf1e5409ee00a0b6ec7ae1f7951147cf8cbe88",
+      "address": "0x29b39f0a4045ba3a4916eaa318b1d518944dc9d2521f2415e4a5420ecf4dc56",
+      "class_hash": "0x43c8b1a07b770a7ec2252548084193b5ac503828291891695ebb1f76f3c84e1",
       "abi": [
         {
           "type": "impl",
@@ -2130,6 +2154,22 @@
                 }
               ],
               "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "transfer_lords",
+              "inputs": [
+                {
+                  "name": "recipient",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "amount",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
             }
           ]
         },
@@ -2259,6 +2299,7 @@
         "charge_lords_purchase",
         "peg_minted_fame_to_lords",
         "depeg_lords_from_fame_to_be_burned",
+        "transfer_lords",
         "upgrade"
       ]
     },
@@ -2962,8 +3003,8 @@
       ]
     },
     {
-      "address": "0x4681322985eeee8333fc12bd39eb024fd4feab0f41e2a7ea8cb5f4ee4148112",
-      "class_hash": "0x4d9bde4f2f374d3d14824947a3b3c705ee08c13acb8189057a8d91fc3640f69",
+      "address": "0x4f994e318e7390d397d2deb2d2164310825de2b0c24f1fe8fe87c67adf268cc",
+      "class_hash": "0x53acb1c9e64c990e99e55bf0cf80f13e81fe1f54fc6bfc1dcfffe34dcc937ce",
       "abi": [
         {
           "type": "impl",
@@ -7625,8 +7666,8 @@
       ]
     },
     {
-      "address": "0x1d9b6affce88e4e437b6d7b2aa845b5eacd036b4242c7a8df130db07d94f48e",
-      "class_hash": "0x31628d0027a21c068278222267574f86a12ace6df24510ce68b26908a2d7df7",
+      "address": "0x763838f677a4e0cac70884ad870b45139beda430d4ad006dfb1eda850a56fc9",
+      "class_hash": "0x2ff80ca9264ffdc31fd4b59c22b75e8ebac25d943544fff472669664db7b5ff",
       "abi": [
         {
           "type": "impl",
@@ -8106,34 +8147,6 @@
         },
         {
           "type": "struct",
-          "name": "pistols::models::leaderboard::LeaderboardPosition",
-          "members": [
-            {
-              "name": "position",
-              "type": "core::integer::u8"
-            },
-            {
-              "name": "duelist_id",
-              "type": "core::integer::u128"
-            },
-            {
-              "name": "points",
-              "type": "core::integer::u16"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "core::array::Span::<pistols::models::leaderboard::LeaderboardPosition>",
-          "members": [
-            {
-              "name": "snapshot",
-              "type": "@core::array::Array::<pistols::models::leaderboard::LeaderboardPosition>"
-            }
-          ]
-        },
-        {
-          "type": "struct",
           "name": "pistols::types::rules::RewardValues",
           "members": [
             {
@@ -8366,42 +8379,6 @@
               "outputs": [
                 {
                   "type": "pistols::types::duel_progress::DuelProgress"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "get_duelist_leaderboard_position",
-              "inputs": [
-                {
-                  "name": "season_id",
-                  "type": "core::integer::u32"
-                },
-                {
-                  "name": "duelist_id",
-                  "type": "core::integer::u128"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "pistols::models::leaderboard::LeaderboardPosition"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "get_leaderboard",
-              "inputs": [
-                {
-                  "name": "season_id",
-                  "type": "core::integer::u32"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::array::Span::<pistols::models::leaderboard::LeaderboardPosition>"
                 }
               ],
               "state_mutability": "view"
@@ -9914,8 +9891,8 @@
       ]
     },
     {
-      "address": "0x65ffbed82f3ce61279a43d0a5a3325b83e090aeb6d6527cae51175389b7584e",
-      "class_hash": "0xd2e7529dff309afd0035859b6ea128c9d4f26af013a25ad2c4b1385eb24005",
+      "address": "0x6f4c716184893ce00e90d8167c24c17a2fd4fa8fedbe430b0a910ad7ca030a7",
+      "class_hash": "0x2b9f032306fc986e944bae131ab364891c1168c5e0fe8a35b281e06ffbc7e7b",
       "abi": [
         {
           "type": "impl",
