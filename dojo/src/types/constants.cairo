@@ -30,8 +30,8 @@ pub mod CHANCES {
 }
 
 pub mod RULES {
-    pub const UNDERWARE_PERCENT: u8 = 45;
-    pub const REALMS_PERCENT: u8 = 5;
+    pub const UNDERWARE_PERCENT: u8 = 40;
+    pub const REALMS_PERCENT: u8 = 10;
     pub const FEES_PERCENT: u8 = 10;
     pub const SEASON_PERCENT: u8 = 40;
 }
