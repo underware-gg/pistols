@@ -1146,6 +1146,10 @@ pub mod tester {
         world.write_model_test(model);
     }
     #[inline(always)]
+    pub fn set_DuelistAssignment(ref world: WorldStorage, model: @DuelistAssignment) {
+        world.write_model_test(model);
+    }
+    #[inline(always)]
     pub fn set_SeasonScoreboard(ref world: WorldStorage, model: @SeasonScoreboard) {
         world.write_model_test(model);
     }

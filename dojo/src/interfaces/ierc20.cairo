@@ -34,12 +34,17 @@ pub impl IErc20Impl of IErc20Trait {
         assert(token_amount != 0, Errors::INVALID_AMOUNT);
         // check balance
         let erc20_dispatcher: Erc20Dispatcher = Erc20Dispatcher{ contract_address: token_address };
-        let balance: u128 = erc20_dispatcher.balance_of(from).low;
+        let balance: u128 = erc20_dispatcher.balance_of(from).low;  
         assert(balance >= token_amount, Errors::INSUFFICIENT_BALANCE);
-        // check allowance
-        let allowance: u128 = erc20_dispatcher.allowance(from, starknet::get_contract_address()).low;
-        assert(allowance >= token_amount, Errors::INSUFFICIENT_ALLOWANCE);
-        // transfer...
-        erc20_dispatcher.transfer_from(from, to, token_amount.into());
+        if (from == starknet::get_contract_address()) {
+            // transfer from contract
+            erc20_dispatcher.transfer(to, token_amount.into());
+        } else {
+            // check allowance
+            let allowance: u128 = erc20_dispatcher.allowance(from, starknet::get_contract_address()).low;
+            assert(allowance >= token_amount, Errors::INSUFFICIENT_ALLOWANCE);
+            // transfer using allowance...
+            erc20_dispatcher.transfer_from(from, to, token_amount.into());
+        }
     }
 }

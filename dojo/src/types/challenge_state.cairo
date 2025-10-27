@@ -32,6 +32,18 @@ pub impl ChallengeStateImpl of ChallengeStateTrait {
             ChallengeState::Draw        => false,
         }
     }
+    fn is_ongoing(self: @ChallengeState) -> bool {
+        match self {
+            ChallengeState::Null        => false,
+            ChallengeState::Awaiting    => true,
+            ChallengeState::Withdrawn   => false,
+            ChallengeState::Refused     => false,
+            ChallengeState::Expired     => false,
+            ChallengeState::InProgress  => true,
+            ChallengeState::Resolved    => false,
+            ChallengeState::Draw        => false,
+        }
+    }
     fn is_concluded(self: @ChallengeState) -> bool {
         match self {
             ChallengeState::Null        => false,

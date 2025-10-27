@@ -645,9 +645,7 @@ fn test_duelist_sacrifice_twice() {
 fn test_duelist_sacrifice_cant_play() {
     let mut sys: TestSystems = setup(FLAGS::GAME); // minted starter pack
     let token_id: u128 = TOKEN_ID_1_1.low;
-println!("+++++sacrifice... {}", token_id);
     _test_duelist_sacrifice(@sys, OWNER(), token_id, CauseOfDeath::Sacrifice);
-println!("+++++duel... {}", token_id);
     tester::execute_create_duel_ID(@sys, OWNER(), token_id, OTHER(), "", DuelType::Seasonal, 0, 1);
 }
 

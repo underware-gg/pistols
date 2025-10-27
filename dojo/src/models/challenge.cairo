@@ -189,7 +189,7 @@ pub impl ChallengeImpl of ChallengeTrait {
     #[inline(always)]
     fn season_bounded_expired(self: @Challenge, store: @Store) -> bool {
         (
-            (*self.state == ChallengeState::Awaiting || *self.state == ChallengeState::InProgress) &&
+            self.state.is_ongoing() &&
             self.season_id.is_non_zero() &&
             store.get_season_config(*self.season_id).has_ended()
         )

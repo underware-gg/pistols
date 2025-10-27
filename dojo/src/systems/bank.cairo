@@ -254,7 +254,7 @@ pub mod bank {
         // pool migration
         fn transfer_lords(ref self: ContractState, recipient: ContractAddress, amount: u128) {
             let mut store: Store = StoreTrait::new(self.world_default());
-            assert(store.world.caller_is_duelist_token_contract(), Errors::INVALID_CALLER);
+            assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
             self._charge_payer_lords(store,
                 starknet::get_contract_address(), // from
                 recipient, // to
