@@ -21,7 +21,7 @@ historical = [
 [indexing]
 world_block = $world_block
 # blocks_chunk_size = 10240 # default: 10240
-max_concurrent_tasks = 40
+# max_concurrent_tasks = 40
 transactions = true
 controllers = true
 pending = true
