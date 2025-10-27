@@ -87,7 +87,7 @@ pub mod game {
     };
     use pistols::systems::rng::{RngWrap, RngWrapTrait};
     use pistols::models::{
-        player::{PlayerTrait, PlayerDelegation, PlayerDelegationTrait},
+        player::{PlayerTrait, PlayerDelegationTrait},//, PlayerDelegation, PlayerDelegationTrait},
         challenge::{
             Challenge, ChallengeTrait,
             DuelType,
@@ -422,10 +422,10 @@ pub mod game {
         }
 
         fn delegate_game_actions(ref self: ContractState, delegatee_address: ContractAddress, enabled: bool) {
-            let mut store: Store = StoreTrait::new(self.world_default());
-            let mut delegation: PlayerDelegation = store.get_player_delegation(starknet::get_caller_address(), delegatee_address);
-            delegation.can_play_game = enabled;
-            store.set_player_delegation(@delegation);
+            // let mut store: Store = StoreTrait::new(self.world_default());
+            // let mut delegation: PlayerDelegation = store.get_player_delegation(starknet::get_caller_address(), delegatee_address);
+            // delegation.can_play_game = enabled;
+            // store.set_player_delegation(@delegation);
         }
 
         //------------------------------------
