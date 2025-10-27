@@ -1,6 +1,6 @@
 use starknet::{ContractAddress};
 use pistols::types::duel_progress::{DuelProgress};
-use pistols::models::leaderboard::{LeaderboardPosition};
+// use pistols::models::leaderboard::{LeaderboardPosition};
 use pistols::models::events::{SocialPlatform, PlayerSetting, PlayerSettingValue};
 use pistols::types::rules::{RewardValues};
 
@@ -33,8 +33,8 @@ pub trait IGame<TState> {
     // view calls
     fn get_duel_deck(self: @TState, duel_id: u128) -> Span<Span<u8>>;
     fn get_duel_progress(self: @TState, duel_id: u128) -> DuelProgress;
-    fn get_duelist_leaderboard_position(self: @TState, season_id: u32, duelist_id: u128) -> LeaderboardPosition;
-    fn get_leaderboard(self: @TState, season_id: u32) -> Span<LeaderboardPosition>;
+    // fn get_duelist_leaderboard_position(self: @TState, season_id: u32, duelist_id: u128) -> LeaderboardPosition;
+    // fn get_leaderboard(self: @TState, season_id: u32) -> Span<LeaderboardPosition>;
     fn can_collect_duel(self: @TState, duel_id: u128) -> bool;
     fn calc_season_reward(self: @TState, season_id: u32, duelist_id: u128, lives_staked: u8) -> RewardValues;
     fn get_timestamp(self: @TState) -> u64;
@@ -95,7 +95,7 @@ pub mod game {
             MovesTrait,
         },
         duelist::{DuelistAssignmentTrait, Totals, TotalsTrait},
-        leaderboard::{Leaderboard, LeaderboardTrait, LeaderboardPosition},
+        leaderboard::{Leaderboard, LeaderboardTrait},//, LeaderboardPosition},
         pact::{PactTrait},
         ring::{RingType},
         season::{SeasonScoreboard, SeasonScoreboardTrait},
@@ -481,15 +481,15 @@ pub mod game {
             }
         }
 
-        fn get_duelist_leaderboard_position(self: @ContractState, season_id: u32, duelist_id: u128) -> LeaderboardPosition {
-            let mut store: Store = StoreTrait::new(self.world_default());
-            (store.get_leaderboard(season_id).get_duelist_position(duelist_id))
-        }
+        // fn get_duelist_leaderboard_position(self: @ContractState, season_id: u32, duelist_id: u128) -> LeaderboardPosition {
+        //     let mut store: Store = StoreTrait::new(self.world_default());
+        //     (store.get_leaderboard(season_id).get_duelist_position(duelist_id))
+        // }
         
-        fn get_leaderboard(self: @ContractState, season_id: u32) -> Span<LeaderboardPosition> {
-            let mut store: Store = StoreTrait::new(self.world_default());
-            (store.get_leaderboard(season_id).get_all_positions())
-        }
+        // fn get_leaderboard(self: @ContractState, season_id: u32) -> Span<LeaderboardPosition> {
+        //     let mut store: Store = StoreTrait::new(self.world_default());
+        //     (store.get_leaderboard(season_id).get_all_positions())
+        // }
 
         fn can_collect_duel(self: @ContractState, duel_id: u128) -> bool {
             let mut store: Store = StoreTrait::new(self.world_default());
