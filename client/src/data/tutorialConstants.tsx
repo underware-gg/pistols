@@ -6,7 +6,7 @@ import {
   TutorialParts,
   DuelTutorialLevel
 } from '@underware/pistols-sdk/pistols/constants'
-import { SceneName } from "./assets";
+import { SceneName } from "./assetsTypes";
 import { AudioName } from "./audioAssets";
 
 const ANIMATION_TIME_PER_LETTER = 20

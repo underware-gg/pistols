@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { usePistolsScene } from '/src/hooks/PistolsContext'
-import { SceneName, TextureName } from '/src/data/assets'
+import { SceneName, TextureName  } from '/src/data/assetsTypes'
 import { useGameEvent } from '/src/hooks/useGameEvent'
 import { useTextureShift } from '/src/hooks/useTextureShift'
 import { DojoSetupErrorDetector } from '/src/components/account/DojoSetupErrorDetector'

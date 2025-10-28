@@ -9,7 +9,7 @@ import { useDuelProgress } from '/src/hooks/usePistolsContractCalls'
 import { useDuelCallToAction } from '/src/stores/eventsModelStore'
 import { DuelStage, useAnimatedDuel } from '/src/hooks/useDuel'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
-import { CharacterType } from '/src/data/assets'
+import { CharacterType  } from '/src/data/assetsTypes'
 import { useSettings } from '/src/hooks/SettingsContext'
 
 export type DuelistState = {

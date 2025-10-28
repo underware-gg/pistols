@@ -1,7 +1,8 @@
 import React, { useMemo, useCallback } from 'react'
 import { Menu } from 'semantic-ui-react'
 import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
-import { AnimName, SPRITESHEETS } from '/src/data/assets'
+import { AnimName } from '/src/data/assetsTypes'
+import { SPRITESHEETS } from '/src/data/assets'
 import { AnimationState } from '/src/three/game'
 
 

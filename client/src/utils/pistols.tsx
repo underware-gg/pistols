@@ -3,7 +3,7 @@ import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
 import { bigintToDecimal } from '@underware/pistols-sdk/utils'
 import { makeCharacterDuelistId } from '@underware/pistols-sdk/pistols'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
-import { SceneName } from '/src/data/assets'
+import { SceneName  } from '/src/data/assetsTypes'
 
 
 //------------------------------------------

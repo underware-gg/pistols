@@ -4,7 +4,7 @@ import { BigNumberish } from 'starknet'
 import { Opener, useOpener } from '/src/hooks/useOpener'
 import { bigintToHex, bigintToDecimal, isPositiveBigint, bigintEquals } from '@underware/pistols-sdk/utils'
 import { DuelTutorialLevel, tutorialScenes } from '/src/data/tutorialConstants'
-import { SceneName } from '/src/data/assets'
+import { SceneName  } from '/src/data/assetsTypes'
 import { SCENE_CHANGE_ANIMATION_DURATION } from '/src/three/game'
 
 import { emitter } from '/src/three/game'

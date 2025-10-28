@@ -4,7 +4,7 @@ import { usePistolsScene } from '/src/hooks/PistolsContext'
 import { ProfilePoster } from '/src/components/ui/ProfilePoster'
 import { usePlayerAddressFromUsername } from '/src/stores/playerStore'
 import { useRouteSlugs } from '/src/hooks/useRoute'
-import { SceneName } from '/src/data/assets'
+import { SceneName } from '/src/data/assetsTypes'
 import { useCookies } from 'react-cookie'
 import { BigNumberish } from 'starknet'
 

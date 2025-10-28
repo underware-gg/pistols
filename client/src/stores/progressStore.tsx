@@ -1,7 +1,6 @@
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { debug } from '@underware/pistols-sdk/pistols'
-import { useMemo } from 'react'
 
 
 //-----------------------------------------
@@ -51,10 +50,10 @@ export const useProgressStore = createStore();
 // 'consumer' hooks
 //
 export function useStoreLoadingProgress() {
-  const state = useProgressStore((state) => state)
-  const progress = useMemo(() => state.getProgress(), [state.loaders])
-  const counter = useMemo(() => state.counter, [state.counter])
-  const finished = useMemo(() => state.finished(), [state.loaders])
+  const counter = useProgressStore((state) => state.counter)
+  const progress = useProgressStore((state) => state.getProgress())
+  const finished = useProgressStore((state) => state.finished())
+  
   return {
     progress,
     counter,

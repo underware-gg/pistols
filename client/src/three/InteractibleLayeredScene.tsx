@@ -12,7 +12,8 @@ import {
   SCENE_CHANGE_ANIMATION_DURATION,
   cameraDataStatic,
 } from './game';
-import { sceneBackgrounds, SceneData, SceneObject, TextureName, TextureState, AnimatedLayer, SceneBackgroundObject } from '/src/data/assets';
+import { sceneBackgrounds } from '/src/data/assets';
+import { SceneData, SceneObject, TextureName, TextureState, AnimatedLayer, SceneBackgroundObject } from '/src/data/assetsTypes';
 import { ShaderManager, ShaderMaterial } from './shaders'
 import TWEEN from '@tweenjs/tween.js'
 

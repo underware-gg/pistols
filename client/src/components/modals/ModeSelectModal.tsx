@@ -5,7 +5,7 @@ import { useSettings } from '/src/hooks/SettingsContext'
 import { InteractibleComponent, InteractibleComponentHandle } from '/src/components/InteractibleComponent'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { CardColor } from '@underware/pistols-sdk/pistols/constants'
-import { SceneName } from '/src/data/assets'
+import { SceneName } from '/src/data/assetsTypes'
 import { usePistolsScene } from '/src/hooks/PistolsContext'
 
 export interface ModeSelectModalProps {

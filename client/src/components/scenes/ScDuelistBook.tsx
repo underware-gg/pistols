@@ -4,7 +4,7 @@ import { _currentScene } from '/src/three/game'
 import { DuelistsBook } from '/src/components/ui/DuelistsBook'
 import { DuelistsBookAlwaysOpen } from '/src/components/ui/DuelistsBookAlwaysOpen'
 import { ActionButton } from '/src/components/ui/Buttons'
-import { SceneName } from '/src/data/assets'
+import { SceneName  } from '/src/data/assetsTypes'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 
 export default function ScDuelistBook() {

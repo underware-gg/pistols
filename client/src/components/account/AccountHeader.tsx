@@ -3,7 +3,7 @@ import { useAccount } from '@starknet-react/core'
 import { useConnectedController } from '@underware/pistols-sdk/dojo'
 import { usePistolsScene } from '/src/hooks/PistolsContext'
 import { ProfilePic } from '/src/components/account/ProfilePic'
-import { SceneName } from '/src/data/assets'
+import { SceneName  } from '/src/data/assetsTypes'
 import { FoolsBalance } from '/src/components/account/LordsBalance'
 import { usePlayerAvatar } from '/src/stores/playerStore'
 

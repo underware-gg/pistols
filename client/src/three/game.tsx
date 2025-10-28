@@ -20,9 +20,9 @@ import { InteractibleLayeredScene } from './InteractibleLayeredScene'
 import ee from 'event-emitter'
 export var emitter = ee()
 
-import { TEXTURES, SPRITESHEETS, TextureName, AnimName } from '/src/data/assets.tsx'
+import { TEXTURES, SPRITESHEETS } from '/src/data/assets.tsx'
+import { AnimName, TextureName, SceneName } from "/src/data/assetsTypes.tsx"
 import { AudioName, AUDIO_ASSETS, AudioType } from '/src/data/audioAssets.tsx'
-import { SceneName } from '/src/data/assets.tsx'
 import { map } from '@underware/pistols-sdk/utils'
 import { SpriteSheet } from './SpriteSheetMaker.tsx'
 import { DuelistsManager } from './DuelistsManager.tsx'
@@ -177,7 +177,8 @@ let _duelistManager: DuelistsManager
 let _duelistHighlightA: THREE.Group
 let _duelistHighlightB: THREE.Group
 
-let _scenes: Partial<Record<SceneName, THREE.Scene>> = {}
+let _duelScene: THREE.Scene = null
+let _staticScene: InteractibleScene = null
 export let _currentScene: THREE.Scene = null
 export let _sceneName: SceneName
 
@@ -219,7 +220,7 @@ export async function init(canvas, framerate = 60, statsEnabled = false) {
 
   dispose()
 
-  if (Object.keys(_scenes).length > 0) {
+  if (_duelScene || _staticScene) {
     return
   }
 
@@ -247,7 +248,8 @@ export async function init(canvas, framerate = 60, statsEnabled = false) {
   window.addEventListener('resize', onWindowResize)
   onWindowResize()
 
-  setupScenes()
+  _duelScene = setupDuelScene();
+  _staticScene = setupStaticScene(SceneName.Tavern, false);
 
   _clock = new THREE.Clock(true)
 
@@ -260,8 +262,8 @@ async function loadAssets() {
   const loadingManager = new THREE.LoadingManager();
   const textureLoader = new THREE.TextureLoader(loadingManager);
   const ktx2Loader = new KTX2Loader(loadingManager)
-  ktx2Loader.setTranscoderPath( '/basis/' )
-  ktx2Loader.detectSupport( _renderer )
+  ktx2Loader.setTranscoderPath('/basis/')
+  ktx2Loader.detectSupport(_renderer)
   ktx2Loader.setWorkerLimit(4)
 
   Object.keys(TEXTURES).forEach(key => {
@@ -783,20 +785,6 @@ export function animate() {
 // Scene hook
 //
 
-function setupScenes() {
-  _scenes = {}
-  Object.values(SceneName).forEach((sceneName) => {
-    if (sceneName === SceneName.Duel) {
-      _scenes[sceneName] = setupDuelScene()
-    } else if (sceneName !== SceneName.TutorialDuel) {
-      _scenes[sceneName] = setupStaticScene(sceneName, false)
-    }
-  })
-}
-
-//
-// SceneName.Duel
-//
 function setupDuelScene() {
   const scene = new THREE.Scene()
   scene.add(_duelCameraParent)
@@ -1103,7 +1091,7 @@ function createWaterPlane(name, geometry, reflective, params) {
 }
 
 function createGrass() {
-  if (!_scenes[SceneName.Duel]) return;
+  if (!_duelScene) return;
   if (!_grassTransforms) return;
 
   _grass = new Grass(
@@ -1119,7 +1107,7 @@ function createGrass() {
     }
   );
 
-  _scenes[SceneName.Duel].add(_grass);
+  _duelScene.add(_grass);
 }
 
 function setCameraHelpers(scene) {
@@ -1142,12 +1130,14 @@ function setCameraHelpers(scene) {
 }
 
 //
-// Static Scenes
+// Static Scene
 //
-function setupStaticScene(sceneName, useLayered = false) {
-  const scene = useLayered 
-    ? new InteractibleLayeredScene(sceneName, _renderer, _staticCamera)
-    : new InteractibleScene(sceneName, _renderer, _staticCamera)
+function setupStaticScene(sceneName: string, useLayered = false): InteractibleScene {
+  // const scene = useLayered 
+  //   ? new InteractibleLayeredScene(sceneName, _renderer, _staticCamera)
+  //   : new InteractibleScene(sceneName, _renderer, _staticCamera)
+
+  const scene = new InteractibleScene(sceneName, _renderer, _staticCamera)
 
   scene.add(_staticCamera)
 
@@ -1160,38 +1150,58 @@ function setupStaticScene(sceneName, useLayered = false) {
 // Game Interface
 //
 
-export function switchScene(sceneName) {
+export function switchScene(sceneName: SceneName) {
   if (sceneName === SceneName.TutorialDuel) {
     sceneName = SceneName.Duel
   }
 
-  if (_currentScene === sceneName) return;
+  if (_sceneName === sceneName && _currentScene) return;
 
-  console.log(`Switching scene to ${sceneName}`)
+  console.log(`Switching scene to ${sceneName} 🐙`)
+
+  const isDuelScene = sceneName === SceneName.Duel
+  const wasDuelScene = _sceneName === SceneName.Duel
 
   if (!_currentScene) {
     _sceneName = sceneName
-    _currentScene = _scenes[sceneName];
-    if (_currentScene instanceof InteractibleScene) {
-      (_currentScene as InteractibleScene).activate();
+    
+    if (isDuelScene) {
+      _currentScene = _duelScene
+    } else {
+      _currentScene = _staticScene
+      _staticScene.setSceneData(sceneName)
+      _staticScene.activate()
     }
 
     setTimeout(() => {
       fadeInCurrentScene();
     }, SCENE_CHANGE_ANIMATION_DURATION);
     
-    if (sceneName != SceneName.Duel) {
+    if (!isDuelScene) {
       _duelistManager.hideElements()
     } else if (_statsEnabled) {
       resetDuelScene()
     }
   } else {
+    // Scene transition
     fadeOutCurrentScene(() => {
-      if (_currentScene instanceof InteractibleScene) {
-        (_currentScene as InteractibleScene).deactivate();
+      // Deactivate previous scene
+      if (!wasDuelScene && isDuelScene) {
+        _staticScene.deactivate()
       }
-      _sceneName = sceneName;
-      _currentScene = _scenes[sceneName];
+      
+      _sceneName = sceneName
+
+      // Switch to appropriate scene
+      if (isDuelScene) {
+        _currentScene = _duelScene
+      } else {
+        _currentScene = _staticScene
+        _staticScene.setSceneData(sceneName)
+        if (wasDuelScene) {
+          _staticScene.activate()
+        }
+      }
 
       emitter.emit('hover_description', null)
       emitter.emit('hover_item', null)
@@ -1200,7 +1210,7 @@ export function switchScene(sceneName) {
         fadeInCurrentScene();
       }, 0);
       
-      if (sceneName != SceneName.Duel) {
+      if (!isDuelScene) {
         _duelistManager.hideElements()
         _renderer.getContext().disable(_renderer.getContext().DEPTH_TEST);
       } else if (_statsEnabled) {
@@ -1490,12 +1500,19 @@ export function dispose() {
   _renderer?.dispose()
   _renderer = null
 
-  // 3. Dispose of Scenes and Objects:
+  // 3. Dispose of Scenes and Objects - now using single static scene 🐙:
   _currentScene = null
-  for (const scene of Object.values(_scenes)) {
-    disposeOfScene(scene)
+  
+  if (_duelScene) {
+    disposeOfScene(_duelScene)
+    _duelScene = null
   }
-  _scenes = {}
+  
+  if (_staticScene) {
+    _staticScene.dispose() // Use InteractibleScene's dispose method
+    disposeOfScene(_staticScene)
+    _staticScene = null
+  }
 
   // 4. Dispose of Textures and Sprite Sheets:
   disposeTexturesAndSpriteSheets()
@@ -1524,7 +1541,6 @@ export function dispose() {
   }
 
   // 7. Additional Cleanup (As Needed):
-  // - Dispose of other custom objects or resources
   window.removeEventListener('resize', onWindowResize)
 
   Object.values(AUDIO_ASSETS).forEach(audio => {
@@ -1672,12 +1688,11 @@ export function updateGrass(density: number, segments: number) {
   _currentQualitySettings.grassCount = density;
   _currentQualitySettings.grassSegments = segments;
   
-  
   // Recreate grass with new settings if it exists
   if (_grass) {
     // Remove old grass
-    if (_scenes[SceneName.Duel]) {
-      _scenes[SceneName.Duel].remove(_grass)
+    if (_duelScene) {
+      _duelScene.remove(_grass)
     }
     
     // Dispose of old grass
@@ -1702,7 +1717,7 @@ export function updateWater(reflective: boolean, quality: number, waveEffects: b
   // If we have a water plane
   if (_groundMirror) {
     // Remove existing water plane from the scene
-    _scenes[SceneName.Duel].remove(_groundMirror)
+    _duelScene.remove(_groundMirror)
     
     // Dispose of the current water object
     _groundMirror?.dispose();
@@ -1721,7 +1736,7 @@ export function updateWater(reflective: boolean, quality: number, waveEffects: b
       }
     );
 
-    _scenes[SceneName.Duel].add(_groundMirror)
+    _duelScene.add(_groundMirror)
      
   }
 }
@@ -1773,9 +1788,8 @@ export function updateInteractibeSceneSettings(sceneShiftEnabled: boolean, blurE
   _currentQualitySettings.sceneShiftEnabled = sceneShiftEnabled;
   _currentQualitySettings.blurEnabled = blurEnabled;
   
-  Object.values(_scenes).forEach(scene => {
-    if (scene instanceof InteractibleScene) {
-      scene.updateSettings(sceneShiftEnabled, blurEnabled)
-    }
-  });
+  // Update the single static scene instance 🐙
+  if (_staticScene instanceof InteractibleScene) {
+    _staticScene.updateSettings(sceneShiftEnabled, blurEnabled)
+  }
 }
