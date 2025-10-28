@@ -274,25 +274,7 @@ mod tests {
 
     #[test]
     fn test_velords_migrate_ranked_duelists_2() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN | FLAGS::OWNER | FLAGS::DUELIST | FLAGS::FAME | FLAGS::LORDS);
-        //
-        // get some FAME into the bank for burning
-        tester::execute_claim_starter_pack(@sys, OWNER()); // minted 1, 2
-        let fame_supply: u256 = sys.fame.total_supply();
-        let fame_balance: u256 = sys.fame.balance_of_token(sys.duelists.contract_address, 1);
-        let half_balance: u256 = fame_balance / 2;
-        assert_gt!(fame_balance, 0);
-        assert_eq!(fame_supply, fame_balance * 2);
-        tester::impersonate(sys.duelists.contract_address);
-        sys.fame.transfer_from_token(sys.duelists.contract_address, 1, sys.bank.contract_address, half_balance);
-        assert_eq!(sys.fame.balance_of_token(sys.duelists.contract_address, 1), half_balance);
-        assert_eq!(sys.fame.balance_of(sys.bank.contract_address), half_balance);
-        // mock FAME pool
-        tester::set_Pool(ref sys.world, @Pool {
-            pool_id: PoolType::FamePeg,
-            balance_lords: 0,
-            balance_fame: fame_supply.low,
-        });
+        let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN | FLAGS::OWNER);
         //
         // mock memorials
         tester::impersonate(OWNER());
@@ -324,12 +306,66 @@ mod tests {
         // migrate...
         let season_id: u32 = 13;
         tester::set_current_season(ref sys, season_id);
+        tester::impersonate(OWNER());
         sys.admin.velords_migrate_ranked_duelists_2(array![2,3]);
         assert_eq!(sys.store.get_duelist_memorial_value(1).season_id, 12);
         assert_eq!(sys.store.get_duelist_memorial_value(2).season_id, 12);
         assert_eq!(sys.store.get_duelist_memorial_value(3).season_id, 12);
+    }
+
+
+    #[test]
+    fn test_velords_migrate_pools_2_burn_fame() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN | FLAGS::OWNER | FLAGS::DUELIST | FLAGS::FAME | FLAGS::LORDS);
+        //
+        // get some FAME into the bank for burning
+        tester::execute_claim_starter_pack(@sys, OWNER()); // minted 1, 2
+        let fame_supply: u256 = sys.fame.total_supply();
+        let fame_balance: u256 = sys.fame.balance_of_token(sys.duelists.contract_address, 1);
+        let half_balance: u256 = fame_balance / 2;
+        assert_gt!(fame_balance, 0);
+        assert_eq!(fame_supply, fame_balance * 2);
+        tester::impersonate(sys.duelists.contract_address);
+        sys.fame.transfer_from_token(sys.duelists.contract_address, 1, sys.bank.contract_address, half_balance);
+        assert_eq!(sys.fame.balance_of_token(sys.duelists.contract_address, 1), half_balance);
+        assert_eq!(sys.fame.balance_of(sys.bank.contract_address), half_balance);
+        // mock FAME pool
+        tester::set_Pool(ref sys.world, @Pool {
+            pool_id: PoolType::FamePeg,
+            balance_lords: 100_000_000_000_000_000_000,
+            balance_fame: fame_supply.low,
+        });
+        //
+        // get LORDS into bank...
+        tester::impersonate(OWNER());
+        tester::execute_lords_faucet(@sys.lords, sys.bank.contract_address);
+        assert_eq!(sys.lords.balance_of(sys.bank.contract_address), 10_000_000_000_000_000_000_000);
+        // mock pools
+        tester::impersonate(OWNER());
+        tester::set_Config(ref sys.world, @Config {
+            key: CONFIG::CONFIG_KEY,
+            current_season_id: 13,
+            treasury_address: TREASURY(),
+            lords_address: sys.lords.contract_address,
+            vrf_address: ZERO(),
+            realms_address: REALMS(),
+            is_paused: false,
+        });
+        //
+        // migrate...
+        tester::impersonate(OWNER());
+        sys.admin.velords_migrate_pools_2();
+        //
+        // validate burned FAME
+        let pool_fame_peg: Pool = sys.store.get_pool(PoolType::FamePeg);
         assert_eq!(sys.fame.balance_of(sys.bank.contract_address), 0);
         assert_eq!(sys.fame.total_supply(), fame_supply - half_balance);
-        assert_eq!(sys.store.get_pool(PoolType::FamePeg).balance_fame, fame_supply.low - half_balance.low);
+        assert_eq!(pool_fame_peg.balance_fame, fame_supply.low - half_balance.low);
+        //
+        // Validate FamePeg pool
+        assert_eq!(sys.lords.balance_of(TREASURY()), 30_000_000_000_000_000_000);
+        assert_eq!(sys.lords.balance_of(REALMS()), 15_000_000_000_000_000_000);
+        assert_eq!(sys.lords.balance_of(sys.bank.contract_address), 10_000_000_000_000_000_000_000 - 45_000_000_000_000_000_000);
+        assert_eq!(pool_fame_peg.balance_lords, 55_000_000_000_000_000_000);
     }
 }

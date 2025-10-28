@@ -193,4 +193,41 @@ pub impl AdminFixImpl of AdminFixTrait {
         store.set_pool(@fame_peg_pool);
     }
 
+    //
+    // dilute bank FAME
+    //
+    fn velords_migrate_pools_2(ref store: Store) {
+        //
+        // Peg Pool distribution
+        let config: Config = store.get_config();
+        let mut peg_pool: Pool = store.get_pool(PoolType::FamePeg);
+        let pegged_lords: u128 = peg_pool.balance_lords;
+        assert(pegged_lords.is_non_zero(), 'ADMIN: Invalid pegged lords');
+        let lords_underware: u128 = MathTrait::percentage(pegged_lords, 30);
+        let lords_realms: u128 = MathTrait::percentage(pegged_lords, 15);
+        let lords_distributed: u128 = (lords_underware + lords_realms);
+        // transfer
+        assert(config.treasury_address.is_non_zero(), 'ADMIN: Invalid treasury');
+        assert(config.realms_address.is_non_zero(), 'ADMIN: Invalid realms');
+        let bank_dispatcher: IBankProtectedDispatcher = store.world.bank_protected_dispatcher();
+        bank_dispatcher.transfer_lords(config.treasury_address, lords_underware);
+        bank_dispatcher.transfer_lords(config.realms_address, lords_realms);
+        // emit event
+        let past_season_id: u32 = config.current_season_id - 1;
+        store.emit_purchase_distribution(
+            past_season_id,
+            store.world.bank_address(),
+            ZERO(), // purchase token_address
+            array![], // token_ids
+            lords_distributed,
+            lords_underware,
+            lords_realms,
+            0, // lords_fees
+            0, // lords_season
+        );
+        // update pool
+        peg_pool.withdraw_lords(lords_distributed);
+        store.set_pool(@peg_pool);
+    }
+
 }
