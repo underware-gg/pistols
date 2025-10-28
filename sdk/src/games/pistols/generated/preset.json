@@ -120,7 +120,7 @@
               },
               {
                 "entrypoint": "purchase",
-                "description": "Purchase a closed pack"
+                "description": "Purchase packs"
               },
               {
                 "entrypoint": "open",
@@ -152,10 +152,6 @@
           "0x07aaa9866750a0db82a54ba8674c38620fa2f967d2fbb31133def48e0527c87f": {
             "description": "Duelist ERC721 contract",
             "methods": [
-              {
-                "entrypoint": "poke",
-                "description": "Reactivates an inactive Duelist"
-              },
               {
                 "entrypoint": "sacrifice",
                 "description": "Sacrifices a Duelist"
