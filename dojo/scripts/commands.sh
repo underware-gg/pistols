@@ -29,7 +29,12 @@ fi
 # sozo -P $PROFILE model get pistols-Config 1
 
 # admin::set_treasury
-# sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait admin set_treasury 0x04D92577856263bDe8E7601Ee189b6dbe52aCb879462489B92c0789f6c157E6c
+# sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait admin set_treasury 0x029211ae4f53126082017b1C69B7d9D7CCBA2bA3bc67710884B4Bf55d79Ef8F4
+# sozo -P $PROFILE model get pistols-Config 1
+
+# admin::set_realms_address
+# https://github.com/BibliothecaDAO/lordship-stREALMS/blob/96c3185b88408a129823ceb92d83f30b77055ff4/veLords/README.md?plain=1#L13
+# sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait admin set_realms_address 0x045c587318c9ebcf2fbe21febf288ee2e3597a21cd48676005a5770a50d433c5
 # sozo -P $PROFILE model get pistols-Config 1
 
 # admin::set_is_team_member
