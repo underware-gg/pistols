@@ -23,6 +23,7 @@ export const useConfig = () => {
   const treasuryAddress = useMemo(() => (config ? BigInt(config.treasury_address) : undefined), [config])
   const lordsAddress = useMemo(() => (config ? BigInt(config.lords_address) : undefined), [config])
   const vrfAddress = useMemo(() => (config ? BigInt(config.vrf_address) : undefined), [config])
+  const realmsAddress = useMemo(() => (config ? BigInt(config.realms_address ?? 0) : undefined), [config])
 
   return {
     isPaused,
@@ -31,6 +32,7 @@ export const useConfig = () => {
     treasuryAddress,
     lordsAddress,
     vrfAddress,
+    realmsAddress,
   }
 }
 

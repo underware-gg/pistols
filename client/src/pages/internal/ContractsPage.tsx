@@ -11,6 +11,7 @@ import { Connect } from '/src/pages/tests/ConnectTestPage'
 import { InternalPageMenu } from '/src/pages/internal/InternalPageIndex'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppDojo from '/src/components/AppDojo'
+import { FoolsBalance, LordsBalance } from '/src/components/account/LordsBalance'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -61,10 +62,10 @@ function Contracts() {
         <ContractRow name='game' />
         <ContractRow name='game_loop' />
         <ContractRow name='bot_player' />
-        <ContractRow name='matchmaker' />
+        <ContractRow name='matchmaker' foolsBalance />
         <ContractRow name='tutorial' />
         <ContractRow name='admin' />
-        <ContractRow name='bank' />
+        <ContractRow name='bank' lordsBalance />
       </Body>
       <Header>
         <Row className='H5'>
@@ -109,10 +110,14 @@ function ContractRow({
   name,
   address,
   description,
+  lordsBalance = false,
+  foolsBalance = false,
 }: {
   name: string,
   address?: BigNumberish,
   description?: string,
+  lordsBalance?: boolean,
+  foolsBalance?: boolean,
 }) {
   const { contractAddress } = useDojoSystem(name)
   const _address = address ?? contractAddress
@@ -141,7 +146,9 @@ function ContractRow({
         <ExplorerLink address={_address} starkscan />
       </Cell>
       <Cell>
-        <ExplorerLink address={_address} viewblock />
+        {/* <ExplorerLink address={_address} viewblock /> */}
+        {lordsBalance && <LordsBalance address={_address} />}
+        {foolsBalance && <FoolsBalance address={_address} />}
       </Cell>
     </Row>
   )

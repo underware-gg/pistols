@@ -293,6 +293,7 @@ const snSepoliaConfig: DojoNetworkConfig = {
   slotName: 'pistols-sepolia',
   rpcUrl: 'https://api.cartridge.gg/x/starknet/sepolia/rpc/v0_9',
   toriiUrl: undefined,    // derive from slotName
+  // toriiUrl: 'http://127.0.0.1:8080',
   graphqlUrl: undefined,  // derive from slotName
   sqlUrl: undefined,      // derive from slotName
   etherAddress: sepolia.nativeCurrency.address,

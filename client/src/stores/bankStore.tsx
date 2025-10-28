@@ -67,7 +67,7 @@ export const useFundedStarterPackCount = () => {
 export const useFundedPackCount = (pack_type: constants.PackType) => {
   const { priceLords } = usePackType(pack_type)
   const { balanceLords: poolBalanceLords } = usePool(constants.PoolType.Claimable)
-  const fundedCount = useMemo(() => Number(poolBalanceLords / priceLords), [poolBalanceLords, priceLords])
+  const fundedCount = useMemo(() => !priceLords ? 999999 : Number(poolBalanceLords / priceLords), [poolBalanceLords, priceLords])
   return {
     fundedCount,
     priceLords,

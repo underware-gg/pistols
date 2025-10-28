@@ -6,6 +6,8 @@ export const CHARACTER_NAMES: Record<string, string> = {
   '0x0569d6f6080a3aB8678738De7Da68097796b11ECE78b21fD7FAe2Fd7505AB0Ba': 'The Bartender', // auto reveal account
   '0x05d9c9168e6bf86f250a813d38ad5a95c67cb3ca42ab93411a184c9c731fa69a': 'Imp Master', // bot_player contract
   '0x002346e4ccfc96bee8eb5391344f5f5ab7bf17d36c566888fe39e8816d0a50e7': '[Cartridge Airdropper]', // merkle drop contract
+  '0x029211ae4f53126082017b1C69B7d9D7CCBA2bA3bc67710884B4Bf55d79Ef8F4': '[Pistols Treasury]', // pistols treasury wallet
+  '0x045c587318c9ebcf2fbe21febf288ee2e3597a21cd48676005a5770a50d433c5': '[veLords Burner Contract]', // https://github.com/BibliothecaDAO/lordship-stREALMS/blob/main/veLords/README.md
 }
 
 export const CHARACTER_AVATARS: Record<string, string> = {

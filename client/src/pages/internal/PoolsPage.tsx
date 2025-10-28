@@ -241,7 +241,7 @@ function Pools() {
 
         <PoolRow pool={poolPurchases} description='Unopened purchased packs' />
         <PoolRow pool={poolClaimable} description='Sponsored free duelists' />
-        <PoolRow pool={poolSeason} displayFame={false} description='Season prizes (sponsored)' />
+        <PoolRow pool={poolSeason} description='Season prizes (dead duelists + sponsored)' />
 
         <Row className='BgDarkest'>
           <Cell><h3 className='Important TitleCase'>$FAME Peg</h3></Cell>
@@ -287,7 +287,6 @@ function Pools() {
         </Row>
 
         <PoolRow pool={poolFamePeg} description='Opened packs, pegged to full FAME supply' />
-        <PoolRow pool={poolSeason} displayLords={false} description='Season prizes (dead duelists)' />
         <PoolRow pool={poolSacrifice} description='Reserved for Sacrifice (dead duelists)' />
 
         <Row className='BgDarkest'>

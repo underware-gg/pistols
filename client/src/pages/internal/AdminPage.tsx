@@ -16,6 +16,7 @@ import { useValidateWalletAddress } from '@underware/pistols-sdk/utils/hooks'
 import { bigintToAddress, isBigint, isPositiveBigint, STARKNET_ADDRESS_LENGTH } from '@underware/pistols-sdk/utils'
 import { PlayerNameSync } from '/src/stores/sync/PlayerNameSync'
 import { Leaderboards } from './SeasonsPage'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppDojo from '/src/components/AppDojo'
 
@@ -38,6 +39,7 @@ export default function AdminPage() {
 
         <InternalPageWrapper>
           <Config />
+          <LordsDistribution />
           <TeamMembers />
           <TeamMembersEditor />
           <br />
@@ -122,7 +124,7 @@ export function WalletAddressRow({
 
 function Config() {
   const { account } = useAccount()
-  const { isPaused, currentSeasonId, treasuryAddress, vrfAddress, lordsAddress } = useConfig()
+  const { isPaused, currentSeasonId, treasuryAddress, vrfAddress, lordsAddress, realmsAddress } = useConfig()
   const deployerAddress = '0x04D92577856263bDe8E7601Ee189b6dbe52aCb879462489B92c0789f6c157E6c';
   const botAddress = '0x0569d6f6080a3aB8678738De7Da68097796b11ECE78b21fD7FAe2Fd7505AB0Ba';
   const { admin } = useDojoSystemCalls()
@@ -190,6 +192,18 @@ function Config() {
           <Cell></Cell>
         </Row>
         <Row className='H5'>
+          <Cell className='Important'>realmsAddress</Cell>
+          <Cell>
+            <Address address={realmsAddress} full />
+          </Cell>
+          <Cell>
+            <ExplorerLink address={realmsAddress} voyager />
+          </Cell>
+          <Cell>
+            <LordsBalance address={realmsAddress} />
+          </Cell>
+        </Row>
+        <Row className='H5'>
           <Cell>[Pistols Deployer]</Cell>
           <Cell>
             <Address address={deployerAddress} full />
@@ -211,6 +225,45 @@ function Config() {
           </Cell>
           <Cell>
             <StrkBalance address={botAddress} decimals={3} />
+          </Cell>
+        </Row>
+      </Body>
+    </Table>
+  )
+}
+
+
+
+//------------------------------------
+// Lords Distribution
+//
+
+function LordsDistribution() {
+  return (
+    <Table celled striped size='small' color='orange'>
+      <Header>
+        <Row>
+          <HeaderCell width={3}><h3>Lords Distribution</h3></HeaderCell>
+          <HeaderCell><h3>Underware</h3></HeaderCell>
+          <HeaderCell><h3>Realms</h3></HeaderCell>
+          <HeaderCell><h3>Fees</h3></HeaderCell>
+          <HeaderCell><h3>Season</h3></HeaderCell>
+        </Row>
+      </Header>
+      <Body className='Code'>
+        <Row className='H5'>
+          <Cell className='Important'></Cell>
+          <Cell textAlign='left'>
+            {constants.RULES.UNDERWARE_PERCENT}%
+          </Cell>
+          <Cell textAlign='left'>
+            {constants.RULES.REALMS_PERCENT}%
+          </Cell>
+          <Cell textAlign='left'>
+            {constants.RULES.FEES_PERCENT}%
+          </Cell>
+          <Cell textAlign='left'>
+            {constants.RULES.SEASON_PERCENT}%
           </Cell>
         </Row>
       </Body>
