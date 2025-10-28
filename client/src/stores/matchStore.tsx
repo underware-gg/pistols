@@ -8,7 +8,7 @@ import { useDuelistsOrganizedByAddress, useDuelistStore, useFetchDuelistIdsOwned
 import { DuelistProfileKey } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { useAccount } from '@starknet-react/core'
-import { arrayUnique } from '@underware/pistols-sdk/utils'
+import { arrayUnique, bigintToNumber } from '@underware/pistols-sdk/utils'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 
 export const useMatchStore = createDojoStore<PistolsSchemaType>();
@@ -143,7 +143,7 @@ export const _useDuelistsInMatchMakingByAddress = (queueId: constants.QueueId, a
           return;
         }
         // Free to enlist
-        if (isUnassigned) {
+        if (isUnassigned && bigintToNumber(duelist.totals.total_duels) == 0) {
           rankedCanEnlistIds.push(duelistId);
         }
         // All Enlisted (paid)
