@@ -17,6 +17,7 @@ pub trait IAdmin<TState> {
     fn velords_migrate_ranked_challenges(ref self: TState, duel_ids: Array<u128>); //@description: Admin function
     fn velords_migrate_ranked_duelists(ref self: TState, duelist_ids: Array<u128>); //@description: Admin function
     fn velords_migrate_packs(ref self: TState, pack_ids: Array<u128>); //@description: Admin function
+    fn velords_migrate_ranked_duelists_2(ref self: TState, duelist_ids: Array<u128>); //@description: Admin function
 }
 
 #[dojo::contract]
@@ -188,6 +189,12 @@ pub mod admin {
             self._assert_caller_is_admin();
             let mut store: Store = StoreTrait::new(self.world_default());
             AdminFixTrait::velords_migrate_packs(ref store, pack_ids.span());
+        }
+        fn velords_migrate_ranked_duelists_2(ref self: ContractState, duelist_ids: Array<u128>) {
+            self._assert_caller_is_admin();
+            let mut store: Store = StoreTrait::new(self.world_default());
+            AdminFixTrait::velords_migrate_ranked_duelists_fix(ref store, duelist_ids.span());
+            AdminFixTrait::velords_migrate_burn_fame(ref store);
         }
     }
 

@@ -13,7 +13,7 @@ use dojo::model::{
 use pistols::models::{
     config::{Config},
     challenge::{Challenge},
-    duelist::{DuelistAssignment, CauseOfDeath},
+    duelist::{DuelistAssignment, DuelistMemorial, CauseOfDeath},
     pack::{Pack},
     pool::{Pool, PoolType},
 };
@@ -154,6 +154,15 @@ pub impl AdminFixImpl of AdminFixTrait {
     fn velords_migrate_memorialize_duelists(ref store: Store, duelist_ids: Array<u128>) {
         store.world.duelist_token_protected_dispatcher().memorialize_duelists(duelist_ids, CauseOfDeath::Ranked);
     }
+    fn velords_migrate_ranked_duelists_fix(ref store: Store, duelist_ids: Span<u128>) {
+        let past_season_id: u32 = store.get_current_season_id() - 1;
+        let ptrs: Span<ModelPtr<DuelistMemorial>> = Model::<DuelistMemorial>::ptrs_from_keys(duelist_ids);
+        let mut season_ids: Array<u32> = array![];
+        for _ in 0..duelist_ids.len() {
+            season_ids.append(past_season_id);
+        }
+        store.world.write_member_of_models_legacy(ptrs, selector!("season_id"), season_ids.span());
+    }
 
     //
     // adds pegged_lords_amount to unopened packs
@@ -170,6 +179,18 @@ pub impl AdminFixImpl of AdminFixTrait {
             pegged_lords_amounts.append(MathTrait::percentage(*lords_amounts[i], RULES::SEASON_PERCENT));
         }
         store.world.write_member_of_models_legacy(ptrs, selector!("pegged_lords_amount"), pegged_lords_amounts.span());
+    }
+
+    //
+    // dilute bank FAME
+    //
+    fn velords_migrate_burn_fame(ref store: Store) {
+        let fame_burned: u128 = store.world.bank_protected_dispatcher().burn_fame();
+        assert(fame_burned.is_non_zero(), 'ADMIN: Failed to burn FAME');
+        // Remove from peg pool
+        let mut fame_peg_pool: Pool = store.get_pool(PoolType::FamePeg);
+        fame_peg_pool.withdraw_fame(fame_burned);
+        store.set_pool(@fame_peg_pool);
     }
 
 }

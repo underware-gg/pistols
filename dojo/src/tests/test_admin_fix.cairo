@@ -5,7 +5,7 @@ mod tests {
     use pistols::models::{
         // pool::{Pool, PoolTrait, PoolType},
         challenge::{Challenge, DuelType},
-        duelist::{DuelistAssignment, CauseOfDeath},
+        duelist::{DuelistAssignment, DuelistMemorial, CauseOfDeath},
         match_queue::{QueueId},
         pack::{Pack, PackType},
         pool::{Pool, PoolType},
@@ -271,4 +271,65 @@ mod tests {
         assert_eq!(sys.store.get_duelist_memorial_value(6).cause_of_death, CauseOfDeath::None); // no change
     }
 
+
+    #[test]
+    fn test_velords_migrate_ranked_duelists_2() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN | FLAGS::OWNER | FLAGS::DUELIST | FLAGS::FAME | FLAGS::LORDS);
+        //
+        // get some FAME into the bank for burning
+        tester::execute_claim_starter_pack(@sys, OWNER()); // minted 1, 2
+        let fame_supply: u256 = sys.fame.total_supply();
+        let fame_balance: u256 = sys.fame.balance_of_token(sys.duelists.contract_address, 1);
+        let half_balance: u256 = fame_balance / 2;
+        assert_gt!(fame_balance, 0);
+        assert_eq!(fame_supply, fame_balance * 2);
+        tester::impersonate(sys.duelists.contract_address);
+        sys.fame.transfer_from_token(sys.duelists.contract_address, 1, sys.bank.contract_address, half_balance);
+        assert_eq!(sys.fame.balance_of_token(sys.duelists.contract_address, 1), half_balance);
+        assert_eq!(sys.fame.balance_of(sys.bank.contract_address), half_balance);
+        // mock FAME pool
+        tester::set_Pool(ref sys.world, @Pool {
+            pool_id: PoolType::FamePeg,
+            balance_lords: 0,
+            balance_fame: fame_supply.low,
+        });
+        //
+        // mock memorials
+        tester::impersonate(OWNER());
+        tester::set_DuelistMemorial(ref sys.world, @DuelistMemorial {
+            duelist_id: 1,
+            cause_of_death: CauseOfDeath::Ranked,
+            killed_by: 0,
+            fame_before_death: 0,
+            player_address: OWNER(),
+            season_id: 12,
+        });
+        tester::set_DuelistMemorial(ref sys.world, @DuelistMemorial {
+            duelist_id: 2,
+            cause_of_death: CauseOfDeath::Ranked,
+            killed_by: 0,
+            fame_before_death: 0,
+            player_address: OWNER(),
+            season_id: 13,
+        });
+        tester::set_DuelistMemorial(ref sys.world, @DuelistMemorial {
+            duelist_id: 3,
+            cause_of_death: CauseOfDeath::Ranked,
+            killed_by: 0,
+            fame_before_death: 0,
+            player_address: OWNER(),
+            season_id: 13,
+        });
+        //
+        // migrate...
+        let season_id: u32 = 13;
+        tester::set_current_season(ref sys, season_id);
+        sys.admin.velords_migrate_ranked_duelists_2(array![2,3]);
+        assert_eq!(sys.store.get_duelist_memorial_value(1).season_id, 12);
+        assert_eq!(sys.store.get_duelist_memorial_value(2).season_id, 12);
+        assert_eq!(sys.store.get_duelist_memorial_value(3).season_id, 12);
+        assert_eq!(sys.fame.balance_of(sys.bank.contract_address), 0);
+        assert_eq!(sys.fame.total_supply(), fame_supply - half_balance);
+        assert_eq!(sys.store.get_pool(PoolType::FamePeg).balance_fame, fame_supply.low - half_balance.low);
+    }
 }

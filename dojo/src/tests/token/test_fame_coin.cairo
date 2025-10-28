@@ -154,3 +154,21 @@ fn test_fame_transfer_from_owner_not_allowed() {
     tester::impersonate(OWNER());
     sys.fame.transfer(OTHER(), FAME::MINT_GRANT_AMOUNT.into() / 2);
 }
+
+#[test]
+#[should_panic(expected: ('ERC20: insufficient allowance', 'ENTRYPOINT_FAILED'))]
+fn test_fame_transfer_from_token_not_allowed() {
+    let mut sys: TestSystems = setup(0);
+    // transfer FAME
+    tester::impersonate(OWNER());
+    sys.fame.transfer_from_token(sys.duelists.contract_address, TOKEN_ID_1_1.low, OTHER(), FAME::MINT_GRANT_AMOUNT.into() / 2);
+}
+
+#[test]
+#[should_panic(expected: ('ERC20: insufficient allowance', 'ENTRYPOINT_FAILED'))]
+fn test_fame_transfer_from_token_to_token_not_allowed() {
+    let mut sys: TestSystems = setup(0);
+    // transfer FAME
+    tester::impersonate(OWNER());
+    sys.fame.transfer_from_token_to_token(sys.duelists.contract_address, TOKEN_ID_1_1.low, TOKEN_ID_2_1.low, FAME::MINT_GRANT_AMOUNT.into() / 2);
+}

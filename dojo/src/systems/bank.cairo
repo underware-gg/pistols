@@ -35,6 +35,8 @@ pub trait IBankProtected<TState> {
     fn depeg_lords_from_fame_to_be_burned(ref self: TState, season_id: u32, fame_amount: u128) -> u128;
     // pool migration
     fn transfer_lords(ref self: TState, recipient: ContractAddress, amount: u128);
+    // FAME burner (no account should hold fame)
+    fn burn_fame(ref self: TState) -> u128;
 }
 
 #[dojo::contract]
@@ -50,6 +52,8 @@ pub mod bank {
         IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
         IAdminDispatcherTrait,
         IMatchMakerProtectedDispatcherTrait,
+        IFameCoinProtectedDispatcherTrait,
+        IFameCoinDispatcherTrait,
     };
     use pistols::interfaces::ierc20::{IErc20Trait};
     use pistols::models::{
@@ -261,6 +265,16 @@ pub mod bank {
                 amount,
                 Option::None,
             );
+        }
+
+        fn burn_fame(ref self: ContractState) -> u128 {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
+            let balance: u128 = store.world.fame_coin_dispatcher().balance_of(starknet::get_contract_address()).low;
+            if (balance.is_non_zero()) {
+                store.world.fame_coin_protected_dispatcher().burn(balance);
+            }
+            (balance)
         }
 
         fn peg_minted_fame_to_lords(ref self: ContractState,

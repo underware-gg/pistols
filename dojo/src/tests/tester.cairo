@@ -1150,6 +1150,10 @@ pub mod tester {
         world.write_model_test(model);
     }
     #[inline(always)]
+    pub fn set_DuelistMemorial(ref world: WorldStorage, model: @DuelistMemorial) {
+        world.write_model_test(model);
+    }
+    #[inline(always)]
     pub fn set_SeasonScoreboard(ref world: WorldStorage, model: @SeasonScoreboard) {
         world.write_model_test(model);
     }

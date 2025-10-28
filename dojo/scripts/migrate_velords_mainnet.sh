@@ -51,8 +51,8 @@ fi
 # # POOLS
 # # 
 # sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait admin velords_migrate_pools
-# sozo -P sepolia model get pistols-Pool 1
-# sozo -P sepolia model get pistols-Pool 2
+# sozo -P mainnet model get pistols-Pool 1
+# sozo -P mainnet model get pistols-Pool 2
 
 # # {
 # #     pool_id         : PoolType::Purchases,
@@ -484,3 +484,124 @@ fi
 # # sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait admin velords_migrate_ranked_duelists arr:$DUELIST_IDS_1
 # # sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait admin velords_migrate_ranked_duelists arr:$DUELIST_IDS_2
 
+
+
+# #------------------------------------------------------------------------------
+# # DUELISTS 2 FIX
+# # 
+# # SELECT duelist_id, queue_id
+# # FROM "pistols-DuelistAssignment"
+# # where queue_id="Ranked"
+# #
+# export DUELIST_IDS_0="0x057f"
+# export DUELIST_IDS_1="\
+# 0x16dc,\
+# 0x16cb,\
+# 0x16c9,\
+# 0x1541,\
+# 0x16cf,\
+# 0x1348,\
+# 0x165f,\
+# 0x16ce,\
+# 0x16c0,\
+# 0x133f,\
+# 0x16b7,\
+# 0x16d8,\
+# 0x1577,\
+# 0x0954,\
+# 0x15f3,\
+# 0x167b,\
+# 0x159b,\
+# 0x1710,\
+# 0x1225,\
+# 0x16ba,\
+# 0x149a,\
+# 0x165c,\
+# 0x15a1,\
+# 0x0594,\
+# 0x16d2,\
+# 0x16ca,\
+# 0x167f,\
+# 0x159c,\
+# 0x17bc,\
+# 0x17d0,\
+# 0x17a6,\
+# 0x136b,\
+# 0x17b9,\
+# 0x1691,\
+# 0x03af,\
+# 0x17a9,\
+# 0x1794,\
+# 0x03ac,\
+# 0x124b,\
+# 0x17ac,\
+# 0x174a,\
+# 0x17a8,\
+# 0x17e8,\
+# 0x1606,\
+# 0x17d9,\
+# 0x0952,\
+# 0x1749,\
+# 0x177d,\
+# 0x1745,\
+# 0x0b7b,\
+# 0x1713,\
+# 0x03ae,\
+# 0x17ae,\
+# 0x17ab,\
+# 0x17ec,\
+# 0x1793,\
+# 0x17d5,\
+# 0x17ad,\
+# 0x157a,\
+# 0x17d4,\
+# 0x17aa,\
+# 0x170e,\
+# 0x16db,\
+# 0x17a7,\
+# 0x17f5,\
+# 0x1778,\
+# 0x0953,\
+# 0x1366,\
+# 0x16ee,\
+# 0x15ec,\
+# 0x178d,\
+# 0x17ba,\
+# 0x17ea,\
+# 0x173d,\
+# 0x168d,\
+# 0x168e,\
+# 0x1779,\
+# 0x1786,\
+# 0x170f,\
+# 0x1694,\
+# 0x17a5,\
+# 0x16d0,\
+# 0x1784,\
+# 0x16cc,\
+# 0x17e9,\
+# 0x17db,\
+# 0x1693"
+# sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait admin velords_migrate_ranked_duelists_2 arr:$DUELIST_IDS_0
+# # sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait admin velords_migrate_ranked_duelists_2 arr:$DUELIST_IDS_1
+
+
+
+
+# #------------------------------------------------------------------------------
+# # POOLS 2
+# # 
+# sozo -P $PROFILE execute --world $WORLD_ADDRESS --wait admin velords_migrate_pools_2
+# sozo -P mainnet model get pistols-Pool 1
+# sozo -P mainnet model get pistols-Pool 2
+
+# # {
+# #     pool_id         : PoolType::Purchases,
+# #     balance_lords   : 0x000000000000008bdcb14a92fbd00000,
+# #     balance_fame    : 0x00000000000000000000000000000000
+# # }
+# # {
+# #     pool_id         : PoolType::FamePeg,
+# #     balance_lords   : 0x000000000000045a2e0120ed621209b9,
+# #     balance_fame    : 0x0000000000091bcf213db09799249147
+# # }
