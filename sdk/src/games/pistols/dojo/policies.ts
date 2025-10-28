@@ -21,6 +21,10 @@ import { Connector } from '@starknet-react/core'
 // policies
 //
 export const contractPolicyDescriptions_pistols: ContractPolicyDescriptions = {
+  world: {
+    name: 'Dojo world',
+    description: 'Dojo world contract',
+  },
   game: {
     name: 'Game',
     description: 'Game entry point',

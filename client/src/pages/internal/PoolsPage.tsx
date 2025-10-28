@@ -162,23 +162,21 @@ function Pools() {
   // FAME supply
   const { fameContractAddress } = useTokenContracts()
   const { totalSupply: fameSupply } = useERC20TotalSupply(fameContractAddress)
-  const { fame: fameSupplyIntoLords, percentage: fameSupplyIntoLordsPercentage } = useFameIntoLords(fameSupply)
 
   // Bank balances
   const { contractAddress: bankContractAddress } = useDojoSystem('bank')
   useFetchAccountsBalances(fameContractAddress, [bankContractAddress], true)
   const { balance: bankLordsBalance } = useLordsBalance(bankContractAddress)
   const { balance: bankFameBalance } = useFameBalance(bankContractAddress)
-  const { fame: balanceFameIntoLords, percentage: balanceFameIntoLordsPercentage } = useFameIntoLords(bankFameBalance)
-
-  // Duelists
-  const fameLivingDuelists = useMemo(() => ((fameSupply ?? 0n) - (bankFameBalance ?? 0n)), [fameSupply, bankFameBalance])
-  const { fame: fameLivingIntoLords, percentage: fameLivingIntoLordsPercentage } = useFameIntoLords(fameLivingDuelists)
 
   const poolClaimable = usePool(constants.PoolType.Claimable)
   const poolPurchases = usePool(constants.PoolType.Purchases)
   const poolFamePeg = usePool(constants.PoolType.FamePeg)
   const poolSacrifice = usePool(constants.PoolType.Sacrifice)
+
+  // Duelists
+  const fameMemorizedDuelists = useMemo(() => ((fameSupply ?? 0n) - (poolFamePeg?.balanceFame ?? 0n)), [fameSupply, poolFamePeg])
+  const { famePercentage: fameMemorizedPercentage } = useFameSupplyPercentage(fameMemorizedDuelists);
 
   const { currentSeasonId } = useConfig()
   const poolSeason = useSeasonPool(currentSeasonId)
@@ -186,16 +184,16 @@ function Pools() {
   const poolTotalLords = useMemo(() => (
     poolClaimable.balanceLords + poolPurchases.balanceLords + poolFamePeg.balanceLords + poolSacrifice.balanceLords + poolSeason.balanceLords
   ), [poolClaimable, poolPurchases, poolFamePeg, poolSacrifice, poolSeason])
-  const poolTotalFame = useMemo(() => (
-    poolClaimable.balanceFame + poolPurchases.balanceFame + poolFamePeg.balanceFame + poolSacrifice.balanceFame + poolSeason.balanceFame
-  ), [poolClaimable, poolPurchases, poolFamePeg, poolSacrifice, poolSeason])
-  const { fame: totalFameIntoLords, percentage: totalFameIntoLordsPercentage } = useFameIntoLords(poolTotalFame)
+  // const poolTotalFame = useMemo(() => (
+  //   poolClaimable.balanceFame + poolPurchases.balanceFame + poolFamePeg.balanceFame + poolSacrifice.balanceFame + poolSeason.balanceFame
+  // ), [poolClaimable, poolPurchases, poolFamePeg, poolSacrifice, poolSeason])
+  const poolTotalFame = 0n; // no pools contain fame
 
   const diffLords = useMemo(() => (bankLordsBalance - poolTotalLords), [bankLordsBalance, poolTotalLords])
   const diffFame = useMemo(() => (bankFameBalance - poolTotalFame), [bankFameBalance, poolTotalFame])
 
-  // console.log("bank: diffLords", _formatWei(diffLords))
-  // console.log("bank: diffFame", _formatWei(diffFame))
+  console.log("bank: diffLords", _formatWei(diffLords))
+  console.log("bank: diffFame", _formatWei(diffFame))
 
   return (
     <Table celled striped size='small' color='green'>
@@ -204,8 +202,8 @@ function Pools() {
           <HeaderCell width={4}><h3>Balances</h3></HeaderCell>
           <HeaderCell><h3>$LORDS</h3></HeaderCell>
           <HeaderCell><h3>$FAME</h3></HeaderCell>
-          <HeaderCell><h3>➡</h3></HeaderCell>
-          <HeaderCell><h3>$LORDS</h3></HeaderCell>
+          <HeaderCell><h3>FAME%</h3></HeaderCell>
+          <HeaderCell><h3>FAME/LORDS</h3></HeaderCell>
           <HeaderCell><h3>Description</h3></HeaderCell>
         </Row>
       </Header>
@@ -220,10 +218,8 @@ function Pools() {
             <FameBalance address={bankContractAddress} size='big' />
           </Cell>
           <Cell className='' textAlign='left'>
-            {balanceFameIntoLordsPercentage.toFixed(2)}%
           </Cell>
           <Cell className='Code' textAlign='left'>
-            ~<Balance lords wei={balanceFameIntoLords} size='big' />
           </Cell>
           <Cell className='' textAlign='left'>
             Total amount deposited, split into pools
@@ -259,35 +255,33 @@ function Pools() {
             <Balance fame wei={fameSupply} size='big' />
           </Cell>
           <Cell className='' textAlign='left'>
-            {fameSupplyIntoLordsPercentage.toFixed(2)}%
+            100%
           </Cell>
           <Cell className='Code' textAlign='left'>
-            ~<Balance lords wei={fameSupplyIntoLords} size='big' />
           </Cell>
           <Cell className='' textAlign='left'>
             Living Duelists + Pools, equals <b>FamePeg</b>
           </Cell>
         </Row>
 
+        <PoolRow pool={poolFamePeg} description='Opened packs, pegged to full FAME supply' />
+        {/* <PoolRow pool={poolSacrifice} description='Reserved for Sacrifice (dead duelists)' /> */}
+
         <Row className=''>
-          <Cell className='ModalText'>Living Duelists</Cell>
+          <Cell className='ModalText'>Released FAME</Cell>
           <Cell></Cell>
           <Cell className='Code' textAlign='left'>
-            <Balance fame wei={fameLivingDuelists} size='big' />
+            <Balance fame wei={fameMemorizedDuelists} size='big' />
           </Cell>
           <Cell className='' textAlign='left'>
-            {fameLivingIntoLordsPercentage.toFixed(2)}%
+            {fameMemorizedPercentage.toFixed(2)}%
           </Cell>
           <Cell className='Code' textAlign='left'>
-            ~<Balance lords wei={fameLivingIntoLords} size='big' />
           </Cell>
           <Cell className='' textAlign='left'>
-            Owned by Living Duelists
+            Enlisted, memorialized, sacrificed
           </Cell>
         </Row>
-
-        <PoolRow pool={poolFamePeg} description='Opened packs, pegged to full FAME supply' />
-        <PoolRow pool={poolSacrifice} description='Reserved for Sacrifice (dead duelists)' />
 
         <Row className='BgDarkest'>
           <Cell><h3 className='Important TitleCase'>Totals</h3></Cell>
@@ -307,10 +301,8 @@ function Pools() {
             <Balance fame wei={poolTotalFame} size='big' />
           </Cell>
           <Cell className='' textAlign='left'>
-            {totalFameIntoLordsPercentage.toFixed(2)}%
           </Cell>
           <Cell className='Code' textAlign='left'>
-            ~<Balance lords wei={totalFameIntoLords} size='big' />
           </Cell>
           <Cell className='' textAlign='left'>
             Should equals <b>Bank</b>
@@ -353,7 +345,8 @@ function PoolRow({
   description?: string
 }) {
   const { poolType, seasonId, tournamentId, balanceLords, balanceFame } = pool
-  const { fame: fameIntoLords, percentage: fameIntoLordsPercentage } = useFameIntoLords(balanceFame)
+  const { famePercentage } = useFameSupplyPercentage(balanceFame);
+  const fameToLords = useMemo(() => (balanceFame && balanceLords) ? (balanceFame / balanceLords) : 0n, [balanceLords, balanceFame])
 
   return (
     <Row className=''>
@@ -367,10 +360,10 @@ function PoolRow({
         <Balance fame wei={displayFame ? balanceFame : 0n} size='big' />
       </Cell>
       <Cell className='' textAlign='left'>
-        {displayFame && fameIntoLordsPercentage > 0 ? `${fameIntoLordsPercentage.toFixed(2)}%` : ''}
+        {displayFame && famePercentage > 0 ? `${famePercentage.toFixed(2)}%` : ''}
       </Cell>
       <Cell className='Code' textAlign='left'>
-        ~<Balance lords wei={displayFame ? fameIntoLords : 0n} size='big' />
+        <Balance fame eth={displayFame ? fameToLords : 0n} decimals={2} size='big' />
       </Cell>
       <Cell className='' textAlign='left'>
         {description}
@@ -379,19 +372,15 @@ function PoolRow({
   )
 }
 
-const useFameIntoLords = (balanceFame: bigint) => {
+const useFameSupplyPercentage = (balanceFame: bigint) => {
   const { fameContractAddress } = useTokenContracts();
   const { totalSupply: fameSupply } = useERC20TotalSupply(fameContractAddress);
-  const { balanceLords: peggedLords } = usePool(constants.PoolType.FamePeg);
   const precision = 100000000;
   const percentage = useMemo(() => (
     (isBigint(balanceFame) && isBigint(fameSupply)) ? Math.floor((Number(weiToEth(balanceFame)) / Number(weiToEth(fameSupply))) * precision) : 0
   ), [balanceFame, fameSupply]);
-  const result = useMemo(() => (BigInt(percentage) * peggedLords) / BigInt(precision), [percentage, peggedLords]);
-  // console.log('useFameIntoLords', weiToEth(balanceFame), weiToEth(fameSupply), weiToEth(peggedLords), percentage, '>', weiToEth(result));
   return {
-    fame: result,
-    percentage: (percentage / precision) * 100,
+    famePercentage: (percentage / precision) * 100,
   };
 }
 
