@@ -19,6 +19,8 @@ export const INTERFACE_DESCRIPTIONS: any = {
     velords_migrate_ranked_challenges: 'Admin function',
     velords_migrate_ranked_duelists: 'Admin function',
     velords_migrate_packs: 'Admin function',
+    velords_migrate_pools_2: 'Admin function',
+    velords_migrate_ranked_duelists_2: 'Admin function',
   },
   // from: ../dojo/src/systems/bank.cairo
   IBankPublic: {

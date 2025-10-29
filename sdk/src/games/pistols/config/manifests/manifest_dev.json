@@ -1479,8 +1479,8 @@
   },
   "contracts": [
     {
-      "address": "0x460f434280fad8587049d56845c4d996d248ae1695afbea901fe2f2c7cc51b9",
-      "class_hash": "0x6ccc1eb9d2e8b252d4b4449c6723bb08a21b2fb90e425891762bfe09fd66054",
+      "address": "0x3bcc96581d88c6b848548979c335023470544e9cfee1cb83bd0414d9211b450",
+      "class_hash": "0x2bc993db6b5823313485c74134dab58b4c87ab0b063612171213246b09ded48",
       "abi": [
         {
           "type": "impl",
@@ -1756,6 +1756,25 @@
               ],
               "outputs": [],
               "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "velords_migrate_pools_2",
+              "inputs": [],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "velords_migrate_ranked_duelists_2",
+              "inputs": [
+                {
+                  "name": "duelist_ids",
+                  "type": "core::array::Array::<core::integer::u128>"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
             }
           ]
         },
@@ -1888,12 +1907,14 @@
         "velords_migrate_ranked_challenges",
         "velords_migrate_ranked_duelists",
         "velords_migrate_packs",
+        "velords_migrate_pools_2",
+        "velords_migrate_ranked_duelists_2",
         "upgrade"
       ]
     },
     {
-      "address": "0x29b39f0a4045ba3a4916eaa318b1d518944dc9d2521f2415e4a5420ecf4dc56",
-      "class_hash": "0x43c8b1a07b770a7ec2252548084193b5ac503828291891695ebb1f76f3c84e1",
+      "address": "0x174e1f7d57c2d7c00752afcf151b67661dabce3cffeb686ceeeffea58e0ed1a",
+      "class_hash": "0x1c4b126097a1d683c06802b9838686cb2dbf514a48e158cff86af9a6c656844",
       "abi": [
         {
           "type": "impl",
@@ -2170,6 +2191,17 @@
               ],
               "outputs": [],
               "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "burn_fame",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::integer::u128"
+                }
+              ],
+              "state_mutability": "external"
             }
           ]
         },
@@ -2300,6 +2332,7 @@
         "peg_minted_fame_to_lords",
         "depeg_lords_from_fame_to_be_burned",
         "transfer_lords",
+        "burn_fame",
         "upgrade"
       ]
     },
