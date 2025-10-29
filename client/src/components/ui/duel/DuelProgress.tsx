@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Image } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
-import { bigintToHex } from '@underware/pistols-sdk/utils'
+import { BigNumberish } from 'starknet'
+import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
-import { useDojoSetup } from '@underware/pistols-sdk/dojo'
+import { useDojoSetup, useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { useApiAutoReveal } from '@underware/pistols-sdk/api'
 import { useRevealAction, useSignAndRestoreMovesFromHash } from '/src/hooks/useRevealAction'
 import { useIsMyDuelist } from '/src/hooks/useIsYou'
@@ -11,6 +12,11 @@ import { DuelStage, useDuel } from '/src/hooks/useDuel'
 import CommitPacesModal from '/src/components/modals/CommitPacesModal'
 import { useTransactionHandler, useTransactionObserver } from '/src/hooks/useTransaction'
 import { useDuelContext } from '/src/components/ui/duel/DuelContext'
+import { usePistolsContext } from '/src/hooks/PistolsContext'
+import { useChallenge } from '/src/stores/challengeStore'
+import { useDuelist } from '/src/stores/duelistStore'
+import { useDuelistFameBalance } from '/src/stores/coinStore'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 export default function DuelProgress({
   isA = false,
@@ -28,6 +34,15 @@ export default function DuelProgress({
   const { gameImpl } = useThreeJsContext()
   const { completedStagesLeft } = useDuelContext()
   const { round1, challenge: { isTutorial } } = useDuel(duelId)
+  const { duelistSelectOpener } = usePistolsContext()
+  const { livesStaked, state } = useChallenge(duelId)
+  const { duel_token } = useDojoSystemCalls()
+  const { account } = useAccount()
+  
+  const [selectedDuelistIdForCheck, setSelectedDuelistIdForCheck] = useState<BigNumberish>(0n)
+  
+  const { isInAction } = useDuelist(selectedDuelistIdForCheck)
+  const { lives } = useDuelistFameBalance(selectedDuelistIdForCheck)
 
   const round1Moves = useMemo(() => {
     if (swapSides) {
@@ -56,6 +71,36 @@ export default function DuelProgress({
 
   const { isLoading: isLoadingCommit } = useTransactionObserver({ key: `commit_paces${duelId}`, indexerCheck: completedStagesLeft[DuelStage.Round1Commit] })
 
+  const { call: acceptChallenge, isLoading: isLoadingAccept } = useTransactionHandler<boolean, [bigint, BigNumberish?, boolean?]>({
+    transactionCall: (duelId, duelistId, accepted, key) => duel_token.reply_duel(account, duelId, duelistId, accepted, key),
+    indexerCheck: state != constants.ChallengeState.Awaiting,
+    key: `accept_challenge_${duelId}`,
+  })
+  
+  useEffect(() => {
+    if (isLoadingAccept || selectedDuelistIdForCheck === 0n) return
+    
+    if (lives === undefined) return
+    
+    const isViable = !isInAction && lives >= livesStaked
+    
+    if (!isViable) {
+      setTimeout(() => {
+        duelistSelectOpener?.open({ onDuelistSelected: handleDuelistSelectedCallback })
+      }, 100)
+      setSelectedDuelistIdForCheck(0n)
+      return
+    }
+    
+    acceptChallenge(duelId, selectedDuelistIdForCheck, true)
+    setSelectedDuelistIdForCheck(0n)
+  }, [selectedDuelistIdForCheck, isInAction, lives, livesStaked])
+  
+  const handleDuelistSelectedCallback = useCallback((selectedDuelistId: BigNumberish) => {
+    if (!isPositiveBigint(selectedDuelistId)) return
+    setSelectedDuelistIdForCheck(selectedDuelistId)
+  }, [])
+
   const { selectedNetworkConfig } = useDojoSetup()
   const revealFromServer = useMemo(() => (selectedNetworkConfig.useRevealServer && !isTutorial), [selectedNetworkConfig, isTutorial])
   const { isRevealing: isLoadingAutoReveal, isRevealed } = useApiAutoReveal(
@@ -65,7 +110,10 @@ export default function DuelProgress({
   )
 
   const onClick = useCallback(() => {
-    if (isMyDuelist && isConnected && completedStages[duelStage] === false) {
+    if (isYou && !isPositiveBigint(duelistId) && isConnected) {
+      duelistSelectOpener?.open({ onDuelistSelected: handleDuelistSelectedCallback })
+      return
+    } else if (isMyDuelist && isConnected && completedStages[duelStage] === false) {
       if (duelStage == DuelStage.Round1Commit) {
         setCommitModalIsOpen(true)
       }
@@ -77,7 +125,7 @@ export default function DuelProgress({
         }
       }
     }
-  }, [isMyDuelist, isConnected, duelStage, completedStages, canReveal, revealFromServer, isLoadingReveal, isLoadingCommit])
+  }, [isYou, duelistId, isMyDuelist, isConnected, duelStage, completedStages, canReveal, revealFromServer, isLoadingReveal, isLoadingCommit, duelistSelectOpener, handleDuelistSelectedCallback])
 
   useEffect(() => {
     gameImpl.setIsLoading(isA, isLoadingAutoReveal || isLoadingCommit || isLoadingReveal)
