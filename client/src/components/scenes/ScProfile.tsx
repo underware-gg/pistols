@@ -53,8 +53,10 @@ export default function ScProfile() {
   useEffect(() => {
     if (showCardPack) {
       (_currentScene as InteractibleScene)?.setClickable(false);
+      (_currentScene as InteractibleScene)?.toggleBlur(true);
     } else {
       (_currentScene as InteractibleScene)?.setClickable(true);
+      (_currentScene as InteractibleScene)?.toggleBlur(false);
     }
   }, [showCardPack])
 
@@ -72,17 +74,17 @@ export default function ScProfile() {
       <div className='UIContainer'>
       </div>
 
-      
-      <CardPack 
-        packType={constants.PackType.StarterPack} 
-        isOpen={showCardPack} 
-        clickable={showCardPack} 
-        cardPackSize={CARD_PACK_SIZE} 
-        maxTilt={MAX_TILT}
-        onComplete={() => setShowCardPack(false)}
-        customButtonLabel="Close"
-      />
-
+      {showCardPack && (
+        <CardPack 
+          packType={constants.PackType.StarterPack} 
+          isOpen={showCardPack} 
+          clickable={showCardPack} 
+          cardPackSize={CARD_PACK_SIZE} 
+          maxTilt={MAX_TILT}
+          onComplete={() => setShowCardPack(false)}
+          customButtonLabel="Close"
+        />
+      )}
       {(debugMode || true) && <>
         <PublishOnlineStatusButton />
         {/* <TutorialProgressDebug /> */}

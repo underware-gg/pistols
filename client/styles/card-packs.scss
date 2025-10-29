@@ -595,6 +595,73 @@
     top: calc(50% - var(--card-height) / 2);
     left: calc(50% - var(--card-width) / 2);
   }
+
+  // Click here bubble for StarterPack
+  .click-here-bubble {
+    position: absolute;
+    // Position below card pack - card pack is centered at 50%, place bubble below it
+    top: 46%;
+    left: 50%;
+    transform: translateZ(aspect-width(0.5)) translateX(-50%);
+    z-index: 400;
+    pointer-events: none;
+    opacity: 0;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    gap: aspect-width(0.4);
+  }
+
+  .click-here-text {
+    // Match game's style: dark semi-transparent background with muted colors
+    background-color: rgba(39, 17, 11, 1);
+    color: #c8b6a8;
+    padding: aspect-width(0.8) aspect-width(2);
+    border-radius: aspect-width(0.5);
+    font-size: aspect-width(1.4);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: aspect-width(0.15);
+    // Simple shadow matching game style
+    box-shadow: 0 aspect-height(0.5) aspect-height(1.5) rgba(0, 0, 0, 0.4);
+    // Simple border matching game style
+    border: 1px solid rgba(200, 182, 168, 0.5);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    white-space: nowrap;
+    animation: bubblePulse 2s ease-in-out infinite;
+    transform-origin: center;
+    position: relative;
+  }
+
+  .click-here-arrow {
+    width: aspect-width(1.2);
+    height: aspect-width(4);
+    color: rgba(39, 17, 11, 1);
+    animation: arrowBounce 1.5s ease-in-out infinite;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @keyframes bubblePulse {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.02);
+      opacity: 0.95;
+    }
+  }
+
+  @keyframes arrowBounce {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(aspect-width(-0.3));
+    }
+  }
 }
 
 .reveal-button-container {
