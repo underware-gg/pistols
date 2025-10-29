@@ -23,12 +23,10 @@ import { InteractibleScene } from '/src/three/InteractibleScene'
 export default function ScDuelists() {
   const { filterPlayerName, filterPlayerActive, filterPlayerBookmarked, filterPlayerSortColumn, filterPlayerSortDirection } = useQueryParams()
   const { playerIds } = useQueryPlayerIds(filterPlayerName, filterPlayerActive, filterPlayerBookmarked, filterPlayerSortColumn, filterPlayerSortDirection)
-  const { playerIds: matchmakingPlayerAddresses } = useQueryPlayerIds("", true, false, PlayerColumn.Timestamp, SortDirection.Descending)
   
   // get the players current challenges
   const { address } = useAccount()
   useFetchChallengeIdsOwnedByAccount(address)
-  const { challenges: currentChallenges } = useQueryChallengesOwnedByAccount(address, LiveChallengeStates)
 
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSelectPlayerAddress, tutorialOpener, duelistSelectOpener, dispatchChallengingPlayerAddress, dispatchSelectDuel, modeSelectOpener } = usePistolsContext()
@@ -36,12 +34,6 @@ export default function ScDuelists() {
   const { selectedMode } = useSettings()
   const { botPlayerContractAddress } = useTokenContracts()
   const { hasPact, pactDuelId } = usePactGet(constants.DuelType.BotPlayer, address, botPlayerContractAddress)
-
-  const availableMatchmakingPlayers = useMemo(() => {
-    return matchmakingPlayerAddresses.filter(address => (
-      !currentChallenges.some(ch => bigintEquals(ch.address_a, address) || bigintEquals(ch.address_b, address))
-    ))
-  }, [matchmakingPlayerAddresses, currentChallenges])
 
   const lastSelectedModeRef = useRef(selectedMode)
 
@@ -73,7 +65,9 @@ export default function ScDuelists() {
             if (!hasPact) {
               // pick duelist and create a new duel
               dispatchChallengingPlayerAddress(botPlayerContractAddress);
-              duelistSelectOpener.open();
+              setTimeout(() => {
+                duelistSelectOpener.open();
+              }, 100)
             } else {
               // go to existing duel
               dispatchSelectDuel(pactDuelId);

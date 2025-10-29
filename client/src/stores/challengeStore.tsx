@@ -15,6 +15,7 @@ import { ChallengeColumn, SortDirection } from '/src/stores/queryParamsStore'
 import { useCallToChallenges } from '/src/stores/eventsModelStore'
 import { useChallengeFetchStore } from '/src/stores/fetchStore'
 import { debug } from '@underware/pistols-sdk/pistols'
+import { useCurrentSeason } from './seasonStore'
 
 export const useChallengeStore = createDojoStore<PistolsSchemaType>();
 
@@ -52,6 +53,7 @@ export const useChallenge = (duelId: BigNumberish) => {
   const entities = useChallengeStore((state) => state.entities);
   const challenge = useStoreModelsByKeys<models.Challenge>(entities, 'Challenge', [duelId])
   const challengeMessage = useStoreModelsByKeys<models.ChallengeMessage>(entities, 'ChallengeMessage', [duelId])
+  const { seasonId: currentSeasonId } = useCurrentSeason()
   // const fameBalance = useStoreModelsByKeys<models.ChallengeFameBalance>(entities, 'ChallengeFameBalance', [duelId])
   // console.log(`useChallenge(${Number(duelId)}) =>`, 
   //   fameBalance, 
@@ -117,7 +119,7 @@ export const useChallenge = (duelId: BigNumberish) => {
     isResolved: (state == constants.ChallengeState.Resolved),
     isDraw: (state == constants.ChallengeState.Draw),
     isCanceled: (state == constants.ChallengeState.Withdrawn || state == constants.ChallengeState.Refused),
-    isExpired: (state == constants.ChallengeState.Expired),
+    isExpired: (state == constants.ChallengeState.Expired) || (seasonId > 0 && seasonId !== currentSeasonId),
     needToSyncExpired,
     // times
     timestampStart,
