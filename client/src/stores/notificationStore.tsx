@@ -188,11 +188,15 @@ const createStore = () => {
     },
 
     cleanupOldNotifications: async () => {
-      const twentyOneDaysAgo = Math.floor(Date.now() / 1000) - 21 * 24 * 60 * 60;
+      const sixtyDaysAgo = Math.floor(Date.now() / 1000) - 60 * 24 * 60 * 60;
       
       const oldKeys = await db.notifications
         .where('timestamp')
-        .below(twentyOneDaysAgo)
+        .below(sixtyDaysAgo)
+        .and(n => n.requiresAction === false)
+        .and(n => n.isDisplayed === true)
+        .and(n => n.isRead === true)
+        .and(n => n.state !== constants.ChallengeState.Awaiting && n.state !== constants.ChallengeState.InProgress)
         .primaryKeys();
 
       if (oldKeys.length === 0) return;
