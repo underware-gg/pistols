@@ -103,19 +103,24 @@ const SeasonRow = memo(({
           </div>
         </Grid.Column>
 
-        <Grid.Column width={4}>
+        <Grid.Column width={3}>
           <div style={{ fontSize: aspectWidth(0.9), color: '#888' }}>Participants:</div>
           <div style={{ fontSize: aspectWidth(1.1), fontWeight: 'bold', color: 'white' }}>{seasonTotals?.playerCount ?? <LoadingIcon className='Brightest' />}</div>
         </Grid.Column>
+
+        <Grid.Column width={3}>
+          <div style={{ fontSize: aspectWidth(0.9), color: '#888' }}>Duelists:</div>
+          <div style={{ fontSize: aspectWidth(1.1), fontWeight: 'bold', color: 'white' }}>{seasonTotals?.duelistCount ?? <LoadingIcon className='Brightest' />}</div>
+        </Grid.Column>
         
-        <Grid.Column width={4}>
+        <Grid.Column width={3}>
           <div style={{ fontSize: aspectWidth(0.9), color: '#888' }}>Prize Pool:</div>
           <div style={{ fontSize: aspectWidth(1.1), fontWeight: 'bold', color: 'white' }}>
             <Balance lords wei={totalPrizePool} />
           </div>
         </Grid.Column>
         
-        <Grid.Column width={4}>
+        <Grid.Column width={3}>
           <div style={{ fontSize: aspectWidth(0.9), color: '#888' }}>
             {!isActive ? 'Winner:' : 'Time Left:'}
           </div>

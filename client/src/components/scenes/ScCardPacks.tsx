@@ -221,6 +221,7 @@ export default function ScCardPacks() {
           onComplete={() => handlePackComplete(packId)}
           packId={undefined}
           isOpen={true}
+          clickable={false}
           cardPackSize={PACK_SIZE}
           maxTilt={20}
           atTutorialEnding={false}
@@ -242,6 +243,7 @@ export default function ScCardPacks() {
         onComplete={() => handlePackComplete(packId)}
         packId={packId}
         isOpen={true}
+        clickable={false}
         cardPackSize={PACK_SIZE}
         maxTilt={20}
         atTutorialEnding={false}

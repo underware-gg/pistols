@@ -1263,6 +1263,10 @@ export function setOnLoadComplete(onLoadComplete: () => void) {
   _duelistManager.setLoadCompleteCallback(onLoadComplete)
 }
 
+export function setDuelistSelectDataA(duelistName: string, isDuelistAYou: boolean) {
+  _duelistManager.setDuelistSelectDataA(duelistName, isDuelistAYou)
+}
+
 export function spawnDuelist(duelist, duelistName, duelistModel, isYou, frontMaterialPath, backMaterialPath) {
   if (duelist == 'A') {
     _duelistManager.setupDuelistA(duelistName, duelistModel, isYou, frontMaterialPath, backMaterialPath, () => {

@@ -117,16 +117,13 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
         return;
       }
 
-      const duelistLeft = context.isYouA ? context.leftDuelist.id : context.isYouB ? context.rightDuelist.id : context.leftDuelist.id
-      const duelistRight = context.isYouA ? context.rightDuelist.id : context.isYouB ? context.leftDuelist.id : context.rightDuelist.id
-      
       // Initialize scene
       if (!didSceneInit.current) {
         try {          
           gameImpl.setDuelData(
             Number(duelId), 
-            Number(duelistLeft), 
-            Number(duelistRight)
+            Number(context.leftDuelist.id), 
+            Number(context.rightDuelist.id)
           );
           gameImpl.resetDuelScene(false, true);
           
@@ -150,7 +147,17 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
     };
     
     pollForData();
-  }, [duelId, context, gameImpl, dispatchAnimated]);
+  }, [duelId, gameImpl, context.leftDuelist.id, context.rightDuelist.id, dispatchAnimated]);
+
+  useEffect(() => {
+    if (!gameImpl || !didSceneInit.current) return;
+    
+    gameImpl.setDuelData(
+      Number(duelId),
+      Number(context.leftDuelist.id || 0),
+      Number(context.rightDuelist.id || 0)
+    );
+  }, [gameImpl, duelId, context.leftDuelist.id, context.rightDuelist.id]);
 
   useEffect(() => {
     if (gameImpl) {
@@ -162,7 +169,14 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
 
   // Update left duelist info when it changes
   useEffect(() => {
-    if (!gameImpl || !didSceneInit.current || !context.leftDuelist.id || !duelistASVG) return;
+    if (!gameImpl || !didSceneInit.current) return;
+
+    if (!context.leftDuelist.id && context.leftDuelist.isYou) {
+      gameImpl.setDuelistSelectDataA(context.leftDuelist.name, context.leftDuelist.isYou);
+      return;
+    }
+
+    if (!context.leftDuelist.id || !duelistBSVG) return;
     
     // Skip delay if we already have initialized duelists
     const spawnDelay = didPlayersInitA.current ? 0 : 600;

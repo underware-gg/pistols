@@ -100,8 +100,6 @@ export default function ScMatchmaking() {
         duelId: duelId ? BigInt(duelId) : undefined,
       });
     });
-
-    console.log(`slowSlotsData() =>`, duelsByDuelistId, challengeIds, sortedDuellingIds, duellingIds, inQueueIds);
     
     // Then add queued duelists
     inQueueIds.filter(id => !sortedDuellingIds.includes(id)).forEach((duelistId) => {
@@ -112,7 +110,7 @@ export default function ScMatchmaking() {
       })
     })
     
-    // console.log(`slowSlotsData() =>`, challengeIds.filter(id => !duellingDuelIds.includes(id)), sortedDuellingIds, inQueueIds, slots);
+    console.log(`slowSlotsData() =>`, challengeIds.filter(id => !duellingDuelIds.includes(id)), sortedDuellingIds, inQueueIds, slots);
 
     return slots
   }, [totalUsedSlowSlots, inQueueIds, duellingIds, duelsByDuelistId, challengeIds])
@@ -224,7 +222,7 @@ export default function ScMatchmaking() {
       onActionStart={handleActionStart}
       onActionComplete={handleActionComplete}
     />
-  ), [matchmakingType, isAnimating, duelistInAction])
+  ), [matchmakingType, isAnimating, duelistInAction, handleActionStart, handleActionComplete, handleDuelistRemoved])
 
   const emptySlotUnranked = useMemo(() => (
     <DuelistEmptySlot
@@ -238,7 +236,7 @@ export default function ScMatchmaking() {
       onActionStart={handleActionStart}
       onActionComplete={handleActionComplete}
     />
-  ), [matchmakingType, isAnimating, duelistInAction])
+  ), [matchmakingType, isAnimating, duelistInAction, handleActionStart, handleActionComplete, handleDuelistRemoved])
 
   const slowSlots = useMemo(() => {
     return slowSlotsData.slice(currentPage * duelistsPerPage, (currentPage + 1) * duelistsPerPage).map(({ slotIndex, duelistId, duelId }) => {

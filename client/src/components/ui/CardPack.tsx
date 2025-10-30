@@ -76,6 +76,9 @@ export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType: packTy
   const [newDuelistIds, setNewDuelistIds] = useState<number[]>([])
   const [revealedDuelists, setRevealedDuelists] = useState<Set<number>>(new Set())
   const previousDuelistIdsRef = useRef<bigint[]>([])
+  const [showClickBubble, setShowClickBubble] = useState(false)
+  const [bubbleVisible, setBubbleVisible] = useState(false)
+  const bubbleRef = useRef<HTMLDivElement>(null)
 
   const [cookies] = useCookies([REFERER_ADDRESS_COOKIE_NAME]);
   const referrerAddress = (cookies[REFERER_ADDRESS_COOKIE_NAME] ?? 0n);
@@ -88,6 +91,22 @@ export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType: packTy
     if (isClaiming || sealClicked || cardsSpawned) {
       e.stopPropagation();
       return;
+    }
+
+    if (bubbleVisible && bubbleRef.current) {
+      setBubbleVisible(false);
+      new TWEEN.Tween({ opacity: 1 })
+        .to({ opacity: 0 }, 300)
+        .easing(TWEEN.Easing.Quadratic.Out)
+        .onUpdate(({ opacity }) => {
+          if (bubbleRef.current) {
+            bubbleRef.current.style.opacity = opacity.toString();
+          }
+        })
+        .onComplete(() => {
+          setShowClickBubble(false);
+        })
+        .start();
     }
 
     onClick?.(e, fromInternalElement);
@@ -118,6 +137,35 @@ export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType: packTy
       cardPackRef.current.style.setProperty('--card-pack-opacity', '0')
     }
   }, [])
+
+  // Show bubble for StarterPack after 1 second
+  useEffect(() => {
+    if (packType === constants.PackType.StarterPack && isOpen && !sealClicked && !cardPackOnly) {
+      const timer = setTimeout(() => {
+        setShowClickBubble(true)
+        // Trigger fade in animation
+        setTimeout(() => {
+          if (bubbleRef.current) {
+            bubbleRef.current.style.opacity = '0'
+            setBubbleVisible(true)
+            new TWEEN.Tween({ opacity: 0 })
+              .to({ opacity: 1 }, 400)
+              .easing(TWEEN.Easing.Quadratic.Out)
+              .onUpdate(({ opacity }) => {
+                if (bubbleRef.current) {
+                  bubbleRef.current.style.opacity = opacity.toString()
+                }
+              })
+              .start()
+          }
+        }, 10)
+      }, 1000)
+      return () => clearTimeout(timer)
+    } else {
+      setShowClickBubble(false)
+      setBubbleVisible(false)
+    }
+  }, [packType, isOpen, sealClicked, cardPackOnly])
 
   useEffect(() => {
     if (!isClaiming) {
@@ -456,7 +504,7 @@ export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType: packTy
   return (
     <>
       <div 
-        className={`card-pack YesMouse`} 
+        className={`card-pack ${isOpen && clickable ? 'YesMouse' : 'NoMouse'}`} 
         ref={cardPackRef}
         onClick={e => handleCardPackClick(e, false)}
         onMouseEnter={() => cardPackOnly && handleCardPackHover(true)}
@@ -518,6 +566,31 @@ export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType: packTy
           onMouseLeave={() => !cardPackOnly && handleCardPackHover(false)}
           ref={sealRef}
         />
+
+        {/* Click here bubble for StarterPack */}
+        {showClickBubble && packType === constants.PackType.StarterPack && !cardPackOnly && (
+          <div 
+            ref={bubbleRef}
+            className="click-here-bubble"
+          >
+            <div className="click-here-text">Click The Seal</div>
+            <div className="click-here-arrow">
+              <svg 
+                width="100%" 
+                height="100%" 
+                viewBox="0 0 20 50" 
+                fill="none" 
+                xmlns="http://www.w3.org/2000/svg"
+                preserveAspectRatio="none"
+              >
+                {/* Arrow shaft - goes from bottom (y=50) upward */}
+                <rect x="9" y="12" width="2" height="38" fill="currentColor" />
+                {/* Arrowhead pointing up - tip at top (y=0), base connects to shaft at y=12 */}
+                <path d="M10 0 L20 12 L0 12 Z" fill="currentColor" />
+              </svg>
+            </div>
+          </div>
+        )}
 
         <div className="card-pack-cards" ref={cardPackCardsRef}>
           { sealClicked && newDuelistIds.map((id, i) => (
@@ -593,10 +666,3 @@ export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType: packTy
     </>
   )
 })
-
-//TODO add card pack entry animation fade in and like a spin with it inceasing size
-//TODO polissh card reveal animations
-//TODO connect data
-//TODo adjust toscreen resizing
-//TODO on click of duelist card, go to next duelist card
-//TODO after reveal all, add a button to collapse the duelist, zsoom them out fade out and go back to the scene (call on complete?)

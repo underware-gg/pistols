@@ -11,6 +11,7 @@ import { useIsMyAccount } from '/src/hooks/useIsYou'
 import { useDuelCallToAction } from '/src/stores/eventsModelStore'
 import { CardColor } from '@underware/pistols-sdk/pistols/constants'
 import { emitter } from '/src/three/game'
+import { useDuel } from '/src/hooks/useDuel'
 
 interface DuelistMatchmakingSlotProps {
   width?: number
@@ -50,6 +51,7 @@ export const DuelistMatchmakingSlot = forwardRef<DuelistMatchmakingSlotHandle, D
   const { isMyAccount: isYouB } = useIsMyAccount(challenge.duelistAddressB);
 
   const requiresAction = useDuelCallToAction(props.duelId || 0n);
+  const animatedDuel = useDuel(props.duelId || 0n);
 
   const myDuelistIdFromDuel = useMemo(() => {
     if (!props.duelId) return null;
@@ -87,7 +89,7 @@ export const DuelistMatchmakingSlot = forwardRef<DuelistMatchmakingSlotHandle, D
     }
 
     if (currentDuelistId && (rankedPlayer.duelistId === BigInt(currentDuelistId) || unrankedPlayer.duelistId === BigInt(currentDuelistId)) && challenge.isAwaiting) {
-      return { message: "Searching for Match...", buttonText: null, color: "#fbbf24", showTimer: true };
+      return { message: "Searching for Match...", buttonText: props.duelId ? "GO TO DUEL" : null, color: "#fbbf24", showTimer: true };
     }
 
     const isInQueue = currentDuelistId && inQueueIds.includes(currentDuelistId) && challenge.isAwaiting;
@@ -100,7 +102,7 @@ export const DuelistMatchmakingSlot = forwardRef<DuelistMatchmakingSlotHandle, D
         return { message: "Duel Finished", buttonText: "SEE RESULTS", color: "#d1d5db", showTimer: false };
       }
 
-      if (requiresAction && !!challenge.duelistAddressA && !!challenge.duelistAddressB) {
+      if (((animatedDuel.turnA && isYouA) || (animatedDuel.turnB && isYouB)) && !!challenge.duelistAddressA && !!challenge.duelistAddressB) {
         return { message: "Its Your move!", buttonText: "GO TO DUEL", color: "#22c55e", showTimer: true };
       }
 
