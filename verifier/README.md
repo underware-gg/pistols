@@ -10,12 +10,13 @@
 ## Voyager
 
 * [Submission form](https://docs.google.com/forms/d/e/1FAIpQLSfC1MfNJMviRPARsVSZd68luyXUuPfuxPcSWK7Et4SP52733Q/viewform)
-* [CLI verifyer](https://github.com/NethermindEth/starknet-contract-verifier)
+* [CLI verifyer](https://github.com/NethermindEth/voyager-verifier)
 
 Install dependencies:
 
 ```sh
-pnpm sync
+asdf plugin add voyager https://github.com/NethermindEth/asdf-voyager-verifier.git
+asdf install voyager latest
 ```
 
 Verify all contracts:
