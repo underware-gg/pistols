@@ -63,9 +63,23 @@ export const DuelNotificationItem: React.FC<DuelNotificationItemProps> = ({
     const hasCommittedB = completedStagesB?.[DuelStage.Round1Commit]
     const hasRevealedA = completedStagesA?.[DuelStage.Round1Reveal]
     const hasRevealedB = completedStagesB?.[DuelStage.Round1Reveal]
-
+    const isMatchmaking = challenge.duelType === constants.DuelType.Ranked || challenge.duelType === constants.DuelType.Unranked
+    
     switch (state) {
       case constants.ChallengeState.Awaiting:
+        if (isMatchmaking) {
+          if (requiresAction) {
+            return {
+              title: 'Searching for Match',
+              message: <>Precommit your moves for <ChallengeLink duelId={duelId} /></>
+            }
+          }
+          return {
+            title: 'Searching for Match',
+            message: <>Waiting to find a match in <ChallengeLink duelId={duelId} /></>
+          }
+        }
+        
         if (requiresAction && isMeA) {
           return {
             title: 'Your Move - Commit Cards',
@@ -81,6 +95,26 @@ export const DuelNotificationItem: React.FC<DuelNotificationItemProps> = ({
       case constants.ChallengeState.InProgress:
         // Handle commit phase
         if (!hasCommittedA || !hasCommittedB) {
+          if (isMatchmaking) {
+            if (requiresAction) {
+              return {
+                title: 'Match Found! - Commit Cards',
+                message: <>It's your turn to commit your moves in <ChallengeLink duelId={duelId} /> against <PlayerLink address={isMeA ? duelistAddressB : duelistAddressA} /></>
+              }
+            } else if (isOpponentTurn) {
+              return {
+                title: 'Match Found! - Waiting for Opponent',
+                message: <>Waiting for <PlayerLink address={isMeA ? duelistAddressB : duelistAddressA} /> to commit their moves in <ChallengeLink duelId={duelId} /></>
+              }
+            }
+
+            return {
+              title: 'Match Found!',
+              message: <>Your matchmaking duel <ChallengeLink duelId={duelId} /> has been matched! <PlayerLink address={isMeA ? duelistAddressB : duelistAddressA} /> joined.</>
+            }
+          }
+          
+          // Normal commit phase messages
           if (requiresAction) {
             return {
               title: 'Your Move - Commit Cards',
@@ -109,7 +143,7 @@ export const DuelNotificationItem: React.FC<DuelNotificationItemProps> = ({
         }
         // Fallback for other in-progress states
         return {
-          title: 'Duel In Progress',
+          title: isMatchmaking ? 'Matchmaking Duel In Progress' : 'Duel In Progress',
           message: isMeA
             ? <><PlayerLink address={duelistAddressB} /> has accepted your <ChallengeLink duelId={duelId} /></>
             : <>You've accepted <PlayerLink address={duelistAddressA} />'s <ChallengeLink duelId={duelId} /></>
@@ -138,23 +172,23 @@ export const DuelNotificationItem: React.FC<DuelNotificationItemProps> = ({
       case constants.ChallengeState.Resolved:
         if (requiresAction) {
           return {
-            title: 'Duel Ended - Action Required',
+            title: isMatchmaking ? 'Matchmaking Duel Ended - Action Required' : 'Duel Ended - Action Required',
             message: <>Your <ChallengeLink duelId={duelId} /> with <PlayerLink address={isMeA ? duelistAddressB : duelistAddressA} /> has been resolved. Click to see the result!</>
           }
         }
         return {
-          title: 'Duel Resolved',
+          title: isMatchmaking ? 'Matchmaking Duel Resolved' : 'Duel Resolved',
           message: <>Your <ChallengeLink duelId={duelId} /> with <PlayerLink address={isMeA ? duelistAddressB : duelistAddressA} />  has been resolved</>
         }
       case constants.ChallengeState.Draw:
         if (requiresAction) {
           return {
-            title: 'Duel Ended - Action Required',
+            title: isMatchmaking ? 'Matchmaking Duel Ended - Action Required' : 'Duel Ended - Action Required',
             message: <>Your <ChallengeLink duelId={duelId} /> with <PlayerLink address={isMeA ? duelistAddressB : duelistAddressA} /> has been resolved. Click to see the result!</>
           }
         }
         return {
-          title: 'Duel Draw',
+          title: isMatchmaking ? 'Matchmaking Duel Draw' : 'Duel Draw',
           message: <>Your <ChallengeLink duelId={duelId} /> with <PlayerLink address={isMeA ? duelistAddressB : duelistAddressA} /> ended in a draw</>
         }
       default:
