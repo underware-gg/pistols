@@ -32,8 +32,7 @@ import { useExecuteEmitPlayerBookmark } from '/src/hooks/usePistolsSystemCalls'
 import { useDuelistFameOnDuel, useFetchChallengeRewardsByDuelistIds } from '/src/stores/challengeRewardsStore'
 import { useTransactionHandler } from '/src/hooks/useTransaction'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
-import { showElementPopupNotification } from '/src/components/ui/ElementPopupNotification'
-import { SceneName } from '/src/data/assets'
+import { SceneName } from '/src/data/assetsTypes'
 import { StampImage } from './ui/StampImage'
 
 const Row = Grid.Row

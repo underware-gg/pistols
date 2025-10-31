@@ -10,7 +10,8 @@ import {
   sizes,
   SCENE_CHANGE_ANIMATION_DURATION,
 } from './game';
-import { sceneBackgrounds, SceneData, SceneObject, TextureName, TextureState, AnimatedLayer, SceneBackgroundObject } from '/src/data/assets';
+import { sceneBackgrounds } from '/src/data/assets';
+import { SceneData, SceneObject, TextureName, TextureState, AnimatedLayer, SceneBackgroundObject } from '/src/data/assetsTypes';
 import { ShaderManager, ShaderMaterial } from './shaders'
 import TWEEN from '@tweenjs/tween.js'
 
@@ -285,6 +286,7 @@ export class InteractibleScene extends THREE.Scene {
     window.removeEventListener('resize', this.onResize, false);
 
     this.fbo_mask?.dispose();
+    this.fbo_blur_background?.dispose();
     
     this.fbo_mask_scene?.traverse((child) => {
         if (child instanceof THREE.Mesh) {
@@ -299,6 +301,23 @@ export class InteractibleScene extends THREE.Scene {
 
     this.maskShader?.dispose();
     this.maskShader = null;
+    this.backgroundBlurShader?.dispose();
+    this.backgroundBlurShader = null;
+    
+    // Dispose background scene
+    if (this.backgroundScene) {
+      this.backgroundScene.traverse((child) => {
+        if (child instanceof THREE.Mesh) {
+          child.geometry.dispose();
+          if (child.material instanceof THREE.Material) {
+            child.material.dispose();
+          }
+        }
+      });
+      this.backgroundScene = null;
+    }
+    
+    this.backgroundMesh = null;
   }
 
   public render(elapsedTime: number, enabled: boolean = true) {

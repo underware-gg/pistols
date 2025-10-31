@@ -11,7 +11,7 @@ import { NoDuelistsSlip, NoDuelistsSlipHandle } from '/src/components/NoDuelists
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { CARD_ASPECT_RATIO } from '/src/data/cardConstants'
-import { SceneName } from '/src/data/assets'
+import { SceneName  } from '/src/data/assetsTypes'
 import { emitter } from '/src/three/game'
 import { Opener } from '/src/hooks/useOpener'
 import { useDuelistsInMatchMaking, useMatchQueue } from '/src/stores/matchStore'

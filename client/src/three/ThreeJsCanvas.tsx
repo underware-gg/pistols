@@ -42,10 +42,15 @@ export const ThreeJsCanvas = ({
     }
 
     return () => {
-      console.warn(`UNMOUNTED ThreeJsCanvas! this should not be happening`)
+      console.warn(`🧹 UNMOUNTING ThreeJsCanvas - cleaning up game resources`)
       _mounted = false
+      // CRITICAL: Dispose of game resources to prevent memory leaks
+      if (gameImpl) {
+        gameImpl.dispose()
+        dispatchGameImpl(null)
+      }
     }
-  }, [canvasRef.current])
+  }, [canvasRef.current, gameImpl, dispatchGameImpl])
 
   return (
     <div>

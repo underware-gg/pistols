@@ -8,7 +8,7 @@ import { emitter, playAudio } from '/src/three/game'
 import { DuelNotificationItem } from './DuelNotificationItem'
 import { PushNotification } from './PushNotification'
 import { AudioName } from '/src/data/audioAssets'
-import { SceneName } from '/src/data/assets'
+import { SceneName } from '/src/data/assetsTypes'
 
 const NOTIFICATION_DISPLAY_DURATION = 4000
 const NOTIFICATION_ANIMATION_DURATION = 500
@@ -36,8 +36,7 @@ export default function NotificationSystem() {
   const swRegistrationRef = useRef<ServiceWorkerRegistration | null>(null)
   const lastSoundTimeRef = useRef<number>(0)
 
-  // never display at gate or door (after disconnect)
-  const wrongScene = useMemo(() => (atDuel || atGate || atDoor || atTutorial), [atDuel, atGate, atDoor, atTutorial])
+  const wrongScene = useMemo(() => (atGate || atDoor || atTutorial), [atGate, atDoor, atTutorial])
   useEffect(() => {
     if (wrongScene) {
       setIsVisible(false)
@@ -74,13 +73,29 @@ export default function NotificationSystem() {
     }
   }, [])
 
-  // Register service worker for browser notifications
   useEffect(() => {
     if (!("serviceWorker" in navigator)) return
 
     const registerSW = async () => {
       try {
-        const registration = await navigator.serviceWorker.register('/notification-worker.js')
+        const registration = await navigator.serviceWorker.getRegistration("/");
+
+        if (!registration) {
+          throw new Error("No service worker registration found");
+        }
+
+        if (registration.waiting) {
+          await new Promise<void>((resolve) => {
+            const checkActive = () => {
+              if (registration.active?.scriptURL.includes("game-worker.js")) {
+                resolve();
+              } else {
+                setTimeout(checkActive, 100);
+              }
+            };
+            checkActive();
+          });
+        }
 
         // Request notification permission if needed
         if (Notification.permission !== "granted" && Notification.permission !== "denied") {
@@ -335,7 +350,7 @@ export default function NotificationSystem() {
       <PushNotification 
         key={`push-${notificationsRef.current?.[0]?.duelId}`} 
         notifications={notificationsRef.current} 
-        shouldShow={!isFocused && !hasDisplayedNotificationsRef.current} 
+        shouldShow={!isFocused && !hasDisplayedNotificationsRef.current && !wrongScene} 
         showNotification={showPushNotification}
       />
 

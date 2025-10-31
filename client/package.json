@@ -10,6 +10,7 @@
   "scripts": {
     "dev": "vite",
     "devs": "vite -c vite_https.config",
+    "prebuild": "tsx scripts/generateAssetManifest.ts",
     "build": "npx tsc -p tsconfig.json && vite build",
     "sync": "npx tsc -watch",
     "check-types": "npx tsc --noEmit",
@@ -77,6 +78,7 @@
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.16",
     "sass": "^1.83.0",
+    "tsx": "^4.20.3",
     "typescript": "catalog:",
     "vite": "^6.0.5",
     "vite-plugin-glsl": "^1.5.0",

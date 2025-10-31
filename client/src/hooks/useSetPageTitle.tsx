@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { bigintToDecimal } from '@underware/pistols-sdk/utils'
 import { getPlayernameFromAddress } from '/src/stores/playerStore'
-import { SceneName } from '/src/data/assets'
+import { SceneName  } from '/src/data/assetsTypes'
 
 export const MenuLabels: Partial<Record<SceneName, string>> = {
   [SceneName.Door]: 'Door',

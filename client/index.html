@@ -30,10 +30,309 @@
   <meta name="twitter:description" content="10 paces, one shot. Whether you are duelling for honour or vengeance, be sure to put the bastard in the dirt. Made with love by Underware.gg" />
   <meta name="twitter:site" content="https://pistols.gg" />
   <meta name="twitter:creator" content="@underware_gg" />
+
+  <link rel="preload" href="/images/scenes/splash/pistols_loading.png" as="image" />
+  <link rel="preload" href="/images/logo/logo.svg" as="image" />
+  <link rel="preload" href="/images/logo/logo_text.svg" as="image" />
+
+  <style>
+    :root {
+      --loading-progress: 0;
+      --loading-message: 'Loading the saloon...';
+      --loading-mb-data: '';
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: #4A2508;
+    }
+
+    #pre-loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 9999;
+      background: #4A2508;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 1;
+      transition: opacity 0.3s ease-out;
+    }
+
+    #pre-loading-screen.bg-loaded {
+      background-image: url('/images/scenes/splash/pistols_loading.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    #pre-loading-screen.bg-loaded::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.2);
+      z-index: 1;
+    }
+
+    #pre-loading-content {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Logo in center, moved up */
+    #pre-loading-logo {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      z-index: 10;
+    }
+
+    #pre-loading-logo .logo-image {
+      width: clamp(120px, 20vw, 280px);
+      height: clamp(120px, 20vw, 280px);
+      margin: 0;
+      padding: 0;
+      display: block;
+    }
+
+    #pre-loading-logo .logo-text {
+      width: clamp(180px, 30vw, 400px);
+      height: auto;
+      margin: 0;
+      padding: 0;
+      display: block;
+    }
+
+    /* Text section above progress bar */
+    #pre-loading-text-section {
+      position: absolute;
+      bottom: 1%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      padding: 1.5rem 2rem 2rem 2rem;
+    }
+
+    #pre-loading-text {
+      text-align: center;
+      color: #E8D4A0;
+      font-size: 16px;
+      font-weight: 400;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.4;
+      margin: 0;
+      padding: 0;
+    }
+
+    #pre-loading-details {
+      text-align: center;
+      color: #B8A080;
+      font-size: 14px;
+      font-family: 'Courier New', monospace;
+      font-weight: 400;
+      line-height: 1.4;
+      display: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    #pre-loading-details.show {
+      display: block;
+    }
+
+    /* Full width progress bar at bottom */
+    #pre-loading-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      padding: 0;
+      margin: 0;
+    }
+
+    #pre-loading-track {
+      background: #6B3410;
+      height: 32px;
+      position: relative;
+      overflow: visible;
+      border: none;
+      border-radius: 0;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    #pre-loading-fill {
+      background: #FFA500;
+      height: 100%;
+      width: var(--loading-progress, 0%);
+      transition: width 0.3s ease-out;
+      position: relative;
+      border-radius: 0 4px 4px 0;
+    }
+
+    #pre-loading-percentage {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      letter-spacing: 0.5px;
+      text-shadow: 
+        -1px -1px 0 #000,
+        1px -1px 0 #000,
+        -1px 1px 0 #000,
+        1px 1px 0 #000,
+        0 0 4px #000;
+      z-index: 10;
+    }
+
+    /* Instantly hide when loading is complete */
+    #pre-loading-screen.loading-complete {
+      display: none;
+    }
+
+    #pre-loading-text-maintenance {
+      display: none;
+      position: absolute;
+      bottom: 5%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      text-align: center;
+      color: #B8A080;
+      font-size: 2.6rem;
+      font-weight: 600;
+      margin: 0;
+      padding: 0;
+    }
+
+    .maintenance-mode #pre-loading-bar {
+      display: none !important;
+    }
+  </style>
 </head>
 
 <body>
+  <div id="pre-loading-screen">
+    <div id="pre-loading-content">
+      <div id="pre-loading-logo">
+        <img src="/images/logo/logo.svg" alt="Pistols" class="logo-image" />
+        <img src="/images/logo/logo_text.svg" alt="at Dawn" class="logo-text" />
+      </div>
+      <h3 id="pre-loading-text-maintenance">Under Maintenance</h3>
+      <div id="pre-loading-text-section">
+        <div id="pre-loading-text"></div>
+        <div id="pre-loading-details"></div>
+      </div>
+      <div id="pre-loading-bar">
+        <div id="pre-loading-track">
+          <div id="pre-loading-fill"></div>
+          <div id="pre-loading-percentage">0%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="root"></div>
+  
+  <script>
+    // Preload background image and only show when fully loaded
+    (function() {
+      const screen = document.getElementById('pre-loading-screen');
+      const bgImg = new Image();
+      bgImg.src = '/images/scenes/splash/pistols_loading.png';
+      bgImg.onload = () => {
+        if (screen) screen.classList.add('bg-loaded');
+      };
+    })();
+
+    // Check maintenance mode - using Vite's HTML env replacement
+    if ('%VITE_MAINTENANCE_MODE%' === 'true') {
+      document.getElementById('pre-loading-bar').style.display = 'none';
+      document.getElementById('pre-loading-text').style.display = 'none';
+      document.getElementById('pre-loading-text-maintenance').style.display = 'flex';
+      document.querySelector('script[type="module"][src="/src/main.tsx"]').remove();
+    } else {
+
+      // Update UI from CSS variables (managed by AssetSetupWrapper)
+      (function() {
+        const textEl = document.getElementById('pre-loading-text');
+        const detailsEl = document.getElementById('pre-loading-details');
+        const percentageEl = document.getElementById('pre-loading-percentage');
+        let isComplete = false;
+        
+        function updateUI() {
+          if (isComplete) return;
+          
+          const progress = getComputedStyle(document.documentElement).getPropertyValue('--loading-progress').trim();
+          const message = getComputedStyle(document.documentElement).getPropertyValue('--loading-message').trim().replace(/['"]/g, '');
+          const mbData = getComputedStyle(document.documentElement).getPropertyValue('--loading-mb-data').trim().replace(/['"]/g, '');
+          
+          if (textEl && message) textEl.textContent = message;
+          if (detailsEl) {
+            detailsEl.textContent = mbData;
+            // Show/hide details based on whether we have MB data
+            if (mbData && mbData.length > 0) {
+              detailsEl.classList.add('show');
+            } else {
+              detailsEl.classList.remove('show');
+            }
+          }
+          if (percentageEl && progress) {
+            const progressNum = parseFloat(progress);
+            percentageEl.textContent = Math.round(progressNum) + '%';
+          }
+          
+          requestAnimationFrame(updateUI);
+        }
+        
+        if (textEl) textEl.textContent = 'Loading the tavern...';
+        if (percentageEl) percentageEl.textContent = '0%';
+        
+        window.addEventListener('loading-complete', () => {
+          isComplete = true;
+        }, { once: true });
+        
+        updateUI();
+      })();
+      
+      window.addEventListener('loading-complete', () => {
+        const screen = document.getElementById('pre-loading-screen');
+        if (screen) {
+          screen.classList.add('loading-complete');
+        }
+      });
+    }
+  </script>
+
   <script type="module" src="/src/main.tsx"></script>
 </body>
 

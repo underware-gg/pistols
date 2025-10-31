@@ -10,6 +10,7 @@ import { DojoStatus, emitter } from '@underware/pistols-sdk/dojo'
 import { MouseToolTip } from '/src/components/ui/MouseToolTip'
 import { SCENE_CHANGE_ANIMATION_DURATION } from '/src/three/game'
 import CurrentChainHint from '/src/components/CurrentChainHint'
+import AssetSetupWrapper from '/src/components/AssetSetupWrapper'
 import AppGame from '/src/components/AppGame'
 import GameContainer, { TavernAudios } from '/src/components/GameContainer'
 import Background from '/src/components/Background'
@@ -89,20 +90,22 @@ export default function MainPage() {
 
   return (
     <AppGame backgroundImage={null} networkId={undefined} autoConnect={false}>
-      <Background className={null}>
-        <NotificationProvider>
-          <GameContainer isVisible={true} />
-          <MainUI />
-          <Modals />
-          {overlay}
-          <Header />
-          <CurrentChainHint />
-          <MouseToolTip />
-          <TavernAudios />
-          <NotificationSystem />
-          <ElementPopupNotification ref={globalNotificationRef} />
-        </NotificationProvider>
-      </Background>
+      <AssetSetupWrapper>
+        <Background className={null}>
+          <NotificationProvider>
+            <GameContainer isVisible={true} />
+            <MainUI />
+            <Modals />
+            {overlay}
+            <Header />
+            <CurrentChainHint />
+            <MouseToolTip />
+            <TavernAudios />
+            <NotificationSystem />
+            <ElementPopupNotification ref={globalNotificationRef} />
+          </NotificationProvider>
+        </Background>
+      </AssetSetupWrapper>
     </AppGame>
   );
 }
@@ -195,7 +198,6 @@ function MainUI() {
 
   return (
     <>
-      {(Boolean(currentScene) && !atGate) && <StoreSync />}
       {currentScene || <DojoStatus message={'Loading Scene...'} />}
     </>
   )

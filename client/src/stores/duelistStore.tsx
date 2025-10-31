@@ -14,7 +14,7 @@ import { useDuelistIdsOwnedByAccounts, useDuelistsOwnedByPlayer, useOwnerOfDueli
 import { useDuelistFetchStore, useDuelistStackFetchStore } from '/src/stores/fetchStore'
 import { useFetchChallengeRewardsByDuelistIds } from '/src/stores/challengeRewardsStore'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
-import { CharacterType } from '/src/data/assets'
+import { CharacterType  } from '/src/data/assetsTypes'
 import { ArchetypeNames } from '/src/utils/pistols'
 import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
 import { debug } from '@underware/pistols-sdk/pistols'

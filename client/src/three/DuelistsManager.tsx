@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { CharacterType, AnimName } from '/src/data/assets'
+import { CharacterType, AnimName  } from '/src/data/assetsTypes'
 import { DuelistState } from '/src/components/ui/duel/DuelContext'
 import { AudioName } from '/src/data/audioAssets'
 import { Action } from '/src/utils/pistols'

@@ -90,9 +90,13 @@ export const useFetchPacksOwnedByAccount = (address: BigNumberish) => {
   const packs = useEntitiesModel<models.Pack>(entities, 'Pack')
   const existingPackIds = useMemo(() => packs.map((p) => BigInt(p.pack_id)), [packs])
 
+  debug.log(`PROGRESS(player_packs) - ${packIds.length} packs to fetch, ${existingPackIds.length} packs already in store`)
+
   const newPackIds = useMemo(() => (
     packIds.filter((id) => !existingPackIds.includes(BigInt(id)))
   ), [packIds, existingPackIds])
+
+  debug.log("PROGRESS(player_packs) - newPackIds", newPackIds)
 
   const query = useMemo<PistolsQueryBuilder>(() => (
     newPackIds.length > 0
@@ -107,6 +111,8 @@ export const useFetchPacksOwnedByAccount = (address: BigNumberish) => {
       : null
   ), [newPackIds])
 
+  debug.log("PROGRESS(player_packs) - query", query)
+
   const { isLoading, isFinished } = useSdkEntitiesGet({
     query,
     setEntities: (entities: PistolsEntity[]) => {
@@ -116,6 +122,9 @@ export const useFetchPacksOwnedByAccount = (address: BigNumberish) => {
       })
     },
   })
+
+  debug.log("PROGRESS(player_packs) - isLoading", isLoading)
+  debug.log("PROGRESS(player_packs) - isFinished", isFinished)
 
   return {
     isLoading,
