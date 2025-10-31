@@ -92,13 +92,16 @@
 
     /* Logo in center, moved up */
     #pre-loading-logo {
-      flex: 1;
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding-top: 10vh;
       gap: 2rem;
+      z-index: 10;
     }
 
     #pre-loading-logo .logo-image {
@@ -119,6 +122,10 @@
 
     /* Text section above progress bar */
     #pre-loading-text-section {
+      position: absolute;
+      bottom: 1%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       display: flex;
       flex-direction: row;
       align-items: center;
@@ -156,6 +163,10 @@
 
     /* Full width progress bar at bottom */
     #pre-loading-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
       width: 100%;
       padding: 0;
       margin: 0;
@@ -163,7 +174,7 @@
 
     #pre-loading-track {
       background: #6B3410;
-      height: 28px;
+      height: 32px;
       position: relative;
       overflow: visible;
       border: none;
@@ -207,6 +218,25 @@
     #pre-loading-screen.loading-complete {
       display: none;
     }
+
+    #pre-loading-text-maintenance {
+      display: none;
+      position: absolute;
+      bottom: 5%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      text-align: center;
+      color: #B8A080;
+      font-size: 2.6rem;
+      font-weight: 600;
+      margin: 0;
+      padding: 0;
+    }
+
+    .maintenance-mode #pre-loading-bar {
+      display: none !important;
+    }
   </style>
 </head>
 
@@ -217,6 +247,7 @@
         <img src="/images/logo/logo.svg" alt="Pistols" class="logo-image" />
         <img src="/images/logo/logo_text.svg" alt="at Dawn" class="logo-text" />
       </div>
+      <h3 id="pre-loading-text-maintenance">Under Maintenance</h3>
       <div id="pre-loading-text-section">
         <div id="pre-loading-text"></div>
         <div id="pre-loading-details"></div>
@@ -243,54 +274,63 @@
       };
     })();
 
-    // Update UI from CSS variables (managed by AssetSetupWrapper)
-    (function() {
-      const textEl = document.getElementById('pre-loading-text');
-      const detailsEl = document.getElementById('pre-loading-details');
-      const percentageEl = document.getElementById('pre-loading-percentage');
-      let isComplete = false;
-      
-      function updateUI() {
-        if (isComplete) return;
+    // Check maintenance mode - using Vite's HTML env replacement
+    if ('%VITE_MAINTENANCE_MODE%' === 'true') {
+      document.getElementById('pre-loading-bar').style.display = 'none';
+      document.getElementById('pre-loading-text').style.display = 'none';
+      document.getElementById('pre-loading-text-maintenance').style.display = 'flex';
+      document.querySelector('script[type="module"][src="/src/main.tsx"]').remove();
+    } else {
+
+      // Update UI from CSS variables (managed by AssetSetupWrapper)
+      (function() {
+        const textEl = document.getElementById('pre-loading-text');
+        const detailsEl = document.getElementById('pre-loading-details');
+        const percentageEl = document.getElementById('pre-loading-percentage');
+        let isComplete = false;
         
-        const progress = getComputedStyle(document.documentElement).getPropertyValue('--loading-progress').trim();
-        const message = getComputedStyle(document.documentElement).getPropertyValue('--loading-message').trim().replace(/['"]/g, '');
-        const mbData = getComputedStyle(document.documentElement).getPropertyValue('--loading-mb-data').trim().replace(/['"]/g, '');
-        
-        if (textEl && message) textEl.textContent = message;
-        if (detailsEl) {
-          detailsEl.textContent = mbData;
-          // Show/hide details based on whether we have MB data
-          if (mbData && mbData.length > 0) {
-            detailsEl.classList.add('show');
-          } else {
-            detailsEl.classList.remove('show');
+        function updateUI() {
+          if (isComplete) return;
+          
+          const progress = getComputedStyle(document.documentElement).getPropertyValue('--loading-progress').trim();
+          const message = getComputedStyle(document.documentElement).getPropertyValue('--loading-message').trim().replace(/['"]/g, '');
+          const mbData = getComputedStyle(document.documentElement).getPropertyValue('--loading-mb-data').trim().replace(/['"]/g, '');
+          
+          if (textEl && message) textEl.textContent = message;
+          if (detailsEl) {
+            detailsEl.textContent = mbData;
+            // Show/hide details based on whether we have MB data
+            if (mbData && mbData.length > 0) {
+              detailsEl.classList.add('show');
+            } else {
+              detailsEl.classList.remove('show');
+            }
           }
-        }
-        if (percentageEl && progress) {
-          const progressNum = parseFloat(progress);
-          percentageEl.textContent = Math.round(progressNum) + '%';
+          if (percentageEl && progress) {
+            const progressNum = parseFloat(progress);
+            percentageEl.textContent = Math.round(progressNum) + '%';
+          }
+          
+          requestAnimationFrame(updateUI);
         }
         
-        requestAnimationFrame(updateUI);
-      }
-      
-      if (textEl) textEl.textContent = 'Loading the tavern...';
-      if (percentageEl) percentageEl.textContent = '0%';
+        if (textEl) textEl.textContent = 'Loading the tavern...';
+        if (percentageEl) percentageEl.textContent = '0%';
+        
+        window.addEventListener('loading-complete', () => {
+          isComplete = true;
+        }, { once: true });
+        
+        updateUI();
+      })();
       
       window.addEventListener('loading-complete', () => {
-        isComplete = true;
-      }, { once: true });
-      
-      updateUI();
-    })();
-
-    window.addEventListener('loading-complete', () => {
-      const screen = document.getElementById('pre-loading-screen');
-      if (screen) {
-        screen.classList.add('loading-complete');
-      }
-    });
+        const screen = document.getElementById('pre-loading-screen');
+        if (screen) {
+          screen.classList.add('loading-complete');
+        }
+      });
+    }
   </script>
 
   <script type="module" src="/src/main.tsx"></script>
