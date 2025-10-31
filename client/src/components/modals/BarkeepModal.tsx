@@ -32,11 +32,19 @@ function _BarkeepModal({ opener }: { opener: Opener }) {
   // const { username, name } = useConnectedController()
   // const { sendMessage, responses } = useElizaMessage(username, name)
 
+  const openNotifications = () => {
+    setStage('notifications')
+    setDisplayText(
+      sortedNotifications.length > 0
+        ? 'Here ya go, ya filthy animal. Don\'t make me regret this...'
+        : 'Go play some duels, you scum, before bothering me with your empty woes!'
+    )
+  }
+
   useEffect(() => {
     if (opener.isOpen) {
       if (opener.props.initialStage === 'notifications') {
-        setStage('notifications')
-        setDisplayText('Here ya go, ya filthy animal. Don\'t make me regret this...')
+        openNotifications()
       } else {
         const introTexts = [
           'What do you want, you filthy mortal?',
@@ -60,7 +68,7 @@ function _BarkeepModal({ opener }: { opener: Opener }) {
 
   return (
     <div className='TempBarkeepOverlay NoMouse NoDrag'>
-      <div className={`TempBarkeepTalkBalloon Relative ${stage === 'notifications' ? 'Notifications' : 'Menu'}`}>
+      <div className={`TempBarkeepTalkBalloon Relative ${stage === 'notifications' ? 'Notifications' : 'Menu'} ${ stage === 'notifications' && sortedNotifications.length === 0 ? 'NoNotifications' : ''}`}>
         <div className='BarkeepModalContainer'>
           <AnimatedText text={displayText} delayPerCharacter={30} />
           
@@ -72,8 +80,7 @@ function _BarkeepModal({ opener }: { opener: Opener }) {
                 icon="/images/ui/notification_exclamation.png"
                 shouldShowIcon={hasUnreadNotifications}
                 onClick={() => {
-                  setStage('notifications')
-                  setDisplayText('Here ya go, ya filthy animal. Don\'t make me regret this...')
+                  openNotifications()
                 }}
                 index={1}
               />
@@ -105,7 +112,7 @@ function _BarkeepModal({ opener }: { opener: Opener }) {
             </div>
           )}
 
-          {stage === 'notifications' && (
+          {stage === 'notifications' && sortedNotifications.length > 0 && (
             <div className="NotificationScrollContainer">
               {sortedNotifications.map((notification, index) => (
                 <div 
@@ -126,7 +133,7 @@ function _BarkeepModal({ opener }: { opener: Opener }) {
           )}
 
           <div className="BarkeepButtonContainer">
-            {hasUnreadNotifications && stage === 'notifications' && (
+            {hasUnreadNotifications && stage === 'notifications' && sortedNotifications.length > 0 && (
               <button
                 onClick={() => {
                   markAllAsRead(address)

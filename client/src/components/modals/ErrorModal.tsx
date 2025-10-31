@@ -7,39 +7,19 @@ import { useGameAspect } from '/src/hooks/useGameAspect'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { showElementPopupNotification } from '/src/components/ui/ElementPopupNotification'
 
-const extractSimplifiedError = (errorText: string): string => {
+export const extractSimplifiedError = (errorText: string): string => {
   if (!errorText) return 'Unknown error'
-  
-  const failureReasonMatch = errorText.match(/failure reason:\s*\((.*)\)\./is)
-  if (failureReasonMatch) {
-    const failureContent = failureReasonMatch[1]
-    
-    const parts = failureContent.split(/\),\s*/)
-    
-    if (parts.length >= 3) {
-      let thirdElement = parts[2].trim()
-      
-      if (!thirdElement.endsWith(')')) {
-        thirdElement += ')'
-      }
-      
-      const quotedMatch = thirdElement.match(/\('([^']+)'\)/i)
-      
-      if (quotedMatch && quotedMatch[1]) {
-        const extracted = quotedMatch[1].trim()
-        if (extracted && extracted.length > 0) {
-          return extracted
-        }
-      }
-    }
+  const failureReasonQuoted = errorText.match(/failure\s*reason:[\s\S]*?\('([^']+)'\)/i)
+  if (failureReasonQuoted?.[1]) {
+    const msg = failureReasonQuoted[1].trim()
+    if (msg) return msg
   }
-  
+
+  //As a fallback, return the last meaningful line with letters (short enough for UI)
   const lines = errorText.split('\n')
-  const firstLine = lines[0]?.trim()
-  if (firstLine && firstLine.length < 100) {
-    return firstLine
-  }
-  
+  const lastMeaningful = [...lines].reverse().find(l => /[A-Za-z]/.test(l))?.trim()
+  if (lastMeaningful && lastMeaningful.length < 140) return lastMeaningful
+
   return 'Transaction failed - see details for more info'
 }
 

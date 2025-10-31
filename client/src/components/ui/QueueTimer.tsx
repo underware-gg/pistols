@@ -25,7 +25,7 @@ export const QueueTimer: React.FC<QueueTimerProps> = ({
       const colonVisible = currentSecond % 2 === 0
       
       // Update the DOM directly without triggering React re-renders
-      timerRef.current.textContent = formatQueueTime(elapsed, colonVisible)
+      timerRef.current.innerHTML = formatQueueTime(elapsed, colonVisible)
     }
     
     // Update immediately
@@ -44,10 +44,10 @@ export const QueueTimer: React.FC<QueueTimerProps> = ({
     const colon = showColon ? ':' : ' '
     
     if (hours > 0) {
-      // HH:MM format when over 1 hour - NO SECONDS!
-      return `${hours.toString().padStart(2, '0')}${colon}${mins.toString().padStart(2, '0')}`
+      // HH:MM format when over 1 hour - add subtle 'h' indicator to clarify it's hours
+      return `${hours.toString().padStart(2, '0')}${colon}${mins.toString().padStart(2, '0')}<span class="timer-unit">h</span>`
     } else {
-      // MM:SS format when under 1 hour
+      // MM:SS format when under 1 hour - no indicator needed (presence of seconds makes it clear)
       return `${mins.toString().padStart(2, '0')}${colon}${secs.toString().padStart(2, '0')}`
     }
   }

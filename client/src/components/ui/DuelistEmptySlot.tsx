@@ -7,6 +7,7 @@ import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { useDuelistsInMatchMaking } from '/src/stores/matchStore'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { DuelistMatchmakingSlot } from './DuelistMatchmakingSlot'
+import { extractSimplifiedError } from '../modals/ErrorModal'
 
 interface EnlistmentState {
   isEnlisting: boolean
@@ -77,8 +78,11 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
 
   const enlistmentHasIndexed = useMemo(() => {
     if (!enlistmentState.enlistedDuelistId) return true;
-    return rankedEnlistedIds.includes(enlistmentState.enlistedDuelistId);
-  }, [enlistmentState.enlistedDuelistId, rankedEnlistedIds]);
+    return (
+      rankedEnlistedIds.includes(enlistmentState.enlistedDuelistId) &&
+      canMatchMakeIds.includes(enlistmentState.enlistedDuelistId)
+    );
+  }, [enlistmentState.enlistedDuelistId, rankedEnlistedIds, canMatchMakeIds]);
 
   const currentDuelistId = useMemo(() => {
     return commitmentState.committedDuelistId || enlistmentState.enlistedDuelistId;
@@ -90,7 +94,7 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
     lockedAccountRef.current = null;
     
     if (result instanceof Error || result === false) {
-      const errorMessage = result instanceof Error ? result.message : "Failed to commit duelist. Please try again.";
+      const errorMessage = result instanceof Error ? extractSimplifiedError(result.message) : "Failed to commit duelist. Please try again.";
       console.error("match_make_me failed", duelistIdArg?.toString() ?? "unknown");
       setCommitmentState((prev) => ({
         ...prev,
@@ -131,7 +135,7 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
   const onCompleteEnlistDuelist = useCallback((result: boolean | Error, args: [bigint, constants.QueueId]) => {
     const [duelistIdArg] = args;
     if (result instanceof Error || result === false) {
-      const errorMessage = result instanceof Error ? result.message : "Failed to enlist duelist. Please try again.";
+      const errorMessage = result instanceof Error ? extractSimplifiedError(result.message) : "Failed to enlist duelist. Please try again.";
       console.error("enlist_duelist failed", duelistIdArg?.toString() ?? "unknown");
       setEnlistmentState((prev) => ({
         ...prev,
@@ -147,13 +151,15 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
       return;
     }
 
-    setEnlistmentState({
-      isEnlisting: false,
-      enlistError: null,
-      enlistedDuelistId: null,
-    });
-
-    handleCommitDuelist(duelistIdArg);
+    setTimeout(() => {
+      setEnlistmentState({
+        isEnlisting: false,
+        enlistError: null,
+        enlistedDuelistId: null,
+      });
+      
+      handleCommitDuelist(duelistIdArg);
+    }, 2000);
   }, [setEnlistmentState, props.onActionComplete]);
 
   const {
@@ -171,7 +177,7 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
     if (!props.matchmakingType || isCommitting || isWaitingForCommit || isEnlisting || isWaitingForEnlistment) return;
     
     if (!account) {
-      const errorMessage = "Account required for enlist_duelist";
+      const errorMessage = "Data was out of sync. Please retry!";
       console.error(errorMessage);
       
       setEnlistmentState((prev) => ({
@@ -208,7 +214,7 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
     const accountToUse = account || lockedAccountRef.current;
     
     if (!accountToUse) {
-      const errorMessage = "Account required for match_make_me";
+      const errorMessage = "Data was out of sync. Please retry!";
       console.error(errorMessage);
       
       setCommitmentState((prev) => ({
@@ -257,16 +263,6 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
       handleEnlistDuelist(enlistmentState.enlistedDuelistId);
       return;
     }
-
-    console.log(
-      "openDuelistSelect",
-      props.matchmakingType,
-      canMatchMakeIds,
-      props.matchmakingType,
-      props.queueMode,
-      props.matchmakingType === constants.QueueId.Ranked &&
-        canMatchMakeIds.length === 0
-    );
 
     duelistSelectOpener.open({
       enlistMode:

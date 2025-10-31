@@ -240,7 +240,8 @@ export function useMyActiveDuels(notificationDuelIds: bigint[] = []) {
         duel_id: BigInt(ch.duel_id),
         timestamp: Number(ch.timestamps.start),
         state: parseEnumVariant<constants.ChallengeState>(ch.state),
-        callToAction: requiredDuelIds.includes(BigInt(ch.duel_id))
+        callToAction: requiredDuelIds.includes(BigInt(ch.duel_id)),
+        hasOpponent: BigInt(ch.address_b ?? 0) > 0n
       })
       )
   }, [challenges, address, requiredDuelIds, notificationDuelIds])

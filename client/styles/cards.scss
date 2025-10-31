@@ -996,6 +996,12 @@
   font-family: Garamond;
   font-weight: bold;
   font-variant-numeric: tabular-nums;
+
+  .timer-unit {
+    font-size: 0.8em;
+    margin-left: 2px;
+    font-weight: 800;
+  }
 }
 
 .queue-status-text {

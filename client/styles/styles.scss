@@ -1498,6 +1498,10 @@ $logo-url: '/logos/logo_avante.svg';
     --tail-inner-offset-y: 11.17;
   }
 
+  &.NoNotifications {
+    bottom: 42%;
+  }
+
   &.Notifications {
     --tail-offset-y: 2;
     --tail-inner-offset-y: 2.17;

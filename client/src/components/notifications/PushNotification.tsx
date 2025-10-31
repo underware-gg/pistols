@@ -39,34 +39,61 @@ export const PushNotification: React.FC<{
     const hasCommittedB = completedStagesB?.[DuelStage.Round1Commit]
     const hasRevealedA = completedStagesA?.[DuelStage.Round1Reveal]
     const hasRevealedB = completedStagesB?.[DuelStage.Round1Reveal]
+    const isMatchmaking = challenge.duelType === constants.DuelType.Ranked || challenge.duelType === constants.DuelType.Unranked
 
     let rawTitle: string
     let rawMessage: string
 
     switch (state) {
       case constants.ChallengeState.Awaiting:
-        if (requiresAction && isMeA) {
-          rawTitle = `Your Move - ${myName}`
-          rawMessage = `It's your turn to commit your moves in duel #${duelId.toString()} against ${duelistNameB}`
-        } else {
-          if (isMeB) {
-            rawTitle = `Waiting for Duel Acceptance - ${myName}`
-            rawMessage = `${duelistNameA} has challenged you to a duel #${duelId.toString()}`
+        // Matchmaking: check if opponent found
+        if (isMatchmaking && BigInt(challenge.duelistIdB ?? 0) === 0n) {
+          // No opponent yet - searching for match
+          if (requiresAction) {
+            rawTitle = `Searching for Match - ${myName}`
+            rawMessage = `Precommit your moves for duel #${duelId.toString()}`
           } else {
-            rawTitle = `Waiting for Duel Acceptance - ${myName}`
-            rawMessage = `Waiting for ${duelistNameB} to accept your duel #${duelId.toString()}`
+            rawTitle = `Searching for Match - ${myName}`
+            rawMessage = `Waiting to find a match in duel #${duelId.toString()}`
+          }
+        } else {
+          // Opponent found or casual duel - use old flow
+          if (requiresAction && isMeA) {
+            rawTitle = `Your Move - ${myName}`
+            rawMessage = `It's your turn to commit your moves in duel #${duelId.toString()} against ${duelistNameB}`
+          } else {
+            if (isMeB) {
+              rawTitle = `Waiting for Duel Acceptance - ${myName}`
+              rawMessage = `${duelistNameA} has challenged you to a duel #${duelId.toString()}`
+            } else {
+              rawTitle = `Waiting for Duel Acceptance - ${myName}`
+              rawMessage = `Waiting for ${duelistNameB} to accept your duel #${duelId.toString()}`
+            }
           }
         }
         break
       case constants.ChallengeState.InProgress:
         // Handle commit phase
         if (!hasCommittedA || !hasCommittedB) {
-          if (requiresAction) {
-            rawTitle = `Commit Cards - ${myName}`
-            rawMessage = `It's your turn to commit your moves in duel #${duelId.toString()} against ${isMeA ? duelistNameB : duelistNameA}`
-          } else if (isOpponentTurn) {
-            rawTitle = `Waiting for Opponent - ${myName}`
-            rawMessage = `Waiting for ${isMeA ? duelistNameB : duelistNameA} to commit their moves in duel #${duelId.toString()}`
+          if (isMatchmaking) {
+            if (requiresAction) {
+              rawTitle = `Match Found! - Commit Cards - ${myName}`
+              rawMessage = `It's your turn to commit your moves in duel #${duelId.toString()} against ${isMeA ? duelistNameB : duelistNameA}`
+            } else if (isOpponentTurn) {
+              rawTitle = `Match Found! - Waiting for Opponent - ${myName}`
+              rawMessage = `Waiting for ${isMeA ? duelistNameB : duelistNameA} to commit their moves in duel #${duelId.toString()}`
+            } else {
+              rawTitle = `Match Found! - ${myName}`
+              rawMessage = `Your matchmaking duel #${duelId.toString()} has been matched! ${isMeA ? duelistNameB : duelistNameA} joined.`
+            }
+          } else {
+            if (requiresAction) {
+              rawTitle = `Commit Cards - ${myName}`
+              rawMessage = `It's your turn to commit your moves in duel #${duelId.toString()} against ${isMeA ? duelistNameB : duelistNameA}`
+            } else if (isOpponentTurn) {
+              rawTitle = `Waiting for Opponent - ${myName}`
+              rawMessage = `Waiting for ${isMeA ? duelistNameB : duelistNameA} to commit their moves in duel #${duelId.toString()}`
+            }
           }
         }
         // Handle reveal phase
@@ -81,7 +108,7 @@ export const PushNotification: React.FC<{
         }
         // Fallback for other in-progress states
         else {
-          rawTitle = `Duel In Progress - ${myName}`
+          rawTitle = isMatchmaking ? `Matchmaking Duel In Progress - ${myName}` : `Duel In Progress - ${myName}`
           rawMessage = isMeA
             ? `${duelistNameB} has accepted your duel #${duelId.toString()}`
             : `You've accepted ${duelistNameA}'s duel #${duelId.toString()}`
@@ -107,19 +134,19 @@ export const PushNotification: React.FC<{
         break
       case constants.ChallengeState.Resolved:
         if (requiresAction) {
-          rawTitle = `Duel Ended - ${myName}`
+          rawTitle = isMatchmaking ? `Matchmaking Duel Ended - ${myName}` : `Duel Ended - ${myName}`
           rawMessage = `Your duel #${duelId.toString()} with ${isMeA ? duelistNameB : duelistNameA} has been resolved. Click to see the result!`
         } else {
-          rawTitle = `Duel Resolved - ${myName}`
+          rawTitle = isMatchmaking ? `Matchmaking Duel Resolved - ${myName}` : `Duel Resolved - ${myName}`
           rawMessage = `Your duel #${duelId.toString()} with ${isMeA ? duelistNameB : duelistNameA} has been resolved`
         }
         break
       case constants.ChallengeState.Draw:
         if (requiresAction) {
-          rawTitle = `Duel Ended - ${myName}`
+          rawTitle = isMatchmaking ? `Matchmaking Duel Ended - ${myName}` : `Duel Ended - ${myName}`
           rawMessage = `Your duel #${duelId.toString()} with ${isMeA ? duelistNameB : duelistNameA} has been resolved. Click to see the result!`
         } else {
-          rawTitle = `Duel Draw - ${myName}`
+          rawTitle = isMatchmaking ? `Matchmaking Duel Draw - ${myName}` : `Duel Draw - ${myName}`
           rawMessage = `Your duel #${duelId.toString()} with ${isMeA ? duelistNameB : duelistNameA} ended in a draw`
         }
         break
