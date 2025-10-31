@@ -110,7 +110,7 @@ export default function ScMatchmaking() {
       })
     })
     
-    console.log(`slowSlotsData() =>`, challengeIds.filter(id => !duellingDuelIds.includes(id)), sortedDuellingIds, inQueueIds, slots);
+    // console.log(`slowSlotsData() =>`, challengeIds.filter(id => !duellingDuelIds.includes(id)), sortedDuellingIds, inQueueIds, slots);
 
     return slots
   }, [totalUsedSlowSlots, inQueueIds, duellingIds, duelsByDuelistId, challengeIds])
