@@ -77,9 +77,13 @@ export const useScoreboardStore = createStore();
 // in order from first to last
 //
 export const useCurrentSeasonScoreboard = () => {
-  const scoreboard = useScoreboardStore((state) => state.scoreboard);
+  const scoreboardState = useScoreboardStore((state) => state);
   // merge with Leaderboard (10 first may be out of order)
   const { currentSeasonId } = useConfig()
+  // Filter scoreboard by currentSeasonId first, just like useGetSeasonScoreboard does
+  const scoreboard = useMemo<DuelistScore[]>(() => (
+    scoreboardState.scoreboard.filter(s => s.seasonId === currentSeasonId)
+  ), [scoreboardState.scoreboard, currentSeasonId])
   const seasonScoreboard = _useMergeScoreboardWithLeaderboard(scoreboard, currentSeasonId)
   return {
     seasonScoreboard,

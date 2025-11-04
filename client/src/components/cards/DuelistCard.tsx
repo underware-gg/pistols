@@ -65,6 +65,10 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
   const { points, position } = props.seasonId ? useDuelistSeasonScore(props.duelistId, props.seasonId) : useDuelistCurrentSeasonScore(props.duelistId)
   // console.log(`DUELIST SCORE:`, props.duelistId, position, points)
 
+  useEffect(() => {
+    console.log(`DUELIST CARD:`, props.duelistId, props.seasonId, position, points)
+  }, [props.duelistId, props.seasonId, position, points])
+
   // Animation states
   const [isAnimatingSouls, setIsAnimatingSouls] = useState(false)
   const [displayLevel, setDisplayLevel] = useState(props.shouldAnimateIncrease ? (level - 1) || 0 : level || 0)
@@ -281,8 +285,8 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
                 cursor: !props.isSmall ? 'pointer' : 'default',
                 transition: 'filter 0.3s ease, transform 0.5s ease'
               }}
-              onMouseEnter={() => emitter.emit('hover_description', position === 0 ? `Duelist not ranked in ${seasonName}` : `Duelists rank in ${seasonName} is ${position}`)}
-              onMouseLeave={() => emitter.emit('hover_description', null)}
+              onMouseEnter={() => props.isSmall ? null : emitter.emit('hover_description', position === 0 ? `Duelist not ranked in ${seasonName}` : `Duelists rank in ${seasonName} is ${position}`)}
+              onMouseLeave={() => props.isSmall ? null : emitter.emit('hover_description', null)}
               
             >
               <span className={numberAnimationClass} style={{
