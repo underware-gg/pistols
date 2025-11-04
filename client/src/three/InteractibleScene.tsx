@@ -355,8 +355,16 @@ export class InteractibleScene extends THREE.Scene {
     this.maskShader.setUniformValue('uMasksSize', this.sceneData.items?.length || 0)
     this.maskShader.setUniformValue('uMasks', this.sceneData.items?.map(item => _textures[item.mask]) || [])
     this.maskShader.setUniformValue('uMasksRenderOrder', this.sceneData.items?.map(item => item.renderOrder) || [])
+    
+    // Ensure texture array is properly sized for WebGL (pad to at least 2 elements if single texture) 🐙
+    // Some WebGL implementations have issues with single-element texture arrays
+    const textureArray = [...this.currentTextures];
+    if (textureArray.length === 1 && this.sceneData.backgrounds.length === 1) {
+      textureArray.push(textureArray[0]);
+    }
+    
     this.maskShader.setUniformValue('uTexturesSize', this.sceneData.backgrounds?.length || 0)
-    this.maskShader.setUniformValue('uTextures', this.currentTextures)
+    this.maskShader.setUniformValue('uTextures', textureArray)
     this.maskShader.setUniformValue('uTexturesRenderOrder', this.sceneData.backgrounds.map(background => background.renderOrder))
     this.uniformCache.resolution.set(sizes.canvasWidth, sizes.canvasHeight)
     this.maskShader.setUniformValue('uResolution', this.uniformCache.resolution)

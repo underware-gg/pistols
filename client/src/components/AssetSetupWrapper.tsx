@@ -15,18 +15,18 @@ function updateLoadingVars(progress: number, message: string, mbData: string) {
 }
 
 const loadingMessages = [
-  "Loading the saloon doors...",
-  "Polishing pistols and preparing cards...",
-  "Setting up the dueling grounds...",
-  "Gathering the town folk...",
-  "Preparing the tavern atmosphere...",
-  "Loading ammunition and honor...",
-  "Collecting bounty information...",
-  "Reading wanted posters...",
-  "Gathering duel records...",
-  "Loading sheriff reports...",
-  "Syncing with the frontier database...",
-  "Preparing challenger data...",
+  "Loading the saloon doors",
+  "Polishing pistols and preparing cards",
+  "Setting up the dueling grounds",
+  "Gathering the town folk",
+  "Preparing the tavern atmosphere",
+  "Loading ammunition and honor",
+  "Collecting bounty information",
+  "Reading wanted posters",
+  "Gathering duel records",
+  "Loading sheriff reports",
+  "Syncing with the frontier database",
+  "Preparing challenger data",
 ]
 
 export default function AssetSetupWrapper({ children }: AssetSetupWrapperProps) {
