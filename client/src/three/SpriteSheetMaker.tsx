@@ -27,12 +27,7 @@ export class SpriteSheet {
     for (let f = 1; f <= this.frameCount; ++f) {
       const frameNumber = ('000' + f.toString()).slice(-3)
       const path = `${SHEET.path}/frame_${frameNumber}.ktx2`
-      
-      const response = await fetch(path)
-      const buffer = await response.arrayBuffer()
-      const tex = await new Promise<THREE.CompressedTexture>((resolve, reject) => {
-        loader.parse(buffer, resolve, reject)
-      })
+      const tex = await loader.loadAsync(path);
 
       tex.colorSpace = THREE.SRGBColorSpace
       tex.generateMipmaps = false

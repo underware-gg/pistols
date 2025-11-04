@@ -38,7 +38,7 @@
   <style>
     :root {
       --loading-progress: 0;
-      --loading-message: 'Loading the saloon...';
+      --loading-message: 'Loading the saloon';
       --loading-mb-data: '';
     }
 
@@ -143,6 +143,12 @@
       line-height: 1.4;
       margin: 0;
       padding: 0;
+    }
+
+    .loading-dots {
+      display: inline-block;
+      width: 1em;
+      text-align: left;
     }
 
     #pre-loading-details {
@@ -288,6 +294,45 @@
         const detailsEl = document.getElementById('pre-loading-details');
         const percentageEl = document.getElementById('pre-loading-percentage');
         let isComplete = false;
+        let dotsSpan = null;
+        let dotsState = 0;
+        let lastMessage = '';
+        
+        function ensureDots() {
+          if (!textEl || !dotsSpan || dotsSpan.parentNode !== textEl) {
+            if (dotsSpan && dotsSpan.parentNode) {
+              dotsSpan.remove();
+            }
+            dotsSpan = document.createElement('span');
+            dotsSpan.className = 'loading-dots';
+            dotsSpan.textContent = '.';
+            if (textEl) {
+              textEl.appendChild(dotsSpan);
+            }
+          }
+        }
+        
+        // Animate dots independently - runs continuously
+        function animateDots() {
+          if (isComplete) return;
+          
+          ensureDots();
+          
+          if (!dotsSpan) return;
+          
+          dotsState = (dotsState + 1) % 4;
+          if (dotsState === 0) {
+            dotsSpan.textContent = '.';
+          } else if (dotsState === 1) {
+            dotsSpan.textContent = '..';
+          } else if (dotsState === 2) {
+            dotsSpan.textContent = '...';
+          } else {
+            dotsSpan.textContent = '';
+          }
+          
+          setTimeout(animateDots, 400);
+        }
         
         function updateUI() {
           if (isComplete) return;
@@ -296,7 +341,23 @@
           const message = getComputedStyle(document.documentElement).getPropertyValue('--loading-message').trim().replace(/['"]/g, '');
           const mbData = getComputedStyle(document.documentElement).getPropertyValue('--loading-mb-data').trim().replace(/['"]/g, '');
           
-          if (textEl && message) textEl.textContent = message;
+          if (textEl && message) {
+            if (message !== lastMessage) {
+              lastMessage = message;
+              if (dotsSpan && dotsSpan.parentNode === textEl) {
+                const dotsContent = dotsSpan.textContent;
+                dotsSpan.remove();
+                textEl.textContent = message;
+                textEl.appendChild(dotsSpan);
+                dotsSpan.textContent = dotsContent;
+              } else {
+                textEl.textContent = message;
+                ensureDots();
+              }
+            } else {
+              ensureDots();
+            }
+          }
           if (detailsEl) {
             detailsEl.textContent = mbData;
             // Show/hide details based on whether we have MB data
@@ -314,7 +375,12 @@
           requestAnimationFrame(updateUI);
         }
         
-        if (textEl) textEl.textContent = 'Loading the tavern...';
+        if (textEl) {
+          textEl.textContent = 'Loading the tavern';
+          lastMessage = 'Loading the tavern';
+          ensureDots();
+          setTimeout(animateDots, 400);
+        }
         if (percentageEl) percentageEl.textContent = '0%';
         
         window.addEventListener('loading-complete', () => {
@@ -324,12 +390,39 @@
         updateUI();
       })();
       
-      window.addEventListener('loading-complete', () => {
+      // Wait for both assets AND game to be ready before hiding loading screen
+      let assetsReady = false;
+      let gameReady = false;
+      
+      const checkAndHide = () => {
+        if (assetsReady && gameReady) {
         const screen = document.getElementById('pre-loading-screen');
         if (screen) {
           screen.classList.add('loading-complete');
         }
-      });
+        }
+      };
+      
+      // Listen for asset loading complete
+      window.addEventListener('loading-complete', () => {
+        assetsReady = true;
+        checkAndHide();
+      }, { once: true });
+      
+      // Check if game is ready by polling window.__gameImpl (set by ThreeJsContext)
+      const checkGameReady = () => {
+        // Check if gameImpl exists in window (set by React after game initializes)
+        if (window.__gameImpl || (window.__reactRoot && window.__reactRoot._gameImpl)) {
+          gameReady = true;
+          checkAndHide();
+        } else {
+          // Poll every 100ms for game to be ready
+          setTimeout(checkGameReady, 100);
+        }
+      };
+      
+      // Start checking for game readiness after a short delay
+      setTimeout(checkGameReady, 500);
     }
   </script>
 

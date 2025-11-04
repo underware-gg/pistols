@@ -14,20 +14,19 @@ function updateLoadingVars(progress: number, message: string, mbData: string) {
   document.documentElement.style.setProperty('--loading-mb-data', `"${mbData}"`)
 }
 
-// All loading messages in one array 🐙
 const loadingMessages = [
-  "Loading the saloon doors...",
-  "Polishing pistols and preparing cards...",
-  "Setting up the dueling grounds...",
-  "Gathering the town folk...",
-  "Preparing the tavern atmosphere...",
-  "Loading ammunition and honor...",
-  "Collecting bounty information...",
-  "Reading wanted posters...",
-  "Gathering duel records...",
-  "Loading sheriff reports...",
-  "Syncing with the frontier database...",
-  "Preparing challenger data...",
+  "Loading the saloon doors",
+  "Polishing pistols and preparing cards",
+  "Setting up the dueling grounds",
+  "Gathering the town folk",
+  "Preparing the tavern atmosphere",
+  "Loading ammunition and honor",
+  "Collecting bounty information",
+  "Reading wanted posters",
+  "Gathering duel records",
+  "Loading sheriff reports",
+  "Syncing with the frontier database",
+  "Preparing challenger data",
 ]
 
 export default function AssetSetupWrapper({ children }: AssetSetupWrapperProps) {
@@ -65,7 +64,6 @@ export default function AssetSetupWrapper({ children }: AssetSetupWrapperProps) 
 
       const hideTimer = setTimeout(() => {
         window.dispatchEvent(new Event('loading-complete'))
-        
       }, 700)
       
       return () => clearTimeout(hideTimer)

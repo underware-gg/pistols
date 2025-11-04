@@ -71,9 +71,6 @@ export default function ScProfile() {
 
   return (
     <div id='Profile'>
-      <div className='UIContainer'>
-      </div>
-
       {showCardPack && (
         <CardPack 
           packType={constants.PackType.StarterPack} 
@@ -85,6 +82,7 @@ export default function ScProfile() {
           customButtonLabel="Close"
         />
       )}
+
       {(debugMode || true) && <>
         <PublishOnlineStatusButton />
         {/* <TutorialProgressDebug /> */}

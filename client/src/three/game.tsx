@@ -266,40 +266,35 @@ async function loadAssets() {
   ktx2Loader.detectSupport(_renderer)
   ktx2Loader.setWorkerLimit(4)
 
-  Object.keys(TEXTURES).forEach(key => {
+  await Promise.all(Object.keys(TEXTURES).map(async key => {
     const TEX = TEXTURES[key]
     if (TEX.path.includes('.ktx2')) {
-      ktxLoaderCount ++;
-      ktx2Loader.load(TEX.path, (tex) => {
-        tex.colorSpace = THREE.SRGBColorSpace
-        tex.generateMipmaps = false
-        tex.minFilter = THREE.LinearFilter
-        _textures[key] = tex
+      const tex = await ktx2Loader.loadAsync(TEX.path);
 
-        if (key == TextureName.duel_ground && _ground) {
-          _ground.material.map = tex
-          _ground.material.needsUpdate = true
-        } else if (key == TextureName.duel_ground_normal && _ground) {
-          _ground.material.normalMap = tex
-          _ground.material.needsUpdate = true
-        } else if (key == TextureName.duel_water_map && _groundMirror) {
-          _groundMirror.setUniformValue('waterMap', tex)
-        }
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.generateMipmaps = false;
+      tex.minFilter = THREE.LinearFilter;
+      _textures[key] = tex;
 
-        ktxLoaderCount --;
-      })
+      if (key == TextureName.duel_ground && _ground) {
+        _ground.material.map = tex;
+        _ground.material.needsUpdate = true;
+      } else if (key == TextureName.duel_ground_normal && _ground) {
+        _ground.material.normalMap = tex;
+        _ground.material.needsUpdate = true;
+      } else if (key == TextureName.duel_water_map && _groundMirror) {
+        _groundMirror.setUniformValue("waterMap", tex);
+      }
     } else {
       const tex = textureLoader.load(TEX.path)
       tex.colorSpace = THREE.SRGBColorSpace
       tex.generateMipmaps = false
       tex.minFilter = THREE.LinearFilter
 
-      if (TEX == TEXTURES.cliffs) {
-        // tex.flipY = false
-      }
       _textures[key] = tex
+
     }
-  })
+  }))
 
   Object.keys(SPRITESHEETS).forEach(actorName => {
     _spriteSheets[actorName] = {}
@@ -309,30 +304,10 @@ async function loadAssets() {
   })
 
   _textures[TextureName.duel_water_dudv].wrapS = _textures[TextureName.duel_water_dudv].wrapT = THREE.RepeatWrapping;
-  
-  setTimeout(() => {
-    checkKTX2LoaderState(ktx2Loader)
-  }, 10_000)
-}
 
-let ktxLoaderCount = 0
-//make sure the ktx2 loader disposes AFTER all the textures have been loaded
-function checkKTX2LoaderState(loader) {
-  let completed = true
-  Object.keys(SPRITESHEETS).forEach(actorName => {
-    Object.keys(SPRITESHEETS[actorName]).forEach(key => {
-      if (!_spriteSheets[actorName][key].isLoaded) {
-        completed = false 
-      }
-    })
-  })
-  if (ktxLoaderCount == 0 && completed) {
-    loader.dispose()
-  } else {
-    setTimeout(() => {
-      checkKTX2LoaderState(loader)
-    }, 1_000)
-  } 
+  setTimeout(() => {
+    ktx2Loader.dispose();
+  }, 10_000);
 }
 
 function setRender(canvas) {
@@ -755,13 +730,15 @@ export function animate() {
         animateHighlights(deltaTime)
 
         _renderer.render(_currentScene, _duelCamera)
-      } else {
-        //@ts-ignore
-        _currentScene.children.forEach(c => c.animate?.(deltaTime)) //replaced with deltaTime (could be elapsedTime), because if more than one childs had called getDelta() the animation wont work as supposed
+      } else {  
         _renderer.render(_currentScene, _staticCamera)
 
         if (_currentScene instanceof InteractibleScene) {
-          _currentScene.render(elapsedTime)
+          //@ts-ignore
+          _currentScene.children.forEach((c) => c.animate?.(deltaTime));
+          if (_currentScene.sceneData?.backgrounds) {
+            _currentScene.render(elapsedTime);
+          }
         } else if (_currentScene instanceof InteractibleLayeredScene) {
           _currentScene.render(elapsedTime)
         }
@@ -1197,10 +1174,12 @@ export function switchScene(sceneName: SceneName) {
         _currentScene = _duelScene
       } else {
         _currentScene = _staticScene
-        _staticScene.setSceneData(sceneName)
-        if (wasDuelScene) {
-          _staticScene.activate()
-        }
+        requestAnimationFrame(() => {
+          _staticScene.setSceneData(sceneName)
+          if (wasDuelScene) {
+            _staticScene.activate()
+          }
+        })
       }
 
       emitter.emit('hover_description', null)
