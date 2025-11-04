@@ -33,6 +33,18 @@ export default function AssetSetupWrapper({ children }: AssetSetupWrapperProps) 
   const assetSetup = useAssetSetup()
   const [allowGameRender, setAllowGameRender] = useState(false)
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).__waitingForAssets = true
+    }
+    
+    return () => {
+      if (typeof window !== 'undefined') {
+        (window as any).__waitingForAssets = false
+      }
+    }
+  }, [])
+
   const progressBucket = Math.floor(assetSetup.progress.percentage / 20);
 
   const loadingMessage = useMemo(() => {
@@ -63,6 +75,9 @@ export default function AssetSetupWrapper({ children }: AssetSetupWrapperProps) 
       }, 300);
 
       const hideTimer = setTimeout(() => {
+        if (typeof window !== 'undefined') {
+          (window as any).__waitingForAssets = false
+        }
         window.dispatchEvent(new Event('loading-complete'))
       }, 700)
       

@@ -393,13 +393,45 @@
       // Wait for both assets AND game to be ready before hiding loading screen
       let assetsReady = false;
       let gameReady = false;
+      let reactRendered = false;
+      
+      const checkReactRendered = () => {
+        const root = document.getElementById('root');
+        if (root && root.children.length > 0) {
+          reactRendered = true;
+          
+          setTimeout(() => {
+            const isMaintenanceMode = '%VITE_MAINTENANCE_MODE%' === 'true';
+            if (isMaintenanceMode) {
+              console.log('🔧 Maintenance mode active, keeping loading screen');
+              return;
+            }
+            
+            if (!window.__waitingForAssets && !assetsReady) {
+              console.log('⚠️ No asset loading detected, hiding loading screen for non-game route');
+              assetsReady = true;
+              gameReady = true;
+              checkAndHide();
+            }
+          }, 1500);
+        } else {
+          setTimeout(checkReactRendered, 100);
+        }
+      };
+      
+      setTimeout(checkReactRendered, 500);
       
       const checkAndHide = () => {
-        if (assetsReady && gameReady) {
-        const screen = document.getElementById('pre-loading-screen');
-        if (screen) {
-          screen.classList.add('loading-complete');
+        const isMaintenanceMode = '%VITE_MAINTENANCE_MODE%' === 'true';
+        if (isMaintenanceMode) {
+          return;
         }
+        
+        if (assetsReady && gameReady) {
+          const screen = document.getElementById('pre-loading-screen');
+          if (screen) {
+            screen.classList.add('loading-complete');
+          }
         }
       };
       
@@ -411,6 +443,10 @@
       
       // Check if game is ready by polling window.__gameImpl (set by ThreeJsContext)
       const checkGameReady = () => {
+        if (!window.__waitingForAssets) {
+          return;
+        }
+        
         // Check if gameImpl exists in window (set by React after game initializes)
         if (window.__gameImpl || (window.__reactRoot && window.__reactRoot._gameImpl)) {
           gameReady = true;
