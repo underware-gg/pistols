@@ -14,7 +14,6 @@ function updateLoadingVars(progress: number, message: string, mbData: string) {
   document.documentElement.style.setProperty('--loading-mb-data', `"${mbData}"`)
 }
 
-// All loading messages in one array 🐙
 const loadingMessages = [
   "Loading the saloon doors...",
   "Polishing pistols and preparing cards...",
@@ -65,7 +64,6 @@ export default function AssetSetupWrapper({ children }: AssetSetupWrapperProps) 
 
       const hideTimer = setTimeout(() => {
         window.dispatchEvent(new Event('loading-complete'))
-        
       }, 700)
       
       return () => clearTimeout(hideTimer)

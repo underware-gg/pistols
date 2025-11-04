@@ -102,6 +102,7 @@ export const useThreeJsContext = () => {
 
   const dispatchGameImpl = (gameImpl: ThreeJsGame) => {
     dispatch({ type: ThreeJsActions.SET_GAME_IMPL, payload: gameImpl })
+    ;(window as any).__gameImpl = gameImpl
   }
 
   const dispatchLoadedAudioAssets = (loaded: boolean) => {

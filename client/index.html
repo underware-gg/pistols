@@ -324,12 +324,39 @@
         updateUI();
       })();
       
-      window.addEventListener('loading-complete', () => {
+      // Wait for both assets AND game to be ready before hiding loading screen
+      let assetsReady = false;
+      let gameReady = false;
+      
+      const checkAndHide = () => {
+        if (assetsReady && gameReady) {
         const screen = document.getElementById('pre-loading-screen');
         if (screen) {
           screen.classList.add('loading-complete');
         }
-      });
+        }
+      };
+      
+      // Listen for asset loading complete
+      window.addEventListener('loading-complete', () => {
+        assetsReady = true;
+        checkAndHide();
+      }, { once: true });
+      
+      // Check if game is ready by polling window.__gameImpl (set by ThreeJsContext)
+      const checkGameReady = () => {
+        // Check if gameImpl exists in window (set by React after game initializes)
+        if (window.__gameImpl || (window.__reactRoot && window.__reactRoot._gameImpl)) {
+          gameReady = true;
+          checkAndHide();
+        } else {
+          // Poll every 100ms for game to be ready
+          setTimeout(checkGameReady, 100);
+        }
+      };
+      
+      // Start checking for game readiness after a short delay
+      setTimeout(checkGameReady, 500);
     }
   </script>
 

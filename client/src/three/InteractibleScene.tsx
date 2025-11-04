@@ -73,6 +73,10 @@ export class InteractibleScene extends THREE.Scene {
 
   private emittedVectors: Map<string, THREE.Vector2> = new Map();
 
+  private boundOnMouseMove: (e: MouseEvent) => void;
+  private boundOnMouseClick: (e: PointerEvent) => void;
+  private boundOnResize: () => void;
+
   constructor(sceneName: string, renderer: THREE.WebGLRenderer, camera: THREE.Camera) {
     super()
 
@@ -80,6 +84,10 @@ export class InteractibleScene extends THREE.Scene {
     this.camera = camera
 
     this.setSceneData(sceneName)
+
+    this.boundOnMouseMove = this.onMouseMove.bind(this);
+    this.boundOnMouseClick = this.onMouseClick.bind(this);
+    this.boundOnResize = this.onResize.bind(this);
 
     emitter.on('hasModalOpen', (data) => {
       this.isModalOpen = data
@@ -138,7 +146,7 @@ export class InteractibleScene extends THREE.Scene {
           minFilter: THREE.LinearFilter,
           magFilter: THREE.LinearFilter,
           format: THREE.RGBAFormat,
-          type: THREE.FloatType,
+          type: THREE.UnsignedByteType,
           generateMipmaps: false,
           colorSpace: THREE.SRGBColorSpace,
           depthBuffer: false,
@@ -176,7 +184,7 @@ export class InteractibleScene extends THREE.Scene {
               new THREE.PlaneGeometry(width, height),
               new THREE.MeshBasicMaterial({
                 transparent: true, 
-                map: _textures[item.mask]
+                map: _textures[item.mask] || null
               })
             )
             itemMesh.name = `mask_${item.mask}_${background.renderOrder}`
@@ -197,7 +205,7 @@ export class InteractibleScene extends THREE.Scene {
           minFilter: THREE.NearestFilter,
           magFilter: THREE.NearestFilter,
           format: THREE.RGBAFormat,
-          type: THREE.FloatType
+          type: THREE.UnsignedByteType
         }
       )
     }
@@ -281,9 +289,9 @@ export class InteractibleScene extends THREE.Scene {
   }
 
   public dispose() {
-    document.removeEventListener('mousemove', this.onMouseMove.bind(this), false);
-    document.removeEventListener('click', this.onMouseClick.bind(this), false);
-    window.removeEventListener('resize', this.onResize, false);
+    document.removeEventListener('mousemove', this.boundOnMouseMove, false);
+    document.removeEventListener('click', this.boundOnMouseClick, false);
+    window.removeEventListener('resize', this.boundOnResize, false);
 
     this.fbo_mask?.dispose();
     this.fbo_blur_background?.dispose();
@@ -360,19 +368,19 @@ export class InteractibleScene extends THREE.Scene {
   }
 
   private performColorPick() {
-    const maskRead = new Float32Array(4);
+    const maskRead = new Uint8Array(4);
     this.renderer.readRenderTargetPixels(this.fbo_mask, this.mousePos.x, this.mousePos.y, 1, 1, maskRead);
 
     this.checkRenderOrders(maskRead);
   }
 
-  private checkRenderOrders(maskRead: Float32Array) {
-    const maskColor = new THREE.Color(maskRead[0], maskRead[1], maskRead[2]);
+  private checkRenderOrders(maskRead: Uint8Array) {
+    const maskColor = new THREE.Color(maskRead[0] / 255, maskRead[1] / 255, maskRead[2] / 255);
     const hitMask = this.sceneData.items?.find(item => item.color == maskColor.getHexString())
 
     if (this.isClickable) {
       if (hitMask) {
-        this.pickColor(maskRead[0], maskRead[1], maskRead[2]);
+        this.pickColor(maskRead[0] / 255, maskRead[1] / 255, maskRead[2] / 255);
       } else {
         this.pickColor(0, 0, 0)
       }
@@ -460,12 +468,12 @@ export class InteractibleScene extends THREE.Scene {
 
   public activate() {
     if (this.sceneData.backgrounds && this.sceneData.backgrounds.length > 0) {
-      document.addEventListener('mousemove', this.onMouseMove.bind(this), false);
+      document.addEventListener('mousemove', this.boundOnMouseMove, false);
     } 
     if (this.sceneData.items && this.sceneData.items.length > 0) {
-      document.addEventListener('click', this.onMouseClick.bind(this), false);
+      document.addEventListener('click', this.boundOnMouseClick, false);
     }
-    window.addEventListener('resize', this.onResize, false);
+    window.addEventListener('resize', this.boundOnResize, false);
   }
 
   public deactivate() {
@@ -487,9 +495,9 @@ export class InteractibleScene extends THREE.Scene {
     }
     this.pickColor(0, 0, 0);
     this.pickedItem = null;
-    document.removeEventListener('mousemove', this.onMouseMove.bind(this), false);
-    document.removeEventListener('click', this.onMouseClick.bind(this), false);
-    window.removeEventListener('resize', this.onResize, false);
+    document.removeEventListener('mousemove', this.boundOnMouseMove, false);
+    document.removeEventListener('click', this.boundOnMouseClick, false);
+    window.removeEventListener('resize', this.boundOnResize, false);
   }
 
   private resetRandomInterpolation() {

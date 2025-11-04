@@ -69,10 +69,6 @@ export default function ScProfile() {
 
   return (
     <div id='Profile'>
-      <div className='UIContainer'>
-      </div>
-
-      
       <CardPack 
         packType={constants.PackType.StarterPack} 
         isOpen={showCardPack} 
