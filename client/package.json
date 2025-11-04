@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "vite",
     "devs": "vite -c vite_https.config",
-    "prebuild": "tsx scripts/generateAssetManifest.ts",
+    "prebuild": "npx tsx scripts/generateAssetManifest.ts",
     "build": "npx tsc -p tsconfig.json && vite build",
     "sync": "npx tsc -watch",
     "check-types": "npx tsc --noEmit",
