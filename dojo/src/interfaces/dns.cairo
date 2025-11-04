@@ -1,4 +1,4 @@
-use starknet::{ContractAddress};
+use starknet::{ContractAddress, ClassHash};
 use core::num::traits::Zero;
 use dojo::world::{WorldStorage, WorldStorageTrait, IWorldDispatcher};
 use dojo::meta::interface::{
@@ -74,7 +74,7 @@ pub impl DnsImpl of DnsTrait {
     }
     fn find_library_address(self: @WorldStorage, library_name: @ByteArray, library_version: @ByteArray) -> ClassHash {
         let library_name: ByteArray = format!("{}_v{}", library_name, library_version);
-        (self.dns_class_hash(@library_name).expect(library_name.to_felt252_word().unwrap_or('library not found')))
+        (self.dns_class_hash(@library_name).expect('library not found'))
     }
 
 
