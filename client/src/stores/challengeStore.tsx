@@ -119,7 +119,8 @@ export const useChallenge = (duelId: BigNumberish) => {
     isResolved: (state == constants.ChallengeState.Resolved),
     isDraw: (state == constants.ChallengeState.Draw),
     isCanceled: (state == constants.ChallengeState.Withdrawn || state == constants.ChallengeState.Refused),
-    isExpired: (state == constants.ChallengeState.Expired) || (seasonId > 0 && seasonId !== currentSeasonId),
+    isExpired: (state == constants.ChallengeState.Expired),
+    isSeasonExpired: (seasonId > 0 && seasonId !== currentSeasonId),
     needToSyncExpired,
     // times
     timestampStart,
