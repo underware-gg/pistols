@@ -132,12 +132,12 @@ export const DuelistMatchmakingSlot = forwardRef<DuelistMatchmakingSlotHandle, D
       return { message: "Error", buttonText: null, color: "#ef4444", showTimer: false };
     }
 
-    if (canCollectDuel === true) {
-      return { message: "Duel Timed Out", buttonText: null, color: "#ef4444", showTimer: false };
+    if (canCollectDuel) {
+      return { message: "Duel Timed Out", buttonText: !challenge.isSeasonExpired ? "GO TO DUEL" : null, color: "#ef4444", showTimer: !challenge.isSeasonExpired ? true : false };
     }
     
     if (challenge.needToSyncExpired) {
-      return { message: "Duel Expired", buttonText: null, color: "#ef4444", showTimer: false };
+      return { message: "Duel Expired", buttonText: !challenge.isSeasonExpired ? "GO TO DUEL" : null, color: "#ef4444", showTimer: !challenge.isSeasonExpired ? true : false };
     }
 
     if (currentDuelistId && (rankedPlayer.duelistId === BigInt(currentDuelistId) || unrankedPlayer.duelistId === BigInt(currentDuelistId)) && challenge.isAwaiting) {
