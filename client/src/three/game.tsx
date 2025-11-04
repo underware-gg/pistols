@@ -730,13 +730,15 @@ export function animate() {
         animateHighlights(deltaTime)
 
         _renderer.render(_currentScene, _duelCamera)
-      } else {
-        //@ts-ignore
-        _currentScene.children.forEach(c => c.animate?.(deltaTime)) //replaced with deltaTime (could be elapsedTime), because if more than one childs had called getDelta() the animation wont work as supposed
+      } else {  
         _renderer.render(_currentScene, _staticCamera)
 
         if (_currentScene instanceof InteractibleScene) {
-          _currentScene.render(elapsedTime)
+          //@ts-ignore
+          _currentScene.children.forEach((c) => c.animate?.(deltaTime));
+          if (_currentScene.sceneData?.backgrounds) {
+            _currentScene.render(elapsedTime);
+          }
         } else if (_currentScene instanceof InteractibleLayeredScene) {
           _currentScene.render(elapsedTime)
         }
@@ -1172,10 +1174,12 @@ export function switchScene(sceneName: SceneName) {
         _currentScene = _duelScene
       } else {
         _currentScene = _staticScene
-        _staticScene.setSceneData(sceneName)
-        if (wasDuelScene) {
-          _staticScene.activate()
-        }
+        requestAnimationFrame(() => {
+          _staticScene.setSceneData(sceneName)
+          if (wasDuelScene) {
+            _staticScene.activate()
+          }
+        })
       }
 
       emitter.emit('hover_description', null)

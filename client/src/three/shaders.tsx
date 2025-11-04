@@ -93,6 +93,10 @@ export class ShaderMaterial extends THREE.ShaderMaterial {
     super(parameters);
 
     this.uniforms.time = { value: 0.0 };
+    
+    this.customProgramCacheKey = function() {
+      return shaderType;
+    };
   }
 
   setUniformValue(name, value) {
