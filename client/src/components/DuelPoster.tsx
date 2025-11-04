@@ -262,13 +262,14 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
     seasonName,
     isLive,
     isFinished,
-    isExpired,
+    isSeasonExpired,
     premise,
     message,
     livesStaked,
     needToSyncExpired,
     isMatchmaking,
   } = useChallenge(props.duelId)
+  console.log(`useChallenge(props.duelId) =>`, useChallenge(props.duelId))
   const { endedInBlades, endedInPaces } = useRound(props.duelId)
   const { canCollectDuel } = useCanCollectDuel(props.duelId)
   const { challengeDescription } = useChallengeDescription(props.duelId)
@@ -577,60 +578,56 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
               <Col>
                 <ActionButton large fillParent label='Close' className='FillParent' onClick={props._close} />
               </Col>
-              {!isExpired && (
+              {((state == constants.ChallengeState.InProgress || isSeasonExpired) && canCollectDuel) &&
+                <Col>
+                  <ActionButton large fillParent important label='Timed Out, Collect Duel' loading={isSubmitting} loadingClassName='poster' onClick={() => _collectDuel()} />
+                </Col>
+              }
+              {(state == constants.ChallengeState.Awaiting && isChallenger && !isMatchmaking) &&
                 <>
-                  {(state == constants.ChallengeState.InProgress && canCollectDuel) &&
-                    <Col>
-                      <ActionButton large fillParent important label='Timed Out, Collect Duel' loading={isSubmitting} loadingClassName='poster' onClick={() => _collectDuel()} />
-                    </Col>
-                  }
-                  {(state == constants.ChallengeState.Awaiting && isChallenger && !isMatchmaking) &&
-                    <>
-                      <Col>
-                        <ActionButton large fillParent negative label='Cowardly Withdraw' loading={isSubmitting} loadingClassName='poster' onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
-                      </Col>
-                    </>
-                  }
-                  {(state == constants.ChallengeState.Awaiting && isChallenged) &&
-                    <Col>
-                      <ActionButton large fillParent negative label='Cowardly Refuse' loading={isSubmitting} loadingClassName='poster' onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
-                    </Col>
-                  }
-                  {(state == constants.ChallengeState.Awaiting && isChallenged) &&
-                    (!challengingDuelistId ? (
-                        <Col>
-                          <ActionButton large fillParent important label='Select Duelist' loading={isSubmitting} loadingClassName='poster' onClick={() => duelistSelectOpener.open()} />
-                        </Col>
-                      ) : (
-                        isInAction || lives < livesStaked ? (
-                          <Col>
-                            <ActionButton large fillParent label='Select another duelist!' loading={isSubmitting} loadingClassName='poster' onClick={() => duelistSelectOpener.open()} />
-                          </Col>
-                        ) : (
-                          <Col>
-                            <BalanceRequiredButton label='Accept Challenge!' fillParent fill={false} loading={isSubmitting} onClick={() => _submit(challengingDuelistId, true)} fee={0} />
-                          </Col>
-                        )
-                      ))
-                  }
-                  {(isFinished && isCallToAction) &&
-                    <Col>
-                      <ActionButton large fillParent important label='Instant Reveal' loading={isSubmitting} loadingClassName='poster' onClick={() => _revealResult()} />
-                    </Col>
-                  }
-                  {((state == constants.ChallengeState.Awaiting && isChallenger) || state == constants.ChallengeState.InProgress || (isFinished && isCallToAction)) &&
-                    <Col>
-                      <ActionButton large fillParent important label='Go to Live Duel!' loading={isSubmitting} loadingClassName='poster' onClick={() => _gotoDuel()} />
-                    </Col>
-                  }
-                  {isFinished && !isCallToAction && (endedInBlades || endedInPaces) &&
-                    <Col>
-                      <ActionButton large fillParent important label='Replay Duel!' loading={isSubmitting} loadingClassName='poster' onClick={() => _gotoDuel()} />
-                    </Col>
-                  }
+                  <Col>
+                    <ActionButton large fillParent negative label='Cowardly Withdraw' loading={isSubmitting} loadingClassName='poster' onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
+                  </Col>
                 </>
-              )}
-              {((needToSyncExpired && isChallenger) || isExpired) &&
+              }
+              {(state == constants.ChallengeState.Awaiting && isChallenged) &&
+                <Col>
+                  <ActionButton large fillParent negative label='Cowardly Refuse' loading={isSubmitting} loadingClassName='poster' onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
+                </Col>
+              }
+              {(state == constants.ChallengeState.Awaiting && isChallenged) &&
+                (!challengingDuelistId ? (
+                    <Col>
+                      <ActionButton large fillParent important label='Select Duelist' loading={isSubmitting} loadingClassName='poster' onClick={() => duelistSelectOpener.open()} />
+                    </Col>
+                  ) : (
+                    isInAction || lives < livesStaked ? (
+                      <Col>
+                        <ActionButton large fillParent label='Select another duelist!' loading={isSubmitting} loadingClassName='poster' onClick={() => duelistSelectOpener.open()} />
+                      </Col>
+                    ) : (
+                      <Col>
+                        <BalanceRequiredButton label='Accept Challenge!' fillParent fill={false} loading={isSubmitting} onClick={() => _submit(challengingDuelistId, true)} fee={0} />
+                      </Col>
+                    )
+                  ))
+              }
+              {(isFinished && isCallToAction) &&
+                <Col>
+                  <ActionButton large fillParent important label='Instant Reveal' loading={isSubmitting} loadingClassName='poster' onClick={() => _revealResult()} />
+                </Col>
+              }
+              {(((state == constants.ChallengeState.Awaiting && isChallenger) || state == constants.ChallengeState.InProgress || (isFinished && isCallToAction)) && !isSeasonExpired) &&
+                <Col>
+                  <ActionButton large fillParent important label='Go to Live Duel!' loading={isSubmitting} loadingClassName='poster' onClick={() => _gotoDuel()} />
+                </Col>
+              }
+              {isFinished && !isCallToAction && (endedInBlades || endedInPaces) &&
+                <Col>
+                  <ActionButton large fillParent important label='Replay Duel!' loading={isSubmitting} loadingClassName='poster' onClick={() => _gotoDuel()} />
+                </Col>
+              }
+              {((needToSyncExpired && isChallenger)) &&
                 <Col>
                   <ActionButton large fillParent important label='Expired, Collect Duel' loading={isSubmitting} loadingClassName='poster' onClick={() => _reply(false)} />
                 </Col>
