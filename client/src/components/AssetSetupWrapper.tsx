@@ -62,7 +62,7 @@ export default function AssetSetupWrapper({ children }: AssetSetupWrapperProps) 
     if (!assetSetup.status.isReady || assetSetup.status.isLoading) {
       updateLoadingVars(Math.round(assetSetup.progress.percentage), loadingMessage, detailsText)
     } else {
-      updateLoadingVars(100, 'Ready! Loading game...', '')
+      updateLoadingVars(100, 'Ready! Loading game', '')
     }
   }, [assetSetup.progress.percentage, loadingMessage, detailsText, assetSetup.status.isReady, assetSetup.status.isLoading])  
   
