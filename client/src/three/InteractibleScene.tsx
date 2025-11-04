@@ -293,6 +293,42 @@ export class InteractibleScene extends THREE.Scene {
     document.removeEventListener('click', this.boundOnMouseClick, false);
     window.removeEventListener('resize', this.boundOnResize, false);
 
+    this.opacityTweens.forEach(tween => {
+      if (tween) tween.stop();
+    });
+    this.opacityTweens = [];
+    
+    if (this.blurTween) {
+      this.blurTween.stop();
+      this.blurTween = null;
+    }
+
+    if (this.maskOverlay) {
+      this.remove(this.maskOverlay);
+      if (this.maskOverlay.geometry) {
+        this.maskOverlay.geometry.dispose();
+      }
+      if (this.maskOverlay.material) {
+        if (Array.isArray(this.maskOverlay.material)) {
+          this.maskOverlay.material.forEach(material => material.dispose());
+        } else {
+          this.maskOverlay.material.dispose();
+        }
+      }
+      this.maskOverlay = null;
+    }
+
+    while (this.children.length > 0) {
+      const child = this.children[0];
+      this.remove(child);
+      if (child instanceof THREE.Mesh) {
+        if (child.geometry) child.geometry.dispose();
+        if (child.material instanceof THREE.Material) {
+          child.material.dispose();
+        }
+      }
+    }
+
     this.fbo_mask?.dispose();
     this.fbo_blur_background?.dispose();
     
@@ -326,6 +362,11 @@ export class InteractibleScene extends THREE.Scene {
     }
     
     this.backgroundMesh = null;
+    
+    // Clear animated layers map
+    this.animatedLayers.clear();
+    this.currentTextures = [];
+    this.emittedVectors.clear();
   }
 
   public render(elapsedTime: number, enabled: boolean = true) {
