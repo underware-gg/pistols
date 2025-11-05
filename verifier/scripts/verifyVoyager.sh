@@ -55,14 +55,14 @@ verify_contract () {
 # verify
 #
 voyager --version
-# verify_contract "game"
-# verify_contract "game_loop"
-# verify_contract "tutorial"
-# verify_contract "admin"
+verify_contract "game" # verified 2025-11-04
+verify_contract "game_loop" # verified 2025-11-04
+verify_contract "tutorial" # verified 2025-11-04
+verify_contract "admin" # verified 2025-11-04
 # verify_contract "bank"
-# verify_contract "fame_coin"
-verify_contract "fools_coin"
-# verify_contract "duel_token"
-# verify_contract "duelist_token"
-# verify_contract "pack_token"
+# verify_contract "fame_coin" # verified 2025-11-04
+# verify_contract "fools_coin" # verified 2025-11-04
+verify_contract "duel_token" # verified 2025-11-04
+# verify_contract "duelist_token" # verified 2025-11-04
+verify_contract "pack_token" # verified 2025-11-04
 
