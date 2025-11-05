@@ -1,6 +1,6 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { BigNumberish } from 'starknet'
-import { bigintToAddress, isPositiveBigint } from '@underware/pistols-sdk/utils'
+import { bigintToAddress, bigintToHex, bigintToHex128, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { useEntityModel, useSdkEntitiesGetState, useSdkEntitiesSubState } from '@underware/pistols-sdk/dojo'
 import { PistolsQueryBuilder, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols/sdk'
 import { make_pact_pair } from '@underware/pistols-sdk/pistols'
@@ -12,14 +12,22 @@ const usePactQuery = (duel_type: constants.DuelType, address_a: BigNumberish, ad
     (duel_type !== constants.DuelType.Undefined && isPositiveBigint(pair))
       ? new PistolsQueryBuilder()
         .withClause(
-          new PistolsClauseBuilder().keys(
-            ["pistols-Pact"],
-            [bigintToAddress(constants.getDuelTypeValue(duel_type)), bigintToAddress(pair)]
-          ).build()
+          // !!! not working in torii 1.8.0 + dojo.js 1.7
+          // new PistolsClauseBuilder().keys(
+          //   ["pistols-Pact"],
+          //   [bigintToHex(constants.getDuelTypeValue(duel_type)), bigintToHex128(pair)]
+          // ).build()
+          //
+          // this works...
+          new PistolsClauseBuilder().compose().and([
+            new PistolsClauseBuilder().where("pistols-Pact", "duel_type", "Eq", duel_type),
+            new PistolsClauseBuilder().where("pistols-Pact", "pair", "Eq", bigintToHex128(pair)),
+          ]).build()
         )
         .withEntityModels(
           ["pistols-Pact"]
         )
+        .withLimit(88)
         .includeHashedKeys()
       : null
   ), [duel_type, pair])
@@ -35,7 +43,7 @@ export const usePactGet = (duel_type: constants.DuelType, address_a: BigNumberis
   const pact = useEntityModel<models.Pact>(entities?.[0], 'Pact')
   const pactDuelId = useMemo(() => BigInt(pact?.duel_id ?? 0n), [pact])
   const hasPact = useMemo(() => (pactDuelId > 0n), [pactDuelId])
-  // useEffect(() => console.log(`usePactGet()`, query, entities, pact), [query, entities, pact])
+  // useEffect(() => console.log(`usePactGet()`, duel_type, address_a, address_b, query, pact, entities), [pactDuelId, hasPact, entities])
   return {
     pactDuelId,
     hasPact,

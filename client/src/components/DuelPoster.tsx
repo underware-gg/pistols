@@ -269,7 +269,6 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
     needToSyncExpired,
     isMatchmaking,
   } = useChallenge(props.duelId)
-  console.log(`useChallenge(props.duelId) =>`, useChallenge(props.duelId))
   const { endedInBlades, endedInPaces } = useRound(props.duelId)
   const { canCollectDuel } = useCanCollectDuel(props.duelId)
   const { challengeDescription } = useChallengeDescription(props.duelId)
