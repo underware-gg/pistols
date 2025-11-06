@@ -9,6 +9,7 @@ pub enum DuelistProfile {
     Bot: BotKey,                // Bot(id)
     Genesis: GenesisKey,        // Genesis(id)
     Legends: LegendsKey,        // Legends(id)
+    Pirates: PiratesKey,        // Pirates(id)
     // Eternum: u16,   // Eternum(realm id)
 }
 
@@ -115,6 +116,25 @@ pub enum LegendsKey {
     TGC2,
 }
 
+#[derive(Copy, Drop, Serde, PartialEq, Introspect)]
+pub enum PiratesKey {
+    Unknown,
+    ArdineTideborn,     // 1
+    CaptainEtienne,     // 2
+    CaptainGarran,      // 3
+    CorsairKojo,        // 4
+    Diego,              // 5
+    Mirella,            // 6
+    GunnerFinnan,       // 7
+    Ingrid,             // 8
+    RaiderBjorn,        // 9
+    Reika,              // 10
+    SableTideborn,      // 11
+    AbyssalAdmiral,     // 12
+    SeaWitch,           // 13
+    Asha,               // 14 
+}
+
 
 
 //--------------------------
@@ -165,6 +185,13 @@ mod COLLECTIONS {
         name: 'Legends Collection',
         folder_name: 'legends',
         profile_count: 2,
+        is_playable: true,
+        duelist_id_base: 0, // playable characters do not convert to duelist_id
+    };
+    pub const Pirates: CollectionDescriptor = CollectionDescriptor {
+        name: 'Pirates Collection',
+        folder_name: 'pirates',
+        profile_count: 14,
         is_playable: true,
         duelist_id_base: 0, // playable characters do not convert to duelist_id
     };
@@ -440,7 +467,7 @@ mod GENESIS_PROFILES {
 }
 
 // to be exported to typescript by generateConstants
-// IMPORTANT: names must be in sync with enum GenesisKey
+// IMPORTANT: names must be in sync with enum LegendsKey
 mod LEGENDS_PROFILES {
     use super::{ProfileDescriptor};
     pub const Unknown: ProfileDescriptor = ProfileDescriptor {
@@ -451,6 +478,57 @@ mod LEGENDS_PROFILES {
     };
     pub const TGC2: ProfileDescriptor = ProfileDescriptor { // 1
         name: 'King Angre the Crimson',
+    };
+}
+
+// to be exported to typescript by generateConstants
+// IMPORTANT: names must be in sync with enum PiratesKey
+mod PIRATES_PROFILES {
+    use super::{ProfileDescriptor};
+    pub const Unknown: ProfileDescriptor = ProfileDescriptor {
+        name: 'Unknown',
+    };
+    pub const ArdineTideborn: ProfileDescriptor = ProfileDescriptor { // 1
+        name: 'Ardine Tideborn',
+    };
+    pub const CaptainEtienne: ProfileDescriptor = ProfileDescriptor { // 2
+        name: 'Captain Etienne the Doomed',
+    };
+    pub const CaptainGarran: ProfileDescriptor = ProfileDescriptor { // 3
+        name: 'Captain Garran the Timeworn',
+    };
+    pub const CorsairKojo: ProfileDescriptor = ProfileDescriptor { // 4
+        name: 'Corsair Kojo Krakenrider',
+    };
+    pub const Diego: ProfileDescriptor = ProfileDescriptor { // 5
+        name: 'Diego the Pillager',
+    };
+    pub const Mirella: ProfileDescriptor = ProfileDescriptor { // 6
+        name: 'Fire Queen Mirella',
+    };
+    pub const GunnerFinnan: ProfileDescriptor = ProfileDescriptor { // 7
+        name: 'Gunner Finnan the Contemplative',
+    };
+    pub const Ingrid: ProfileDescriptor = ProfileDescriptor { // 8
+        name: 'Ingrid the Frost Corsair',
+    };
+    pub const RaiderBjorn: ProfileDescriptor = ProfileDescriptor { // 9
+        name: 'Raider Bjorn Shipbreaker',
+    };
+    pub const Reika: ProfileDescriptor = ProfileDescriptor { // 10
+        name: 'Reika the Siren\'s Lament',
+    };
+    pub const SableTideborn: ProfileDescriptor = ProfileDescriptor { // 11
+        name: 'Sable Tideborn',
+    };
+    pub const AbyssalAdmiral: ProfileDescriptor = ProfileDescriptor { // 12
+        name: 'The Abyssal Admiral',
+    };
+    pub const SeaWitch: ProfileDescriptor = ProfileDescriptor { // 13
+        name: 'The Sea Witch of Lomalagi Shoal',
+    };
+    pub const Asha: ProfileDescriptor = ProfileDescriptor { // 14
+        name: 'Vaultbreaker Asha',
     };
 }
 
@@ -494,6 +572,7 @@ pub impl ProfileManagerImpl of ProfileManagerTrait {
             DuelistProfile::Bot(_) =>           DuelistProfile::Bot(profile_id.into()),
             DuelistProfile::Genesis(_) =>       DuelistProfile::Genesis(profile_id.into()),
             DuelistProfile::Legends(_) =>       DuelistProfile::Legends(profile_id.into()),
+            DuelistProfile::Pirates(_) =>       DuelistProfile::Pirates(profile_id.into()),
         })
     }
 
@@ -510,6 +589,7 @@ pub impl ProfileManagerImpl of ProfileManagerTrait {
                 DuelistProfile::Bot(_) =>           DuelistProfile::Bot(i.into()),
                 DuelistProfile::Genesis(_) =>       DuelistProfile::Genesis(i.into()),
                 DuelistProfile::Legends(_) =>       DuelistProfile::Legends(i.into()),
+                DuelistProfile::Pirates(_) =>       DuelistProfile::Pirates(i.into()),
             };
             if (!profile.exists()) {
                 break;
@@ -529,6 +609,7 @@ pub impl ProfileManagerImpl of ProfileManagerTrait {
                 DuelistProfile::Bot(_) =>           DuelistProfile::Bot(i.into()),
                 DuelistProfile::Genesis(_) =>       DuelistProfile::Genesis(i.into()),
                 DuelistProfile::Legends(_) =>       DuelistProfile::Legends(i.into()),
+                DuelistProfile::Pirates(_) =>       DuelistProfile::Pirates(i.into()),
             };
             if (!profile.exists()) {
                 break;
@@ -552,6 +633,7 @@ pub impl DuelistProfileImpl of DuelistProfileTrait {
             DuelistProfile::Bot(key) =>         key.into(),
             DuelistProfile::Genesis(key) =>     key.into(),
             DuelistProfile::Legends(key) =>     key.into(),
+            DuelistProfile::Pirates(key) =>     key.into(),
         })
     }
     fn profile_id(self: @DuelistProfile) -> u8 {
@@ -561,6 +643,7 @@ pub impl DuelistProfileImpl of DuelistProfileTrait {
             DuelistProfile::Bot(key) =>         key.into(),
             DuelistProfile::Genesis(key) =>     key.into(),
             DuelistProfile::Legends(key) =>     key.into(),
+            DuelistProfile::Pirates(key) =>     key.into(),
         })
     }
     fn exists(self: @DuelistProfile) -> bool {
@@ -590,6 +673,7 @@ pub impl DuelistProfileImpl of DuelistProfileTrait {
             DuelistProfile::Bot(_) =>           format!("Bot Card: {}", self.name()),
             DuelistProfile::Genesis(_) =>       format!("Genesis Card: {}", self.name()),
             DuelistProfile::Legends(_) =>       format!("Legends Card: {}", self.name()),
+            DuelistProfile::Pirates(_) =>       format!("Pirates Card: {}", self.name()),
         })
     }
     fn get_image_uri(self: @DuelistProfile,
@@ -641,6 +725,7 @@ impl DuelistProfileIntoCollectionDescriptor of core::traits::Into<DuelistProfile
             DuelistProfile::Bot(_) =>           COLLECTIONS::Bot,
             DuelistProfile::Genesis(_) =>       COLLECTIONS::Genesis,
             DuelistProfile::Legends(_) =>       COLLECTIONS::Legends,
+            DuelistProfile::Pirates(_) =>       COLLECTIONS::Pirates,
         }
     }
 }
@@ -749,6 +834,28 @@ impl LegendsKeyIntoDescriptor of core::traits::Into<LegendsKey, ProfileDescripto
             LegendsKey::Unknown =>          LEGENDS_PROFILES::Unknown,
             LegendsKey::TGC1 =>             LEGENDS_PROFILES::TGC1,             // 1
             LegendsKey::TGC2 =>             LEGENDS_PROFILES::TGC2,             // 2
+        }
+    }
+}
+
+impl PiratesKeyIntoDescriptor of core::traits::Into<PiratesKey, ProfileDescriptor> {
+    fn into(self: PiratesKey) -> ProfileDescriptor {
+        match self {
+            PiratesKey::Unknown =>          PIRATES_PROFILES::Unknown,
+            PiratesKey::ArdineTideborn =>   PIRATES_PROFILES::ArdineTideborn,   // 1
+            PiratesKey::CaptainEtienne =>   PIRATES_PROFILES::CaptainEtienne,   // 2
+            PiratesKey::CaptainGarran =>    PIRATES_PROFILES::CaptainGarran,    // 3
+            PiratesKey::CorsairKojo =>      PIRATES_PROFILES::CorsairKojo,      // 4
+            PiratesKey::Diego =>            PIRATES_PROFILES::Diego,            // 5
+            PiratesKey::Mirella =>          PIRATES_PROFILES::Mirella,          // 6
+            PiratesKey::GunnerFinnan =>     PIRATES_PROFILES::GunnerFinnan,     // 7
+            PiratesKey::Ingrid =>           PIRATES_PROFILES::Ingrid,           // 8
+            PiratesKey::RaiderBjorn =>      PIRATES_PROFILES::RaiderBjorn,      // 9
+            PiratesKey::Reika =>            PIRATES_PROFILES::Reika,            // 10
+            PiratesKey::SableTideborn =>    PIRATES_PROFILES::SableTideborn,    // 11
+            PiratesKey::AbyssalAdmiral =>   PIRATES_PROFILES::AbyssalAdmiral,   // 12   
+            PiratesKey::SeaWitch =>         PIRATES_PROFILES::SeaWitch,         // 13
+            PiratesKey::Asha =>             PIRATES_PROFILES::Asha,             // 14
         }
     }
 }
@@ -951,6 +1058,7 @@ impl U8IntoGenesisKey of core::traits::Into<u8, GenesisKey> {
         else                { GenesisKey::Unknown }
     }
 }
+
 impl LegendsKeyIntoU8 of core::traits::Into<LegendsKey, u8> {
     fn into(self: LegendsKey) -> u8 {
         match self {
@@ -968,7 +1076,46 @@ impl U8IntoLegendsKey of core::traits::Into<u8, LegendsKey> {
     }
 }
 
-
+impl PiratesKeyIntoU8 of core::traits::Into<PiratesKey, u8> {
+    fn into(self: PiratesKey) -> u8 {
+        match self {
+            PiratesKey::Unknown =>          0,
+            PiratesKey::ArdineTideborn =>   1,
+            PiratesKey::CaptainEtienne =>   2,
+            PiratesKey::CaptainGarran =>    3,
+            PiratesKey::CorsairKojo =>      4,
+            PiratesKey::Diego =>            5,
+            PiratesKey::Mirella =>          6,
+            PiratesKey::GunnerFinnan =>     7,
+            PiratesKey::Ingrid =>           8,
+            PiratesKey::RaiderBjorn =>      9,
+            PiratesKey::Reika =>            10,
+            PiratesKey::SableTideborn =>    11,
+            PiratesKey::AbyssalAdmiral =>   12,
+            PiratesKey::SeaWitch =>         13,
+            PiratesKey::Asha =>             14,
+        }
+    }
+}
+impl U8IntoPiratesKey of core::traits::Into<u8, PiratesKey> {
+    fn into(self: u8) -> PiratesKey {
+        if self == 1        { PiratesKey::ArdineTideborn }
+        else if self == 2   { PiratesKey::CaptainEtienne }
+        else if self == 3   { PiratesKey::CaptainGarran }
+        else if self == 4   { PiratesKey::CorsairKojo }
+        else if self == 5   { PiratesKey::Diego }
+        else if self == 6   { PiratesKey::Mirella }
+        else if self == 7   { PiratesKey::GunnerFinnan }
+        else if self == 8   { PiratesKey::Ingrid }
+        else if self == 9   { PiratesKey::RaiderBjorn }
+        else if self == 10  { PiratesKey::Reika }
+        else if self == 11  { PiratesKey::SableTideborn }
+        else if self == 12  { PiratesKey::AbyssalAdmiral }
+        else if self == 13  { PiratesKey::SeaWitch }
+        else if self == 14  { PiratesKey::Asha }
+        else                { PiratesKey::Unknown }
+    }
+}
 
 
 //----------------------------------------
@@ -1011,18 +1158,20 @@ impl DuelistProfileIntoByteArray of core::traits::Into<DuelistProfile, ByteArray
             DuelistProfile::Bot(_) =>           "Bot",
             DuelistProfile::Genesis(_) =>       "Genesis",
             DuelistProfile::Legends(_) =>       "Legends",
+            DuelistProfile::Pirates(_) =>       "Pirates",
         }
     }
 }
 // for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
 pub impl DuelistProfileDisplay of core::fmt::Display<DuelistProfile> {
     fn fmt(self: @DuelistProfile, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
-        let result = match self {
+        let result: ByteArray = match self {
             DuelistProfile::Undefined =>        format!("Undefined"),
             DuelistProfile::Character(key) =>   { let id: u8 = (*key).into(); format!("Character::({})[{}]", self.name(), id) },
             DuelistProfile::Bot(key) =>         { let id: u8 = (*key).into(); format!("Bot::({})[{}]", self.name(), id) },
             DuelistProfile::Genesis(key) =>     { let id: u8 = (*key).into(); format!("Genesis::({})[{}]", self.name(), id) },
             DuelistProfile::Legends(key) =>     { let id: u8 = (*key).into(); format!("Legends::({})[{}]", self.name(), id) },
+            DuelistProfile::Pirates(key) =>     { let id: u8 = (*key).into(); format!("Pirates::({})[{}]", self.name(), id) },
         };
         f.buffer.append(@result);
         Result::Ok(())
@@ -1030,7 +1179,7 @@ pub impl DuelistProfileDisplay of core::fmt::Display<DuelistProfile> {
 }
 pub impl DuelistProfileDebug of core::fmt::Debug<DuelistProfile> {
     fn fmt(self: @DuelistProfile, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
-        let result = format!("{}", self);
+        let result: ByteArray = format!("{}", self);
         f.buffer.append(@result);
         Result::Ok(())
     }
@@ -1063,6 +1212,13 @@ pub impl LegendsKeyDebug of core::fmt::Debug<LegendsKey> {
         Result::Ok(())
     }
 }
+pub impl PiratesKeyDebug of core::fmt::Debug<PiratesKey> {
+    fn fmt(self: @PiratesKey, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        let result: ByteArray = DuelistProfile::Pirates(*self).name();
+        f.buffer.append(@result);
+        Result::Ok(())
+    }
+}
 
 
 
@@ -1075,7 +1231,7 @@ mod unit {
 
     use super::{
         DuelistProfile, DuelistProfileTrait,
-        GenesisKey, CharacterKey, BotKey, LegendsKey,
+        GenesisKey, CharacterKey, BotKey, LegendsKey, PiratesKey,
         ProfileDescriptor,
         ProfileManagerTrait,
         COLLECTIONS,
@@ -1213,6 +1369,30 @@ mod unit {
     }
 
     #[test]
+    fn validate_descriptors_pirates() {
+        // invalid
+        let invalid_profile: DuelistProfile = DuelistProfile::Pirates(0_u8.into());
+        _test_invalid_profile(invalid_profile);
+        // validate profiles
+        let descriptors: Span<ProfileDescriptor> = ProfileManagerTrait::_get_all_descriptors_by_type(invalid_profile);
+        let mut last_profile_id: u8 = 0;
+        let mut last_desc: ProfileDescriptor = Default::default();
+        let mut p: u8 = 1;
+        while (p.into() <= descriptors.len()) {
+            let profile: DuelistProfile = DuelistProfile::Pirates(p.into());
+            assert!(profile.exists(), "({}) exists", p);
+            assert_ne!(profile, DuelistProfile::Pirates(PiratesKey::Unknown), "({}) is Unknown", p);
+            assert_eq!(p, profile.profile_id(), "({}) bad profile_id", p);
+            assert_eq!(p, last_profile_id + 1, "({}) == ({}): profile_id", p, p-1);
+            let desc: ProfileDescriptor = *descriptors.at((p-1).into());
+            assert_ne!(desc.name, last_desc.name, "({}) == ({}): name {}", p, p-1, desc.name);
+            last_profile_id = p;
+            last_desc = desc;
+            p += 1;
+        };
+    }
+
+    #[test]
     fn validate_profile_duelist_ids_character() {
         let duelist_id_base: u128 = COLLECTIONS::Character.duelist_id_base;
         assert_gt!(duelist_id_base, 0, "bad base id");
@@ -1261,6 +1441,17 @@ mod unit {
         while (p <= COLLECTIONS::Legends.profile_count.into()) {
             let key: LegendsKey = p.into();
             assert_eq!(DuelistProfile::Legends(key).to_duelist_id(), 0, "({}) bad type_id", p);
+            p += 1;
+        };
+    }
+
+    #[test]
+    fn validate_profile_duelist_ids_pirates() {
+        assert_eq!(COLLECTIONS::Pirates.duelist_id_base, 0, "bad base id");
+        let mut p: u8 = 1;
+        while (p <= COLLECTIONS::Pirates.profile_count.into()) {
+            let key: PiratesKey = p.into();
+            assert_eq!(DuelistProfile::Pirates(key).to_duelist_id(), 0, "({}) bad type_id", p);
             p += 1;
         };
     }

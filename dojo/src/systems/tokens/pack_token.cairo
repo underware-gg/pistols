@@ -160,7 +160,7 @@ pub mod pack_token {
         pool::{PoolType},
     };
     use pistols::types::{
-        duelist_profile::{DuelistProfile, DuelistProfileTrait, GenesisKey},
+        duelist_profile::{DuelistProfile, DuelistProfileTrait, GenesisKey, PiratesKey},
         timestamp::{TimestampTrait, TIMESTAMP},
         constants::{METADATA, RULES},
     };
@@ -580,6 +580,19 @@ pub mod pack_token {
                             recipient,
                             quantity,
                             DuelistProfile::Genesis(GenesisKey::Unknown),
+                            *pack.seed,
+                            pool_type,
+                            pegged_lords_amount,
+                        )
+                    )
+                },
+                PackType::PiratesDuelists5x |
+                PackType::FreePirates5x => {
+                    (store.world.duelist_token_protected_dispatcher()
+                        .mint_duelists(
+                            recipient,
+                            quantity,
+                            DuelistProfile::Pirates(PiratesKey::Unknown),
                             *pack.seed,
                             pool_type,
                             pegged_lords_amount,
