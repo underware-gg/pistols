@@ -657,8 +657,9 @@ pub fn _airdrop_open(sys: @TestSystems, recipient: ContractAddress, pack_type: P
 #[test]
 fn test_airdrop_ok() {
     let mut sys: TestSystems = setup(0);
-    tester::fund_duelists_pool(@sys, 18);
-    // randomize mock VRF
+    tester::fund_duelists_pool(@sys, 21);
+    // generate entropy for mock VRF (avoid starter duelist inside genesis packs)
+    sys.world.dispatcher.uuid();
     sys.world.dispatcher.uuid();
     _airdrop_open(@sys, OTHER(), PackType::StarterPack, Option::None, "StarterPack");
     _airdrop_open(@sys, OTHER(), PackType::FreeDuelist, Option::None, "FreeDuelist");
@@ -666,6 +667,9 @@ fn test_airdrop_ok() {
     _airdrop_open(@sys, OTHER(), PackType::FreePirates5x, Option::None, "FreePirates5x");
     _airdrop_open(@sys, OTHER(), PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "GenesisKey::Duke");
     _airdrop_open(@sys, OTHER(), PackType::SingleDuelist, Option::Some(DuelistProfile::Legends(LegendsKey::TGC1)), "LegendsKey::TGC1");
+    _airdrop_open(@sys, OTHER(), PackType::SingleDuelist, Option::Some(DuelistProfile::Legends(LegendsKey::TGC2)), "LegendsKey::TGC2");
+    _airdrop_open(@sys, OTHER(), PackType::SingleDuelist, Option::Some(DuelistProfile::Legends(LegendsKey::Cumberlord)), "LegendsKey::Cumberlord");
+    _airdrop_open(@sys, OTHER(), PackType::SingleDuelist, Option::Some(DuelistProfile::Legends(LegendsKey::JulianTryhard)), "LegendsKey::JulianTryhard");
     _airdrop_open(@sys, OTHER(), PackType::SingleDuelist, Option::Some(DuelistProfile::Pirates(PiratesKey::ArdineTideborn)), "PiratesKey::ArdineTideborn");
 }
 

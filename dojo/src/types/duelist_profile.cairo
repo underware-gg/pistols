@@ -112,8 +112,10 @@ pub enum GenesisKey {
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
 pub enum LegendsKey {
     Unknown,
-    TGC1,
-    TGC2,
+    TGC1,               // 1
+    TGC2,               // 2
+    Cumberlord,         // 3
+    JulianTryhard,      // 4
 }
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
@@ -184,7 +186,7 @@ mod COLLECTIONS {
     pub const Legends: CollectionDescriptor = CollectionDescriptor {
         name: 'Legends Collection',
         folder_name: 'legends',
-        profile_count: 2,
+        profile_count: 4,
         is_playable: true,
         duelist_id_base: 0, // playable characters do not convert to duelist_id
     };
@@ -478,6 +480,12 @@ mod LEGENDS_PROFILES {
     };
     pub const TGC2: ProfileDescriptor = ProfileDescriptor { // 1
         name: 'King Angre the Crimson',
+    };
+    pub const Cumberlord: ProfileDescriptor = ProfileDescriptor { // 3
+        name: 'Cumberlord',
+    };
+    pub const JulianTryhard: ProfileDescriptor = ProfileDescriptor { // 4
+        name: 'Julian Tryhard',
     };
 }
 
@@ -834,6 +842,8 @@ impl LegendsKeyIntoDescriptor of core::traits::Into<LegendsKey, ProfileDescripto
             LegendsKey::Unknown =>          LEGENDS_PROFILES::Unknown,
             LegendsKey::TGC1 =>             LEGENDS_PROFILES::TGC1,             // 1
             LegendsKey::TGC2 =>             LEGENDS_PROFILES::TGC2,             // 2
+            LegendsKey::Cumberlord =>       LEGENDS_PROFILES::Cumberlord,       // 3
+            LegendsKey::JulianTryhard =>    LEGENDS_PROFILES::JulianTryhard,    // 4
         }
     }
 }
@@ -1065,6 +1075,8 @@ impl LegendsKeyIntoU8 of core::traits::Into<LegendsKey, u8> {
             LegendsKey::Unknown =>         0,
             LegendsKey::TGC1 =>            1,
             LegendsKey::TGC2 =>            2,
+            LegendsKey::Cumberlord =>      3,
+            LegendsKey::JulianTryhard =>   4,
         }
     }
 }
@@ -1072,6 +1084,8 @@ impl U8IntoLegendsKey of core::traits::Into<u8, LegendsKey> {
     fn into(self: u8) -> LegendsKey {
         if self == 1        { LegendsKey::TGC1 }
         else if self == 2   { LegendsKey::TGC2 }
+        else if self == 3   { LegendsKey::Cumberlord }
+        else if self == 4   { LegendsKey::JulianTryhard }
         else                { LegendsKey::Unknown }
     }
 }
@@ -1229,36 +1243,43 @@ pub impl PiratesKeyDebug of core::fmt::Debug<PiratesKey> {
 #[cfg(test)]
 mod unit {
 
-    use super::{
-        DuelistProfile, DuelistProfileTrait,
-        GenesisKey, CharacterKey, BotKey, LegendsKey, PiratesKey,
-        ProfileDescriptor,
-        ProfileManagerTrait,
-        COLLECTIONS,
-    };
+    use super::*;
+
+    fn _assert_profile_counts(collection: @CollectionDescriptor, profiles: Span<DuelistProfile>, descriptors: Span<ProfileDescriptor>, prefix: ByteArray) {
+        let count: u8 = (*collection.profile_count);
+        assert_eq!(profiles.len(), count.into(), "[{}]: {} profiles.len()", prefix, collection.name);
+        assert_eq!(descriptors.len(), count.into(), "[{}]: {} descriptors.len()", prefix, collection.name);
+        assert_ne!(profiles.at((count-1).into()).name(), "Unknown", "[{}]: last is not Unknown", prefix);
+        // assert_eq!(profiles.at((count).into()).name(), "Unknown", "[{}]: next from last is Unknown", prefix);
+    }
 
     #[test]
     fn validate_profile_counts() {
+        // Undefined
         let profiles: Span<DuelistProfile> = ProfileManagerTrait::_get_all_profiles_by_type(DuelistProfile::Undefined);
         let descriptors: Span<ProfileDescriptor> = ProfileManagerTrait::_get_all_descriptors_by_type(DuelistProfile::Undefined);
         assert_eq!(profiles.len(), 0, "Undefined.profiles");
         assert_eq!(descriptors.len(), 0, "Undefined.descriptors");
+        // Characters
         let profiles: Span<DuelistProfile> = ProfileManagerTrait::_get_all_profiles_by_type(DuelistProfile::Character(0_u8.into()));
         let descriptors: Span<ProfileDescriptor> = ProfileManagerTrait::_get_all_descriptors_by_type(DuelistProfile::Character(0_u8.into()));
-        assert_eq!(profiles.len(), COLLECTIONS::Character.profile_count.into(), "Character.profiles");
-        assert_eq!(descriptors.len(), COLLECTIONS::Character.profile_count.into(), "Character.descriptors");
+        _assert_profile_counts(@COLLECTIONS::Character, profiles, descriptors, "Characters");
+        // Bots
         let profiles: Span<DuelistProfile> = ProfileManagerTrait::_get_all_profiles_by_type(DuelistProfile::Bot(0_u8.into()));
         let descriptors: Span<ProfileDescriptor> = ProfileManagerTrait::_get_all_descriptors_by_type(DuelistProfile::Bot(0_u8.into()));
-        assert_eq!(profiles.len(), COLLECTIONS::Bot.profile_count.into(), "Bot.profiles");
-        assert_eq!(descriptors.len(), COLLECTIONS::Bot.profile_count.into(), "Bot.descriptors");
+        _assert_profile_counts(@COLLECTIONS::Bot, profiles, descriptors, "Characters");
+        // Genesis
         let profiles: Span<DuelistProfile> = ProfileManagerTrait::_get_all_profiles_by_type(DuelistProfile::Genesis(0_u8.into()));
         let descriptors: Span<ProfileDescriptor> = ProfileManagerTrait::_get_all_descriptors_by_type(DuelistProfile::Genesis(0_u8.into()));
-        assert_eq!(profiles.len(), COLLECTIONS::Genesis.profile_count.into(), "Genesis.profiles");
-        assert_eq!(descriptors.len(), COLLECTIONS::Genesis.profile_count.into(), "Genesis.descriptors");
+        _assert_profile_counts(@COLLECTIONS::Genesis, profiles, descriptors, "Genesis");
+        // Legends
         let profiles: Span<DuelistProfile> = ProfileManagerTrait::_get_all_profiles_by_type(DuelistProfile::Legends(0_u8.into()));
         let descriptors: Span<ProfileDescriptor> = ProfileManagerTrait::_get_all_descriptors_by_type(DuelistProfile::Legends(0_u8.into()));
-        assert_eq!(profiles.len(), COLLECTIONS::Legends.profile_count.into(), "Legends.profiles");
-        assert_eq!(descriptors.len(), COLLECTIONS::Legends.profile_count.into(), "Legends.descriptors");
+        _assert_profile_counts(@COLLECTIONS::Legends, profiles, descriptors, "Legends");
+        // Pirates
+        let profiles: Span<DuelistProfile> = ProfileManagerTrait::_get_all_profiles_by_type(DuelistProfile::Pirates(0_u8.into()));
+        let descriptors: Span<ProfileDescriptor> = ProfileManagerTrait::_get_all_descriptors_by_type(DuelistProfile::Pirates(0_u8.into()));
+        _assert_profile_counts(@COLLECTIONS::Pirates, profiles, descriptors, "Pirates");
     }
     
     //
