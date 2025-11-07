@@ -123,6 +123,10 @@
                 "description": "Purchase packs"
               },
               {
+                "entrypoint": "purchase_random",
+                "description": "Purchase a random currently available 5x Duelist pack"
+              },
+              {
                 "entrypoint": "open",
                 "description": "Open a pack, mint its contents"
               },
@@ -428,6 +432,10 @@
               {
                 "entrypoint": "purchase",
                 "description": "Purchase packs"
+              },
+              {
+                "entrypoint": "purchase_random",
+                "description": "Purchase a random currently available 5x Duelist pack"
               },
               {
                 "entrypoint": "open",

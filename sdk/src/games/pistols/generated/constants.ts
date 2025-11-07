@@ -72,6 +72,7 @@ export const INTERFACE_DESCRIPTIONS: any = {
     claim_starter_pack: 'Claim the starter pack, mint Duelists',
     claim_gift: 'Claim gift pack, if available',
     purchase: 'Purchase packs',
+    purchase_random: 'Purchase a currently available pack',
     open: 'Open a pack, mint its contents',
     mint_to: 'Promotional airdrops (admin)',
     airdrop: 'Airdrops a pack (admin)',

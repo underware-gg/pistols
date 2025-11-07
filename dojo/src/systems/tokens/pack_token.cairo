@@ -82,7 +82,7 @@ pub trait IPackTokenPublic<TState> {
     fn claim_starter_pack(ref self: TState, referrer_address: ContractAddress) -> Span<u128>; //@description: Claim the starter pack, mint Duelists
     fn claim_gift(ref self: TState) -> Span<u128>; //@description: Claim gift pack, if available
     fn purchase(ref self: TState, pack_type: PackType, quantity: usize) -> Span<u128>; //@description: Purchase packs
-    fn purchase_random(ref self: TState) -> u128;
+    fn purchase_random(ref self: TState) -> u128; //@description: Purchase a random currently available 5x Duelist pack
     fn open(ref self: TState, pack_id: u128) -> Span<u128>; //@description: Open a pack, mint its contents
     // admin functions
     fn mint_to(ref self: TState, recipient: ContractAddress) -> u128; //@description: Promotional airdrops (admin)
