@@ -1,25 +1,49 @@
 const self = this;
+const MANIFEST_URL = '/assets-manifest.json';
+const MANIFEST_FORCE_REFRESH_DEBOUNCE_MS = 1000;
 let ASSETS_MANIFEST = null;
 let ASSETS_MANIFEST_LOADING = false;
+let manifestLoadPromise = null;
+let lastManifestForceTrigger = 0;
 
 // Import Dexie - works in service workers
 importScripts('https://unpkg.com/dexie@4.0.11/dist/dexie.min.js');
 
-async function loadManifest() {
-  try {
-    ASSETS_MANIFEST_LOADING = true;
-    const response = await fetch('/assets-manifest.json');
-    ASSETS_MANIFEST_LOADING = false;
-    if (response.ok) {
-      ASSETS_MANIFEST = await response.json();
-      console.log(`📋 Asset manifest loaded: version ${ASSETS_MANIFEST.version}, ${Object.keys(ASSETS_MANIFEST.assets).length} assets`);
-    } else {
-      console.error('❌ Failed to load asset manifest');
-    }
-  } catch (error) {
-    ASSETS_MANIFEST_LOADING = false;
-    console.error('❌ Error loading asset manifest:', error);
+async function loadManifest(reason = 'manual') {
+  console.log('loadManifest', reason);
+  if (ASSETS_MANIFEST_LOADING && manifestLoadPromise) {
+    return manifestLoadPromise;
   }
+
+  ASSETS_MANIFEST_LOADING = true;
+  const cacheBuster = Date.now();
+
+  manifestLoadPromise = (async () => {
+    try {
+      const response = await fetch(`${MANIFEST_URL}?ts=${cacheBuster}`, {
+        cache: 'reload',
+        headers: {
+          'Cache-Control': 'no-cache',
+          Pragma: 'no-cache'
+        }
+      });
+
+      if (response.ok) {
+        ASSETS_MANIFEST = await response.json();
+        console.log(`📋 Asset manifest loaded (${reason}): version ${ASSETS_MANIFEST.version}, ${Object.keys(ASSETS_MANIFEST.assets).length} assets`);
+      } else {
+        console.error('❌ Failed to load asset manifest');
+      }
+    } catch (error) {
+      console.error('❌ Error loading asset manifest:', error);
+      throw error;
+    } finally {
+      ASSETS_MANIFEST_LOADING = false;
+      manifestLoadPromise = null;
+    }
+  })();
+
+  return manifestLoadPromise;
 }
 
 //Dexie-based asset cache
@@ -144,6 +168,35 @@ function formatBytes(bytes) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
+function getManifestReloadReason(request) {
+  if (request.mode !== 'navigate') {
+    return null;
+  }
+
+  if (request.cache === 'reload' || request.cache === 'no-store') {
+    return 'browser-reload';
+  }
+
+  const cacheControl = (request.headers.get('cache-control') || '').toLowerCase();
+  const pragma = (request.headers.get('pragma') || '').toLowerCase();
+  const hasNoCacheHeaders = cacheControl.includes('max-age=0') ||
+    cacheControl.includes('no-cache') ||
+    cacheControl.includes('no-store') ||
+    pragma.includes('no-cache');
+
+  return hasNoCacheHeaders ? 'no-cache-navigation' : null;
+}
+
+function queueManifestRefresh(reason) {
+  const now = Date.now();
+  if (now - lastManifestForceTrigger < MANIFEST_FORCE_REFRESH_DEBOUNCE_MS) {
+    return manifestLoadPromise || Promise.resolve();
+  }
+
+  lastManifestForceTrigger = now;
+  return loadManifest(reason);
+}
+
 // Event handlers
 self.addEventListener('install', (event) => {
   console.log('🐙 Pistols Assets Service Worker installing...');
@@ -204,6 +257,11 @@ self.addEventListener('notificationclick', function(event) {
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = request.url;
+
+  const reloadReason = getManifestReloadReason(request);
+  if (reloadReason) {
+    event.waitUntil(queueManifestRefresh(reloadReason));
+  }
   
   if (request.method !== 'GET' || !shouldInterceptRequest(url)) {
     return;
