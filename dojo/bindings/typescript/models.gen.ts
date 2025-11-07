@@ -583,6 +583,8 @@ export const packType = [
 	'SingleDuelist',
 	'BotDuelist',
 	'FreeGenesis5x',
+	'PiratesDuelists5x',
+	'FreePirates5x',
 ] as const;
 export type PackType = { [key in typeof packType[number]]: string };
 export type PackTypeEnum = CairoCustomEnum;
@@ -708,6 +710,7 @@ export const duelistProfile = [
 	'Bot',
 	'Genesis',
 	'Legends',
+	'Pirates',
 ] as const;
 export type DuelistProfile = { 
 	Undefined: string,
@@ -715,6 +718,7 @@ export type DuelistProfile = {
 	Bot: BotKeyEnum,
 	Genesis: GenesisKeyEnum,
 	Legends: LegendsKeyEnum,
+	Pirates: PiratesKeyEnum,
 };
 export type DuelistProfileEnum = CairoCustomEnum;
 
@@ -799,9 +803,32 @@ export const legendsKey = [
 	'Unknown',
 	'TGC1',
 	'TGC2',
+	'Cumberlord',
+	'JulianTryhard',
 ] as const;
 export type LegendsKey = { [key in typeof legendsKey[number]]: string };
 export type LegendsKeyEnum = CairoCustomEnum;
+
+// Type definition for `pistols::types::duelist_profile::PiratesKey` enum
+export const piratesKey = [
+	'Unknown',
+	'ArdineTideborn',
+	'CaptainEtienne',
+	'CaptainGarran',
+	'CorsairKojo',
+	'Diego',
+	'Mirella',
+	'GunnerFinnan',
+	'Ingrid',
+	'RaiderBjorn',
+	'Reika',
+	'SableTideborn',
+	'AbyssalAdmiral',
+	'SeaWitch',
+	'Asha',
+] as const;
+export type PiratesKey = { [key in typeof piratesKey[number]]: string };
+export type PiratesKeyEnum = CairoCustomEnum;
 
 // Type definition for `pistols::types::premise::Premise` enum
 export const premise = [
@@ -1137,7 +1164,8 @@ export const schema: SchemaType = {
 				Character: undefined,
 				Bot: undefined,
 				Genesis: undefined,
-				Legends: undefined, }),
+				Legends: undefined,
+				Pirates: undefined, }),
 		timestamps: { registered: 0, active: 0, },
 		totals: { total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour: 0, honour_log: 0, },
 			released_fame: false,
@@ -1233,7 +1261,9 @@ export const schema: SchemaType = {
 				FreeDuelist: undefined,
 				SingleDuelist: undefined,
 				BotDuelist: undefined,
-				FreeGenesis5x: undefined, }),
+				FreeGenesis5x: undefined,
+				PiratesDuelists5x: undefined,
+				FreePirates5x: undefined, }),
 			seed: 0,
 			lords_amount: 0,
 			is_open: false,
@@ -1278,7 +1308,8 @@ export const schema: SchemaType = {
 				Character: undefined,
 				Bot: undefined,
 				Genesis: undefined,
-				Legends: undefined, }),
+				Legends: undefined,
+				Pirates: undefined, }),
 			active_duelist_id: 0,
 			level: 0,
 			stacked_ids: [0],
@@ -1949,6 +1980,7 @@ export enum ModelsMapping {
 	DuelistProfile = 'pistols-DuelistProfile',
 	GenesisKey = 'pistols-GenesisKey',
 	LegendsKey = 'pistols-LegendsKey',
+	PiratesKey = 'pistols-PiratesKey',
 	Premise = 'pistols-Premise',
 	RoundState = 'pistols-RoundState',
 	Rules = 'pistols-Rules',

@@ -27,7 +27,6 @@ import { useDuelistsOwnedByPlayer } from '/src/hooks/useTokenDuelists';
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo';
 import { usePack, usePackType } from '/src/stores/packStore';
 import { constants } from '@underware/pistols-sdk/pistols/gen'
-import { useFundedStarterPackCount } from '/src/stores/bankStore';
 import { Button } from 'semantic-ui-react';
 import { Modal } from 'semantic-ui-react';
 import { REFERER_ADDRESS_COOKIE_NAME } from '/src/components/modals/InviteModal';
@@ -62,8 +61,9 @@ export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType: packTy
   const { packType: packTypeFromId } = usePack(packId)
   const packType = useMemo(() => (packTypeFromProps ?? packTypeFromId), [packTypeFromProps, packTypeFromId])
   const { quantity, name: packName } = usePackType(packType)
-  const { fundedCount } = useFundedStarterPackCount()
-  
+  // const { fundedCount } = useFundedStarterPackCount()
+  const fundedCount = 999; // it's unllimited now
+
   const [isNoFundsModalOpen, setIsNoFundsModalOpen] = useState(false)
   const [isClaiming, setIsClaiming] = useState(false)
   const [isOpening, setIsOpening] = useState(false)

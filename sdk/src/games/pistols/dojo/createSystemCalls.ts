@@ -342,6 +342,16 @@ export function createSystemCalls(
         ]
         return await _executeTransaction(signer, calls, key)
       },
+      purchase_random: async (signer: AccountInterface, key?: string): Promise<boolean> => {
+        const pack_type_enum = makeCustomEnum(constants.PackType.GenesisDuelists5x)
+        const value = await contractCalls.pack_token.calcMintFee(signer.address, pack_type_enum) as BigNumberish
+        const calls: DojoCalls = [
+          approve_lords_call(value),
+          vrf_request_call('pack_token', signer.address),
+          contractCalls.pack_token.buildPurchaseRandomCalldata(),
+        ]
+        return await _executeTransaction(signer, calls, key)
+      },
       open: async (signer: AccountInterface, pack_id: BigNumberish, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
           contractCalls.pack_token.buildOpenCalldata(

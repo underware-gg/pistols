@@ -1479,8 +1479,8 @@
   },
   "contracts": [
     {
-      "address": "0x3bcc96581d88c6b848548979c335023470544e9cfee1cb83bd0414d9211b450",
-      "class_hash": "0x2bc993db6b5823313485c74134dab58b4c87ab0b063612171213246b09ded48",
+      "address": "0x7e8ea18bda5fe752d9b26cd5f41f12a0720827ada0be7c20641b0d760d3b288",
+      "class_hash": "0x1d97f94e39012487c724e927de2bfbcf20ad7a835004390c6671c476bffd575",
       "abi": [
         {
           "type": "impl",
@@ -2337,8 +2337,8 @@
       ]
     },
     {
-      "address": "0x646a63f63c978bc98847fcc8f4f2e5356fd164b7f78b695e2ee859f6a0f41c1",
-      "class_hash": "0x1338270115fc00c040f1a7a0434cc9b5c1a2598d02c86734909b45d78b5e216",
+      "address": "0x6c3125d3cbeb0a8af4558cab107410c2bf60a052b02409342881e1f0906f752",
+      "class_hash": "0x5c523dc433d721acdfbb0d270565bab8fe9d992172efd76bef4504bb8c1967b",
       "abi": [
         {
           "type": "impl",
@@ -2791,6 +2791,80 @@
             {
               "name": "TGC2",
               "type": "()"
+            },
+            {
+              "name": "Cumberlord",
+              "type": "()"
+            },
+            {
+              "name": "JulianTryhard",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "pistols::types::duelist_profile::PiratesKey",
+          "variants": [
+            {
+              "name": "Unknown",
+              "type": "()"
+            },
+            {
+              "name": "ArdineTideborn",
+              "type": "()"
+            },
+            {
+              "name": "CaptainEtienne",
+              "type": "()"
+            },
+            {
+              "name": "CaptainGarran",
+              "type": "()"
+            },
+            {
+              "name": "CorsairKojo",
+              "type": "()"
+            },
+            {
+              "name": "Diego",
+              "type": "()"
+            },
+            {
+              "name": "Mirella",
+              "type": "()"
+            },
+            {
+              "name": "GunnerFinnan",
+              "type": "()"
+            },
+            {
+              "name": "Ingrid",
+              "type": "()"
+            },
+            {
+              "name": "RaiderBjorn",
+              "type": "()"
+            },
+            {
+              "name": "Reika",
+              "type": "()"
+            },
+            {
+              "name": "SableTideborn",
+              "type": "()"
+            },
+            {
+              "name": "AbyssalAdmiral",
+              "type": "()"
+            },
+            {
+              "name": "SeaWitch",
+              "type": "()"
+            },
+            {
+              "name": "Asha",
+              "type": "()"
             }
           ]
         },
@@ -2817,6 +2891,10 @@
             {
               "name": "Legends",
               "type": "pistols::types::duelist_profile::LegendsKey"
+            },
+            {
+              "name": "Pirates",
+              "type": "pistols::types::duelist_profile::PiratesKey"
             }
           ]
         },
@@ -3036,8 +3114,8 @@
       ]
     },
     {
-      "address": "0x4f994e318e7390d397d2deb2d2164310825de2b0c24f1fe8fe87c67adf268cc",
-      "class_hash": "0x53acb1c9e64c990e99e55bf0cf80f13e81fe1f54fc6bfc1dcfffe34dcc937ce",
+      "address": "0x1bd329683a9b54e888b55bb463951f17daee5cd0fd1ab60afa2ebc49d79cc5d",
+      "class_hash": "0x7cb6a5a20703bdab6224ac1d065147051b06ddee137dde9e3cb76fa433c4e17",
       "abi": [
         {
           "type": "impl",
@@ -4465,8 +4543,8 @@
       ]
     },
     {
-      "address": "0x220563213e153efa3e97c0a8f9df466fce1ec12b51e414f210ceab9f3552a06",
-      "class_hash": "0x2a354e96f2047e757b3cea49cfd5a2e0be84ed0262e9b16c66c29d44f6dc6db",
+      "address": "0x3f43732b0acf3d762420ae7165d5d474f4dfd032a642600f02bc8f22ee1dfc8",
+      "class_hash": "0x32a011939baa36a6c74ed3f477d74e2fca6666206e42c58c2dc0416bdc8dd70",
       "abi": [
         {
           "type": "impl",
@@ -5021,6 +5099,80 @@
             {
               "name": "TGC2",
               "type": "()"
+            },
+            {
+              "name": "Cumberlord",
+              "type": "()"
+            },
+            {
+              "name": "JulianTryhard",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "pistols::types::duelist_profile::PiratesKey",
+          "variants": [
+            {
+              "name": "Unknown",
+              "type": "()"
+            },
+            {
+              "name": "ArdineTideborn",
+              "type": "()"
+            },
+            {
+              "name": "CaptainEtienne",
+              "type": "()"
+            },
+            {
+              "name": "CaptainGarran",
+              "type": "()"
+            },
+            {
+              "name": "CorsairKojo",
+              "type": "()"
+            },
+            {
+              "name": "Diego",
+              "type": "()"
+            },
+            {
+              "name": "Mirella",
+              "type": "()"
+            },
+            {
+              "name": "GunnerFinnan",
+              "type": "()"
+            },
+            {
+              "name": "Ingrid",
+              "type": "()"
+            },
+            {
+              "name": "RaiderBjorn",
+              "type": "()"
+            },
+            {
+              "name": "Reika",
+              "type": "()"
+            },
+            {
+              "name": "SableTideborn",
+              "type": "()"
+            },
+            {
+              "name": "AbyssalAdmiral",
+              "type": "()"
+            },
+            {
+              "name": "SeaWitch",
+              "type": "()"
+            },
+            {
+              "name": "Asha",
+              "type": "()"
             }
           ]
         },
@@ -5047,6 +5199,10 @@
             {
               "name": "Legends",
               "type": "pistols::types::duelist_profile::LegendsKey"
+            },
+            {
+              "name": "Pirates",
+              "type": "pistols::types::duelist_profile::PiratesKey"
             }
           ]
         },
@@ -7699,8 +7855,8 @@
       ]
     },
     {
-      "address": "0x763838f677a4e0cac70884ad870b45139beda430d4ad006dfb1eda850a56fc9",
-      "class_hash": "0x2ff80ca9264ffdc31fd4b59c22b75e8ebac25d943544fff472669664db7b5ff",
+      "address": "0x2bfba19eb4dc82b7e562d088a5a00d3b5f358b1a0c80cfd1c1836809417499d",
+      "class_hash": "0x26ba765b3537208b0c64136225ae158beccb090392ff5ab793a1b7bb7d4d3e0",
       "abi": [
         {
           "type": "impl",
@@ -9924,8 +10080,8 @@
       ]
     },
     {
-      "address": "0x6f4c716184893ce00e90d8167c24c17a2fd4fa8fedbe430b0a910ad7ca030a7",
-      "class_hash": "0x2b9f032306fc986e944bae131ab364891c1168c5e0fe8a35b281e06ffbc7e7b",
+      "address": "0x44bda7be72be411de337adecbea480db6c44c6d6a6d9a4c912a338367b00fba",
+      "class_hash": "0x7e2cb0b62f0b6871a06d682bf631dc40d1bce382252c4e99fb24bfa4fe59e8c",
       "abi": [
         {
           "type": "impl",
@@ -10302,8 +10458,8 @@
       ]
     },
     {
-      "address": "0x377570d35ccb86cceec2b232ebaf8679bca7c9e5a404b242ae1fdf84f290cd7",
-      "class_hash": "0x4fda6da1b7c4fe7ab84b17e249de38bb0bbb4fdf2d5c792066e55d4ce6a0267",
+      "address": "0x3b073701f2978a86df14129db3dcd80e5dac7085ef3ac29d86b9704b206ff4c",
+      "class_hash": "0x5523321cc62fc54ad438d330dd2e74ae36ce0208e63f13f20d0db3f35997919",
       "abi": [
         {
           "type": "impl",
@@ -10416,6 +10572,14 @@
             },
             {
               "name": "FreeGenesis5x",
+              "type": "()"
+            },
+            {
+              "name": "PiratesDuelists5x",
+              "type": "()"
+            },
+            {
+              "name": "FreePirates5x",
               "type": "()"
             }
           ]
@@ -10787,6 +10951,80 @@
             {
               "name": "TGC2",
               "type": "()"
+            },
+            {
+              "name": "Cumberlord",
+              "type": "()"
+            },
+            {
+              "name": "JulianTryhard",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "pistols::types::duelist_profile::PiratesKey",
+          "variants": [
+            {
+              "name": "Unknown",
+              "type": "()"
+            },
+            {
+              "name": "ArdineTideborn",
+              "type": "()"
+            },
+            {
+              "name": "CaptainEtienne",
+              "type": "()"
+            },
+            {
+              "name": "CaptainGarran",
+              "type": "()"
+            },
+            {
+              "name": "CorsairKojo",
+              "type": "()"
+            },
+            {
+              "name": "Diego",
+              "type": "()"
+            },
+            {
+              "name": "Mirella",
+              "type": "()"
+            },
+            {
+              "name": "GunnerFinnan",
+              "type": "()"
+            },
+            {
+              "name": "Ingrid",
+              "type": "()"
+            },
+            {
+              "name": "RaiderBjorn",
+              "type": "()"
+            },
+            {
+              "name": "Reika",
+              "type": "()"
+            },
+            {
+              "name": "SableTideborn",
+              "type": "()"
+            },
+            {
+              "name": "AbyssalAdmiral",
+              "type": "()"
+            },
+            {
+              "name": "SeaWitch",
+              "type": "()"
+            },
+            {
+              "name": "Asha",
+              "type": "()"
             }
           ]
         },
@@ -10813,6 +11051,10 @@
             {
               "name": "Legends",
               "type": "pistols::types::duelist_profile::LegendsKey"
+            },
+            {
+              "name": "Pirates",
+              "type": "pistols::types::duelist_profile::PiratesKey"
             }
           ]
         },
@@ -10949,6 +11191,17 @@
               "outputs": [
                 {
                   "type": "core::array::Span::<core::integer::u128>"
+                }
+              ],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "purchase_random",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::integer::u128"
                 }
               ],
               "state_mutability": "external"
@@ -11994,6 +12247,7 @@
         "claim_starter_pack",
         "claim_gift",
         "purchase",
+        "purchase_random",
         "open",
         "mint_to",
         "airdrop",
@@ -13765,8 +14019,8 @@
       ]
     },
     {
-      "address": "0x2d37a264cb8372f7e6584e49a1fca024bf46486ff00d6018888916ffc858e21",
-      "class_hash": "0x1e0dcbb93d99efc52afeb323181704a49ec2834b8d1682ef88576527f2c2e90",
+      "address": "0x6ef0e8182a6eafdaccf88a2c3450f1d5ca98139998c3e4b21ff0c429d53a059",
+      "class_hash": "0x525ca7196c12582c29d585564fdb475272640e240ee35fd6ba921de83b6817b",
       "abi": [
         {
           "type": "impl",
@@ -14672,7 +14926,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x336c7ec2f47f543041e5b26e661630c283965d04096fc8e9a1f5396f949c8bf",
+      "class_hash": "0x79d6cf5a7bda986e3bb3c412000ee1a8bf37a5306699e18cf8a6698eaa244cd",
       "tag": "pistols-Duelist",
       "selector": "0x1ec34ce9ccaa39b540179d85e0dd0d46c1c1ae712f4cb40a9cd7f8c21ebaa46"
     },
@@ -14714,7 +14968,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x1c537e8c0fbf887527d37f876af5c812a891d7c6ef42b7b89e0849dd6dfa29a",
+      "class_hash": "0xf72deb035d1e05974a1dabd540b5789cc781946fb499838694fbc680c77573",
       "tag": "pistols-Pack",
       "selector": "0x64159b4947adcdc7a87b41f7889ba33495ac8e3a3a333305c7712806763fa2d"
     },
@@ -14738,7 +14992,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x15048ae790dd4b34ab6b36b1e9783ec9709b0844a2e42f881bfc76564be88da",
+      "class_hash": "0x5f8cbc9c5990be2b22a1eb7ca2f14ebcddd5ec446729b1a1141cab93198d4f",
       "tag": "pistols-PlayerDuelistStack",
       "selector": "0xb47a4ea3849ae004ed3d0ba58070c0eb3cdca2bed8c9a6ab6bfe01210effc6"
     },

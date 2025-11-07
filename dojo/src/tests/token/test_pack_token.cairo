@@ -15,7 +15,7 @@ use pistols::models::{
     pool::{Pool, PoolType},
 };
 
-use pistols::types::duelist_profile::{DuelistProfile, BotKey, CharacterKey, GenesisKey, LegendsKey};
+use pistols::types::duelist_profile::{DuelistProfile, BotKey, CharacterKey, GenesisKey, LegendsKey, PiratesKey};
 // use pistols::interfaces::dns::{DnsTrait};
 use pistols::types::constants::{CONST, FAME};
 use pistols::types::timestamp::{TIMESTAMP};
@@ -266,6 +266,45 @@ fn test_claim_purchase_multiple() {
     pool_purchases = tester::assert_balance_up(sys.store.get_pool(PoolType::Purchases).balance_lords, pool_purchases, "pool_purchases PURCHASE");
     pool_peg_lords = tester::assert_balance_equal(sys.store.get_pool(PoolType::FamePeg).balance_lords, pool_peg_lords, "pool_peg_lords PURCHASE");
     pool_peg_fame = tester::assert_balance_equal(sys.store.get_pool(PoolType::FamePeg).balance_fame, pool_peg_fame, "pool_peg_fame PURCHASE");
+}
+
+
+#[test]
+fn test_claim_purchase_random() {
+    let mut sys: TestSystems = setup(0);
+
+    let quantity: u8 = 10;
+    let recipient: ContractAddress = OTHER();
+    let price: u128 = sys.pack.calc_mint_fee(recipient, PackType::GenesisDuelists5x);
+    tester::impersonate(recipient);
+    tester::execute_lords_approve(@sys.lords, recipient, sys.bank.contract_address, price * quantity.into());
+    tester::execute_claim_starter_pack(@sys, recipient);
+
+    // mint a bunch
+    let mut count_genesis: usize = 0;
+    let mut count_pirates: usize = 0;
+    for _ in 0..quantity {
+        let pack_id: u128 = tester::execute_pack_purchase_random(@sys, recipient);
+        let pack: Pack = sys.store.get_pack(pack_id);
+        match (pack.pack_type) {
+            PackType::GenesisDuelists5x => {
+                count_genesis += 1;
+            },
+            PackType::PiratesDuelists5x => {
+                count_pirates += 1;
+            },
+            _ => {
+                assert!(false, "invalid pack type!!!");
+            }
+        }
+    }
+// println!("count_genesis:{}", count_genesis);
+// println!("count_pirates:{}", count_pirates);
+    assert_eq!(sys.pack.total_supply(), quantity.into(), "total_supply");
+    assert_eq!(sys.pack.balance_of(recipient), quantity.into(), "balance_of");
+    assert_gt!(count_genesis, 0, "count_genesis");
+    assert_gt!(count_pirates, 0, "count_pirates");
+    assert_gt!(count_genesis, count_pirates.into(), "count_genesis > count_pirates");
 }
 
 #[test]
@@ -601,10 +640,10 @@ fn test_transfer_unopened_no_allowance() {
 // airdrops...
 //
 
-pub fn _airdrop_open(sys: @TestSystems, recipient: ContractAddress, pack_type: PackType, duelist_profile: Option<DuelistProfile>, prefix: ByteArray) -> u128 {
+pub fn _airdrop_open(sys: @TestSystems, recipient: ContractAddress, pack_type: PackType, requested_profile: Option<DuelistProfile>, prefix: ByteArray) -> u128 {
     let duelist_balance_before: u128 = (*sys.duelists).balance_of(recipient).low;
     // airdrop...
-    let pack_id: u128 = tester::execute_pack_airdrop(sys, OWNER(), recipient, pack_type, duelist_profile);
+    let pack_id: u128 = tester::execute_pack_airdrop(sys, OWNER(), recipient, pack_type, requested_profile);
     assert_eq!((*sys.pack).owner_of(pack_id.into()), recipient, "{}:: owner_of(pack_id)", prefix);
     // open...
     let token_ids: Span<u128> = tester::execute_pack_open(sys, recipient, pack_id);
@@ -612,22 +651,38 @@ pub fn _airdrop_open(sys: @TestSystems, recipient: ContractAddress, pack_type: P
     let minted_profile: DuelistProfile = sys.store.get_duelist_profile(duelist_id_0);
     assert_eq!((*sys.duelists).owner_of(duelist_id_0.into()), recipient, "{}:: owner_of(duelist_id_0)", prefix);
     assert_ne!(minted_profile, DuelistProfile::Undefined, "{}:: !DuelistProfile::Undefined", prefix);
+    // validate requested profile
+    if let Option::Some(requested_profile) = requested_profile {
+        assert_eq!(minted_profile, requested_profile, "{}:: incorrect profile", prefix);
+    }
     // validated minted duelist profile
+    let profile_name: ByteArray = minted_profile.into();
     match pack_type {
         PackType::StarterPack => {
             assert_eq!(minted_profile, DuelistProfile::Genesis(GenesisKey::SerWalker), "{}:: GenesisKey::SerWalker", prefix);
+            assert_eq!(profile_name, "Genesis");
+        },
+        PackType::SingleDuelist => {
+            assert_eq!(minted_profile, requested_profile.unwrap(), "{}:: incorrect profile", prefix);
         },
         PackType::FreeDuelist |
         PackType::GenesisDuelists5x |
         PackType::FreeGenesis5x => {
+            assert_eq!(profile_name, "Genesis");
             assert_ne!(minted_profile, DuelistProfile::Genesis(GenesisKey::Unknown), "{}:: !GenesisKey::Unknown", prefix);
             // could be! but is not...
             assert_ne!(minted_profile, DuelistProfile::Genesis(GenesisKey::SerWalker), "{}:: !SerWalker", prefix);
         },
-        PackType::SingleDuelist => {
-            assert_eq!(minted_profile, duelist_profile.unwrap(), "{}:: incorrect profile", prefix);
+        PackType::PiratesDuelists5x |
+        PackType::FreePirates5x => {
+            assert_eq!(profile_name, "Pirates");
+            assert_ne!(minted_profile, DuelistProfile::Pirates(PiratesKey::Unknown), "{}:: !PiratesKey::Unknown", prefix);
         },
-        _ => {},
+        PackType::BotDuelist => {
+            assert_eq!(profile_name, "Bots");
+            assert!(false, "NOT IMPLEMENTED");
+        },
+        PackType::Unknown => {},
     }
     // validate new duelist balance
     let duelist_balance_after: u128 = (*sys.duelists).balance_of(recipient).low;
@@ -641,15 +696,20 @@ pub fn _airdrop_open(sys: @TestSystems, recipient: ContractAddress, pack_type: P
 #[test]
 fn test_airdrop_ok() {
     let mut sys: TestSystems = setup(0);
-    tester::fund_duelists_pool(@sys, 13);
-    // randomize mock VRF
+    tester::fund_duelists_pool(@sys, 21);
+    // generate entropy for mock VRF (avoid starter duelist inside genesis packs)
+    sys.world.dispatcher.uuid();
     sys.world.dispatcher.uuid();
     _airdrop_open(@sys, OTHER(), PackType::StarterPack, Option::None, "StarterPack");
     _airdrop_open(@sys, OTHER(), PackType::FreeDuelist, Option::None, "FreeDuelist");
     _airdrop_open(@sys, OTHER(), PackType::FreeGenesis5x, Option::None, "FreeGenesis5x");
-    _airdrop_open(@sys, OTHER(), PackType::FreeGenesis5x, Option::None, "FreeGenesis5x");
+    _airdrop_open(@sys, OTHER(), PackType::FreePirates5x, Option::None, "FreePirates5x");
     _airdrop_open(@sys, OTHER(), PackType::SingleDuelist, Option::Some(DuelistProfile::Genesis(GenesisKey::Duke)), "GenesisKey::Duke");
     _airdrop_open(@sys, OTHER(), PackType::SingleDuelist, Option::Some(DuelistProfile::Legends(LegendsKey::TGC1)), "LegendsKey::TGC1");
+    _airdrop_open(@sys, OTHER(), PackType::SingleDuelist, Option::Some(DuelistProfile::Legends(LegendsKey::TGC2)), "LegendsKey::TGC2");
+    _airdrop_open(@sys, OTHER(), PackType::SingleDuelist, Option::Some(DuelistProfile::Legends(LegendsKey::Cumberlord)), "LegendsKey::Cumberlord");
+    _airdrop_open(@sys, OTHER(), PackType::SingleDuelist, Option::Some(DuelistProfile::Legends(LegendsKey::JulianTryhard)), "LegendsKey::JulianTryhard");
+    _airdrop_open(@sys, OTHER(), PackType::SingleDuelist, Option::Some(DuelistProfile::Pirates(PiratesKey::ArdineTideborn)), "PiratesKey::ArdineTideborn");
 }
 
 #[test]
@@ -668,15 +728,59 @@ fn test_promo_mint_to_ok() {
     assert_ne!(pack_1.seed, 0, "airdrop 1");
     // airdrop more...
     let pack_id_2: u128 = tester::execute_pack_promo_mint_to(@sys, OWNER(), BUMMER());
-    _assert_minted_count(@sys, 2, 2, "airdrop 2");
+    let pack_id_3: u128 = tester::execute_pack_promo_mint_to(@sys, OWNER(), BUMMER());
+    _assert_minted_count(@sys, 3, 3, "airdrop 2");
     assert_eq!(pack_id_2, 2, "airdrop 2");
+    assert_eq!(pack_id_3, 3, "airdrop 2");
     assert_eq!(sys.pack.balance_of(OWNER()), 0, "airdrop 2");
     assert_eq!(sys.pack.balance_of(OTHER()), 1, "airdrop 2");
-    assert_eq!(sys.pack.balance_of(BUMMER()), 1, "airdrop 2");
+    assert_eq!(sys.pack.balance_of(BUMMER()), 2, "airdrop 2");
     let pack_2: Pack = sys.store.get_pack(pack_id_2);
-    assert_eq!(pack_2.pack_type, PackType::FreeGenesis5x, "airdrop 2");
-    assert_ne!(pack_2.seed, 0, "airdrop 2");
-    assert_ne!(pack_2.seed, pack_1.seed, "airdrop 2");
+    assert_eq!(pack_2.pack_type, PackType::FreeGenesis5x);
+    assert_ne!(pack_2.seed, 0);
+    assert_ne!(pack_2.seed, pack_1.seed);
+    let pack_3: Pack = sys.store.get_pack(pack_id_3);
+    assert_eq!(pack_3.pack_type, PackType::FreeGenesis5x);
+    assert_ne!(pack_3.seed, 0);
+    assert_ne!(pack_3.seed, pack_2.seed);
+}
+
+#[test]
+fn test_promo_mint_to_pirate_nation_ok() {
+    let mut sys: TestSystems = setup(0);
+    
+    // set pirate nation minter as admin
+    let minter: ContractAddress = pistols::models::pack::pirate_nation_minter();
+    tester::execute_admin_set_is_team_member(@sys.admin, OWNER(), minter, false, true);
+
+    let quantity: u8 = 9;
+    let recipient: ContractAddress = OTHER();
+    tester::fund_duelists_pool(@sys, quantity.into());
+
+    // mint a bunch
+    let mut count_genesis: usize = 0;
+    let mut count_pirates: usize = 0;
+    for _ in 0..quantity {
+        let pack_id: u128 = tester::execute_pack_promo_mint_to(@sys, minter, recipient);
+        let pack: Pack = sys.store.get_pack(pack_id);
+        match (pack.pack_type) {
+            PackType::FreeGenesis5x => {
+                count_genesis += 1;
+            },
+            PackType::FreePirates5x => {
+                count_pirates += 1;
+            },
+            _ => {
+                assert!(false, "invalid pack type!!!");
+            }
+        }
+    }
+// println!("count_genesis:{}", count_genesis);
+// println!("count_pirates:{}", count_pirates);
+    assert_eq!(sys.pack.total_supply(), quantity.into(), "total_supply");
+    assert_eq!(sys.pack.balance_of(recipient), quantity.into(), "balance_of");
+    assert_eq!(count_genesis, 6, "count_genesis");
+    assert_eq!(count_pirates, 3, "count_pirates");
 }
 
 #[test]
@@ -847,7 +951,7 @@ fn test_airdrop_open_free_pool_insufficient() {
 #[test]
 fn test_airdrop_open_claimable_pool_ok() {
     let mut sys: TestSystems = setup(0);
-    tester::fund_duelists_pool(@sys, 10);
+    tester::fund_duelists_pool(@sys, 15);
     // check pool balance
     let pool_claimable_before: Pool = sys.store.get_pool(PoolType::Claimable);
     let pool_fame_peg_before: Pool = sys.store.get_pool(PoolType::FamePeg);
@@ -855,7 +959,7 @@ fn test_airdrop_open_claimable_pool_ok() {
     assert_eq!(pool_fame_peg_before.balance_lords, 0, "pool_fame_peg_before");
     // airdrop...
     let pack_1: u128 = tester::execute_pack_airdrop(@sys, OWNER(), OTHER(), PackType::FreeGenesis5x, Option::None);
-    let pack_2: u128 = tester::execute_pack_airdrop(@sys, OWNER(), OTHER(), PackType::FreeGenesis5x, Option::None);
+    let pack_2: u128 = tester::execute_pack_airdrop(@sys, OWNER(), OTHER(), PackType::FreePirates5x, Option::None);
     // check pool balance
     let pool_claimable_airdropped: Pool = sys.store.get_pool(PoolType::Claimable);
     let pool_fame_peg_airdropped: Pool = sys.store.get_pool(PoolType::FamePeg);

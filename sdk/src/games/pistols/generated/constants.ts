@@ -72,6 +72,7 @@ export const INTERFACE_DESCRIPTIONS: any = {
     claim_starter_pack: 'Claim the starter pack, mint Duelists',
     claim_gift: 'Claim gift pack, if available',
     purchase: 'Purchase packs',
+    purchase_random: 'Purchase a currently available pack',
     open: 'Open a pack, mint its contents',
     mint_to: 'Promotional airdrops (admin)',
     airdrop: 'Airdrops a pack (admin)',
@@ -257,6 +258,8 @@ export enum PackType {
   SingleDuelist = 'SingleDuelist', // 4
   BotDuelist = 'BotDuelist', // 5
   FreeGenesis5x = 'FreeGenesis5x', // 6
+  PiratesDuelists5x = 'PiratesDuelists5x', // 7
+  FreePirates5x = 'FreePirates5x', // 8
 };
 export const getPackTypeValue = (name: PackType): number | undefined => _indexOrUndefined(Object.keys(PackType).indexOf(name));
 export const getPackTypeFromValue = (value: number): PackType | undefined => Object.keys(PackType)[value] as PackType;
@@ -467,6 +470,7 @@ export enum DuelistProfile {
   Bot = 'Bot', // 2
   Genesis = 'Genesis', // 3
   Legends = 'Legends', // 4
+  Pirates = 'Pirates', // 5
 };
 export const getDuelistProfileValue = (name: DuelistProfile): number | undefined => _indexOrUndefined(Object.keys(DuelistProfile).indexOf(name));
 export const getDuelistProfileFromValue = (value: number): DuelistProfile | undefined => Object.keys(DuelistProfile)[value] as DuelistProfile;
@@ -579,10 +583,34 @@ export enum LegendsKey {
   Unknown = 'Unknown', // 0
   TGC1 = 'TGC1', // 1
   TGC2 = 'TGC2', // 2
+  Cumberlord = 'Cumberlord', // 3
+  JulianTryhard = 'JulianTryhard', // 4
 };
 export const getLegendsKeyValue = (name: LegendsKey): number | undefined => _indexOrUndefined(Object.keys(LegendsKey).indexOf(name));
 export const getLegendsKeyFromValue = (value: number): LegendsKey | undefined => Object.keys(LegendsKey)[value] as LegendsKey;
 export const getLegendsKeyMap = (): Record<LegendsKey, number> => Object.keys(LegendsKey).reduce((acc, v, index) => { acc[v as LegendsKey] = index; return acc; }, {} as Record<LegendsKey, number>);
+
+// from: ../dojo/src/types/duelist_profile.cairo
+export enum PiratesKey {
+  Unknown = 'Unknown', // 0
+  ArdineTideborn = 'ArdineTideborn', // 1
+  CaptainEtienne = 'CaptainEtienne', // 2
+  CaptainGarran = 'CaptainGarran', // 3
+  CorsairKojo = 'CorsairKojo', // 4
+  Diego = 'Diego', // 5
+  Mirella = 'Mirella', // 6
+  GunnerFinnan = 'GunnerFinnan', // 7
+  Ingrid = 'Ingrid', // 8
+  RaiderBjorn = 'RaiderBjorn', // 9
+  Reika = 'Reika', // 10
+  SableTideborn = 'SableTideborn', // 11
+  AbyssalAdmiral = 'AbyssalAdmiral', // 12
+  SeaWitch = 'SeaWitch', // 13
+  Asha = 'Asha', // 14
+};
+export const getPiratesKeyValue = (name: PiratesKey): number | undefined => _indexOrUndefined(Object.keys(PiratesKey).indexOf(name));
+export const getPiratesKeyFromValue = (value: number): PiratesKey | undefined => Object.keys(PiratesKey)[value] as PiratesKey;
+export const getPiratesKeyMap = (): Record<PiratesKey, number> => Object.keys(PiratesKey).reduce((acc, v, index) => { acc[v as PiratesKey] = index; return acc; }, {} as Record<PiratesKey, number>);
 
 // from: ../dojo/src/types/premise.cairo
 export enum Premise {
@@ -921,6 +949,8 @@ type type_PACK_TYPES = {
   SingleDuelist: PackDescriptor, // cairo: PackDescriptor
   BotDuelist: PackDescriptor, // cairo: PackDescriptor
   FreeGenesis5x: PackDescriptor, // cairo: PackDescriptor
+  PiratesDuelists5x: PackDescriptor, // cairo: PackDescriptor
+  FreePirates5x: PackDescriptor, // cairo: PackDescriptor
 };
 export const PACK_TYPES: type_PACK_TYPES = {
   Unknown: {
@@ -992,6 +1022,26 @@ export const PACK_TYPES: type_PACK_TYPES = {
     price_lords: (50n * CONST.ETH_TO_WEI),
     quantity: 5,
     contents: 'Five Random Genesis Duelists',
+  },
+  PiratesDuelists5x: {
+    id: 'PiratesDuelists5x',
+    name: 'Pirates 5-pack',
+    image_file_closed: 'PiratesDuelists5x.png',
+    image_file_open: 'PiratesDuelists5x.png',
+    can_purchase: true,
+    price_lords: (100n * CONST.ETH_TO_WEI),
+    quantity: 5,
+    contents: 'Five Random Pirates Duelists',
+  },
+  FreePirates5x: {
+    id: 'FreePirates5x',
+    name: 'Free Pirates 5-pack',
+    image_file_closed: 'PiratesDuelists5x.png',
+    image_file_open: 'PiratesDuelists5x.png',
+    can_purchase: false,
+    price_lords: (50n * CONST.ETH_TO_WEI),
+    quantity: 5,
+    contents: 'Five Random Pirates Duelists',
   },
 };
 
@@ -1297,6 +1347,7 @@ type type_COLLECTIONS = {
   Bot: CollectionDescriptor, // cairo: CollectionDescriptor
   Genesis: CollectionDescriptor, // cairo: CollectionDescriptor
   Legends: CollectionDescriptor, // cairo: CollectionDescriptor
+  Pirates: CollectionDescriptor, // cairo: CollectionDescriptor
 };
 export const COLLECTIONS: type_COLLECTIONS = {
   Undefined: {
@@ -1330,7 +1381,14 @@ export const COLLECTIONS: type_COLLECTIONS = {
   Legends: {
     name: 'Legends Collection',
     folder_name: 'legends',
-    profile_count: 2,
+    profile_count: 4,
+    is_playable: true,
+    duelist_id_base: 0n,
+  },
+  Pirates: {
+    name: 'Pirates Collection',
+    folder_name: 'pirates',
+    profile_count: 14,
     is_playable: true,
     duelist_id_base: 0n,
   },
@@ -1683,6 +1741,8 @@ type type_LEGENDS_PROFILES = {
   Unknown: ProfileDescriptor, // cairo: ProfileDescriptor
   TGC1: ProfileDescriptor, // cairo: ProfileDescriptor
   TGC2: ProfileDescriptor, // cairo: ProfileDescriptor
+  Cumberlord: ProfileDescriptor, // cairo: ProfileDescriptor
+  JulianTryhard: ProfileDescriptor, // cairo: ProfileDescriptor
 };
 export const LEGENDS_PROFILES: type_LEGENDS_PROFILES = {
   Unknown: {
@@ -1693,6 +1753,78 @@ export const LEGENDS_PROFILES: type_LEGENDS_PROFILES = {
   },
   TGC2: {
     name: 'King Angre the Crimson',
+  },
+  Cumberlord: {
+    name: 'Cumberlord',
+  },
+  JulianTryhard: {
+    name: 'Julian Tryhard',
+  },
+};
+
+// from: ../dojo/src/types/duelist_profile.cairo
+type type_PIRATES_PROFILES = {
+  Unknown: ProfileDescriptor, // cairo: ProfileDescriptor
+  ArdineTideborn: ProfileDescriptor, // cairo: ProfileDescriptor
+  CaptainEtienne: ProfileDescriptor, // cairo: ProfileDescriptor
+  CaptainGarran: ProfileDescriptor, // cairo: ProfileDescriptor
+  CorsairKojo: ProfileDescriptor, // cairo: ProfileDescriptor
+  Diego: ProfileDescriptor, // cairo: ProfileDescriptor
+  Mirella: ProfileDescriptor, // cairo: ProfileDescriptor
+  GunnerFinnan: ProfileDescriptor, // cairo: ProfileDescriptor
+  Ingrid: ProfileDescriptor, // cairo: ProfileDescriptor
+  RaiderBjorn: ProfileDescriptor, // cairo: ProfileDescriptor
+  Reika: ProfileDescriptor, // cairo: ProfileDescriptor
+  SableTideborn: ProfileDescriptor, // cairo: ProfileDescriptor
+  AbyssalAdmiral: ProfileDescriptor, // cairo: ProfileDescriptor
+  SeaWitch: ProfileDescriptor, // cairo: ProfileDescriptor
+  Asha: ProfileDescriptor, // cairo: ProfileDescriptor
+};
+export const PIRATES_PROFILES: type_PIRATES_PROFILES = {
+  Unknown: {
+    name: 'Unknown',
+  },
+  ArdineTideborn: {
+    name: 'Ardine Tideborn',
+  },
+  CaptainEtienne: {
+    name: 'Captain Etienne the Doomed',
+  },
+  CaptainGarran: {
+    name: 'Captain Garran the Timeworn',
+  },
+  CorsairKojo: {
+    name: 'Corsair Kojo Krakenrider',
+  },
+  Diego: {
+    name: 'Diego the Pillager',
+  },
+  Mirella: {
+    name: 'Fire Queen Mirella',
+  },
+  GunnerFinnan: {
+    name: 'Gunner Finnan the Contemplative',
+  },
+  Ingrid: {
+    name: 'Ingrid the Frost Corsair',
+  },
+  RaiderBjorn: {
+    name: 'Raider Bjorn Shipbreaker',
+  },
+  Reika: {
+    name: 'Reika the Siren\'s Lament',
+  },
+  SableTideborn: {
+    name: 'Sable Tideborn',
+  },
+  AbyssalAdmiral: {
+    name: 'The Abyssal Admiral',
+  },
+  SeaWitch: {
+    name: 'The Sea Witch of Lomalagi Shoal',
+  },
+  Asha: {
+    name: 'Vaultbreaker Asha',
   },
 };
 

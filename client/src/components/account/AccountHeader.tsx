@@ -6,6 +6,7 @@ import { ProfilePic } from '/src/components/account/ProfilePic'
 import { SceneName  } from '/src/data/assetsTypes'
 import { FoolsBalance } from '/src/components/account/LordsBalance'
 import { usePlayerAvatar } from '/src/stores/playerStore'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 export default function AccountHeader() {
   const { isConnected } = useAccount()
@@ -42,6 +43,7 @@ export default function AccountHeader() {
       
       <div className="ProfileContainer">
         <ProfilePic 
+          profileType={constants.DuelistProfile.Character}
           profilePic={avatarUrl ? undefined : 0} 
           profilePicUrl={avatarUrl} 
           fallbackPicUrl={apiAvatarUrl}

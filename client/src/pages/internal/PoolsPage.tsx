@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react'
 import { Container, Table } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSystem, useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
-import { usePool, useSeasonPool, UsePoolResult, useFundedStarterPackCount, usePurchasedUnopenedDuelistPackCount } from '/src/stores/bankStore'
+import { usePool, useSeasonPool, UsePoolResult, usePurchasedUnopenedDuelistPackCount, useFundedPackCount } from '/src/stores/bankStore'
 import { useFameBalance, useFetchAccountsBalances, useLordsBalance } from '/src/stores/coinStore'
 import { useERC20TotalSupply } from '@underware/pistols-sdk/utils/hooks'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
@@ -50,11 +50,11 @@ export default function PoolsPage() {
 
 function Bank() {
   const { account } = useAccount()
-  const [packCount, setPackCount] = useState(1)
+  const [sponsorDuelistCount, setSponsorDuelistCount] = useState(1)
   const [sponsorLords, setSponsorLords] = useState(1000)
 
-  const { fundedCount, priceLords, poolBalanceLords } = useFundedStarterPackCount()
-  const fundAmount = useMemo(() => (priceLords * BigInt(packCount)), [priceLords, packCount])
+  const { fundedCount, priceLords, poolBalanceLords } = useFundedPackCount(constants.PackType.FreeDuelist)
+  const fundAmount = useMemo(() => (priceLords * BigInt(sponsorDuelistCount)), [priceLords, sponsorDuelistCount])
 
   const { fundedCount: duelistPackCount, priceLords: duelistPackPriceLords, balanceLords: duelistPackBalanceLords } = usePurchasedUnopenedDuelistPackCount()
 
@@ -103,11 +103,11 @@ function Bank() {
           </Cell>
         </Row>
         <Row>
-          <Cell className='ModalText'>Sponsor Packs:</Cell>
+          <Cell className='ModalText'>Sponsor Duelists:</Cell>
           <Cell className='ModalText' textAlign='left'>
             <FormInputNumber
-              value={packCount}
-              setValue={setPackCount}
+              value={sponsorDuelistCount}
+              setValue={setSponsorDuelistCount}
               minValue={1}
               maxValue={1000}
               fluid={false}
@@ -117,8 +117,8 @@ function Bank() {
           </Cell>
           <Cell className='Smaller'>
             <BalanceRequiredButton
-              label={`Fund ${packCount} More Packs`}
-              disabled={packCount === 0}
+              label={`Fund ${sponsorDuelistCount} More Duelists`}
+              disabled={sponsorDuelistCount === 0}
               fee={fundAmount}
               fill={false}
               onClick={_fund_packs}

@@ -1,3 +1,4 @@
+use starknet::{ContractAddress};
 pub use pistols::types::duelist_profile::{DuelistProfile};
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
@@ -9,6 +10,8 @@ pub enum PackType {
     SingleDuelist,      // 4
     BotDuelist,         // 5
     FreeGenesis5x,      // 6
+    PiratesDuelists5x,  // 7
+    FreePirates5x,      // 8
 }
 
 //------------------------
@@ -122,8 +125,31 @@ mod PACK_TYPES {
         quantity: 5,
         contents: 'Five Random Genesis Duelists',
     };
+    pub const PiratesDuelists5x: PackDescriptor = PackDescriptor {
+        id: 'PiratesDuelists5x',
+        name: 'Pirates 5-pack',
+        image_file_closed: 'PiratesDuelists5x.png',
+        image_file_open: 'PiratesDuelists5x.png',
+        can_purchase: true,
+        price_lords: (100 * CONST::ETH_TO_WEI.low), // amount of LORDS to peg to FAME
+        quantity: 5,
+        contents: 'Five Random Pirates Duelists',
+    };
+    pub const FreePirates5x: PackDescriptor = PackDescriptor {
+        id: 'FreePirates5x',
+        name: 'Free Pirates 5-pack',
+        image_file_closed: 'PiratesDuelists5x.png',
+        image_file_open: 'PiratesDuelists5x.png',
+        can_purchase: false,
+        price_lords: (50 * CONST::ETH_TO_WEI.low), // amount of LORDS to peg to FAME
+        quantity: 5,
+        contents: 'Five Random Pirates Duelists',
+    };
 }
 
+pub fn pirate_nation_minter() -> ContractAddress {
+    (0x002346E4CCfc96beE8EB5391344F5f5Ab7bF17d36c566888Fe39E8816D0A50e7.try_into().unwrap())
+}
 
 //----------------------------------
 // Traits
@@ -157,6 +183,8 @@ pub impl PackTypeImpl of PackTypeTrait {
             PackType::SingleDuelist         => PACK_TYPES::SingleDuelist,
             PackType::BotDuelist            => PACK_TYPES::BotDuelist,
             PackType::FreeGenesis5x         => PACK_TYPES::FreeGenesis5x,
+            PackType::PiratesDuelists5x     => PACK_TYPES::PiratesDuelists5x,
+            PackType::FreePirates5x         => PACK_TYPES::FreePirates5x,
         })
     }
     #[inline(always)]
@@ -227,5 +255,7 @@ mod unit {
         assert_gt!(PackType::FreeGenesis5x.mint_fee(), 0);
         assert_gt!(PackType::FreeDuelist.mint_fee(), 0);
         assert_gt!(PackType::SingleDuelist.mint_fee(), 0);
+        assert_gt!(PackType::PiratesDuelists5x.mint_fee(), 0);
+        assert_gt!(PackType::FreePirates5x.mint_fee(), 0);
     }
 }

@@ -61,9 +61,6 @@ export const useTournamentPool = (tournament_id: BigNumberish) => {
 //
 // count the number of funded Starter Packs
 // If zero, claiming will fail!
-export const useFundedStarterPackCount = () => {
-  return useFundedPackCount(constants.PackType.StarterPack);
-}
 export const useFundedPackCount = (pack_type: constants.PackType) => {
   const { priceLords } = usePackType(pack_type)
   const { balanceLords: poolBalanceLords } = usePool(constants.PoolType.Claimable)

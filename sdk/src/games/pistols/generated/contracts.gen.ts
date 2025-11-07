@@ -231,6 +231,27 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
+	const build_admin_velordsMigratePools2_calldata = (): DojoCall => {
+		return {
+			contractName: "admin",
+			entrypoint: "velords_migrate_pools_2",
+			calldata: [],
+		};
+	};
+
+	const admin_velordsMigratePools2 = async (snAccount: Account | AccountInterface) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_admin_velordsMigratePools2_calldata(),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 	const build_admin_velordsMigrateRankedChallenges_calldata = (duelIds: Array<BigNumberish>): DojoCall => {
 		return {
 			contractName: "admin",
@@ -265,6 +286,48 @@ export function setupWorld(provider: DojoProvider) {
 			return await provider.execute(
 				snAccount,
 				build_admin_velordsMigrateRankedDuelists_calldata(duelistIds),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_admin_velordsMigrateRankedDuelists2_calldata = (duelistIds: Array<BigNumberish>): DojoCall => {
+		return {
+			contractName: "admin",
+			entrypoint: "velords_migrate_ranked_duelists_2",
+			calldata: [duelistIds],
+		};
+	};
+
+	const admin_velordsMigrateRankedDuelists2 = async (snAccount: Account | AccountInterface, duelistIds: Array<BigNumberish>) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_admin_velordsMigrateRankedDuelists2_calldata(duelistIds),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_bank_burnFame_calldata = (): DojoCall => {
+		return {
+			contractName: "bank",
+			entrypoint: "burn_fame",
+			calldata: [],
+		};
+	};
+
+	const bank_burnFame = async (snAccount: Account | AccountInterface) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_bank_burnFame_calldata(),
 				"pistols",
 			);
 		} catch (error) {
@@ -3563,6 +3626,27 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
+	const build_pack_token_purchaseRandom_calldata = (): DojoCall => {
+		return {
+			contractName: "pack_token",
+			entrypoint: "purchase_random",
+			calldata: [],
+		};
+	};
+
+	const pack_token_purchaseRandom = async (snAccount: Account | AccountInterface) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_pack_token_purchaseRandom_calldata(),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 	const build_pack_token_royaltyInfo_calldata = (tokenId: BigNumberish, salePrice: BigNumberish): DojoCall => {
 		return {
 			contractName: "pack_token",
@@ -4405,7 +4489,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-  const build_rng_mock_mockValues_calldata = (mocked: Array<models.MockedValue>): DojoCall => {
+	const build_rng_mock_mockValues_calldata = (mocked: Array<models.MockedValue>): DojoCall => {
 		return {
 			contractName: "rng_mock",
 			entrypoint: "mock_values",
@@ -4413,7 +4497,7 @@ export function setupWorld(provider: DojoProvider) {
 		};
 	};
 
-  const rng_mock_mockValues = async (snAccount: Account | AccountInterface, mocked: Array<models.MockedValue>) => {
+	const rng_mock_mockValues = async (snAccount: Account | AccountInterface, mocked: Array<models.MockedValue>) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -4434,7 +4518,7 @@ export function setupWorld(provider: DojoProvider) {
 		};
 	};
 
-  const rng_mock_reseed = async (seed: BigNumberish, salt: BigNumberish, mocked: Array<models.MockedValue>) => {
+	const rng_mock_reseed = async (seed: BigNumberish, salt: BigNumberish, mocked: Array<models.MockedValue>) => {
 		try {
 			return await provider.call("pistols", build_rng_mock_reseed_calldata(seed, salt, mocked));
 		} catch (error) {
@@ -4443,7 +4527,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-  const build_rng_reseed_calldata = (seed: BigNumberish, salt: BigNumberish, mocked: Array<models.MockedValue>): DojoCall => {
+	const build_rng_reseed_calldata = (seed: BigNumberish, salt: BigNumberish, mocked: Array<models.MockedValue>): DojoCall => {
 		return {
 			contractName: "rng",
 			entrypoint: "reseed",
@@ -4451,7 +4535,7 @@ export function setupWorld(provider: DojoProvider) {
 		};
 	};
 
-  const rng_reseed = async (seed: BigNumberish, salt: BigNumberish, mocked: Array<models.MockedValue>) => {
+	const rng_reseed = async (seed: BigNumberish, salt: BigNumberish, mocked: Array<models.MockedValue>) => {
 		try {
 			return await provider.call("pistols", build_rng_reseed_calldata(seed, salt, mocked));
 		} catch (error) {
@@ -4621,12 +4705,18 @@ export function setupWorld(provider: DojoProvider) {
 			buildVelordsMigratePacksCalldata: build_admin_velordsMigratePacks_calldata,
 			velordsMigratePools: admin_velordsMigratePools,
 			buildVelordsMigratePoolsCalldata: build_admin_velordsMigratePools_calldata,
+			velordsMigratePools2: admin_velordsMigratePools2,
+			buildVelordsMigratePools2Calldata: build_admin_velordsMigratePools2_calldata,
 			velordsMigrateRankedChallenges: admin_velordsMigrateRankedChallenges,
 			buildVelordsMigrateRankedChallengesCalldata: build_admin_velordsMigrateRankedChallenges_calldata,
 			velordsMigrateRankedDuelists: admin_velordsMigrateRankedDuelists,
 			buildVelordsMigrateRankedDuelistsCalldata: build_admin_velordsMigrateRankedDuelists_calldata,
+			velordsMigrateRankedDuelists2: admin_velordsMigrateRankedDuelists2,
+			buildVelordsMigrateRankedDuelists2Calldata: build_admin_velordsMigrateRankedDuelists2_calldata,
 		},
 		bank: {
+			burnFame: bank_burnFame,
+			buildBurnFameCalldata: build_bank_burnFame_calldata,
 			canCollectSeason: bank_canCollectSeason,
 			buildCanCollectSeasonCalldata: build_bank_canCollectSeason_calldata,
 			chargeLordsPurchase: bank_chargeLordsPurchase,
@@ -4995,6 +5085,8 @@ export function setupWorld(provider: DojoProvider) {
 			buildOwnerOfCalldata: build_pack_token_ownerOf_calldata,
 			purchase: pack_token_purchase,
 			buildPurchaseCalldata: build_pack_token_purchase_calldata,
+			purchaseRandom: pack_token_purchaseRandom,
+			buildPurchaseRandomCalldata: build_pack_token_purchaseRandom_calldata,
 			royaltyInfo: pack_token_royaltyInfo,
 			buildRoyaltyInfoCalldata: build_pack_token_royaltyInfo_calldata,
 			safeTransferFrom: pack_token_safeTransferFrom,
