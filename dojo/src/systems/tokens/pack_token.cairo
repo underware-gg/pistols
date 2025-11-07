@@ -64,6 +64,7 @@ pub trait IPackToken<TState> {
     fn claim_starter_pack(ref self: TState, referrer_address: ContractAddress) -> Span<u128>;
     fn claim_gift(ref self: TState) -> Span<u128>;
     fn purchase(ref self: TState, pack_type: PackType, quantity: usize) -> Span<u128>;
+    fn purchase_random(ref self: TState) -> u128;
     fn open(ref self: TState, pack_id: u128) -> Span<u128>;
     fn mint_to(ref self: TState, recipient: ContractAddress) -> u128;
     fn airdrop(ref self: TState, recipient: ContractAddress, pack_type: PackType, duelist_profile: Option<DuelistProfile>, quantity: usize) -> Span<u128>;
@@ -81,6 +82,7 @@ pub trait IPackTokenPublic<TState> {
     fn claim_starter_pack(ref self: TState, referrer_address: ContractAddress) -> Span<u128>; //@description: Claim the starter pack, mint Duelists
     fn claim_gift(ref self: TState) -> Span<u128>; //@description: Claim gift pack, if available
     fn purchase(ref self: TState, pack_type: PackType, quantity: usize) -> Span<u128>; //@description: Purchase packs
+    fn purchase_random(ref self: TState) -> u128;
     fn open(ref self: TState, pack_id: u128) -> Span<u128>; //@description: Open a pack, mint its contents
     // admin functions
     fn mint_to(ref self: TState, recipient: ContractAddress) -> u128; //@description: Promotional airdrops (admin)
@@ -95,6 +97,7 @@ pub trait IPackTokenProtected<TState> {
 
 #[dojo::contract]
 pub mod pack_token {
+    use core::num::traits::{Bounded, Zero};
     use starknet::{ContractAddress};
     use dojo::world::{WorldStorage};
 
@@ -304,40 +307,56 @@ pub mod pack_token {
 
         fn purchase(ref self: ContractState, pack_type: PackType, quantity: usize) -> Span<u128> {
             let mut store: Store = StoreTrait::new(self.world_default());
-
-            // validate pack
-            assert(pack_type.can_purchase(), Errors::NOT_FOR_SALE);
-
-            // validate recipient
             let recipient: ContractAddress = starknet::get_caller_address();
-            assert(!self.can_claim_starter_pack(recipient), Errors::CLAIM_FIRST);
 
             // create vrf seed
             let seed: felt252 = store.vrf_dispatcher().consume_random(Source::Nonce(recipient));
-
+            
             // calculate price
             let lords_per_pack: u128 = self.calc_mint_fee(recipient, pack_type);
+            
+            // purchase and return pack ids
+            (self._purchase(ref store, pack_type, lords_per_pack, quantity, recipient, seed))
+        }
 
-            // mint packs
-            let pack_ids: Array<u128> = self._mint_multiple_packs(ref store,
-                pack_type,
-                Option::None, // duelist_profile
-                lords_per_pack,
-                quantity,
-                recipient,
-                seed,
-                false,
-            );
+        fn purchase_random(ref self: ContractState) -> u128 {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let recipient: ContractAddress = starknet::get_caller_address();
+            
+            // create vrf seed
+            let seed: felt252 = store.vrf_dispatcher().consume_random(Source::Nonce(recipient));
 
-            // transfer mint fees
-            store.world.bank_protected_dispatcher().charge_lords_purchase(
-                starknet::get_contract_address(),
-                pack_ids.clone(),
-                recipient,
-                (lords_per_pack * quantity.into()),
-            );
+            // randomize pack type
+            let available_packs: Span<(PackType, u128)> = array![
+                (PackType::GenesisDuelists5x, 75),
+                (PackType::PiratesDuelists5x, 100),
+            ].span();
 
-            (pack_ids.span())
+            // calculate price (minimum price from available packs)
+            let mut lords_per_pack: u128 = Bounded::MAX;
+            for i in 0..available_packs.len() {
+                let (pack_type, _) = *available_packs[i];
+                let price: u128 = self.calc_mint_fee(recipient, pack_type);
+                if (price < lords_per_pack) {
+                    lords_per_pack = price;
+                }
+            }
+
+            // randomize pack type
+            let s: u256 = seed.into();
+            let r: u128 = ((s.low / 0x100) % 100);
+            let mut selected_pack: PackType = PackType::Unknown;
+            for i in 0..available_packs.len() {
+                let (pack_type, chances) = *available_packs[i];
+                if (r < chances) {
+                    selected_pack = pack_type;
+                    break;
+                }
+            }
+
+            // purchase and return pack id
+            let pack_ids: Span<u128> = self._purchase(ref store, selected_pack, lords_per_pack, 1, recipient, seed);
+            (*pack_ids[0])
         }
 
         fn mint_to(ref self: ContractState,
@@ -447,6 +466,41 @@ pub mod pack_token {
         fn _assert_caller_is_admin(self: @ContractState) {
             let mut world: WorldStorage = self.world_default();
             assert(world.admin_dispatcher().am_i_admin(starknet::get_caller_address()), Errors::CALLER_NOT_ADMIN);
+        }
+
+        fn _purchase(ref self: ContractState,
+            ref store: Store,
+            pack_type: PackType,
+            lords_per_pack: u128,
+            quantity: usize,
+            recipient: ContractAddress,
+            seed: felt252,
+        ) -> Span<u128> {
+            // validate pack
+            assert(pack_type.can_purchase(), Errors::NOT_FOR_SALE);
+            // validate recipient
+            assert(!self.can_claim_starter_pack(recipient), Errors::CLAIM_FIRST);
+
+            // mint packs
+            let pack_ids: Array<u128> = self._mint_multiple_packs(ref store,
+                pack_type,
+                Option::None, // duelist_profile
+                lords_per_pack,
+                quantity,
+                recipient,
+                seed,
+                false,
+            );
+
+            // transfer mint fees
+            store.world.bank_protected_dispatcher().charge_lords_purchase(
+                starknet::get_contract_address(),
+                pack_ids.clone(),
+                recipient,
+                (lords_per_pack * quantity.into()),
+            );
+
+            (pack_ids.span())
         }
 
         fn _airdrop(ref self: ContractState,

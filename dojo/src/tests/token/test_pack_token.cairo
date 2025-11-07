@@ -268,6 +268,45 @@ fn test_claim_purchase_multiple() {
     pool_peg_fame = tester::assert_balance_equal(sys.store.get_pool(PoolType::FamePeg).balance_fame, pool_peg_fame, "pool_peg_fame PURCHASE");
 }
 
+
+#[test]
+fn test_claim_purchase_random() {
+    let mut sys: TestSystems = setup(0);
+
+    let quantity: u8 = 10;
+    let recipient: ContractAddress = OTHER();
+    let price: u128 = sys.pack.calc_mint_fee(recipient, PackType::GenesisDuelists5x);
+    tester::impersonate(recipient);
+    tester::execute_lords_approve(@sys.lords, recipient, sys.bank.contract_address, price * quantity.into());
+    tester::execute_claim_starter_pack(@sys, recipient);
+
+    // mint a bunch
+    let mut count_genesis: usize = 0;
+    let mut count_pirates: usize = 0;
+    for _ in 0..quantity {
+        let pack_id: u128 = tester::execute_pack_purchase_random(@sys, recipient);
+        let pack: Pack = sys.store.get_pack(pack_id);
+        match (pack.pack_type) {
+            PackType::GenesisDuelists5x => {
+                count_genesis += 1;
+            },
+            PackType::PiratesDuelists5x => {
+                count_pirates += 1;
+            },
+            _ => {
+                assert!(false, "invalid pack type!!!");
+            }
+        }
+    }
+// println!("count_genesis:{}", count_genesis);
+// println!("count_pirates:{}", count_pirates);
+    assert_eq!(sys.pack.total_supply(), quantity.into(), "total_supply");
+    assert_eq!(sys.pack.balance_of(recipient), quantity.into(), "balance_of");
+    assert_gt!(count_genesis, 0, "count_genesis");
+    assert_gt!(count_pirates, 0, "count_pirates");
+    assert_gt!(count_genesis, count_pirates.into(), "count_genesis > count_pirates");
+}
+
 #[test]
 fn test_claim_referrer() {
     let mut sys: TestSystems = setup(0);
