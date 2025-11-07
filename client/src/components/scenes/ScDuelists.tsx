@@ -88,16 +88,18 @@ export default function ScDuelists() {
   }, [itemClicked, timestamp])
 
   useEffect(() => {
-    if (selectedMode) {
-      (_currentScene as InteractibleScene).setLayerVariant(TextureName.bg_duelists_matchmaking_unranked, selectedMode)
-    }
-    if (selectedMode === 'singleplayer' && lastSelectedModeRef.current !== 'singleplayer') {
-      setTimeout(() => {
+    const timeout = setTimeout(() => {
+      if (selectedMode && _currentScene && _currentScene instanceof InteractibleScene) {
+        (_currentScene as InteractibleScene).setLayerVariant(TextureName.bg_duelists_matchmaking_unranked, selectedMode)
+      }
+      if (selectedMode === 'singleplayer' && lastSelectedModeRef.current !== 'singleplayer') {
         dispatchChallengingPlayerAddress(botPlayerContractAddress);
         duelistSelectOpener.open();
-      }, 300)
-    }
-    lastSelectedModeRef.current = selectedMode
+      }
+      lastSelectedModeRef.current = selectedMode
+    }, 0)
+
+    return () => clearTimeout(timeout)
   }, [selectedMode])
 
   const [pageNumber, setPageNumber] = useState(0)
