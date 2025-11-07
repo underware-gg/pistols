@@ -416,6 +416,7 @@ function PackTypeSelector({
     constants.PackType.FreeGenesis5x,
     constants.PackType.FreeDuelist,
     constants.PackType.SingleDuelist,
+    constants.PackType.FreePirates5x,
   ].map((p) => ({
     key: `${p}`,
     value: `${p}`,

@@ -8,6 +8,7 @@ import {
   BotKey,
   GenesisKey,
   LegendsKey,
+  PiratesKey,
   getCharacterKeyValue,
   getCharacterKeyFromValue,
   getBotKeyValue,
@@ -16,11 +17,14 @@ import {
   getGenesisKeyFromValue,
   getLegendsKeyValue,
   getLegendsKeyFromValue,
+  getPiratesKeyValue,
+  getPiratesKeyFromValue,
   COLLECTIONS,
   GENESIS_PROFILES,
   CHARACTER_PROFILES,
   BOT_PROFILES,
   LEGENDS_PROFILES,
+  PIRATES_PROFILES,
 } from '../generated/constants'
 
 
@@ -28,7 +32,7 @@ import {
 // (duelist_profile.cairo)
 //
 
-export type DuelistProfileKey = GenesisKey | CharacterKey | BotKey | LegendsKey;
+export type DuelistProfileKey = GenesisKey | CharacterKey | BotKey | LegendsKey | PiratesKey;
 
 // get numeric ID from profile key (string)
 export const getProfileId = (profileType: DuelistProfile, profileKey: DuelistProfileKey): number => {
@@ -37,6 +41,7 @@ export const getProfileId = (profileType: DuelistProfile, profileKey: DuelistPro
     case DuelistProfile.Character: return getCharacterKeyValue(profileKey as CharacterKey);
     case DuelistProfile.Bot: return getBotKeyValue(profileKey as BotKey);
     case DuelistProfile.Legends: return getLegendsKeyValue(profileKey as LegendsKey);
+    case DuelistProfile.Pirates: return getPiratesKeyValue(profileKey as PiratesKey);
     default: return 0;
   };
 }
@@ -48,6 +53,7 @@ export const getProfileKey = (profileType: DuelistProfile, profileId: number): D
     case DuelistProfile.Character: return getCharacterKeyFromValue(profileId);
     case DuelistProfile.Bot: return getBotKeyFromValue(profileId);
     case DuelistProfile.Legends: return getLegendsKeyFromValue(profileId);
+    case DuelistProfile.Pirates: return getPiratesKeyFromValue(profileId);
     default: return CharacterKey.Unknown;
   };
 }
@@ -72,6 +78,7 @@ export const getProfileDescriptor = (profileType: DuelistProfile, profileKey: Du
     case DuelistProfile.Character: return CHARACTER_PROFILES[profileKey as CharacterKey];
     case DuelistProfile.Bot: return BOT_PROFILES[profileKey as BotKey];
     case DuelistProfile.Legends: return LEGENDS_PROFILES[profileKey as LegendsKey];
+    case DuelistProfile.Pirates: return PIRATES_PROFILES[profileKey as PiratesKey];
     default: return CHARACTER_PROFILES[CharacterKey.Unknown];
   };
 }
@@ -83,6 +90,7 @@ export const makeCharacterDuelistId = (profileType: DuelistProfile, profileKey: 
       case DuelistProfile.Character: return getCharacterKeyValue(profileKey as CharacterKey);
       case DuelistProfile.Bot: return getBotKeyValue(profileKey as BotKey);
       case DuelistProfile.Legends: return getLegendsKeyValue(profileKey as LegendsKey);
+      case DuelistProfile.Pirates: return getPiratesKeyValue(profileKey as PiratesKey);
       default: return 0;
     };
   };
@@ -106,6 +114,7 @@ const profileKeys: Record<DuelistProfile, DuelistProfileKey[]> = {
   [DuelistProfile.Bot]: Object.keys(BOT_PROFILES).map((k) => k) as BotKey[],
   [DuelistProfile.Genesis]: Object.keys(GENESIS_PROFILES).map((k) => k) as GenesisKey[],
   [DuelistProfile.Legends]: Object.keys(LEGENDS_PROFILES).map((k) => k) as LegendsKey[],
+  [DuelistProfile.Pirates]: Object.keys(PIRATES_PROFILES).map((k) => k) as PiratesKey[],
 };
 
 export const getCollectionProfileKeys = (profileType: DuelistProfile): DuelistProfileKey[] => {
@@ -208,6 +217,25 @@ const legendsQuotes: Record<LegendsKey, string> = {
   [LegendsKey.Unknown]: "...",
   [LegendsKey.TGC1]: "Gold buys lead, lead buys death, death buys gold, so give me your gold, or die.",
   [LegendsKey.TGC2]: "Whether by grape or grapeshot, the soil will drink its fill of red this angry morn.",
+  [LegendsKey.Cumberlord]: "...",
+  [LegendsKey.JulianTryhard]: "...",
+};
+const piratesQuotes: Record<PiratesKey, string> = {
+  [PiratesKey.Unknown]: "...",
+  [PiratesKey.ArdineTideborn]: "Follow my lead, or be dead by dawn. Your choice.",
+  [PiratesKey.CaptainEtienne]: "The fog stole my crew, but I won't leave without my revenge.",
+  [PiratesKey.CaptainGarran]: "I took this coat from a court magician. Still has some of his blood on it.",
+  [PiratesKey.CorsairKojo]: "Unlike you Diego, I need no ship. The beasts of the deep call me brother.",
+  [PiratesKey.Diego]: "Kraken or not Kojo, a shot to the head and you'll die all the same.",
+  [PiratesKey.Mirella]: "Let it all burn!",
+  [PiratesKey.GunnerFinnan]: "Have you ever wondered if the sea dreams of drowning the sky?",
+  [PiratesKey.Ingrid]: "The sea remembers warmth the way that I remember kindness. Faintly, and with regret.",
+  [PiratesKey.RaiderBjorn]: "I was born in a squall, and I'll die in one.",
+  [PiratesKey.Reika]: "Their singing is beautiful, but I much prefer the silence afterwards.",
+  [PiratesKey.SableTideborn]: "My sister commands men. I kill those who cross her.",
+  [PiratesKey.AbyssalAdmiral]: "Fool! Even the leviathan trembles at my wrath, who are you to defy me?",
+  [PiratesKey.SeaWitch]: "None who seek answers in the shoal return unchanged.",
+  [PiratesKey.Asha]: "There is no such thing as an unbreakable vault, only an impatient thief.",
 };
 
 export const getProfileQuote = (profileType: DuelistProfile, profileKey: DuelistProfileKey): string => {
@@ -216,6 +244,7 @@ export const getProfileQuote = (profileType: DuelistProfile, profileKey: Duelist
     case DuelistProfile.Bot: return botQuotes[profileKey as BotKey];
     case DuelistProfile.Genesis: return genesisQuotes[profileKey as GenesisKey];
     case DuelistProfile.Legends: return legendsQuotes[profileKey as LegendsKey];
+    case DuelistProfile.Pirates: return piratesQuotes[profileKey as PiratesKey];
     default: return 'Male';
   };
 }
@@ -316,6 +345,25 @@ const legendsGenders: Record<LegendsKey, DuelistGender> = {
   [LegendsKey.Unknown]: 'Male',
   [LegendsKey.TGC1]: 'Male',
   [LegendsKey.TGC2]: 'Male',
+  [LegendsKey.Cumberlord]: 'Male',
+  [LegendsKey.JulianTryhard]: 'Male',
+};
+const piratesGenders: Record<PiratesKey, DuelistGender> = {
+  [PiratesKey.Unknown]: 'Male',
+  [PiratesKey.ArdineTideborn]: 'Female',
+  [PiratesKey.CaptainEtienne]: 'Male',
+  [PiratesKey.CaptainGarran]: 'Male',
+  [PiratesKey.CorsairKojo]: 'Male',
+  [PiratesKey.Diego]: 'Male',
+  [PiratesKey.Mirella]: 'Female',
+  [PiratesKey.GunnerFinnan]: 'Male',
+  [PiratesKey.Ingrid]: 'Female',
+  [PiratesKey.RaiderBjorn]: 'Male',
+  [PiratesKey.Reika]: 'Female',
+  [PiratesKey.SableTideborn]: 'Female',
+  [PiratesKey.AbyssalAdmiral]: 'Male',
+  [PiratesKey.SeaWitch]: 'Female',
+  [PiratesKey.Asha]: 'Female',
 };
 
 export const getProfileGender = (profileType: DuelistProfile, profileKey: DuelistProfileKey): DuelistGender => {
@@ -324,6 +372,7 @@ export const getProfileGender = (profileType: DuelistProfile, profileKey: Duelis
     case DuelistProfile.Bot: return botGenders[profileKey as BotKey];
     case DuelistProfile.Genesis: return genesisGenders[profileKey as GenesisKey];
     case DuelistProfile.Legends: return legendsGenders[profileKey as LegendsKey];
+    case DuelistProfile.Pirates: return piratesGenders[profileKey as PiratesKey];
     default: return 'Male';
   };
 }

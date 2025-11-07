@@ -26,9 +26,11 @@ export default function ProfilesTestPage() {
       <Container>
         <TestPageMenu />
         <br />
+        <Profiles profiles={constants.GENESIS_PROFILES as unknown as Profiles} profileType={constants.DuelistProfile.Genesis} />
+        <br />
         <Profiles profiles={constants.LEGENDS_PROFILES as unknown as Profiles} profileType={constants.DuelistProfile.Legends} />
         <br />
-        <Profiles profiles={constants.GENESIS_PROFILES as unknown as Profiles} profileType={constants.DuelistProfile.Genesis} />
+        <Profiles profiles={constants.PIRATES_PROFILES as unknown as Profiles} profileType={constants.DuelistProfile.Pirates} />
         <br />
         <Profiles profiles={constants.CHARACTER_PROFILES as unknown as Profiles} profileType={constants.DuelistProfile.Character} />
         <br />
