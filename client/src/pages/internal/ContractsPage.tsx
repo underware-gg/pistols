@@ -139,13 +139,13 @@ function ContractRow({
         {`Pistols at Dawn ${_description}`}
       </Cell>
       <Cell>
-        <ExplorerLink address={_address} cartridge />
-      </Cell>
-      <Cell>
         <ExplorerLink address={_address} voyager />
       </Cell>
       <Cell>
         <ExplorerLink address={_address} starkscan />
+      </Cell>
+      <Cell>
+        <ExplorerLink address={_address} cartridge />
       </Cell>
       <Cell>
         {/* <ExplorerLink address={_address} viewblock /> */}
