@@ -1,6 +1,6 @@
 {
-  "version": "b2ae405511a6",
-  "generatedAt": 1762274011778,
+  "version": "e8a9056df01e",
+  "generatedAt": 1762524022261,
   "assets": {
     "audioBiodecaySong6Mp3": {
       "path": "/audio/biodecay-song6.mp3",
@@ -432,1003 +432,1003 @@
       "path": "/images/scenes/crypt/bg_graveyard_items.ktx2",
       "hash": "v1_cd51ec4fb58dc5f4",
       "size": 99612,
-      "mtime": 1762273818261
+      "mtime": 1762274038796
     },
     "imagesScenesCryptBgGraveyardItemsPng": {
       "path": "/images/scenes/crypt/bg_graveyard_items.png",
       "hash": "v1_5dabf10f977270ad",
       "size": 70763,
-      "mtime": 1762273818262
+      "mtime": 1762274038797
     },
     "imagesScenesCryptBgGraveyardItemsMaskKtx2": {
       "path": "/images/scenes/crypt/bg_graveyard_items_mask.ktx2",
       "hash": "v1_a7759d94a2575be9",
       "size": 14887,
-      "mtime": 1762273818264
+      "mtime": 1762274038797
     },
     "imagesScenesCryptBgGraveyardItemsMaskPng": {
       "path": "/images/scenes/crypt/bg_graveyard_items_mask.png",
       "hash": "v1_d86b1fe208b2c4de",
       "size": 16341,
-      "mtime": 1762273818265
+      "mtime": 1762274038798
     },
     "imagesScenesDoorBgDoorBackgroundKtx2": {
       "path": "/images/scenes/door/bg_door_background.ktx2",
       "hash": "v1_d06e77d00db95013",
       "size": 4787,
-      "mtime": 1762273818265
+      "mtime": 1762274038798
     },
     "imagesScenesDoorBgDoorBackgroundPng": {
       "path": "/images/scenes/door/bg_door_background.png",
       "hash": "v1_dc6dfccd243baead",
       "size": 14083,
-      "mtime": 1762273818266
+      "mtime": 1762274038799
     },
     "imagesScenesDoorBgDoorDoorKtx2": {
       "path": "/images/scenes/door/bg_door_door.ktx2",
       "hash": "v1_3b00cc8106f32670",
       "size": 738957,
-      "mtime": 1762273818280
+      "mtime": 1762274038799
     },
     "imagesScenesDoorBgDoorDoorPng": {
       "path": "/images/scenes/door/bg_door_door.png",
       "hash": "v1_aacca8409e919d51",
       "size": 539929,
-      "mtime": 1762273818282
+      "mtime": 1762274038802
     },
     "imagesScenesDoorBgDoorFaceKtx2": {
       "path": "/images/scenes/door/bg_door_face.ktx2",
       "hash": "v1_cb7f205714e3c915",
       "size": 359088,
-      "mtime": 1762273818283
+      "mtime": 1762274038803
     },
     "imagesScenesDoorBgDoorFacePng": {
       "path": "/images/scenes/door/bg_door_face.png",
       "hash": "v1_bcfcb0399c69d0e4",
       "size": 258076,
-      "mtime": 1762273818285
+      "mtime": 1762274038805
     },
     "imagesScenesDoorBgDoorFaceAngryKtx2": {
       "path": "/images/scenes/door/bg_door_face_angry.ktx2",
       "hash": "v1_94d06a27b3ec272f",
       "size": 163874,
-      "mtime": 1762273818286
+      "mtime": 1762274038805
     },
     "imagesScenesDoorBgDoorFaceAngryPng": {
       "path": "/images/scenes/door/bg_door_face_angry.png",
       "hash": "v1_1c88ab24309a7905",
       "size": 112638,
-      "mtime": 1762273818288
+      "mtime": 1762274038807
     },
     "imagesScenesDoorBgDoorFaceAngryBlinkKtx2": {
       "path": "/images/scenes/door/bg_door_face_angry_blink.ktx2",
       "hash": "v1_4e7f12e676bb578b",
       "size": 155787,
-      "mtime": 1762273818289
+      "mtime": 1762274038808
     },
     "imagesScenesDoorBgDoorFaceAngryBlinkPng": {
       "path": "/images/scenes/door/bg_door_face_angry_blink.png",
       "hash": "v1_f7eefdb4e2e424e8",
       "size": 112083,
-      "mtime": 1762273818291
+      "mtime": 1762274038809
     },
     "imagesScenesDoorBgDoorFaceBlinkKtx2": {
       "path": "/images/scenes/door/bg_door_face_blink.ktx2",
       "hash": "v1_ba8fb94e8df1c11e",
       "size": 354931,
-      "mtime": 1762273818293
+      "mtime": 1762274038811
     },
     "imagesScenesDoorBgDoorFaceBlinkPng": {
       "path": "/images/scenes/door/bg_door_face_blink.png",
       "hash": "v1_9f0cf715e45139cd",
       "size": 262613,
-      "mtime": 1762273818296
+      "mtime": 1762274038814
     },
     "imagesScenesDuelistsBgDuelistsBackgroundKtx2": {
       "path": "/images/scenes/duelists/bg_duelists_background.ktx2",
       "hash": "v1_4b8b86f7ebe94536",
       "size": 678352,
-      "mtime": 1762273818298
+      "mtime": 1762274038816
     },
     "imagesScenesDuelistsBgDuelistsBackgroundPng": {
       "path": "/images/scenes/duelists/bg_duelists_background.png",
       "hash": "v1_74092c5ed268d223",
       "size": 584306,
-      "mtime": 1762273818302
+      "mtime": 1762274038819
     },
     "imagesScenesDuelistsBgDuelistsItemsKtx2": {
       "path": "/images/scenes/duelists/bg_duelists_items.ktx2",
       "hash": "v1_b9d599d5c8374cf6",
       "size": 41916,
-      "mtime": 1762273818303
+      "mtime": 1762274038819
     },
     "imagesScenesDuelistsBgDuelistsItemsPng": {
       "path": "/images/scenes/duelists/bg_duelists_items.png",
       "hash": "v1_631a429c4b554a3d",
       "size": 31533,
-      "mtime": 1762273818305
+      "mtime": 1762274038821
     },
     "imagesScenesDuelistsBgDuelistsItemsMaskKtx2": {
       "path": "/images/scenes/duelists/bg_duelists_items_mask.ktx2",
       "hash": "v1_7641a09d4c036b88",
       "size": 6909,
-      "mtime": 1762273818305
+      "mtime": 1762274038821
     },
     "imagesScenesDuelistsBgDuelistsItemsMaskPng": {
       "path": "/images/scenes/duelists/bg_duelists_items_mask.png",
       "hash": "v1_9e06227359996891",
       "size": 7452,
-      "mtime": 1762273818306
+      "mtime": 1762274038821
     },
     "imagesScenesDuelistsBgDuelistsMatchmakingMaskKtx2": {
       "path": "/images/scenes/duelists/bg_duelists_matchmaking_mask.ktx2",
       "hash": "v1_60f22aec2e815be9",
       "size": 8108,
-      "mtime": 1762273818306
+      "mtime": 1762274038821
     },
     "imagesScenesDuelistsBgDuelistsMatchmakingMaskPng": {
       "path": "/images/scenes/duelists/bg_duelists_matchmaking_mask.png",
       "hash": "v1_6b36d083e9d9c5bc",
       "size": 7648,
-      "mtime": 1762273818306
+      "mtime": 1762274038821
     },
     "imagesScenesDuelistsBgDuelistsMatchmakingRankedKtx2": {
       "path": "/images/scenes/duelists/bg_duelists_matchmaking_ranked.ktx2",
       "hash": "v1_391264645e6b12e4",
       "size": 143861,
-      "mtime": 1762273818307
+      "mtime": 1762274038822
     },
     "imagesScenesDuelistsBgDuelistsMatchmakingRankedPng": {
       "path": "/images/scenes/duelists/bg_duelists_matchmaking_ranked.png",
       "hash": "v1_dad80d2191466e56",
       "size": 227974,
-      "mtime": 1762273818309
+      "mtime": 1762274038823
     },
     "imagesScenesDuelistsBgDuelistsMatchmakingSingleplayerKtx2": {
       "path": "/images/scenes/duelists/bg_duelists_matchmaking_singleplayer.ktx2",
       "hash": "v1_80bcd4c1f99a35d9",
       "size": 141735,
-      "mtime": 1762273818309
+      "mtime": 1762274038824
     },
     "imagesScenesDuelistsBgDuelistsMatchmakingSingleplayerPng": {
       "path": "/images/scenes/duelists/bg_duelists_matchmaking_singleplayer.png",
       "hash": "v1_3fe68236b0ef1f93",
       "size": 222886,
-      "mtime": 1762273818311
+      "mtime": 1762274038825
     },
     "imagesScenesDuelistsBgDuelistsMatchmakingUnrankedKtx2": {
       "path": "/images/scenes/duelists/bg_duelists_matchmaking_unranked.ktx2",
       "hash": "v1_0c0d66c20b1b52f8",
       "size": 141897,
-      "mtime": 1762273818312
+      "mtime": 1762274038826
     },
     "imagesScenesDuelistsBgDuelistsMatchmakingUnrankedPng": {
       "path": "/images/scenes/duelists/bg_duelists_matchmaking_unranked.png",
       "hash": "v1_b5b3c9af6e36f39f",
       "size": 216709,
-      "mtime": 1762273818314
+      "mtime": 1762274038829
     },
     "imagesScenesDuelistsBgDuelistsModeButtonKtx2": {
       "path": "/images/scenes/duelists/bg_duelists_mode_button.ktx2",
       "hash": "v1_5e6436afc0061b14",
       "size": 9748,
-      "mtime": 1762273818314
+      "mtime": 1762274038829
     },
     "imagesScenesDuelistsBgDuelistsModeButtonPng": {
       "path": "/images/scenes/duelists/bg_duelists_mode_button.png",
       "hash": "v1_d4e5852ae68bf8a1",
       "size": 33296,
-      "mtime": 1762273818315
+      "mtime": 1762274038830
     },
     "imagesScenesDuelistsBgDuelistsModeButtonMaskKtx2": {
       "path": "/images/scenes/duelists/bg_duelists_mode_button_mask.ktx2",
       "hash": "v1_e44a5c960f230eb1",
       "size": 2742,
-      "mtime": 1762273818315
+      "mtime": 1762274038830
     },
     "imagesScenesDuelistsBgDuelistsModeButtonMaskPng": {
       "path": "/images/scenes/duelists/bg_duelists_mode_button_mask.png",
       "hash": "v1_2399283874e23654",
       "size": 3893,
-      "mtime": 1762273818316
+      "mtime": 1762274038830
     },
     "imagesScenesDuelistsBgDuelistsPistolKtx2": {
       "path": "/images/scenes/duelists/bg_duelists_pistol.ktx2",
       "hash": "v1_125f47421e295729",
       "size": 104714,
-      "mtime": 1762273818316
+      "mtime": 1762274038830
     },
     "imagesScenesDuelistsBgDuelistsPistolPng": {
       "path": "/images/scenes/duelists/bg_duelists_pistol.png",
       "hash": "v1_d4a0b9abf57a5534",
       "size": 62276,
-      "mtime": 1762273818317
+      "mtime": 1762274038831
     },
     "imagesScenesDuelistsBgDuelistsPistolMaskKtx2": {
       "path": "/images/scenes/duelists/bg_duelists_pistol_mask.ktx2",
       "hash": "v1_c08c9d93b05fdefe",
       "size": 13822,
-      "mtime": 1762273818317
+      "mtime": 1762274038832
     },
     "imagesScenesDuelistsBgDuelistsPistolMaskPng": {
       "path": "/images/scenes/duelists/bg_duelists_pistol_mask.png",
       "hash": "v1_6a83840798917774",
       "size": 11722,
-      "mtime": 1762273818318
+      "mtime": 1762274038832
     },
     "imagesScenesDuelistsBgDuelistsTutorialKtx2": {
       "path": "/images/scenes/duelists/bg_duelists_tutorial.ktx2",
       "hash": "v1_3be5a8f64ce5c921",
       "size": 28843,
-      "mtime": 1762273818318
+      "mtime": 1762274038832
     },
     "imagesScenesDuelistsBgDuelistsTutorialPng": {
       "path": "/images/scenes/duelists/bg_duelists_tutorial.png",
       "hash": "v1_ae3c78d5bda15d09",
       "size": 24094,
-      "mtime": 1762273818319
+      "mtime": 1762274038833
     },
     "imagesScenesDuelistsBgDuelistsTutorialMaskKtx2": {
       "path": "/images/scenes/duelists/bg_duelists_tutorial_mask.ktx2",
       "hash": "v1_ec19441a619329ef",
       "size": 7664,
-      "mtime": 1762273818320
+      "mtime": 1762274038833
     },
     "imagesScenesDuelistsBgDuelistsTutorialMaskPng": {
       "path": "/images/scenes/duelists/bg_duelists_tutorial_mask.png",
       "hash": "v1_faf2c3c088f19054",
       "size": 7106,
-      "mtime": 1762273818320
+      "mtime": 1762274038833
     },
     "imagesScenesDuelsBoardBgDuelsBackgroundKtx2": {
       "path": "/images/scenes/duels_board/bg_duels_background.ktx2",
       "hash": "v1_0e54dbe636961313",
       "size": 618951,
-      "mtime": 1762273818322
+      "mtime": 1762274038834
     },
     "imagesScenesDuelsBoardBgDuelsBackgroundPng": {
       "path": "/images/scenes/duels_board/bg_duels_background.png",
       "hash": "v1_c46c1e195cd02465",
       "size": 425720,
-      "mtime": 1762273818324
+      "mtime": 1762274038836
     },
     "imagesScenesDuelsBoardBgDuelsItemsKtx2": {
       "path": "/images/scenes/duels_board/bg_duels_items.ktx2",
       "hash": "v1_5d90f31b1c68c801",
       "size": 84280,
-      "mtime": 1762273818324
+      "mtime": 1762274038837
     },
     "imagesScenesDuelsBoardBgDuelsItemsPng": {
       "path": "/images/scenes/duels_board/bg_duels_items.png",
       "hash": "v1_f44108cfaaca63a6",
       "size": 56619,
-      "mtime": 1762273818325
+      "mtime": 1762274038837
     },
     "imagesScenesDuelsBoardBgDuelsItemsMaskKtx2": {
       "path": "/images/scenes/duels_board/bg_duels_items_mask.ktx2",
       "hash": "v1_23bb06f734ab19c9",
       "size": 9266,
-      "mtime": 1762273818325
+      "mtime": 1762274038838
     },
     "imagesScenesDuelsBoardBgDuelsItemsMaskPng": {
       "path": "/images/scenes/duels_board/bg_duels_items_mask.png",
       "hash": "v1_6bd0a9e20ee2adf8",
       "size": 10718,
-      "mtime": 1762273818326
+      "mtime": 1762274038838
     },
     "imagesScenesDuelsBoardBgDuelsLightingPng": {
       "path": "/images/scenes/duels_board/bg_duels_lighting.png",
       "hash": "v1_bf35dfa5e4302c13",
       "size": 139078,
-      "mtime": 1762273818327
+      "mtime": 1762274038840
     },
     "imagesScenesGateBgEntranceBackgroundKtx2": {
       "path": "/images/scenes/gate/bg_entrance_background.ktx2",
       "hash": "v1_3a70894f8f409ab6",
       "size": 639389,
-      "mtime": 1762273818329
+      "mtime": 1762274038841
     },
     "imagesScenesGateBgEntranceBackgroundPng": {
       "path": "/images/scenes/gate/bg_entrance_background.png",
       "hash": "v1_06238c7bbdb8ea15",
       "size": 336974,
-      "mtime": 1762273818333
+      "mtime": 1762274038845
     },
     "imagesScenesGateBgEntranceDoorMaskKtx2": {
       "path": "/images/scenes/gate/bg_entrance_door_mask.ktx2",
       "hash": "v1_f34c3a01529ca941",
       "size": 8129,
-      "mtime": 1762273818334
+      "mtime": 1762274038845
     },
     "imagesScenesGateBgEntranceDoorMaskPng": {
       "path": "/images/scenes/gate/bg_entrance_door_mask.png",
       "hash": "v1_88ecb40092fda345",
       "size": 12182,
-      "mtime": 1762273818334
+      "mtime": 1762274038845
     },
     "imagesScenesGateBgEntranceFogBackgroundKtx2": {
       "path": "/images/scenes/gate/bg_entrance_fog_background.ktx2",
       "hash": "v1_d1fe1ddfa1685014",
       "size": 144276,
-      "mtime": 1762273818335
+      "mtime": 1762274038846
     },
     "imagesScenesGateBgEntranceFogBackgroundPng": {
       "path": "/images/scenes/gate/bg_entrance_fog_background.png",
       "hash": "v1_88bea752031f698c",
       "size": 121031,
-      "mtime": 1762273818336
+      "mtime": 1762274038847
     },
     "imagesScenesGateBgEntranceFogForegroundKtx2": {
       "path": "/images/scenes/gate/bg_entrance_fog_foreground.ktx2",
       "hash": "v1_4323f89d7b8e8891",
       "size": 203553,
-      "mtime": 1762273818337
+      "mtime": 1762274038847
     },
     "imagesScenesGateBgEntranceFogForegroundPng": {
       "path": "/images/scenes/gate/bg_entrance_fog_foreground.png",
       "hash": "v1_bd4ae2b2fb860726",
       "size": 157230,
-      "mtime": 1762273818338
+      "mtime": 1762274038848
     },
     "imagesScenesGateBgEntranceForegroundKtx2": {
       "path": "/images/scenes/gate/bg_entrance_foreground.ktx2",
       "hash": "v1_7567105cc720c93c",
       "size": 462876,
-      "mtime": 1762273818339
+      "mtime": 1762274038849
     },
     "imagesScenesGateBgEntranceForegroundPng": {
       "path": "/images/scenes/gate/bg_entrance_foreground.png",
       "hash": "v1_727e075b15de7d17",
       "size": 272981,
-      "mtime": 1762273818342
+      "mtime": 1762274038852
     },
     "imagesScenesGateBgEntrancePlayerKtx2": {
       "path": "/images/scenes/gate/bg_entrance_player.ktx2",
       "hash": "v1_95d46c31735d421c",
       "size": 155786,
-      "mtime": 1762273818342
+      "mtime": 1762274038852
     },
     "imagesScenesGateBgEntrancePlayerPng": {
       "path": "/images/scenes/gate/bg_entrance_player.png",
       "hash": "v1_25c628938627f2e0",
       "size": 98009,
-      "mtime": 1762273818343
+      "mtime": 1762274038853
     },
     "imagesScenesGateBgEntranceSignKtx2": {
       "path": "/images/scenes/gate/bg_entrance_sign.ktx2",
       "hash": "v1_e3d6ac98498da8a9",
       "size": 157094,
-      "mtime": 1762273818344
+      "mtime": 1762274038853
     },
     "imagesScenesGateBgEntranceSignPng": {
       "path": "/images/scenes/gate/bg_entrance_sign.png",
       "hash": "v1_e2be232c624652a5",
       "size": 112815,
-      "mtime": 1762273818345
+      "mtime": 1762274038855
     },
     "imagesScenesGateBgEntranceTavernKtx2": {
       "path": "/images/scenes/gate/bg_entrance_tavern.ktx2",
       "hash": "v1_5c0679faca4ad313",
       "size": 1911125,
-      "mtime": 1762273818351
+      "mtime": 1762274038856
     },
     "imagesScenesGateBgEntranceTavernPng": {
       "path": "/images/scenes/gate/bg_entrance_tavern.png",
       "hash": "v1_f71291ada90d3a55",
       "size": 1144171,
-      "mtime": 1762273818358
+      "mtime": 1762274038862
     },
     "imagesScenesLeaderboardsBgLeaderboardsKtx2": {
       "path": "/images/scenes/leaderboards/bg_leaderboards.ktx2",
       "hash": "v1_727c02ce53423bca",
       "size": 1567394,
-      "mtime": 1762273818362
+      "mtime": 1762274038864
     },
     "imagesScenesLeaderboardsBgLeaderboardsPng": {
       "path": "/images/scenes/leaderboards/bg_leaderboards.png",
       "hash": "v1_6f8399ef22e2875d",
       "size": 969939,
-      "mtime": 1762273818367
+      "mtime": 1762274038869
     },
     "imagesScenesLeaderboardsBgLeaderboardsSignPng": {
       "path": "/images/scenes/leaderboards/bg_leaderboards_sign.png",
       "hash": "v1_745f269d7b87d6bb",
       "size": 23791,
-      "mtime": 1762273818368
+      "mtime": 1762274038870
     },
     "imagesScenesLeaderboardsBgLeaderboardsSignForbiddenPng": {
       "path": "/images/scenes/leaderboards/bg_leaderboards_sign_forbidden.png",
       "hash": "v1_8e9c8110141e4076",
       "size": 40798,
-      "mtime": 1762273818368
+      "mtime": 1762274038871
     },
     "imagesScenesMatchmakingBgMatchmakingBellKtx2": {
       "path": "/images/scenes/matchmaking/bg_matchmaking_bell.ktx2",
       "hash": "v1_b1cb9d1b94dd3a9d",
       "size": 75863,
-      "mtime": 1762273818369
+      "mtime": 1762274038871
     },
     "imagesScenesMatchmakingBgMatchmakingBellPng": {
       "path": "/images/scenes/matchmaking/bg_matchmaking_bell.png",
       "hash": "v1_a781c28c43ce9c71",
       "size": 174308,
-      "mtime": 1762273818370
+      "mtime": 1762274038874
     },
     "imagesScenesMatchmakingBgMatchmakingBellMaskKtx2": {
       "path": "/images/scenes/matchmaking/bg_matchmaking_bell_mask.ktx2",
       "hash": "v1_1009799801e22b0f",
       "size": 6615,
-      "mtime": 1762273818371
+      "mtime": 1762274038874
     },
     "imagesScenesMatchmakingBgMatchmakingBellMaskPng": {
       "path": "/images/scenes/matchmaking/bg_matchmaking_bell_mask.png",
       "hash": "v1_9eee9efc6d8dcc16",
       "size": 6929,
-      "mtime": 1762273818372
+      "mtime": 1762274038874
     },
     "imagesScenesMatchmakingBgMatchmakingRankedKtx2": {
       "path": "/images/scenes/matchmaking/bg_matchmaking_ranked.ktx2",
       "hash": "v1_fab7651159481847",
       "size": 1104420,
-      "mtime": 1762273818375
+      "mtime": 1762274038877
     },
     "imagesScenesMatchmakingBgMatchmakingRankedPng": {
       "path": "/images/scenes/matchmaking/bg_matchmaking_ranked.png",
       "hash": "v1_abe987729eba1434",
       "size": 633570,
-      "mtime": 1762273818379
+      "mtime": 1762274038882
     },
     "imagesScenesMatchmakingBgMatchmakingUnrankedKtx2": {
       "path": "/images/scenes/matchmaking/bg_matchmaking_unranked.ktx2",
       "hash": "v1_ab36cdbcc4f03a18",
       "size": 1244574,
-      "mtime": 1762273818383
+      "mtime": 1762274038883
     },
     "imagesScenesMatchmakingBgMatchmakingUnrankedPng": {
       "path": "/images/scenes/matchmaking/bg_matchmaking_unranked.png",
       "hash": "v1_a8febfd6bfff400d",
       "size": 775276,
-      "mtime": 1762273818386
+      "mtime": 1762274038886
     },
     "imagesScenesProfileBgProfileBackgroundKtx2": {
       "path": "/images/scenes/profile/bg_profile_background.ktx2",
       "hash": "v1_f4295e44b0ae6a0c",
       "size": 1091850,
-      "mtime": 1762273818390
+      "mtime": 1762274038887
     },
     "imagesScenesProfileBgProfileBackgroundPng": {
       "path": "/images/scenes/profile/bg_profile_background.png",
       "hash": "v1_6c2aa0200e6b4bc0",
       "size": 711933,
-      "mtime": 1762273818394
+      "mtime": 1762274038891
     },
     "imagesScenesProfileBgProfileBookMaskKtx2": {
       "path": "/images/scenes/profile/bg_profile_book_mask.ktx2",
       "hash": "v1_d9670046fb684439",
       "size": 8635,
-      "mtime": 1762273818396
+      "mtime": 1762274038892
     },
     "imagesScenesProfileBgProfileBookMaskPng": {
       "path": "/images/scenes/profile/bg_profile_book_mask.png",
       "hash": "v1_b889d023191ef679",
       "size": 12290,
-      "mtime": 1762273818397
+      "mtime": 1762274038892
     },
     "imagesScenesProfileBgProfileChestMaskKtx2": {
       "path": "/images/scenes/profile/bg_profile_chest_mask.ktx2",
       "hash": "v1_de62bc26aedd4815",
       "size": 14211,
-      "mtime": 1762273818398
+      "mtime": 1762274038892
     },
     "imagesScenesProfileBgProfileChestMaskPng": {
       "path": "/images/scenes/profile/bg_profile_chest_mask.png",
       "hash": "v1_d6113aae57e8512c",
       "size": 17134,
-      "mtime": 1762273818398
+      "mtime": 1762274038892
     },
     "imagesScenesProfileBgProfileDoorMaskKtx2": {
       "path": "/images/scenes/profile/bg_profile_door_mask.ktx2",
       "hash": "v1_f6d78070d3fdd8c3",
       "size": 14560,
-      "mtime": 1762273818399
+      "mtime": 1762274038893
     },
     "imagesScenesProfileBgProfileDoorMaskPng": {
       "path": "/images/scenes/profile/bg_profile_door_mask.png",
       "hash": "v1_6a31872f83689bb4",
       "size": 18832,
-      "mtime": 1762273818399
+      "mtime": 1762274038893
     },
     "imagesScenesProfileBgProfileDoormanKtx2": {
       "path": "/images/scenes/profile/bg_profile_doorman.ktx2",
       "hash": "v1_e7e150a6802caa42",
       "size": 58042,
-      "mtime": 1762273818400
+      "mtime": 1762274038893
     },
     "imagesScenesProfileBgProfileDoormanPng": {
       "path": "/images/scenes/profile/bg_profile_doorman.png",
       "hash": "v1_da9d2e7b3a50a0ec",
       "size": 44093,
-      "mtime": 1762273818401
+      "mtime": 1762274038894
     },
     "imagesScenesProfileBgProfileItemsKtx2": {
       "path": "/images/scenes/profile/bg_profile_items.ktx2",
       "hash": "v1_d0950135eb082c1b",
       "size": 463847,
-      "mtime": 1762273818403
+      "mtime": 1762274038894
     },
     "imagesScenesProfileBgProfileItemsPng": {
       "path": "/images/scenes/profile/bg_profile_items.png",
       "hash": "v1_f1c2670abeb33a22",
       "size": 247606,
-      "mtime": 1762273818405
+      "mtime": 1762274038896
     },
     "imagesScenesProfileBgProfilePlayerKtx2": {
       "path": "/images/scenes/profile/bg_profile_player.ktx2",
       "hash": "v1_f65db0dab5479813",
       "size": 218114,
-      "mtime": 1762273818407
+      "mtime": 1762274038896
     },
     "imagesScenesProfileBgProfilePlayerPng": {
       "path": "/images/scenes/profile/bg_profile_player.png",
       "hash": "v1_9568c19181833d4f",
       "size": 151908,
-      "mtime": 1762273818409
+      "mtime": 1762274038897
     },
     "imagesScenesProfileBgProfileSkyKtx2": {
       "path": "/images/scenes/profile/bg_profile_sky.ktx2",
       "hash": "v1_e74897599b2bd598",
       "size": 927884,
-      "mtime": 1762273818412
+      "mtime": 1762274038898
     },
     "imagesScenesProfileBgProfileSkyPng": {
       "path": "/images/scenes/profile/bg_profile_sky.png",
       "hash": "v1_5d4561fdc103f0c4",
       "size": 516952,
-      "mtime": 1762273818416
+      "mtime": 1762274038901
     },
     "imagesScenesProfileBgProfileTableKtx2": {
       "path": "/images/scenes/profile/bg_profile_table.ktx2",
       "hash": "v1_0defbe1959595268",
       "size": 168247,
-      "mtime": 1762273818418
+      "mtime": 1762274038902
     },
     "imagesScenesProfileBgProfileTablePng": {
       "path": "/images/scenes/profile/bg_profile_table.png",
       "hash": "v1_f04fec7b5b707e99",
       "size": 88908,
-      "mtime": 1762273818418
+      "mtime": 1762274038902
     },
     "imagesScenesProfileCardpacksBgCardpackBoxKtx2": {
       "path": "/images/scenes/profile/cardpacks/bg_cardpack_box.ktx2",
       "hash": "v1_d612b62cfecfd08f",
       "size": 973083,
-      "mtime": 1762273818421
+      "mtime": 1762274038903
     },
     "imagesScenesProfileCardpacksBgCardpackBoxPng": {
       "path": "/images/scenes/profile/cardpacks/bg_cardpack_box.png",
       "hash": "v1_34b3a2cf8bb0f5fd",
       "size": 1136231,
-      "mtime": 1762273818425
+      "mtime": 1762274038911
     },
     "imagesScenesProfileCardpacksBgCardpackFrontBoxPng": {
       "path": "/images/scenes/profile/cardpacks/bg_cardpack_front_box.png",
       "hash": "v1_97faa29639c0db05",
       "size": 146244,
-      "mtime": 1762273818427
+      "mtime": 1762274038913
     },
     "imagesScenesProfileDuelistbookBgDuelistbookTableKtx2": {
       "path": "/images/scenes/profile/duelistbook/bg_duelistbook_table.ktx2",
       "hash": "v1_b22273158a25a58f",
       "size": 1393625,
-      "mtime": 1762273818431
+      "mtime": 1762274038915
     },
     "imagesScenesProfileDuelistbookBgDuelistbookTablePng": {
       "path": "/images/scenes/profile/duelistbook/bg_duelistbook_table.png",
       "hash": "v1_9d1b48411c0c0c42",
       "size": 1295486,
-      "mtime": 1762273818435
+      "mtime": 1762274038920
     },
     "imagesScenesSplashPistolsLoadingPng": {
       "path": "/images/scenes/splash/pistols_loading.png",
       "hash": "v1_610bfea0cdfaaa04",
       "size": 343611,
-      "mtime": 1762273818438
+      "mtime": 1762274038921
     },
     "imagesScenesTavernBgTavernBackgroundKtx2": {
       "path": "/images/scenes/tavern/bg_tavern_background.ktx2",
       "hash": "v1_2e0d02bc06b07b96",
       "size": 1159723,
-      "mtime": 1762273818442
+      "mtime": 1762274038922
     },
     "imagesScenesTavernBgTavernBackgroundPng": {
       "path": "/images/scenes/tavern/bg_tavern_background.png",
       "hash": "v1_d8bdc0d2c0a5a2d7",
       "size": 738056,
-      "mtime": 1762273818445
+      "mtime": 1762274038926
     },
     "imagesScenesTavernBgTavernBarKtx2": {
       "path": "/images/scenes/tavern/bg_tavern_bar.ktx2",
       "hash": "v1_e8667d3ae718f6a3",
       "size": 466955,
-      "mtime": 1762273818447
+      "mtime": 1762274038927
     },
     "imagesScenesTavernBgTavernBarPng": {
       "path": "/images/scenes/tavern/bg_tavern_bar.png",
       "hash": "v1_7e62181385115a57",
       "size": 265427,
-      "mtime": 1762273818449
+      "mtime": 1762274038931
     },
     "imagesScenesTavernBgTavernBartenderKtx2": {
       "path": "/images/scenes/tavern/bg_tavern_bartender.ktx2",
       "hash": "v1_50753a40e7c2ffb4",
       "size": 167150,
-      "mtime": 1762273818451
+      "mtime": 1762274038934
     },
     "imagesScenesTavernBgTavernBartenderPng": {
       "path": "/images/scenes/tavern/bg_tavern_bartender.png",
       "hash": "v1_c377d6948f16c701",
       "size": 120784,
-      "mtime": 1762273818452
+      "mtime": 1762274038936
     },
     "imagesScenesTavernBgTavernBartenderMaskKtx2": {
       "path": "/images/scenes/tavern/bg_tavern_bartender_mask.ktx2",
       "hash": "v1_a18832585812897d",
       "size": 15005,
-      "mtime": 1762273818453
+      "mtime": 1762274038937
     },
     "imagesScenesTavernBgTavernBartenderMaskPng": {
       "path": "/images/scenes/tavern/bg_tavern_bartender_mask.png",
       "hash": "v1_aedfee4630a4371c",
       "size": 15951,
-      "mtime": 1762273818454
+      "mtime": 1762274038937
     },
     "imagesScenesTavernBgTavernCryptMaskKtx2": {
       "path": "/images/scenes/tavern/bg_tavern_crypt_mask.ktx2",
       "hash": "v1_d55511d474b5353a",
       "size": 15744,
-      "mtime": 1762273818455
+      "mtime": 1762274038938
     },
     "imagesScenesTavernBgTavernCryptMaskPng": {
       "path": "/images/scenes/tavern/bg_tavern_crypt_mask.png",
       "hash": "v1_69786dae021ebd98",
       "size": 19794,
-      "mtime": 1762273818455
+      "mtime": 1762274038941
     },
     "imagesScenesTavernBgTavernPistolMaskKtx2": {
       "path": "/images/scenes/tavern/bg_tavern_pistol_mask.ktx2",
       "hash": "v1_2e5d5ad7377cedcb",
       "size": 11505,
-      "mtime": 1762273818456
+      "mtime": 1762274038942
     },
     "imagesScenesTavernBgTavernPistolMaskPng": {
       "path": "/images/scenes/tavern/bg_tavern_pistol_mask.png",
       "hash": "v1_408a6093a9331c57",
       "size": 11616,
-      "mtime": 1762273818456
+      "mtime": 1762274038943
     },
     "imagesScenesTavernBgTavernTrophyMaskKtx2": {
       "path": "/images/scenes/tavern/bg_tavern_trophy_mask.ktx2",
       "hash": "v1_18b79ff1141f2c92",
       "size": 10513,
-      "mtime": 1762273818457
+      "mtime": 1762274038943
     },
     "imagesScenesTavernBgTavernTrophyMaskPng": {
       "path": "/images/scenes/tavern/bg_tavern_trophy_mask.png",
       "hash": "v1_ee4db333f65e760c",
       "size": 14754,
-      "mtime": 1762273818458
+      "mtime": 1762274038943
     },
     "imagesScenesTutorialBarkeepBgBarkeepBackgroundKtx2": {
       "path": "/images/scenes/tutorial/barkeep/bg_barkeep_background.ktx2",
       "hash": "v1_6ff584cd713ecc47",
       "size": 1258812,
-      "mtime": 1762273818461
+      "mtime": 1762274038945
     },
     "imagesScenesTutorialBarkeepBgBarkeepBackgroundPng": {
       "path": "/images/scenes/tutorial/barkeep/bg_barkeep_background.png",
       "hash": "v1_71eb89fed5b8d280",
       "size": 679457,
-      "mtime": 1762273818466
+      "mtime": 1762274038951
     },
     "imagesScenesTutorialBarkeepBgBarkeepCrowdBackKtx2": {
       "path": "/images/scenes/tutorial/barkeep/bg_barkeep_crowd_back.ktx2",
       "hash": "v1_52ae8dc1e74cce14",
       "size": 271272,
-      "mtime": 1762273818468
+      "mtime": 1762274038954
     },
     "imagesScenesTutorialBarkeepBgBarkeepCrowdBackPng": {
       "path": "/images/scenes/tutorial/barkeep/bg_barkeep_crowd_back.png",
       "hash": "v1_ce22e4c3bccc4992",
       "size": 158378,
-      "mtime": 1762273818469
+      "mtime": 1762274038959
     },
     "imagesScenesTutorialBarkeepBgBarkeepCrowdFrontKtx2": {
       "path": "/images/scenes/tutorial/barkeep/bg_barkeep_crowd_front.ktx2",
       "hash": "v1_4ee755f32836d967",
       "size": 234226,
-      "mtime": 1762273818470
+      "mtime": 1762274038961
     },
     "imagesScenesTutorialBarkeepBgBarkeepCrowdFrontPng": {
       "path": "/images/scenes/tutorial/barkeep/bg_barkeep_crowd_front.png",
       "hash": "v1_f5d6810b54c3a12f",
       "size": 157790,
-      "mtime": 1762273818472
+      "mtime": 1762274038963
     },
     "imagesScenesTutorialBarkeepBgBarkeepPlayerKtx2": {
       "path": "/images/scenes/tutorial/barkeep/bg_barkeep_player.ktx2",
       "hash": "v1_c3ec468fd31fb975",
       "size": 256494,
-      "mtime": 1762273818473
+      "mtime": 1762274038964
     },
     "imagesScenesTutorialBarkeepBgBarkeepPlayerPng": {
       "path": "/images/scenes/tutorial/barkeep/bg_barkeep_player.png",
       "hash": "v1_b39fdfcd8b90333d",
       "size": 164428,
-      "mtime": 1762273818474
+      "mtime": 1762274038966
     },
     "imagesScenesTutorialBarkeepBgBarkeepTableKtx2": {
       "path": "/images/scenes/tutorial/barkeep/bg_barkeep_table.ktx2",
       "hash": "v1_4ec20b4b395553b3",
       "size": 88050,
-      "mtime": 1762273818474
+      "mtime": 1762274038966
     },
     "imagesScenesTutorialBarkeepBgBarkeepTablePng": {
       "path": "/images/scenes/tutorial/barkeep/bg_barkeep_table.png",
       "hash": "v1_a0f5937764b54345",
       "size": 59099,
-      "mtime": 1762273818475
+      "mtime": 1762274038967
     },
     "imagesScenesTutorialConflictBgConflictBackgroundKtx2": {
       "path": "/images/scenes/tutorial/conflict/bg_conflict_background.ktx2",
       "hash": "v1_683a5474de151850",
       "size": 813607,
-      "mtime": 1762273818477
+      "mtime": 1762274038969
     },
     "imagesScenesTutorialConflictBgConflictBackgroundPng": {
       "path": "/images/scenes/tutorial/conflict/bg_conflict_background.png",
       "hash": "v1_065dc3a1fde2d4a4",
       "size": 532052,
-      "mtime": 1762273818480
+      "mtime": 1762274039003
     },
     "imagesScenesTutorialConflictBgConflictBarKtx2": {
       "path": "/images/scenes/tutorial/conflict/bg_conflict_bar.ktx2",
       "hash": "v1_e0544cb98e87b869",
       "size": 521250,
-      "mtime": 1762273818482
+      "mtime": 1762274039009
     },
     "imagesScenesTutorialConflictBgConflictBarPng": {
       "path": "/images/scenes/tutorial/conflict/bg_conflict_bar.png",
       "hash": "v1_e2381e796879115f",
       "size": 269846,
-      "mtime": 1762273818485
+      "mtime": 1762274039021
     },
     "imagesScenesTutorialConflictBgConflictBarkeepKtx2": {
       "path": "/images/scenes/tutorial/conflict/bg_conflict_barkeep.ktx2",
       "hash": "v1_a6b0642827c8b73d",
       "size": 176677,
-      "mtime": 1762273818487
+      "mtime": 1762274039023
     },
     "imagesScenesTutorialConflictBgConflictBarkeepPng": {
       "path": "/images/scenes/tutorial/conflict/bg_conflict_barkeep.png",
       "hash": "v1_58d803af98118fff",
       "size": 127050,
-      "mtime": 1762273818488
+      "mtime": 1762274039027
     },
     "imagesScenesTutorialConflictBgConflictDrunkardKtx2": {
       "path": "/images/scenes/tutorial/conflict/bg_conflict_drunkard.ktx2",
       "hash": "v1_a7f895041c358bc3",
       "size": 145772,
-      "mtime": 1762273818488
+      "mtime": 1762274039029
     },
     "imagesScenesTutorialConflictBgConflictDrunkardPng": {
       "path": "/images/scenes/tutorial/conflict/bg_conflict_drunkard.png",
       "hash": "v1_86dce811628886d1",
       "size": 104576,
-      "mtime": 1762273818489
+      "mtime": 1762274039036
     },
     "imagesScenesTutorialConflictBgConflictPlayerKtx2": {
       "path": "/images/scenes/tutorial/conflict/bg_conflict_player.ktx2",
       "hash": "v1_4fe94d5a952e177a",
       "size": 265439,
-      "mtime": 1762273818490
+      "mtime": 1762274039036
     },
     "imagesScenesTutorialConflictBgConflictPlayerPng": {
       "path": "/images/scenes/tutorial/conflict/bg_conflict_player.png",
       "hash": "v1_4c12782cda5f16c5",
       "size": 194704,
-      "mtime": 1762273818491
+      "mtime": 1762274039043
     },
     "imagesScenesTutorialDemonBgDemonKtx2": {
       "path": "/images/scenes/tutorial/demon/bg_demon.ktx2",
       "hash": "v1_b620e1de23cbc7b2",
       "size": 222374,
-      "mtime": 1762273818492
+      "mtime": 1762274039043
     },
     "imagesScenesTutorialDemonBgDemonPng": {
       "path": "/images/scenes/tutorial/demon/bg_demon.png",
       "hash": "v1_9f55f654b89d0b58",
       "size": 163213,
-      "mtime": 1762273818494
+      "mtime": 1762274039056
     },
     "imagesScenesTutorialDemonBgDemonBackgroundKtx2": {
       "path": "/images/scenes/tutorial/demon/bg_demon_background.ktx2",
       "hash": "v1_cd7192e4e92f5b84",
       "size": 555399,
-      "mtime": 1762273818497
+      "mtime": 1762274039057
     },
     "imagesScenesTutorialDemonBgDemonBackgroundPng": {
       "path": "/images/scenes/tutorial/demon/bg_demon_background.png",
       "hash": "v1_c8b8410271143d6f",
       "size": 351055,
-      "mtime": 1762273818500
+      "mtime": 1762274039086
     },
     "imagesScenesTutorialDemonBgDemonLeftHandKtx2": {
       "path": "/images/scenes/tutorial/demon/bg_demon_left_hand.ktx2",
       "hash": "v1_9175c09e9e722ca7",
       "size": 132654,
-      "mtime": 1762273818502
+      "mtime": 1762274039091
     },
     "imagesScenesTutorialDemonBgDemonLeftHandPng": {
       "path": "/images/scenes/tutorial/demon/bg_demon_left_hand.png",
       "hash": "v1_0d3260f813c2b52f",
       "size": 103217,
-      "mtime": 1762273818503
+      "mtime": 1762274039099
     },
     "imagesScenesTutorialDemonBgDemonLeftHandMaskKtx2": {
       "path": "/images/scenes/tutorial/demon/bg_demon_left_hand_mask.ktx2",
       "hash": "v1_462fcb3591e92498",
       "size": 31248,
-      "mtime": 1762273818504
+      "mtime": 1762274039101
     },
     "imagesScenesTutorialDemonBgDemonLeftHandMaskPng": {
       "path": "/images/scenes/tutorial/demon/bg_demon_left_hand_mask.png",
       "hash": "v1_2b0497f42f8387d2",
       "size": 32752,
-      "mtime": 1762273818504
+      "mtime": 1762274039106
     },
     "imagesScenesTutorialDemonBgDemonRightHandKtx2": {
       "path": "/images/scenes/tutorial/demon/bg_demon_right_hand.ktx2",
       "hash": "v1_8751a5e4e078e1f9",
       "size": 114888,
-      "mtime": 1762273818505
+      "mtime": 1762274039113
     },
     "imagesScenesTutorialDemonBgDemonRightHandPng": {
       "path": "/images/scenes/tutorial/demon/bg_demon_right_hand.png",
       "hash": "v1_ed6fbb96b17c5db9",
       "size": 87161,
-      "mtime": 1762273818507
+      "mtime": 1762274039118
     },
     "imagesScenesTutorialDemonBgDemonRightHandMaskKtx2": {
       "path": "/images/scenes/tutorial/demon/bg_demon_right_hand_mask.ktx2",
       "hash": "v1_a0a2bc364f6e8d93",
       "size": 15787,
-      "mtime": 1762273818508
+      "mtime": 1762274039120
     },
     "imagesScenesTutorialDemonBgDemonRightHandMaskPng": {
       "path": "/images/scenes/tutorial/demon/bg_demon_right_hand_mask.png",
       "hash": "v1_dc38cb80955c004e",
       "size": 17714,
-      "mtime": 1762273818509
+      "mtime": 1762274039121
     },
     "imagesScenesTutorialDemonBgDemonVictimKtx2": {
       "path": "/images/scenes/tutorial/demon/bg_demon_victim.ktx2",
       "hash": "v1_4cf56cb9e715fb31",
       "size": 165049,
-      "mtime": 1762273818510
+      "mtime": 1762274039131
     },
     "imagesScenesTutorialDemonBgDemonVictimPng": {
       "path": "/images/scenes/tutorial/demon/bg_demon_victim.png",
       "hash": "v1_f505b59ba4e805de",
       "size": 117212,
-      "mtime": 1762273818512
+      "mtime": 1762274039140
     },
     "imagesScenesTutorialEntryBgEntryBackgroundKtx2": {
       "path": "/images/scenes/tutorial/entry/bg_entry_background.ktx2",
       "hash": "v1_239a0d916670f000",
       "size": 579391,
-      "mtime": 1762273818515
+      "mtime": 1762274039171
     },
     "imagesScenesTutorialEntryBgEntryBackgroundPng": {
       "path": "/images/scenes/tutorial/entry/bg_entry_background.png",
       "hash": "v1_975499efc4dc381d",
       "size": 336856,
-      "mtime": 1762273818518
+      "mtime": 1762274039249
     },
     "imagesScenesTutorialEntryBgEntryBarKtx2": {
       "path": "/images/scenes/tutorial/entry/bg_entry_bar.ktx2",
       "hash": "v1_b356244cd71ce076",
       "size": 473546,
-      "mtime": 1762273818524
+      "mtime": 1762274039262
     },
     "imagesScenesTutorialEntryBgEntryBarPng": {
       "path": "/images/scenes/tutorial/entry/bg_entry_bar.png",
       "hash": "v1_03ec3e4c8dfc541f",
       "size": 290391,
-      "mtime": 1762273818526
+      "mtime": 1762274039306
     },
     "imagesScenesTutorialEntryBgEntryBarkeepKtx2": {
       "path": "/images/scenes/tutorial/entry/bg_entry_barkeep.ktx2",
       "hash": "v1_3caadec522caec46",
       "size": 84254,
-      "mtime": 1762273818527
+      "mtime": 1762274039312
     },
     "imagesScenesTutorialEntryBgEntryBarkeepPng": {
       "path": "/images/scenes/tutorial/entry/bg_entry_barkeep.png",
       "hash": "v1_24c0f94b88c0ec72",
       "size": 70702,
-      "mtime": 1762273818530
+      "mtime": 1762274039318
     },
     "imagesScenesTutorialEntryBgEntryCrowdKtx2": {
       "path": "/images/scenes/tutorial/entry/bg_entry_crowd.ktx2",
       "hash": "v1_3bbb0f0045488791",
       "size": 504285,
-      "mtime": 1762273818534
+      "mtime": 1762274039335
     },
     "imagesScenesTutorialEntryBgEntryCrowdPng": {
       "path": "/images/scenes/tutorial/entry/bg_entry_crowd.png",
       "hash": "v1_9d33f8d1f713040a",
       "size": 302646,
-      "mtime": 1762273818539
+      "mtime": 1762274039342
     },
     "imagesScenesTutorialEntryBgEntryPlayerKtx2": {
       "path": "/images/scenes/tutorial/entry/bg_entry_player.ktx2",
       "hash": "v1_50481501836f39f9",
       "size": 469148,
-      "mtime": 1762273818542
+      "mtime": 1762274039349
     },
     "imagesScenesTutorialEntryBgEntryPlayerPng": {
       "path": "/images/scenes/tutorial/entry/bg_entry_player.png",
       "hash": "v1_5736e717b17ddbd2",
       "size": 276033,
-      "mtime": 1762273818543
+      "mtime": 1762274039354
     },
     "imagesScenesTutorialResurrectionBgResurrectionBackgroundKtx2": {
       "path": "/images/scenes/tutorial/resurrection/bg_resurrection_background.ktx2",
       "hash": "v1_299fa3dace542341",
       "size": 416724,
-      "mtime": 1762273818546
+      "mtime": 1762274039357
     },
     "imagesScenesTutorialResurrectionBgResurrectionBackgroundPng": {
       "path": "/images/scenes/tutorial/resurrection/bg_resurrection_background.png",
       "hash": "v1_5162811455f38638",
       "size": 270439,
-      "mtime": 1762273818549
+      "mtime": 1762274039361
     },
     "imagesScenesTutorialResurrectionBgResurrectionBarkeepKtx2": {
       "path": "/images/scenes/tutorial/resurrection/bg_resurrection_barkeep.ktx2",
       "hash": "v1_15fd39a8c65f6db0",
       "size": 146425,
-      "mtime": 1762273818550
+      "mtime": 1762274039363
     },
     "imagesScenesTutorialResurrectionBgResurrectionBarkeepPng": {
       "path": "/images/scenes/tutorial/resurrection/bg_resurrection_barkeep.png",
       "hash": "v1_5b80909b071e5fd1",
       "size": 102028,
-      "mtime": 1762273818552
+      "mtime": 1762274039366
     },
     "imagesScenesTutorialResurrectionBgResurrectionPlayerKtx2": {
       "path": "/images/scenes/tutorial/resurrection/bg_resurrection_player.ktx2",
       "hash": "v1_b6b98673c93aac7e",
       "size": 194065,
-      "mtime": 1762273818554
+      "mtime": 1762274039368
     },
     "imagesScenesTutorialResurrectionBgResurrectionPlayerPng": {
       "path": "/images/scenes/tutorial/resurrection/bg_resurrection_player.png",
       "hash": "v1_5b3821d5893e9330",
       "size": 130051,
-      "mtime": 1762273818556
+      "mtime": 1762274039370
     },
     "imagesScenesTutorialResurrectionBgResurrectionTableKtx2": {
       "path": "/images/scenes/tutorial/resurrection/bg_resurrection_table.ktx2",
       "hash": "v1_3de75cccfdabb109",
       "size": 268735,
-      "mtime": 1762273818559
+      "mtime": 1762274039374
     },
     "imagesScenesTutorialResurrectionBgResurrectionTablePng": {
       "path": "/images/scenes/tutorial/resurrection/bg_resurrection_table.png",
       "hash": "v1_6ee32fd14e11d7f6",
       "size": 170381,
-      "mtime": 1762273818561
+      "mtime": 1762274039376
     },
     "imagesSplashJpg": {
       "path": "/images/splash.jpg",
@@ -2410,9 +2410,9 @@
     },
     "profilesCharacters00Jpg": {
       "path": "/profiles/characters/00.jpg",
-      "hash": "v1_2cf64af198e5cd66",
-      "size": 130403,
-      "mtime": 1745564997880
+      "hash": "v1_d60a3c0995b40066",
+      "size": 105478,
+      "mtime": 1762517381265
     },
     "profilesCharacters01Jpg": {
       "path": "/profiles/characters/01.jpg",
@@ -2881,6 +2881,108 @@
       "hash": "v1_726a5b4bebeaebe0",
       "size": 371177,
       "mtime": 1754991218562
+    },
+    "profilesLegends03Jpg": {
+      "path": "/profiles/legends/03.jpg",
+      "hash": "v1_ca323792ef15f815",
+      "size": 262975,
+      "mtime": 1762517381267
+    },
+    "profilesLegends04Jpg": {
+      "path": "/profiles/legends/04.jpg",
+      "hash": "v1_141b91d193af98b2",
+      "size": 143610,
+      "mtime": 1762517381275
+    },
+    "profilesPirates00Jpg": {
+      "path": "/profiles/pirates/00.jpg",
+      "hash": "v1_2cf64af198e5cd66",
+      "size": 130403,
+      "mtime": 1762517381290
+    },
+    "profilesPirates01Jpg": {
+      "path": "/profiles/pirates/01.jpg",
+      "hash": "v1_7682d7fc75fd348a",
+      "size": 380955,
+      "mtime": 1762517381296
+    },
+    "profilesPirates02Jpg": {
+      "path": "/profiles/pirates/02.jpg",
+      "hash": "v1_db886af9d6de6d31",
+      "size": 303607,
+      "mtime": 1762517381300
+    },
+    "profilesPirates03Jpg": {
+      "path": "/profiles/pirates/03.jpg",
+      "hash": "v1_a8dfeb57f4931cb2",
+      "size": 283433,
+      "mtime": 1762517381314
+    },
+    "profilesPirates04Jpg": {
+      "path": "/profiles/pirates/04.jpg",
+      "hash": "v1_1e0011c7c87e2ab1",
+      "size": 363584,
+      "mtime": 1762517381322
+    },
+    "profilesPirates05Jpg": {
+      "path": "/profiles/pirates/05.jpg",
+      "hash": "v1_268b8d2f7e29cc27",
+      "size": 275530,
+      "mtime": 1762517381328
+    },
+    "profilesPirates06Jpg": {
+      "path": "/profiles/pirates/06.jpg",
+      "hash": "v1_3eeb4d9621e0f26a",
+      "size": 316944,
+      "mtime": 1762517381332
+    },
+    "profilesPirates07Jpg": {
+      "path": "/profiles/pirates/07.jpg",
+      "hash": "v1_000165036e20bd70",
+      "size": 361597,
+      "mtime": 1762517381334
+    },
+    "profilesPirates08Jpg": {
+      "path": "/profiles/pirates/08.jpg",
+      "hash": "v1_38be52856ea7db61",
+      "size": 371672,
+      "mtime": 1762517381344
+    },
+    "profilesPirates09Jpg": {
+      "path": "/profiles/pirates/09.jpg",
+      "hash": "v1_b4d1add8ea713eac",
+      "size": 424307,
+      "mtime": 1762517381357
+    },
+    "profilesPirates10Jpg": {
+      "path": "/profiles/pirates/10.jpg",
+      "hash": "v1_75e022b0361796e2",
+      "size": 270182,
+      "mtime": 1762517381363
+    },
+    "profilesPirates11Jpg": {
+      "path": "/profiles/pirates/11.jpg",
+      "hash": "v1_703a7df6ca076c15",
+      "size": 501840,
+      "mtime": 1762517381371
+    },
+    "profilesPirates12Jpg": {
+      "path": "/profiles/pirates/12.jpg",
+      "hash": "v1_fb9532174337809d",
+      "size": 301691,
+      "mtime": 1762517381378
+    },
+    "profilesPirates13Jpg": {
+      "path": "/profiles/pirates/13.jpg",
+      "hash": "v1_4fa0770f198ecdaf",
+      "size": 331730,
+      "mtime": 1762517381380
+    },
+    "profilesPirates14Jpg": {
+      "path": "/profiles/pirates/14.jpg",
+      "hash": "v1_70d4d51bf3d312e8",
+      "size": 370029,
+      "mtime": 1762517381387
     },
     "profilesUndefined00Jpg": {
       "path": "/profiles/undefined/00.jpg",
@@ -5791,6 +5893,12 @@
       "hash": "v1_77a440eb4b170ae5",
       "size": 545171,
       "mtime": 1752236926515
+    },
+    "tokensPacksPiratesduelists5xPng": {
+      "path": "/tokens/packs/PiratesDuelists5x.png",
+      "hash": "v1_0ff29bc2e3280f57",
+      "size": 550447,
+      "mtime": 1762517381398
     },
     "tokensPacksSingleduelistPng": {
       "path": "/tokens/packs/SingleDuelist.png",

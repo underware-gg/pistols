@@ -455,7 +455,13 @@ const PROFILE_COLLECTIONS: Record<ProfileCollectionType, ProfileCollectionAsset>
   },
   [ProfileCollectionType.Legends]: {
     path: '/profiles/legends',
-    totalCount: 3, // 00 to 02
+    totalCount: 5, // 00 to 04
+    groups: [GroupName.DuelistImages],
+    version: 1,
+  },
+  [ProfileCollectionType.Pirates]: {
+    path: '/profiles/pirates',
+    totalCount: 15, // 00 to 14
     groups: [GroupName.DuelistImages],
     version: 1,
   },

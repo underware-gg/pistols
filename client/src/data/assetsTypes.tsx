@@ -490,6 +490,7 @@ enum ProfileCollectionType {
   Bots = 'Bots',
   Characters = 'Characters',
   Legends = 'Legends',
+  Pirates = 'Pirates',
   Undefined = 'Undefined',
 }
 
