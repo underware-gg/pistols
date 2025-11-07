@@ -29,7 +29,8 @@ const PACK_BASE_Z_INDEX = 10
 const PACKS_PER_ROW = 10
 const MAX_VISIBLE_PACKS = PACKS_PER_ROW * 2
 
-const availablePackTypes = Object.keys(constants.PACK_TYPES).filter(key => constants.PACK_TYPES[key].can_purchase).map(key => constants.PACK_TYPES[key].id as constants.PackType)
+// const availablePackTypes = Object.keys(constants.PACK_TYPES).filter(key => constants.PACK_TYPES[key].can_purchase).map(key => constants.PACK_TYPES[key].id as constants.PackType)
+const availablePackTypes = [constants.PackType.GenesisDuelists5x]
 
 export default function ScCardPacks() {
   const { dispatchSetScene } = usePistolsScene()
@@ -66,7 +67,8 @@ export default function ScCardPacks() {
   
   const handlePurchasePack = () => {
     if (isConnected && account) {
-      pack_token.purchase(account, selectedPackType)
+      // pack_token.purchase(account, selectedPackType)
+      pack_token.purchase_random(account)
     }
   }
   
