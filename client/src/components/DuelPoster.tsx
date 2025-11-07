@@ -586,7 +586,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
                   <ActionButton large fillParent important label='Timed Out, Collect Duel' loading={isSubmitting} loadingClassName='poster' onClick={() => _collectDuel()} />
                 </Col>
               }
-              {(state == constants.ChallengeState.Awaiting && isChallenger && !isMatchmaking) &&
+              {(state == constants.ChallengeState.Awaiting && isChallenger && !isMatchmaking && !needToSyncExpired) &&
                 <>
                   <Col>
                     <ActionButton large fillParent negative label='Cowardly Withdraw' loading={isSubmitting} loadingClassName='poster' onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
