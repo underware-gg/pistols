@@ -1,6 +1,6 @@
 import Dexie from 'dexie';
 import { SceneName, GroupName } from '/src/data/assetsTypes';
-import { SCENE_PRIORITIES, TEXTURES, SPRITESHEETS } from '/src/data/assets';
+import { SCENE_PRIORITIES, TEXTURES, SPRITESHEETS, PROFILE_COLLECTIONS } from '/src/data/assets';
 
 export interface AssetManifest {
   version: string;
@@ -294,6 +294,21 @@ export class AssetCacheManager {
             }
           }
         });
+      });
+    }
+
+    if (groups.includes(GroupName.DuelistImages)) {
+      Object.entries(PROFILE_COLLECTIONS).forEach(([collectionType, collectionData]) => {
+        if (collectionData.totalCount > 0) {
+          for (let imageIndex = 0; imageIndex < collectionData.totalCount; imageIndex++) {
+            const imageNumber = ('00' + imageIndex.toString()).slice(-2);
+            const imagePath = `${collectionData.path}/${imageNumber}.jpg`;
+            if (!assetSet.has(imagePath)) {
+              assets.push(imagePath);
+              assetSet.add(imagePath);
+            }
+          }
+        }
       });
     }
 

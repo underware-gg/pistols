@@ -1,4 +1,4 @@
-import { SceneName, TextureAttributes, TextureName, UIImagesName, GroupName, SceneData, AnimName, Spritesheets, AssetKey } from "./assetsTypes";
+import { SceneName, TextureAttributes, TextureName, UIImagesName, GroupName, SceneData, AnimName, Spritesheets, AssetKey, ProfileCollectionType, ProfileCollectionAsset } from "./assetsTypes";
 
 
 const SCENE_PRIORITIES: Record<SceneName, GroupName[]> = {
@@ -389,101 +389,6 @@ const TEXTURES: Record<AssetKey, TextureAttributes> = {
   [UIImagesName.duel_card_details_profile_border]: { path: '/images/ui/duel/card_details/profile_border.png', groups: [GroupName.DuelUI], version: 1 },
   [UIImagesName.duel_card_details_box_left]: { path: '/images/ui/duel/card_details/box_left.png', groups: [GroupName.DuelUI], version: 1 },
 
-  // Profile Genesis Images
-  [UIImagesName.profile_genesis_00]: { path: '/profiles/genesis/00.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_01]: { path: '/profiles/genesis/01.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_02]: { path: '/profiles/genesis/02.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_03]: { path: '/profiles/genesis/03.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_04]: { path: '/profiles/genesis/04.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_05]: { path: '/profiles/genesis/05.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_06]: { path: '/profiles/genesis/06.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_07]: { path: '/profiles/genesis/07.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_08]: { path: '/profiles/genesis/08.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_09]: { path: '/profiles/genesis/09.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_10]: { path: '/profiles/genesis/10.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_11]: { path: '/profiles/genesis/11.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_12]: { path: '/profiles/genesis/12.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_13]: { path: '/profiles/genesis/13.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_14]: { path: '/profiles/genesis/14.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_15]: { path: '/profiles/genesis/15.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_16]: { path: '/profiles/genesis/16.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_17]: { path: '/profiles/genesis/17.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_18]: { path: '/profiles/genesis/18.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_19]: { path: '/profiles/genesis/19.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_20]: { path: '/profiles/genesis/20.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_21]: { path: '/profiles/genesis/21.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_22]: { path: '/profiles/genesis/22.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_23]: { path: '/profiles/genesis/23.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_24]: { path: '/profiles/genesis/24.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_25]: { path: '/profiles/genesis/25.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_26]: { path: '/profiles/genesis/26.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_27]: { path: '/profiles/genesis/27.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_28]: { path: '/profiles/genesis/28.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_29]: { path: '/profiles/genesis/29.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_30]: { path: '/profiles/genesis/30.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_31]: { path: '/profiles/genesis/31.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_32]: { path: '/profiles/genesis/32.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_33]: { path: '/profiles/genesis/33.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_34]: { path: '/profiles/genesis/34.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_35]: { path: '/profiles/genesis/35.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_36]: { path: '/profiles/genesis/36.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_37]: { path: '/profiles/genesis/37.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_38]: { path: '/profiles/genesis/38.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_39]: { path: '/profiles/genesis/39.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_40]: { path: '/profiles/genesis/40.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_41]: { path: '/profiles/genesis/41.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_42]: { path: '/profiles/genesis/42.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_43]: { path: '/profiles/genesis/43.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_44]: { path: '/profiles/genesis/44.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_45]: { path: '/profiles/genesis/45.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_46]: { path: '/profiles/genesis/46.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_47]: { path: '/profiles/genesis/47.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_48]: { path: '/profiles/genesis/48.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_49]: { path: '/profiles/genesis/49.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_50]: { path: '/profiles/genesis/50.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_51]: { path: '/profiles/genesis/51.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_52]: { path: '/profiles/genesis/52.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_53]: { path: '/profiles/genesis/53.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_54]: { path: '/profiles/genesis/54.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_55]: { path: '/profiles/genesis/55.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_56]: { path: '/profiles/genesis/56.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_57]: { path: '/profiles/genesis/57.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_58]: { path: '/profiles/genesis/58.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_59]: { path: '/profiles/genesis/59.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_60]: { path: '/profiles/genesis/60.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_61]: { path: '/profiles/genesis/61.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_62]: { path: '/profiles/genesis/62.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_63]: { path: '/profiles/genesis/63.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_64]: { path: '/profiles/genesis/64.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_65]: { path: '/profiles/genesis/65.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_66]: { path: '/profiles/genesis/66.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_67]: { path: '/profiles/genesis/67.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_68]: { path: '/profiles/genesis/68.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_genesis_69]: { path: '/profiles/genesis/69.jpg', groups: [GroupName.DuelistImages], version: 1 },
-
-  // Profile Bots Images
-  [UIImagesName.profile_bots_00]: { path: '/profiles/bots/00.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_bots_01]: { path: '/profiles/bots/01.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_bots_02]: { path: '/profiles/bots/02.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_bots_03]: { path: '/profiles/bots/03.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_bots_04]: { path: '/profiles/bots/04.jpg', groups: [GroupName.DuelistImages], version: 1 },
-
-  // Profile Characters Images
-  [UIImagesName.profile_characters_00]: { path: '/profiles/characters/00.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_characters_01]: { path: '/profiles/characters/01.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_characters_02]: { path: '/profiles/characters/02.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_characters_03]: { path: '/profiles/characters/03.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_characters_04]: { path: '/profiles/characters/04.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_characters_05]: { path: '/profiles/characters/05.jpg', groups: [GroupName.DuelistImages], version: 1 },
-
-  // Profile Legends Images
-  [UIImagesName.profile_legends_00]: { path: '/profiles/legends/00.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_legends_01]: { path: '/profiles/legends/01.jpg', groups: [GroupName.DuelistImages], version: 1 },
-  [UIImagesName.profile_legends_02]: { path: '/profiles/legends/02.jpg', groups: [GroupName.DuelistImages], version: 1 },
-
-  // Profile Undefined Images
-  [UIImagesName.profile_undefined_00]: { path: '/profiles/undefined/00.jpg', groups: [GroupName.DuelistImages], version: 1 },
-
   // Cards Images
   [UIImagesName.card_front_blue]: { path: '/textures/cards/card_front_blue.png', groups: [GroupName.CardUI], version: 1 },
   [UIImagesName.card_front_red]: { path: '/textures/cards/card_front_red.png', groups: [GroupName.CardUI], version: 1 },
@@ -524,6 +429,42 @@ const TEXTURES: Record<AssetKey, TextureAttributes> = {
   [UIImagesName.card_illustration_duelist_desperate]: { path: '/textures/cards/illustrations/Duelist_Desperate.png', groups: [GroupName.CardUI], version: 1 },
   [UIImagesName.card_illustration_decapitation]: { path: '/textures/cards/illustrations/Decapitation.png', groups: [GroupName.CardUI], version: 1 },
   [UIImagesName.card_illustration_blade_miss]: { path: '/textures/cards/illustrations/Blade_Miss.png', groups: [GroupName.CardUI], version: 1 },
+}
+
+// Profile Image Collections - like frames, we define collections with path and total count
+// Images are loaded from 0 to totalCount-1 in the specified path
+// Each image is named with zero-padded 2-digit numbers: 00.jpg, 01.jpg, etc.
+const PROFILE_COLLECTIONS: Record<ProfileCollectionType, ProfileCollectionAsset> = {
+  [ProfileCollectionType.Genesis]: {
+    path: '/profiles/genesis',
+    totalCount: 70, // 00 to 69
+    groups: [GroupName.DuelistImages],
+    version: 1,
+  },
+  [ProfileCollectionType.Bots]: {
+    path: '/profiles/bots',
+    totalCount: 5, // 00 to 04
+    groups: [GroupName.DuelistImages],
+    version: 1,
+  },
+  [ProfileCollectionType.Characters]: {
+    path: '/profiles/characters',
+    totalCount: 6, // 00 to 05
+    groups: [GroupName.DuelistImages],
+    version: 1,
+  },
+  [ProfileCollectionType.Legends]: {
+    path: '/profiles/legends',
+    totalCount: 3, // 00 to 02
+    groups: [GroupName.DuelistImages],
+    version: 1,
+  },
+  [ProfileCollectionType.Undefined]: {
+    path: '/profiles/undefined',
+    totalCount: 1, // 00
+    groups: [GroupName.DuelistImages],
+    version: 1,
+  },
 }
 
 const sceneBackgrounds: Record<SceneName, SceneData> = {
@@ -1024,5 +965,6 @@ export {
   SCENE_PRIORITIES,
   TEXTURES,
   SPRITESHEETS,
+  PROFILE_COLLECTIONS,
   sceneBackgrounds,
 }

@@ -300,101 +300,6 @@ enum UIImagesName {
   duel_card_details_profile_border = 'duel_card_details_profile_border',
   duel_card_details_box_left = 'duel_card_details_box_left',
 
-  // Profile Genesis Images
-  profile_genesis_00 = 'profile_genesis_00',
-  profile_genesis_01 = 'profile_genesis_01',
-  profile_genesis_02 = 'profile_genesis_02',
-  profile_genesis_03 = 'profile_genesis_03',
-  profile_genesis_04 = 'profile_genesis_04',
-  profile_genesis_05 = 'profile_genesis_05',
-  profile_genesis_06 = 'profile_genesis_06',
-  profile_genesis_07 = 'profile_genesis_07',
-  profile_genesis_08 = 'profile_genesis_08',
-  profile_genesis_09 = 'profile_genesis_09',
-  profile_genesis_10 = 'profile_genesis_10',
-  profile_genesis_11 = 'profile_genesis_11',
-  profile_genesis_12 = 'profile_genesis_12',
-  profile_genesis_13 = 'profile_genesis_13',
-  profile_genesis_14 = 'profile_genesis_14',
-  profile_genesis_15 = 'profile_genesis_15',
-  profile_genesis_16 = 'profile_genesis_16',
-  profile_genesis_17 = 'profile_genesis_17',
-  profile_genesis_18 = 'profile_genesis_18',
-  profile_genesis_19 = 'profile_genesis_19',
-  profile_genesis_20 = 'profile_genesis_20',
-  profile_genesis_21 = 'profile_genesis_21',
-  profile_genesis_22 = 'profile_genesis_22',
-  profile_genesis_23 = 'profile_genesis_23',
-  profile_genesis_24 = 'profile_genesis_24',
-  profile_genesis_25 = 'profile_genesis_25',
-  profile_genesis_26 = 'profile_genesis_26',
-  profile_genesis_27 = 'profile_genesis_27',
-  profile_genesis_28 = 'profile_genesis_28',
-  profile_genesis_29 = 'profile_genesis_29',
-  profile_genesis_30 = 'profile_genesis_30',
-  profile_genesis_31 = 'profile_genesis_31',
-  profile_genesis_32 = 'profile_genesis_32',
-  profile_genesis_33 = 'profile_genesis_33',
-  profile_genesis_34 = 'profile_genesis_34',
-  profile_genesis_35 = 'profile_genesis_35',
-  profile_genesis_36 = 'profile_genesis_36',
-  profile_genesis_37 = 'profile_genesis_37',
-  profile_genesis_38 = 'profile_genesis_38',
-  profile_genesis_39 = 'profile_genesis_39',
-  profile_genesis_40 = 'profile_genesis_40',
-  profile_genesis_41 = 'profile_genesis_41',
-  profile_genesis_42 = 'profile_genesis_42',
-  profile_genesis_43 = 'profile_genesis_43',
-  profile_genesis_44 = 'profile_genesis_44',
-  profile_genesis_45 = 'profile_genesis_45',
-  profile_genesis_46 = 'profile_genesis_46',
-  profile_genesis_47 = 'profile_genesis_47',
-  profile_genesis_48 = 'profile_genesis_48',
-  profile_genesis_49 = 'profile_genesis_49',
-  profile_genesis_50 = 'profile_genesis_50',
-  profile_genesis_51 = 'profile_genesis_51',
-  profile_genesis_52 = 'profile_genesis_52',
-  profile_genesis_53 = 'profile_genesis_53',
-  profile_genesis_54 = 'profile_genesis_54',
-  profile_genesis_55 = 'profile_genesis_55',
-  profile_genesis_56 = 'profile_genesis_56',
-  profile_genesis_57 = 'profile_genesis_57',
-  profile_genesis_58 = 'profile_genesis_58',
-  profile_genesis_59 = 'profile_genesis_59',
-  profile_genesis_60 = 'profile_genesis_60',
-  profile_genesis_61 = 'profile_genesis_61',
-  profile_genesis_62 = 'profile_genesis_62',
-  profile_genesis_63 = 'profile_genesis_63',
-  profile_genesis_64 = 'profile_genesis_64',
-  profile_genesis_65 = 'profile_genesis_65',
-  profile_genesis_66 = 'profile_genesis_66',
-  profile_genesis_67 = 'profile_genesis_67',
-  profile_genesis_68 = 'profile_genesis_68',
-  profile_genesis_69 = 'profile_genesis_69',
-
-  // Profile Bots Images
-  profile_bots_00 = 'profile_bots_00',
-  profile_bots_01 = 'profile_bots_01',
-  profile_bots_02 = 'profile_bots_02',
-  profile_bots_03 = 'profile_bots_03',
-  profile_bots_04 = 'profile_bots_04',
-
-  // Profile Characters Images
-  profile_characters_00 = 'profile_characters_00',
-  profile_characters_01 = 'profile_characters_01',
-  profile_characters_02 = 'profile_characters_02',
-  profile_characters_03 = 'profile_characters_03',
-  profile_characters_04 = 'profile_characters_04',
-  profile_characters_05 = 'profile_characters_05',
-
-  // Profile Legends Images
-  profile_legends_00 = 'profile_legends_00',
-  profile_legends_01 = 'profile_legends_01',
-  profile_legends_02 = 'profile_legends_02',
-
-  // Profile Undefined Images
-  profile_undefined_00 = 'profile_undefined_00',
-
   // Cards Images
   card_front_blue = 'card_front_blue',
   card_front_red = 'card_front_red',
@@ -576,6 +481,25 @@ interface AnimationAsset {
   isFlipped?: boolean;
 }
 
+//----------------------------
+// UI Image Collection Types
+//
+
+enum ProfileCollectionType {
+  Genesis = 'Genesis',
+  Bots = 'Bots',
+  Characters = 'Characters',
+  Legends = 'Legends',
+  Undefined = 'Undefined',
+}
+
+interface ProfileCollectionAsset {
+  path: string;
+  totalCount: number;
+  groups: GroupName[];
+  version: number;
+}
+
 type Spritesheets = {
   [key in CharacterType]: Animations;
 };
@@ -596,6 +520,7 @@ export {
   GroupName,
   CharacterType,
   AnimName,
+  ProfileCollectionType,
 };
 
 export type {
@@ -609,5 +534,6 @@ export type {
   AnimationAsset,
   Spritesheets,
   Animations,
+  ProfileCollectionAsset,
 };
 
