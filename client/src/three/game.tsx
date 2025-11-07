@@ -1134,8 +1134,6 @@ export function switchScene(sceneName: SceneName) {
 
   if (_sceneName === sceneName && _currentScene) return;
 
-  console.log(`Switching scene to ${sceneName} 🐙`)
-
   const isDuelScene = sceneName === SceneName.Duel
   const wasDuelScene = _sceneName === SceneName.Duel
 

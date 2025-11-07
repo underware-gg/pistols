@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useStoreLoadingProgress } from '/src/stores/progressStore'
 import { 
@@ -40,6 +40,7 @@ export function useAssetSetup() {
   const [isInitialized, setIsInitialized] = useState(false)
   const [sceneAssetsLoaded, setSceneAssetsLoaded] = useState(false)
   const [assetsProgress, setAssetsProgress] = useState(0) // 0-100
+  const hasLoadedAssetsOnce = useRef(false) // Track if assets have been loaded once per session
   
   const [progress, setProgress] = useState<AssetProgress>({
     percentage: 0,
@@ -146,7 +147,7 @@ export function useAssetSetup() {
 
   // Step 2: Load scene assets using AssetCacheManager
   useEffect(() => {
-    if (!mounted || !isInitialized) return
+    if (!mounted || !isInitialized || hasLoadedAssetsOnce.current) return
     
     let cancelled = false
     
@@ -171,6 +172,7 @@ export function useAssetSetup() {
         )
         
         if (!cancelled) {
+          hasLoadedAssetsOnce.current = true
           setSceneAssetsLoaded(true)
           setAssetsProgress(100)
           setProgress(prev => ({ ...prev, currentAsset: undefined }))
@@ -178,6 +180,7 @@ export function useAssetSetup() {
         }
       } catch (error) {
         if (!cancelled) {
+          hasLoadedAssetsOnce.current = true
           console.error('❌ Scene assets loading failed:', error)
           // Don't fail completely, mark as complete
           setSceneAssetsLoaded(true)
