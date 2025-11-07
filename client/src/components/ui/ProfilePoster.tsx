@@ -24,6 +24,7 @@ import { COLORS } from '@underware/pistols-sdk/pistols/constants'
 import { StampImage } from './StampImage'
 import { ConnectButton } from '../scenes/ScDoor'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -126,6 +127,7 @@ const ProfilePosterSmall = forwardRef<ProfilePosterHandle, ProfilePosterProps>((
           
           <div className='ProfileSection Small'>
             <ProfilePic 
+              profileType={constants.DuelistProfile.Character}
               profilePic={avatarUrl ? undefined : 0} 
               profilePicUrl={avatarUrl}
               fallbackPicUrl={apiAvatarUrl}
@@ -279,6 +281,7 @@ const ProfilePosterFull = forwardRef<ProfilePosterHandle, ProfilePosterProps>((p
           
           <div className='ProfileSection'>
             <ProfilePic 
+              profileType={constants.DuelistProfile.Character}
               profilePic={avatarUrl ? undefined : 0} 
               profilePicUrl={avatarUrl}
               fallbackPicUrl={apiAvatarUrl}

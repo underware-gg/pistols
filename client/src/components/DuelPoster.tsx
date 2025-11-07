@@ -437,6 +437,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
           <div className='ProfilePicContainer Large'>
             <div className='ProfilePicChallengeContainer Left Large'>
               <ProfilePic 
+                profileType={constants.DuelistProfile.Character}
                 profilePic={leftAvatarUrl ? undefined : 0} 
                 profilePicUrl={leftAvatarUrl}
                 fallbackPicUrl={leftApiAvatarUrl}
@@ -452,6 +453,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
             </div>
             <div className='ProfilePicChallengeContainer Right Large'>
               <ProfilePic 
+                profileType={constants.DuelistProfile.Character}
                 profilePic={rightAvatarUrl ? undefined : 0} 
                 profilePicUrl={rightAvatarUrl}
                 fallbackPicUrl={rightApiAvatarUrl}
