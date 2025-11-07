@@ -1,3 +1,4 @@
+use starknet::{ContractAddress};
 pub use pistols::types::duelist_profile::{DuelistProfile};
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
@@ -146,6 +147,9 @@ mod PACK_TYPES {
     };
 }
 
+pub fn pirate_nation_minter() -> ContractAddress {
+    (0x002346E4CCfc96beE8EB5391344F5f5Ab7bF17d36c566888Fe39E8816D0A50e7.try_into().unwrap())
+}
 
 //----------------------------------
 // Traits

@@ -97,7 +97,7 @@ pub trait IPackTokenProtected<TState> {
 
 #[dojo::contract]
 pub mod pack_token {
-    use core::num::traits::{Bounded, Zero};
+    use core::num::traits::{Bounded};
     use starknet::{ContractAddress};
     use dojo::world::{WorldStorage};
 
@@ -365,14 +365,23 @@ pub mod pack_token {
             self._assert_caller_is_admin();
 
             // default promo package
-            let quantity: usize = 1;
-            let pack_type: PackType = PackType::FreeGenesis5x;
+            let supply: u128 = self.last_token_id().low.into();
+            let pack_type: PackType = 
+                if (starknet::get_caller_address() == pistols::models::pack::pirate_nation_minter() && supply % 3 == 0) {
+                    // 1 every 3 packs is Pirate
+                    (PackType::FreePirates5x)
+                } else {
+                    (PackType::FreeGenesis5x)
+                };
+            
+            // generate pseudo-random seed
             let seed: felt252 = make_seed(
                 starknet::get_contract_address(),
-                self.last_token_id().low.into(),
+                supply.into(),
             );
 
             // mint...
+            let quantity: usize = 1;
             let mut store: Store = StoreTrait::new(self.world_default());
             let pack_ids: Span<u128> = self._airdrop(ref store, pack_type, Option::None, quantity, recipient, seed);
             

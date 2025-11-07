@@ -728,15 +728,59 @@ fn test_promo_mint_to_ok() {
     assert_ne!(pack_1.seed, 0, "airdrop 1");
     // airdrop more...
     let pack_id_2: u128 = tester::execute_pack_promo_mint_to(@sys, OWNER(), BUMMER());
-    _assert_minted_count(@sys, 2, 2, "airdrop 2");
+    let pack_id_3: u128 = tester::execute_pack_promo_mint_to(@sys, OWNER(), BUMMER());
+    _assert_minted_count(@sys, 3, 3, "airdrop 2");
     assert_eq!(pack_id_2, 2, "airdrop 2");
+    assert_eq!(pack_id_3, 3, "airdrop 2");
     assert_eq!(sys.pack.balance_of(OWNER()), 0, "airdrop 2");
     assert_eq!(sys.pack.balance_of(OTHER()), 1, "airdrop 2");
-    assert_eq!(sys.pack.balance_of(BUMMER()), 1, "airdrop 2");
+    assert_eq!(sys.pack.balance_of(BUMMER()), 2, "airdrop 2");
     let pack_2: Pack = sys.store.get_pack(pack_id_2);
-    assert_eq!(pack_2.pack_type, PackType::FreeGenesis5x, "airdrop 2");
-    assert_ne!(pack_2.seed, 0, "airdrop 2");
-    assert_ne!(pack_2.seed, pack_1.seed, "airdrop 2");
+    assert_eq!(pack_2.pack_type, PackType::FreeGenesis5x);
+    assert_ne!(pack_2.seed, 0);
+    assert_ne!(pack_2.seed, pack_1.seed);
+    let pack_3: Pack = sys.store.get_pack(pack_id_3);
+    assert_eq!(pack_3.pack_type, PackType::FreeGenesis5x);
+    assert_ne!(pack_3.seed, 0);
+    assert_ne!(pack_3.seed, pack_2.seed);
+}
+
+#[test]
+fn test_promo_mint_to_pirate_nation_ok() {
+    let mut sys: TestSystems = setup(0);
+    
+    // set pirate nation minter as admin
+    let minter: ContractAddress = pistols::models::pack::pirate_nation_minter();
+    tester::execute_admin_set_is_team_member(@sys.admin, OWNER(), minter, false, true);
+
+    let quantity: u8 = 9;
+    let recipient: ContractAddress = OTHER();
+    tester::fund_duelists_pool(@sys, quantity.into());
+
+    // mint a bunch
+    let mut count_genesis: usize = 0;
+    let mut count_pirates: usize = 0;
+    for _ in 0..quantity {
+        let pack_id: u128 = tester::execute_pack_promo_mint_to(@sys, minter, recipient);
+        let pack: Pack = sys.store.get_pack(pack_id);
+        match (pack.pack_type) {
+            PackType::FreeGenesis5x => {
+                count_genesis += 1;
+            },
+            PackType::FreePirates5x => {
+                count_pirates += 1;
+            },
+            _ => {
+                assert!(false, "invalid pack type!!!");
+            }
+        }
+    }
+// println!("count_genesis:{}", count_genesis);
+// println!("count_pirates:{}", count_pirates);
+    assert_eq!(sys.pack.total_supply(), quantity.into(), "total_supply");
+    assert_eq!(sys.pack.balance_of(recipient), quantity.into(), "balance_of");
+    assert_eq!(count_genesis, 6, "count_genesis");
+    assert_eq!(count_pirates, 3, "count_pirates");
 }
 
 #[test]
