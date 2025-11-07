@@ -199,6 +199,7 @@ const DuelPosterSmall = forwardRef<DuelPosterHandle, DuelPosterProps>((props, re
           <div className='ProfilePicContainer'>
             <div className='ProfilePicChallengeContainer Left Small'>
               <ProfilePic 
+                profileType={constants.DuelistProfile.Character}
                 profilePic={leftAvatarUrl ? undefined : 0} 
                 profilePicUrl={leftAvatarUrl} 
                 fallbackPicUrl={leftApiAvatarUrl}
@@ -213,6 +214,7 @@ const DuelPosterSmall = forwardRef<DuelPosterHandle, DuelPosterProps>((props, re
             <StampImage playerAddress={leftDuelistAddress} size="DuelSmall" position="Left" rotation={10} />
             <div className='ProfilePicChallengeContainer Right Small'>
               <ProfilePic 
+                profileType={constants.DuelistProfile.Character}
                 profilePic={rightAvatarUrl ? undefined : 0} 
                 profilePicUrl={rightAvatarUrl} 
                 fallbackPicUrl={rightApiAvatarUrl}
