@@ -620,6 +620,11 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
                   <ActionButton large fillParent important label='Instant Reveal' loading={isSubmitting} loadingClassName='poster' onClick={() => _revealResult()} />
                 </Col>
               }
+              {((needToSyncExpired && isChallenger)) &&
+                <Col>
+                  <ActionButton large fillParent important label='Expired, Collect Duel' loading={isSubmitting} loadingClassName='poster' onClick={() => _reply(false)} />
+                </Col>
+              }
               {(((state == constants.ChallengeState.Awaiting && isChallenger) || state == constants.ChallengeState.InProgress || (isFinished && isCallToAction)) && !isSeasonExpired) &&
                 <Col>
                   <ActionButton large fillParent important label='Go to Live Duel!' loading={isSubmitting} loadingClassName='poster' onClick={() => _gotoDuel()} />
@@ -628,11 +633,6 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
               {isFinished && !isCallToAction && (endedInBlades || endedInPaces) &&
                 <Col>
                   <ActionButton large fillParent important label='Replay Duel!' loading={isSubmitting} loadingClassName='poster' onClick={() => _gotoDuel()} />
-                </Col>
-              }
-              {((needToSyncExpired && isChallenger)) &&
-                <Col>
-                  <ActionButton large fillParent important label='Expired, Collect Duel' loading={isSubmitting} loadingClassName='poster' onClick={() => _reply(false)} />
                 </Col>
               }
             </Row>
