@@ -212,8 +212,9 @@ export default function ScMatchmaking() {
   // Memoize empty slot to preserve state between mode changes
   const emptySlotRanked = useMemo(() => (
     <DuelistEmptySlot
+      key="empty-slot-ranked"
       ref={emptySlowSlotRankedRef}
-      matchmakingType={matchmakingType}
+      matchmakingType={constants.QueueId.Ranked}
       queueMode={constants.QueueMode.Slow}
       width={DUELIST_CARD_WIDTH * 1.1}
       height={DUELIST_CARD_HEIGHT * 1.1}
@@ -222,12 +223,13 @@ export default function ScMatchmaking() {
       onActionStart={handleActionStart}
       onActionComplete={handleActionComplete}
     />
-  ), [matchmakingType, isAnimating, duelistInAction, handleActionStart, handleActionComplete, handleDuelistRemoved])
+  ), [isAnimating, duelistInAction, handleActionStart, handleActionComplete, handleDuelistRemoved])
 
   const emptySlotUnranked = useMemo(() => (
     <DuelistEmptySlot
+      key="empty-slot-unranked"
       ref={emptySlowSlotUnrankedRef}
-      matchmakingType={matchmakingType}
+      matchmakingType={constants.QueueId.Unranked}
       queueMode={constants.QueueMode.Slow}
       width={DUELIST_CARD_WIDTH * 1.1}
       height={DUELIST_CARD_HEIGHT * 1.1}
@@ -236,7 +238,7 @@ export default function ScMatchmaking() {
       onActionStart={handleActionStart}
       onActionComplete={handleActionComplete}
     />
-  ), [matchmakingType, isAnimating, duelistInAction, handleActionStart, handleActionComplete, handleDuelistRemoved])
+  ), [isAnimating, duelistInAction, handleActionStart, handleActionComplete, handleDuelistRemoved])
 
   const slowSlots = useMemo(() => {
     return slowSlotsData.slice(currentPage * duelistsPerPage, (currentPage + 1) * duelistsPerPage).map(({ slotIndex, duelistId, duelId }) => {
@@ -530,6 +532,7 @@ export default function ScMatchmaking() {
           {slowSlots}
 
           <div
+            key={isRankedMode ? 'ranked-slot-container' : 'unranked-slot-container'}
             style={{ 
               display: currentPage == totalPages - 1 ? 'flex' : 'none', 
               justifyContent: 'center' 
