@@ -343,6 +343,15 @@ export interface ChallengeRewardsEvent {
 	rewards: RewardValues;
 }
 
+// Type definition for `pistols::models::events::FamePegEvent` struct
+export interface FamePegEvent {
+	season_id: BigNumberish;
+	source_pool_id: PoolTypeEnum;
+	target_pool_id: PoolTypeEnum;
+	lords_amount: BigNumberish;
+	fame_amount: BigNumberish;
+}
+
 // Type definition for `pistols::models::events::LordsReleaseEvent` struct
 export interface LordsReleaseEvent {
 	season_id: BigNumberish;
@@ -395,6 +404,20 @@ export interface PurchaseDistributionEvent {
 	lords_realms: BigNumberish;
 	lords_fees: BigNumberish;
 	lords_season: BigNumberish;
+}
+
+// Type definition for `pistols::models::events::SeasonLeaderboardEvent` struct
+export interface SeasonLeaderboardEvent {
+	season_id: BigNumberish;
+	positions: Array<SeasonLeaderboardPosition>;
+}
+
+// Type definition for `pistols::models::events::SeasonLeaderboardPosition` struct
+export interface SeasonLeaderboardPosition {
+	duelist_id: BigNumberish;
+	points: BigNumberish;
+	player_address: string;
+	lords_amount: BigNumberish;
 }
 
 // Type definition for `pistols::models::pool::LordsReleaseBill` struct
@@ -1034,12 +1057,15 @@ export interface SchemaType extends ISchemaType {
 		Task: Task,
 		CallToChallengeEvent: CallToChallengeEvent,
 		ChallengeRewardsEvent: ChallengeRewardsEvent,
+		FamePegEvent: FamePegEvent,
 		LordsReleaseEvent: LordsReleaseEvent,
 		PlayerActivityEvent: PlayerActivityEvent,
 		PlayerBookmarkEvent: PlayerBookmarkEvent,
 		PlayerSettingEvent: PlayerSettingEvent,
 		PlayerSocialLinkEvent: PlayerSocialLinkEvent,
 		PurchaseDistributionEvent: PurchaseDistributionEvent,
+		SeasonLeaderboardEvent: SeasonLeaderboardEvent,
+		SeasonLeaderboardPosition: SeasonLeaderboardPosition,
 		LordsReleaseBill: LordsReleaseBill,
 		RewardValues: RewardValues,
 		BatchMetadataUpdate: BatchMetadataUpdate,
@@ -1438,6 +1464,27 @@ export const schema: SchemaType = {
 			duelist_id: 0,
 		rewards: { fame_lost: 0, fame_gained: 0, fools_gained: 0, points_scored: 0, position: 0, fame_burned: 0, lords_unlocked: 0, survived: false, },
 		},
+		FamePegEvent: {
+			season_id: 0,
+		source_pool_id: new CairoCustomEnum({ 
+					Undefined: "",
+				Purchases: undefined,
+				FamePeg: undefined,
+				Season: undefined,
+				Tournament: undefined,
+				Sacrifice: undefined,
+				Claimable: undefined, }),
+		target_pool_id: new CairoCustomEnum({ 
+					Undefined: "",
+				Purchases: undefined,
+				FamePeg: undefined,
+				Season: undefined,
+				Tournament: undefined,
+				Sacrifice: undefined,
+				Claimable: undefined, }),
+			lords_amount: 0,
+			fame_amount: 0,
+		},
 		LordsReleaseEvent: {
 			season_id: 0,
 		bill: { reason: new CairoCustomEnum({ 
@@ -1514,6 +1561,16 @@ export const schema: SchemaType = {
 			lords_realms: 0,
 			lords_fees: 0,
 			lords_season: 0,
+		},
+		SeasonLeaderboardEvent: {
+			season_id: 0,
+			positions: [{ duelist_id: 0, points: 0, player_address: "", lords_amount: 0, }],
+		},
+		SeasonLeaderboardPosition: {
+			duelist_id: 0,
+			points: 0,
+			player_address: "",
+			lords_amount: 0,
 		},
 		LordsReleaseBill: {
 		reason: new CairoCustomEnum({ 
@@ -1992,6 +2049,7 @@ export enum ModelsMapping {
 	CallToChallengeEvent = 'pistols-CallToChallengeEvent',
 	ChallengeAction = 'pistols-ChallengeAction',
 	ChallengeRewardsEvent = 'pistols-ChallengeRewardsEvent',
+	FamePegEvent = 'pistols-FamePegEvent',
 	LordsReleaseEvent = 'pistols-LordsReleaseEvent',
 	PlayerActivityEvent = 'pistols-PlayerActivityEvent',
 	PlayerBookmarkEvent = 'pistols-PlayerBookmarkEvent',
@@ -1999,6 +2057,8 @@ export enum ModelsMapping {
 	PlayerSettingEvent = 'pistols-PlayerSettingEvent',
 	PlayerSocialLinkEvent = 'pistols-PlayerSocialLinkEvent',
 	PurchaseDistributionEvent = 'pistols-PurchaseDistributionEvent',
+	SeasonLeaderboardEvent = 'pistols-SeasonLeaderboardEvent',
+	SeasonLeaderboardPosition = 'pistols-SeasonLeaderboardPosition',
 	SocialPlatform = 'pistols-SocialPlatform',
 	LordsReleaseBill = 'pistols-LordsReleaseBill',
 	ReleaseReason = 'pistols-ReleaseReason',

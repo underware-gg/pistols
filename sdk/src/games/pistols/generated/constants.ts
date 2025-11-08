@@ -15,12 +15,7 @@ export const INTERFACE_DESCRIPTIONS: any = {
     disqualify_duelist: 'Admin function',
     qualify_duelist: 'Admin function',
     urgent_update: 'Admin function',
-    velords_migrate_pools: 'Admin function',
-    velords_migrate_ranked_challenges: 'Admin function',
-    velords_migrate_ranked_duelists: 'Admin function',
-    velords_migrate_packs: 'Admin function',
-    velords_migrate_pools_2: 'Admin function',
-    velords_migrate_ranked_duelists_2: 'Admin function',
+    emit_past_season_leaderboard_event: 'Admin function',
   },
   // from: ../dojo/src/systems/bank.cairo
   IBankPublic: {
@@ -72,7 +67,7 @@ export const INTERFACE_DESCRIPTIONS: any = {
     claim_starter_pack: 'Claim the starter pack, mint Duelists',
     claim_gift: 'Claim gift pack, if available',
     purchase: 'Purchase packs',
-    purchase_random: 'Purchase a currently available pack',
+    purchase_random: 'Purchase a random currently available 5x Duelist pack',
     open: 'Open a pack, mint its contents',
     mint_to: 'Promotional airdrops (admin)',
     airdrop: 'Airdrops a pack (admin)',
