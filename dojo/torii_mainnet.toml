@@ -11,6 +11,7 @@ raw = true
 historical = [
   "pistols-PlayerActivityEvent",
   "pistols-LordsReleaseEvent",
+  "pistols-FamePegEvent",
   "pistols-PurchaseDistributionEvent",
   "pistols-TrophyProgression",
 ]

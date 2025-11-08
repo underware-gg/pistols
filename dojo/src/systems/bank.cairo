@@ -60,7 +60,7 @@ pub mod bank {
         season::{SeasonConfig, SeasonConfigTrait},
         pool::{Pool, PoolTrait, PoolType},
         events::{SeasonLeaderboardPosition},
-        // events::{FamePegEvent, FamePegDirection},
+        events::{FamePegEvent},
         leaderboard::{LeaderboardTrait, LeaderboardPosition},
         match_queue::{QueueId},
     };
@@ -302,12 +302,13 @@ pub mod bank {
             store.set_pool(@pool_source);
             store.set_pool(@pool_peg);
             // emit event
-            // store.emit_fame_peg(@FamePegEvent {
-            //     season_id: store.get_current_season_id(),
-            //     peg_direction: FamePegDirection::LordsToFame,
-            //     lords_amount: lords_amount,
-            //     fame_amount: fame_amount,
-            // });
+            store.emit_fame_peg(@FamePegEvent {
+                season_id: store.get_current_season_id(),
+                source_pool_id: pool_source.pool_id,
+                target_pool_id: pool_peg.pool_id,
+                lords_amount,
+                fame_amount,
+            });
         }
 
         fn depeg_lords_from_fame_to_be_burned(ref self: ContractState,
@@ -334,12 +335,13 @@ pub mod bank {
             store.set_pool(@pool_peg);
             store.set_pool(@pool_season);
             // emit event
-            // store.emit_fame_peg(@FamePegEvent {
-            //     season_id: store.get_current_season_id(),
-            //     peg_direction: FamePegDirection::FameToLords,
-            //     lords_amount: released_lords,
-            //     fame_amount,
-            // });
+            store.emit_fame_peg(@FamePegEvent {
+                season_id,
+                source_pool_id: pool_peg.pool_id,
+                target_pool_id: pool_season.pool_id,
+                lords_amount,
+                fame_amount,
+            });
             // return amount released
             (lords_amount)
         }

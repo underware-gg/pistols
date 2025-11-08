@@ -71,7 +71,7 @@ pub use pistols::models::{
     events::{
         CallToChallengeEvent, ChallengeAction,
         ChallengeRewardsEvent,
-        // FamePegEvent,
+        FamePegEvent,
         PlayerBookmarkEvent,
         PlayerSocialLinkEvent, SocialPlatform,
         PlayerSettingEvent, PlayerSetting, PlayerSettingValue,
@@ -756,12 +756,12 @@ pub impl StoreImpl of StoreTrait {
         }
     }
 
-    // #[inline(always)]
-    // fn emit_fame_peg(ref self: Store,
-    //     peg_event: @FamePegEvent,
-    // ) {
-    //     self.world.emit_event(peg_event);
-    // }
+    #[inline(always)]
+    fn emit_fame_peg(ref self: Store,
+        peg_event: @FamePegEvent,
+    ) {
+        self.world.emit_event(peg_event);
+    }
 
     #[inline(always)]
     fn emit_purchase_distribution(ref self: Store,
