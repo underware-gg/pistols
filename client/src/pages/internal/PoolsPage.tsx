@@ -70,16 +70,16 @@ function Bank() {
     <Table celled striped size='small' color='orange'>
       <Header>
         <Row>
-          <HeaderCell width={4}><h3>Starter Packs</h3></HeaderCell>
+          <HeaderCell width={4}><h3></h3></HeaderCell>
           <HeaderCell><h5>Quantity</h5></HeaderCell>
           <HeaderCell><h5>Cost per Pack</h5></HeaderCell>
           <HeaderCell><h5>Balance</h5></HeaderCell>
           <HeaderCell><h5></h5></HeaderCell>
         </Row>
       </Header>
-      <Body className='H5'>
-        <Row className='ModalText'>
-          <Cell>Funded Starter Packs:</Cell>
+      <Body>
+        <Row className='H3'>
+          <Cell>Funded Duelists:</Cell>
           <Cell className='Code' textAlign='left'>
             {fundedCount}
           </Cell>
@@ -90,8 +90,8 @@ function Bank() {
             <Balance lords wei={poolBalanceLords} size='big' />
           </Cell>
         </Row>
-        <Row className='ModalText'>
-          <Cell>Unopened Genesis Packs:</Cell>
+        <Row className='H3'>
+          <Cell>Unopened Purchased Packs:</Cell>
           <Cell className='Code' textAlign='left'>
             {duelistPackCount}
           </Cell>
@@ -102,9 +102,9 @@ function Bank() {
             <Balance lords wei={duelistPackBalanceLords} size='big' />
           </Cell>
         </Row>
-        <Row>
-          <Cell className='ModalText'>Sponsor Duelists:</Cell>
-          <Cell className='ModalText' textAlign='left'>
+        <Row className='H3'>
+          <Cell>Sponsor Duelists:</Cell>
+          <Cell textAlign='left'>
             <FormInputNumber
               value={sponsorDuelistCount}
               setValue={setSponsorDuelistCount}
@@ -120,15 +120,15 @@ function Bank() {
               label={`Fund ${sponsorDuelistCount} More Duelists`}
               disabled={sponsorDuelistCount === 0}
               fee={fundAmount}
-              fill={false}
               onClick={_fund_packs}
+              large={false}
             />
           </Cell>
           <Cell></Cell>
         </Row>
-        <Row>
-          <Cell className='ModalText'>Sponsor Season:</Cell>
-          <Cell className='ModalText' textAlign='left'>
+        <Row className='H3'>
+          <Cell>Sponsor Season:</Cell>
+          <Cell textAlign='left'>
             <FormInputNumber
               // label='Amount:'
               value={sponsorLords}
@@ -145,8 +145,8 @@ function Bank() {
               label={`Sponsor Season`}
               disabled={sponsorLords === 0}
               fee={sponsorLords}
-              fill={false}
               onClick={_sponsor_season}
+              large={false}
             />
           </Cell>
           <Cell></Cell>
@@ -199,18 +199,18 @@ function Pools() {
     <Table celled striped size='small' color='green'>
       <Header>
         <Row>
-          <HeaderCell width={4}><h3>Balances</h3></HeaderCell>
-          <HeaderCell><h3>$LORDS</h3></HeaderCell>
-          <HeaderCell><h3>$FAME</h3></HeaderCell>
-          <HeaderCell><h3>FAME%</h3></HeaderCell>
+          <HeaderCell width={3}><h3>Pools</h3></HeaderCell>
+          <HeaderCell width={2}><h3>$LORDS</h3></HeaderCell>
+          <HeaderCell width={3}><h3>$FAME</h3></HeaderCell>
+          <HeaderCell width={1}><h3>FAME%</h3></HeaderCell>
           <HeaderCell><h3>FAME/LORDS</h3></HeaderCell>
           <HeaderCell><h3>Description</h3></HeaderCell>
         </Row>
       </Header>
-      <Body className='H5'>
+      <Body>
 
-        <Row className=''>
-          <Cell className='ModalText'>🏦 Bank</Cell>
+        <Row className='H3'>
+          <Cell>🏦 Bank</Cell>
           <Cell className='Code' textAlign='left'>
             <LordsBalance address={bankContractAddress} size='big' />
           </Cell>
@@ -248,13 +248,13 @@ function Pools() {
           <Cell></Cell>
         </Row>
 
-        <Row className=''>
-          <Cell className='ModalText'>$FAME Supply</Cell>
+        <Row className='H3'>
+          <Cell>$FAME Supply</Cell>
           <Cell></Cell>
           <Cell className='Code' textAlign='left'>
             <Balance fame wei={fameSupply} size='big' />
           </Cell>
-          <Cell className='' textAlign='left'>
+          <Cell className='Code Smaller' textAlign='left'>
             100%
           </Cell>
           <Cell className='Code' textAlign='left'>
@@ -267,13 +267,13 @@ function Pools() {
         <PoolRow pool={poolFamePeg} description='Opened packs, pegged to full FAME supply' />
         {/* <PoolRow pool={poolSacrifice} description='Reserved for Sacrifice (dead duelists)' /> */}
 
-        <Row className=''>
-          <Cell className='ModalText'>Released FAME</Cell>
+        <Row className='H3'>
+          <Cell>Released FAME</Cell>
           <Cell></Cell>
           <Cell className='Code' textAlign='left'>
             <Balance fame wei={fameMemorizedDuelists} size='big' />
           </Cell>
-          <Cell className='' textAlign='left'>
+          <Cell className='Code Smaller' textAlign='left'>
             {fameMemorizedPercentage.toFixed(2)}%
           </Cell>
           <Cell className='Code' textAlign='left'>
@@ -292,8 +292,8 @@ function Pools() {
           <Cell></Cell>
         </Row>
 
-        <Row className=''>
-          <Cell className='ModalText'>Pools Total</Cell>
+        <Row className='H3'>
+          <Cell>Pools Total</Cell>
           <Cell className='Code' textAlign='left'>
             <Balance lords wei={poolTotalLords} size='big' />
           </Cell>
@@ -309,8 +309,8 @@ function Pools() {
           </Cell>
         </Row>
 
-        <Row className=''>
-          <Cell className='ModalText'>Surplus</Cell>
+        <Row className='H3'>
+          <Cell>Surplus</Cell>
           <Cell className='Code' textAlign='left'>
             {diffLords == 0n ? <>✅</> : diffLords > 0n ? <>‼️</> : <>❌</>}
             &nbsp;
@@ -349,8 +349,8 @@ function PoolRow({
   const fameToLords = useMemo(() => (balanceFame && balanceLords) ? (balanceFame / balanceLords) : 0n, [balanceLords, balanceFame])
 
   return (
-    <Row className=''>
-      <Cell className='ModalText'>
+    <Row className='H3'>
+      <Cell>
         🏷️ Pool::{poolType}{seasonId ? `(${seasonId})` : ''}
       </Cell>
       <Cell className='Code' textAlign='left'>
@@ -359,7 +359,7 @@ function PoolRow({
       <Cell className='Code' textAlign='left'>
         <Balance fame wei={displayFame ? balanceFame : 0n} size='big' />
       </Cell>
-      <Cell className='' textAlign='left'>
+      <Cell className='Code Smaller' textAlign='left'>
         {displayFame && famePercentage > 0 ? `${famePercentage.toFixed(2)}%` : ''}
       </Cell>
       <Cell className='Code' textAlign='left'>
