@@ -673,6 +673,11 @@ pub mod game {
             // exit challenge
             store.unassign_challenge(challenge.duelist_id_a);
             store.unassign_challenge(challenge.duelist_id_b);
+            // clear expired call to actions
+            if (challenge.state == ChallengeState::Expired) {
+                store.emit_challenge_action(@challenge, 1, ChallengeAction::Finished);
+                store.emit_challenge_action(@challenge, 2, ChallengeAction::Finished);
+            }
             // distributions
             if (challenge.state.is_concluded()) {
                 // deliver trophies

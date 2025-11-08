@@ -730,7 +730,7 @@ pub impl StoreImpl of StoreTrait {
     fn emit_challenge_action(ref self: Store, challenge: @Challenge, duelist_number: u8, action: ChallengeAction) {
         if (duelist_number == 1) {
             self.emit_call_to_challenge(*challenge.address_a, *challenge.duel_id, action);
-        } else if (duelist_number == 2) {
+        } else if (duelist_number == 2 && challenge.address_b.is_non_zero()) {
             self.emit_call_to_challenge(*challenge.address_b, *challenge.duel_id, action);
         }
     }
