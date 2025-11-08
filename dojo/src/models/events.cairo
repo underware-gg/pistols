@@ -123,6 +123,21 @@ pub struct PurchaseDistributionEvent {
 //     FameToLords,    // 2
 // }
 
+#[derive(Clone, Drop, Serde)]
+#[dojo::event(historical:false)]
+pub struct SeasonLeaderboardEvent {
+    #[key]
+    pub season_id: u32,
+    //-----------------------
+    pub positions: Array<SeasonLeaderboardPosition>,
+}
+#[derive(Clone, Drop, Serde, Introspect)]
+pub struct SeasonLeaderboardPosition {
+    pub duelist_id: u128,
+    pub points: u16,
+    pub player_address: ContractAddress,
+    pub lords_amount: u128,
+}
 
 
 //----------------------------------

@@ -59,6 +59,7 @@ pub mod bank {
     use pistols::models::{
         season::{SeasonConfig, SeasonConfigTrait},
         pool::{Pool, PoolTrait, PoolType},
+        events::{SeasonLeaderboardPosition},
         // events::{FamePegEvent, FamePegDirection},
         leaderboard::{LeaderboardTrait, LeaderboardPosition},
         match_queue::{QueueId},
@@ -392,6 +393,7 @@ pub mod bank {
             let mut pool_season: Pool = store.get_pool(PoolType::Season(season_id));
             let mut due_amount_lords: u128 = pool_season.balance_lords;
             // calculate bills
+            let mut season_positions: Array<SeasonLeaderboardPosition> = array![];
             for i in 0..(*distribution.percents).len() { // distribution is never greater than positions
                 let position: LeaderboardPosition = *positions[i];
                 let percent: u8 = *((*distribution.percents)[i]);
@@ -420,12 +422,21 @@ pub mod bank {
                 // transfer to player
                 let recipient: ContractAddress = duelist_dispatcher.owner_of(position.duelist_id.into());
                 lords_dispatcher.transfer(recipient, lords_amount.into());
+                // store for event
+                season_positions.append(SeasonLeaderboardPosition {
+                    duelist_id: position.duelist_id,
+                    points: position.points,
+                    player_address: recipient,
+                    lords_amount,
+                });
                 // next...
                 due_amount_lords -= lords_amount;
             };
             // empty from pool
             pool_season.empty();
             store.set_pool(@pool_season);
+            // emit season leaderboard event
+            store.emit_season_leaderboard(season_id, season_positions);
         }
     }
 }

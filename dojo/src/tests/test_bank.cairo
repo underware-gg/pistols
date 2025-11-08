@@ -374,6 +374,8 @@ tester::print_pools(@sys, 1, "COLLECTED");
         let season: SeasonConfig = (*sys.store).get_current_season();
         tester::set_block_timestamp(season.period.end);
         tester::execute_collect_season(sys, OWNER());
+        // fired leaderboard event
+        tester::assert_event_season_leaderbords(sys, season.season_id, order.len());
 
         // duelists got some LORDS
         let mut last_balance: u128 = 0xffffffffffffffffffffffffffffffff;

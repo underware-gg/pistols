@@ -76,6 +76,7 @@ pub use pistols::models::{
         PlayerSocialLinkEvent, SocialPlatform,
         PlayerSettingEvent, PlayerSetting, PlayerSettingValue,
         PurchaseDistributionEvent,
+        SeasonLeaderboardEvent, SeasonLeaderboardPosition,
     },
 };
 pub use pistols::systems::components::{
@@ -787,6 +788,15 @@ pub impl StoreImpl of StoreTrait {
         });
     }
 
+    #[inline(always)]
+    fn emit_season_leaderboard(ref self: Store, season_id: u32, positions: Array<SeasonLeaderboardPosition>) {
+        self.world.emit_event(@SeasonLeaderboardEvent{
+            season_id,
+            positions,
+        });
+    }
+
+    // #[inline(always)]
     #[inline(always)]
     fn emit_player_bookmark(ref self: Store,
         player_address: ContractAddress,
