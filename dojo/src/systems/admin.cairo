@@ -13,6 +13,7 @@ pub trait IAdmin<TState> {
     fn qualify_duelist(ref self: TState, season_id: u32, duelist_id: u128) -> u8; //@description: Admin function
     // maintenance functions
     fn urgent_update(ref self: TState); //@description: Admin function
+    fn emit_past_season_leaderboard_event(ref self: TState, season_id: u32, duelist_ids: Array<u128>, points: Array<u16>, player_addresses: Array<ContractAddress>, lords_amount: Array<u128>); //@description: Admin function
 }
 
 #[dojo::contract]
@@ -161,6 +162,24 @@ pub mod admin {
             self._assert_caller_is_admin();
             let mut store: Store = StoreTrait::new(self.world_default());
             AdminFixTrait::urgent_update(ref store);
+        }
+
+        fn emit_past_season_leaderboard_event(ref self: ContractState,
+            season_id: u32,
+            duelist_ids: Array<u128>,
+            points: Array<u16>,
+            player_addresses: Array<ContractAddress>,
+            lords_amount: Array<u128>,
+        ) {
+            self._assert_caller_is_admin();
+            let mut store: Store = StoreTrait::new(self.world_default());
+            AdminFixTrait::emit_past_season_leaderboard_event(ref store,
+                season_id,
+                duelist_ids,
+                points,
+                player_addresses,
+                lords_amount,
+            );
         }
     }
 

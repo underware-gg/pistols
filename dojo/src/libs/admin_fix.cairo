@@ -1,5 +1,5 @@
 // use core::num::traits::Zero;
-// use starknet::{ContractAddress};
+use starknet::{ContractAddress};
 // use dojo::world::{WorldStorage, IWorldDispatcherTrait};
 
 use dojo::model::{
@@ -20,6 +20,9 @@ use pistols::interfaces::dns::{
 use pistols::utils::{
     // address::{ZERO},
     // math::{MathTrait},
+};
+use pistols::models::events::{
+    SeasonLeaderboardPosition,
 };
 use pistols::libs::{
     store::{Store, StoreTrait},
@@ -44,4 +47,23 @@ pub impl AdminFixImpl of AdminFixTrait {
     fn urgent_update(ref store: Store) {
     }
 
+    fn emit_past_season_leaderboard_event(ref store: Store,
+        season_id: u32,
+        duelist_ids: Array<u128>,
+        points: Array<u16>,
+        player_addresses: Array<ContractAddress>,
+        lords_amount: Array<u128>,
+    ) {
+        let mut positions: Array<SeasonLeaderboardPosition> = array![];
+        for i in 0..duelist_ids.len() {
+            positions.append(SeasonLeaderboardPosition {
+                duelist_id: *duelist_ids[i],
+                points: *points[i],
+                player_address: *player_addresses[i],
+                lords_amount: *lords_amount[i],
+            });
+        };
+        // emit season leaderboard event
+        store.emit_season_leaderboard(season_id, positions);
+    }
 }
