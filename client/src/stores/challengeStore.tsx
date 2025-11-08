@@ -459,7 +459,7 @@ export const useFetchChallengeIdsOwnedByAccounts = (addresses: BigNumberish[]) =
 
   return {
     isLoading,
-    isFinished,
+    isFinished: (isFinished || newAddresses.length === 0),
   }
 }
 
