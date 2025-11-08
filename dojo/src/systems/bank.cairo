@@ -52,8 +52,8 @@ pub mod bank {
         IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
         IAdminDispatcherTrait,
         IMatchMakerProtectedDispatcherTrait,
-        IFameCoinProtectedDispatcherTrait,
-        IFameCoinDispatcherTrait,
+        // IFameCoinProtectedDispatcherTrait,
+        // IFameCoinDispatcherTrait,
     };
     use pistols::interfaces::ierc20::{IErc20Trait};
     use pistols::models::{
@@ -72,6 +72,7 @@ pub mod bank {
     use pistols::utils::math::{MathTrait};
 
     pub mod Errors {
+        pub const INVALID_ENDPOINT: felt252         = 'BANK: invalid endpoint';
         pub const INVALID_CALLER: felt252           = 'BANK: invalid caller';
         pub const CALLER_NOT_ADMIN: felt252         = 'BANK: caller not admin';
         pub const INVALID_PAYER: felt252            = 'BANK: invalid payer';
@@ -258,24 +259,27 @@ pub mod bank {
 
         // pool migration
         fn transfer_lords(ref self: ContractState, recipient: ContractAddress, amount: u128) {
-            let mut store: Store = StoreTrait::new(self.world_default());
-            assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
-            self._charge_payer_lords(store,
-                starknet::get_contract_address(), // from
-                recipient, // to
-                amount,
-                Option::None,
-            );
+            assert(false, Errors::INVALID_ENDPOINT);
+            // let mut store: Store = StoreTrait::new(self.world_default());
+            // assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
+            // self._charge_payer_lords(store,
+            //     starknet::get_contract_address(), // from
+            //     recipient, // to
+            //     amount,
+            //     Option::None,
+            // );
         }
 
         fn burn_fame(ref self: ContractState) -> u128 {
-            let mut store: Store = StoreTrait::new(self.world_default());
-            assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
-            let balance: u128 = store.world.fame_coin_dispatcher().balance_of(starknet::get_contract_address()).low;
-            if (balance.is_non_zero()) {
-                store.world.fame_coin_protected_dispatcher().burn(balance);
-            }
-            (balance)
+            assert(false, Errors::INVALID_ENDPOINT);
+            (0)
+            // let mut store: Store = StoreTrait::new(self.world_default());
+            // assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
+            // let balance: u128 = store.world.fame_coin_dispatcher().balance_of(starknet::get_contract_address()).low;
+            // if (balance.is_non_zero()) {
+            //     store.world.fame_coin_protected_dispatcher().burn(balance);
+            // }
+            // (balance)
         }
 
         fn peg_minted_fame_to_lords(ref self: ContractState,
