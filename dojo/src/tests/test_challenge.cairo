@@ -19,6 +19,7 @@ mod tests {
             TestSystems, FLAGS,
             IGameDispatcherTrait,
             IDuelTokenDispatcherTrait,
+            IAdminDispatcherTrait,
             ID, ZERO, OWNER, OTHER, BUMMER, STACKER, STACKER2,
             FAKE_OWNER_OF_1, OWNED_BY_OWNER, MESSAGE,
         }
@@ -101,7 +102,7 @@ mod tests {
     fn test_challenge_ok() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
         let timestamp: u64 = tester::get_block_timestamp();
-        let game_timestamp = sys.game.get_timestamp();
+        let game_timestamp = sys.admin.get_timestamp();
         assert_gt!(timestamp, 0, "timestamp > 0");
         assert_eq!(timestamp, game_timestamp, "game_timestamp");
         let duel_id: u128 = tester::execute_create_duel(@sys, OWNER(), OTHER(), MESSAGE(), DuelType::Seasonal, 0, 1);
@@ -118,7 +119,7 @@ mod tests {
         let msg = sys.store.get_challenge_message_value(duel_id);
         assert_eq!(msg.message, MESSAGE(), "message");
         _assert_empty_progress(@sys, duel_id);
-        let game_timestamp = sys.game.get_timestamp();
+        let game_timestamp = sys.admin.get_timestamp();
         assert_gt!(game_timestamp, ch.timestamps.start, "game_timestamp > timestamps.start");
         // deck type
         assert_eq!(sys.store.get_challenge(duel_id).get_deck_type(), DeckType::Classic, "challenge.deck_type");

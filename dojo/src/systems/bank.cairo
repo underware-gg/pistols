@@ -1,5 +1,6 @@
 use starknet::{ContractAddress};
 use pistols::models::pool::{PoolType};
+use pistols::types::rules::{RewardValues};
 
 #[starknet::interface]
 pub trait IBank<TState> {
@@ -7,6 +8,7 @@ pub trait IBank<TState> {
     fn sponsor_duelists(ref self: TState, payer: ContractAddress, lords_amount: u128);
     fn sponsor_season(ref self: TState, payer: ContractAddress, lords_amount: u128);
     fn sponsor_tournament(ref self: TState, payer: ContractAddress, lords_amount: u128, tournament_id: u64);
+    fn calc_season_reward(self: @TState, season_id: u32, duelist_id: u128, lives_staked: u8) -> RewardValues;
     fn can_collect_season(self: @TState) -> bool;
     fn collect_season(ref self: TState) -> u32;
 }
@@ -17,6 +19,7 @@ pub trait IBankPublic<TState> {
     fn sponsor_duelists(ref self: TState, payer: ContractAddress, lords_amount: u128); //@description: Sponsor duelist starter packs with $LORDS
     fn sponsor_season(ref self: TState, payer: ContractAddress, lords_amount: u128); //@description: Sponsor the current season with $LORDS
     fn sponsor_tournament(ref self: TState, payer: ContractAddress, lords_amount: u128, tournament_id: u64); //@description: Sponsor a tournament with $LORDS
+    fn calc_season_reward(self: @TState, season_id: u32, duelist_id: u128, lives_staked: u8) -> RewardValues;
     fn can_collect_season(self: @TState) -> bool;
     fn collect_season(ref self: TState) -> u32; // @description: Close the current season and start the next one
 }
@@ -61,12 +64,14 @@ pub mod bank {
         pool::{Pool, PoolTrait, PoolType},
         events::{SeasonLeaderboardPosition},
         events::{FamePegEvent},
-        leaderboard::{LeaderboardTrait, LeaderboardPosition},
+        leaderboard::{Leaderboard, LeaderboardTrait, LeaderboardPosition},
         match_queue::{QueueId},
+        ring::{RingType},
     };
     use pistols::types::{
-        rules::{Rules, RulesTrait, PoolDistribution, RewardDistribution},
-        trophies::{TrophyProgressTrait}
+        rules::{Rules, RulesTrait, PoolDistribution, RewardDistribution, RewardValues},
+        trophies::{TrophyProgressTrait},
+        constants::{FAME},
     };
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::math::{MathTrait};
@@ -145,6 +150,33 @@ pub mod bank {
             );
         }
 
+        fn calc_season_reward(self: @ContractState,
+            season_id: u32,
+            duelist_id: u128,
+            lives_staked: u8,
+        ) -> RewardValues {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let rules: Rules = store.get_current_season_rules();
+            let signet_ring: RingType = store.get_player_active_signet_ring(starknet::get_caller_address());
+            let fame_balance: u128 = store.world.duelist_token_dispatcher().fame_balance(duelist_id);
+            let rewards_loss: RewardValues = rules.calc_rewards(fame_balance, lives_staked, false, signet_ring, @Default::default());
+            let rewards_win: RewardValues = rules.calc_rewards(fame_balance, lives_staked, true, signet_ring, @Default::default());
+            let mut leaderboard: Leaderboard = store.get_leaderboard(season_id);
+            let position: u8 = leaderboard.insert_score(duelist_id, rewards_win.points_scored);
+            (RewardValues{
+                // if you win...
+                fame_gained: rewards_win.fame_gained,
+                fools_gained: rewards_win.fools_gained,
+                points_scored: rewards_win.points_scored,
+                position,
+                // if you lose...
+                fame_lost: rewards_loss.fame_lost,
+                lords_unlocked: 0,
+                fame_burned: 0,
+                survived: (fame_balance - rewards_loss.fame_lost) >= FAME::ONE_LIFE,
+            })
+        }
+        
         fn can_collect_season(self: @ContractState) -> bool {
             let mut store: Store = StoreTrait::new(self.world_default());
             let season: SeasonConfig = store.get_current_season();

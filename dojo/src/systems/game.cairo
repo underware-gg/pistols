@@ -2,7 +2,6 @@ use starknet::{ContractAddress};
 use pistols::types::duel_progress::{DuelProgress};
 // use pistols::models::leaderboard::{LeaderboardPosition};
 use pistols::models::events::{SocialPlatform, PlayerSetting, PlayerSettingValue};
-use pistols::types::rules::{RewardValues};
 
 // Exposed to clients
 #[starknet::interface]
@@ -36,8 +35,6 @@ pub trait IGame<TState> {
     // fn get_duelist_leaderboard_position(self: @TState, season_id: u32, duelist_id: u128) -> LeaderboardPosition;
     // fn get_leaderboard(self: @TState, season_id: u32) -> Span<LeaderboardPosition>;
     fn can_collect_duel(self: @TState, duel_id: u128) -> bool;
-    fn calc_season_reward(self: @TState, season_id: u32, duelist_id: u128, lives_staked: u8) -> RewardValues;
-    fn get_timestamp(self: @TState) -> u64;
 }
 
 // Exposed to world
@@ -97,7 +94,6 @@ pub mod game {
         duelist::{DuelistAssignmentTrait, Totals, TotalsTrait},
         leaderboard::{Leaderboard, LeaderboardTrait},//, LeaderboardPosition},
         pact::{PactTrait},
-        ring::{RingType},
         season::{SeasonScoreboard, SeasonScoreboardTrait},
         events::{Activity, ActivityTrait, ChallengeAction, SocialPlatform, PlayerSetting, PlayerSettingValue},
         // tournament::{TournamentRound, TournamentRoundTrait, TournamentDuelKeys},
@@ -106,11 +102,10 @@ pub mod game {
         challenge_state::{ChallengeState, ChallengeStateTrait},
         duel_progress::{DuelProgress},
         round_state::{RoundState},
-        rules::{Rules, RulesTrait ,RewardValues, DuelBonus},
+        rules::{RewardValues, DuelBonus},
         timestamp::{PeriodTrait, TimestampTrait},
         cards::deck::{DeckTrait},
         cards::hand::{FinalBlow, FinalBlowTrait},
-        constants::{FAME},
     };
     // use pistols::types::trophies::{Trophy, TrophyTrait, TrophyProgressTrait, TROPHY_ID};
     use pistols::types::trophies::{TrophyProgressTrait};
@@ -503,37 +498,6 @@ pub mod game {
                 // if in season bound (ranked) and season ended
                 challenge.season_bounded_expired(@store)
             )
-        }
-
-        fn calc_season_reward(self: @ContractState,
-            season_id: u32,
-            duelist_id: u128,
-            lives_staked: u8,
-        ) -> RewardValues {
-            let mut store: Store = StoreTrait::new(self.world_default());
-            let rules: Rules = store.get_current_season_rules();
-            let signet_ring: RingType = store.get_player_active_signet_ring(starknet::get_caller_address());
-            let fame_balance: u128 = store.world.duelist_token_dispatcher().fame_balance(duelist_id);
-            let rewards_loss: RewardValues = rules.calc_rewards(fame_balance, lives_staked, false, signet_ring, @Default::default());
-            let rewards_win: RewardValues = rules.calc_rewards(fame_balance, lives_staked, true, signet_ring, @Default::default());
-            let mut leaderboard: Leaderboard = store.get_leaderboard(season_id);
-            let position: u8 = leaderboard.insert_score(duelist_id, rewards_win.points_scored);
-            (RewardValues{
-                // if you win...
-                fame_gained: rewards_win.fame_gained,
-                fools_gained: rewards_win.fools_gained,
-                points_scored: rewards_win.points_scored,
-                position,
-                // if you lose...
-                fame_lost: rewards_loss.fame_lost,
-                lords_unlocked: 0,
-                fame_burned: 0,
-                survived: (fame_balance - rewards_loss.fame_lost) >= FAME::ONE_LIFE,
-            })
-        }
-
-        fn get_timestamp(self: @ContractState) -> u64 {
-            (starknet::get_block_timestamp())
         }
     }
 
