@@ -3,7 +3,6 @@ use starknet::{ContractAddress};
 // Exposed to clients
 #[starknet::interface]
 pub trait IAdmin<TState> {
-    fn am_i_admin(self: @TState, account_address: ContractAddress) -> bool;
     fn set_paused(ref self: TState, paused: bool); //@description: Admin function
     fn set_treasury(ref self: TState, treasury_address: ContractAddress); //@description: Admin function
     fn set_realms_address(ref self: TState, realms_address: ContractAddress); //@description: Admin function
@@ -11,14 +10,12 @@ pub trait IAdmin<TState> {
     fn set_is_blocked(ref self: TState, account_address: ContractAddress, is_blocked: bool); //@description: Admin function
     fn disqualify_duelist(ref self: TState, season_id: u32, duelist_id: u128, block_owner: bool) -> bool; //@description: Admin function
     fn qualify_duelist(ref self: TState, season_id: u32, duelist_id: u128) -> u8; //@description: Admin function
+    // view calls
+    fn am_i_admin(self: @TState, account_address: ContractAddress) -> bool;
+    fn get_timestamp(self: @TState) -> u64;
     // maintenance functions
     fn urgent_update(ref self: TState); //@description: Admin function
-    fn velords_migrate_pools(ref self: TState); //@description: Admin function
-    fn velords_migrate_ranked_challenges(ref self: TState, duel_ids: Array<u128>); //@description: Admin function
-    fn velords_migrate_ranked_duelists(ref self: TState, duelist_ids: Array<u128>); //@description: Admin function
-    fn velords_migrate_packs(ref self: TState, pack_ids: Array<u128>); //@description: Admin function
-    fn velords_migrate_pools_2(ref self: TState); //@description: Admin function
-    fn velords_migrate_ranked_duelists_2(ref self: TState, duelist_ids: Array<u128>); //@description: Admin function
+    fn emit_past_season_leaderboard_event(ref self: TState, season_id: u32, duelist_ids: Array<u128>, points: Array<u16>, player_addresses: Array<ContractAddress>, lords_amount: Array<u128>); //@description: Admin function
 }
 
 #[dojo::contract]
@@ -83,6 +80,10 @@ pub mod admin {
                 store.world.dispatcher.is_owner(SELECTORS::ADMIN, account_address) ||
                 store.get_player_is_admin(account_address)
             )
+        }
+        
+        fn get_timestamp(self: @ContractState) -> u64 {
+            (starknet::get_block_timestamp())
         }
 
         fn set_paused(ref self: ContractState, paused: bool) {
@@ -165,42 +166,26 @@ pub mod admin {
         //
         fn urgent_update(ref self: ContractState) {
             self._assert_caller_is_admin();
-            //
-            // implement update here...
-            // let mut store: Store = StoreTrait::new(self.world_default());
-            // AdminFixTrait::urgent_update(ref store);
+            let mut store: Store = StoreTrait::new(self.world_default());
+            AdminFixTrait::urgent_update(ref store);
         }
-        fn velords_migrate_pools(ref self: ContractState) {
+
+        fn emit_past_season_leaderboard_event(ref self: ContractState,
+            season_id: u32,
+            duelist_ids: Array<u128>,
+            points: Array<u16>,
+            player_addresses: Array<ContractAddress>,
+            lords_amount: Array<u128>,
+        ) {
             self._assert_caller_is_admin();
             let mut store: Store = StoreTrait::new(self.world_default());
-            AdminFixTrait::velords_migrate_pools(ref store);
-        }
-        fn velords_migrate_ranked_duelists(ref self: ContractState, duelist_ids: Array<u128>) {
-            self._assert_caller_is_admin();
-            let mut store: Store = StoreTrait::new(self.world_default());
-            AdminFixTrait::velords_migrate_ranked_duelists(ref store, duelist_ids.span());
-            AdminFixTrait::velords_migrate_memorialize_duelists(ref store, duelist_ids);
-        }
-        fn velords_migrate_ranked_challenges(ref self: ContractState, duel_ids: Array<u128>) {
-            self._assert_caller_is_admin();
-            let mut store: Store = StoreTrait::new(self.world_default());
-            AdminFixTrait::velords_migrate_ranked_challenges(ref store, duel_ids.span());
-        }
-        fn velords_migrate_packs(ref self: ContractState, pack_ids: Array<u128>) {
-            self._assert_caller_is_admin();
-            let mut store: Store = StoreTrait::new(self.world_default());
-            AdminFixTrait::velords_migrate_packs(ref store, pack_ids.span());
-        }
-        fn velords_migrate_pools_2(ref self: ContractState) {
-            self._assert_caller_is_admin();
-            let mut store: Store = StoreTrait::new(self.world_default());
-            AdminFixTrait::velords_migrate_pools_2(ref store);
-            AdminFixTrait::velords_migrate_burn_fame(ref store);
-        }
-        fn velords_migrate_ranked_duelists_2(ref self: ContractState, duelist_ids: Array<u128>) {
-            self._assert_caller_is_admin();
-            let mut store: Store = StoreTrait::new(self.world_default());
-            AdminFixTrait::velords_migrate_ranked_duelists_fix(ref store, duelist_ids.span());
+            AdminFixTrait::emit_past_season_leaderboard_event(ref store,
+                season_id,
+                duelist_ids,
+                points,
+                player_addresses,
+                lords_amount,
+            );
         }
     }
 

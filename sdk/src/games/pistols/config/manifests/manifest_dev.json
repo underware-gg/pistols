@@ -1479,8 +1479,8 @@
   },
   "contracts": [
     {
-      "address": "0x7e8ea18bda5fe752d9b26cd5f41f12a0720827ada0be7c20641b0d760d3b288",
-      "class_hash": "0x1d97f94e39012487c724e927de2bfbcf20ad7a835004390c6671c476bffd575",
+      "address": "0x4fa94d24c0d0e7f4ac3edaab3d3841446a2544fc0a039c66323dfe113668c95",
+      "class_hash": "0x3da53607199f8bbe0f6d71ed7df5ab9aee2a5121f0568827f443ca13f92b16a",
       "abi": [
         {
           "type": "impl",
@@ -1575,22 +1575,6 @@
           "type": "interface",
           "name": "pistols::systems::admin::IAdmin",
           "items": [
-            {
-              "type": "function",
-              "name": "am_i_admin",
-              "inputs": [
-                {
-                  "name": "account_address",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::bool"
-                }
-              ],
-              "state_mutability": "view"
-            },
             {
               "type": "function",
               "name": "set_paused",
@@ -1709,6 +1693,33 @@
             },
             {
               "type": "function",
+              "name": "am_i_admin",
+              "inputs": [
+                {
+                  "name": "account_address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "get_timestamp",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::integer::u64"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
               "name": "urgent_update",
               "inputs": [],
               "outputs": [],
@@ -1716,60 +1727,26 @@
             },
             {
               "type": "function",
-              "name": "velords_migrate_pools",
-              "inputs": [],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "velords_migrate_ranked_challenges",
+              "name": "emit_past_season_leaderboard_event",
               "inputs": [
                 {
-                  "name": "duel_ids",
-                  "type": "core::array::Array::<core::integer::u128>"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "velords_migrate_ranked_duelists",
-              "inputs": [
+                  "name": "season_id",
+                  "type": "core::integer::u32"
+                },
                 {
                   "name": "duelist_ids",
                   "type": "core::array::Array::<core::integer::u128>"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "velords_migrate_packs",
-              "inputs": [
+                },
                 {
-                  "name": "pack_ids",
-                  "type": "core::array::Array::<core::integer::u128>"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "velords_migrate_pools_2",
-              "inputs": [],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "velords_migrate_ranked_duelists_2",
-              "inputs": [
+                  "name": "points",
+                  "type": "core::array::Array::<core::integer::u16>"
+                },
                 {
-                  "name": "duelist_ids",
+                  "name": "player_addresses",
+                  "type": "core::array::Array::<core::starknet::contract_address::ContractAddress>"
+                },
+                {
+                  "name": "lords_amount",
                   "type": "core::array::Array::<core::integer::u128>"
                 }
               ],
@@ -1903,18 +1880,13 @@
         "disqualify_duelist",
         "qualify_duelist",
         "urgent_update",
-        "velords_migrate_pools",
-        "velords_migrate_ranked_challenges",
-        "velords_migrate_ranked_duelists",
-        "velords_migrate_packs",
-        "velords_migrate_pools_2",
-        "velords_migrate_ranked_duelists_2",
+        "emit_past_season_leaderboard_event",
         "upgrade"
       ]
     },
     {
-      "address": "0x174e1f7d57c2d7c00752afcf151b67661dabce3cffeb686ceeeffea58e0ed1a",
-      "class_hash": "0x1c4b126097a1d683c06802b9838686cb2dbf514a48e158cff86af9a6c656844",
+      "address": "0x142b83dad3f00048889ea7b297de5cf09e04686bf0a25d3a00d8abd0f781d9a",
+      "class_hash": "0x471b23034c83827b44f2e32167ba47b800bffe908ce343d996f7704933a8b1b",
       "abi": [
         {
           "type": "impl",
@@ -1986,6 +1958,44 @@
           ]
         },
         {
+          "type": "struct",
+          "name": "pistols::types::rules::RewardValues",
+          "members": [
+            {
+              "name": "fame_lost",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "fame_gained",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "fools_gained",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "points_scored",
+              "type": "core::integer::u16"
+            },
+            {
+              "name": "position",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "fame_burned",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "lords_unlocked",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "survived",
+              "type": "core::bool"
+            }
+          ]
+        },
+        {
           "type": "interface",
           "name": "pistols::systems::bank::IBankPublic",
           "items": [
@@ -2040,6 +2050,30 @@
               ],
               "outputs": [],
               "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "calc_season_reward",
+              "inputs": [
+                {
+                  "name": "season_id",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "duelist_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "lives_staked",
+                  "type": "core::integer::u8"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "pistols::types::rules::RewardValues"
+                }
+              ],
+              "state_mutability": "view"
             },
             {
               "type": "function",
@@ -3114,8 +3148,8 @@
       ]
     },
     {
-      "address": "0x1bd329683a9b54e888b55bb463951f17daee5cd0fd1ab60afa2ebc49d79cc5d",
-      "class_hash": "0x7cb6a5a20703bdab6224ac1d065147051b06ddee137dde9e3cb76fa433c4e17",
+      "address": "0x567547bcfdf0e592d05535843eb02a0717d4206e8ec7ca6ab3bfd60df0f1cb2",
+      "class_hash": "0x7488281f30f22317ba4db62da6d554366fe1c561cb70bf174db482d36fd8dad",
       "abi": [
         {
           "type": "impl",
@@ -7855,8 +7889,8 @@
       ]
     },
     {
-      "address": "0x2bfba19eb4dc82b7e562d088a5a00d3b5f358b1a0c80cfd1c1836809417499d",
-      "class_hash": "0x26ba765b3537208b0c64136225ae158beccb090392ff5ab793a1b7bb7d4d3e0",
+      "address": "0x48241d4c2f5acd6d085fc5da9fc35740f1cb964bd9ca24c06860ca0dac4dba6",
+      "class_hash": "0x5dbe65a379231e4e3c184113927104fb27f74a9668edf35eca58d720f9de7b0",
       "abi": [
         {
           "type": "impl",
@@ -8335,44 +8369,6 @@
           ]
         },
         {
-          "type": "struct",
-          "name": "pistols::types::rules::RewardValues",
-          "members": [
-            {
-              "name": "fame_lost",
-              "type": "core::integer::u128"
-            },
-            {
-              "name": "fame_gained",
-              "type": "core::integer::u128"
-            },
-            {
-              "name": "fools_gained",
-              "type": "core::integer::u128"
-            },
-            {
-              "name": "points_scored",
-              "type": "core::integer::u16"
-            },
-            {
-              "name": "position",
-              "type": "core::integer::u8"
-            },
-            {
-              "name": "fame_burned",
-              "type": "core::integer::u128"
-            },
-            {
-              "name": "lords_unlocked",
-              "type": "core::integer::u128"
-            },
-            {
-              "name": "survived",
-              "type": "core::bool"
-            }
-          ]
-        },
-        {
           "type": "interface",
           "name": "pistols::systems::game::IGame",
           "items": [
@@ -8584,41 +8580,6 @@
               "outputs": [
                 {
                   "type": "core::bool"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "calc_season_reward",
-              "inputs": [
-                {
-                  "name": "season_id",
-                  "type": "core::integer::u32"
-                },
-                {
-                  "name": "duelist_id",
-                  "type": "core::integer::u128"
-                },
-                {
-                  "name": "lives_staked",
-                  "type": "core::integer::u8"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "pistols::types::rules::RewardValues"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "get_timestamp",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::integer::u64"
                 }
               ],
               "state_mutability": "view"
@@ -15078,6 +15039,12 @@
     },
     {
       "members": [],
+      "class_hash": "0x54a691df369bfd417caccb69f8730c600dcc705de35cfe042d04fc3113d9433",
+      "tag": "pistols-FamePegEvent",
+      "selector": "0x285196789c564ebe4e7bfba2ac0ea1b65a3b853b9d187ea3a505ed8bfd7ff35"
+    },
+    {
+      "members": [],
       "class_hash": "0x36030567075dbbc2fc27f746d789391ccc09043268a4a5ab581531bf0e74efc",
       "tag": "pistols-LordsReleaseEvent",
       "selector": "0x7121aa913fad664b07951ce2c9a3ee807c721c6fa15b015d5b6fc22f8daa7a1"
@@ -15111,6 +15078,12 @@
       "class_hash": "0x26d89c39d12e7ee712695dbe2bb9aa2571fd7228c4560537203fba8cc099e78",
       "tag": "pistols-PurchaseDistributionEvent",
       "selector": "0x11b9cb4ac22f27d84c5a59023bc2a5ff64b6b60976f7e44cfa7b952d45d1a85"
+    },
+    {
+      "members": [],
+      "class_hash": "0x4ef513b3cc2cdeb43ba09decdde8afe9c916f8d1913db427176f1b5b83490c8",
+      "tag": "pistols-SeasonLeaderboardEvent",
+      "selector": "0xb80c41cc2f87b6c1c9bf2e4cfff1ccb4b29ae3f82a1160441996f974d1cedd"
     },
     {
       "members": [],

@@ -1,5 +1,6 @@
 use starknet::{ContractAddress};
 use pistols::models::pool::{PoolType};
+use pistols::types::rules::{RewardValues};
 
 #[starknet::interface]
 pub trait IBank<TState> {
@@ -7,6 +8,7 @@ pub trait IBank<TState> {
     fn sponsor_duelists(ref self: TState, payer: ContractAddress, lords_amount: u128);
     fn sponsor_season(ref self: TState, payer: ContractAddress, lords_amount: u128);
     fn sponsor_tournament(ref self: TState, payer: ContractAddress, lords_amount: u128, tournament_id: u64);
+    fn calc_season_reward(self: @TState, season_id: u32, duelist_id: u128, lives_staked: u8) -> RewardValues;
     fn can_collect_season(self: @TState) -> bool;
     fn collect_season(ref self: TState) -> u32;
 }
@@ -17,6 +19,7 @@ pub trait IBankPublic<TState> {
     fn sponsor_duelists(ref self: TState, payer: ContractAddress, lords_amount: u128); //@description: Sponsor duelist starter packs with $LORDS
     fn sponsor_season(ref self: TState, payer: ContractAddress, lords_amount: u128); //@description: Sponsor the current season with $LORDS
     fn sponsor_tournament(ref self: TState, payer: ContractAddress, lords_amount: u128, tournament_id: u64); //@description: Sponsor a tournament with $LORDS
+    fn calc_season_reward(self: @TState, season_id: u32, duelist_id: u128, lives_staked: u8) -> RewardValues;
     fn can_collect_season(self: @TState) -> bool;
     fn collect_season(ref self: TState) -> u32; // @description: Close the current season and start the next one
 }
@@ -52,25 +55,29 @@ pub mod bank {
         IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
         IAdminDispatcherTrait,
         IMatchMakerProtectedDispatcherTrait,
-        IFameCoinProtectedDispatcherTrait,
-        IFameCoinDispatcherTrait,
+        // IFameCoinProtectedDispatcherTrait,
+        // IFameCoinDispatcherTrait,
     };
     use pistols::interfaces::ierc20::{IErc20Trait};
     use pistols::models::{
         season::{SeasonConfig, SeasonConfigTrait},
         pool::{Pool, PoolTrait, PoolType},
-        // events::{FamePegEvent, FamePegDirection},
-        leaderboard::{LeaderboardTrait, LeaderboardPosition},
+        events::{SeasonLeaderboardPosition},
+        events::{FamePegEvent},
+        leaderboard::{Leaderboard, LeaderboardTrait, LeaderboardPosition},
         match_queue::{QueueId},
+        ring::{RingType},
     };
     use pistols::types::{
-        rules::{Rules, RulesTrait, PoolDistribution, RewardDistribution},
-        trophies::{TrophyProgressTrait}
+        rules::{Rules, RulesTrait, PoolDistribution, RewardDistribution, RewardValues},
+        trophies::{TrophyProgressTrait},
+        constants::{FAME},
     };
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::math::{MathTrait};
 
     pub mod Errors {
+        pub const INVALID_ENDPOINT: felt252         = 'BANK: invalid endpoint';
         pub const INVALID_CALLER: felt252           = 'BANK: invalid caller';
         pub const CALLER_NOT_ADMIN: felt252         = 'BANK: caller not admin';
         pub const INVALID_PAYER: felt252            = 'BANK: invalid payer';
@@ -143,6 +150,33 @@ pub mod bank {
             );
         }
 
+        fn calc_season_reward(self: @ContractState,
+            season_id: u32,
+            duelist_id: u128,
+            lives_staked: u8,
+        ) -> RewardValues {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let rules: Rules = store.get_current_season_rules();
+            let signet_ring: RingType = store.get_player_active_signet_ring(starknet::get_caller_address());
+            let fame_balance: u128 = store.world.duelist_token_dispatcher().fame_balance(duelist_id);
+            let rewards_loss: RewardValues = rules.calc_rewards(fame_balance, lives_staked, false, signet_ring, @Default::default());
+            let rewards_win: RewardValues = rules.calc_rewards(fame_balance, lives_staked, true, signet_ring, @Default::default());
+            let mut leaderboard: Leaderboard = store.get_leaderboard(season_id);
+            let position: u8 = leaderboard.insert_score(duelist_id, rewards_win.points_scored);
+            (RewardValues{
+                // if you win...
+                fame_gained: rewards_win.fame_gained,
+                fools_gained: rewards_win.fools_gained,
+                points_scored: rewards_win.points_scored,
+                position,
+                // if you lose...
+                fame_lost: rewards_loss.fame_lost,
+                lords_unlocked: 0,
+                fame_burned: 0,
+                survived: (fame_balance - rewards_loss.fame_lost) >= FAME::ONE_LIFE,
+            })
+        }
+        
         fn can_collect_season(self: @ContractState) -> bool {
             let mut store: Store = StoreTrait::new(self.world_default());
             let season: SeasonConfig = store.get_current_season();
@@ -257,24 +291,27 @@ pub mod bank {
 
         // pool migration
         fn transfer_lords(ref self: ContractState, recipient: ContractAddress, amount: u128) {
-            let mut store: Store = StoreTrait::new(self.world_default());
-            assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
-            self._charge_payer_lords(store,
-                starknet::get_contract_address(), // from
-                recipient, // to
-                amount,
-                Option::None,
-            );
+            assert(false, Errors::INVALID_ENDPOINT);
+            // let mut store: Store = StoreTrait::new(self.world_default());
+            // assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
+            // self._charge_payer_lords(store,
+            //     starknet::get_contract_address(), // from
+            //     recipient, // to
+            //     amount,
+            //     Option::None,
+            // );
         }
 
         fn burn_fame(ref self: ContractState) -> u128 {
-            let mut store: Store = StoreTrait::new(self.world_default());
-            assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
-            let balance: u128 = store.world.fame_coin_dispatcher().balance_of(starknet::get_contract_address()).low;
-            if (balance.is_non_zero()) {
-                store.world.fame_coin_protected_dispatcher().burn(balance);
-            }
-            (balance)
+            assert(false, Errors::INVALID_ENDPOINT);
+            (0)
+            // let mut store: Store = StoreTrait::new(self.world_default());
+            // assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
+            // let balance: u128 = store.world.fame_coin_dispatcher().balance_of(starknet::get_contract_address()).low;
+            // if (balance.is_non_zero()) {
+            //     store.world.fame_coin_protected_dispatcher().burn(balance);
+            // }
+            // (balance)
         }
 
         fn peg_minted_fame_to_lords(ref self: ContractState,
@@ -301,12 +338,13 @@ pub mod bank {
             store.set_pool(@pool_source);
             store.set_pool(@pool_peg);
             // emit event
-            // store.emit_fame_peg(@FamePegEvent {
-            //     season_id: store.get_current_season_id(),
-            //     peg_direction: FamePegDirection::LordsToFame,
-            //     lords_amount: lords_amount,
-            //     fame_amount: fame_amount,
-            // });
+            store.emit_fame_peg(@FamePegEvent {
+                season_id: store.get_current_season_id(),
+                source_pool_id: pool_source.pool_id,
+                target_pool_id: pool_peg.pool_id,
+                lords_amount,
+                fame_amount,
+            });
         }
 
         fn depeg_lords_from_fame_to_be_burned(ref self: ContractState,
@@ -333,12 +371,13 @@ pub mod bank {
             store.set_pool(@pool_peg);
             store.set_pool(@pool_season);
             // emit event
-            // store.emit_fame_peg(@FamePegEvent {
-            //     season_id: store.get_current_season_id(),
-            //     peg_direction: FamePegDirection::FameToLords,
-            //     lords_amount: released_lords,
-            //     fame_amount,
-            // });
+            store.emit_fame_peg(@FamePegEvent {
+                season_id,
+                source_pool_id: pool_peg.pool_id,
+                target_pool_id: pool_season.pool_id,
+                lords_amount,
+                fame_amount,
+            });
             // return amount released
             (lords_amount)
         }
@@ -392,6 +431,7 @@ pub mod bank {
             let mut pool_season: Pool = store.get_pool(PoolType::Season(season_id));
             let mut due_amount_lords: u128 = pool_season.balance_lords;
             // calculate bills
+            let mut season_positions: Array<SeasonLeaderboardPosition> = array![];
             for i in 0..(*distribution.percents).len() { // distribution is never greater than positions
                 let position: LeaderboardPosition = *positions[i];
                 let percent: u8 = *((*distribution.percents)[i]);
@@ -420,12 +460,21 @@ pub mod bank {
                 // transfer to player
                 let recipient: ContractAddress = duelist_dispatcher.owner_of(position.duelist_id.into());
                 lords_dispatcher.transfer(recipient, lords_amount.into());
+                // store for event
+                season_positions.append(SeasonLeaderboardPosition {
+                    duelist_id: position.duelist_id,
+                    points: position.points,
+                    player_address: recipient,
+                    lords_amount,
+                });
                 // next...
                 due_amount_lords -= lords_amount;
             };
             // empty from pool
             pool_season.empty();
             store.set_pool(@pool_season);
+            // emit season leaderboard event
+            store.emit_season_leaderboard(season_id, season_positions);
         }
     }
 }

@@ -42,6 +42,44 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
+	const build_admin_emitPastSeasonLeaderboardEvent_calldata = (seasonId: BigNumberish, duelistIds: Array<BigNumberish>, points: Array<BigNumberish>, playerAddresses: Array<string>, lordsAmount: Array<BigNumberish>): DojoCall => {
+		return {
+			contractName: "admin",
+			entrypoint: "emit_past_season_leaderboard_event",
+			calldata: [seasonId, duelistIds, points, playerAddresses, lordsAmount],
+		};
+	};
+
+	const admin_emitPastSeasonLeaderboardEvent = async (snAccount: Account | AccountInterface, seasonId: BigNumberish, duelistIds: Array<BigNumberish>, points: Array<BigNumberish>, playerAddresses: Array<string>, lordsAmount: Array<BigNumberish>) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_admin_emitPastSeasonLeaderboardEvent_calldata(seasonId, duelistIds, points, playerAddresses, lordsAmount),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_admin_getTimestamp_calldata = (): DojoCall => {
+		return {
+			contractName: "admin",
+			entrypoint: "get_timestamp",
+			calldata: [],
+		};
+	};
+
+	const admin_getTimestamp = async () => {
+		try {
+			return await provider.call("pistols", build_admin_getTimestamp_calldata());
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 	const build_admin_qualifyDuelist_calldata = (seasonId: BigNumberish, duelistId: BigNumberish): DojoCall => {
 		return {
 			contractName: "admin",
@@ -189,132 +227,6 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_admin_velordsMigratePacks_calldata = (packIds: Array<BigNumberish>): DojoCall => {
-		return {
-			contractName: "admin",
-			entrypoint: "velords_migrate_packs",
-			calldata: [packIds],
-		};
-	};
-
-	const admin_velordsMigratePacks = async (snAccount: Account | AccountInterface, packIds: Array<BigNumberish>) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				build_admin_velordsMigratePacks_calldata(packIds),
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
-	const build_admin_velordsMigratePools_calldata = (): DojoCall => {
-		return {
-			contractName: "admin",
-			entrypoint: "velords_migrate_pools",
-			calldata: [],
-		};
-	};
-
-	const admin_velordsMigratePools = async (snAccount: Account | AccountInterface) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				build_admin_velordsMigratePools_calldata(),
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
-	const build_admin_velordsMigratePools2_calldata = (): DojoCall => {
-		return {
-			contractName: "admin",
-			entrypoint: "velords_migrate_pools_2",
-			calldata: [],
-		};
-	};
-
-	const admin_velordsMigratePools2 = async (snAccount: Account | AccountInterface) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				build_admin_velordsMigratePools2_calldata(),
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
-	const build_admin_velordsMigrateRankedChallenges_calldata = (duelIds: Array<BigNumberish>): DojoCall => {
-		return {
-			contractName: "admin",
-			entrypoint: "velords_migrate_ranked_challenges",
-			calldata: [duelIds],
-		};
-	};
-
-	const admin_velordsMigrateRankedChallenges = async (snAccount: Account | AccountInterface, duelIds: Array<BigNumberish>) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				build_admin_velordsMigrateRankedChallenges_calldata(duelIds),
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
-	const build_admin_velordsMigrateRankedDuelists_calldata = (duelistIds: Array<BigNumberish>): DojoCall => {
-		return {
-			contractName: "admin",
-			entrypoint: "velords_migrate_ranked_duelists",
-			calldata: [duelistIds],
-		};
-	};
-
-	const admin_velordsMigrateRankedDuelists = async (snAccount: Account | AccountInterface, duelistIds: Array<BigNumberish>) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				build_admin_velordsMigrateRankedDuelists_calldata(duelistIds),
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
-	const build_admin_velordsMigrateRankedDuelists2_calldata = (duelistIds: Array<BigNumberish>): DojoCall => {
-		return {
-			contractName: "admin",
-			entrypoint: "velords_migrate_ranked_duelists_2",
-			calldata: [duelistIds],
-		};
-	};
-
-	const admin_velordsMigrateRankedDuelists2 = async (snAccount: Account | AccountInterface, duelistIds: Array<BigNumberish>) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				build_admin_velordsMigrateRankedDuelists2_calldata(duelistIds),
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
 	const build_bank_burnFame_calldata = (): DojoCall => {
 		return {
 			contractName: "bank",
@@ -330,6 +242,23 @@ export function setupWorld(provider: DojoProvider) {
 				build_bank_burnFame_calldata(),
 				"pistols",
 			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_bank_calcSeasonReward_calldata = (seasonId: BigNumberish, duelistId: BigNumberish, livesStaked: BigNumberish): DojoCall => {
+		return {
+			contractName: "bank",
+			entrypoint: "calc_season_reward",
+			calldata: [seasonId, duelistId, livesStaked],
+		};
+	};
+
+	const bank_calcSeasonReward = async (seasonId: BigNumberish, duelistId: BigNumberish, livesStaked: BigNumberish) => {
+		try {
+			return await provider.call("pistols", build_bank_calcSeasonReward_calldata(seasonId, duelistId, livesStaked));
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -2503,23 +2432,6 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_game_calcSeasonReward_calldata = (seasonId: BigNumberish, duelistId: BigNumberish, livesStaked: BigNumberish): DojoCall => {
-		return {
-			contractName: "game",
-			entrypoint: "calc_season_reward",
-			calldata: [seasonId, duelistId, livesStaked],
-		};
-	};
-
-	const game_calcSeasonReward = async (seasonId: BigNumberish, duelistId: BigNumberish, livesStaked: BigNumberish) => {
-		try {
-			return await provider.call("pistols", build_game_calcSeasonReward_calldata(seasonId, duelistId, livesStaked));
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
 	const build_game_canCollectDuel_calldata = (duelId: BigNumberish): DojoCall => {
 		return {
 			contractName: "game",
@@ -2754,23 +2666,6 @@ export function setupWorld(provider: DojoProvider) {
 	const game_getDuelProgress = async (duelId: BigNumberish) => {
 		try {
 			return await provider.call("pistols", build_game_getDuelProgress_calldata(duelId));
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
-	const build_game_getTimestamp_calldata = (): DojoCall => {
-		return {
-			contractName: "game",
-			entrypoint: "get_timestamp",
-			calldata: [],
-		};
-	};
-
-	const game_getTimestamp = async () => {
-		try {
-			return await provider.call("pistols", build_game_getTimestamp_calldata());
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -4687,6 +4582,10 @@ export function setupWorld(provider: DojoProvider) {
 			buildAmIAdminCalldata: build_admin_amIAdmin_calldata,
 			disqualifyDuelist: admin_disqualifyDuelist,
 			buildDisqualifyDuelistCalldata: build_admin_disqualifyDuelist_calldata,
+			emitPastSeasonLeaderboardEvent: admin_emitPastSeasonLeaderboardEvent,
+			buildEmitPastSeasonLeaderboardEventCalldata: build_admin_emitPastSeasonLeaderboardEvent_calldata,
+			getTimestamp: admin_getTimestamp,
+			buildGetTimestampCalldata: build_admin_getTimestamp_calldata,
 			qualifyDuelist: admin_qualifyDuelist,
 			buildQualifyDuelistCalldata: build_admin_qualifyDuelist_calldata,
 			setIsBlocked: admin_setIsBlocked,
@@ -4701,22 +4600,12 @@ export function setupWorld(provider: DojoProvider) {
 			buildSetTreasuryCalldata: build_admin_setTreasury_calldata,
 			urgentUpdate: admin_urgentUpdate,
 			buildUrgentUpdateCalldata: build_admin_urgentUpdate_calldata,
-			velordsMigratePacks: admin_velordsMigratePacks,
-			buildVelordsMigratePacksCalldata: build_admin_velordsMigratePacks_calldata,
-			velordsMigratePools: admin_velordsMigratePools,
-			buildVelordsMigratePoolsCalldata: build_admin_velordsMigratePools_calldata,
-			velordsMigratePools2: admin_velordsMigratePools2,
-			buildVelordsMigratePools2Calldata: build_admin_velordsMigratePools2_calldata,
-			velordsMigrateRankedChallenges: admin_velordsMigrateRankedChallenges,
-			buildVelordsMigrateRankedChallengesCalldata: build_admin_velordsMigrateRankedChallenges_calldata,
-			velordsMigrateRankedDuelists: admin_velordsMigrateRankedDuelists,
-			buildVelordsMigrateRankedDuelistsCalldata: build_admin_velordsMigrateRankedDuelists_calldata,
-			velordsMigrateRankedDuelists2: admin_velordsMigrateRankedDuelists2,
-			buildVelordsMigrateRankedDuelists2Calldata: build_admin_velordsMigrateRankedDuelists2_calldata,
 		},
 		bank: {
 			burnFame: bank_burnFame,
 			buildBurnFameCalldata: build_bank_burnFame_calldata,
+			calcSeasonReward: bank_calcSeasonReward,
+			buildCalcSeasonRewardCalldata: build_bank_calcSeasonReward_calldata,
 			canCollectSeason: bank_canCollectSeason,
 			buildCanCollectSeasonCalldata: build_bank_canCollectSeason_calldata,
 			chargeLordsPurchase: bank_chargeLordsPurchase,
@@ -4959,8 +4848,6 @@ export function setupWorld(provider: DojoProvider) {
 			buildTransferFromCalldata: build_fools_coin_transferFrom_calldata,
 		},
 		game: {
-			calcSeasonReward: game_calcSeasonReward,
-			buildCalcSeasonRewardCalldata: build_game_calcSeasonReward_calldata,
 			canCollectDuel: game_canCollectDuel,
 			buildCanCollectDuelCalldata: build_game_canCollectDuel_calldata,
 			clearCallToChallenge: game_clearCallToChallenge,
@@ -4985,8 +4872,6 @@ export function setupWorld(provider: DojoProvider) {
 			buildGetDuelDeckCalldata: build_game_getDuelDeck_calldata,
 			getDuelProgress: game_getDuelProgress,
 			buildGetDuelProgressCalldata: build_game_getDuelProgress_calldata,
-			getTimestamp: game_getTimestamp,
-			buildGetTimestampCalldata: build_game_getTimestamp_calldata,
 			revealMoves: game_revealMoves,
 			buildRevealMovesCalldata: build_game_revealMoves_calldata,
 		},

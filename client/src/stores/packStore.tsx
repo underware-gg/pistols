@@ -128,6 +128,6 @@ export const useFetchPacksOwnedByAccount = (address: BigNumberish) => {
 
   return {
     isLoading,
-    isFinished,
+    isFinished: (isFinished || newPackIds.length === 0),
   }
 }

@@ -749,8 +749,14 @@ pub mod duel_token {
             let mut store: Store = StoreTrait::new(self.world_default());
             assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
             if (self.token_exists(duel_id.into())) {
+                // burn the token
                 self.erc721.burn(duel_id.into());
-                store.delete_challenge(@store.get_challenge(duel_id));
+                // clear call to actions
+                let challenge: Challenge = store.get_challenge(duel_id);
+                store.emit_challenge_action(@challenge, 1, ChallengeAction::Finished);
+                store.emit_challenge_action(@challenge, 2, ChallengeAction::Finished);
+                // delete challenge and round
+                store.delete_challenge(@challenge);
                 store.delete_round(@store.get_round(duel_id));
             }
         }

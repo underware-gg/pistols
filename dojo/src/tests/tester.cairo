@@ -333,7 +333,8 @@ pub mod tester {
             TestResource::Event(pistols::models::events::e_PlayerBookmarkEvent::TEST_CLASS_HASH.into()),
             TestResource::Event(pistols::models::events::e_PlayerSocialLinkEvent::TEST_CLASS_HASH.into()),
             TestResource::Event(pistols::models::events::e_PlayerSettingEvent::TEST_CLASS_HASH.into()),
-            // TestResource::Event(pistols::models::events::e_FamePegEvent::TEST_CLASS_HASH.into()),
+            TestResource::Event(pistols::models::events::e_FamePegEvent::TEST_CLASS_HASH.into()),
+            TestResource::Event(pistols::models::events::e_SeasonLeaderboardEvent::TEST_CLASS_HASH.into()),
             // cartridge arcade
             TestResource::Event(achievement::events::index::e_TrophyCreation::TEST_CLASS_HASH.into()),
             TestResource::Event(achievement::events::index::e_TrophyProgression::TEST_CLASS_HASH.into()),
@@ -726,6 +727,26 @@ pub mod tester {
             let mut values: Array<felt252> = array![];
             values.append_serde(value);
             ArrayTestUtilsTrait::assert_span_eq(event.values, values.span(), "values");
+        }
+    }
+    pub fn assert_event_fame_peg(sys: @TestSystems, season_id: u32) {
+        let contract_event: WorldEvent = testing::pop_log::<WorldEvent>(*sys.world.dispatcher.contract_address).unwrap();
+        if let WorldEvent::EventEmitted(event) = contract_event {
+            assert_eq!(event.selector, selector_from_tag!("pistols-FamePegEvent"), "Invalid selector");
+            // compare keys
+            assert_eq!(*event.keys[0], season_id.into(), "season_id");
+            // // compare values
+            // assert_eq!(*event.values[0], position_count.into(), "position_count");
+        }
+    }
+    pub fn assert_event_season_leaderboards(sys: @TestSystems, season_id: u32, position_count: usize) {
+        let contract_event: WorldEvent = testing::pop_log::<WorldEvent>(*sys.world.dispatcher.contract_address).unwrap();
+        if let WorldEvent::EventEmitted(event) = contract_event {
+            assert_eq!(event.selector, selector_from_tag!("pistols-SeasonLeaderboardEvent"), "Invalid selector");
+            // compare keys
+            assert_eq!(*event.keys[0], season_id.into(), "season_id");
+            // compare values
+            assert_eq!(*event.values[0], position_count.into(), "position_count");
         }
     }
 

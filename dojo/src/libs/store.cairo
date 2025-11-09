@@ -71,11 +71,12 @@ pub use pistols::models::{
     events::{
         CallToChallengeEvent, ChallengeAction,
         ChallengeRewardsEvent,
-        // FamePegEvent,
+        FamePegEvent,
         PlayerBookmarkEvent,
         PlayerSocialLinkEvent, SocialPlatform,
         PlayerSettingEvent, PlayerSetting, PlayerSettingValue,
         PurchaseDistributionEvent,
+        SeasonLeaderboardEvent, SeasonLeaderboardPosition,
     },
 };
 pub use pistols::systems::components::{
@@ -730,7 +731,7 @@ pub impl StoreImpl of StoreTrait {
     fn emit_challenge_action(ref self: Store, challenge: @Challenge, duelist_number: u8, action: ChallengeAction) {
         if (duelist_number == 1) {
             self.emit_call_to_challenge(*challenge.address_a, *challenge.duel_id, action);
-        } else if (duelist_number == 2) {
+        } else if (duelist_number == 2 && challenge.address_b.is_non_zero()) {
             self.emit_call_to_challenge(*challenge.address_b, *challenge.duel_id, action);
         }
     }
@@ -755,12 +756,12 @@ pub impl StoreImpl of StoreTrait {
         }
     }
 
-    // #[inline(always)]
-    // fn emit_fame_peg(ref self: Store,
-    //     peg_event: @FamePegEvent,
-    // ) {
-    //     self.world.emit_event(peg_event);
-    // }
+    #[inline(always)]
+    fn emit_fame_peg(ref self: Store,
+        peg_event: @FamePegEvent,
+    ) {
+        self.world.emit_event(peg_event);
+    }
 
     #[inline(always)]
     fn emit_purchase_distribution(ref self: Store,
@@ -787,6 +788,15 @@ pub impl StoreImpl of StoreTrait {
         });
     }
 
+    #[inline(always)]
+    fn emit_season_leaderboard(ref self: Store, season_id: u32, positions: Array<SeasonLeaderboardPosition>) {
+        self.world.emit_event(@SeasonLeaderboardEvent{
+            season_id,
+            positions,
+        });
+    }
+
+    // #[inline(always)]
     #[inline(always)]
     fn emit_player_bookmark(ref self: Store,
         player_address: ContractAddress,

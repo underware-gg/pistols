@@ -65,19 +65,24 @@ const _useSdkGet = (prefix: string, {
 }: UseSdkGetProps & {
   fn: (query: PistolsGetParams) => Promise<PistolsToriiResponse>
 }): UseSdkGetResult => {
-  const [isLoading, setIsLoading] = useState<boolean>()
+  const [isLoading, setIsLoading] = useState<boolean>(undefined)
+  const [isFinished, setIsFinished] = useState<boolean>(undefined)
 
   useEffect(() => {
     let _mounted = true
     const _get = async () => {
       setIsLoading(true)
+      setIsFinished(false)
       try {
         let pageIndex = 0;
         let lastCursor = undefined;
         while (query) {
           updateProgress?.(pageIndex);
           const response: PistolsToriiResponse = await fn({ query });
-          if (!_mounted) return
+          if (!_mounted) {
+            console.warn(`${prefix} UNMOUNTED GOT:`, response)
+            return
+          }
           debug.log(`${prefix} GOT[page:${pageIndex}]:`, response, query)
           const entities = _filterItems(response.getItems())
           if (pageIndex == 0 && resetStore) {
@@ -92,6 +97,7 @@ const _useSdkGet = (prefix: string, {
               response.cursor != lastCursor // avoid sdk sending repeated cursor
             ) ? response.getNextQuery(query) : null
             lastCursor = response.cursor
+            debug.log(`${prefix} cursor/query=`, lastCursor, query)
           } else {
             setEntities([]); // notify that no events exist to stop trying
             query = null
@@ -103,10 +109,12 @@ const _useSdkGet = (prefix: string, {
           pageIndex++;
         }
         updateProgress?.(pageIndex, true);
-        setIsLoading(false)
       } catch (error) {
         console.error(`${prefix} exception:`, error)
-        if (_mounted) setIsLoading(false)
+      }
+      if (_mounted) {
+        setIsLoading(undefined)
+        setIsFinished(true)
       }
     }
     // get...
@@ -118,7 +126,7 @@ const _useSdkGet = (prefix: string, {
 
   return {
     isLoading,
-    isFinished: (isLoading === false)
+    isFinished,
   }
 }
 
@@ -190,7 +198,9 @@ export const useSdkEntitiesSub = ({
   enabled = true,
 }: UseSdkSubProps): UseSdkGetResult => {
   const { sdk } = useDojoSetup()
-  const [isLoading, setIsLoading] = useState<boolean>()
+  const [isLoading, setIsLoading] = useState<boolean>(undefined)
+  const [isFinished, setIsFinished] = useState<boolean>(undefined)
+
   const limit = useMemo(() => query?.build().pagination.limit, [query])
 
   useEffect(() => {
@@ -198,6 +208,7 @@ export const useSdkEntitiesSub = ({
     let _unsubscribe: (() => void) = undefined;
     const _subscribe = async () => {
       setIsLoading(true)
+      setIsFinished(false)
       debug.log("ENTITIES SUB _______ query:", query);
       sdk.subscribeEntityQuery({
         query,
@@ -210,7 +221,10 @@ export const useSdkEntitiesSub = ({
           }
         },
       }).then((response: SdkSubscribeResponse) => {
-        if (!_mounted) return
+        if (!_mounted) {
+          console.warn(`useSdkEntitiesSub() UNMOUNTED GOT:`, response)
+          return
+        }
         // debug.log("useSdkEntitiesSub() ENTITIES SUB ====== initialEntities:", response);
         const [initialEntities, sub] = response;
         // if (initialEntities.getItems().length == limit) {
@@ -221,11 +235,14 @@ export const useSdkEntitiesSub = ({
           debug.log("useSdkEntitiesSub() ====== initialEntities>>>>>", initialEntities)
           setEntities(_filterItems(initialEntities.getItems()))
         }
-        setIsLoading(false)
       }).catch(error => {
         if (!_mounted) return
         console.error("useSdkEntitiesSub() promise error:", error, query)
-        setIsLoading(false)
+      }).finally(() => {
+        if (_mounted) {
+          setIsLoading(undefined)
+          setIsFinished(true)
+        }
       })
     };
     // subscribe
@@ -240,7 +257,7 @@ export const useSdkEntitiesSub = ({
 
   return {
     isLoading,
-    isFinished: (isLoading === false)
+    isFinished,
   }
 }
 
@@ -251,7 +268,9 @@ export const useSdkEventsSub = ({
   enabled = true,
 }: UseSdkSubProps): UseSdkGetResult => {
   const { sdk } = useDojoSetup()
-  const [isLoading, setIsLoading] = useState<boolean>()
+  const [isLoading, setIsLoading] = useState<boolean>(undefined)
+  const [isFinished, setIsFinished] = useState<boolean>(undefined)
+
   const limit = useMemo(() => query?.build().pagination.limit, [query])
   const historical = useMemo(() => query?.build().historical, [query])
 
@@ -260,6 +279,7 @@ export const useSdkEventsSub = ({
     let _unsubscribe: (() => void) = undefined;
     const _subscribe = async () => {
       setIsLoading(true)
+      setIsFinished(false)
       debug.log("useSdkEventsSub() _______ query:", query);
       await sdk.subscribeEventQuery({
         query,
@@ -272,7 +292,10 @@ export const useSdkEventsSub = ({
           }
         },
       }).then((response: SdkSubscribeResponse) => {
-        if (!_mounted) return
+        if (!_mounted) {
+          console.warn(`useSdkEventsSub() UNMOUNTED GOT:`, response)
+          return
+        }
         // debug.log("useSdkEventsSub() ENTITIES SUB ====== initialEntities:", historical, response);
         const [initialEntities, sub] = response;
         // if (initialEntities.getItems().length == limit) {
@@ -282,12 +305,15 @@ export const useSdkEventsSub = ({
           _unsubscribe = () => sub.cancel()
           debug.log("useSdkEventsSub() ====== initialEntities>>>>>", historical, initialEntities, _filterItems(initialEntities.getItems()))
           setEntities(_filterItems(initialEntities.getItems()))
-          setIsLoading(false)
         }
       }).catch(error => {
         if (!_mounted) return
         console.error("useSdkEventsSub() promise error:", historical, error, query)
-        setIsLoading(false)
+      }).finally(() => {
+        if (_mounted) {
+          setIsLoading(undefined)
+          setIsFinished(true)
+        }
       })
     };
     // subscribe...
@@ -302,7 +328,7 @@ export const useSdkEventsSub = ({
 
   return {
     isLoading,
-    isFinished: (isLoading === false)
+    isFinished,
   }
 }
 

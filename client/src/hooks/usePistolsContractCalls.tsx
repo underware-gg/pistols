@@ -87,7 +87,7 @@ export type RewardValues = {
 }
 
 export const useCalcSeasonReward = (season_id: number, duelist_id: BigNumberish, lives_staked: BigNumberish) => {
-  const { game: { calcSeasonReward } } = useDojoContractCalls()
+  const { bank: { calcSeasonReward } } = useDojoContractCalls()
   const options = useMemo(() => ({
     call: calcSeasonReward,
     args: [BigInt(season_id ?? 0), BigInt(duelist_id ?? 0), BigInt(lives_staked ?? 1)],
@@ -144,7 +144,7 @@ export const useCanCollectSeason = () => {
 }
 
 export const useGameTimestamp = () => {
-  const { game: { getTimestamp } } = useDojoContractCalls()
+  const { admin: { getTimestamp } } = useDojoContractCalls()
   const options = useMemo(() => ({
     call: getTimestamp,
     args: [],

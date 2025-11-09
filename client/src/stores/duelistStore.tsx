@@ -458,7 +458,7 @@ export const useFetchDuelistsByIds = (duelistIds: BigNumberish[], retryInterval?
 
   return {
     isLoading,
-    isFinished,
+    isFinished: (isFinished || newDuelistIds.length === 0),
   }
 }
 
@@ -537,6 +537,6 @@ const useFetchPlayerDuelistStacks = (addresses: BigNumberish[]) => {
 
   return {
     isLoading,
-    isFinished,
+    isFinished: (isFinished || newAddresses.length === 0),
   }
 }
