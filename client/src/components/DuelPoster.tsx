@@ -253,7 +253,8 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
   const { duelistSelectOpener } = usePistolsContext()
   const { leftDuelistId, rightDuelistId, leftDuelistAddress, rightDuelistAddress, leftPlayerName, rightPlayerName, isDead, isYouA, isYouB, isCallToAction, leftAvatarUrl, rightAvatarUrl, leftApiAvatarUrl, rightApiAvatarUrl, displayDuelType, duelType } = useDuelPosterData(props.duelId)
 
-  useFetchDuelistIdsOwnedByAccounts([leftDuelistAddress, rightDuelistAddress]) // fetch duelists in the store, if not already fetched
+  const duelistAddresses = useMemo(() => [leftDuelistAddress, rightDuelistAddress], [leftDuelistAddress, rightDuelistAddress])
+  useFetchDuelistIdsOwnedByAccounts(duelistAddresses) // fetch duelists in the store, if not already fetched
 
   const {
     state,
