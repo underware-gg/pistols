@@ -16,6 +16,7 @@ import { DuelistEmptySlot, DuelistEmptySlotHandle } from '../ui/DuelistEmptySlot
 import { AudioName } from '/src/data/audioAssets'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
+import { useClearExpiredRankedDuels } from '/src/hooks/useClearExpiredRankedDuels'
 
 export default function ScMatchmaking() {
   const { aspectWidth, aspectHeight } = useGameAspect()
@@ -42,6 +43,9 @@ export default function ScMatchmaking() {
   const [hasAutoSelected, setHasAutoSelected] = useState(false)
 
   const { challengeIds } = useQueryChallengeIdsForMatchmaking(matchmakingType === constants.QueueId.Ranked ? constants.DuelType.Ranked : constants.DuelType.Unranked);
+
+  // Clear expired ranked duels with call-to-action flags
+  useClearExpiredRankedDuels(challengeIds)
 
   const {
     // current queue

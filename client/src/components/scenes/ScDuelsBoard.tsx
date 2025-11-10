@@ -13,6 +13,7 @@ import { SceneName  } from '/src/data/assetsTypes'
 import { ActionButton } from '/src/components/ui/Buttons'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { useCurrentSeason } from '/src/stores/seasonStore'
+import { useClearExpiredRankedDuels } from '/src/hooks/useClearExpiredRankedDuels'
 
 export default function ScDuelsBoard() {
   const [pageNumber, setPageNumber] = useState(0)
@@ -49,6 +50,9 @@ export default function ScDuelsBoard() {
     Math.max(0, pageNumber - 1),
     3
   )
+
+  // Clear expired ranked duels with call-to-action flags
+  useClearExpiredRankedDuels(challengeIds)
 
   useEffect(() => {
     setPageNumber(0)
