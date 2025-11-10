@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { useLordsBalance, useEtherBalance, useFoolsBalance, useFameBalance, useDuelistFameBalance, useStrkBalance } from '/src/stores/coinStore'
 import { Balance } from '/src/components/account/Balance'
@@ -109,18 +109,21 @@ export const FameLivesDuelist = ({
   size = null,
   overrideFame = false,
   fame = null,
+  isLoading: externalLoading = false,
 }: {
   duelistId: BigNumberish
   size?: IconSizeProp
   overrideFame?: boolean
   fame?: bigint
+  isLoading?: boolean
 }) => {
   const { balance, isLoading } = useDuelistFameBalance(duelistId)
   const _fame = useMemo(() => {
     return overrideFame ? fame : balance
   }, [overrideFame, fame, balance])
+  const isLoadingState = externalLoading || isLoading
   return (
-    <Balance fame size={size} wei={_fame / 1000n} isLoading={isLoading} />
+    <Balance fame size={size} wei={_fame / 1000n} isLoading={isLoadingState} />
   )
 }
 
