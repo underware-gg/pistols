@@ -355,39 +355,39 @@ const PistolsProvider = ({
   })
 
   useEffect(() => {
-    const hasModalOpen = connectOpener.isOpen || 
-                        shopOpener.isOpen || 
-                        tutorialOpener.isOpen || 
-                        bookOpener.isOpen || 
-                        duelistSelectOpener.isOpen || 
-                        walletFinderOpener.isOpen ||
-                        settingsOpener.isOpen ||
-                        errorModalOpener.isOpen ||
-                        bugReportOpener.isOpen ||
-                        barkeepModalOpener.isOpen ||
-                        tavernRingsOpener.isOpen ||
-                        ringAnimationOpener.isOpen ||
-                        tutorialPromptOpener.isOpen ||
-                        modeSelectOpener.isOpen ||
+    const hasModalOpen = connectOpener?.isOpen || 
+                        shopOpener?.isOpen || 
+                        tutorialOpener?.isOpen || 
+                        bookOpener?.isOpen || 
+                        duelistSelectOpener?.isOpen || 
+                        walletFinderOpener?.isOpen ||
+                        settingsOpener?.isOpen ||
+                        errorModalOpener?.isOpen ||
+                        bugReportOpener?.isOpen ||
+                        barkeepModalOpener?.isOpen ||
+                        tavernRingsOpener?.isOpen ||
+                        ringAnimationOpener?.isOpen ||
+                        tutorialPromptOpener?.isOpen ||
+                        modeSelectOpener?.isOpen ||
                         hasSearchParams ||
                         (state.challengingAddress && state.challengingDuelistId)
 
     emitter.emit('hasModalOpen', hasModalOpen)
   }, [
-    connectOpener.isOpen,
-    shopOpener.isOpen, 
-    tutorialOpener.isOpen,
-    bookOpener.isOpen,
-    duelistSelectOpener.isOpen,
-    walletFinderOpener.isOpen,
-    settingsOpener.isOpen,
-    errorModalOpener.isOpen,
-    bugReportOpener.isOpen,
-    barkeepModalOpener.isOpen,
-    tavernRingsOpener.isOpen,
-    ringAnimationOpener.isOpen,
-    tutorialPromptOpener.isOpen,
-    modeSelectOpener.isOpen,
+    connectOpener?.isOpen,
+    shopOpener?.isOpen, 
+    tutorialOpener?.isOpen,
+    bookOpener?.isOpen,
+    duelistSelectOpener?.isOpen,
+    walletFinderOpener?.isOpen,
+    settingsOpener?.isOpen,
+    errorModalOpener?.isOpen,
+    bugReportOpener?.isOpen,
+    barkeepModalOpener?.isOpen,
+    tavernRingsOpener?.isOpen,
+    ringAnimationOpener?.isOpen,
+    tutorialPromptOpener?.isOpen,
+    modeSelectOpener?.isOpen,
     hasSearchParams,
     state.challengingAddress,
     state.challengingDuelistId
