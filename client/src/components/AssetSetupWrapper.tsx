@@ -15,7 +15,7 @@ function updateLoadingVars(progress: number, message: string, mbData: string) {
 }
 
 const loadingMessages = [
-  "Loading the saloon doors",
+  "Loading the tavern doors",
   "Polishing pistols and preparing cards",
   "Setting up the dueling grounds",
   "Gathering the town folk",
@@ -89,7 +89,7 @@ export default function AssetSetupWrapper({ children }: AssetSetupWrapperProps) 
   if (assetSetup.status.isError) {
     return (
       <div className="asset-setup-wrapper error-screen">
-        <DojoStatus message={assetSetup.status.errorMessage || 'The saloon doors are jammed! Try again, partner.'} />
+        <DojoStatus message={assetSetup.status.errorMessage || 'The tavern doors are jammed! Try again, partner.'} />
       </div>
     )
   }
