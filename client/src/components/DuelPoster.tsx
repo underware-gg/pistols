@@ -29,7 +29,6 @@ import { useCanCollectDuel } from '/src/hooks/usePistolsContractCalls'
 import { useDuelCallToAction } from '/src/stores/eventsModelStore'
 import { useDuelistFameBalance } from '/src/stores/coinStore'
 import { useExecuteEmitPlayerBookmark } from '/src/hooks/usePistolsSystemCalls'
-import { useDuelistFameOnDuel, useFetchChallengeRewardsByDuelistIds } from '/src/stores/challengeRewardsStore'
 import { useTransactionHandler } from '/src/hooks/useTransaction'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { SceneName } from '/src/data/assetsTypes'
@@ -253,9 +252,6 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
   const { account } = useAccount()
   const { duelistSelectOpener } = usePistolsContext()
   const { leftDuelistId, rightDuelistId, leftDuelistAddress, rightDuelistAddress, leftPlayerName, rightPlayerName, isDead, isYouA, isYouB, isCallToAction, leftAvatarUrl, rightAvatarUrl, leftApiAvatarUrl, rightApiAvatarUrl, displayDuelType, duelType } = useDuelPosterData(props.duelId)
-  useFetchChallengeRewardsByDuelistIds([leftDuelistId, rightDuelistId])
-  const { fameBefore: fameBeforeA, fameAfter: fameAfterA } = useDuelistFameOnDuel(props.duelId, leftDuelistId)
-  const { fameBefore: fameBeforeB, fameAfter: fameAfterB } = useDuelistFameOnDuel(props.duelId, rightDuelistId)
 
   useFetchDuelistIdsOwnedByAccounts([leftDuelistAddress, rightDuelistAddress]) // fetch duelists in the store, if not already fetched
 
@@ -475,9 +471,8 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
               {leftDuelistId || challengingDuelistId ? (
                 <DuelistCard
                   duelistId={Number(leftDuelistId || challengingDuelistId)}
+                  duelId={props.duelId}
                   isSmall={true}
-                  overrideFame={!isLive}
-                  fame={isFinished && !isCallToAction ? fameAfterA : fameBeforeA}
                   isLeft={true}
                   isVisible={true}
                   isFlipped={true}
@@ -557,9 +552,8 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
               {rightDuelistId ? (
                 <DuelistCard
                   duelistId={Number(rightDuelistId)}
+                  duelId={props.duelId}
                   isSmall={true}
-                  overrideFame={!isLive}
-                  fame={isFinished && !isCallToAction ? fameAfterB : fameBeforeB}
                   isLeft={false}
                   isVisible={true}
                   isFlipped={true}

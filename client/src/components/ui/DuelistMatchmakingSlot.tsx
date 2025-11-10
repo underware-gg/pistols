@@ -248,6 +248,7 @@ export const DuelistMatchmakingSlot = forwardRef<DuelistMatchmakingSlotHandle, D
       <DuelistCard
         ref={duelistCardRef}
         duelistId={Number(currentDuelistId)}
+        duelId={props.duelId}
         isSmall
         isLeft
         isVisible
