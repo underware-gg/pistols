@@ -9,6 +9,8 @@ katana \
   --dev \
   --dev.accounts 10 \
   --dev.no-fee \
+  --cartridge.controllers \
+  --cartridge.paymaster \
   # | grep -v \
   # -e starknet_call \
   # -e starknet_chainId \
