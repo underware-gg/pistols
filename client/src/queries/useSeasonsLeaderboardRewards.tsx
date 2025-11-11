@@ -43,7 +43,8 @@ export type SeasonLeaderboardPrizes = {
   }
 }
 
-export const useSeasonsLeaderboardRewards = () => {
+// TODO: REMOVE THIS!!!
+export const useSeasonsLeaderboardRewards_OLD = () => {
   const query = `select * from "event_messages_historical" where data like "%LeaderboardPrize%"`;
   const { data, isLoading, queryHash } = useSdkSqlQuery({
     query,

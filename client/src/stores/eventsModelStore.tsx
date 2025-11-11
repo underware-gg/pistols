@@ -1,13 +1,15 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { BigNumberish } from 'starknet';
 import { useAccount } from '@starknet-react/core';
 import { createDojoStore } from '@dojoengine/sdk/react'
 import { PistolsSchemaType } from '@underware/pistols-sdk/pistols/sdk'
-import { useDojoSetup, useStoreModelsByKeys } from '@underware/pistols-sdk/dojo';
-import { parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/starknet';
-import { bigintEquals, bigintToHex } from '@underware/pistols-sdk/utils';
+import { useAllStoreModels, useDojoSetup, useStoreModelsByKeys } from '@underware/pistols-sdk/dojo';
+import { parseCustomEnum, parseEnumVariant, weiToEth } from '@underware/pistols-sdk/starknet';
+import { bigintEquals, bigintToAddress, bigintToDecimal, bigintToHex, bigintToNumber } from '@underware/pistols-sdk/utils';
 import { models, constants } from '@underware/pistols-sdk/pistols/gen';
 import * as ENV from '/src/utils/env'
+import { useConfig } from './configStore';
+import { useSeasonsLeaderboardRewards_OLD } from '../queries/useSeasonsLeaderboardRewards';
 
 export const useEventsStore = createDojoStore<PistolsSchemaType>();
 
@@ -159,3 +161,97 @@ export const useDiscordSocialLink = (address: BigNumberish) => {
   }
 }
 
+
+//--------------------------------
+// [SeasonLeaderboardEvent]
+//
+export type SeasonLeaderboardPosition = {
+  duelistId: bigint;
+  points: number;
+  playerAddress: string;
+  lordsAmount_eth: bigint;
+  lordsAmount_wei: bigint;
+}
+export type SeasonLeaderboard = {
+  totalLords_wei: bigint;
+  totalLords_eth: bigint;
+  duelists: Record<string, SeasonLeaderboardPosition>;
+  positions: SeasonLeaderboardPosition[],
+}
+const _parseSeasonLeaderboard = (leaderboard: models.SeasonLeaderboardEvent | undefined): SeasonLeaderboard => {
+  const positions = leaderboard?.positions.map((position) => {
+    return {
+      duelistId: BigInt(position.duelist_id),
+      points: bigintToNumber(position.points),
+      playerAddress: bigintToAddress(position.player_address),
+      lordsAmount_eth: weiToEth(BigInt(position.lords_amount)),
+      lordsAmount_wei: BigInt(position.lords_amount)
+    }
+  }) ?? [];
+  const duelists = positions.reduce((acc, position) => {
+    acc[bigintToDecimal(position.duelistId)] = position;
+    return acc;
+  }, {} as Record<string, SeasonLeaderboardPosition>);
+  const totalLords_wei = positions.reduce((acc, position) => acc + BigInt(position.lordsAmount_wei), 0n);
+  return {
+    positions,
+    duelists,
+    totalLords_wei,
+    totalLords_eth: weiToEth(totalLords_wei),
+  }
+}
+
+export const useSeasonLeaderboards = (seasonId: number) => {
+  const entities = useEventsStore((state) => state.entities);
+  const leaderboard = useStoreModelsByKeys<models.SeasonLeaderboardEvent>(entities, 'SeasonLeaderboardEvent', [seasonId]);
+  const seasonLeaderboard = useMemo(() => _parseSeasonLeaderboard(leaderboard), [leaderboard])
+  // useEffect(() => {
+  //   console.log(`useSeasonLeaderboards() ::: seasonLeaderboard=`, seasonId, seasonLeaderboard)
+  // }, [seasonId, seasonLeaderboard])
+  return {
+    seasonLeaderboard
+  }
+}
+
+export const useAllSeasonLeaderboards = () => {
+  const entities = useEventsStore((state) => state.entities);
+  const leaderboards = useAllStoreModels<models.SeasonLeaderboardEvent>(entities, 'SeasonLeaderboardEvent');
+
+  // TODO: REMOVE THIS!
+  const rewardsPerSeason = useSeasonsLeaderboardRewards_OLD();
+
+  const leaderboardsPerSeason = useMemo(() => {
+    const result = leaderboards.reduce((acc, leaderboard) => {
+      const seasonId = Number(leaderboard.season_id);
+      acc[seasonId] = _parseSeasonLeaderboard(leaderboard);
+      return acc;
+    }, {} as Record<number, SeasonLeaderboard>);
+
+    // -------- TODO: REMOVE THIS! ------------
+    Object.entries(rewardsPerSeason).forEach(([seasonId, rewards]) => {
+      result[seasonId] = {
+        totalLords_wei: rewards.totalLords,
+        totalLords_eth: weiToEth(rewards.totalLords),
+        duelists: Object.fromEntries(Object.entries(rewards.duelists).map(([duelistId, lordsAmount]) => [duelistId, {
+          duelistId: BigInt(duelistId),
+          points: 0,
+          playerAddress: '?',
+          lordsAmount_wei: lordsAmount,
+          lordsAmount_eth: weiToEth(lordsAmount),
+        }])),
+      };
+    });
+    // ---------- until here ----------
+
+    return result;
+  }, [leaderboards, rewardsPerSeason])
+
+
+  useEffect(() => {
+    console.log(`useAllSeasonLeaderboards() ::: leaderboards=`, leaderboardsPerSeason)
+  }, [leaderboardsPerSeason])
+  
+  return {
+    leaderboardsPerSeason,
+  }
+}
