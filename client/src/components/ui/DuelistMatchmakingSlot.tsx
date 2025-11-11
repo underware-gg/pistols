@@ -63,7 +63,7 @@ export const DuelistMatchmakingSlot = forwardRef<DuelistMatchmakingSlotHandle, D
   const buttonsRowRef = useRef(null);
 
   const isMyTurn = useMemo(() => {
-    if (!props.duelId || !challenge.duelistAddressA || !challenge.duelistAddressB) return false;
+    if (!props.duelId || !challenge.duelistAddressA) return false;
     return (animatedDuel.turnA && isYouA) || (animatedDuel.turnB && isYouB);
   }, [props.duelId, animatedDuel.turnA, animatedDuel.turnB, isYouA, isYouB, challenge.duelistAddressA, challenge.duelistAddressB]);
 
