@@ -44,6 +44,7 @@ export function EventsModelStoreSync() {
             new PistolsClauseBuilder().where("pistols-PlayerSettingEvent", "player_address", "Eq", bigintToAddress(address)),
             new PistolsClauseBuilder().where("pistols-PlayerBookmarkEvent", "player_address", "Eq", bigintToAddress(address)),
             new PistolsClauseBuilder().where("pistols-PlayerSocialLinkEvent", "player_address", "Neq", bigintToAddress(0)),
+            new PistolsClauseBuilder().where("pistols-SeasonLeaderboardEvent", "season_id", "Neq", 0),
           ]).build()
         )
         .withEntityModels([
@@ -51,6 +52,7 @@ export function EventsModelStoreSync() {
           'pistols-PlayerSettingEvent',
           'pistols-PlayerBookmarkEvent',
           'pistols-PlayerSocialLinkEvent', // get all
+          'pistols-SeasonLeaderboardEvent', // get all
         ])
         .withLimit(999)
         .includeHashedKeys()
@@ -110,7 +112,7 @@ export function EventsModelStoreSync() {
     setEntities: (entities: PistolsEntity[]) => {
       debug.log(`GET EventsModelStoreSync() ======> [Player]`, entities)
       debug.log(`GET EventsModelStoreSync() ======> [PlayerSocialLinkEvent]`, entities)
-      eventsState.setEntities(filterEntitiesByModels(entities, ['CallToChallengeEvent', 'PlayerSettingEvent', 'PlayerSocialLinkEvent']))
+      eventsState.setEntities(filterEntitiesByModels(entities, ['CallToChallengeEvent', 'PlayerSettingEvent', 'PlayerSocialLinkEvent', 'SeasonLeaderboardEvent']))
       playerDataState.updateMessages(filterEntitiesByModels(entities, ['PlayerBookmarkEvent']))
     },
   })
@@ -154,7 +156,7 @@ export function EventsModelStoreSync() {
         }
       }
       // other events
-      if (entityContainsModels(entity, ['PlayerSocialLinkEvent'])) {
+      if (entityContainsModels(entity, ['PlayerSocialLinkEvent', 'SeasonLeaderboardEvent'])) {
         eventsState.updateEntity(entity)
       }
       if (entityContainsModels(entity, ['ChallengeRewardsEvent'])) {
