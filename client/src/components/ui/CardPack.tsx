@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import TWEEN from '@tweenjs/tween.js'
 import { useCookies } from 'react-cookie';
 import { DuelistCard, DuelistCardHandle } from '/src/components/cards/DuelistCard';
@@ -24,6 +24,8 @@ import {
 } from '/src/data/cardConstants';
 import { useAccount } from '@starknet-react/core';
 import { useDuelistsOwnedByPlayer } from '/src/hooks/useTokenDuelists';
+import { useFetchDuelistIdsOwnedByAccount } from '/src/stores/duelistStore';
+import { useFetchTokenBalancesOwnedByAccount } from '/src/queries/useTokenBalancesQuery';
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo';
 import { usePack, usePackType } from '/src/stores/packStore';
 import { constants } from '@underware/pistols-sdk/pistols/gen'
@@ -57,6 +59,7 @@ export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType: packTy
   const { account } = useAccount()
   const { pack_token } = useDojoSystemCalls()
   const { duelistIds } = useDuelistsOwnedByPlayer()
+  const { aspectWidth } = useGameAspect();
 
   const { packType: packTypeFromId } = usePack(packId)
   const packType = useMemo(() => (packTypeFromProps ?? packTypeFromId), [packTypeFromProps, packTypeFromId])
@@ -82,6 +85,9 @@ export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType: packTy
 
   const [cookies] = useCookies([REFERER_ADDRESS_COOKIE_NAME]);
   const referrerAddress = (cookies[REFERER_ADDRESS_COOKIE_NAME] ?? 0n);
+
+  useFetchTokenBalancesOwnedByAccount(account?.address);
+  useFetchDuelistIdsOwnedByAccount(account?.address);
 
   const handleCardPackClick = (e: React.MouseEvent, fromInternalElement: boolean = false) => {
     if (fromInternalElement) {
@@ -117,18 +123,68 @@ export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType: packTy
     onHover?.(isHovered);
   }
 
+  const resetPackState = useCallback(() => {
+    setIsClaiming(false)
+    setSealClicked(false)
+    setCardsSpawned(false)
+    setIsOpening(false)
+    setShowRevealButton(false)
+    setHasRevealed(false)
+    setNewDuelistIds([])
+    setRevealedDuelists(new Set())
+    setSelectedDuelistId(undefined)
+    // Reset animation states
+    if (cardPackRef.current) {
+      cardPackRef.current.style.setProperty('--seal-translate-x', '0px')
+      cardPackRef.current.style.setProperty('--seal-translate-y', '0px')
+      cardPackRef.current.style.setProperty('--seal-rotation', '0deg')
+      cardPackRef.current.style.setProperty('--flipper-rotation', '0deg')
+      cardPackRef.current.style.setProperty('--inner-bag-translate-y', '0px')
+      cardPackRef.current.style.setProperty('--front-bag-translate-y', '0px')
+      cardPackRef.current.style.setProperty('--flip-container-translate-y', '0px')
+    }
+    // Reset card positions (safety check for cardRefs)
+    if (cardRefs.current) {
+      cardRefs.current.forEach(cardRef => {
+        if (cardRef) {
+          cardRef.setPosition(0, aspectWidth(5), 0)
+          cardRef.setScale(0.8, 0)
+          cardRef.toggleVisibility(false)
+        }
+      })
+    }
+  }, [aspectWidth])
+
   const _claim = async () => {
     if (isClaiming) return
     if (packType === constants.PackType.StarterPack) {
       if (fundedCount > 0) {
         setIsClaiming(true)
-        await pack_token.claim_starter_pack(account, referrerAddress)
+        try {
+          const success = await pack_token.claim_starter_pack(account, referrerAddress)
+          if (!success) {
+            console.warn('Failed to claim starter pack')
+            resetPackState()
+          }
+        } catch (error) {
+          console.error('Error claiming starter pack:', error)
+          resetPackState()
+        }
       } else {
         setIsNoFundsModalOpen(true)
       }
     } else if (packId) {
       setIsClaiming(true)
-      await pack_token.open(account, packId)
+      try {
+        const success = await pack_token.open(account, packId)
+        if (!success) {
+          console.warn('Failed to open pack')
+          resetPackState()
+        }
+      } catch (error) {
+        console.error('Error opening pack:', error)
+        resetPackState()
+      }
     }
   }
 
@@ -196,7 +252,6 @@ export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType: packTy
   const flipperRef = useRef<HTMLDivElement>(null)
   const cardPackCardsRef = useRef<HTMLDivElement>(null)
   const cardRefs = useRef<Array<DuelistCardHandle | null>>([]);
-  const { aspectWidth } = useGameAspect()
 
   useEffect(() => {
     if (isOpen) {
