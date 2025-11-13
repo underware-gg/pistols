@@ -555,7 +555,8 @@ export default function ScLeaderboards() {
   const duelistsStats = useSeasonDuelistsStats(selectedSeasonId || 0);
 
   const { scores } = useFullLeaderboard(selectedSeasonId || 0, secretLeaderboard);
-  useFetchDuelistsByIds(scores.map(s => s.duelistId))
+  const scoringDuelistIds = useMemo(() => scores.map(s => s.duelistId), [scores])
+  useFetchDuelistsByIds(scoringDuelistIds)
 
   const { itemsPerPage, startIndex, totalPages } = useMemo(() => {
     const itemsPerPage = activePage === 1 ? 3 : 7;

@@ -447,9 +447,10 @@ export const useFetchDuelistsByIds = (duelistIds: BigNumberish[], retryInterval?
     },
   })
 
-  // useEffect(() => {
-  //   console.log(`::useFetchDuelistsByIds...`, newDuelistIds, query)
-  // }, [newDuelistIds, query])
+  // useEffect(() => console.warn(`::useFetchDuelistsByIds... duelistIds:`, duelistIds), [duelistIds])
+  // useEffect(() => console.warn(`::useFetchDuelistsByIds... existingDuelistIds:`, existingDuelistIds), [existingDuelistIds])
+  // useEffect(() => console.warn(`::useFetchDuelistsByIds... newDuelistIds:`, newDuelistIds), [newDuelistIds])
+  // useEffect(() => console.warn(`::useFetchDuelistsByIds... query:`, query), [query])
 
   // const entities = useDuelistStore((state) => state.entities);
   // useEffect(() => {
