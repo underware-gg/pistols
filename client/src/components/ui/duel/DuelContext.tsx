@@ -212,7 +212,8 @@ export const DuelContextProvider: React.FC<{
   //   isExpired, isCanceled])
 
   // Get duelist data
-  useFetchDuelistsByIds([duelistIdA, duelistIdB])
+  const duelistIds = useMemo(() => [duelistIdA, duelistIdB], [duelistIdA, duelistIdB])
+  useFetchDuelistsByIds(duelistIds)
   const duelistA = useDuelist(duelistIdA);
   const duelistB = useDuelist(duelistIdB);
   
