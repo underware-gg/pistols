@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useGetChallenge } from '/src/stores/challengeStore'
 import { useFetchDuelistsByIds } from '/src/stores/duelistStore'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
@@ -10,6 +11,7 @@ export function DuelSync() {
   const { atDuel } = usePistolsScene()
   const { currentDuel } = usePistolsContext()
   const { duelistIdA, duelistIdB } = useGetChallenge(atDuel ? currentDuel : undefined)
-  const { isLoading } = useFetchDuelistsByIds(atDuel ? [duelistIdA, duelistIdB] : [])
+  const duelistIds = useMemo(() => atDuel ? [duelistIdA, duelistIdB] : [], [duelistIdA, duelistIdB])
+  const { isLoading } = useFetchDuelistsByIds(duelistIds)
   return (<></>)
 }

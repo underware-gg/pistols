@@ -122,7 +122,7 @@ const _useSdkGet = (prefix: string, {
     return () => {
       _mounted = false
     }
-  }, [enabled, fn, query])
+  }, [enabled, query])
 
   return {
     isLoading,
