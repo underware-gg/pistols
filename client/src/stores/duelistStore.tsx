@@ -476,18 +476,34 @@ export const useFetchDuelistIdsOwnedByAccount = (address: BigNumberish) => {
   return useFetchDuelistIdsOwnedByAccounts(addresses)
 }
 
+const useNormalizedAddresses = (addresses: BigNumberish[]) => (
+  useMemo(() => {
+    if (!addresses || addresses.length === 0) return []
+    const uniqueSorted = Array.from(
+      new Set(
+        addresses
+          .filter(isPositiveBigint)
+          .map((address) => BigInt(address).toString())
+          .sort()
+      )
+    )
+    return uniqueSorted.map((value) => BigInt(value))
+  }, [addresses])
+)
+
 export const useFetchDuelistIdsOwnedByAccounts = (addresses: BigNumberish[]) => {
+  const normalizedAddresses = useNormalizedAddresses(addresses)
   // dont even try for players already fetched...
   const fetchState = useDuelistFetchStore((state) => state);
   const newAddresses = useMemo(() => (
-    fetchState.getNewAddresses(addresses)
-  ), [addresses, fetchState.addresses])
+    fetchState.getNewAddresses(normalizedAddresses)
+  ), [normalizedAddresses, fetchState.addresses])
 
   // fetch duelists...
   const { duelistIds } = useDuelistIdsOwnedByAccounts(newAddresses)
   const { isLoading, isFinished } = useFetchDuelistsByIds(duelistIds)
   // fetch player stacks...
-  useFetchPlayerDuelistStacks(addresses)
+  useFetchPlayerDuelistStacks(normalizedAddresses)
   
   // mark players as fetched...
   useEffect(() => {

@@ -151,15 +151,11 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
       return;
     }
 
-    setTimeout(() => {
-      setEnlistmentState({
-        isEnlisting: false,
-        enlistError: null,
-        enlistedDuelistId: null,
-      });
-      
-      handleCommitDuelist(duelistIdArg);
-    }, 2000);
+    setEnlistmentState({
+      isEnlisting: false,
+      enlistError: null,
+      enlistedDuelistId: duelistIdArg,
+    });
   }, [setEnlistmentState, props.onActionComplete]);
 
   const {
@@ -231,6 +227,14 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
     
     // Notify parent that action started
     props.onActionStart?.(duelistId, 'commit');
+    
+    if (enlistmentState.enlistedDuelistId) {
+      setEnlistmentState({
+        isEnlisting: false,
+        enlistError: null,
+        enlistedDuelistId: null,
+      });
+    }
     
     setCommitmentState((prev) => ({
       ...prev,
@@ -331,6 +335,8 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
     console.log("commitmentState", commitmentState, "enlistmentState", enlistmentState, "currentDuelistId", currentDuelistId);
   }, [commitmentState, enlistmentState, currentDuelistId]);
 
+  const isEnlistedButNotCommitted = enlistmentState.enlistedDuelistId && !commitmentState.committedDuelistId && !enlistmentState.isEnlisting && !enlistmentState.enlistError;
+
   //full slot
   if (currentDuelistId) {
 
@@ -346,6 +352,7 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
         duelistId={currentDuelistId}
         isCommitting={isCommitting || isWaitingForCommit || commitmentState.isCommitting}
         isEnlisting={isEnlisting || isWaitingForEnlistment || enlistmentState.isEnlisting}
+        isEnlistedButNotCommitted={isEnlistedButNotCommitted}
         isError={!!commitmentState.commitError || !!enlistmentState.enlistError}
         onError={commitmentState.commitError && commitmentState.committedDuelistId 
           ? () => handleCommitDuelist(commitmentState.committedDuelistId!) 
@@ -354,6 +361,7 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
           : undefined}
         errorMessage={commitmentState.commitError || enlistmentState.enlistError}
         handleRemove={handleRemove}
+        onQueueClick={isEnlistedButNotCommitted ? () => handleCommitDuelist(enlistmentState.enlistedDuelistId!) : undefined}
       />
     );
   }

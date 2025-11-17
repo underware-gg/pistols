@@ -17,6 +17,7 @@ import { arrayRemoveValue } from '@underware/pistols-sdk/utils'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { emitter } from '../three/game'
 import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
+import { useClearExpiredRankedDuels } from '/src/hooks/useClearExpiredRankedDuels'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -37,10 +38,6 @@ export function ChallengeTableSelectedDuelist({
   // filter challenges
   const { filterChallengeSortDirection } = useQueryParams()
   const { challengeIds, states, challengesPerSeason } = useQueryChallengeIdsByDuelist(selectedDuelistId, statesFilter, ChallengeColumn.Time, filterChallengeSortDirection)
-
-  useEffect(() => {
-    console.log('ChallengeTableSelectedDuelist', selectedDuelistId)
-  }, [selectedDuelistId])
 
   return (
     <div style={{width: '100%', height: '100%',}}>
@@ -67,6 +64,13 @@ function ChallengeTableByIds({
 }) {
   const { aspectWidth } = useGameAspect()
   const [collapsedSeasons, setCollapsedSeasons] = useState<Set<string>>(new Set())
+
+  const allDuelIds = useMemo(() => {
+    return Object.values(challengeIds).flat()
+  }, [challengeIds])
+
+  // Clear expired ranked duels with call-to-action flags
+  useClearExpiredRankedDuels(allDuelIds)
 
   const toggleSeason = (seasonId: string) => {
     const newCollapsed = new Set(collapsedSeasons)

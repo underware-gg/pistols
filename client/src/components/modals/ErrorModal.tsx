@@ -36,12 +36,16 @@ export default function ErrorModal() {
 
   const { value: eventData, timestamp } = useDojoEmitterEvent('transaction_error', null)
   
+  if (!errorModalOpener || !bugReportOpener) {
+    return null
+  }
+  
   useEffect(() => {
-    if (eventData) {
+    if (eventData && errorModalOpener) {
       errorModalOpener.open()
       setIsExpanded(false)
     }
-  }, [eventData, timestamp])
+  }, [eventData, timestamp, errorModalOpener])
 
   const handleClose = () => {
     errorModalOpener.close()

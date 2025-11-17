@@ -28,12 +28,14 @@ interface DuelistMatchmakingSlotProps {
   duelId?: bigint
   isCommitting?: boolean
   isEnlisting?: boolean
+  isEnlistedButNotCommitted?: boolean
   isError?: boolean
   errorMessage?: string | null
   onDuelistPromoted?: (duelistId: bigint) => void
   onRequeueDuelist?: (duelistId: bigint) => void
   onError?: () => void
   handleRemove?: () => void
+  onQueueClick?: () => void
 }
 
 export interface DuelistMatchmakingSlotHandle {
@@ -61,7 +63,7 @@ export const DuelistMatchmakingSlot = forwardRef<DuelistMatchmakingSlotHandle, D
   const buttonsRowRef = useRef(null);
 
   const isMyTurn = useMemo(() => {
-    if (!props.duelId || !challenge.duelistAddressA || !challenge.duelistAddressB) return false;
+    if (!props.duelId || !challenge.duelistAddressA) return false;
     return (animatedDuel.turnA && isYouA) || (animatedDuel.turnB && isYouB);
   }, [props.duelId, animatedDuel.turnA, animatedDuel.turnB, isYouA, isYouB, challenge.duelistAddressA, challenge.duelistAddressB]);
 
@@ -124,6 +126,10 @@ export const DuelistMatchmakingSlot = forwardRef<DuelistMatchmakingSlotHandle, D
       return { message: "Enlisting...", buttonText: null, color: "#f97316", showTimer: false };
     }
 
+    if (props.isEnlistedButNotCommitted) {
+      return { message: "Enlisted!", buttonText: null, color: "#22c55e", showTimer: false };
+    }
+
     if (props.isCommitting) {
       return { message: "Commiting...", buttonText: null, color: "#f97316", showTimer: false };
     }
@@ -170,6 +176,7 @@ export const DuelistMatchmakingSlot = forwardRef<DuelistMatchmakingSlotHandle, D
   }, [
     props.isCommitting,
     props.isEnlisting,
+    props.isEnlistedButNotCommitted,
     props.isError,
     currentDuelistId,
     inQueueIds,
@@ -241,6 +248,7 @@ export const DuelistMatchmakingSlot = forwardRef<DuelistMatchmakingSlotHandle, D
       <DuelistCard
         ref={duelistCardRef}
         duelistId={Number(currentDuelistId)}
+        duelId={props.duelId}
         isSmall
         isLeft
         isVisible
@@ -381,6 +389,16 @@ export const DuelistMatchmakingSlot = forwardRef<DuelistMatchmakingSlotHandle, D
               fill
               disabled={disableButtons}
               loading={isCollecting}
+            />
+          )}
+          {props.isEnlistedButNotCommitted && props.onQueueClick && (
+            <ActionButton
+              className="YesMouse"
+              label="Queue!"
+              onClick={props.onQueueClick}
+              important
+              fill
+              disabled={disableButtons}
             />
           )}
         </div>

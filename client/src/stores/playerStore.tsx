@@ -1,11 +1,11 @@
-import { useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { createDojoStore } from '@dojoengine/sdk/react'
 import { PistolsEntity, PistolsSchemaType } from '@underware/pistols-sdk/pistols/sdk'
-import { arrayRemoveValue, bigintEquals, bigintToAddress, bigintToNumber, formatTimestampDeltaElapsed, isPositiveBigint, sortObjectByValue } from '@underware/pistols-sdk/utils'
+import { arrayRemoveValue, bigintEquals, bigintToAddress, bigintToNumber, formatTimestampDeltaElapsed, isPositiveBigint, sortObjectByValue, shortAddress } from '@underware/pistols-sdk/utils'
 import { useAllStoreModels, useStoreModelsByKeys } from '@underware/pistols-sdk/dojo'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { useDuelistTokenStore } from '/src/stores/tokenStore'
@@ -219,6 +219,16 @@ export const usePlayer = (address: BigNumberish, onlineClientTimestamp?: number)
     lastSeenTimestamp,
     totals,
   }
+}
+
+export const usePlayerDisplayName = (address: BigNumberish) => {
+  const playerKey = useMemo(() => _playerKey(address), [address])
+  const selectName = useCallback(
+    (state: State) => (playerKey ? state.players_names[playerKey] : undefined),
+    [playerKey]
+  )
+  const username = usePlayerDataStore(selectName)
+  return username || (playerKey ? shortAddress(playerKey) : 'Unknown')
 }
 
 export const usePlayerAddressFromUsername = (username: string): BigNumberish | undefined => {

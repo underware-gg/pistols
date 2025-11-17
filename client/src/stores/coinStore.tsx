@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
@@ -27,6 +27,7 @@ interface State {
   coinName: string,
   addOnUpdate: boolean,
   accounts: Record<string, CoinState>,
+  version: number,
   resetStore: () => void;
   initBalances: (accounts: BigNumberish[]) => void;
   setBalances: (balances: torii.TokenBalance[]) => void;
@@ -35,12 +36,13 @@ interface State {
   hasBalance: (accountAddress: BigNumberish | undefined) => boolean;
 }
 
+const accountKeyFromAddress = (account: BigNumberish | undefined): string | null => (
+  isPositiveBigint(account) ? bigintToAddress(account) : null
+)
+
 const createStore = (coinName: string, addOnUpdate: boolean) => {
-  const _accountKey = (account: BigNumberish | undefined): string | null => (
-    isPositiveBigint(account) ? bigintToAddress(account) : null
-  )
   const _processBalance = (state: State, balance: torii.TokenBalance, insert: boolean) => {
-    const _key = _accountKey(balance.account_address);
+    const _key = accountKeyFromAddress(balance.account_address);
     if (_key) {
       if (insert || state.accounts[_key]) {
         state.accounts[_key] = {
@@ -53,20 +55,23 @@ const createStore = (coinName: string, addOnUpdate: boolean) => {
     coinName,
     addOnUpdate,
     accounts: {},
+    version: 0,
     resetStore: () => {
       set((state: State) => {
         state.accounts = {}
+        state.version = 0
       })
     },
     initBalances: (accounts: BigNumberish[]) => {
       // console.log(`coinStore(${get().coinName}) INIT:`, accounts)
       set((state: State) => {
         accounts.forEach((account) => {
-          const _key = _accountKey(account);
-          if (state.accounts[_key] === undefined) {
+          const _key = accountKeyFromAddress(account);
+          if (_key && state.accounts[_key] === undefined) {
             state.accounts[_key] = {
               balance: undefined,
             }
+            state.version++
           }
         })
       });
@@ -86,15 +91,30 @@ const createStore = (coinName: string, addOnUpdate: boolean) => {
       });
     },
     getBalance: (accountAddress: BigNumberish | undefined): bigint | undefined => {
-      const _key = _accountKey(accountAddress ?? 0n);
+      const _key = accountKeyFromAddress(accountAddress ?? 0n);
       return _key ? get().accounts[_key]?.balance : undefined
     },
     hasBalance: (accountAddress: BigNumberish | undefined): boolean => {
-      const _key = _accountKey(accountAddress ?? 0n);
+      const _key = accountKeyFromAddress(accountAddress ?? 0n);
       return _key ? Boolean(get().accounts[_key]) : undefined
     },
   })))
 }
+
+const useNormalizedTokenIds = (tokenIds: BigNumberish[]) => (
+  useMemo(() => {
+    if (!tokenIds || tokenIds.length === 0) return []
+    const uniqueSorted = Array.from(
+      new Set(
+        tokenIds
+          .filter(isPositiveBigint)
+          .map((tokenId) => BigInt(tokenId).toString())
+          .sort()
+      )
+    )
+    return uniqueSorted.map((value) => BigInt(value))
+  }, [tokenIds])
+)
 
 export const useFameCoinStore = createStore('fame', true);
 export const useFoolsCoinStore = createStore('fools', true);
@@ -130,8 +150,11 @@ export const useDuelistFameBalance = (duelistId: BigNumberish) => {
 }
 
 export const useFameBalance = (address: BigNumberish) => {
-  const state = useFameCoinStore((state) => state)
-  const balance = useMemo(() => state.getBalance(address), [state.accounts, address])
+  const accountKey = useMemo(() => accountKeyFromAddress(address), [address])
+  const selectBalance = useCallback((state: State) => (
+    accountKey ? state.accounts[accountKey]?.balance : undefined
+  ), [accountKey])
+  const balance = useFameCoinStore(selectBalance)
   const lives = useMemo(() => (
     balance != undefined ? Math.floor(Number(balance / constants.FAME.ONE_LIFE)) : undefined
   ), [balance])
@@ -146,8 +169,11 @@ export const useFameBalance = (address: BigNumberish) => {
 
 export const useFoolsBalance = (address: BigNumberish, fee: BigNumberish = 0n) => {
   const { foolsContractAddress } = useTokenContracts()
-  const state = useFoolsCoinStore((state) => state)
-  const balance = useMemo(() => state.getBalance(address), [state.accounts, address])
+  const accountKey = useMemo(() => accountKeyFromAddress(address), [address])
+  const selectBalance = useCallback((state: State) => (
+    accountKey ? state.accounts[accountKey]?.balance : undefined
+  ), [accountKey])
+  const balance = useFoolsCoinStore(selectBalance)
   // fetch if not cached
   const accounts = useMemo(() => [address], [address])
   useFetchAccountsBalances(foolsContractAddress, accounts, balance == null)
@@ -162,8 +188,11 @@ export const useFoolsBalance = (address: BigNumberish, fee: BigNumberish = 0n) =
 
 export const useLordsBalance = (address: BigNumberish, fee: BigNumberish = 0n) => {
   const { lordsContractAddress } = useTokenContracts()
-  const state = useLordsCoinStore((state) => state)
-  const balance = useMemo(() => state.getBalance(address), [state.accounts, address])
+  const accountKey = useMemo(() => accountKeyFromAddress(address), [address])
+  const selectBalance = useCallback((state: State) => (
+    accountKey ? state.accounts[accountKey]?.balance : undefined
+  ), [accountKey])
+  const balance = useLordsCoinStore(selectBalance)
   // fetch if not cached
   const accounts = useMemo(() => [address], [address])
   useFetchAccountsBalances(lordsContractAddress, accounts, balance == null)
@@ -196,26 +225,43 @@ const _useCalcFee = (
 //
 
 export const useFetchTokenboundAccountsBalances = (coinAddress: BigNumberish, tokenAddress: BigNumberish, tokenIds: BigNumberish[], enabled: boolean) => {
+  const normalizedTokenIds = useNormalizedTokenIds(tokenIds)
   const tokenBoundAddresses = useMemo(() => (
-    tokenIds.map((tokenId) => make_token_bound_address(tokenAddress, tokenId))
-  ), [tokenAddress, tokenIds]);
+    normalizedTokenIds.map((tokenId) => make_token_bound_address(tokenAddress, tokenId))
+  ), [tokenAddress, normalizedTokenIds]);
   return useFetchAccountsBalances(coinAddress, tokenBoundAddresses, enabled)
 }
 
 export const useFetchAccountsBalances = (coinAddress: BigNumberish, accounts: BigNumberish[], enabled: boolean) => {
   const { address } = useAccount() // do not fetch connected player (done by sql)
-  const state = useCoinStore(coinAddress)((state) => state)
+  const store = useCoinStore(coinAddress)
+  const {
+    version,
+    hasBalance,
+    initBalances,
+    setBalances,
+  } = store ? store((state: State) => ({
+    version: state.version,
+    hasBalance: state.hasBalance,
+    initBalances: state.initBalances,
+    setBalances: state.setBalances,
+  })) : {
+    version: 0,
+    hasBalance: () => false,
+    initBalances: () => {},
+    setBalances: () => {},
+  }
   const newAccounts = useMemo(() => (
     (enabled && isPositiveBigint(coinAddress))
-      ? accounts.filter((a) => (isPositiveBigint(a) && !state.hasBalance(a) && !bigintEquals(a, address)))
+      ? accounts.filter((a) => (isPositiveBigint(a) && !hasBalance(a) && !bigintEquals(a, address)))
       : []
-  ), [enabled, coinAddress, accounts, state.accounts, address])
+  ), [enabled, coinAddress, accounts, hasBalance, address, version])
   // fetch...
   const { isLoading } = useSdkTokenBalancesGet({
     contract: coinAddress,
     accounts: newAccounts,
-    initBalances: state.initBalances,
-    setBalances: state.setBalances,
+    initBalances,
+    setBalances,
     enabled: (newAccounts.length > 0),
   })
   return {

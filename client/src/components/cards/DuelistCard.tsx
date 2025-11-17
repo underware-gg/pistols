@@ -22,13 +22,15 @@ import { emitter } from '/src/three/game'
 import { useDuelistCurrentSeasonScore, useDuelistSeasonScore } from '/src/stores/scoreboardStore'
 import { useCurrentSeason, useSeason } from '/src/stores/seasonStore'
 import { QueueTimer } from '/src/components/ui/QueueTimer'
+import { useChallenge } from '/src/stores/challengeStore'
+import { useDuelCallToAction } from '/src/stores/eventsModelStore'
+import { useDuelistFameOnDuel, useFetchChallengeRewardsByDuelistIds } from '/src/stores/challengeRewardsStore'
 
 interface DuelistCardProps extends InteractibleComponentProps {
   duelistId: number
   address?: BigNumberish
+  duelId?: bigint
   isSmall?: boolean
-  overrideFame?: boolean
-  fame?: bigint
   isAnimating?: boolean
   showQuote?: boolean
   hideSouls?: boolean
@@ -58,8 +60,28 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
   
   useFetchDuelist(props.duelistId)
   const { nameAndId: name, profilePic, profileType, isInAction, totals, quote, currentDuelId } = useDuelist(props.duelistId)
-  const { isAlive, isLoading: isFameLoading } = useDuelistFameBalance(props.duelistId)
+  const { isAlive: isAliveFromBalance, isLoading: isFameLoading } = useDuelistFameBalance(props.duelistId)
   const { stackedDuelistIds, level } = useDuelistStack(props.duelistId)
+
+  const isCallToAction = props.duelId ? useDuelCallToAction(props.duelId) : false;
+  const { isFinished: challengeIsFinished } = props.duelId ? useChallenge(props.duelId) : { isFinished: false }
+
+  const rewardFetchIds = useMemo(() => [props.duelistId], [props.duelistId])
+  const { isLoading: isRewardsLoading } = useFetchChallengeRewardsByDuelistIds(rewardFetchIds);
+  const { fameBefore, fameAfter } = props.duelId ? useDuelistFameOnDuel(props.duelId, props.duelistId) : { fameBefore: 0n, fameAfter: 0n }
+
+  const shouldShowResults = useMemo(() => {
+    return props.duelId ? challengeIsFinished && !isCallToAction : true;
+  }, [props.duelId, challengeIsFinished, isCallToAction]);
+  
+  const duelScopedFame = useMemo(() => {
+    if (!props.duelId) return null;
+    return shouldShowResults ? fameAfter : fameBefore;
+  }, [props.duelId, shouldShowResults, fameAfter, fameBefore]);
+  
+  const isAliveForDisplay = useMemo(() => {
+    return isAliveFromBalance || !shouldShowResults;
+  }, [shouldShowResults, isAliveFromBalance]);
 
   const { seasonName } = props.seasonId ? useSeason(props.seasonId) : useCurrentSeason()
   const { points, position } = props.seasonId ? useDuelistSeasonScore(props.duelistId, props.seasonId) : useDuelistCurrentSeasonScore(props.duelistId)
@@ -80,7 +102,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
   }, [level, isAnimatingSouls, props.shouldAnimateIncrease])
 
   // Don't show souls for dead duelists
-  const showSouls = useMemo(() => !props.hideSouls && isAlive, [props.hideSouls, isAlive])
+  const showSouls = useMemo(() => !props.hideSouls && isAliveForDisplay, [props.hideSouls, isAliveForDisplay])
 
   // Show NEW badge ONLY when level is 0 or 1 AND shouldAnimateIncrease is true
   const isNewDuelist = props.shouldAnimateIncrease && (level === 0 || level === 1)
@@ -248,13 +270,13 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
               profileType={profileType} 
               profilePic={profilePic} 
               width={(props.width ?? DUELIST_CARD_WIDTH) * 0.7} 
-              disabled={!isAlive} 
+              disabled={!isAliveForDisplay} 
               removeBorder 
               removeCorners 
               removeShadow 
             />
           </div>
-          <img id='DuelistDeadOverlay' className={ `Left ${(!isAlive && !isFameLoading) ? 'visible' : ''}`} src='/textures/cards/card_disabled.png' />
+          <img id='DuelistDeadOverlay' className={ `Left ${(!isAliveForDisplay && !isFameLoading) ? 'visible' : ''}`} src='/textures/cards/card_disabled.png' />
         </>
       }
       childrenInFront={
@@ -491,7 +513,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
                 />
               </div>
             )}
-            {!isAlive &&
+            {!isAliveForDisplay &&
               <EmojiIcon emoji={EMOJIS.DEAD} size={props.isSmall ? 'small' : 'big'} />
             }
           </div>
@@ -545,17 +567,17 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
                 ) : (
                   <>
                   <div className="duelist-fame">
-                    <FameLivesDuelist duelistId={props.duelistId} overrideFame={props.overrideFame} fame={props.fame} />
+                    <FameLivesDuelist duelistId={props.duelistId} overrideFame={duelScopedFame !== null} fame={duelScopedFame ?? undefined} isLoading={isRewardsLoading} />
                   </div>
-                  <FameProgressBar duelistId={props.duelistId} width={props.width * 0.8} height={props.height * 0.1} hideValue overrideFame={props.overrideFame} fame={props.fame} />
+                  <FameProgressBar duelistId={props.duelistId} width={props.width * 0.8} height={props.height * 0.1} hideValue overrideFame={duelScopedFame !== null} fame={duelScopedFame ?? undefined} />
                   </>
                 )
               ) : (
                 <>
                   <div className="duelist-fame">
-                    <FameLivesDuelist duelistId={props.duelistId} size='huge' />
+                    <FameLivesDuelist duelistId={props.duelistId} size='huge' overrideFame={duelScopedFame !== null} fame={duelScopedFame ?? undefined} isLoading={isRewardsLoading} />
                   </div>
-                  <FameProgressBar duelistId={props.duelistId} width={props.width * 0.8} />
+                  <FameProgressBar duelistId={props.duelistId} width={props.width * 0.8} overrideFame={duelScopedFame !== null} fame={duelScopedFame ?? undefined} />
                   
                   <div className="TextDivider CardDivider">Stats</div>
                   

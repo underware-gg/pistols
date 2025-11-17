@@ -176,7 +176,7 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
       return;
     }
 
-    if (!context.leftDuelist.id || !duelistBSVG) return;
+    if (!context.leftDuelist.id || !duelistASVG) return;
     
     // Skip delay if we already have initialized duelists
     const spawnDelay = didPlayersInitA.current ? 0 : 600;
