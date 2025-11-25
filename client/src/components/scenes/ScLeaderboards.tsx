@@ -96,32 +96,48 @@ const SeasonRow = memo(({
         marginLeft: aspectWidth(0.4)
       }}
     >
-      <Grid columns={6}>
+      <Grid columns={6} style={{ margin: 0 }}>
         <Grid.Column width={4} style={{ display: 'flex', alignItems: 'center' }}>
           <div style={{ fontSize: aspectWidth(1.4), color: 'lightskyblue' }}>
             Season {season}
           </div>
         </Grid.Column>
 
-        <Grid.Column width={3}>
-          <div style={{ fontSize: aspectWidth(0.9), color: '#888' }}>Participants:</div>
-          <div style={{ fontSize: aspectWidth(1.1), fontWeight: 'bold', color: 'white' }}>{seasonTotals?.playerCount ?? <LoadingIcon className='Brightest' />}</div>
+        <Grid.Column width={3} style={{ paddingLeft: aspectWidth(0.2), paddingRight: aspectWidth(0.2) }}>
+          <div style={{ fontSize: aspectWidth(0.9), color: '#888', marginBottom: aspectWidth(0.2) }}>
+            Participants:
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', minHeight: aspectWidth(1.1) }}>
+            <div style={{ fontSize: aspectWidth(1.1), fontWeight: 'bold', color: 'white' }}>
+              {seasonTotals?.playerCount ?? <LoadingIcon className='Brightest' />}
+            </div>
+          </div>
         </Grid.Column>
 
-        <Grid.Column width={3}>
-          <div style={{ fontSize: aspectWidth(0.9), color: '#888' }}>Duelists:</div>
-          <div style={{ fontSize: aspectWidth(1.1), fontWeight: 'bold', color: 'white' }}>{seasonTotals?.duelistCount ?? <LoadingIcon className='Brightest' />}</div>
-        </Grid.Column>
-        
-        <Grid.Column width={3}>
-          <div style={{ fontSize: aspectWidth(0.9), color: '#888' }}>Prize Pool:</div>
-          <div style={{ fontSize: aspectWidth(1.1), fontWeight: 'bold', color: 'white' }}>
-            <Balance lords wei={totalPrizePool} />
+        <Grid.Column width={2} style={{ paddingLeft: aspectWidth(0.2), paddingRight: aspectWidth(0.2) }}>
+          <div style={{ fontSize: aspectWidth(0.9), color: '#888', marginBottom: aspectWidth(0.2) }}>
+            Duelists:
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', minHeight: aspectWidth(1.1) }}>
+            <div style={{ fontSize: aspectWidth(1.1), fontWeight: 'bold', color: 'white' }}>
+              {seasonTotals?.duelistCount ?? <LoadingIcon className='Brightest' />}
+            </div>
           </div>
         </Grid.Column>
         
-        <Grid.Column width={3}>
-          <div style={{ fontSize: aspectWidth(0.9), color: '#888' }}>
+        <Grid.Column width={4}>
+          <div style={{ fontSize: aspectWidth(0.9), color: '#888', marginBottom: aspectWidth(0.2) }}>
+            Prize Pool:
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', minHeight: aspectWidth(1.1) }}>
+            <div style={{ fontSize: aspectWidth(1.1), fontWeight: 'bold', color: 'white' }}>
+              <Balance lords wei={totalPrizePool} />
+            </div>
+          </div>
+        </Grid.Column>
+        
+        <Grid.Column width={3} style={{ paddingLeft: aspectWidth(0.2), paddingRight: aspectWidth(0.3) }}>
+          <div style={{ fontSize: aspectWidth(0.9), color: '#888', marginBottom: aspectWidth(0.2) }}>
             {!isActive ? 'Winner:' : 'Time Left:'}
           </div>
           <div style={{ fontSize: aspectWidth(1.1), fontWeight: 'bold', color: !isActive ? 'gold' : 'white' }}>
