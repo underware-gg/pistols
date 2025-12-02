@@ -9,7 +9,7 @@ import { useDuelProgress } from '/src/hooks/usePistolsContractCalls'
 import { useDuelCallToAction } from '/src/stores/eventsModelStore'
 import { DuelStage, useAnimatedDuel } from '/src/hooks/useDuel'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
-import { CharacterType } from '/src/data/assets'
+import { CharacterType  } from '/src/data/assetsTypes'
 import { useSettings } from '/src/hooks/SettingsContext'
 
 export type DuelistState = {
@@ -171,11 +171,10 @@ const createPositionToAB = (swapSides: boolean) => {
   };
 };
 
-// Global tracker to prevent repeated setup across renders
 const StateTracker = {
   sceneStarted: false,
   dataSet: false,
-  duelIds: new Set<string>()
+  lastDuelId: null as string | null
 };
 
 export const DuelContextProvider: React.FC<{ 
@@ -225,40 +224,38 @@ export const DuelContextProvider: React.FC<{
   // Determine if we need to swap sides - true if duelist B is the user's duelist
   const swapSides = useMemo(() => isYouB, [isYouB]);
   
-  // First mount tracking
-  const isFirstMount = useRef(true);
-  
-  // Reset state tracking for new duels
-  useEffect(() => {
-    if (isFirstMount.current) {
-      isFirstMount.current = false;
-      if (!StateTracker.duelIds.has(duelId.toString())) {
-        StateTracker.duelIds.add(duelId.toString());
-        StateTracker.sceneStarted = false;
-        StateTracker.dataSet = false;
-      }
-    }
-    
-    return () => {};
-  }, [duelId]);
-
   // Component state - use refs to limit render cycles where possible
-  const [isSceneStarted, _setSceneStarted] = useState(StateTracker.sceneStarted);
-  const [isDataSet, _setDataSet] = useState(StateTracker.dataSet);
+  const [isSceneStarted, _setSceneStarted] = useState(false);
+  const [isDataSet, _setDataSet] = useState(false);
   const [isPlaying, setIsPlaying] = useState(true);
   const [duelInProgress, setDuelInProgress] = useState(false);
   const [statsLeft, setStatsLeft] = useState<DuelistState>(defaultState);
   const [statsRight, setStatsRight] = useState<DuelistState>(defaultState);
   const [areDuelistsLoaded, setDuelistsLoaded] = useState(false);
+  // Reset state when duelId changes
+  useEffect(() => {
+    const duelIdStr = duelId.toString();
+    if (StateTracker.lastDuelId !== duelIdStr) {
+      StateTracker.lastDuelId = duelIdStr;
+      StateTracker.sceneStarted = false;
+      StateTracker.dataSet = false;
+      _setSceneStarted(false);
+      _setDataSet(false);
+      setIsPlaying(true);
+      setDuelInProgress(false);
+      setStatsLeft(defaultState);
+      setStatsRight(defaultState);
+      setDuelistsLoaded(false);
+    }
+  }, [duelId]);
+
   // Create safe setters that prevent unnecessary state updates
   const setSceneStarted = useCallback((value: boolean) => {
-    // Never set to false once it's been true
     if (value === false && isSceneStarted) {
       return;
     }
     
-    // Only set true once
-    if (value === true && !StateTracker.sceneStarted) {
+    if (value === true && !isSceneStarted) {
       stateUpdateCount.current.sceneStarted++;
       StateTracker.sceneStarted = true;
       _setSceneStarted(true);
@@ -266,13 +263,11 @@ export const DuelContextProvider: React.FC<{
   }, [isSceneStarted]);
   
   const setDataSet = useCallback((value: boolean) => {
-    // Never set to false once it's been true
     if (value === false && isDataSet) {
       return;
     }
     
-    // Only set true once
-    if (value === true && !StateTracker.dataSet) {
+    if (value === true && !isDataSet) {
       stateUpdateCount.current.dataSet++;
       StateTracker.dataSet = true;
       _setDataSet(true);

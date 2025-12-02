@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
-import { usePlayer } from '/src/stores/playerStore'
+import { usePlayer, usePlayerDisplayName } from '/src/stores/playerStore'
 import { formatTimestampDeltaElapsed, bigintToDecimal, shortAddress, bigintEquals } from '@underware/pistols-sdk/utils'
 import { useDuelist } from '/src/stores/duelistStore'
 import { useOwnerOfDuelist } from '../hooks/useTokenDuelists'
@@ -13,7 +13,7 @@ export const PlayerLink = ({
 }: {
   address: BigNumberish
 }) => {
-  const { name } = usePlayer(address)
+  const name = usePlayerDisplayName(address)
   const { dispatchSelectPlayerAddress } = usePistolsContext()
   return (
     <span 
@@ -35,7 +35,18 @@ export const DuelistLink = ({
   duelistId: BigNumberish
   useName?: boolean
 }) => {
-  const { nameAndId } = useDuelist(useName ? duelistId : 0)
+  return useName
+    ? <DuelistLinkWithName duelistId={duelistId} />
+    : <DuelistLinkWithoutName duelistId={duelistId} />
+}
+
+const DuelistLinkBase = ({
+  duelistId,
+  label,
+}: {
+  duelistId: BigNumberish
+  label: string
+}) => {
   const { dispatchSelectDuelistId } = usePistolsContext()
   return (
     <span
@@ -45,9 +56,19 @@ export const DuelistLink = ({
         dispatchSelectDuelistId(duelistId)
       }}
     >
-      {useName ? nameAndId : `Duelist #${bigintToDecimal(duelistId)}`}
+      {label}
     </span>
   )
+}
+
+const DuelistLinkWithName = ({ duelistId }: { duelistId: BigNumberish }) => {
+  const { nameAndId } = useDuelist(duelistId)
+  return <DuelistLinkBase duelistId={duelistId} label={nameAndId} />
+}
+
+const DuelistLinkWithoutName = ({ duelistId }: { duelistId: BigNumberish }) => {
+  const label = useMemo(() => `Duelist #${bigintToDecimal(duelistId)}`, [duelistId])
+  return <DuelistLinkBase duelistId={duelistId} label={label} />
 }
 
 export const DuelistOwnerLink = ({

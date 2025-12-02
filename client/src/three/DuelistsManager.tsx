@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { CharacterType, AnimName } from '/src/data/assets'
+import { CharacterType, AnimName  } from '/src/data/assetsTypes'
 import { DuelistState } from '/src/components/ui/duel/DuelContext'
 import { AudioName } from '/src/data/audioAssets'
 import { Action } from '/src/utils/pistols'
@@ -131,6 +131,10 @@ export class DuelistsManager {
 
   private spawnHighlightA: () => void
   private spawnHighlightB: () => void
+
+  public setDuelistSelectDataA(duelistName: string, isDuelistAYou: boolean) {
+    this.duelProgressDialogManger.setDataA(duelistName, isDuelistAYou)
+  }
 
   public setupDuelistA(duelistName: string, duelistModel: CharacterType, isDuelistAYou: boolean, frontMaterialPath: string, backMaterialPath: string, spawnHighlight: () => void) {
     localStorage.setItem(DuelistsData.DUELIST_A_MODEL, duelistModel)

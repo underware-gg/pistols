@@ -1,4 +1,4 @@
-use starknet::{ContractAddress};
+use starknet::{ContractAddress, ClassHash};
 use core::num::traits::Zero;
 use dojo::world::{WorldStorage, WorldStorageTrait, IWorldDispatcher};
 use dojo::meta::interface::{
@@ -72,6 +72,11 @@ pub impl DnsImpl of DnsTrait {
         // let (contract_address, _) = self.dns(contract_name).unwrap(); // will panic if not found
         (self.dns_address(contract_name).unwrap_or(ZERO()))
     }
+    fn find_library_address(self: @WorldStorage, library_name: @ByteArray, library_version: @ByteArray) -> ClassHash {
+        let library_name: ByteArray = format!("{}_v{}", library_name, library_version);
+        (self.dns_class_hash(@library_name).expect('library not found'))
+    }
+
 
     // Create a Store from a dispatcher
     // https://github.com/dojoengine/dojo/blob/main/crates/dojo/core/src/contract/components/world_provider.cairo
@@ -162,6 +167,10 @@ pub impl DnsImpl of DnsTrait {
     // #[inline(always)]
     // fn budokan_mock_address(self: @WorldStorage) -> ContractAddress {
     //     (self.find_contract_address(@"budokan_mock"))
+    // }
+    // #[inline(always)]
+    // fn libxyz_class_hash(self: @WorldStorage) -> ClassHash {
+    //     (self.find_library_address(@"libxyz", @"0_1_0"))
     // }
 
     //--------------------------
@@ -328,6 +337,10 @@ pub impl DnsImpl of DnsTrait {
     // #[inline(always)]
     // fn budokan_dispatcher_from_pass_id(self: @Store, pass_id: u64) -> ITournamentDispatcher {
     //     (ITournamentDispatcher{ contract_address: self.get_tournament_pass_minter_address(pass_id) })
+    // }
+    // #[inline(always)]
+    // fn libxyz_dispatcher(self: @WorldStorage) -> ILibXYZLibraryDispatcher {
+    //     (ILibXYZLibraryDispatcher{ class_hash: self.libxyz_class_hash() })
     // }
 
 

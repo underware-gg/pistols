@@ -11,7 +11,7 @@ import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { DojoSetupErrorDetector } from '/src/components/account/DojoSetupErrorDetector'
 import { POSTER_HEIGHT_SMALL, POSTER_WIDTH_SMALL, ProfilePoster, ProfilePosterHandle } from '/src/components/ui/ProfilePoster'
 import { SortDirection, PlayerColumn, useQueryParams, ChallengeColumn } from '/src/stores/queryParamsStore'
-import { SceneName, TextureName } from '/src/data/assets'
+import { SceneName, TextureName } from '/src/data/assetsTypes'
 import { LiveChallengeStates } from '/src/utils/pistols'
 import DuelTutorialOverlay from '/src/components/ui/duel/DuelTutorialOverlay'
 import { bigintEquals } from '@underware/pistols-sdk/utils'
@@ -23,12 +23,10 @@ import { InteractibleScene } from '/src/three/InteractibleScene'
 export default function ScDuelists() {
   const { filterPlayerName, filterPlayerActive, filterPlayerBookmarked, filterPlayerSortColumn, filterPlayerSortDirection } = useQueryParams()
   const { playerIds } = useQueryPlayerIds(filterPlayerName, filterPlayerActive, filterPlayerBookmarked, filterPlayerSortColumn, filterPlayerSortDirection)
-  const { playerIds: matchmakingPlayerAddresses } = useQueryPlayerIds("", true, false, PlayerColumn.Timestamp, SortDirection.Descending)
   
   // get the players current challenges
   const { address } = useAccount()
   useFetchChallengeIdsOwnedByAccount(address)
-  const { challenges: currentChallenges } = useQueryChallengesOwnedByAccount(address, LiveChallengeStates)
 
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSelectPlayerAddress, tutorialOpener, duelistSelectOpener, dispatchChallengingPlayerAddress, dispatchSelectDuel, modeSelectOpener } = usePistolsContext()
@@ -36,12 +34,6 @@ export default function ScDuelists() {
   const { selectedMode } = useSettings()
   const { botPlayerContractAddress } = useTokenContracts()
   const { hasPact, pactDuelId } = usePactGet(constants.DuelType.BotPlayer, address, botPlayerContractAddress)
-
-  const availableMatchmakingPlayers = useMemo(() => {
-    return matchmakingPlayerAddresses.filter(address => (
-      !currentChallenges.some(ch => bigintEquals(ch.address_a, address) || bigintEquals(ch.address_b, address))
-    ))
-  }, [matchmakingPlayerAddresses, currentChallenges])
 
   const lastSelectedModeRef = useRef(selectedMode)
 
@@ -73,7 +65,9 @@ export default function ScDuelists() {
             if (!hasPact) {
               // pick duelist and create a new duel
               dispatchChallengingPlayerAddress(botPlayerContractAddress);
-              duelistSelectOpener.open();
+              setTimeout(() => {
+                duelistSelectOpener.open();
+              }, 100)
             } else {
               // go to existing duel
               dispatchSelectDuel(pactDuelId);
@@ -94,16 +88,18 @@ export default function ScDuelists() {
   }, [itemClicked, timestamp])
 
   useEffect(() => {
-    if (selectedMode) {
-      (_currentScene as InteractibleScene).setLayerVariant(TextureName.bg_duelists_matchmaking_unranked, selectedMode)
-    }
-    if (selectedMode === 'singleplayer' && lastSelectedModeRef.current !== 'singleplayer') {
-      setTimeout(() => {
+    const timeout = setTimeout(() => {
+      if (selectedMode && _currentScene && _currentScene instanceof InteractibleScene) {
+        (_currentScene as InteractibleScene).setLayerVariant(TextureName.bg_duelists_matchmaking_unranked, selectedMode)
+      }
+      if (selectedMode === 'singleplayer' && lastSelectedModeRef.current !== 'singleplayer') {
         dispatchChallengingPlayerAddress(botPlayerContractAddress);
         duelistSelectOpener.open();
-      }, 300)
-    }
-    lastSelectedModeRef.current = selectedMode
+      }
+      lastSelectedModeRef.current = selectedMode
+    }, 0)
+
+    return () => clearTimeout(timeout)
   }, [selectedMode])
 
   const [pageNumber, setPageNumber] = useState(0)

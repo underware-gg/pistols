@@ -4,7 +4,7 @@ import { BigNumberish } from 'starknet'
 import { Opener, useOpener } from '/src/hooks/useOpener'
 import { bigintToHex, bigintToDecimal, isPositiveBigint, bigintEquals } from '@underware/pistols-sdk/utils'
 import { DuelTutorialLevel, tutorialScenes } from '/src/data/tutorialConstants'
-import { SceneName } from '/src/data/assets'
+import { SceneName  } from '/src/data/assetsTypes'
 import { SCENE_CHANGE_ANIMATION_DURATION } from '/src/three/game'
 
 import { emitter } from '/src/three/game'
@@ -355,39 +355,39 @@ const PistolsProvider = ({
   })
 
   useEffect(() => {
-    const hasModalOpen = connectOpener.isOpen || 
-                        shopOpener.isOpen || 
-                        tutorialOpener.isOpen || 
-                        bookOpener.isOpen || 
-                        duelistSelectOpener.isOpen || 
-                        walletFinderOpener.isOpen ||
-                        settingsOpener.isOpen ||
-                        errorModalOpener.isOpen ||
-                        bugReportOpener.isOpen ||
-                        barkeepModalOpener.isOpen ||
-                        tavernRingsOpener.isOpen ||
-                        ringAnimationOpener.isOpen ||
-                        tutorialPromptOpener.isOpen ||
-                        modeSelectOpener.isOpen ||
+    const hasModalOpen = connectOpener?.isOpen || 
+                        shopOpener?.isOpen || 
+                        tutorialOpener?.isOpen || 
+                        bookOpener?.isOpen || 
+                        duelistSelectOpener?.isOpen || 
+                        walletFinderOpener?.isOpen ||
+                        settingsOpener?.isOpen ||
+                        errorModalOpener?.isOpen ||
+                        bugReportOpener?.isOpen ||
+                        barkeepModalOpener?.isOpen ||
+                        tavernRingsOpener?.isOpen ||
+                        ringAnimationOpener?.isOpen ||
+                        tutorialPromptOpener?.isOpen ||
+                        modeSelectOpener?.isOpen ||
                         hasSearchParams ||
                         (state.challengingAddress && state.challengingDuelistId)
 
     emitter.emit('hasModalOpen', hasModalOpen)
   }, [
-    connectOpener.isOpen,
-    shopOpener.isOpen, 
-    tutorialOpener.isOpen,
-    bookOpener.isOpen,
-    duelistSelectOpener.isOpen,
-    walletFinderOpener.isOpen,
-    settingsOpener.isOpen,
-    errorModalOpener.isOpen,
-    bugReportOpener.isOpen,
-    barkeepModalOpener.isOpen,
-    tavernRingsOpener.isOpen,
-    ringAnimationOpener.isOpen,
-    tutorialPromptOpener.isOpen,
-    modeSelectOpener.isOpen,
+    connectOpener?.isOpen,
+    shopOpener?.isOpen, 
+    tutorialOpener?.isOpen,
+    bookOpener?.isOpen,
+    duelistSelectOpener?.isOpen,
+    walletFinderOpener?.isOpen,
+    settingsOpener?.isOpen,
+    errorModalOpener?.isOpen,
+    bugReportOpener?.isOpen,
+    barkeepModalOpener?.isOpen,
+    tavernRingsOpener?.isOpen,
+    ringAnimationOpener?.isOpen,
+    tutorialPromptOpener?.isOpen,
+    modeSelectOpener?.isOpen,
     hasSearchParams,
     state.challengingAddress,
     state.challengingDuelistId

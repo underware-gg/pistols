@@ -5,14 +5,11 @@ import { DuelStage } from '/src/hooks/useDuel'
 import { _currentDuelId, _currentDuelistAId, _currentDuelistBId, sizes } from './game'
 
 enum DuelState {
-  CHOOSING_STEPS,       //I'm choosing steps
-  STEPS_CHOSEN,         //I have chosen my steps but the opponent hasn't
-  REVEALING_STEPS,      //I have to reveal my steps
-  STEPS_REVEALED,       //I have revealed my steps but my opponent hasn't
-  CHOOSING_ACTIONS,     //I'm choosing my actions
-  ACTIONS_CHOSEN,       //I have chosen my actions but my opponent hasn't
-  REVEALING_ACTIONS,    //I have to reveal my actions
-  ACTIONS_REVEALED      //I have revealed my actions but my opponent hasn't
+  NEEDS_DUELIST_SELECTION,  //I need to select a duelist to enter this duel
+  CHOOSING_STEPS,           //I'm choosing steps
+  STEPS_CHOSEN,             //I have chosen my steps but the opponent hasn't
+  REVEALING_STEPS,          //I have to reveal my steps
+  STEPS_REVEALED,           //I have revealed my steps but my opponent hasn't
 }
 
 enum DuelOutcome {
@@ -37,6 +34,11 @@ type EndingMessages = {
 
 // Define the DialogOptions object with different states and corresponding messages
 const dialogOptions: DialogOptions = {
+  [DuelState.NEEDS_DUELIST_SELECTION]: {
+    isThinkingBubble: true,
+    opponentText: "",
+    messages: ["Select a Duelist"],
+  },
   [DuelState.CHOOSING_STEPS]: {
     isThinkingBubble: true,
     opponentText: "I'm choosin' my steps...",
@@ -181,151 +183,7 @@ const dialogOptions: DialogOptions = {
       "Reveal yer choice, scum!"
     ]
   },
-  [DuelState.CHOOSING_ACTIONS]: {
-    isThinkingBubble: true,
-    opponentText: "I'm choosin' my actions...",
-    messages: [
-      "Choose your actions, quick!",
-      "Decide your actions now!",
-      "What's your plan? Act fast!",
-      "Make your move, no delay!",
-      "Pick actions, time's short!",
-      "Choose wisely, partner!",
-      "Hurry, choose your actions!",
-      "Think fast, pick actions!",
-      "Time's ticking, choose!",
-      "Act fast, quick!",
-      "Move up, make your choice!",
-      "Decide actions, hurry!",
-      "Pick fast or regret it!",
-      "Your move, no time to waste!",
-      "Choose and don't dawdle!",
-      "Make your actions count!",
-      "Decide swiftly, partner!",
-      "Hurry, pick your path!",
-      "Your actions, choose now!",
-      "Don't delay, pick actions!",
-      "Make your choice, hurry!",
-      "Fast decisions win duels!",
-      "Choose quick, no time!",
-      "Your move, partner!",
-      "Move it up, decide!",
-      "Choose actions, no delay!",
-      "Pick your path fast!",
-      "Decide quick, partner!",
-      "Time's short, choose!",
-      "Move fast, pick now!"
-    ]
-  },
-  [DuelState.ACTIONS_CHOSEN]: {
-    isThinkingBubble: false,
-    opponentText: "Revealin' my actions...",
-    messages: [
-      "Choose, you filthy wretch!",
-      "I ain't got the whole day!",
-      "What are you waiting for?!",
-      "Tsk tsk, are you scared?",
-      "Try and keep up, if you can!",
-      "Better pick up the pace, pal!",
-      "Quit stallin', make a choice!",
-      "Move it, scum!",
-      "Choose, you coward!",
-      "Don't dawdle, pick!",
-      "Get on with it, bastard!",
-      "Time's wasting, scum!",
-      "Hurry up, you dog!",
-      "Move, filthy wretch!",
-      "Pick, you mangy cur!",
-      "Quit delayin', choose!",
-      "Hurry, ya sluggard!",
-      "What's takin' so long?",
-      "Come on, scum!",
-      "Get to it, bastard!",
-      "Quit thinkin', act!",
-      "Make a move, coward!",
-      "Time's tickin', scum!",
-      "Decide, you dog!",
-      "Move along, wretch!",
-      "Pick up the pace!",
-      "Don't stall, dog!",
-      "Quit waitin', choose!",
-      "Get on with it, wretch!",
-      "Make yer choice, scum!"
-    ]
-  },
-  [DuelState.REVEALING_ACTIONS]: {
-    isThinkingBubble: true,
-    opponentText: "",
-    messages: [
-      "Reveal your actions now!",
-      "Show us your move, quick!",
-      "Reveal your plan, hurry!",
-      "Let's see it, no delay!",
-      "Reveal actions, partner!",
-      "Show your hand, quick!",
-      "Time to reveal, no wait!",
-      "Reveal your move now!",
-      "Let's see your actions!",
-      "Reveal, time's ticking!",
-      "Show your path quick!",
-      "Reveal actions, hurry!",
-      "Reveal now, partner!",
-      "Let's see your choice!",
-      "Reveal, time's short!",
-      "Show your hand fast!",
-      "Reveal, partner, quick!",
-      "Show what you chose!",
-      "Reveal and prepare!",
-      "Reveal your moves fast!",
-      "Show your hand quick!",
-      "Reveal, no delay!",
-      "Let's see your actions!",
-      "Reveal now, no wait!",
-      "Reveal your steps fast!",
-      "Show it now, hurry!",
-      "Reveal your path, quick!",
-      "Let's see your actions!",
-      "Reveal quick, partner!",
-      "Show your move now!"
-    ]
-  },
-  [DuelState.ACTIONS_REVEALED]: {
-    isThinkingBubble: false,
-    opponentText: "",
-    messages: [
-      "Prepare to meet your maker!",
-      "I ain't got the whole day!",
-      "You're digging your grave!",
-      "You're pissing me off, hurry!",
-      "What? Scared?",
-      "Tick-tock, reveal or die!",
-      "Ready to die, scum?",
-      "Make your move, coward!",
-      "Quit stallin', bastard!",
-      "Reveal, you cur!",
-      "Get on with it, scum!",
-      "Make yer choice, dog!",
-      "Quit waitin', wretch!",
-      "Don't dawdle, bastard!",
-      "Reveal, you coward!",
-      "Hurry up, scum!",
-      "Time's up, show it!",
-      "Move along, wretch!",
-      "Get to it, bastard!",
-      "Come on, scum!",
-      "Reveal, ya coward!",
-      "Quit delayin', dog!",
-      "Make yer move, scum!",
-      "Show us, bastard!",
-      "Move it, wretch!",
-      "Tick-tock, scum!",
-      "Reveal now, coward!",
-      "Hurry, ya scum!",
-      "Show it, you dog!",
-      "Reveal yer choice, scum!"
-    ]
-  }
-}
+};
 
 // Define the EndingMessages object with the different outcomes and corresponding messages
 const duelEndingMessages: EndingMessages = {
@@ -522,21 +380,24 @@ export class ProgressDialogManager {
 
   private findCurrentDuelStates(stageA: any, stageB: any): { stateA: DuelState, stateB: DuelState } {
     let stateA, stateB
-
-    if (stageA[DuelStage.Round1Commit] == false) stateA = DuelState.CHOOSING_STEPS
-    else if (stageA[DuelStage.Round1Reveal] == false) stateA = DuelState.REVEALING_STEPS
-    else stateA = DuelState.ACTIONS_REVEALED
+    
+    if (_currentDuelistAId === 0 && this.isDialogAYou) {
+      stateA = DuelState.NEEDS_DUELIST_SELECTION
+    } else if (stageA[DuelStage.Round1Commit] == false) {
+      stateA = DuelState.CHOOSING_STEPS
+    } else if (stageA[DuelStage.Round1Reveal] == false) {
+      stateA = DuelState.REVEALING_STEPS
+    } else {
+      stateA = DuelState.STEPS_REVEALED
+    }
 
     if (stageB[DuelStage.Round1Commit] == false) stateB = DuelState.CHOOSING_STEPS
     else if (stageB[DuelStage.Round1Reveal] == false) stateB = DuelState.REVEALING_STEPS
-    else stateB = DuelState.ACTIONS_REVEALED
+    else stateB = DuelState.STEPS_REVEALED
 
-    if (stateA == DuelState.REVEALING_STEPS && stateB == DuelState.CHOOSING_STEPS) stateA = DuelState.STEPS_CHOSEN
+    if (stateA == DuelState.NEEDS_DUELIST_SELECTION && stateB == DuelState.REVEALING_STEPS) stateB = DuelState.STEPS_CHOSEN
+    else if (stateA == DuelState.REVEALING_STEPS && stateB == DuelState.CHOOSING_STEPS) stateA = DuelState.STEPS_CHOSEN
     else if (stateB == DuelState.REVEALING_STEPS && stateA == DuelState.CHOOSING_STEPS) stateB = DuelState.STEPS_CHOSEN
-    else if (stateA == DuelState.CHOOSING_ACTIONS && stateB == DuelState.REVEALING_STEPS) stateA = DuelState.STEPS_REVEALED
-    else if (stateB == DuelState.CHOOSING_ACTIONS && stateA == DuelState.REVEALING_STEPS) stateB = DuelState.STEPS_REVEALED
-    else if (stateA == DuelState.REVEALING_ACTIONS && stateB == DuelState.CHOOSING_ACTIONS) stateA = DuelState.ACTIONS_CHOSEN
-    else if (stateB == DuelState.REVEALING_ACTIONS && stateA == DuelState.CHOOSING_ACTIONS) stateB = DuelState.ACTIONS_CHOSEN
 
     return { stateA, stateB }
   }

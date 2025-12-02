@@ -9,7 +9,7 @@ import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { CardPackAnimationWrapper, CardPackAnimationWrapperHandle } from '/src/components/ui/CardPackAnimationWrapper'
 import { ActionButton, BalanceRequiredButton } from '/src/components/ui/Buttons'
 import { PackTypeListItem } from '/src/components/ui/PackTypeListItem'
-import { SceneName } from '/src/data/assets'
+import { SceneName  } from '/src/data/assetsTypes'
 import { Divider } from '/src/components/ui/Divider'
 import { LordsBalance } from '/src/components/account/LordsBalance'
 import * as TWEEN from '@tweenjs/tween.js'
@@ -223,6 +223,7 @@ export default function ScCardPacks() {
           onComplete={() => handlePackComplete(packId)}
           packId={undefined}
           isOpen={true}
+          clickable={false}
           cardPackSize={PACK_SIZE}
           maxTilt={20}
           atTutorialEnding={false}
@@ -244,6 +245,7 @@ export default function ScCardPacks() {
         onComplete={() => handlePackComplete(packId)}
         packId={packId}
         isOpen={true}
+        clickable={false}
         cardPackSize={PACK_SIZE}
         maxTilt={20}
         atTutorialEnding={false}

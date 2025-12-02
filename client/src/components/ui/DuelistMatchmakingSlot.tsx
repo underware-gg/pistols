@@ -11,6 +11,10 @@ import { useIsMyAccount } from '/src/hooks/useIsYou'
 import { useDuelCallToAction } from '/src/stores/eventsModelStore'
 import { CardColor } from '@underware/pistols-sdk/pistols/constants'
 import { emitter } from '/src/three/game'
+import { useDuel } from '/src/hooks/useDuel'
+import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
+import { useTransactionHandler } from '/src/hooks/useTransaction'
+import { useCanCollectDuel } from '/src/hooks/usePistolsContractCalls'
 
 interface DuelistMatchmakingSlotProps {
   width?: number
@@ -24,12 +28,14 @@ interface DuelistMatchmakingSlotProps {
   duelId?: bigint
   isCommitting?: boolean
   isEnlisting?: boolean
+  isEnlistedButNotCommitted?: boolean
   isError?: boolean
   errorMessage?: string | null
   onDuelistPromoted?: (duelistId: bigint) => void
   onRequeueDuelist?: (duelistId: bigint) => void
   onError?: () => void
   handleRemove?: () => void
+  onQueueClick?: () => void
 }
 
 export interface DuelistMatchmakingSlotHandle {
@@ -38,7 +44,7 @@ export interface DuelistMatchmakingSlotHandle {
 
 export const DuelistMatchmakingSlot = forwardRef<DuelistMatchmakingSlotHandle, DuelistMatchmakingSlotProps>((props, ref) => {
   const { aspectWidth } = useGameAspect();
-  const { address } = useAccount();
+  const { address, account } = useAccount();
   const { dispatchSelectDuel } = usePistolsContext();
 
   const rankedPlayer = useMatchPlayer(address, constants.QueueId.Ranked);
@@ -50,6 +56,48 @@ export const DuelistMatchmakingSlot = forwardRef<DuelistMatchmakingSlotHandle, D
   const { isMyAccount: isYouB } = useIsMyAccount(challenge.duelistAddressB);
 
   const requiresAction = useDuelCallToAction(props.duelId || 0n);
+  const { canCollectDuel } = useCanCollectDuel(props.duelId || 0n);
+  const animatedDuel = useDuel(props.duelId || 0n);
+  const { game, duel_token } = useDojoSystemCalls();
+  
+  const buttonsRowRef = useRef(null);
+
+  const isMyTurn = useMemo(() => {
+    if (!props.duelId || !challenge.duelistAddressA) return false;
+    return (animatedDuel.turnA && isYouA) || (animatedDuel.turnB && isYouB);
+  }, [props.duelId, animatedDuel.turnA, animatedDuel.turnB, isYouA, isYouB, challenge.duelistAddressA, challenge.duelistAddressB]);
+
+  const showCollectButton = useMemo(() => {
+    if (!props.duelId) return false;
+    if (isMyTurn && !challenge.isSeasonExpired) return false;
+    return canCollectDuel || challenge.needToSyncExpired;
+  }, [props.duelId, canCollectDuel, challenge.needToSyncExpired, isMyTurn, challenge.isSeasonExpired]);
+
+  const { call: collectExpiredDuel, isLoading: isCollectingExpired } = useTransactionHandler<boolean, [bigint]>({
+    key: `collect_expired_duel${props.duelId}`,
+    transactionCall: (duelId, key) => {
+      if (!account) throw new Error('Account not available');
+      return duel_token.reply_duel(account, 0n, duelId, false, key);
+    },
+    indexerCheck: !challenge.needToSyncExpired,
+    messageTargetRef: buttonsRowRef,
+    waitingMessage: "Transaction successful! Waiting for indexer...",
+    messageDelay: 1000,
+  });
+
+  const { call: collectTimedOutDuel, isLoading: isCollectingTimedOut } = useTransactionHandler<boolean, [bigint]>({
+    key: `collect_timed_out_duel${props.duelId}`,
+    transactionCall: (duelId, key) => {
+      if (!account) throw new Error('Account not available');
+      return game.collect_duel(account, duelId, key);
+    },
+    indexerCheck: !canCollectDuel,
+    messageTargetRef: buttonsRowRef,
+    waitingMessage: "Transaction successful! Waiting for indexer...",
+    messageDelay: 1000,
+  });
+
+  const isCollecting = isCollectingExpired || isCollectingTimedOut;
 
   const myDuelistIdFromDuel = useMemo(() => {
     if (!props.duelId) return null;
@@ -78,6 +126,10 @@ export const DuelistMatchmakingSlot = forwardRef<DuelistMatchmakingSlotHandle, D
       return { message: "Enlisting...", buttonText: null, color: "#f97316", showTimer: false };
     }
 
+    if (props.isEnlistedButNotCommitted) {
+      return { message: "Enlisted!", buttonText: null, color: "#22c55e", showTimer: false };
+    }
+
     if (props.isCommitting) {
       return { message: "Commiting...", buttonText: null, color: "#f97316", showTimer: false };
     }
@@ -86,8 +138,16 @@ export const DuelistMatchmakingSlot = forwardRef<DuelistMatchmakingSlotHandle, D
       return { message: "Error", buttonText: null, color: "#ef4444", showTimer: false };
     }
 
+    if (canCollectDuel) {
+      return { message: "Duel Timed Out", buttonText: !challenge.isSeasonExpired ? "GO TO DUEL" : null, color: "#ef4444", showTimer: !challenge.isSeasonExpired ? true : false };
+    }
+    
+    if (challenge.needToSyncExpired) {
+      return { message: "Duel Expired", buttonText: !challenge.isSeasonExpired ? "GO TO DUEL" : null, color: "#ef4444", showTimer: !challenge.isSeasonExpired ? true : false };
+    }
+
     if (currentDuelistId && (rankedPlayer.duelistId === BigInt(currentDuelistId) || unrankedPlayer.duelistId === BigInt(currentDuelistId)) && challenge.isAwaiting) {
-      return { message: "Searching for Match...", buttonText: null, color: "#fbbf24", showTimer: true };
+      return { message: "Searching for Match...", buttonText: props.duelId ? "GO TO DUEL" : null, color: "#fbbf24", showTimer: true };
     }
 
     const isInQueue = currentDuelistId && inQueueIds.includes(currentDuelistId) && challenge.isAwaiting;
@@ -100,7 +160,7 @@ export const DuelistMatchmakingSlot = forwardRef<DuelistMatchmakingSlotHandle, D
         return { message: "Duel Finished", buttonText: "SEE RESULTS", color: "#d1d5db", showTimer: false };
       }
 
-      if (requiresAction && !!challenge.duelistAddressA && !!challenge.duelistAddressB) {
+      if (((animatedDuel.turnA && isYouA) || (animatedDuel.turnB && isYouB)) && !!challenge.duelistAddressA && !!challenge.duelistAddressB) {
         return { message: "Its Your move!", buttonText: "GO TO DUEL", color: "#22c55e", showTimer: true };
       }
 
@@ -116,6 +176,7 @@ export const DuelistMatchmakingSlot = forwardRef<DuelistMatchmakingSlotHandle, D
   }, [
     props.isCommitting,
     props.isEnlisting,
+    props.isEnlistedButNotCommitted,
     props.isError,
     currentDuelistId,
     inQueueIds,
@@ -126,6 +187,9 @@ export const DuelistMatchmakingSlot = forwardRef<DuelistMatchmakingSlotHandle, D
     props.duelId,
     challenge.isFinished,
     challenge.isInProgress,
+    challenge.needToSyncExpired,
+    challenge.isSeasonExpired,
+    canCollectDuel,
     requiresAction,
   ]);
 
@@ -144,6 +208,15 @@ export const DuelistMatchmakingSlot = forwardRef<DuelistMatchmakingSlotHandle, D
     props.onRequeueDuelist?.(myDuelistIdFromDuel);
   }, [myDuelistIdFromDuel, props.onRequeueDuelist]);
 
+  const handleCollect = useCallback(() => {
+    if (!props.duelId) return;
+    if (challenge.needToSyncExpired) {
+      collectExpiredDuel(props.duelId);
+    } else if (canCollectDuel === true) {
+      collectTimedOutDuel(props.duelId);
+    }
+  }, [props.duelId, challenge.needToSyncExpired, collectExpiredDuel, collectTimedOutDuel, canCollectDuel]);
+
   useImperativeHandle(
     ref,
     () => ({
@@ -160,7 +233,7 @@ export const DuelistMatchmakingSlot = forwardRef<DuelistMatchmakingSlotHandle, D
     }
   }, [currentDuelistId, duelistCardRef, isPlayerTurn, props.isError]);
   
-  const disableButtons = props.isCommitting || props.isEnlisting;
+  const disableButtons = props.isCommitting || props.isEnlisting || isCollecting;
 
   return (
     <div
@@ -175,6 +248,7 @@ export const DuelistMatchmakingSlot = forwardRef<DuelistMatchmakingSlotHandle, D
       <DuelistCard
         ref={duelistCardRef}
         duelistId={Number(currentDuelistId)}
+        duelId={props.duelId}
         isSmall
         isLeft
         isVisible
@@ -241,6 +315,7 @@ export const DuelistMatchmakingSlot = forwardRef<DuelistMatchmakingSlotHandle, D
       {!disableButtons && (
         <div
           className="NoMouse NoDrag"
+          ref={buttonsRowRef}
           style={{
             position: "absolute",
             bottom: aspectWidth(-4.8),
@@ -300,6 +375,27 @@ export const DuelistMatchmakingSlot = forwardRef<DuelistMatchmakingSlotHandle, D
               className="YesMouse"
               label="REQUEUE"
               onClick={handleRequeue}
+              important
+              fill
+              disabled={disableButtons}
+            />
+          )}
+          {showCollectButton && (
+            <ActionButton
+              className="YesMouse"
+              label="COLLECT"
+              onClick={handleCollect}
+              important
+              fill
+              disabled={disableButtons}
+              loading={isCollecting}
+            />
+          )}
+          {props.isEnlistedButNotCommitted && props.onQueueClick && (
+            <ActionButton
+              className="YesMouse"
+              label="Queue!"
+              onClick={props.onQueueClick}
               important
               fill
               disabled={disableButtons}

@@ -15,6 +15,7 @@ import { ChallengeColumn, SortDirection } from '/src/stores/queryParamsStore'
 import { useCallToChallenges } from '/src/stores/eventsModelStore'
 import { useChallengeFetchStore } from '/src/stores/fetchStore'
 import { debug } from '@underware/pistols-sdk/pistols'
+import { useCurrentSeason } from './seasonStore'
 
 export const useChallengeStore = createDojoStore<PistolsSchemaType>();
 
@@ -52,6 +53,7 @@ export const useChallenge = (duelId: BigNumberish) => {
   const entities = useChallengeStore((state) => state.entities);
   const challenge = useStoreModelsByKeys<models.Challenge>(entities, 'Challenge', [duelId])
   const challengeMessage = useStoreModelsByKeys<models.ChallengeMessage>(entities, 'ChallengeMessage', [duelId])
+  const { seasonId: currentSeasonId } = useCurrentSeason()
   // const fameBalance = useStoreModelsByKeys<models.ChallengeFameBalance>(entities, 'ChallengeFameBalance', [duelId])
   // console.log(`useChallenge(${Number(duelId)}) =>`, 
   //   fameBalance, 
@@ -118,6 +120,7 @@ export const useChallenge = (duelId: BigNumberish) => {
     isDraw: (state == constants.ChallengeState.Draw),
     isCanceled: (state == constants.ChallengeState.Withdrawn || state == constants.ChallengeState.Refused),
     isExpired: (state == constants.ChallengeState.Expired),
+    isSeasonExpired: (seasonId > 0 && seasonId !== currentSeasonId) && duelType === constants.DuelType.Ranked,
     needToSyncExpired,
     // times
     timestampStart,
@@ -238,7 +241,8 @@ export function useMyActiveDuels(notificationDuelIds: bigint[] = []) {
         duel_id: BigInt(ch.duel_id),
         timestamp: Number(ch.timestamps.start),
         state: parseEnumVariant<constants.ChallengeState>(ch.state),
-        callToAction: requiredDuelIds.includes(BigInt(ch.duel_id))
+        callToAction: requiredDuelIds.includes(BigInt(ch.duel_id)),
+        hasOpponent: BigInt(ch.address_b ?? 0) > 0n
       })
       )
   }, [challenges, address, requiredDuelIds, notificationDuelIds])

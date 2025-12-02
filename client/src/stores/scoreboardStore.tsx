@@ -9,6 +9,7 @@ import { useLeaderboard, DuelistScore } from '/src/stores/seasonStore'
 import { useScoreboardFetchStore } from '/src/stores/fetchStore'
 import { useConfig } from '/src/stores/configStore'
 import { debug } from '@underware/pistols-sdk/pistols'
+import { useBlockedPlayersDuelistIds } from '/src/stores/playerStore'
 
 // re-export
 export type { DuelistScore }
@@ -76,9 +77,13 @@ export const useScoreboardStore = createStore();
 // in order from first to last
 //
 export const useCurrentSeasonScoreboard = () => {
-  const scoreboard = useScoreboardStore((state) => state.scoreboard);
+  const scoreboardState = useScoreboardStore((state) => state);
   // merge with Leaderboard (10 first may be out of order)
   const { currentSeasonId } = useConfig()
+  // Filter scoreboard by currentSeasonId first, just like useGetSeasonScoreboard does
+  const scoreboard = useMemo<DuelistScore[]>(() => (
+    scoreboardState.scoreboard.filter(s => s.seasonId === currentSeasonId)
+  ), [scoreboardState.scoreboard, currentSeasonId])
   const seasonScoreboard = _useMergeScoreboardWithLeaderboard(scoreboard, currentSeasonId)
   return {
     seasonScoreboard,
@@ -98,13 +103,21 @@ const _useMergeScoreboardWithLeaderboard = (scoreboard: DuelistScore[], seasonId
 
 export const useDuelistCurrentSeasonScore = (duelist_id: BigNumberish) => {
   const { seasonScoreboard } = useCurrentSeasonScoreboard();
+  const { blockedPlayersDuelistIds } = useBlockedPlayersDuelistIds()
+  
   const { position, points } = useMemo(() => {
-    const index = seasonScoreboard.findIndex(s => bigintEquals(s.duelistId, duelist_id));
+    const filteredScoreboard = seasonScoreboard.filter(
+      score => !blockedPlayersDuelistIds.includes(score.duelistId)
+    )
+    
+    const sortedScoreboard = [...filteredScoreboard].sort((a, b) => b.points - a.points)
+    const index = sortedScoreboard.findIndex(s => bigintEquals(s.duelistId, duelist_id));
+    
     return {
-      position: index + 1,
-      points: seasonScoreboard[index]?.points ?? 0,
+      position: index >= 0 ? index + 1 : 0,
+      points: sortedScoreboard[index]?.points ?? 0,
     }
-  }, [duelist_id, seasonScoreboard])
+  }, [duelist_id, seasonScoreboard, blockedPlayersDuelistIds])
   // console.log(`DUELIST SCORE >>>>>>>`, duelist_id, position, points)
   return {
     position,
@@ -114,13 +127,22 @@ export const useDuelistCurrentSeasonScore = (duelist_id: BigNumberish) => {
 
 export const useDuelistSeasonScore = (duelist_id: BigNumberish, season_id: number) => {
   const { seasonScoreboard } = useGetSeasonScoreboard(season_id);
+  const { blockedPlayersDuelistIds } = useBlockedPlayersDuelistIds()
+  
   const { position, points } = useMemo(() => {
-    const index = seasonScoreboard.findIndex(s => bigintEquals(s.duelistId, duelist_id));
+    const filteredScoreboard = seasonScoreboard.filter(
+      score => !blockedPlayersDuelistIds.includes(score.duelistId)
+    )
+    
+    const sortedScoreboard = [...filteredScoreboard].sort((a, b) => b.points - a.points)
+    const index = sortedScoreboard.findIndex(s => bigintEquals(s.duelistId, duelist_id));
+
     return {
-      position: index + 1,
-      points: seasonScoreboard[index]?.points ?? 0,
+      position: index >= 0 ? index + 1 : 0,
+      points: sortedScoreboard[index]?.points ?? 0,
     }
-  }, [duelist_id, seasonScoreboard])
+  }, [duelist_id, seasonScoreboard, blockedPlayersDuelistIds])
+  
   return {
     position,
     points,

@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react'
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { useAccount } from '@starknet-react/core'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
@@ -7,17 +7,16 @@ import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { useDuelistsInMatchMaking } from '/src/stores/matchStore'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { DuelistMatchmakingSlot } from './DuelistMatchmakingSlot'
+import { extractSimplifiedError } from '../modals/ErrorModal'
 
 interface EnlistmentState {
   isEnlisting: boolean
-  isWaitingForEnlistment: boolean
   enlistError: string | null
   enlistedDuelistId: bigint | null
 }
 
 interface CommitmentState {
   isCommitting: boolean
-  isWaitingForCommit: boolean
   commitError: string | null
   committedDuelistId: bigint | null
 }
@@ -50,25 +49,22 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
   const { duelistSelectOpener } = usePistolsContext();
 
   const { rankedEnlistedIds, canMatchMakeIds, inQueueIds, duellingIds } = useDuelistsInMatchMaking(props.matchmakingType);
+  
+  const lockedAccountRef = useRef<typeof account>(null);
 
   const [commitmentState, setCommitmentState] = useState<CommitmentState>({
     isCommitting: false,
-    isWaitingForCommit: false,
     commitError: null,
     committedDuelistId: null,
   });
   const [enlistmentState, setEnlistmentState] = useState<EnlistmentState>({
     isEnlisting: false,
-    isWaitingForEnlistment: false,
     enlistError: null,
     enlistedDuelistId: null,
   });
 
   const selectionDisabled = useMemo(() => {
-    return props.disabled || 
-      props.mouseDisabled || 
-      (commitmentState.isCommitting || commitmentState.isWaitingForCommit) || 
-      (enlistmentState.isEnlisting || enlistmentState.isWaitingForEnlistment);
+    return props.disabled || props.mouseDisabled || commitmentState.isCommitting || enlistmentState.isEnlisting;
   }, [props.disabled, props.mouseDisabled, commitmentState, enlistmentState]);
 
   const hasIndexed = useMemo(() => {
@@ -82,8 +78,11 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
 
   const enlistmentHasIndexed = useMemo(() => {
     if (!enlistmentState.enlistedDuelistId) return true;
-    return rankedEnlistedIds.includes(enlistmentState.enlistedDuelistId);
-  }, [enlistmentState.enlistedDuelistId, rankedEnlistedIds]);
+    return (
+      rankedEnlistedIds.includes(enlistmentState.enlistedDuelistId) &&
+      canMatchMakeIds.includes(enlistmentState.enlistedDuelistId)
+    );
+  }, [enlistmentState.enlistedDuelistId, rankedEnlistedIds, canMatchMakeIds]);
 
   const currentDuelistId = useMemo(() => {
     return commitmentState.committedDuelistId || enlistmentState.enlistedDuelistId;
@@ -91,8 +90,11 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
 
   const onCompleteCommitToQueue = useCallback((result: boolean | Error, args: [bigint, constants.QueueId, constants.QueueMode]) => {
     const [duelistIdArg] = args;
+    
+    lockedAccountRef.current = null;
+    
     if (result instanceof Error || result === false) {
-      const errorMessage = result instanceof Error ? result.message : "Failed to commit duelist. Please try again.";
+      const errorMessage = result instanceof Error ? extractSimplifiedError(result.message) : "Failed to commit duelist. Please try again.";
       console.error("match_make_me failed", duelistIdArg?.toString() ?? "unknown");
       setCommitmentState((prev) => ({
         ...prev,
@@ -109,7 +111,6 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
     
     setCommitmentState({
       isCommitting: false,
-      isWaitingForCommit: false,
       commitError: null,
       committedDuelistId: null,
     });
@@ -126,7 +127,7 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
     isWaitingForIndexer: isWaitingForCommit,
   } = useTransactionHandler<boolean, [bigint, constants.QueueId, constants.QueueMode]>({
     key: `commit_slot`,
-    transactionCall: (duelistId, queueId, queueMode, key) => matchmaker.match_make_me(account, duelistId, queueId, queueMode, key),
+    transactionCall: (duelistId, queueId, queueMode, key) => matchmaker.match_make_me(account || lockedAccountRef.current, duelistId, queueId, queueMode, key),
     indexerCheck: hasIndexed,
     onComplete: onCompleteCommitToQueue,
   });
@@ -134,7 +135,7 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
   const onCompleteEnlistDuelist = useCallback((result: boolean | Error, args: [bigint, constants.QueueId]) => {
     const [duelistIdArg] = args;
     if (result instanceof Error || result === false) {
-      const errorMessage = result instanceof Error ? result.message : "Failed to enlist duelist. Please try again.";
+      const errorMessage = result instanceof Error ? extractSimplifiedError(result.message) : "Failed to enlist duelist. Please try again.";
       console.error("enlist_duelist failed", duelistIdArg?.toString() ?? "unknown");
       setEnlistmentState((prev) => ({
         ...prev,
@@ -152,12 +153,9 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
 
     setEnlistmentState({
       isEnlisting: false,
-      isWaitingForEnlistment: false,
       enlistError: null,
-      enlistedDuelistId: null,
+      enlistedDuelistId: duelistIdArg,
     });
-
-    handleCommitDuelist(duelistIdArg);
   }, [setEnlistmentState, props.onActionComplete]);
 
   const {
@@ -166,40 +164,77 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
     isWaitingForIndexer: isWaitingForEnlistment,
   } = useTransactionHandler<boolean, [bigint, constants.QueueId]>({
     key: `enlist_slot`,
-    transactionCall: (duelistId, queueId, key) => matchmaker.enlist_duelist(account, duelistId, queueId, key),
+    transactionCall: (duelistId, queueId, key) => matchmaker.enlist_duelist(account || lockedAccountRef.current, duelistId, queueId, key),
     indexerCheck: enlistmentHasIndexed,
     onComplete: onCompleteEnlistDuelist,
   });
 
-  const handleEnlistDuelist = useCallback(
-    (duelistId: bigint) => {
-      if (!account || !props.matchmakingType) return;
-
-      // Notify parent that action started
-      props.onActionStart?.(duelistId, 'enlist');
-
+  const handleEnlistDuelist = useCallback((duelistId: bigint) => {
+    if (!props.matchmakingType || isCommitting || isWaitingForCommit || isEnlisting || isWaitingForEnlistment) return;
+    
+    if (!account) {
+      const errorMessage = "Data was out of sync. Please retry!";
+      console.error(errorMessage);
+      
       setEnlistmentState((prev) => ({
         ...prev,
-        isEnlisting: true,
+        isEnlisting: false,
         isWaitingForEnlistment: false,
-        enlistError: null,
+        enlistError: errorMessage,
         enlistedDuelistId: duelistId,
       }));
+      
+      props.onActionComplete?.(false, duelistId, errorMessage);
+      return;
+    }
 
-      enlistDuelist(duelistId, props.matchmakingType);
-    },
-    [account, enlistDuelist, props.matchmakingType, props.onActionStart]
-  );
+    lockedAccountRef.current = account;
+
+    // Notify parent that action started
+    props.onActionStart?.(duelistId, 'enlist');
+
+    setEnlistmentState((prev) => ({
+      ...prev,
+      isEnlisting: true,
+      isWaitingForEnlistment: false,
+      enlistError: null,
+      enlistedDuelistId: duelistId,
+    }));
+
+    enlistDuelist(duelistId, props.matchmakingType);
+  }, [account, enlistDuelist, props.matchmakingType, isCommitting, isWaitingForCommit, isEnlisting, isWaitingForEnlistment]);
 
   const handleCommitDuelist = useCallback((duelistId: bigint) => {
-    if (!duelistId || !props.matchmakingType) return;
-    if (!account) {
-      console.error("Account required for match_make_me");
+    if (!duelistId || !props.matchmakingType || isCommitting || isWaitingForCommit || isEnlisting || isWaitingForEnlistment) return;
+    
+    const accountToUse = account || lockedAccountRef.current;
+    
+    if (!accountToUse) {
+      const errorMessage = "Data was out of sync. Please retry!";
+      console.error(errorMessage);
+      
+      setCommitmentState((prev) => ({
+        ...prev,
+        isCommitting: false,
+        isWaitingForCommit: false,
+        commitError: errorMessage,
+        committedDuelistId: duelistId,
+      }));
+      
+      props.onActionComplete?.(false, duelistId, errorMessage);
       return;
     }
     
     // Notify parent that action started
     props.onActionStart?.(duelistId, 'commit');
+    
+    if (enlistmentState.enlistedDuelistId) {
+      setEnlistmentState({
+        isEnlisting: false,
+        enlistError: null,
+        enlistedDuelistId: null,
+      });
+    }
     
     setCommitmentState((prev) => ({
       ...prev,
@@ -210,7 +245,7 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
     }));
     
     commitToQueue(duelistId, props.matchmakingType, props.queueMode);
-  }, [account, commitToQueue, props.matchmakingType, props.queueMode, props.onActionStart]);
+  }, [account, commitToQueue, props.matchmakingType, props.queueMode, isCommitting, isWaitingForCommit, isEnlisting, isWaitingForEnlistment]);
 
   const handleDuelistSelected = useCallback((rawId: bigint, enlistMode: boolean) => {
     if (enlistMode) {
@@ -223,27 +258,15 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
   const handleOpenDuelistSelect = useCallback(() => {
     if (selectionDisabled || !props.matchmakingType) return;
 
-    if (commitmentState.isWaitingForCommit || enlistmentState.isWaitingForEnlistment) return;
-
     if (commitmentState.isCommitting || enlistmentState.isEnlisting) return;
 
-    if (commitmentState.commitError) {
+    if (commitmentState.commitError && commitmentState.committedDuelistId) {
       handleCommitDuelist(commitmentState.committedDuelistId);
       return;
-    } else if (enlistmentState.enlistError) {
+    } else if (enlistmentState.enlistError && enlistmentState.enlistedDuelistId) {
       handleEnlistDuelist(enlistmentState.enlistedDuelistId);
       return;
     }
-
-    console.log(
-      "openDuelistSelect",
-      props.matchmakingType,
-      canMatchMakeIds,
-      props.matchmakingType,
-      props.queueMode,
-      props.matchmakingType === constants.QueueId.Ranked &&
-        canMatchMakeIds.length === 0
-    );
 
     duelistSelectOpener.open({
       enlistMode:
@@ -269,6 +292,8 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
   ]);
 
   const handleRemove = useCallback(() => {
+    lockedAccountRef.current = null;
+    
     if (commitmentState.committedDuelistId) {
       props.onDuelistRemoved?.(commitmentState.committedDuelistId);
       setCommitmentState((prev) => ({
@@ -310,6 +335,8 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
     console.log("commitmentState", commitmentState, "enlistmentState", enlistmentState, "currentDuelistId", currentDuelistId);
   }, [commitmentState, enlistmentState, currentDuelistId]);
 
+  const isEnlistedButNotCommitted = enlistmentState.enlistedDuelistId && !commitmentState.committedDuelistId && !enlistmentState.isEnlisting && !enlistmentState.enlistError;
+
   //full slot
   if (currentDuelistId) {
 
@@ -323,12 +350,18 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
         matchmakingType={props.matchmakingType}
         queueMode={props.queueMode}
         duelistId={currentDuelistId}
-        isCommitting={isCommitting || isWaitingForCommit}
-        isEnlisting={isEnlisting || isWaitingForEnlistment}
+        isCommitting={isCommitting || isWaitingForCommit || commitmentState.isCommitting}
+        isEnlisting={isEnlisting || isWaitingForEnlistment || enlistmentState.isEnlisting}
+        isEnlistedButNotCommitted={isEnlistedButNotCommitted}
         isError={!!commitmentState.commitError || !!enlistmentState.enlistError}
-        onError={commitmentState.commitError ? () => handleCommitDuelist(commitmentState.committedDuelistId) : () => handleEnlistDuelist(enlistmentState.enlistedDuelistId)}
+        onError={commitmentState.commitError && commitmentState.committedDuelistId 
+          ? () => handleCommitDuelist(commitmentState.committedDuelistId!) 
+          : enlistmentState.enlistError && enlistmentState.enlistedDuelistId
+          ? () => handleEnlistDuelist(enlistmentState.enlistedDuelistId!)
+          : undefined}
         errorMessage={commitmentState.commitError || enlistmentState.enlistError}
         handleRemove={handleRemove}
+        onQueueClick={isEnlistedButNotCommitted ? () => handleCommitDuelist(enlistmentState.enlistedDuelistId!) : undefined}
       />
     );
   }

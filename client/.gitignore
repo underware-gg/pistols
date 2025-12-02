@@ -29,3 +29,6 @@ next-env.d.ts
 
 certificates
 .vercel
+
+# Generated files
+src/data/assetsManifest.ts

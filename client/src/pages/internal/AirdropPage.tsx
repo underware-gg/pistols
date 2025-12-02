@@ -54,7 +54,7 @@ export default function AirdropPage() {
         <EntityStoreSync />
         <PlayerNameSync />
         <TokenStoreSync />
-        <StoreProgressBar />
+        {/* <StoreProgressBar /> */}
       </Container>
     </AppDojo>
   );

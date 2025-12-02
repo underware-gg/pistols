@@ -10,11 +10,10 @@ import { useIsMyAccount } from '/src/hooks/useIsYou'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { CustomIcon, IconClick, IconSizeProp } from '/src/components/ui/Icons'
 import { LordsBagIcon, FoolsIcon } from '/src/components/account/Balance'
-import { SceneName } from '/src/data/assets'
+import { SceneName } from '/src/data/assetsTypes'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { useTransactionObserver } from '/src/hooks/useTransaction'
-import { showElementPopupNotification } from '/src/components/ui/ElementPopupNotification'
 
 //-----------------
 // Generic Action button

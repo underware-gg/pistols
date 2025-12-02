@@ -6,7 +6,7 @@ import { CustomIcon } from '/src/components/ui/Icons'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { ActionButton } from '/src/components/ui/Buttons'
 import { usePistolsScene } from '/src/hooks/PistolsContext'
-import { SceneName } from '/src/data/assets'
+import { SceneName  } from '/src/data/assetsTypes'
 
 interface DuelTutorialOverlayProps {
   tutorialType?: DuelTutorialLevel

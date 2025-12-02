@@ -29,11 +29,9 @@ import { useCanCollectDuel } from '/src/hooks/usePistolsContractCalls'
 import { useDuelCallToAction } from '/src/stores/eventsModelStore'
 import { useDuelistFameBalance } from '/src/stores/coinStore'
 import { useExecuteEmitPlayerBookmark } from '/src/hooks/usePistolsSystemCalls'
-import { useDuelistFameOnDuel, useFetchChallengeRewardsByDuelistIds } from '/src/stores/challengeRewardsStore'
 import { useTransactionHandler } from '/src/hooks/useTransaction'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
-import { showElementPopupNotification } from '/src/components/ui/ElementPopupNotification'
-import { SceneName } from '/src/data/assets'
+import { SceneName } from '/src/data/assetsTypes'
 import { StampImage } from './ui/StampImage'
 
 const Row = Grid.Row
@@ -200,6 +198,7 @@ const DuelPosterSmall = forwardRef<DuelPosterHandle, DuelPosterProps>((props, re
           <div className='ProfilePicContainer'>
             <div className='ProfilePicChallengeContainer Left Small'>
               <ProfilePic 
+                profileType={constants.DuelistProfile.Character}
                 profilePic={leftAvatarUrl ? undefined : 0} 
                 profilePicUrl={leftAvatarUrl} 
                 fallbackPicUrl={leftApiAvatarUrl}
@@ -214,6 +213,7 @@ const DuelPosterSmall = forwardRef<DuelPosterHandle, DuelPosterProps>((props, re
             <StampImage playerAddress={leftDuelistAddress} size="DuelSmall" position="Left" rotation={10} />
             <div className='ProfilePicChallengeContainer Right Small'>
               <ProfilePic 
+                profileType={constants.DuelistProfile.Character}
                 profilePic={rightAvatarUrl ? undefined : 0} 
                 profilePicUrl={rightAvatarUrl} 
                 fallbackPicUrl={rightApiAvatarUrl}
@@ -252,18 +252,16 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
   const { account } = useAccount()
   const { duelistSelectOpener } = usePistolsContext()
   const { leftDuelistId, rightDuelistId, leftDuelistAddress, rightDuelistAddress, leftPlayerName, rightPlayerName, isDead, isYouA, isYouB, isCallToAction, leftAvatarUrl, rightAvatarUrl, leftApiAvatarUrl, rightApiAvatarUrl, displayDuelType, duelType } = useDuelPosterData(props.duelId)
-  useFetchChallengeRewardsByDuelistIds([leftDuelistId, rightDuelistId])
-  const { fameBefore: fameBeforeA, fameAfter: fameAfterA } = useDuelistFameOnDuel(props.duelId, leftDuelistId)
-  const { fameBefore: fameBeforeB, fameAfter: fameAfterB } = useDuelistFameOnDuel(props.duelId, rightDuelistId)
 
-  useFetchDuelistIdsOwnedByAccounts([leftDuelistAddress, rightDuelistAddress]) // fetch duelists in the store, if not already fetched
+  const duelistAddresses = useMemo(() => [leftDuelistAddress, rightDuelistAddress], [leftDuelistAddress, rightDuelistAddress])
+  useFetchDuelistIdsOwnedByAccounts(duelistAddresses) // fetch duelists in the store, if not already fetched
 
   const {
     state,
     seasonName,
     isLive,
     isFinished,
-    isAwaiting,
+    isSeasonExpired,
     premise,
     message,
     livesStaked,
@@ -474,9 +472,8 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
               {leftDuelistId || challengingDuelistId ? (
                 <DuelistCard
                   duelistId={Number(leftDuelistId || challengingDuelistId)}
+                  duelId={props.duelId}
                   isSmall={true}
-                  overrideFame={!isLive}
-                  fame={isFinished && !isCallToAction ? fameAfterA : fameBeforeA}
                   isLeft={true}
                   isVisible={true}
                   isFlipped={true}
@@ -556,9 +553,8 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
               {rightDuelistId ? (
                 <DuelistCard
                   duelistId={Number(rightDuelistId)}
+                  duelId={props.duelId}
                   isSmall={true}
-                  overrideFame={!isLive}
-                  fame={isFinished && !isCallToAction ? fameAfterB : fameBeforeB}
                   isLeft={false}
                   isVisible={true}
                   isFlipped={true}
@@ -580,12 +576,12 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
               <Col>
                 <ActionButton large fillParent label='Close' className='FillParent' onClick={props._close} />
               </Col>
-              {(state == constants.ChallengeState.InProgress && canCollectDuel) &&
+              {((state == constants.ChallengeState.InProgress || isSeasonExpired) && canCollectDuel) &&
                 <Col>
                   <ActionButton large fillParent important label='Timed Out, Collect Duel' loading={isSubmitting} loadingClassName='poster' onClick={() => _collectDuel()} />
                 </Col>
               }
-              {(state == constants.ChallengeState.Awaiting && isChallenger && !isMatchmaking) &&
+              {(state == constants.ChallengeState.Awaiting && isChallenger && !isMatchmaking && !needToSyncExpired) &&
                 <>
                   <Col>
                     <ActionButton large fillParent negative label='Cowardly Withdraw' loading={isSubmitting} loadingClassName='poster' onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
@@ -619,7 +615,12 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
                   <ActionButton large fillParent important label='Instant Reveal' loading={isSubmitting} loadingClassName='poster' onClick={() => _revealResult()} />
                 </Col>
               }
-              {((state == constants.ChallengeState.Awaiting && isChallenger) || state == constants.ChallengeState.InProgress || (isFinished && isCallToAction)) &&
+              {((needToSyncExpired && isChallenger)) &&
+                <Col>
+                  <ActionButton large fillParent important label='Expired, Collect Duel' loading={isSubmitting} loadingClassName='poster' onClick={() => _reply(false)} />
+                </Col>
+              }
+              {(((state == constants.ChallengeState.Awaiting && isChallenger) || state == constants.ChallengeState.InProgress || (isFinished && isCallToAction)) && !isSeasonExpired) &&
                 <Col>
                   <ActionButton large fillParent important label='Go to Live Duel!' loading={isSubmitting} loadingClassName='poster' onClick={() => _gotoDuel()} />
                 </Col>
@@ -627,11 +628,6 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
               {isFinished && !isCallToAction && (endedInBlades || endedInPaces) &&
                 <Col>
                   <ActionButton large fillParent important label='Replay Duel!' loading={isSubmitting} loadingClassName='poster' onClick={() => _gotoDuel()} />
-                </Col>
-              }
-              {(needToSyncExpired && isChallenger) &&
-                <Col>
-                  <ActionButton large fillParent important label='Expired, Collect Duel' loading={isSubmitting} loadingClassName='poster' onClick={() => _reply(false)} />
                 </Col>
               }
             </Row>

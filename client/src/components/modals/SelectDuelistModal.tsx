@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState, useEffect, useCallback } from 'react'
+import React, { useMemo, useRef, useState, useEffect, useLayoutEffect, useCallback } from 'react'
 import TWEEN from '@tweenjs/tween.js'
 import { Modal } from 'semantic-ui-react'
 import { Button } from 'semantic-ui-react'
@@ -11,7 +11,7 @@ import { NoDuelistsSlip, NoDuelistsSlipHandle } from '/src/components/NoDuelists
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { CARD_ASPECT_RATIO } from '/src/data/cardConstants'
-import { SceneName } from '/src/data/assets'
+import { SceneName  } from '/src/data/assetsTypes'
 import { emitter } from '/src/three/game'
 import { Opener } from '/src/hooks/useOpener'
 import { useDuelistsInMatchMaking, useMatchQueue } from '/src/stores/matchStore'
@@ -95,6 +95,7 @@ function _SelectDuelistModal({
   
   const [currentPage, setCurrentPage] = useState(0)
   const [isAnimating, setIsAnimating] = useState(false)
+  const hasAnimatedRef = useRef(false)
 
   const isAnimatingRef = useRef(false)
 
@@ -174,6 +175,13 @@ function _SelectDuelistModal({
     animate()
   }, [])
 
+  // Use useLayoutEffect to set initial transform synchronously before paint to prevent flash
+  useLayoutEffect(() => {
+    if (opener.isOpen && modalContentRef.current && !hasAnimatedRef.current) {
+      modalContentRef.current.style.transform = 'translate(-50%, -50%) translateY(1000px) scale(0.5)'
+    }
+  }, [opener.isOpen])
+
   useEffect(() => {
     if (opener.isOpen) {
       setIsAnimating(true)
@@ -185,9 +193,15 @@ function _SelectDuelistModal({
       animate(1000, 0, 0.5, 1, TWEEN.Easing.Circular.Out, () => {
         setIsAnimating(false)
         isAnimatingRef.current = false
+        hasAnimatedRef.current = true
       })
     } else {
       setShowEnlistHeader(false)
+      hasAnimatedRef.current = false
+      // Reset transform when closing
+      if (modalContentRef.current) {
+        modalContentRef.current.style.transform = ''
+      }
     }
   }, [opener.isOpen, animate, opener.props?.matchmakingType])
 
@@ -213,8 +227,10 @@ function _SelectDuelistModal({
     setIsAnimating(true)
     isAnimatingRef.current = true
     animate(0, 1000, 1, 0.5, TWEEN.Easing.Cubic.In, () => {
+      console.log('selectedDuelistId', selectedDuelistId, isPositiveBigint(selectedDuelistId), challengingDuelistId, challengingAddress, opener.props?.onDuelistSelected)
       if (isPositiveBigint(selectedDuelistId)) {
         if (opener.props?.onDuelistSelected) {
+          console.log('onDuelistSelected', selectedDuelistId, pendingSelectedDuelistId === selectedDuelistId)
           opener.props?.onDuelistSelected(selectedDuelistId, pendingSelectedDuelistId === selectedDuelistId)
         } else {
           dispatchChallengingDuelistId(selectedDuelistId)
@@ -225,6 +241,7 @@ function _SelectDuelistModal({
         }
       }
       setSelectedDuelistId(0n)
+      hasAnimatedRef.current = false
       opener?.close()
       setIsAnimating(false)
       isAnimatingRef.current = false

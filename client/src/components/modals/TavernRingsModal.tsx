@@ -6,13 +6,11 @@ import { useTransactionHandler } from '/src/hooks/useTransaction'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { useDuelIdsForClaimingRings } from '/src/queries/useDuelIdsForClaimingRings'
-import { usePlayer, useRingEntityIdsOwnedByPlayer, useRingsOwnedByPlayer } from '/src/stores/playerStore'
+import { usePlayer, useRingEntityIdsOwnedByPlayer } from '/src/stores/playerStore'
 import AnimatedText from '/src/components/ui/AnimatedText'
-import { showElementPopupNotification } from '/src/components/ui/ElementPopupNotification'
 import { Opener } from '/src/hooks/useOpener'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { Modal } from 'semantic-ui-react'
-import { useHasClaimedRing } from '/src/hooks/usePistolsContractCalls'
 
 type RingClaimState = 'loading' | 'open' | 'intro' | 'claiming' | 'success' | 'closing'
 
@@ -316,21 +314,24 @@ function RingClaimItem({ ring, disabled, isVisible, onClaimComplete, onClaiming 
   
   const buttonRef = useRef<HTMLDivElement>(null)
 
+
+  // Stable onComplete callback
+  const onCompleteClaim = React.useCallback((result: boolean | Error) => {
+    if (result instanceof Error) {
+      console.error(`❌ [CLAIM ERROR] Ring claiming failed for ${ring.ringName}:`, result)
+      return
+    }
+    if (result) {
+      onClaimComplete(ring.ringType)
+    }
+  }, [onClaimComplete, ring.ringType, ring.ringName])
+
   const { call: claimRing, isLoading } = useTransactionHandler<boolean, [bigint, constants.RingType]>({
     key: `claim_ring_${ring.ringType}`,
     transactionCall: (duelId: bigint, ringType: constants.RingType, key: string) => {
       return claim_season_ring(account, duelId, ringType, key)
     },
-    onComplete: (result: boolean | Error) => {
-      if (result instanceof Error) {
-        console.error(`❌ [CLAIM ERROR] Ring claiming failed for ${ring.ringName}:`, result)
-        return
-      }
-      
-      if (result) {
-        onClaimComplete(ring.ringType)
-      }
-    },
+    onComplete: onCompleteClaim,
     indexerCheck: ring.hasClaimed,
     messageTargetRef: buttonRef,
     waitingMessage: "Transaction successful! Waiting for indexer...",
@@ -442,13 +443,14 @@ function _TavernRingsModal({ opener }: { opener: Opener }) {
     const rings: constants.RingType[] = []
     
     //NOTE: this works as we know there is already rings claimed so we can be sure that it has to have some rings loaded before rest of logic can be executed
+    //NOTE: can't doesnt work locally, replace with logic that makes sure we loaded the rings.
     if (totalRings > 0) {
       rings.push(...ringTypes)
       setState('open')
     }
     
     return rings
-  }, [goldRingDuelIds, silverRingDuelIds, leadRingDuelIds])
+  }, [totalRings, ringTypes])
 
   const claimableRings = useMemo(() => {
     const rings: ClaimableRing[] = []

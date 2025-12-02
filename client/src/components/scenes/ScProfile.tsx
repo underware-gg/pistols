@@ -4,7 +4,7 @@ import { useSettings } from '/src/hooks/SettingsContext'
 import { usePistolsScene } from '/src/hooks/PistolsContext'
 import { useMintMockLords } from '/src/hooks/useLordsFaucet'
 import { PublishOnlineStatusButton } from '/src/stores/sync/PlayerOnlineSync'
-import { SceneName } from '/src/data/assets'
+import { SceneName  } from '/src/data/assetsTypes'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { useGameEvent } from '/src/hooks/useGameEvent'
 import { _currentScene, emitter } from '/src/three/game'
@@ -53,8 +53,10 @@ export default function ScProfile() {
   useEffect(() => {
     if (showCardPack) {
       (_currentScene as InteractibleScene)?.setClickable(false);
+      (_currentScene as InteractibleScene)?.toggleBlur(true);
     } else {
       (_currentScene as InteractibleScene)?.setClickable(true);
+      (_currentScene as InteractibleScene)?.toggleBlur(false);
     }
   }, [showCardPack])
 
@@ -69,19 +71,17 @@ export default function ScProfile() {
 
   return (
     <div id='Profile'>
-      <div className='UIContainer'>
-      </div>
-
-      
-      <CardPack 
-        packType={constants.PackType.StarterPack} 
-        isOpen={showCardPack} 
-        clickable={showCardPack} 
-        cardPackSize={CARD_PACK_SIZE} 
-        maxTilt={MAX_TILT}
-        onComplete={() => setShowCardPack(false)}
-        customButtonLabel="Close"
-      />
+      {showCardPack && (
+        <CardPack 
+          packType={constants.PackType.StarterPack} 
+          isOpen={showCardPack} 
+          clickable={showCardPack} 
+          cardPackSize={CARD_PACK_SIZE} 
+          maxTilt={MAX_TILT}
+          onComplete={() => setShowCardPack(false)}
+          customButtonLabel="Close"
+        />
+      )}
 
       {(debugMode || true) && <>
         <PublishOnlineStatusButton />
