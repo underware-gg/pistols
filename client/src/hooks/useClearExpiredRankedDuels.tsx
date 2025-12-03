@@ -71,7 +71,7 @@ export const useClearExpiredRankedDuels = (duelIds: BigNumberish[]) => {
       }
 
       const seasonId = Number(challenge.season_id ?? 0)
-      const isSeasonExpired = seasonId > 0 && seasonId !== currentSeasonId
+      const isSeasonExpired = seasonId > 0 && currentSeasonId > 0 && seasonId !== currentSeasonId
 
       if (isSeasonExpired) {
         toClear.push(duelIdBigInt)

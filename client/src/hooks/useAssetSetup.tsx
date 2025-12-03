@@ -147,7 +147,7 @@ export function useAssetSetup() {
 
   // Step 2: Load scene assets using AssetCacheManager
   useEffect(() => {
-    if (!mounted || !isInitialized || hasLoadedAssetsOnce.current) return
+    if (!mounted || !isInitialized || hasLoadedAssetsOnce.current || !currentScene) return
     
     let cancelled = false
     

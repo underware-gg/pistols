@@ -83,8 +83,7 @@ export default function ScMatchmaking() {
       slots.push({ slotIndex: currentSlotIndex++, duelId: duelId })
     })
 
-    // Sort duelling duelists by their duelId to maintain consistent order
-    const sortedDuellingIds = duellingIds.sort((a, b) => {
+    const sortedDuellingIds = [...duellingIds].sort((a, b) => {
       const duelIdA = duelsByDuelistId[a.toString()];
       const duelIdB = duelsByDuelistId[b.toString()];
       if (!duelIdA && !duelIdB) return 0;
@@ -106,7 +105,7 @@ export default function ScMatchmaking() {
     });
     
     // Then add queued duelists
-    inQueueIds.filter(id => !sortedDuellingIds.includes(id)).forEach((duelistId) => {
+    inQueueIds.filter(id => !duellingIds.includes(id)).forEach((duelistId) => {
       slots.push({ 
         slotIndex: currentSlotIndex++, 
         duelistId: duelistId, 
