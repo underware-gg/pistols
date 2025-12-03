@@ -243,6 +243,22 @@
     .maintenance-mode #pre-loading-bar {
       display: none !important;
     }
+
+    #pre-loading-stuck-hint {
+      display: none;
+      position: absolute;
+      bottom: 5%;
+      width: 100%;
+      text-align: center;
+      color: #F9E2B7;
+      font-size: 14px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      letter-spacing: 0.5px;
+    }
+
+    #pre-loading-screen.stuck #pre-loading-stuck-hint {
+      display: block;
+    }
   </style>
 </head>
 
@@ -263,6 +279,9 @@
           <div id="pre-loading-fill"></div>
           <div id="pre-loading-percentage">0%</div>
         </div>
+      </div>
+      <div id="pre-loading-stuck-hint">
+        New version ready &mdash; please reload the client to continue.
       </div>
     </div>
   </div>
@@ -369,7 +388,11 @@
           }
           if (percentageEl && progress) {
             const progressNum = parseFloat(progress);
-            percentageEl.textContent = Math.round(progressNum) + '%';
+            const clamped = Math.round(isNaN(progressNum) ? 0 : progressNum);
+            percentageEl.textContent = clamped + '%';
+            if (clamped > 1) {
+              hideStuckHint();
+            }
           }
           
           requestAnimationFrame(updateUI);
@@ -394,11 +417,13 @@
       let assetsReady = false;
       let gameReady = false;
       let reactRendered = false;
+      let stuckTimer = null;
       
       const checkReactRendered = () => {
         const root = document.getElementById('root');
         if (root && root.children.length > 0) {
           reactRendered = true;
+          startStuckTimer();
           
           setTimeout(() => {
             const isMaintenanceMode = '%VITE_MAINTENANCE_MODE%' === 'true';
@@ -431,6 +456,7 @@
           const screen = document.getElementById('pre-loading-screen');
           if (screen) {
             screen.classList.add('loading-complete');
+            hideStuckHint();
           }
         }
       };
@@ -455,6 +481,29 @@
       
       // Start checking for game readiness after a short delay
       setTimeout(checkGameReady, 500);
+
+      function hideStuckHint() {
+        clearStuckTimer();
+        document.getElementById('pre-loading-screen')?.classList.remove('stuck');
+      }
+
+      function startStuckTimer() {
+        clearStuckTimer();
+        stuckTimer = setTimeout(() => {
+          const screen = document.getElementById('pre-loading-screen');
+          if (screen) {
+            console.warn('⚠️ Loading appears stuck, showing reload hint');
+            screen.classList.add('stuck');
+          }
+        }, 10000);
+      }
+
+      function clearStuckTimer() {
+        if (stuckTimer) {
+          clearTimeout(stuckTimer);
+          stuckTimer = null;
+        }
+      }
     }
   </script>
 

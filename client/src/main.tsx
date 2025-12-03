@@ -107,19 +107,50 @@ const router = createBrowserRouter(
   },
 ]);
 
-// Helper to check if service worker manifest is ready
-async function waitForManifestReady(maxAttempts = 50): Promise<boolean> {
-  if (!navigator.serviceWorker.controller) {
+const CURRENT_SW_SCRIPT = new URL('/game-worker.js', window.location.origin).href;
+const MANIFEST_READY_TIMEOUT = 3000;
+const MAX_MANIFEST_ATTEMPTS = 50;
+
+function isLegacyController(scriptUrl?: string | null) {
+  if (!scriptUrl) return false;
+  return scriptUrl !== CURRENT_SW_SCRIPT;
+}
+
+async function waitForManifestReady(maxAttempts = MAX_MANIFEST_ATTEMPTS): Promise<boolean> {
+  const controller = navigator.serviceWorker.controller;
+  if (!controller) {
     console.warn('⚠️ No service worker controller, skipping manifest check');
+    return false;
+  }
+
+  if (isLegacyController(controller.scriptURL)) {
+    console.warn('⚠️ Legacy service worker detected, forcing update...');
+    await navigator.serviceWorker.getRegistration('/')?.then(async (registration) => {
+      try {
+        await registration?.unregister();
+        window.location.reload();
+      } catch (error) {
+        console.error('❌ Failed to unregister legacy service worker:', error);
+      }
+    });
     return false;
   }
   
   for (let i = 0; i < maxAttempts; i++) {
     try {
-      const response = await new Promise<{ready: boolean, loading: boolean}>((resolve) => {
+      const response = await new Promise<{ready: boolean, loading: boolean}>((resolve, reject) => {
         const messageChannel = new MessageChannel();
-        messageChannel.port1.onmessage = (event) => resolve(event.data);
-        navigator.serviceWorker.controller!.postMessage(
+        const timeout = setTimeout(() => {
+          messageChannel.port1.onmessage = null;
+          reject(new Error('Manifest ready message timed out'));
+        }, MANIFEST_READY_TIMEOUT);
+
+        messageChannel.port1.onmessage = (event) => {
+          clearTimeout(timeout);
+          resolve(event.data);
+        };
+
+        controller.postMessage(
           { type: 'CHECK_MANIFEST_READY' },
           [messageChannel.port2]
         );
@@ -136,10 +167,10 @@ async function waitForManifestReady(maxAttempts = 50): Promise<boolean> {
       }
       
       // Wait a bit before checking again
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 200));
     } catch (error) {
       console.warn('⚠️ Error checking manifest readiness:', error);
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 200));
     }
   }
   

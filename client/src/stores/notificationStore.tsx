@@ -269,7 +269,21 @@ const createStore = () => {
         })
       }
 
-      await db.open()
+      const openDatabase = async () => {
+        try {
+          await db.open()
+        } catch (error: any) {
+          if (error?.name === 'UpgradeError') {
+            db.close()
+            await Dexie.delete('NotificationDB')
+            await db.open()
+          } else {
+            throw error
+          }
+        }
+      }
+
+      await openDatabase()
       
       if (oldNotifications.length > 0 && (await db.notifications.count()) === 0) {
         await db.notifications.bulkPut(oldNotifications)
