@@ -1,7 +1,6 @@
-use starknet::{ContractAddress};
+// use starknet::{ContractAddress};
 use pistols::types::duel_progress::{DuelProgress};
 // use pistols::models::leaderboard::{LeaderboardPosition};
-use pistols::models::events::{SocialPlatform, PlayerSetting, PlayerSettingValue};
 
 // Exposed to clients
 #[starknet::interface]
@@ -21,27 +20,11 @@ pub trait IGame<TState> {
         moves: Span<u8>,
     );
     fn collect_duel(ref self: TState, duel_id: u128) -> u8; //@description: Close expired duels
-    fn delegate_game_actions(ref self: TState, delegatee_address: ContractAddress, enabled: bool); // @description: Delegate game actions to another account
-    // event emitters
-    fn clear_call_to_challenge(ref self: TState, duel_id: u128); // @description: Clear call to action for a player
-    fn emit_player_bookmark(ref self: TState, target_address: ContractAddress, target_id: u128, enabled: bool); //@description: Bookmarks an address or token
-    fn emit_player_social_link(ref self: TState, social_platform: SocialPlatform, player_address: ContractAddress, user_name: ByteArray, user_id: ByteArray, avatar: ByteArray); //@description: Link player to social platform
-    fn clear_player_social_link(ref self: TState, social_platform: SocialPlatform); //@description: Unlink player from social platform
-    fn emit_player_setting(ref self: TState, setting: PlayerSetting, value: PlayerSettingValue); //@description: Store player settings
 
     // view calls
     fn get_duel_deck(self: @TState, duel_id: u128) -> Span<Span<u8>>;
     fn get_duel_progress(self: @TState, duel_id: u128) -> DuelProgress;
-    // fn get_duelist_leaderboard_position(self: @TState, season_id: u32, duelist_id: u128) -> LeaderboardPosition;
-    // fn get_leaderboard(self: @TState, season_id: u32) -> Span<LeaderboardPosition>;
     fn can_collect_duel(self: @TState, duel_id: u128) -> bool;
-}
-
-// Exposed to world
-#[starknet::interface]
-pub trait IGameProtected<TState> {
-    // fn create_trophies(ref self: TState);
-    fn do_that_thing(ref self: TState);
 }
 
 #[dojo::contract]
@@ -95,7 +78,7 @@ pub mod game {
         leaderboard::{Leaderboard, LeaderboardTrait},//, LeaderboardPosition},
         pact::{PactTrait},
         season::{SeasonScoreboard, SeasonScoreboardTrait},
-        events::{Activity, ActivityTrait, ChallengeAction, SocialPlatform, PlayerSetting, PlayerSettingValue},
+        events::{Activity, ActivityTrait, ChallengeAction},
         // tournament::{TournamentRound, TournamentRoundTrait, TournamentDuelKeys},
     };
     use pistols::types::{
@@ -416,40 +399,7 @@ pub mod game {
             (challenge.winner)
         }
 
-        fn delegate_game_actions(ref self: ContractState, delegatee_address: ContractAddress, enabled: bool) {
-            // let mut store: Store = StoreTrait::new(self.world_default());
-            // let mut delegation: PlayerDelegation = store.get_player_delegation(starknet::get_caller_address(), delegatee_address);
-            // delegation.can_play_game = enabled;
-            // store.set_player_delegation(@delegation);
-        }
-
-        //------------------------------------
-        // event emitters
-        //
-        fn clear_call_to_challenge(ref self: ContractState, duel_id: u128) {
-            let mut store: Store = StoreTrait::new(self.world_default());
-            store.emit_call_to_challenge(starknet::get_caller_address(), duel_id, ChallengeAction::Finished);
-        }
-        fn emit_player_bookmark(ref self: ContractState, target_address: ContractAddress, target_id: u128, enabled: bool) {
-            let mut store: Store = StoreTrait::new(self.world_default());
-            store.emit_player_bookmark(starknet::get_caller_address(), target_address, target_id, enabled);
-        }
-        fn emit_player_social_link(ref self: ContractState, social_platform: SocialPlatform, player_address: ContractAddress, user_name: ByteArray, user_id: ByteArray, avatar: ByteArray) {
-            self._assert_caller_is_admin();
-            let mut store: Store = StoreTrait::new(self.world_default());
-            store.emit_player_social_link(player_address, social_platform, user_name, user_id, avatar);
-        }
-        fn clear_player_social_link(ref self: ContractState, social_platform: SocialPlatform) {
-            let mut store: Store = StoreTrait::new(self.world_default());
-            store.emit_player_social_link(starknet::get_caller_address(), social_platform, "", "", "");
-        }
-        fn emit_player_setting(ref self: ContractState, setting: PlayerSetting, value: PlayerSettingValue) {
-            let mut store: Store = StoreTrait::new(self.world_default());
-            store.emit_player_setting(starknet::get_caller_address(), setting, value);
-        }
-
-
-
+        
         //------------------------------------
         // view calls
         //
@@ -476,16 +426,6 @@ pub mod game {
             }
         }
 
-        // fn get_duelist_leaderboard_position(self: @ContractState, season_id: u32, duelist_id: u128) -> LeaderboardPosition {
-        //     let mut store: Store = StoreTrait::new(self.world_default());
-        //     (store.get_leaderboard(season_id).get_duelist_position(duelist_id))
-        // }
-        
-        // fn get_leaderboard(self: @ContractState, season_id: u32) -> Span<LeaderboardPosition> {
-        //     let mut store: Store = StoreTrait::new(self.world_default());
-        //     (store.get_leaderboard(season_id).get_all_positions())
-        // }
-
         fn can_collect_duel(self: @ContractState, duel_id: u128) -> bool {
             let mut store: Store = StoreTrait::new(self.world_default());
             let challenge: Challenge = store.get_challenge(duel_id);
@@ -500,22 +440,6 @@ pub mod game {
             )
         }
     }
-
-
-    //-----------------------------------
-    // Protected
-    //
-    #[abi(embed_v0)]
-    impl GameProtectedImpl of super::IGameProtected<ContractState> {
-        // fn create_trophies(ref self: ContractState) {
-        //     self._assert_caller_is_owner();
-        //     self._create_trophies();
-        // }
-        fn do_that_thing(ref self: ContractState) {
-            TrophyProgressTrait::the_thing(@self.world_default(), @starknet::get_caller_address());
-        }
-    }
-
 
     //------------------------------------
     // Internal calls

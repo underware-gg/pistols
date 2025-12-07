@@ -21,6 +21,7 @@ pub mod tester {
         game_loop::{game_loop, IGameLoopDispatcher, IGameLoopDispatcherTrait},
         bot_player::{bot_player, IBotPlayerDispatcher, IBotPlayerDispatcherTrait, IBotPlayerProtectedDispatcher, IBotPlayerProtectedDispatcherTrait},
         matchmaker::{matchmaker, IMatchMakerDispatcher, IMatchMakerDispatcherTrait},
+        community::{community, ICommunityDispatcher, ICommunityDispatcherTrait},
         tutorial::{tutorial, ITutorialDispatcher, ITutorialDispatcherTrait},
         rng::{rng, IRngDispatcher, IRngDispatcherTrait},
         rng_mock::{rng_mock, IRngMockDispatcher, IRngMockDispatcherTrait},
@@ -195,6 +196,7 @@ pub mod tester {
         pub const RINGS: u16      = 0b1000000000000;
         pub const BOT_PLAYER: u16 = 0b10000000000000;
         pub const MATCHMAKER: u16 = 0b100000000000000;
+        pub const COMMUNITY: u16  = 0b1000000000000000;
     }
 
     #[derive(Copy, Drop)]
@@ -205,6 +207,7 @@ pub mod tester {
         pub game_loop: IGameLoopDispatcher,
         pub bot_player: IBotPlayerDispatcher,
         pub matchmaker: IMatchMakerDispatcher,
+        pub community: ICommunityDispatcher,
         pub tut: ITutorialDispatcher,
         pub admin: IAdminDispatcher,
         pub bank: IBankDispatcher,
@@ -232,6 +235,7 @@ pub mod tester {
                 bot_player: world.bot_player_dispatcher(),
                 matchmaker: world.matchmaker_dispatcher(),
                 store: StoreTrait::new(world),
+                community: world.community_dispatcher(),
                 tut: world.tutorial_dispatcher(),
                 admin: world.admin_dispatcher(),
                 bank: world.bank_dispatcher(),
@@ -266,6 +270,7 @@ pub mod tester {
         let mut deploy_rings: bool = (flags & FLAGS::RINGS) != 0;
         let mut deploy_bot_player: bool = (flags & FLAGS::BOT_PLAYER) != 0;
         let mut deploy_matchmaker: bool = (flags & FLAGS::MATCHMAKER) != 0;
+        let mut deploy_community: bool = (flags & FLAGS::COMMUNITY) != 0;
         let mut deploy_game_loop: bool = false;
         let mut deploy_duelist_mock: bool = false;
         let mut deploy_bank: bool = false;
@@ -512,6 +517,14 @@ pub mod tester {
                 ContractDefTrait::new(@"pistols", @"matchmaker")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
                     .with_init_calldata([].span()),
+            );
+        }
+
+        if (deploy_community) {
+            resources.append(TestResource::Contract(community::TEST_CLASS_HASH.into()));
+            contract_defs.append(
+                ContractDefTrait::new(@"pistols", @"community")
+                    .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
             );
         }
 
@@ -1070,7 +1083,7 @@ pub mod tester {
     }
     pub fn execute_delegate_game_actions(sys: @TestSystems, sender: ContractAddress, delegatee: ContractAddress, enabled: bool) {
         impersonate(sender);
-        (*sys.game).delegate_game_actions(delegatee, enabled);
+        (*sys.community).delegate_game_actions(delegatee, enabled);
         _next_block();
     }
 

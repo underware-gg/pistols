@@ -13,6 +13,7 @@ pub use pistols::systems::{
     game_loop::{IGameLoopDispatcher, IGameLoopDispatcherTrait},
     bot_player::{IBotPlayerDispatcher, IBotPlayerDispatcherTrait, IBotPlayerProtectedDispatcher, IBotPlayerProtectedDispatcherTrait},
     matchmaker::{IMatchMakerDispatcher, IMatchMakerDispatcherTrait, IMatchMakerProtectedDispatcher, IMatchMakerProtectedDispatcherTrait},
+    community::{ICommunityDispatcher, ICommunityDispatcherTrait},
     tutorial::{ITutorialDispatcher, ITutorialDispatcherTrait},
     rng::{IRngDispatcher, IRngDispatcherTrait},
     rng_mock::{IRngMockDispatcher, IRngMockDispatcherTrait},
@@ -45,6 +46,7 @@ pub mod SELECTORS {
     pub const GAME_LOOP: felt252 = selector_from_tag!("pistols-game_loop");
     pub const BOT_PLAYER: felt252 = selector_from_tag!("pistols-bot_player");
     pub const MATCHMAKER: felt252 = selector_from_tag!("pistols-matchmaker");
+    pub const COMMUNITY: felt252 = selector_from_tag!("pistols-community");
     pub const RNG: felt252 = selector_from_tag!("pistols-rng");
     pub const RNG_MOCK: felt252 = selector_from_tag!("pistols-rng_mock");
     // tokens
@@ -112,6 +114,10 @@ pub impl DnsImpl of DnsTrait {
     #[inline(always)]
     fn matchmaker_address(self: @WorldStorage) -> ContractAddress {
         (self.find_contract_address(@"matchmaker"))
+    }
+    #[inline(always)]
+    fn community_address(self: @WorldStorage) -> ContractAddress {
+        (self.find_contract_address(@"community"))
     }
     #[inline(always)]
     fn tutorial_address(self: @WorldStorage) -> ContractAddress {
@@ -219,6 +225,10 @@ pub impl DnsImpl of DnsTrait {
     fn caller_is_matchmaker_contract(self: @WorldStorage) -> bool {
         (starknet::get_caller_address() == self.matchmaker_address())
     }
+    #[inline(always)]
+    fn caller_is_community_contract(self: @WorldStorage) -> bool {
+        (starknet::get_caller_address() == self.community_address())
+    }
     // #[inline(always)]
     // fn caller_is_tournament_contract(self: @WorldStorage) -> bool {
     //     (starknet::get_caller_address() == self.tournament_token_address())
@@ -262,6 +272,10 @@ pub impl DnsImpl of DnsTrait {
     #[inline(always)]
     fn matchmaker_protected_dispatcher(self: @WorldStorage) -> IMatchMakerProtectedDispatcher {
         (IMatchMakerProtectedDispatcher{ contract_address: self.matchmaker_address() })
+    }
+    #[inline(always)]
+    fn community_dispatcher(self: @WorldStorage) -> ICommunityDispatcher {
+        (ICommunityDispatcher{ contract_address: self.community_address() })
     }
     #[inline(always)]
     fn tutorial_dispatcher(self: @WorldStorage) -> ITutorialDispatcher {

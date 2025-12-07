@@ -12,6 +12,7 @@ mod systems {
     pub mod game_loop;
     pub mod bot_player;
     pub mod matchmaker;
+    pub mod community;
     pub mod rng;
     pub mod rng_mock;
     pub mod tutorial;
