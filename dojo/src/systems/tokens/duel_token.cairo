@@ -252,7 +252,7 @@ pub mod duel_token {
         self.erc721_combo.initializer(
             TOKEN_NAME(),
             TOKEN_SYMBOL(),
-            base_uri.to_string(),
+            Option::Some(base_uri.to_string()),
             Option::None, // contract_uri (use hooks)
             Option::None, // max_supply (infinite)
         );
