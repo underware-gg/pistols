@@ -365,7 +365,7 @@ const DuelContent: React.FC<{
 //   useEffect(() => {
 //     if ((isYouA || isYouB) && mounted && account && isRequired && isFinished) {
 //       console.log('clearing required action flag...')
-//       if (isYouA || isYouB) game.clear_call_to_challenge(account, duelId)
+//       if (isYouA || isYouB) community.clear_call_to_challenge(account, duelId)
 //     }
 //   }, [isYouA, isYouB, mounted, account, isRequired, isFinished, duelId])
 

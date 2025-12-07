@@ -12,7 +12,9 @@ import {
   getRingTokenAddress,
   getTournamentTokenAddress,
   getBotPlayerAddress,
-  getMatchmakerAddress,
+  // getMatchmakerAddress,
+  // getCommunityAddress,
+  NetworkId,
 } from '@underware/pistols-sdk/pistols/config'
 
 export const useTokenContracts = () => {
@@ -29,7 +31,8 @@ export const useTokenContracts = () => {
   const tournamentContractAddress = useMemo(() => getTournamentTokenAddress(selectedNetworkId), [selectedNetworkId])
   // misc
   const botPlayerContractAddress = useMemo(() => getBotPlayerAddress(selectedNetworkId), [selectedNetworkId])
-  const matchmakerContractAddress = useMemo(() => getMatchmakerAddress(selectedNetworkId), [selectedNetworkId])
+  // const matchmakerContractAddress = useMemo(() => getMatchmakerAddress(selectedNetworkId), [selectedNetworkId])
+  // const communityContractAddress = useMemo(() => getCommunityAddress(selectedNetworkId), [selectedNetworkId])
 
   const erc20Tokens = useMemo(() => ({
     lordsContractAddress,
@@ -64,7 +67,8 @@ export const useTokenContracts = () => {
     // misc
     allTokens,
     botPlayerContractAddress,
-    matchmakerContractAddress,
+    // matchmakerContractAddress,
+    // communityContractAddress,
   }
 }
 

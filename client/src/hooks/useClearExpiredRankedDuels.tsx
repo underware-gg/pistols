@@ -13,7 +13,7 @@ import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 
 export const useClearExpiredRankedDuels = (duelIds: BigNumberish[]) => {
   const { account, address } = useAccount()
-  const { game } = useDojoSystemCalls()
+  const { game, community } = useDojoSystemCalls()
   
   const { requiredDuelIds } = useCallToChallenges()
   const { seasonId: currentSeasonId } = useCurrentSeason()
@@ -97,7 +97,7 @@ export const useClearExpiredRankedDuels = (duelIds: BigNumberish[]) => {
         clearedDuelIdsRef.current.add(duelIdStr)
 
         try {
-          await game.clear_call_to_challenge(account, duelId)
+          await community.clear_call_to_challenge(account, duelId)
         } catch (error) {
           console.error(`Failed to clear call to action for duel ${duelId}:`, error)
           clearedDuelIdsRef.current.delete(duelIdStr)
@@ -106,6 +106,6 @@ export const useClearExpiredRankedDuels = (duelIds: BigNumberish[]) => {
     }
 
     processDuelsSequentially()
-  }, [duelsToClear, account, game])
+  }, [duelsToClear, account, community])
 }
 

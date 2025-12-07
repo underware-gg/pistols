@@ -61,16 +61,16 @@ export const ActionIcon = ({
 export default function ActivityAction() {
   const { isConnected } = useAccount()
   const { activeChallenges, idleCount, duelistCount, waitingForResult } = usePlayersActions()
-  const { game } = useDojoSystemCalls()
+  const { community } = useDojoSystemCalls()
   const { account } = useAccount()
 
   const revealAllResults = useCallback(() => {
-    if (account && game) {
+    if (account && community) {
       for (const duel of waitingForResult) {
-        game.clear_call_to_challenge(account, duel.duelId)
+        community.clear_call_to_challenge(account, duel.duelId)
       }
     }
-  }, [waitingForResult, account, game])
+  }, [waitingForResult, account, community])
   
   const items = useMemo(() => (activeChallenges.map((a) => {
     return (

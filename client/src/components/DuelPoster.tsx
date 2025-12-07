@@ -248,7 +248,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSetScene } = usePistolsScene()
   const { challengingDuelistId, dispatchSelectPlayerAddress, dispatchSelectDuelistId, dispatchChallengingDuelistId } = usePistolsContext()
-  const { duel_token, game } = useDojoSystemCalls()
+  const { duel_token, game, community } = useDojoSystemCalls()
   const { account } = useAccount()
   const { duelistSelectOpener } = usePistolsContext()
   const { leftDuelistId, rightDuelistId, leftDuelistAddress, rightDuelistAddress, leftPlayerName, rightPlayerName, isDead, isYouA, isYouB, isCallToAction, leftAvatarUrl, rightAvatarUrl, leftApiAvatarUrl, rightApiAvatarUrl, displayDuelType, duelType } = useDuelPosterData(props.duelId)
@@ -309,7 +309,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
   })
 
   const { call: revalFinalDuelResult, isLoading: isLoadingFinalResult } = useTransactionHandler<boolean, [bigint]>({
-    transactionCall: (duelId, key) => game.clear_call_to_challenge(account, duelId, key),
+    transactionCall: (duelId, key) => community.clear_call_to_challenge(account, duelId, key),
     indexerCheck: !isCallToAction,
     key: `reveal_final_duel_result${props.duelId}`,
     messageTargetRef: buttonsRowRef,

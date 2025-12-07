@@ -276,7 +276,7 @@ export const DuelContextProvider: React.FC<{
 
   // For action flags - wrap in a stable callback
   const { account } = useAccount();
-  const { game } = useDojoSystemCalls();
+  const { community } = useDojoSystemCalls();
   const isRequired = useDuelCallToAction(duelId);
 
   // Get duel progress - use useMemo to prevent unnecessary re-renders
@@ -296,9 +296,9 @@ export const DuelContextProvider: React.FC<{
   // Create a stable function to clear action flags
   const clearActionFlag = useCallback(() => {
     if ((isYouA || isYouB) && account && isRequired && isFinished) {
-      game.clear_call_to_challenge(account, duelId);
+      community.clear_call_to_challenge(account, duelId);
     }
-  }, [isYouA, isYouB, account, isRequired, isFinished, game]);
+  }, [isYouA, isYouB, account, isRequired, isFinished, community]);
 
   // Create a stable function to reset stats
   const resetStats = useCallback(() => {

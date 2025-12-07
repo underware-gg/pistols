@@ -157,45 +157,6 @@ export function createSystemCalls(
         ]
         return await _executeTransaction(signer, calls, key)
       },
-      clear_call_to_challenge: async (signer: AccountInterface, duel_id: BigNumberish, key?: string): Promise<boolean> => {
-        const calls: DojoCalls = [
-          contractCalls.game.buildClearCallToChallengeCalldata(
-            duel_id,
-          ),
-        ]
-        return await _executeTransaction(signer, calls, key)
-      },
-      emit_player_bookmark: async (signer: AccountInterface, target_address: BigNumberish, target_id: BigNumberish, enabled: boolean, key?: string): Promise<boolean> => {
-        const calls: DojoCalls = [
-          contractCalls.game.buildEmitPlayerBookmarkCalldata(
-            bigintToHex(target_address),
-            target_id,
-            enabled,
-          ),
-        ]
-        return await _executeTransaction(signer, calls, key)
-      },
-      clear_player_social_link: async (signer: AccountInterface, social_platform: constants.SocialPlatform, key?: string): Promise<boolean> => {
-        const calls: DojoCalls = [
-          contractCalls.game.buildClearPlayerSocialLinkCalldata(
-            makeCustomEnum(social_platform),
-          ),
-        ]
-        return await _executeTransaction(signer, calls, key)
-      },
-      emit_player_setting: async (signer: AccountInterface, social_platform: constants.SocialPlatform, setting: constants.PlayerSetting, value: boolean, key?: string): Promise<boolean> => {
-        const settingValue = (
-          setting == constants.PlayerSetting.OptOutNotifications ? makeCustomEnum(constants.PlayerSettingValue.Boolean, value)
-            : undefined
-        );
-        const calls: DojoCalls = [
-          contractCalls.game.buildEmitPlayerSettingCalldata(
-            makeCustomEnum(setting, makeCustomEnum(social_platform)),
-            settingValue,
-          ),
-        ]
-        return await _executeTransaction(signer, calls, key)
-      },
     },
     //
     // matchmaker.cairo
@@ -248,6 +209,49 @@ export function createSystemCalls(
       },
     },
     //
+    // community.cairo
+    //
+    community: {
+      clear_call_to_challenge: async (signer: AccountInterface, duel_id: BigNumberish, key?: string): Promise<boolean> => {
+        const calls: DojoCalls = [
+          contractCalls.community.buildClearCallToChallengeCalldata(
+            duel_id,
+          ),
+        ]
+        return await _executeTransaction(signer, calls, key)
+      },
+      emit_player_bookmark: async (signer: AccountInterface, target_address: BigNumberish, target_id: BigNumberish, enabled: boolean, key?: string): Promise<boolean> => {
+        const calls: DojoCalls = [
+          contractCalls.community.buildEmitPlayerBookmarkCalldata(
+            bigintToHex(target_address),
+            target_id,
+            enabled,
+          ),
+        ]
+        return await _executeTransaction(signer, calls, key)
+      },
+      clear_player_social_link: async (signer: AccountInterface, social_platform: constants.SocialPlatform, key?: string): Promise<boolean> => {
+        const calls: DojoCalls = [
+          contractCalls.community.buildClearPlayerSocialLinkCalldata(
+            makeCustomEnum(social_platform),
+          ),
+        ]
+        return await _executeTransaction(signer, calls, key)
+      },
+      emit_player_setting: async (signer: AccountInterface, social_platform: constants.SocialPlatform, setting: constants.PlayerSetting, value: boolean, key?: string): Promise<boolean> => {
+        const settingValue = (
+          setting == constants.PlayerSetting.OptOutNotifications ? makeCustomEnum(constants.PlayerSettingValue.Boolean, value)
+            : undefined
+        );
+        const calls: DojoCalls = [
+          contractCalls.community.buildEmitPlayerSettingCalldata(
+            makeCustomEnum(setting, makeCustomEnum(social_platform)),
+            settingValue,
+          ),
+        ]
+        return await _executeTransaction(signer, calls, key)
+      },
+    },    //
     // tutorial.cairo
     //
     tutorial: {
