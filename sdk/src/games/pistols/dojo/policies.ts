@@ -40,6 +40,11 @@ export const contractPolicyDescriptions_pistols: ContractPolicyDescriptions = {
     description: 'Match Maker contract',
     interfaces: ['IMatchMakerPublic'],
   },
+  community: {
+    name: 'Community',
+    description: 'Community functions contract',
+    interfaces: ['ICommunity'],
+  },
   tutorial: {
     name: 'Tutorial',
     description: 'Tutorial game contract',

@@ -67,6 +67,7 @@ pub mod tester {
         },
         pool::{Pool, PoolType},
         player::{PlayerDuelistStack},
+        quiz::{QuizQuestion},
         events::{SocialPlatform, PlayerSetting, PlayerSettingValue},
         // tournament::{TournamentRound},
     };
@@ -335,9 +336,6 @@ pub mod tester {
             TestResource::Event(pistols::models::events::e_CallToChallengeEvent::TEST_CLASS_HASH.into()),
             TestResource::Event(pistols::models::events::e_ChallengeRewardsEvent::TEST_CLASS_HASH.into()),
             TestResource::Event(pistols::models::events::e_PurchaseDistributionEvent::TEST_CLASS_HASH.into()),
-            TestResource::Event(pistols::models::events::e_PlayerBookmarkEvent::TEST_CLASS_HASH.into()),
-            TestResource::Event(pistols::models::events::e_PlayerSocialLinkEvent::TEST_CLASS_HASH.into()),
-            TestResource::Event(pistols::models::events::e_PlayerSettingEvent::TEST_CLASS_HASH.into()),
             TestResource::Event(pistols::models::events::e_FamePegEvent::TEST_CLASS_HASH.into()),
             TestResource::Event(pistols::models::events::e_SeasonLeaderboardEvent::TEST_CLASS_HASH.into()),
             // cartridge arcade
@@ -522,6 +520,12 @@ pub mod tester {
 
         if (deploy_community) {
             resources.append(TestResource::Contract(community::TEST_CLASS_HASH.into()));
+            resources.append(TestResource::Model(pistols::models::quiz::m_QuizConfig::TEST_CLASS_HASH.into()));
+            resources.append(TestResource::Model(pistols::models::quiz::m_QuizQuestion::TEST_CLASS_HASH.into()));
+            resources.append(TestResource::Event(pistols::models::events::e_PlayerBookmarkEvent::TEST_CLASS_HASH.into()));
+            resources.append(TestResource::Event(pistols::models::events::e_PlayerSocialLinkEvent::TEST_CLASS_HASH.into()));
+            resources.append(TestResource::Event(pistols::models::events::e_PlayerSettingEvent::TEST_CLASS_HASH.into()));
+            resources.append(TestResource::Event(pistols::models::events::e_QuizAnswerEvent::TEST_CLASS_HASH.into()));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"community")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
@@ -1154,6 +1158,50 @@ pub mod tester {
     }
     pub fn purchase_share_revenue(sys: @TestSystems, lords_amount: u128) -> u128 {
         (MathTrait::percentage(lords_amount, RULES::REALMS_PERCENT + RULES::UNDERWARE_PERCENT))
+    }
+
+    // ::community
+    pub fn execute_create_quiz(sys: @TestSystems, sender: ContractAddress,
+        quiz_event: felt252,
+    ) -> QuizQuestion {
+        impersonate(sender);
+        let quiz_question: QuizQuestion = (*sys.community).create_quiz(quiz_event);
+        _next_block();
+        (quiz_question)
+    }
+    pub fn execute_open_quiz(sys: @TestSystems, sender: ContractAddress,
+        quiz_id: u32,
+        question: ByteArray,
+        options: Array<ByteArray>,
+    ) -> QuizQuestion {
+        impersonate(sender);
+        let quiz_question: QuizQuestion = (*sys.community).open_quiz(quiz_id, question, options);
+        _next_block();
+        (quiz_question)
+    }
+    pub fn execute_close_quiz(sys: @TestSystems, sender: ContractAddress,
+        quiz_id: u32,
+        answer_number: u8,
+    ) -> QuizQuestion {
+        impersonate(sender);
+        let quiz_question: QuizQuestion = (*sys.community).close_quiz(quiz_id, answer_number);
+        _next_block();
+        (quiz_question)
+    }
+    pub fn execute_set_current_quiz(sys: @TestSystems, sender: ContractAddress,
+        quiz_id: u32,
+    ) {
+        impersonate(sender);
+        (*sys.community).set_current_quiz(quiz_id);
+        _next_block();
+    }
+    pub fn execute_answer_quiz(sys: @TestSystems, sender: ContractAddress,
+        quiz_id: u32,
+        answer_number: u8,
+    ) {
+        impersonate(sender);
+        (*sys.community).answer_quiz(quiz_id, answer_number);
+        _next_block();
     }
 
     //

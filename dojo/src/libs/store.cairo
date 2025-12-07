@@ -58,6 +58,10 @@ pub use pistols::models::{
         SeasonScoreboard, SeasonScoreboardValue,
         Rules,
     },
+    quiz::{
+        QuizConfig, QuizConfigValue,
+        QuizQuestion, QuizQuestionValue,
+    },
     // tournament::{
     //     TournamentPass, TournamentPassValue,
     //     TournamentSettings, TournamentSettingsValue,
@@ -77,6 +81,7 @@ pub use pistols::models::{
         PlayerSettingEvent, PlayerSetting, PlayerSettingValue,
         PurchaseDistributionEvent,
         SeasonLeaderboardEvent, SeasonLeaderboardPosition,
+        QuizAnswerEvent,
     },
 };
 pub use pistols::systems::components::{
@@ -239,6 +244,15 @@ pub impl StoreImpl of StoreTrait {
     #[inline(always)]
     fn get_current_season(self: @Store) -> SeasonConfig {
         (self.world.read_model(self.get_current_season_id()))
+    }
+
+    #[inline(always)]
+    fn get_quiz_config(self: @Store) -> QuizConfig {
+        (self.world.read_model(CONFIG::CONFIG_KEY))
+    }
+    #[inline(always)]
+    fn get_quiz_question(self: @Store, quiz_id: u32) -> QuizQuestion {
+        (self.world.read_model(quiz_id))
     }
 
     #[inline(always)]
@@ -462,6 +476,15 @@ pub impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
+    fn set_quiz_config(ref self: Store, model: @QuizConfig) {
+        self.world.write_model(model);
+    }
+    #[inline(always)]
+    fn set_quiz_question(ref self: Store, model: @QuizQuestion) {
+        self.world.write_model(model);
+    }
+
+    #[inline(always)]
     fn set_coin_config(ref self: Store, model: @CoinConfig) {
         self.world.write_model(model);
     }
@@ -656,6 +679,11 @@ pub impl StoreImpl of StoreTrait {
         (duel_id > 0)
     }
 
+    #[inline(always)]
+    fn get_quiz_question_is_open(self: @Store, quiz_id: u32) -> bool {
+        (self.world.read_member_legacy(Model::<QuizQuestion>::ptr_from_keys(quiz_id), selector!("is_open")))
+    }
+
     //----------------------------------
     // Batch member getters
     // https://book.dojoengine.org/framework/world/api#batch-operations
@@ -754,6 +782,15 @@ pub impl StoreImpl of StoreTrait {
                 rewards,
             });
         }
+    }
+
+    #[inline(always)]
+    fn emit_quiz_answer(ref self: Store, quiz_id: u32, player_address: ContractAddress, answer_number: u8) {
+        self.world.emit_event(@QuizAnswerEvent{
+            quiz_id,
+            player_address,
+            answer_number,
+        });
     }
 
     #[inline(always)]

@@ -1,6 +1,9 @@
 use starknet::{ContractAddress};
-use pistols::models::events::{SocialPlatform, PlayerSetting, PlayerSettingValue};
-use pistols::models::leaderboard::{LeaderboardPosition};
+use pistols::models::{
+    leaderboard::{LeaderboardPosition},
+    events::{SocialPlatform, PlayerSetting, PlayerSettingValue},
+    quiz::{QuizQuestion},
+};
 
 // Exposed to clients
 #[starknet::interface]
@@ -14,6 +17,12 @@ pub trait ICommunity<TState> {
     fn emit_player_setting(ref self: TState, setting: PlayerSetting, value: PlayerSettingValue); //@description: Store player settings
     fn emit_player_bookmark(ref self: TState, target_address: ContractAddress, target_id: u128, enabled: bool); //@description: Bookmarks an address or token
     fn do_that_thing(ref self: TState); //@description: Do that thing
+    // events
+    fn create_quiz(ref self: TState, quiz_event: felt252) -> QuizQuestion; //@description: Create a quiz question (admin)
+    fn open_quiz(ref self: TState, quiz_id: u32, question: ByteArray, options: Array<ByteArray>) -> QuizQuestion; //@description: Open a quiz question (admin)
+    fn close_quiz(ref self: TState, quiz_id: u32, answer_number: u8) -> QuizQuestion; //@description: Close a quiz question (admin)
+    fn set_current_quiz(ref self: TState, quiz_id: u32); //@description: Set current quiz id (admin)
+    fn answer_quiz(ref self: TState, quiz_id: u32, answer_number: u8); //@description: Answer a quiz question (players)
     // view calls
     fn get_duelist_leaderboard_position(self: @TState, season_id: u32, duelist_id: u128) -> LeaderboardPosition;
     fn get_leaderboard(self: @TState, season_id: u32) -> Span<LeaderboardPosition>;
@@ -53,8 +62,9 @@ pub mod community {
     };
     use pistols::models::{
         player::{PlayerDelegation},
-        events::{ChallengeAction, SocialPlatform, PlayerSetting, PlayerSettingValue},
         leaderboard::{LeaderboardTrait, LeaderboardPosition},
+        events::{ChallengeAction, SocialPlatform, PlayerSetting, PlayerSettingValue},
+        quiz::{QuizConfigTrait, QuizQuestion, QuizQuestionImpl},
     };
     use pistols::types::trophies::{TrophyProgressTrait};
     use pistols::libs::{
@@ -62,8 +72,13 @@ pub mod community {
     };
 
     pub mod Errors {
-        pub const CALLER_NOT_OWNER: felt252          = 'COMMUNITY: Caller not owner';
-        pub const CALLER_NOT_ADMIN: felt252          = 'COMMUNITY: Caller not admin';
+        pub const CALLER_NOT_OWNER: felt252     = 'COMMUNITY: Caller not owner';
+        pub const CALLER_NOT_ADMIN: felt252     = 'COMMUNITY: Caller not admin';
+        pub const QUESTION_IS_CLOSED: felt252   = 'COMMUNITY: Quiz is closed';
+        pub const QUESTION_IS_OPEN: felt252     = 'COMMUNITY: Question is open';
+        pub const INVALID_OPTIONS: felt252      = 'COMMUNITY: Invalid options';
+        pub const INVALID_QUIZ: felt252         = 'COMMUNITY: Invalid quiz';
+        pub const INVALID_ANSWER: felt252       = 'COMMUNITY: Invalid answer';
     }
 
     #[generate_trait]
@@ -112,15 +127,50 @@ pub mod community {
             TrophyProgressTrait::the_thing(@self.world_default(), @starknet::get_caller_address());
         }
 
+
+        //------------------------------------
+        // events
+        //
+        fn create_quiz(ref self: ContractState, quiz_event: felt252) -> QuizQuestion {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            self._assert_caller_is_admin();
+            let quiz_question: QuizQuestion = QuizQuestionImpl::create_quiz_question(ref store, quiz_event);
+            (quiz_question)
+        }
+        fn open_quiz(ref self: ContractState, quiz_id: u32, question: ByteArray, options: Array<ByteArray>) -> QuizQuestion {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            self._assert_caller_is_admin();
+            let quiz_question: QuizQuestion = QuizQuestionImpl::open_quiz(ref store, quiz_id, question, options);
+            (quiz_question)
+        }
+        fn close_quiz(ref self: ContractState, quiz_id: u32, answer_number: u8) -> QuizQuestion {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            self._assert_caller_is_admin();
+            let quiz_question: QuizQuestion = QuizQuestionImpl::close_quiz(ref store, quiz_id, answer_number);
+            (quiz_question)
+        }
+        fn set_current_quiz(ref self: ContractState, quiz_id: u32) {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            self._assert_caller_is_admin();
+            QuizConfigTrait::set_current_quiz(ref store, quiz_id);
+        }
+        fn answer_quiz(ref self: ContractState, quiz_id: u32, answer_number: u8) {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let quiz_question: QuizQuestion = store.get_quiz_question(quiz_id);
+            assert(quiz_question.question.len() > 0, Errors::INVALID_QUIZ);
+            assert(quiz_question.is_open, Errors::QUESTION_IS_CLOSED);
+            assert(answer_number.into() <= quiz_question.options.len(), Errors::INVALID_ANSWER);
+            store.emit_quiz_answer(quiz_id, starknet::get_caller_address(), answer_number);
+        }
+
+
         //------------------------------------
         // view calls
         //
-
         fn get_duelist_leaderboard_position(self: @ContractState, season_id: u32, duelist_id: u128) -> LeaderboardPosition {
             let mut store: Store = StoreTrait::new(self.world_default());
             (store.get_leaderboard(season_id).get_duelist_position(duelist_id))
         }
-        
         fn get_leaderboard(self: @ContractState, season_id: u32) -> Span<LeaderboardPosition> {
             let mut store: Store = StoreTrait::new(self.world_default());
             (store.get_leaderboard(season_id).get_all_positions())

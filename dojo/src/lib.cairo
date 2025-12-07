@@ -62,6 +62,7 @@ mod models {
     pub mod ring;
     pub mod leaderboard;
     pub mod season;
+    pub mod quiz;
     // pub mod tournament;
 }
 
@@ -119,6 +120,7 @@ mod tests {
     pub mod test_season;
     pub mod test_matchmaker;
     pub mod test_player;
+    pub mod test_community;
     // pub mod test_tournament;
     // pub mod test_tournament_duels;
     // pub mod test_tournament_round;
