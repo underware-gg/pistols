@@ -247,6 +247,23 @@ export interface Pool {
 	balance_fame: BigNumberish;
 }
 
+// Type definition for `pistols::models::quiz::QuizConfig` struct
+export interface QuizConfig {
+	key: BigNumberish;
+	quiz_count: BigNumberish;
+	current_quiz_id: BigNumberish;
+}
+
+// Type definition for `pistols::models::quiz::QuizQuestion` struct
+export interface QuizQuestion {
+	quiz_id: BigNumberish;
+	quiz_event: BigNumberish;
+	question: string;
+	options: Array<string>;
+	answer_number: BigNumberish;
+	is_open: boolean;
+}
+
 // Type definition for `pistols::models::ring::Ring` struct
 export interface Ring {
 	ring_id: BigNumberish;
@@ -406,6 +423,13 @@ export interface PurchaseDistributionEvent {
 	lords_season: BigNumberish;
 }
 
+// Type definition for `pistols::models::events::QuizAnswerEvent` struct
+export interface QuizAnswerEvent {
+	quiz_id: BigNumberish;
+	player_address: string;
+	answer_number: BigNumberish;
+}
+
 // Type definition for `pistols::models::events::SeasonLeaderboardEvent` struct
 export interface SeasonLeaderboardEvent {
 	season_id: BigNumberish;
@@ -486,6 +510,13 @@ export interface Transfer {
 	from: string;
 	to: string;
 	token_id: BigNumberish;
+}
+
+// Type definition for `pistols::models::leaderboard::LeaderboardPosition` struct
+export interface LeaderboardPosition {
+	position: BigNumberish;
+	duelist_id: BigNumberish;
+	points: BigNumberish;
 }
 
 // Type definition for `pistols::systems::rng_mock::RngWrap` struct
@@ -1045,6 +1076,8 @@ export interface SchemaType extends ISchemaType {
 		PlayerTeamFlags: PlayerTeamFlags,
 		PlayerTimestamps: PlayerTimestamps,
 		Pool: Pool,
+		QuizConfig: QuizConfig,
+		QuizQuestion: QuizQuestion,
 		Ring: Ring,
 		RingBalance: RingBalance,
 		SeasonConfig: SeasonConfig,
@@ -1064,6 +1097,7 @@ export interface SchemaType extends ISchemaType {
 		PlayerSettingEvent: PlayerSettingEvent,
 		PlayerSocialLinkEvent: PlayerSocialLinkEvent,
 		PurchaseDistributionEvent: PurchaseDistributionEvent,
+		QuizAnswerEvent: QuizAnswerEvent,
 		SeasonLeaderboardEvent: SeasonLeaderboardEvent,
 		SeasonLeaderboardPosition: SeasonLeaderboardPosition,
 		LordsReleaseBill: LordsReleaseBill,
@@ -1073,6 +1107,7 @@ export interface SchemaType extends ISchemaType {
 		Approval: Approval,
 		Transfer: Transfer,
 		ApprovalForAll: ApprovalForAll,
+		LeaderboardPosition: LeaderboardPosition,
 		RngWrap: RngWrap,
 		Deck: Deck,
 		DuelistHand: DuelistHand,
@@ -1371,6 +1406,19 @@ export const schema: SchemaType = {
 			balance_lords: 0,
 			balance_fame: 0,
 		},
+		QuizConfig: {
+			key: 0,
+			quiz_count: 0,
+			current_quiz_id: 0,
+		},
+		QuizQuestion: {
+			quiz_id: 0,
+			quiz_event: 0,
+		question: "",
+			options: [""],
+			answer_number: 0,
+			is_open: false,
+		},
 		Ring: {
 			ring_id: 0,
 		ring_type: new CairoCustomEnum({ 
@@ -1562,6 +1610,11 @@ export const schema: SchemaType = {
 			lords_fees: 0,
 			lords_season: 0,
 		},
+		QuizAnswerEvent: {
+			quiz_id: 0,
+			player_address: "",
+			answer_number: 0,
+		},
 		SeasonLeaderboardEvent: {
 			season_id: 0,
 			positions: [{ duelist_id: 0, points: 0, player_address: "", lords_amount: 0, }],
@@ -1626,6 +1679,11 @@ export const schema: SchemaType = {
 			from: "",
 			to: "",
 		token_id: 0,
+		},
+		LeaderboardPosition: {
+			position: 0,
+			duelist_id: 0,
+			points: 0,
 		},
 		RngWrap: {
 			rng_address: "",
@@ -2020,6 +2078,8 @@ export enum ModelsMapping {
 	PlayerTimestamps = 'pistols-PlayerTimestamps',
 	Pool = 'pistols-Pool',
 	PoolType = 'pistols-PoolType',
+	QuizConfig = 'pistols-QuizConfig',
+	QuizQuestion = 'pistols-QuizQuestion',
 	Ring = 'pistols-Ring',
 	RingBalance = 'pistols-RingBalance',
 	RingType = 'pistols-RingType',
@@ -2057,6 +2117,7 @@ export enum ModelsMapping {
 	PlayerSettingEvent = 'pistols-PlayerSettingEvent',
 	PlayerSocialLinkEvent = 'pistols-PlayerSocialLinkEvent',
 	PurchaseDistributionEvent = 'pistols-PurchaseDistributionEvent',
+	QuizAnswerEvent = 'pistols-QuizAnswerEvent',
 	SeasonLeaderboardEvent = 'pistols-SeasonLeaderboardEvent',
 	SeasonLeaderboardPosition = 'pistols-SeasonLeaderboardPosition',
 	SocialPlatform = 'pistols-SocialPlatform',
@@ -2070,6 +2131,7 @@ export enum ModelsMapping {
 	Transfer = 'openzeppelin_token-Transfer',
 	ApprovalForAll = 'openzeppelin_token-ApprovalForAll',
 	Source = 'pistols-Source',
+	LeaderboardPosition = 'pistols-LeaderboardPosition',
 	RngWrap = 'pistols-RngWrap',
 	Deck = 'pistols-Deck',
 	EnvCard = 'pistols-EnvCard',

@@ -24,17 +24,26 @@ export const INTERFACE_DESCRIPTIONS: any = {
     sponsor_tournament: 'Sponsor a tournament with $LORDS',
     collect_season: 'Close the current season and start the next one',
   },
+  // from: ../dojo/src/systems/community.cairo
+  ICommunity: {
+    delegate_game_actions: 'Delegate game actions to another account',
+    clear_call_to_challenge: 'Clear call to action for a player',
+    clear_player_social_link: 'Unlink player from social platform',
+    emit_player_social_link: 'Link player to social platform',
+    emit_player_setting: 'Store player settings',
+    emit_player_bookmark: 'Bookmarks an address or token',
+    do_that_thing: 'Do that thing',
+    create_quiz: 'Create a quiz question (admin)',
+    open_quiz: 'Open a quiz question (admin)',
+    close_quiz: 'Close a quiz question (admin)',
+    set_current_quiz: 'Set current quiz id (admin)',
+    answer_quiz: 'Answer a quiz question (players)',
+  },
   // from: ../dojo/src/systems/game.cairo
   IGame: {
     commit_moves: 'Commit moves of a Duelist in a Duel',
     reveal_moves: 'Reveal moves of a Duelist in a Duel',
     collect_duel: 'Close expired duels',
-    delegate_game_actions: 'Delegate game actions to another account',
-    clear_call_to_challenge: 'Clear call to action for a player',
-    emit_player_bookmark: 'Bookmarks an address or token',
-    emit_player_social_link: 'Link player to social platform',
-    clear_player_social_link: 'Unlink player from social platform',
-    emit_player_setting: 'Store player settings',
   },
   // from: ../dojo/src/systems/matchmaker.cairo
   IMatchMakerPublic: {
@@ -867,6 +876,7 @@ type type_SELECTORS = {
   GAME_LOOP: bigint, // cairo: felt252
   BOT_PLAYER: bigint, // cairo: felt252
   MATCHMAKER: bigint, // cairo: felt252
+  COMMUNITY: bigint, // cairo: felt252
   RNG: bigint, // cairo: felt252
   RNG_MOCK: bigint, // cairo: felt252
   DUEL_TOKEN: bigint, // cairo: felt252
@@ -886,6 +896,7 @@ export const SELECTORS: type_SELECTORS = {
   GAME_LOOP: BigInt('0x01bf3dd2b828d461e19dc794352723ae8d8a1760c61b936a916cf3b4de8d5b9f'), // selector_from_tag!("pistols-game_loop")
   BOT_PLAYER: BigInt('0x022366a4c25ee7406d1d3bd13fab733b310945461fda8a7c721412ac7c01de53'), // selector_from_tag!("pistols-bot_player")
   MATCHMAKER: BigInt('0x05b2844d155e3c1b34dbddfa9a4d321e431b76826510f51dab224efecc822072'), // selector_from_tag!("pistols-matchmaker")
+  COMMUNITY: BigInt('0x07348885054faf5239115b952a0812295ca08f3be01216dd6c03a9fcc22d1dba'), // selector_from_tag!("pistols-community")
   RNG: BigInt('0x013f1a6a9ae118440a997d6624230b59f43516220a1208526c3f66e202910504'), // selector_from_tag!("pistols-rng")
   RNG_MOCK: BigInt('0x00fbd28ccd9cffb9b1783a0bf7cdf42a9b88c49d4568116cd1f7ee70ba415705'), // selector_from_tag!("pistols-rng_mock")
   DUEL_TOKEN: BigInt('0x0670a5c673ac776e00e61c279cf7dc0efbe282787f4d719498e55643c5116063'), // selector_from_tag!("pistols-duel_token")

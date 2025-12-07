@@ -1,7 +1,7 @@
 #
 # torii config for profile [dev]
 #
-world_address = "0x05fa5438c7ccbcbae63ec200779acf8b71f34f432e9f0e7adec7a74230850c6b"
+world_address = "0x00b8d2b85a77394f9980a502e1d9f86a4b9219c9065044bd044a59a8f84f1393"
 rpc = "http://127.0.0.1:5050"
 
 [events]
@@ -27,12 +27,12 @@ transactions = true
 controllers = true
 pending = true
 contracts = [
-  "erc721:0x567547bcfdf0e592d05535843eb02a0717d4206e8ec7ca6ab3bfd60df0f1cb2", # duel_token
-  "erc721:0x3f43732b0acf3d762420ae7165d5d474f4dfd032a642600f02bc8f22ee1dfc8", # duelist_token
-  "erc721:0x3b073701f2978a86df14129db3dcd80e5dac7085ef3ac29d86b9704b206ff4c", # pack_token
-  "erc721:0x6169f67a626c31d70c139326d7746b717eb5ffed671da7c7e0bcf197c45b3ef", # ring_token
+  "erc721:0xd706eaffd0ab2ffbe7bd92be2df71de1aa8eb6521b472ede49183772372deb", # duel_token
+  "erc721:0x7e538c2667e36b602bb50b4ac7fa966224907d8c63ee8df4c7880c8909bc48a", # duelist_token
+  "erc721:0x1ce5b11cd6cd3ebd3939f10e99835563dfb23f1c19980a4453fb034c294b079", # pack_token
+  "erc721:0x7b300fd96bce5edf1c17b0b1b3d6c6d4cc0fee9153d0b834a25681d4b486a45", # ring_token
   # "erc721:$tournament_token", # tournament_token
-  "erc20:0x223cae3cafb1b5b744b124c6537106491cb3adf0a3a3b53dbb6d24a91caccd5", # fame_coin
-  "erc20:0x124b9fd933a93d9fffa66b49a2cb20f3f904935140dd9df44e82896dc6eab6e", # fools_coin
-  "erc20:0x523297eea9b40cce60d3122cac710c5b71dd98a01f75a2ddc69e31accf5a036", # lords
+  "erc20:0x2af2b22b59f9d23595b40ea87c84ad7c1b55b52a23f0c3c40272351bfee64e6", # fame_coin
+  "erc20:0xd3af90aa027ca87122cd4a59089093423715c35401c6ee165e4c2533f04d5a", # fools_coin
+  "erc20:0x111c6000ea3c7687e0681b21014ee6b01379beaba4475636fdf07fd09ed3e34", # lords
 ]
