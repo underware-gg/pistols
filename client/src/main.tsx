@@ -18,6 +18,7 @@ import PlayersPage from '/src/pages/internal/PlayersPage'
 import SnapshotPage from '/src/pages/internal/SnapshotPage'
 import ContractsPage from '/src/pages/internal/ContractsPage'
 import MatchmakingTestPage from './pages/internal/MatchmakingTestPage'
+import QuizTestPage from './pages/internal/QuizTestPage'
 import DuelDataPage from '/src/pages/DuelDataPage'
 import StatusPage from '/src/pages/StatusPage'
 import ErrorPage from '/src/pages/error/ErrorPage'
@@ -103,6 +104,7 @@ const router = createBrowserRouter(
       { path: "snapshot", element: <SnapshotPage /> },
       { path: "contracts", element: <ContractsPage /> },
       { path: "matchmaking", element: <MatchmakingTestPage /> },
+      { path: "quiz", element: <QuizTestPage /> },
     ],
   },
 ]);

@@ -10,6 +10,7 @@ import { useDuelistStore, useDuelistStackStore, useDuelistIdsStore } from '/src/
 import { useChallengeIdsStore, useChallengeStore } from '/src/stores/challengeStore'
 import { useBankStore } from '/src/stores/bankStore'
 import { usePackStore } from '/src/stores/packStore'
+import { useQuizStore } from '/src/stores/quizStore'
 import { useScoreboardStore } from '/src/stores/scoreboardStore'
 import { useProgressStore } from '/src/stores/progressStore'
 import { useMatchStore } from '/src/stores/matchStore'
@@ -24,6 +25,7 @@ const _modelsGet = [
   "pistols-Config",
   "pistols-TokenConfig",
   "pistols-Pool",
+  "pistols-QuizConfig",
   // season
   "pistols-SeasonConfig",
   "pistols-Leaderboard",
@@ -56,8 +58,9 @@ const _modelsSubscribed = [
   'pistols-Round',
   // Scoreboards
   "pistols-SeasonScoreboard",
-  // Other
+  // Misc
   "pistols-Pack",
+  "pistols-QuizQuestion",
 ];
 
 
@@ -85,6 +88,7 @@ export function EntityStoreSync() {
   const matchState = useMatchStore((state) => state)
   const bankState = useBankStore((state) => state)
   const packState = usePackStore((state) => state)
+  const quizState = useQuizStore((state) => state)
   // players
   const playerState = usePlayerEntityStore((state) => state)
   const playerDataState = usePlayerDataStore((state) => state)
@@ -131,6 +135,7 @@ export function EntityStoreSync() {
       matchState.setEntities(filterEntitiesByModels(entities, ['MatchQueue', 'MatchPlayer']))
       playerState.setEntities(filterEntitiesByModels(entities, ['Player', 'PlayerFlags', 'PlayerTeamFlags', 'Ring', 'RingBalance']))
       playerDataState.updateMessages(filterEntitiesByModels(entities, ['PlayerOnline']))
+      quizState.setEntities(filterEntitiesByModels(entities, ['QuizConfig', 'QuizQuestion']))
     },
   })
 
@@ -168,6 +173,9 @@ export function EntityStoreSync() {
       }
       if (entityContainsModels(entity, ['Pack'])) {
         packState.updateEntity(entity)
+      }
+      if (entityContainsModels(entity, ['QuizConfig', 'QuizQuestion'])) {
+        quizState.updateEntity(entity)
       }
       if (entityContainsModels(entity, ['Pool'])) {
         bankState.updateEntity(entity)

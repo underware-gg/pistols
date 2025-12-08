@@ -6,6 +6,7 @@ import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useEventsStore } from '/src/stores/eventsModelStore'
 import { usePlayerDataStore } from '/src/stores/playerStore'
 import { useChallengeRewardsStore } from '/src/stores/challengeRewardsStore'
+import { useQuizStore } from '/src/stores/quizStore'
 import { useProgressStore } from '/src/stores/progressStore'
 import { bigintEquals, bigintToAddress, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { debug } from '@underware/pistols-sdk/pistols'
@@ -16,6 +17,7 @@ export function EventsModelStoreSync() {
   const eventsState = useEventsStore((state) => state)
   const playerDataState = usePlayerDataStore((state) => state)
   const challengeRewardsState = useChallengeRewardsStore((state) => state)
+  const quizState = useQuizStore((state) => state)
   const updateProgress = useProgressStore((state) => state.updateProgress)
 
   const { address } = useAccount()
@@ -80,6 +82,7 @@ export function EventsModelStoreSync() {
               [
                 'pistols-ChallengeRewardsEvent',
                 'pistols-PlayerSocialLinkEvent',
+                'pistols-QuizAnswerEvent',
               ],
               // get it all
               [undefined],
@@ -91,8 +94,9 @@ export function EventsModelStoreSync() {
           'pistols-CallToChallengeEvent',
           'pistols-PlayerSettingEvent',
           'pistols-PlayerBookmarkEvent',
-          'pistols-PlayerSocialLinkEvent',
           'pistols-ChallengeRewardsEvent',
+          'pistols-PlayerSocialLinkEvent',
+          'pistols-QuizAnswerEvent',
         ])
         .withLimit(1) // discard...
         .includeHashedKeys()
@@ -161,6 +165,9 @@ export function EventsModelStoreSync() {
       }
       if (entityContainsModels(entity, ['ChallengeRewardsEvent'])) {
         challengeRewardsState.updateEntity(entity)
+      }
+      if (entityContainsModels(entity, ['QuizAnswerEvent'])) {
+        quizState.updateEntity(entity)
       }
     },
   })

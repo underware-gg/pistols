@@ -16,6 +16,7 @@ const internalPages = [
   { name: 'pools', connected: true },
   { name: 'seasons', connected: true },
   { name: 'matchmaking', connected: true },
+  { name: 'quiz', connected: true },
   { name: 'players', connected: true },
   { name: 'snapshot', connected: true },
 ]

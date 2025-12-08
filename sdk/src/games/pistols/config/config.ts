@@ -1,11 +1,14 @@
 import { Manifest, getContractByName } from '@dojoengine/core'
 import { ChainId, getNetworkConfig, NetworkId } from './networks'
-import pistols_manifest_dev from './manifests/manifest_dev.json'
+import _pistols_manifest_dev from './manifests/manifest_dev.json'
 import pistols_manifest_slot from './manifests/manifest_slot.json'
 import pistols_manifest_staging from './manifests/manifest_staging.json'
 import pistols_manifest_sepolia from './manifests/manifest_sepolia.json'
 import pistols_manifest_mainnet from './manifests/manifest_mainnet.json'
+import { convert_dojo_manifest_1_8_to_1_7 } from 'src/fix/manifest_converter'
 import { bigintToAddress } from 'src/utils/misc/types'
+
+const pistols_manifest_dev = convert_dojo_manifest_1_8_to_1_7(_pistols_manifest_dev);
 
 export const NAMESPACE = 'pistols'
 

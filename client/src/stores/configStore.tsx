@@ -6,7 +6,7 @@ import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 
 export const useConfigStore = createDojoStore<PistolsSchemaType>();
 
-const configKey = keysToEntityId([constants.CONFIG.CONFIG_KEY])
+export const configKey = keysToEntityId([constants.CONFIG.CONFIG_KEY])
 
 
 //--------------------------------

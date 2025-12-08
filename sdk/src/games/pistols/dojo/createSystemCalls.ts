@@ -2,7 +2,7 @@ import { DojoCall, DojoProvider, getContractByName } from '@dojoengine/core'
 import { AccountInterface, BigNumberish, CairoCustomEnum, Call, CallData, UniversalDetails, CairoOption, CairoOptionVariant } from 'starknet'
 import { arrayClean, shortAddress, isPositiveBigint, bigintToHex, bigintToAddress } from 'src/utils/misc/types'
 import { NAMESPACE, getLordsAddress, getBankAddress, getVrfAddress, DojoManifest, getMatchmakerAddress } from 'src/games/pistols/config/config'
-import { bigintToU256 } from 'src/starknet/starknet'
+import { bigintToU256, stringToFelt } from 'src/starknet/starknet'
 import { makeCustomEnum } from 'src/starknet/starknet_enum'
 import { DojoNetworkConfig } from 'src/games/pistols/config/networks'
 import { setupWorld } from 'src/games/pistols/generated/contracts.gen'
@@ -251,7 +251,54 @@ export function createSystemCalls(
         ]
         return await _executeTransaction(signer, calls, key)
       },
-    },    //
+      //
+      // quiz
+      create_quiz: async (signer: AccountInterface, quiz_event: string, key?: string): Promise<boolean> => {
+        const calls: DojoCalls = [
+          contractCalls.community.buildCreateQuizCalldata(
+            stringToFelt(quiz_event),
+          ),
+        ]
+        return await _executeTransaction(signer, calls, key)
+      },
+      open_quiz: async (signer: AccountInterface, quiz_id: BigNumberish, question: string, options: Array<string>, key?: string): Promise<boolean> => {
+        const calls: DojoCalls = [
+          contractCalls.community.buildOpenQuizCalldata(
+            bigintToHex(quiz_id),
+            question,
+            options,
+          ),
+        ]
+        return await _executeTransaction(signer, calls, key)
+      },
+      close_quiz: async (signer: AccountInterface, quiz_id: BigNumberish, answer_number: BigNumberish, key?: string): Promise<boolean> => {
+        const calls: DojoCalls = [
+          contractCalls.community.buildCloseQuizCalldata(
+            bigintToHex(quiz_id),
+            answer_number,
+          ),
+        ]
+        return await _executeTransaction(signer, calls, key)
+      },
+      set_current_quiz: async (signer: AccountInterface, quiz_id: number, key?: string): Promise<boolean> => {
+        const calls: DojoCalls = [
+          contractCalls.community.buildSetCurrentQuizCalldata(
+            bigintToHex(quiz_id),
+          ),
+        ]
+        return await _executeTransaction(signer, calls, key)
+      },
+      answer_quiz: async (signer: AccountInterface, quiz_id: BigNumberish, answer_number: BigNumberish, key?: string): Promise<boolean> => {
+        const calls: DojoCalls = [
+          contractCalls.community.buildAnswerQuizCalldata(  
+            bigintToHex(quiz_id),
+            answer_number,
+          ),
+        ]
+        return await _executeTransaction(signer, calls, key)
+      },
+    },
+    //
     // tutorial.cairo
     //
     tutorial: {

@@ -7,7 +7,7 @@
 #
 
 # export TORII_URL="https://api.cartridge.gg/x/pistols-sepolia/torii/graphql"
-export TORII_URL="http://0.0.0.0:8080/graphql"
+export TORII_URL="http://127.0.0.1:8080/graphql"
 
 echo "> GraphQL shema from: $TORII_URL"
 

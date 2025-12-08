@@ -32,7 +32,7 @@ const HeaderCell = Table.HeaderCell
 
 export default function MatchmakingTestPage() {
   return (
-    <AppDojo subtitle='Test: Matchmaking' autoConnect>
+    <AppDojo subtitle='Internal: Matchmaking' autoConnect>
       <Container>
         <InternalPageMenu />
         <CurrentChainHint />
