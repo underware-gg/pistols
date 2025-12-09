@@ -247,6 +247,14 @@ export interface Pool {
 	balance_fame: BigNumberish;
 }
 
+// Type definition for `pistols::models::quiz::QuizAnswer` struct
+export interface QuizAnswer {
+	quiz_id: BigNumberish;
+	player_address: string;
+	answer_number: BigNumberish;
+	timestamp: BigNumberish;
+}
+
 // Type definition for `pistols::models::quiz::QuizConfig` struct
 export interface QuizConfig {
 	key: BigNumberish;
@@ -421,13 +429,6 @@ export interface PurchaseDistributionEvent {
 	lords_realms: BigNumberish;
 	lords_fees: BigNumberish;
 	lords_season: BigNumberish;
-}
-
-// Type definition for `pistols::models::events::QuizAnswerEvent` struct
-export interface QuizAnswerEvent {
-	quiz_id: BigNumberish;
-	player_address: string;
-	answer_number: BigNumberish;
 }
 
 // Type definition for `pistols::models::events::SeasonLeaderboardEvent` struct
@@ -1076,6 +1077,7 @@ export interface SchemaType extends ISchemaType {
 		PlayerTeamFlags: PlayerTeamFlags,
 		PlayerTimestamps: PlayerTimestamps,
 		Pool: Pool,
+		QuizAnswer: QuizAnswer,
 		QuizConfig: QuizConfig,
 		QuizQuestion: QuizQuestion,
 		Ring: Ring,
@@ -1097,7 +1099,6 @@ export interface SchemaType extends ISchemaType {
 		PlayerSettingEvent: PlayerSettingEvent,
 		PlayerSocialLinkEvent: PlayerSocialLinkEvent,
 		PurchaseDistributionEvent: PurchaseDistributionEvent,
-		QuizAnswerEvent: QuizAnswerEvent,
 		SeasonLeaderboardEvent: SeasonLeaderboardEvent,
 		SeasonLeaderboardPosition: SeasonLeaderboardPosition,
 		LordsReleaseBill: LordsReleaseBill,
@@ -1406,6 +1407,12 @@ export const schema: SchemaType = {
 			balance_lords: 0,
 			balance_fame: 0,
 		},
+		QuizAnswer: {
+			quiz_id: 0,
+			player_address: "",
+			answer_number: 0,
+			timestamp: 0,
+		},
 		QuizConfig: {
 			key: 0,
 			quiz_count: 0,
@@ -1609,11 +1616,6 @@ export const schema: SchemaType = {
 			lords_realms: 0,
 			lords_fees: 0,
 			lords_season: 0,
-		},
-		QuizAnswerEvent: {
-			quiz_id: 0,
-			player_address: "",
-			answer_number: 0,
 		},
 		SeasonLeaderboardEvent: {
 			season_id: 0,
@@ -2078,6 +2080,7 @@ export enum ModelsMapping {
 	PlayerTimestamps = 'pistols-PlayerTimestamps',
 	Pool = 'pistols-Pool',
 	PoolType = 'pistols-PoolType',
+	QuizAnswer = 'pistols-QuizAnswer',
 	QuizConfig = 'pistols-QuizConfig',
 	QuizQuestion = 'pistols-QuizQuestion',
 	Ring = 'pistols-Ring',
@@ -2117,7 +2120,6 @@ export enum ModelsMapping {
 	PlayerSettingEvent = 'pistols-PlayerSettingEvent',
 	PlayerSocialLinkEvent = 'pistols-PlayerSocialLinkEvent',
 	PurchaseDistributionEvent = 'pistols-PurchaseDistributionEvent',
-	QuizAnswerEvent = 'pistols-QuizAnswerEvent',
 	SeasonLeaderboardEvent = 'pistols-SeasonLeaderboardEvent',
 	SeasonLeaderboardPosition = 'pistols-SeasonLeaderboardPosition',
 	SocialPlatform = 'pistols-SocialPlatform',

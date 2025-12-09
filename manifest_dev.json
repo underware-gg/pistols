@@ -91,8 +91,8 @@
       ]
     },
     {
-      "address": "0x5002bbf4c453b9e4b40423be3f09e37eb000b051fc5d7ddca9abebdf4def0f5",
-      "class_hash": "0x442b38dc094c6faebaede1daa86f2b4f11c88c328ef2a7bb2c3533936c496f1",
+      "address": "0x7404167563a749fdec3753d03569b009e524bc5dce7da701e9457f99c389e87",
+      "class_hash": "0x1c1d61b3d95ddd7ff4e87ba29387700b360ef6fa340e95f4f2b524c30a12cdb",
       "init_calldata": [],
       "tag": "pistols-community",
       "selector": "0x7348885054faf5239115b952a0812295ca08f3be01216dd6c03a9fcc22d1dba",
@@ -994,6 +994,33 @@
     {
       "members": [
         {
+          "name": "quiz_id",
+          "type": "core::integer::u32",
+          "key": true
+        },
+        {
+          "name": "player_address",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "key": true
+        },
+        {
+          "name": "answer_number",
+          "type": "core::integer::u8",
+          "key": false
+        },
+        {
+          "name": "timestamp",
+          "type": "core::integer::u64",
+          "key": false
+        }
+      ],
+      "class_hash": "0x569e8094fa2631d200b05cdff8345a03f7e0ee375f120f84cb59a5c52e1d5a1",
+      "tag": "pistols-QuizAnswer",
+      "selector": "0x34298bd13a175838ea39852125ebda8df8e1ae0defd164a280a4ebd271cd2ec"
+    },
+    {
+      "members": [
+        {
           "name": "key",
           "type": "core::integer::u8",
           "key": true
@@ -1508,28 +1535,6 @@
       "class_hash": "0x72312bb42969689b6699ee098ebc5055429ff75a52f417cac54c50b8ae1ad3a",
       "tag": "pistols-PurchaseDistributionEvent",
       "selector": "0x11b9cb4ac22f27d84c5a59023bc2a5ff64b6b60976f7e44cfa7b952d45d1a85"
-    },
-    {
-      "members": [
-        {
-          "name": "quiz_id",
-          "type": "core::integer::u32",
-          "key": true
-        },
-        {
-          "name": "player_address",
-          "type": "core::starknet::contract_address::ContractAddress",
-          "key": true
-        },
-        {
-          "name": "answer_number",
-          "type": "core::integer::u8",
-          "key": false
-        }
-      ],
-      "class_hash": "0x6a76175391f6a6959a3f64fe572d49db00fa91e471b8bd833e6c0dae3c2e801",
-      "tag": "pistols-QuizAnswerEvent",
-      "selector": "0x28ee8a7c9557cb41ff09ab6650fd44083ef648149e1f278ebed9df2960364e3"
     },
     {
       "members": [
@@ -6131,34 +6136,6 @@
     },
     {
       "type": "struct",
-      "name": "pistols::models::events::QuizAnswerEvent",
-      "members": [
-        {
-          "name": "quiz_id",
-          "type": "core::integer::u32"
-        },
-        {
-          "name": "player_address",
-          "type": "core::starknet::contract_address::ContractAddress"
-        },
-        {
-          "name": "answer_number",
-          "type": "core::integer::u8"
-        }
-      ]
-    },
-    {
-      "type": "struct",
-      "name": "pistols::models::events::QuizAnswerEventValue",
-      "members": [
-        {
-          "name": "answer_number",
-          "type": "core::integer::u8"
-        }
-      ]
-    },
-    {
-      "type": "struct",
       "name": "pistols::models::events::SeasonLeaderboardEvent",
       "members": [
         {
@@ -6276,12 +6253,6 @@
     {
       "type": "event",
       "name": "pistols::models::events::e_PurchaseDistributionEvent::Event",
-      "kind": "enum",
-      "variants": []
-    },
-    {
-      "type": "event",
-      "name": "pistols::models::events::e_QuizAnswerEvent::Event",
       "kind": "enum",
       "variants": []
     },
@@ -7109,6 +7080,42 @@
     },
     {
       "type": "struct",
+      "name": "pistols::models::quiz::QuizAnswer",
+      "members": [
+        {
+          "name": "quiz_id",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "player_address",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "name": "answer_number",
+          "type": "core::integer::u8"
+        },
+        {
+          "name": "timestamp",
+          "type": "core::integer::u64"
+        }
+      ]
+    },
+    {
+      "type": "struct",
+      "name": "pistols::models::quiz::QuizAnswerValue",
+      "members": [
+        {
+          "name": "answer_number",
+          "type": "core::integer::u8"
+        },
+        {
+          "name": "timestamp",
+          "type": "core::integer::u64"
+        }
+      ]
+    },
+    {
+      "type": "struct",
       "name": "pistols::models::quiz::QuizConfig",
       "members": [
         {
@@ -7194,6 +7201,12 @@
           "type": "core::bool"
         }
       ]
+    },
+    {
+      "type": "event",
+      "name": "pistols::models::quiz::m_QuizAnswer::Event",
+      "kind": "enum",
+      "variants": []
     },
     {
       "type": "event",
