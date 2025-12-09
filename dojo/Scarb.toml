@@ -9,6 +9,10 @@ license = "CC0-1.0"
 sierra-replace-ids = true
 panic-backtrace = true
 
+[scripts]
+# usage: snforge test test_name
+test = "snforge test"
+
 [dependencies]
 starknet = ">=2.13.1"
 dojo = "1.8.0"
@@ -23,10 +27,14 @@ openzeppelin_introspection = { git = "https://github.com/OpenZeppelin/cairo-cont
 
 [dev-dependencies]
 cairo_test = ">=2.13.1"
-dojo_cairo_test = "1.8.0"
+snforge_std = "0.51.0"
+dojo_snf_test = "1.8.0"
 
 [tool.scarb]
-allow-prebuilt-plugins = ["dojo_cairo_macros"]
+allow-prebuilt-plugins = [
+  "dojo_cairo_macros",
+  "snforge_std",
+]
 
 # [features]
 # default = ["lords_mock"]

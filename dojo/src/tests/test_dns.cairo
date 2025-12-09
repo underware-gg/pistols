@@ -2,7 +2,7 @@
 mod tests {
     use starknet::{ContractAddress};
     use dojo::world::{WorldStorage};
-    use dojo_cairo_test::{
+    use dojo_snf_test::{
         spawn_test_world, NamespaceDef, TestResource, ContractDefTrait, ContractDef,
         WorldStorageTestTrait,
     };
@@ -28,7 +28,7 @@ mod tests {
     fn setup_alternative_world() -> (WorldStorage, IRngDispatcher) {
         let namespace: ByteArray = "alternative";
         let resources: Span<TestResource> = array![
-            TestResource::Contract(rng::TEST_CLASS_HASH.into())
+            TestResource::Contract("rng")
         ].span();
         let contract_defs: Span<ContractDef> = array![
             ContractDefTrait::new(@namespace, @"rng")
@@ -37,7 +37,6 @@ mod tests {
 
         let namespace_def: NamespaceDef = NamespaceDef { namespace, resources };
         let mut world: WorldStorage = spawn_test_world(
-            dojo::world::world::TEST_CLASS_HASH.into(),
             [namespace_def].span(),
         );
         world.sync_perms_and_inits(contract_defs);
