@@ -23,9 +23,9 @@ import { debug } from '@underware/pistols-sdk/pistols'
 const _modelsGet = [
   // admin
   "pistols-Config",
+  "pistols-QuizConfig",
   "pistols-TokenConfig",
   "pistols-Pool",
-  "pistols-QuizConfig",
   // season
   "pistols-SeasonConfig",
   "pistols-Leaderboard",
@@ -56,10 +56,9 @@ const _modelsSubscribed = [
   "pistols-Challenge",
   "pistols-ChallengeMessage",
   'pistols-Round',
-  // Scoreboards
-  "pistols-SeasonScoreboard",
   // Misc
   "pistols-Pack",
+  "pistols-SeasonScoreboard",
   "pistols-QuizQuestion",
   "pistols-QuizAnswer",
 ];
@@ -129,14 +128,14 @@ export function EntityStoreSync() {
       // debug.log("EntityStoreSync() SET PLAYERS =======> [PlayerOnline]:", filterEntitiesByModels(entities, ['PlayerOnline']))
       // debug.log("EntityStoreSync() SET PLAYERS =======> [Ring]:", filterEntitiesByModels(entities, ['Ring']))
       // debug.log("EntityStoreSync() SET PLAYERS =======> [RingBalance]:", filterEntitiesByModels(entities, ['RingBalance']))
-      configState.setEntities(filterEntitiesByModels(entities, ['Config']))
+      configState.setEntities(filterEntitiesByModels(entities, ['Config', 'QuizConfig']))
       tokenState.setEntities(filterEntitiesByModels(entities, ['TokenConfig']))
       bankState.setEntities(filterEntitiesByModels(entities, ['Pool']))
       seasonState.setEntities(filterEntitiesByModels(entities, ['SeasonConfig', 'Leaderboard']))
       matchState.setEntities(filterEntitiesByModels(entities, ['MatchQueue', 'MatchPlayer']))
       playerState.setEntities(filterEntitiesByModels(entities, ['Player', 'PlayerFlags', 'PlayerTeamFlags', 'Ring', 'RingBalance']))
       playerDataState.updateMessages(filterEntitiesByModels(entities, ['PlayerOnline']))
-      quizState.setEntities(filterEntitiesByModels(entities, ['QuizConfig', 'QuizQuestion', 'QuizAnswer']))
+      quizState.setEntities(filterEntitiesByModels(entities, ['QuizQuestion', 'QuizAnswer']))
     },
   })
 
@@ -148,7 +147,7 @@ export function EntityStoreSync() {
     },
     updateEntity: (entity: PistolsEntity) => {
       // debug.log("EntityStoreSync() SUB UPDATE =======> [entity]:", entity)
-      if (entityContainsModels(entity, ['Config'])) {
+      if (entityContainsModels(entity, ['Config', 'QuizConfig'])) {
         configState.updateEntity(entity)
       }
       if (entityContainsModels(entity, ['TokenConfig'])) {
@@ -175,7 +174,7 @@ export function EntityStoreSync() {
       if (entityContainsModels(entity, ['Pack'])) {
         packState.updateEntity(entity)
       }
-      if (entityContainsModels(entity, ['QuizConfig', 'QuizQuestion', 'QuizAnswer'])) {
+      if (entityContainsModels(entity, ['QuizQuestion', 'QuizAnswer'])) {
         quizState.updateEntity(entity)
       }
       if (entityContainsModels(entity, ['Pool'])) {

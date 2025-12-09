@@ -8,6 +8,7 @@ import { useAllStoreModels, useSdkEntitiesGet, useSdkEventsGet, useStoreModelsBy
 import { PistolsSchemaType, PistolsQueryBuilder, PistolsEntity } from '@underware/pistols-sdk/pistols/sdk'
 import { models } from '@underware/pistols-sdk/pistols/gen'
 import { configKey } from './configStore'
+import { BigNumberish } from 'starknet'
 
 export const useQuizStore = createDojoStore<PistolsSchemaType>();
 
@@ -30,16 +31,6 @@ const useQuizFetchStore = createStore();
 //--------------------------------
 // 'consumer' hooks
 //
-export const useQuizConfig = () => {
-  const entities = useQuizStore((state) => state.entities);
-  const model = useStoreModelsById<models.QuizConfig>(entities, 'QuizConfig', configKey)
-  const quizCount = useMemo(() => Number(model?.quiz_count ?? 0), [model])
-  const currentQuizId = useMemo(() => Number(model?.current_quiz_id ?? 0), [model])
-  return {
-    quizCount,
-    currentQuizId,
-  }
-}
 
 export const useQuizQuestion = (quizId: number) => {
   useFetchAllQuiz();
@@ -47,19 +38,28 @@ export const useQuizQuestion = (quizId: number) => {
   const model = useStoreModelsByKeys<models.QuizQuestion>(entities, 'QuizQuestion', [quizId])
   const eventName = useMemo(() => feltToString(model?.quiz_event ?? 0), [model])
   const question = useMemo(() => model?.question ?? '', [model])
+  const description = useMemo(() => model?.description ?? '', [model])
   const options = useMemo(() => model?.options ?? [], [model])
   const answerNumber = useMemo(() => Number(model?.answer_number ?? 0), [model])
-  const isOpen = useMemo(() => model?.is_open ?? false, [model])
+  const timestamp_start = useMemo(() => Number(model?.timestamps.start ?? 0), [model])
+  const timestamp_end = useMemo(() => Number(model?.timestamps.end ?? 0), [model])
+  const isOffChain = useMemo(() => (timestamp_start == 0), [timestamp_start])
+  const isOpen = useMemo(() => (timestamp_start > 0 && timestamp_end == 0), [timestamp_start, timestamp_end])
+  const isClosed = useMemo(() => (timestamp_end > 0), [timestamp_end])
+  // console.log(`useQuizQuestion() =>`, quizId, timestamp_start, timestamp_end, isOffChain, isOpen, isClosed)
   return {
     eventName,
     question,
+    description,
     options,
     answerNumber,
+    isOffChain,
     isOpen,
+    isClosed,
   }
 }
 
-export const useQuizQuestionsByEvent = (eventName: string) => {
+export const useQuizQuestionsByEventName = (eventName: string) => {
   useFetchAllQuiz();
   const entities = useQuizStore((state) => state.entities);
   const models = useAllStoreModels<models.QuizQuestion>(entities, 'QuizQuestion')
@@ -73,12 +73,55 @@ export const useQuizQuestionsByEvent = (eventName: string) => {
   }
 }
 
+export const useQuizPlayerAnswer = (quizId: number, player_address: BigNumberish) => {
+  useFetchAllQuiz();
+  const entities = useQuizStore((state) => state.entities);
+  const model = useStoreModelsByKeys<models.QuizAnswer>(entities, 'QuizAnswer', [quizId, player_address])
+  const playerAnswerNumber = useMemo(() => Number(model?.answer_number ?? 0), [model])
+  const playerTimestamp = useMemo(() => Number(model?.timestamp ?? 0), [model])
+  return {
+    playerAnswerNumber,
+    playerTimestamp,
+  }
+}
+
+export const useQuizAnswersByEventName = (eventName: string) => {
+  useFetchAllQuiz();
+  const entities = useQuizStore((state) => state.entities);
+  const models = useAllStoreModels<models.QuizAnswer>(entities, 'QuizAnswer')
+  const { quizIds } = useQuizQuestionsByEventName(eventName)
+  const answers = useMemo(() => (
+    models.filter((model) => Number(model?.quiz_id ?? 0) in quizIds)
+  ), [models, quizIds])
+  const playersByAnswer = useMemo(() => (
+    answers.reduce((acc, model) => {
+      acc[Number(model.answer_number)] = [...(acc[Number(model.answer_number)] ?? []), BigInt(model.player_address)]
+      return acc
+    }, {} as Record<number, bigint[]>)
+  ), [answers])
+  const answerCounts = useMemo(() => (
+    Object.keys(playersByAnswer).reduce((acc, answerNumber) => {
+      acc[answerNumber] = playersByAnswer[answerNumber].length
+      return acc
+    }, {} as Record<number, number>)
+  ), [answers])
+  // console.log('>>>>>>>>> useQuizAnswersByEventName() =>', answers, playersByAnswer, answerCounts)
+  return {
+    playersByAnswer,
+    answerCounts,
+  }
+}
+
+
 
 //--------------------------------
 // fetch all quizes into client
 //
 const query_get_entities: PistolsQueryBuilder = new PistolsQueryBuilder()
-  .withEntityModels(["pistols-QuizQuestion", "pistols-QuizAnswer"])
+  .withEntityModels([
+    'pistols-QuizQuestion',
+    'pistols-QuizAnswer',
+  ])
   .withLimit(1000)
   .includeHashedKeys();
 export const useFetchAllQuiz = () => {
@@ -92,8 +135,10 @@ export const useFetchAllQuiz = () => {
     query: query_get_entities,
     enabled,
     setEntities: (entities: PistolsEntity[]) => {
-      console.log('>>>>>>>>> useFetchAllQuiz() setEntities =>', entities)
-      quizState.setEntities(entities)
+      // console.log('>>>>>>>>> useFetchAllQuiz() setEntities =>', entities)
+      entities.forEach((entity) => {
+        quizState.updateEntity(entity)
+      })
       quizFetchStore.setFetched(true)
     },
   })
