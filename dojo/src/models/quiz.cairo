@@ -20,6 +20,7 @@ pub struct QuizQuestion {
     pub question: ByteArray,
     pub options: Array<ByteArray>,
     pub answer_number: u8,
+    pub vrf: felt252,
     pub is_open: bool,
 }
 
@@ -67,6 +68,7 @@ pub impl QuizQuestionImpl of QuizQuestionTrait {
             question: "",
             options: array![],
             answer_number: 0,
+            vrf: 0,
             is_open: false,
         };
         store.set_quiz_question(@quiz_question);
@@ -86,11 +88,12 @@ pub impl QuizQuestionImpl of QuizQuestionTrait {
         // returns the quiz question
         (quiz_question)
     }
-    fn close_quiz(ref store: Store, quiz_id: u32, answer_number: u8) -> QuizQuestion {
+    fn close_quiz(ref store: Store, quiz_id: u32, answer_number: u8, vrf: felt252) -> QuizQuestion {
         let mut quiz_question: QuizQuestion = store.get_quiz_question(quiz_id);
         assert(quiz_question.is_open, CommunityErrors::QUESTION_IS_CLOSED);
         assert(answer_number > 0 && answer_number.into() <= quiz_question.options.len(), CommunityErrors::INVALID_ANSWER);
         quiz_question.answer_number = answer_number;
+        quiz_question.vrf = vrf;
         quiz_question.is_open = false;
         store.set_quiz_question(@quiz_question);
         (quiz_question)

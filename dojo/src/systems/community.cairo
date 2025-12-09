@@ -56,9 +56,9 @@ pub mod community {
     // pistols
     //
     use pistols::interfaces::dns::{
-        DnsTrait,
+        DnsTrait, SELECTORS,
         IAdminDispatcherTrait,
-        SELECTORS,
+        IVrfProviderDispatcherTrait, Source,
     };
     use pistols::models::{
         player::{PlayerDelegation},
@@ -146,7 +146,8 @@ pub mod community {
         fn close_quiz(ref self: ContractState, quiz_id: u32, answer_number: u8) -> QuizQuestion {
             let mut store: Store = StoreTrait::new(self.world_default());
             self._assert_caller_is_admin();
-            let quiz_question: QuizQuestion = QuizQuestionImpl::close_quiz(ref store, quiz_id, answer_number);
+            let vrf: felt252 = store.vrf_dispatcher().consume_random(Source::Nonce(starknet::get_caller_address()));
+            let quiz_question: QuizQuestion = QuizQuestionImpl::close_quiz(ref store, quiz_id, answer_number, vrf);
             (quiz_question)
         }
         fn set_current_quiz(ref self: ContractState, quiz_id: u32) {
