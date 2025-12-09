@@ -18,11 +18,13 @@ mod tests {
     const QUIZ_EVENT_1: felt252 = 'QUIZ_EVENT_1';
     const QUIZ_EVENT_2: felt252 = 'QUIZ_EVENT_2';
 
-    fn QUESTION_1() -> ByteArray {"What is the capital of France?"}
-    fn QUESTION_1_OPTIONS() -> Array<ByteArray> {array!["Paris", "London", "Berlin", "Madrid"]}
+    fn Q1() -> ByteArray {"What is the capital of France?"}
+    fn Q1_DESCRIPTION() -> ByteArray {"Sponsored by Starknet"}
+    fn Q1_OPTIONS() -> Array<ByteArray> {array!["Paris", "London", "Berlin", "Madrid"]}
 
-    fn QUESTION_2() -> ByteArray {"What is the capital of Germany?"}
-    fn QUESTION_2_OPTIONS() -> Array<ByteArray> {array!["Berlin", "Munich", "Hamburg", "Frankfurt"]}
+    fn Q2() -> ByteArray {"What is the capital of Germany?"}
+    fn Q2_DESCRIPTION() -> ByteArray {"Winner wins a kiss!"}
+    fn Q2_OPTIONS() -> Array<ByteArray> {array!["Berlin", "Munich", "Hamburg", "Frankfurt"]}
 
 
     //-----------------------------------------
@@ -51,10 +53,11 @@ mod tests {
         assert_eq!(config.current_quiz_id, 0, "question_3.current_quiz_id");
         //
         // question 1...
-        let question_1: QuizQuestion = tester::execute_open_quiz(@sys, OWNER(), question_1.quiz_id, QUESTION_1(), QUESTION_1_OPTIONS());
-        assert_eq!(question_1.question, QUESTION_1(), "question_1.question");
+        let question_1: QuizQuestion = tester::execute_open_quiz(@sys, OWNER(), question_1.quiz_id, Q1(), Q1_DESCRIPTION(), Q1_OPTIONS());
+        assert_eq!(question_1.question, Q1(), "question_1.question");
         assert_eq!(question_1.answer_number, 0, "question_1.answer_number");
-        assert_eq!(question_1.is_open, true, "question_1.is_open");
+        assert_gt!(question_1.timestamps.start, 0, "question_1.start");
+        assert_eq!(question_1.timestamps.end, 0, "question_1.end");
         assert_eq!(sys.store.get_quiz_config().current_quiz_id, question_1.quiz_id, "question_1.opened");
         // players can answer...
         tester::execute_answer_quiz(@sys, OTHER(), question_1.quiz_id, 1);
@@ -64,14 +67,15 @@ mod tests {
         // close it
         let question_1: QuizQuestion = tester::execute_close_quiz(@sys, OWNER(), question_1.quiz_id, 1);
         assert_eq!(question_1.answer_number, 1, "question_1.answer_number");
-        assert_eq!(question_1.is_open, false, "question_1.is_open");
+        assert_gt!(question_1.timestamps.end, 0, "question_1.end");
         assert_eq!(sys.store.get_quiz_config().current_quiz_id, question_1.quiz_id, "question_1.closed");
         //
         // question 2...
-        let question_2: QuizQuestion = tester::execute_open_quiz(@sys, OWNER(), question_2.quiz_id, QUESTION_2(), QUESTION_2_OPTIONS());
-        assert_eq!(question_2.question, QUESTION_2(), "question_2.question");
+        let question_2: QuizQuestion = tester::execute_open_quiz(@sys, OWNER(), question_2.quiz_id, Q2(), Q2_DESCRIPTION(), Q2_OPTIONS());
+        assert_eq!(question_2.question, Q2(), "question_2.question");
         assert_eq!(question_2.answer_number, 0, "question_2.answer_number");
-        assert_eq!(question_2.is_open, true, "question_2.is_open");
+        assert_gt!(question_2.timestamps.start, 0, "question_2.start");
+        assert_eq!(question_2.timestamps.end, 0, "question_2.end");
         assert_eq!(sys.store.get_quiz_config().current_quiz_id, question_2.quiz_id, "question_2.opened");
         // players can answer...
         tester::execute_answer_quiz(@sys, OTHER(), question_2.quiz_id, 2);
@@ -81,7 +85,7 @@ mod tests {
         // close it
         let question_2: QuizQuestion = tester::execute_close_quiz(@sys, OWNER(), question_2.quiz_id, 1);
         assert_eq!(question_2.answer_number, 1, "question_2.answer_number");
-        assert_eq!(question_2.is_open, false, "question_2.is_open");
+        assert_gt!(question_2.timestamps.end, 0, "question_2.end");
         //
         // set current quiz
         tester::execute_set_current_quiz(@sys, OWNER(), question_1.quiz_id);
@@ -98,7 +102,7 @@ mod tests {
         tester::execute_admin_set_is_team_member(@sys.admin, OWNER(), OTHER(), false, true);
         // question 1+2
         let question_1: QuizQuestion = tester::execute_create_quiz(@sys, OTHER(), QUIZ_EVENT_1);
-        tester::execute_open_quiz(@sys, OTHER(), question_1.quiz_id, QUESTION_1(), QUESTION_1_OPTIONS());
+        tester::execute_open_quiz(@sys, OTHER(), question_1.quiz_id, Q1(), Q1_DESCRIPTION(), Q1_OPTIONS());
         tester::execute_close_quiz(@sys, OTHER(), question_1.quiz_id, 1);
     }
 
@@ -116,7 +120,7 @@ mod tests {
     fn test_open_quiz_not_admin() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN | FLAGS::COMMUNITY);
         let question_1: QuizQuestion = tester::execute_create_quiz(@sys, OWNER(), QUIZ_EVENT_1);
-        tester::execute_open_quiz(@sys, OTHER(), question_1.quiz_id, QUESTION_1(), QUESTION_1_OPTIONS());
+        tester::execute_open_quiz(@sys, OTHER(), question_1.quiz_id, Q1(), Q1_DESCRIPTION(), Q1_OPTIONS());
     }
 
     #[test]
@@ -124,8 +128,8 @@ mod tests {
     fn test_open_quiz_twice() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN | FLAGS::COMMUNITY);
         let question_1: QuizQuestion = tester::execute_create_quiz(@sys, OWNER(), QUIZ_EVENT_1);
-        tester::execute_open_quiz(@sys, OWNER(), question_1.quiz_id, QUESTION_1(), QUESTION_1_OPTIONS());
-        tester::execute_open_quiz(@sys, OWNER(), question_1.quiz_id, QUESTION_1(), QUESTION_1_OPTIONS());
+        tester::execute_open_quiz(@sys, OWNER(), question_1.quiz_id, Q1(), Q1_DESCRIPTION(), Q1_OPTIONS());
+        tester::execute_open_quiz(@sys, OWNER(), question_1.quiz_id, Q1(), Q1_DESCRIPTION(), Q1_OPTIONS());
     }
 
     #[test]
@@ -133,17 +137,25 @@ mod tests {
     fn test_close_quiz_not_admin() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN | FLAGS::COMMUNITY);
         let question_1: QuizQuestion = tester::execute_create_quiz(@sys, OWNER(), QUIZ_EVENT_1);
-        tester::execute_open_quiz(@sys, OWNER(), question_1.quiz_id, QUESTION_1(), QUESTION_1_OPTIONS());
+        tester::execute_open_quiz(@sys, OWNER(), question_1.quiz_id, Q1(), Q1_DESCRIPTION(), Q1_OPTIONS());
         tester::execute_close_quiz(@sys, OTHER(), question_1.quiz_id, 1);
     }
 
     #[test]
-    #[should_panic(expected:('COMMUNITY: Quiz is closed', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('COMMUNITY: Question is not open', 'ENTRYPOINT_FAILED'))]
     fn test_close_quiz_twice() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN | FLAGS::COMMUNITY);
         let question_1: QuizQuestion = tester::execute_create_quiz(@sys, OWNER(), QUIZ_EVENT_1);
-        tester::execute_open_quiz(@sys, OWNER(), question_1.quiz_id, QUESTION_1(), QUESTION_1_OPTIONS());
+        tester::execute_open_quiz(@sys, OWNER(), question_1.quiz_id, Q1(), Q1_DESCRIPTION(), Q1_OPTIONS());
         tester::execute_close_quiz(@sys, OWNER(), question_1.quiz_id, 1);
+        tester::execute_close_quiz(@sys, OWNER(), question_1.quiz_id, 1);
+    }
+
+    #[test]
+    #[should_panic(expected:('COMMUNITY: Question is not open', 'ENTRYPOINT_FAILED'))]
+    fn test_close_quiz_before_open() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN | FLAGS::COMMUNITY);
+        let question_1: QuizQuestion = tester::execute_create_quiz(@sys, OWNER(), QUIZ_EVENT_1);
         tester::execute_close_quiz(@sys, OWNER(), question_1.quiz_id, 1);
     }
 
@@ -184,7 +196,7 @@ mod tests {
     fn test_answer_invalid_answer_number() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN | FLAGS::COMMUNITY);
         let question_1: QuizQuestion = tester::execute_create_quiz(@sys, OWNER(), QUIZ_EVENT_1);
-        tester::execute_open_quiz(@sys, OWNER(), question_1.quiz_id, QUESTION_1(), QUESTION_1_OPTIONS());
+        tester::execute_open_quiz(@sys, OWNER(), question_1.quiz_id, Q1(), Q1_DESCRIPTION(), Q1_OPTIONS());
         tester::execute_answer_quiz(@sys, OTHER(), question_1.quiz_id, 5);
     }
 
@@ -193,7 +205,7 @@ mod tests {
     fn test_answer_closed_quiz() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN | FLAGS::COMMUNITY);
         let question_1: QuizQuestion = tester::execute_create_quiz(@sys, OWNER(), QUIZ_EVENT_1);
-        tester::execute_open_quiz(@sys, OWNER(), question_1.quiz_id, QUESTION_1(), QUESTION_1_OPTIONS());
+        tester::execute_open_quiz(@sys, OWNER(), question_1.quiz_id, Q1(), Q1_DESCRIPTION(), Q1_OPTIONS());
         tester::execute_close_quiz(@sys, OWNER(), question_1.quiz_id, 1);
         tester::execute_answer_quiz(@sys, OTHER(), question_1.quiz_id, 1);
     }

@@ -1172,10 +1172,11 @@ pub mod tester {
     pub fn execute_open_quiz(sys: @TestSystems, sender: ContractAddress,
         quiz_id: u32,
         question: ByteArray,
+        description: ByteArray,
         options: Array<ByteArray>,
     ) -> QuizQuestion {
         impersonate(sender);
-        let quiz_question: QuizQuestion = (*sys.community).open_quiz(quiz_id, question, options);
+        let quiz_question: QuizQuestion = (*sys.community).open_quiz(quiz_id, question, description, options);
         _next_block();
         (quiz_question)
     }

@@ -12,7 +12,7 @@ pub mod TIMESTAMP {
     pub const FOUR_WEEKS: u64   = 60 * 60 * 24 * 28;
 }
 
-#[derive(Copy, Drop, Serde, PartialEq, IntrospectPacked)]
+#[derive(Copy, Drop, Serde, Default, IntrospectPacked, DojoStore)]
 pub struct Period {
     pub start: u64,     // seconds since epoch, started
     pub end: u64,       // seconds since epoch, ended
