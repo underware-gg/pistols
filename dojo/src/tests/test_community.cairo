@@ -201,7 +201,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('COMMUNITY: Quiz is closed', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('COMMUNITY: Question is not open', 'ENTRYPOINT_FAILED'))]
     fn test_answer_closed_quiz() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN | FLAGS::COMMUNITY);
         let question_1: QuizQuestion = tester::execute_create_quiz(@sys, OWNER(), QUIZ_EVENT_1);

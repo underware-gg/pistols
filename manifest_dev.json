@@ -91,8 +91,8 @@
       ]
     },
     {
-      "address": "0x7404167563a749fdec3753d03569b009e524bc5dce7da701e9457f99c389e87",
-      "class_hash": "0x1c1d61b3d95ddd7ff4e87ba29387700b360ef6fa340e95f4f2b524c30a12cdb",
+      "address": "0x2f767ddd2e68aff5e4e6015207013ea7b0ad478ac096ba72414193498b0a26d",
+      "class_hash": "0xc9ce6f147f510d4e2333bec0ffd8007b51cdb8592751661e34ceb8dbca38cb",
       "init_calldata": [],
       "tag": "pistols-community",
       "selector": "0x7348885054faf5239115b952a0812295ca08f3be01216dd6c03a9fcc22d1dba",
@@ -1058,8 +1058,18 @@
           "key": false
         },
         {
+          "name": "description",
+          "type": "core::byte_array::ByteArray",
+          "key": false
+        },
+        {
           "name": "options",
           "type": "core::array::Array::<core::byte_array::ByteArray>",
+          "key": false
+        },
+        {
+          "name": "timestamps",
+          "type": "pistols::types::timestamp::Period",
           "key": false
         },
         {
@@ -1068,12 +1078,12 @@
           "key": false
         },
         {
-          "name": "is_open",
-          "type": "core::bool",
+          "name": "vrf",
+          "type": "core::felt252",
           "key": false
         }
       ],
-      "class_hash": "0x48f927dd6c7146f5224a1bd3fdf82324d594b2826b814138f62973d5745be9b",
+      "class_hash": "0xe16d5f04af97f373da54aed1da149b651ec7a907475fe33fc822ec8e4c7682",
       "tag": "pistols-QuizQuestion",
       "selector": "0x8bc324c97c68995ba6d970f9c4ee775a533f8c0f41b8676fb8850e20dc4ccb"
     },
@@ -7163,16 +7173,24 @@
           "type": "core::byte_array::ByteArray"
         },
         {
+          "name": "description",
+          "type": "core::byte_array::ByteArray"
+        },
+        {
           "name": "options",
           "type": "core::array::Array::<core::byte_array::ByteArray>"
+        },
+        {
+          "name": "timestamps",
+          "type": "pistols::types::timestamp::Period"
         },
         {
           "name": "answer_number",
           "type": "core::integer::u8"
         },
         {
-          "name": "is_open",
-          "type": "core::bool"
+          "name": "vrf",
+          "type": "core::felt252"
         }
       ]
     },
@@ -7189,16 +7207,24 @@
           "type": "core::byte_array::ByteArray"
         },
         {
+          "name": "description",
+          "type": "core::byte_array::ByteArray"
+        },
+        {
           "name": "options",
           "type": "core::array::Array::<core::byte_array::ByteArray>"
+        },
+        {
+          "name": "timestamps",
+          "type": "pistols::types::timestamp::Period"
         },
         {
           "name": "answer_number",
           "type": "core::integer::u8"
         },
         {
-          "name": "is_open",
-          "type": "core::bool"
+          "name": "vrf",
+          "type": "core::felt252"
         }
       ]
     },
@@ -8108,6 +8134,10 @@
               "type": "core::byte_array::ByteArray"
             },
             {
+              "name": "description",
+              "type": "core::byte_array::ByteArray"
+            },
+            {
               "name": "options",
               "type": "core::array::Array::<core::byte_array::ByteArray>"
             }
@@ -8164,7 +8194,11 @@
               "type": "core::integer::u8"
             }
           ],
-          "outputs": [],
+          "outputs": [
+            {
+              "type": "pistols::models::quiz::QuizAnswer"
+            }
+          ],
           "state_mutability": "external"
         },
         {

@@ -816,19 +816,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_community_openQuiz_calldata = (quizId: BigNumberish, question: string, options: Array<string>): DojoCall => {
+	const build_community_openQuiz_calldata = (quizId: BigNumberish, question: string, description: string, options: Array<string>): DojoCall => {
 		return {
 			contractName: "community",
 			entrypoint: "open_quiz",
-			calldata: [quizId, question, options],
+			calldata: [quizId, question, description, options],
 		};
 	};
 
-	const community_openQuiz = async (snAccount: Account | AccountInterface, quizId: BigNumberish, question: string, options: Array<string>) => {
+	const community_openQuiz = async (snAccount: Account | AccountInterface, quizId: BigNumberish, question: string, description: string, options: Array<string>) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_community_openQuiz_calldata(quizId, question, options),
+				build_community_openQuiz_calldata(quizId, question, description, options),
 				"pistols",
 			);
 		} catch (error) {

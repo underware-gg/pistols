@@ -267,9 +267,11 @@ export interface QuizQuestion {
 	quiz_id: BigNumberish;
 	quiz_event: BigNumberish;
 	question: string;
+	description: string;
 	options: Array<string>;
+	timestamps: Period;
 	answer_number: BigNumberish;
-	is_open: boolean;
+	vrf: BigNumberish;
 }
 
 // Type definition for `pistols::models::ring::Ring` struct
@@ -1430,9 +1432,11 @@ export const schema: SchemaType = {
 			quiz_id: 0,
 			quiz_event: 0,
 		question: "",
+		description: "",
 			options: [""],
+		timestamps: { start: 0, end: 0, },
 			answer_number: 0,
-			is_open: false,
+			vrf: 0,
 		},
 		Ring: {
 			ring_id: 0,
