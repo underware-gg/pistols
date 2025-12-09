@@ -61,6 +61,7 @@ const _modelsSubscribed = [
   // Misc
   "pistols-Pack",
   "pistols-QuizQuestion",
+  "pistols-QuizAnswer",
 ];
 
 
@@ -135,7 +136,7 @@ export function EntityStoreSync() {
       matchState.setEntities(filterEntitiesByModels(entities, ['MatchQueue', 'MatchPlayer']))
       playerState.setEntities(filterEntitiesByModels(entities, ['Player', 'PlayerFlags', 'PlayerTeamFlags', 'Ring', 'RingBalance']))
       playerDataState.updateMessages(filterEntitiesByModels(entities, ['PlayerOnline']))
-      quizState.setEntities(filterEntitiesByModels(entities, ['QuizConfig', 'QuizQuestion']))
+      quizState.setEntities(filterEntitiesByModels(entities, ['QuizConfig', 'QuizQuestion', 'QuizAnswer']))
     },
   })
 
@@ -174,7 +175,7 @@ export function EntityStoreSync() {
       if (entityContainsModels(entity, ['Pack'])) {
         packState.updateEntity(entity)
       }
-      if (entityContainsModels(entity, ['QuizConfig', 'QuizQuestion'])) {
+      if (entityContainsModels(entity, ['QuizConfig', 'QuizQuestion', 'QuizAnswer'])) {
         quizState.updateEntity(entity)
       }
       if (entityContainsModels(entity, ['Pool'])) {

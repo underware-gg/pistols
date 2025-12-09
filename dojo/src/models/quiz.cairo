@@ -1,4 +1,4 @@
-// use starknet::{ContractAddress};
+use starknet::{ContractAddress};
 
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
@@ -21,6 +21,18 @@ pub struct QuizQuestion {
     pub options: Array<ByteArray>,
     pub answer_number: u8,
     pub is_open: bool,
+}
+
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct QuizAnswer {
+    #[key]
+    pub quiz_id: u32,
+    #[key]
+    pub player_address: ContractAddress,
+    //-----------------------
+    pub answer_number: u8,
+    pub timestamp: u64,
 }
 
 

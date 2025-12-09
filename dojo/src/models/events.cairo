@@ -214,18 +214,6 @@ pub struct ChallengeRewardsEvent {
     // pub timestamp: u64,
 }
 
-//
-// Quiz
-#[derive(Copy, Drop, Serde)]
-#[dojo::event(historical:false)]
-pub struct QuizAnswerEvent {
-    #[key]
-    pub quiz_id: u32,
-    #[key]
-    pub player_address: ContractAddress,
-    //-----------------------
-    pub answer_number: u8,
-}
 
 //----------------------------------
 // Traits

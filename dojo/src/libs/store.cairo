@@ -61,6 +61,7 @@ pub use pistols::models::{
     quiz::{
         QuizConfig, QuizConfigValue,
         QuizQuestion, QuizQuestionValue,
+        QuizAnswer, QuizAnswerValue,
     },
     // tournament::{
     //     TournamentPass, TournamentPassValue,
@@ -81,7 +82,6 @@ pub use pistols::models::{
         PlayerSettingEvent, PlayerSetting, PlayerSettingValue,
         PurchaseDistributionEvent,
         SeasonLeaderboardEvent, SeasonLeaderboardPosition,
-        QuizAnswerEvent,
     },
 };
 pub use pistols::systems::components::{
@@ -253,6 +253,10 @@ pub impl StoreImpl of StoreTrait {
     #[inline(always)]
     fn get_quiz_question(self: @Store, quiz_id: u32) -> QuizQuestion {
         (self.world.read_model(quiz_id))
+    }
+    #[inline(always)]
+    fn get_quiz_answer(self: @Store, quiz_id: u32, player_address: ContractAddress) -> QuizAnswer {
+        (self.world.read_model((quiz_id, player_address),))
     }
 
     #[inline(always)]
@@ -481,6 +485,10 @@ pub impl StoreImpl of StoreTrait {
     }
     #[inline(always)]
     fn set_quiz_question(ref self: Store, model: @QuizQuestion) {
+        self.world.write_model(model);
+    }
+    #[inline(always)]
+    fn set_quiz_answer(ref self: Store, model: @QuizAnswer) {
         self.world.write_model(model);
     }
 
@@ -782,15 +790,6 @@ pub impl StoreImpl of StoreTrait {
                 rewards,
             });
         }
-    }
-
-    #[inline(always)]
-    fn emit_quiz_answer(ref self: Store, quiz_id: u32, player_address: ContractAddress, answer_number: u8) {
-        self.world.emit_event(@QuizAnswerEvent{
-            quiz_id,
-            player_address,
-            answer_number,
-        });
     }
 
     #[inline(always)]

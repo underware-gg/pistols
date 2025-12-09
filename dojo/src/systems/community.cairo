@@ -64,7 +64,7 @@ pub mod community {
         player::{PlayerDelegation},
         leaderboard::{LeaderboardTrait, LeaderboardPosition},
         events::{ChallengeAction, SocialPlatform, PlayerSetting, PlayerSettingValue},
-        quiz::{QuizConfigTrait, QuizQuestion, QuizQuestionImpl},
+        quiz::{QuizConfigTrait, QuizQuestion, QuizQuestionImpl, QuizAnswer},
     };
     use pistols::types::trophies::{TrophyProgressTrait};
     use pistols::libs::{
@@ -160,7 +160,12 @@ pub mod community {
             assert(quiz_question.question.len() > 0, Errors::INVALID_QUIZ);
             assert(quiz_question.is_open, Errors::QUESTION_IS_CLOSED);
             assert(answer_number.into() <= quiz_question.options.len(), Errors::INVALID_ANSWER);
-            store.emit_quiz_answer(quiz_id, starknet::get_caller_address(), answer_number);
+            store.set_quiz_answer(@QuizAnswer {
+                quiz_id,
+                player_address: starknet::get_caller_address(),
+                answer_number,
+                timestamp: starknet::get_block_timestamp(),
+            });
         }
 
 

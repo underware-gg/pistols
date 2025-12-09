@@ -78,11 +78,7 @@ export const useQuizQuestionsByEvent = (eventName: string) => {
 // fetch all quizes into client
 //
 const query_get_entities: PistolsQueryBuilder = new PistolsQueryBuilder()
-  .withEntityModels(["pistols-QuizQuestion"])
-  .withLimit(1000)
-  .includeHashedKeys();
-const query_get_events: PistolsQueryBuilder = new PistolsQueryBuilder()
-  .withEntityModels(["pistols-QuizAnswerEvent"])
+  .withEntityModels(["pistols-QuizQuestion", "pistols-QuizAnswer"])
   .withLimit(1000)
   .includeHashedKeys();
 export const useFetchAllQuiz = () => {
@@ -94,15 +90,6 @@ export const useFetchAllQuiz = () => {
 
   useSdkEntitiesGet({
     query: query_get_entities,
-    enabled,
-    setEntities: (entities: PistolsEntity[]) => {
-      console.log('>>>>>>>>> useFetchAllQuiz() setEntities =>', entities)
-      quizState.setEntities(entities)
-      quizFetchStore.setFetched(true)
-    },
-  })
-  useSdkEventsGet({
-    query: query_get_events,
     enabled,
     setEntities: (entities: PistolsEntity[]) => {
       console.log('>>>>>>>>> useFetchAllQuiz() setEntities =>', entities)

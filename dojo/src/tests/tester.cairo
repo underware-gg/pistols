@@ -522,10 +522,10 @@ pub mod tester {
             resources.append(TestResource::Contract(community::TEST_CLASS_HASH.into()));
             resources.append(TestResource::Model(pistols::models::quiz::m_QuizConfig::TEST_CLASS_HASH.into()));
             resources.append(TestResource::Model(pistols::models::quiz::m_QuizQuestion::TEST_CLASS_HASH.into()));
+            resources.append(TestResource::Model(pistols::models::quiz::m_QuizAnswer::TEST_CLASS_HASH.into()));
             resources.append(TestResource::Event(pistols::models::events::e_PlayerBookmarkEvent::TEST_CLASS_HASH.into()));
             resources.append(TestResource::Event(pistols::models::events::e_PlayerSocialLinkEvent::TEST_CLASS_HASH.into()));
             resources.append(TestResource::Event(pistols::models::events::e_PlayerSettingEvent::TEST_CLASS_HASH.into()));
-            resources.append(TestResource::Event(pistols::models::events::e_QuizAnswerEvent::TEST_CLASS_HASH.into()));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"community")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())

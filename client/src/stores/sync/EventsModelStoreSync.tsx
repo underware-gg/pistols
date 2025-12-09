@@ -82,7 +82,6 @@ export function EventsModelStoreSync() {
               [
                 'pistols-ChallengeRewardsEvent',
                 'pistols-PlayerSocialLinkEvent',
-                'pistols-QuizAnswerEvent',
               ],
               // get it all
               [undefined],
@@ -96,7 +95,6 @@ export function EventsModelStoreSync() {
           'pistols-PlayerBookmarkEvent',
           'pistols-ChallengeRewardsEvent',
           'pistols-PlayerSocialLinkEvent',
-          'pistols-QuizAnswerEvent',
         ])
         .withLimit(1) // discard...
         .includeHashedKeys()
@@ -165,9 +163,6 @@ export function EventsModelStoreSync() {
       }
       if (entityContainsModels(entity, ['ChallengeRewardsEvent'])) {
         challengeRewardsState.updateEntity(entity)
-      }
-      if (entityContainsModels(entity, ['QuizAnswerEvent'])) {
-        quizState.updateEntity(entity)
       }
     },
   })
