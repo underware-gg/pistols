@@ -73,8 +73,26 @@ export const useQuizQuestionsByEventName = (eventName: string) => {
   }
 }
 
-export const useQuizPlayerAnswer = (quizId: number, player_address: BigNumberish) => {
+export const useQuizAllEventNames = () => {
   useFetchAllQuiz();
+  const entities = useQuizStore((state) => state.entities);
+  const models = useAllStoreModels<models.QuizQuestion>(entities, 'QuizQuestion')
+  const eventNames = useMemo(() => (
+    models
+      .map((model) => feltToString(model.quiz_event ?? 0))
+      .filter((eventName) => eventName.length > 0)
+      .reduce((acc, current) => {
+        if (!acc.includes(current)) acc.push(current);
+        return acc;
+      }, [] as string[])
+      .sort((a, b) => (a.localeCompare(b)))
+  ), [models])
+  return {
+    eventNames,
+  }
+}
+
+export const useQuizPlayerAnswer = (quizId: number, player_address: BigNumberish) => {
   const entities = useQuizStore((state) => state.entities);
   const model = useStoreModelsByKeys<models.QuizAnswer>(entities, 'QuizAnswer', [quizId, player_address])
   const playerAnswerNumber = useMemo(() => Number(model?.answer_number ?? 0), [model])
@@ -86,7 +104,6 @@ export const useQuizPlayerAnswer = (quizId: number, player_address: BigNumberish
 }
 
 export const useQuizAnswersByEventName = (eventName: string) => {
-  useFetchAllQuiz();
   const entities = useQuizStore((state) => state.entities);
   const models = useAllStoreModels<models.QuizAnswer>(entities, 'QuizAnswer')
   const { quizIds } = useQuizQuestionsByEventName(eventName)

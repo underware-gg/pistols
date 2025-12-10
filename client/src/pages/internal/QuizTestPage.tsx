@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Button, Container, Input, Tab, Table, TabPane } from 'semantic-ui-react'
+import { Button, Container, Dropdown, Input, Tab, Table, TabPane } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useCookies } from 'react-cookie'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { useQuizConfig } from '/src/stores/configStore'
-import { useQuizAnswersByEventName, useQuizPlayerAnswer, useQuizQuestion, useQuizQuestionsByEventName } from '/src/stores/quizStore'
+import { useQuizAllEventNames, useQuizAnswersByEventName, useQuizPlayerAnswer, useQuizQuestion, useQuizQuestionsByEventName } from '/src/stores/quizStore'
 import { InternalPageMenu, InternalPageWrapper } from '/src/pages/internal/InternalPageIndex'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
 import { Connect } from '/src/pages/tests/ConnectTestPage'
@@ -166,8 +166,8 @@ function QuizAdminPanel() {
         <Body className='ModalText'>
           <Row>
             <Cell width={3}>Event:</Cell>
-            <Cell className='Important Code'>
-              <Input value={eventName} onChange={(e) => setEventName(e.target.value)} maxLength={31} style={{ width: '200px' }} />
+            <Cell className='Code'>
+              <QuizEventNameSelector eventName={eventName} setEventName={setEventName} />
             </Cell>
           </Row>
           <Row>
@@ -183,6 +183,62 @@ function QuizAdminPanel() {
         </Body>
       </Table>
       <QuizAdminQuestion quizId={quizId} />
+    </>
+  )
+}
+
+const COOKIE_EVENT_NAME = 'quiz_event_name'
+function QuizEventNameSelector({
+  eventName,
+  setEventName,
+}: {
+  eventName: string,
+  setEventName: (eventName: string) => void,
+}) {
+  const [cookies, setCookie] = useCookies([COOKIE_EVENT_NAME])
+  useEffect(() => {
+    if (cookies[COOKIE_EVENT_NAME] && !eventName) {
+      setEventName(cookies[COOKIE_EVENT_NAME])
+    }
+  }, [cookies[COOKIE_EVENT_NAME]])
+  useEffect(() => {
+    setCookie(COOKIE_EVENT_NAME, eventName)
+  }, [eventName])
+
+  // use selector?
+  const { eventNames } = useQuizAllEventNames()
+  const exists = useMemo(() => (eventNames.includes(eventName)), [eventNames, eventName])
+
+  const [editing, setEditing] = useState(false)
+  const _startEditing = () => {
+    setEditing(true)
+    setEventName('')
+  }
+  useEffect(() => {
+    if (exists && editing) setEditing(false);
+  }, [exists, editing])
+
+
+  if (editing) {
+    return (
+      <Input value={eventName} onChange={(e) => setEventName(e.target.value)} maxLength={31} style={{ width: '200px' }} />
+    )
+  };
+
+  return (
+    <>
+      <Dropdown
+        value={eventName}
+        options={eventNames.map((eventName) => ({
+          key: eventName,
+          value: eventName,
+          text: eventName,
+        }))}
+        onChange={(e, { value }) => setEventName(value as string)}
+        placeholder='Select Event'
+      />
+      {' | '}
+      <Button onClick={_startEditing}>New</Button>
     </>
   )
 }
