@@ -4,12 +4,15 @@ import { useAccount } from '@starknet-react/core'
 import { useCookies } from 'react-cookie'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { useQuizConfig } from '/src/stores/configStore'
-import { useQuizAllEventNames, useQuizAnswersByEventName, useQuizPlayerAnswer, useQuizQuestion, useQuizQuestionsByEventName } from '/src/stores/quizStore'
+import { useQuizAllEventNames, useQuizAnswers, useQuizPlayerAnswer, useQuizQuestion, useQuizQuestionsByEventName, useQuizWinners } from '/src/stores/quizStore'
 import { InternalPageMenu, InternalPageWrapper } from '/src/pages/internal/InternalPageIndex'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
+import { PlayerNameSync } from '/src/stores/sync/PlayerNameSync'
 import { Connect } from '/src/pages/tests/ConnectTestPage'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppDojo from '/src/components/AppDojo'
+import { PlayerLink } from '/src/components/Links'
+import { Address } from '/src/components/ui/Address'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -32,6 +35,7 @@ export default function QuizTestPage() {
         </InternalPageWrapper>
 
         <EntityStoreSync />
+        <PlayerNameSync />
       </Container>
     </AppDojo>
   );
@@ -61,7 +65,8 @@ function QuizPlayerPanel({
   const { currentQuizId } = useQuizConfig()
   const { eventName, question, description, options, answerNumber, isOpen, isClosed } = useQuizQuestion(currentQuizId)
   const { playerAnswerNumber } = useQuizPlayerAnswer(currentQuizId, address)
-  const { playersByAnswer, answerCounts } = useQuizAnswersByEventName(eventName)
+  const { playersByAnswer, answerCounts } = useQuizAnswers(currentQuizId)
+  const { winners } = useQuizWinners(currentQuizId)
 
   const _asnwer = async (selectedAnswerNumber: number) => {
     await community.answer_quiz(account, currentQuizId, selectedAnswerNumber)
@@ -100,7 +105,7 @@ function QuizPlayerPanel({
               const isTheAnswer = (answerNumber == (i + 1));
               const isYourAnswer = (playerAnswerNumber == (i + 1));
               return (
-                <Row key={i} className={isTheAnswer ? 'BgWarning' : ''}>
+                <Row key={i} className={isTheAnswer ? 'BgDark' : ''}>
                   <Cell className='Important'>Option {i + 1}: {answerCounts[i + 1]}</Cell>
                   <Cell className={isYourAnswer ? 'Important' : ''}>
                     {q}
@@ -124,6 +129,12 @@ function QuizPlayerPanel({
                 </Row>
               )
             })}
+            <Row>
+              <Cell className='Important'>Winners:</Cell>
+              <Cell className='Code Smallest'>
+                {winners.map((winner) => <React.Fragment key={winner.address}><Address address={winner.address} />({winner.name})<br /></React.Fragment>)}
+              </Cell>
+            </Row>
           </>
         )}
       </Body>
@@ -177,7 +188,7 @@ function QuizAdminPanel() {
                 <Button key={q} onClick={() => setQuizId(q)} active={q == quizId}>{q}</Button>
               )}
               {' | '}
-              <Button onClick={_createQuiz} disabled={isCreating || eventName.length < 5}>New</Button>
+              <Button onClick={_createQuiz} disabled={isCreating || eventName.length < 5}>New Question</Button>
             </Cell>
           </Row>
         </Body>
@@ -238,7 +249,7 @@ function QuizEventNameSelector({
         placeholder='Select Event'
       />
       {' | '}
-      <Button onClick={_startEditing}>New</Button>
+      <Button onClick={_startEditing}>New Event</Button>
     </>
   )
 }
@@ -313,14 +324,10 @@ function QuizAdminQuestionOnChain({
 }: {
   quizId: number,
 }) {
-  // off-chain data
-  const COOKIE_NAME_ANSWER = useMemo(() => _answerCookieName(quizId), [quizId]);
-  const [cookies, setCookie] = useCookies([COOKIE_NAME_ANSWER]);
-
-  // on-chain data
-  const { eventName } = useQuizQuestion(quizId)
-  const { playersByAnswer, answerCounts } = useQuizAnswersByEventName(eventName)
+  const { playersByAnswer, answerCounts } = useQuizAnswers(quizId)
   const { question, description, options, answerNumber, isOpen, isClosed } = useQuizQuestion(quizId)
+  const { winners } = useQuizWinners(quizId)
+
   const fields = useMemo<QuestionFields>(() => ({
     question: question,
     description: description,
@@ -331,6 +338,12 @@ function QuizAdminQuestionOnChain({
   return (
     <>
       <QuizAdminQuestionForm quizId={quizId} fields={fields} answerNumber={answerNumber} answerCounts={answerCounts} isOpen={isOpen} isClosed={isClosed} />
+      <Row>
+        <Cell className='Important'>Winners:</Cell>
+        <Cell className='Code Smallest'>
+          {winners.map((winner) => <React.Fragment key={winner.address}><Address address={winner.address} />({winner.name})<br /></React.Fragment>)}
+        </Cell>
+      </Row>
     </>
   )
 }
@@ -431,7 +444,7 @@ function QuizAdminQuestionForm({
         </Cell>
       </Row>
       {fields.options.map((option, index) => (
-        <Row key={index}>
+        <Row key={index} className={index == _answerIndex ? 'BgDark' : ''}>
           <Cell className='Important'>Option {index + 1}: {answerCounts[index + 1]}</Cell>
           <Cell className='Code'>
             <Input disabled={!editable} value={option} onChange={(e) => _setOption(index, e.target.value)} maxLength={100} style={{ width: '600px' }} />
@@ -447,7 +460,7 @@ function QuizAdminQuestionForm({
               disabled={isFinished}
               onClick={() => _setAnswerNumber(index + 1)}
             >
-              {index == _answerIndex ? 'CORRECT' : 'Select'}
+              {index == _answerIndex ? 'THE ANSWER' : 'Select'}
             </Button>
           </Cell>
         </Row>

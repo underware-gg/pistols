@@ -9,6 +9,8 @@ import { PistolsSchemaType, PistolsQueryBuilder, PistolsEntity } from '@underwar
 import { models } from '@underware/pistols-sdk/pistols/gen'
 import { configKey } from './configStore'
 import { BigNumberish } from 'starknet'
+import { bigintToAddress, shortAddress } from '@underware/pistols-sdk/utils'
+import { getPlayernameFromAddress } from './playerStore'
 
 export const useQuizStore = createDojoStore<PistolsSchemaType>();
 
@@ -103,13 +105,14 @@ export const useQuizPlayerAnswer = (quizId: number, player_address: BigNumberish
   }
 }
 
-export const useQuizAnswersByEventName = (eventName: string) => {
+export const useQuizAnswers = (quizId: number) => {
   const entities = useQuizStore((state) => state.entities);
   const models = useAllStoreModels<models.QuizAnswer>(entities, 'QuizAnswer')
-  const { quizIds } = useQuizQuestionsByEventName(eventName)
   const answers = useMemo(() => (
-    models.filter((model) => Number(model?.quiz_id ?? 0) in quizIds)
-  ), [models, quizIds])
+    models
+      .filter((model) => Number(model?.quiz_id ?? 0) == quizId)
+      .sort((a, b) => (Number(a.timestamp) - Number(b.timestamp)))
+  ), [models, quizId])
   const playersByAnswer = useMemo(() => (
     answers.reduce((acc, model) => {
       acc[Number(model.answer_number)] = [...(acc[Number(model.answer_number)] ?? []), BigInt(model.player_address)]
@@ -122,12 +125,30 @@ export const useQuizAnswersByEventName = (eventName: string) => {
       return acc
     }, {} as Record<number, number>)
   ), [answers])
-  // console.log('>>>>>>>>> useQuizAnswersByEventName() =>', answers, playersByAnswer, answerCounts)
+  // console.log('>>>>>>>>> useQuizAnswers() =>', answers, playersByAnswer, answerCounts)
   return {
     playersByAnswer,
     answerCounts,
   }
 }
+
+export const useQuizWinners = (quizId: number) => {
+  const { answerNumber } = useQuizQuestion(quizId)
+  const { playersByAnswer } = useQuizAnswers(quizId)
+  const winners = useMemo(() => {
+    if (answerNumber == 0) return [];
+    const addresses = (playersByAnswer[answerNumber] ?? []);
+    return addresses.map((address) => ({
+      address: bigintToAddress(address),
+      name: getPlayernameFromAddress(address) // ?? shortAddress(address),
+    }));
+  }, [playersByAnswer, answerNumber])
+  // console.log('>>>>>>>>> useQuizWinners() =>', quizId, answerNumber, winners)
+  return {
+    winners,
+  }
+}
+
 
 
 
