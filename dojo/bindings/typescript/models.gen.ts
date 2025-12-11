@@ -249,7 +249,8 @@ export interface Pool {
 
 // Type definition for `pistols::models::quiz::QuizAnswer` struct
 export interface QuizAnswer {
-	quiz_id: BigNumberish;
+	party_id: BigNumberish;
+	question_id: BigNumberish;
 	player_address: string;
 	answer_number: BigNumberish;
 	timestamp: BigNumberish;
@@ -258,14 +259,24 @@ export interface QuizAnswer {
 // Type definition for `pistols::models::quiz::QuizConfig` struct
 export interface QuizConfig {
 	key: BigNumberish;
-	quiz_count: BigNumberish;
-	current_quiz_id: BigNumberish;
+	current_party_id: BigNumberish;
+	current_question_id: BigNumberish;
+	quiz_party_count: BigNumberish;
+}
+
+// Type definition for `pistols::models::quiz::QuizParty` struct
+export interface QuizParty {
+	party_id: BigNumberish;
+	name: string;
+	description: string;
+	timestamps: Period;
+	quiz_question_count: BigNumberish;
 }
 
 // Type definition for `pistols::models::quiz::QuizQuestion` struct
 export interface QuizQuestion {
-	quiz_id: BigNumberish;
-	quiz_event: BigNumberish;
+	party_id: BigNumberish;
+	question_id: BigNumberish;
 	question: string;
 	description: string;
 	options: Array<string>;
@@ -1081,6 +1092,7 @@ export interface SchemaType extends ISchemaType {
 		Pool: Pool,
 		QuizAnswer: QuizAnswer,
 		QuizConfig: QuizConfig,
+		QuizParty: QuizParty,
 		QuizQuestion: QuizQuestion,
 		Ring: Ring,
 		RingBalance: RingBalance,
@@ -1410,19 +1422,28 @@ export const schema: SchemaType = {
 			balance_fame: 0,
 		},
 		QuizAnswer: {
-			quiz_id: 0,
+			party_id: 0,
+			question_id: 0,
 			player_address: "",
 			answer_number: 0,
 			timestamp: 0,
 		},
 		QuizConfig: {
 			key: 0,
-			quiz_count: 0,
-			current_quiz_id: 0,
+			current_party_id: 0,
+			current_question_id: 0,
+			quiz_party_count: 0,
+		},
+		QuizParty: {
+			party_id: 0,
+		name: "",
+		description: "",
+		timestamps: { start: 0, end: 0, },
+			quiz_question_count: 0,
 		},
 		QuizQuestion: {
-			quiz_id: 0,
-			quiz_event: 0,
+			party_id: 0,
+			question_id: 0,
 		question: "",
 		description: "",
 			options: [""],
@@ -2086,6 +2107,7 @@ export enum ModelsMapping {
 	PoolType = 'pistols-PoolType',
 	QuizAnswer = 'pistols-QuizAnswer',
 	QuizConfig = 'pistols-QuizConfig',
+	QuizParty = 'pistols-QuizParty',
 	QuizQuestion = 'pistols-QuizQuestion',
 	Ring = 'pistols-Ring',
 	RingBalance = 'pistols-RingBalance',

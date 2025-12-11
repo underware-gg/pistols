@@ -91,8 +91,8 @@
       ]
     },
     {
-      "address": "0x2f767ddd2e68aff5e4e6015207013ea7b0ad478ac096ba72414193498b0a26d",
-      "class_hash": "0xc9ce6f147f510d4e2333bec0ffd8007b51cdb8592751661e34ceb8dbca38cb",
+      "address": "0x6075cf9a11ac6d9acf6b9223d96855fd28d87940b89856106a94a36ea20ba4b",
+      "class_hash": "0x42bae4776edf21e64c0992beedbd9c33369f568d084ed5613e3b62950e42812",
       "init_calldata": [],
       "tag": "pistols-community",
       "selector": "0x7348885054faf5239115b952a0812295ca08f3be01216dd6c03a9fcc22d1dba",
@@ -104,10 +104,12 @@
         "emit_player_setting",
         "emit_player_bookmark",
         "do_that_thing",
-        "create_quiz",
+        "set_current_quiz",
+        "create_quiz_party",
+        "edit_quiz_party",
+        "create_quiz_question",
         "open_quiz",
         "close_quiz",
-        "set_current_quiz",
         "answer_quiz",
         "upgrade"
       ]
@@ -994,7 +996,12 @@
     {
       "members": [
         {
-          "name": "quiz_id",
+          "name": "party_id",
+          "type": "core::integer::u32",
+          "key": true
+        },
+        {
+          "name": "question_id",
           "type": "core::integer::u32",
           "key": true
         },
@@ -1014,7 +1021,7 @@
           "key": false
         }
       ],
-      "class_hash": "0x569e8094fa2631d200b05cdff8345a03f7e0ee375f120f84cb59a5c52e1d5a1",
+      "class_hash": "0x1c45a5783214260cded360f17a414cd6cba9792cafca874c8dd6d3948a46947",
       "tag": "pistols-QuizAnswer",
       "selector": "0x34298bd13a175838ea39852125ebda8df8e1ae0defd164a280a4ebd271cd2ec"
     },
@@ -1026,31 +1033,68 @@
           "key": true
         },
         {
-          "name": "quiz_count",
+          "name": "current_party_id",
           "type": "core::integer::u32",
           "key": false
         },
         {
-          "name": "current_quiz_id",
+          "name": "current_question_id",
+          "type": "core::integer::u32",
+          "key": false
+        },
+        {
+          "name": "quiz_party_count",
           "type": "core::integer::u32",
           "key": false
         }
       ],
-      "class_hash": "0x74c305d19583e2ed693a71b4614784671a2dff76531499808c4c4defe00d50d",
+      "class_hash": "0x4d64dc7eebc42610cf3f97cc83b77b202b939ef317b06e168e9fc17c8013b0a",
       "tag": "pistols-QuizConfig",
       "selector": "0x3ae0b12918a81099df3d3a82fcdfbe51a8b179c7075735e9f207e3ee2774e25"
     },
     {
       "members": [
         {
-          "name": "quiz_id",
+          "name": "party_id",
           "type": "core::integer::u32",
           "key": true
         },
         {
-          "name": "quiz_event",
-          "type": "core::felt252",
+          "name": "name",
+          "type": "core::byte_array::ByteArray",
           "key": false
+        },
+        {
+          "name": "description",
+          "type": "core::byte_array::ByteArray",
+          "key": false
+        },
+        {
+          "name": "timestamps",
+          "type": "pistols::types::timestamp::Period",
+          "key": false
+        },
+        {
+          "name": "quiz_question_count",
+          "type": "core::integer::u32",
+          "key": false
+        }
+      ],
+      "class_hash": "0x24f9a6ddb53b5b61ee610cae0bd8adcba8fca6c7348aa9e838c581c1abbc4c",
+      "tag": "pistols-QuizParty",
+      "selector": "0x4329facb3d0bde4b58b6403a2100dee581e5cf81c8368f64eb93fdf7c9d2236"
+    },
+    {
+      "members": [
+        {
+          "name": "party_id",
+          "type": "core::integer::u32",
+          "key": true
+        },
+        {
+          "name": "question_id",
+          "type": "core::integer::u32",
+          "key": true
         },
         {
           "name": "question",
@@ -1083,7 +1127,7 @@
           "key": false
         }
       ],
-      "class_hash": "0xe16d5f04af97f373da54aed1da149b651ec7a907475fe33fc822ec8e4c7682",
+      "class_hash": "0xc7f1c796f79e6742c9d0bfb2d01b717a72f1898ceaa0060b0c50d5f28f05a9",
       "tag": "pistols-QuizQuestion",
       "selector": "0x8bc324c97c68995ba6d970f9c4ee775a533f8c0f41b8676fb8850e20dc4ccb"
     },
@@ -7093,7 +7137,11 @@
       "name": "pistols::models::quiz::QuizAnswer",
       "members": [
         {
-          "name": "quiz_id",
+          "name": "party_id",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "question_id",
           "type": "core::integer::u32"
         },
         {
@@ -7133,11 +7181,15 @@
           "type": "core::integer::u8"
         },
         {
-          "name": "quiz_count",
+          "name": "current_party_id",
           "type": "core::integer::u32"
         },
         {
-          "name": "current_quiz_id",
+          "name": "current_question_id",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "quiz_party_count",
           "type": "core::integer::u32"
         }
       ]
@@ -7147,11 +7199,63 @@
       "name": "pistols::models::quiz::QuizConfigValue",
       "members": [
         {
-          "name": "quiz_count",
+          "name": "current_party_id",
           "type": "core::integer::u32"
         },
         {
-          "name": "current_quiz_id",
+          "name": "current_question_id",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "quiz_party_count",
+          "type": "core::integer::u32"
+        }
+      ]
+    },
+    {
+      "type": "struct",
+      "name": "pistols::models::quiz::QuizParty",
+      "members": [
+        {
+          "name": "party_id",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "name",
+          "type": "core::byte_array::ByteArray"
+        },
+        {
+          "name": "description",
+          "type": "core::byte_array::ByteArray"
+        },
+        {
+          "name": "timestamps",
+          "type": "pistols::types::timestamp::Period"
+        },
+        {
+          "name": "quiz_question_count",
+          "type": "core::integer::u32"
+        }
+      ]
+    },
+    {
+      "type": "struct",
+      "name": "pistols::models::quiz::QuizPartyValue",
+      "members": [
+        {
+          "name": "name",
+          "type": "core::byte_array::ByteArray"
+        },
+        {
+          "name": "description",
+          "type": "core::byte_array::ByteArray"
+        },
+        {
+          "name": "timestamps",
+          "type": "pistols::types::timestamp::Period"
+        },
+        {
+          "name": "quiz_question_count",
           "type": "core::integer::u32"
         }
       ]
@@ -7161,12 +7265,12 @@
       "name": "pistols::models::quiz::QuizQuestion",
       "members": [
         {
-          "name": "quiz_id",
+          "name": "party_id",
           "type": "core::integer::u32"
         },
         {
-          "name": "quiz_event",
-          "type": "core::felt252"
+          "name": "question_id",
+          "type": "core::integer::u32"
         },
         {
           "name": "question",
@@ -7198,10 +7302,6 @@
       "type": "struct",
       "name": "pistols::models::quiz::QuizQuestionValue",
       "members": [
-        {
-          "name": "quiz_event",
-          "type": "core::felt252"
-        },
         {
           "name": "question",
           "type": "core::byte_array::ByteArray"
@@ -7237,6 +7337,12 @@
     {
       "type": "event",
       "name": "pistols::models::quiz::m_QuizConfig::Event",
+      "kind": "enum",
+      "variants": []
+    },
+    {
+      "type": "event",
+      "name": "pistols::models::quiz::m_QuizParty::Event",
       "kind": "enum",
       "variants": []
     },
@@ -8012,6 +8118,42 @@
         },
         {
           "type": "function",
+          "name": "get_duelist_leaderboard_position",
+          "inputs": [
+            {
+              "name": "season_id",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "duelist_id",
+              "type": "core::integer::u128"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "pistols::models::leaderboard::LeaderboardPosition"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "get_leaderboard",
+          "inputs": [
+            {
+              "name": "season_id",
+              "type": "core::integer::u32"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "core::array::Span::<pistols::models::leaderboard::LeaderboardPosition>"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "function",
           "name": "clear_call_to_challenge",
           "inputs": [
             {
@@ -8107,11 +8249,87 @@
         },
         {
           "type": "function",
-          "name": "create_quiz",
+          "name": "set_current_quiz",
           "inputs": [
             {
-              "name": "quiz_event",
-              "type": "core::felt252"
+              "name": "party_id",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "question_id",
+              "type": "core::integer::u32"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "create_quiz_party",
+          "inputs": [
+            {
+              "name": "name",
+              "type": "core::byte_array::ByteArray"
+            },
+            {
+              "name": "description",
+              "type": "core::byte_array::ByteArray"
+            },
+            {
+              "name": "start",
+              "type": "core::integer::u64"
+            },
+            {
+              "name": "end",
+              "type": "core::integer::u64"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "pistols::models::quiz::QuizParty"
+            }
+          ],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "edit_quiz_party",
+          "inputs": [
+            {
+              "name": "party_id",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "name",
+              "type": "core::byte_array::ByteArray"
+            },
+            {
+              "name": "description",
+              "type": "core::byte_array::ByteArray"
+            },
+            {
+              "name": "start",
+              "type": "core::integer::u64"
+            },
+            {
+              "name": "end",
+              "type": "core::integer::u64"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "pistols::models::quiz::QuizParty"
+            }
+          ],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "create_quiz_question",
+          "inputs": [
+            {
+              "name": "party_id",
+              "type": "core::integer::u32"
             }
           ],
           "outputs": [
@@ -8126,7 +8344,11 @@
           "name": "open_quiz",
           "inputs": [
             {
-              "name": "quiz_id",
+              "name": "party_id",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "question_id",
               "type": "core::integer::u32"
             },
             {
@@ -8154,7 +8376,11 @@
           "name": "close_quiz",
           "inputs": [
             {
-              "name": "quiz_id",
+              "name": "party_id",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "question_id",
               "type": "core::integer::u32"
             },
             {
@@ -8171,22 +8397,14 @@
         },
         {
           "type": "function",
-          "name": "set_current_quiz",
-          "inputs": [
-            {
-              "name": "quiz_id",
-              "type": "core::integer::u32"
-            }
-          ],
-          "outputs": [],
-          "state_mutability": "external"
-        },
-        {
-          "type": "function",
           "name": "answer_quiz",
           "inputs": [
             {
-              "name": "quiz_id",
+              "name": "party_id",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "question_id",
               "type": "core::integer::u32"
             },
             {
@@ -8200,42 +8418,6 @@
             }
           ],
           "state_mutability": "external"
-        },
-        {
-          "type": "function",
-          "name": "get_duelist_leaderboard_position",
-          "inputs": [
-            {
-              "name": "season_id",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "duelist_id",
-              "type": "core::integer::u128"
-            }
-          ],
-          "outputs": [
-            {
-              "type": "pistols::models::leaderboard::LeaderboardPosition"
-            }
-          ],
-          "state_mutability": "view"
-        },
-        {
-          "type": "function",
-          "name": "get_leaderboard",
-          "inputs": [
-            {
-              "name": "season_id",
-              "type": "core::integer::u32"
-            }
-          ],
-          "outputs": [
-            {
-              "type": "core::array::Span::<pistols::models::leaderboard::LeaderboardPosition>"
-            }
-          ],
-          "state_mutability": "view"
         }
       ]
     },
