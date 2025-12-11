@@ -1,15 +1,12 @@
 import { useEffect, useMemo } from 'react'
 import { create } from 'zustand'
-import { immer } from 'zustand/middleware/immer'
 import { createDojoStore } from '@dojoengine/sdk/react'
-import { feltToString } from '@underware/pistols-sdk/starknet'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
-import { useAllStoreModels, useSdkEntitiesGet, useSdkEventsGet, useStoreModelsById, useStoreModelsByKeys } from '@underware/pistols-sdk/dojo'
+import { useAllStoreModels, useSdkEntitiesGet, useStoreModelsByKeys } from '@underware/pistols-sdk/dojo'
 import { PistolsSchemaType, PistolsQueryBuilder, PistolsEntity } from '@underware/pistols-sdk/pistols/sdk'
 import { models } from '@underware/pistols-sdk/pistols/gen'
-import { configKey } from './configStore'
 import { BigNumberish } from 'starknet'
-import { bigintToAddress, shortAddress } from '@underware/pistols-sdk/utils'
+import { bigintToAddress } from '@underware/pistols-sdk/utils'
 import { getPlayernameFromAddress } from './playerStore'
 
 export const useQuizStore = createDojoStore<PistolsSchemaType>();
@@ -19,14 +16,10 @@ interface FetchState {
   setFetched: (fetched: boolean) => void;
 }
 const createStore = () => {
-  return create<FetchState>()(immer((set, get) => ({
+  return create<FetchState>()((set, get) => ({
     fetched: undefined,
-    setFetched: (fetched: boolean) => {
-      set((state: FetchState) => {
-        state.fetched = fetched
-      })
-    },
-  })))
+    setFetched: (fetched: boolean) => set({ fetched: fetched }),
+  }))
 }
 const useQuizFetchStore = createStore();
 
@@ -34,11 +27,26 @@ const useQuizFetchStore = createStore();
 // 'consumer' hooks
 //
 
-export const useQuizQuestion = (quizId: number) => {
+export const useQuizParty = (quizPartyId: number) => {
   useFetchAllQuiz();
   const entities = useQuizStore((state) => state.entities);
-  const model = useStoreModelsByKeys<models.QuizQuestion>(entities, 'QuizQuestion', [quizId])
-  const eventName = useMemo(() => feltToString(model?.quiz_event ?? 0), [model])
+  const model = useStoreModelsByKeys<models.QuizParty>(entities, 'QuizParty', [quizPartyId])
+  const partyName = useMemo(() => (model?.name ?? ''), [model])
+  const description = useMemo(() => (model?.description ?? ''), [model])
+  const timestamp_start = useMemo(() => Number(model?.timestamps.start ?? 0), [model])
+  const timestamp_end = useMemo(() => Number(model?.timestamps.end ?? 0), [model])
+  return {
+    partyName,
+    description,
+    timestamp_start,
+    timestamp_end,
+  }
+}
+
+export const useQuizQuestion = (partyId: number, questionId: number) => {
+  useFetchAllQuiz();
+  const entities = useQuizStore((state) => state.entities);
+  const model = useStoreModelsByKeys<models.QuizQuestion>(entities, 'QuizQuestion', [partyId, questionId])
   const question = useMemo(() => model?.question ?? '', [model])
   const description = useMemo(() => model?.description ?? '', [model])
   const options = useMemo(() => model?.options ?? [], [model])
@@ -48,9 +56,8 @@ export const useQuizQuestion = (quizId: number) => {
   const isOffChain = useMemo(() => (timestamp_start == 0), [timestamp_start])
   const isOpen = useMemo(() => (timestamp_start > 0 && timestamp_end == 0), [timestamp_start, timestamp_end])
   const isClosed = useMemo(() => (timestamp_end > 0), [timestamp_end])
-  // console.log(`useQuizQuestion() =>`, quizId, timestamp_start, timestamp_end, isOffChain, isOpen, isClosed)
+  // console.log(`useQuizQuestion() =>`, questionId, timestamp_start, timestamp_end, isOffChain, isOpen, isClosed)
   return {
-    eventName,
     question,
     description,
     options,
@@ -61,42 +68,40 @@ export const useQuizQuestion = (quizId: number) => {
   }
 }
 
-export const useQuizQuestionsByEventName = (eventName: string) => {
+export const useQuizQuestionsByParty = (partyId: number) => {
   useFetchAllQuiz();
   const entities = useQuizStore((state) => state.entities);
   const models = useAllStoreModels<models.QuizQuestion>(entities, 'QuizQuestion')
-  const quizIds = useMemo(() => (
-    models.filter((model) => feltToString(model.quiz_event ?? 0) === eventName)
+  const questionIds = useMemo(() => (
+    models.filter((model) => Number(model.party_id ?? 0) === partyId)
       .map((model) => Number(model.question_id))
       .sort((a, b) => (a - b))
-  ), [models, eventName])
+  ), [models, partyId])
   return {
-    quizIds
+    questionIds
   }
 }
 
-export const useQuizAllEventNames = () => {
+export const useQuizAllParties = () => {
   useFetchAllQuiz();
   const entities = useQuizStore((state) => state.entities);
-  const models = useAllStoreModels<models.QuizQuestion>(entities, 'QuizQuestion')
-  const eventNames = useMemo(() => (
+  const models = useAllStoreModels<models.QuizParty>(entities, 'QuizParty')
+  const partyNamesById = useMemo(() => (
     models
-      .map((model) => feltToString(model.quiz_event ?? 0))
-      .filter((eventName) => eventName.length > 0)
-      .reduce((acc, current) => {
-        if (!acc.includes(current)) acc.push(current);
-        return acc;
-      }, [] as string[])
-      .sort((a, b) => (a.localeCompare(b)))
+      .sort((a, b) => (Number((a.party_id ?? 0)) - Number((b.party_id ?? 0))))
+      .reduce((acc, model) => {
+        acc[Number(model.party_id ?? 0)] = model.name ?? ''
+        return acc
+      }, {} as Record<number, string>)
   ), [models])
   return {
-    eventNames,
+    partyNamesById,
   }
 }
 
-export const useQuizPlayerAnswer = (quizId: number, player_address: BigNumberish) => {
+export const useQuizPlayerAnswer = (partyId: number, questionId: number, player_address: BigNumberish) => {
   const entities = useQuizStore((state) => state.entities);
-  const model = useStoreModelsByKeys<models.QuizAnswer>(entities, 'QuizAnswer', [quizId, player_address])
+  const model = useStoreModelsByKeys<models.QuizAnswer>(entities, 'QuizAnswer', [partyId, questionId, player_address])
   const playerAnswerNumber = useMemo(() => Number(model?.answer_number ?? 0), [model])
   const playerTimestamp = useMemo(() => Number(model?.timestamp ?? 0), [model])
   return {
@@ -105,14 +110,15 @@ export const useQuizPlayerAnswer = (quizId: number, player_address: BigNumberish
   }
 }
 
-export const useQuizAnswers = (quizId: number) => {
+export const useQuizAnswers = (partyId: number, questionId: number) => {
   const entities = useQuizStore((state) => state.entities);
   const models = useAllStoreModels<models.QuizAnswer>(entities, 'QuizAnswer')
   const answers = useMemo(() => (
     models
-      .filter((model) => Number(model?.question_id ?? 0) == quizId)
+      .filter((model) => Number(model?.party_id ?? 0) == partyId)
+      .filter((model) => Number(model?.question_id ?? 0) == questionId)
       .sort((a, b) => (Number(a.timestamp) - Number(b.timestamp)))
-  ), [models, quizId])
+  ), [models, questionId])
   const playersByAnswer = useMemo(() => (
     answers.reduce((acc, model) => {
       acc[Number(model.answer_number)] = [...(acc[Number(model.answer_number)] ?? []), BigInt(model.player_address)]
@@ -132,9 +138,9 @@ export const useQuizAnswers = (quizId: number) => {
   }
 }
 
-export const useQuizWinners = (quizId: number) => {
-  const { answerNumber } = useQuizQuestion(quizId)
-  const { playersByAnswer } = useQuizAnswers(quizId)
+export const useQuizQuestionWinners = (partyId: number, questionId: number) => {
+  const { answerNumber } = useQuizQuestion(partyId, questionId)
+  const { playersByAnswer } = useQuizAnswers(partyId, questionId)
   const winners = useMemo(() => {
     if (answerNumber == 0) return [];
     const addresses = (playersByAnswer[answerNumber] ?? []);
@@ -143,7 +149,7 @@ export const useQuizWinners = (quizId: number) => {
       name: getPlayernameFromAddress(address) // ?? shortAddress(address),
     }));
   }, [playersByAnswer, answerNumber])
-  // console.log('>>>>>>>>> useQuizWinners() =>', quizId, answerNumber, winners)
+  // console.log('>>>>>>>>> useQuizQuestionWinners() =>', questionId, answerNumber, winners)
   return {
     winners,
   }
@@ -157,7 +163,7 @@ export const useQuizWinners = (quizId: number) => {
 //
 const query_get_entities: PistolsQueryBuilder = new PistolsQueryBuilder()
   .withEntityModels([
-    'pistols-QuizEvent',
+    'pistols-QuizParty',
     'pistols-QuizQuestion',
     'pistols-QuizAnswer',
   ])

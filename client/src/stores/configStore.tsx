@@ -39,11 +39,13 @@ export const useConfig = () => {
 export const useQuizConfig = () => {
   const entities = useConfigStore((state) => state.entities);
   const model = useStoreModelsById<models.QuizConfig>(entities, 'QuizConfig', configKey)
-  const quizCount = useMemo(() => Number(model?.quiz_count ?? 0), [model])
-  const currentQuizId = useMemo(() => Number(model?.current_question_id ?? 0), [model])
+  const currentPartyId = useMemo(() => Number(model?.current_party_id ?? 0), [model])
+  const currentQuestionId = useMemo(() => Number(model?.current_question_id ?? 0), [model])
+  const partyCount = useMemo(() => Number(model?.quiz_party_count ?? 0), [model])
   return {
-    quizCount,
-    currentQuizId,
+    currentPartyId,
+    currentQuestionId,
+    partyCount,
   }
 }
 
