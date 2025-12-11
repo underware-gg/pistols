@@ -60,6 +60,7 @@ pub use pistols::models::{
     },
     quiz::{
         QuizConfig, QuizConfigValue,
+        QuizParty, QuizPartyValue,
         QuizQuestion, QuizQuestionValue,
         QuizAnswer, QuizAnswerValue,
     },
@@ -251,12 +252,16 @@ pub impl StoreImpl of StoreTrait {
         (self.world.read_model(CONFIG::CONFIG_KEY))
     }
     #[inline(always)]
-    fn get_quiz_question(self: @Store, quiz_id: u32) -> QuizQuestion {
-        (self.world.read_model(quiz_id))
+    fn get_quiz_party(self: @Store, party_id: u32) -> QuizParty {
+        (self.world.read_model(party_id))
     }
     #[inline(always)]
-    fn get_quiz_answer(self: @Store, quiz_id: u32, player_address: ContractAddress) -> QuizAnswer {
-        (self.world.read_model((quiz_id, player_address),))
+    fn get_quiz_question(self: @Store, party_id: u32, question_id: u32) -> QuizQuestion {
+        (self.world.read_model((party_id, question_id),))
+    }
+    #[inline(always)]
+    fn get_quiz_answer(self: @Store, party_id: u32, question_id: u32, player_address: ContractAddress) -> QuizAnswer {
+        (self.world.read_model((party_id, question_id, player_address),))
     }
 
     #[inline(always)]
@@ -484,6 +489,10 @@ pub impl StoreImpl of StoreTrait {
         self.world.write_model(model);
     }
     #[inline(always)]
+    fn set_quiz_party(ref self: Store, model: @QuizParty) {
+        self.world.write_model(model);
+    }
+    #[inline(always)]
     fn set_quiz_question(ref self: Store, model: @QuizQuestion) {
         self.world.write_model(model);
     }
@@ -687,10 +696,10 @@ pub impl StoreImpl of StoreTrait {
         (duel_id > 0)
     }
 
-    #[inline(always)]
-    fn get_quiz_question_is_open(self: @Store, quiz_id: u32) -> bool {
-        (self.world.read_member_legacy(Model::<QuizQuestion>::ptr_from_keys(quiz_id), selector!("is_open")))
-    }
+    // #[inline(always)]
+    // fn get_quiz_question_is_open(self: @Store, party_id: u32, question_id: u32) -> bool {
+    //     (self.world.read_member_legacy(Model::<QuizQuestion>::ptr_from_keys((party_id, question_id),), selector!("is_open")))
+    // }
 
     //----------------------------------
     // Batch member getters

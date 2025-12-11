@@ -249,7 +249,7 @@ export interface Pool {
 
 // Type definition for `pistols::models::quiz::QuizAnswer` struct
 export interface QuizAnswer {
-	quiz_id: BigNumberish;
+	question_id: BigNumberish;
 	player_address: string;
 	answer_number: BigNumberish;
 	timestamp: BigNumberish;
@@ -259,12 +259,12 @@ export interface QuizAnswer {
 export interface QuizConfig {
 	key: BigNumberish;
 	quiz_count: BigNumberish;
-	current_quiz_id: BigNumberish;
+	current_question_id: BigNumberish;
 }
 
 // Type definition for `pistols::models::quiz::QuizQuestion` struct
 export interface QuizQuestion {
-	quiz_id: BigNumberish;
+	question_id: BigNumberish;
 	quiz_event: BigNumberish;
 	question: string;
 	description: string;
@@ -1418,7 +1418,7 @@ export const schema: SchemaType = {
 			balance_fame: 0,
 		},
 		QuizAnswer: {
-			quiz_id: 0,
+			question_id: 0,
 			player_address: "",
 			answer_number: 0,
 			timestamp: 0,
@@ -1426,10 +1426,10 @@ export const schema: SchemaType = {
 		QuizConfig: {
 			key: 0,
 			quiz_count: 0,
-			current_quiz_id: 0,
+			current_question_id: 0,
 		},
 		QuizQuestion: {
-			quiz_id: 0,
+			question_id: 0,
 			quiz_event: 0,
 		question: "",
 		description: "",

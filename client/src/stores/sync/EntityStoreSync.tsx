@@ -59,6 +59,7 @@ const _modelsSubscribed = [
   // Misc
   "pistols-Pack",
   "pistols-SeasonScoreboard",
+  "pistols-QuizEvent",
   "pistols-QuizQuestion",
   "pistols-QuizAnswer",
 ];

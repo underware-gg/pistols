@@ -261,10 +261,10 @@ export function createSystemCalls(
         ]
         return await _executeTransaction(signer, calls, key)
       },
-      open_quiz: async (signer: AccountInterface, quiz_id: BigNumberish, question: string, description: string, options: Array<string>, key?: string): Promise<boolean> => {
+      open_quiz: async (signer: AccountInterface, question_id: BigNumberish, question: string, description: string, options: Array<string>, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
           contractCalls.community.buildOpenQuizCalldata(
-            bigintToHex(quiz_id),
+            bigintToHex(question_id),
             question,
             description,
             options,
@@ -272,28 +272,28 @@ export function createSystemCalls(
         ]
         return await _executeTransaction(signer, calls, key)
       },
-      close_quiz: async (signer: AccountInterface, quiz_id: BigNumberish, answer_number: BigNumberish, key?: string): Promise<boolean> => {
+      close_quiz: async (signer: AccountInterface, question_id: BigNumberish, answer_number: BigNumberish, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
           vrf_request_call('community', signer.address),
           contractCalls.community.buildCloseQuizCalldata(
-            bigintToHex(quiz_id),
+            bigintToHex(question_id),
             bigintToHex(answer_number),
           ),
         ]
         return await _executeTransaction(signer, calls, key)
       },
-      set_current_quiz: async (signer: AccountInterface, quiz_id: number, key?: string): Promise<boolean> => {
+      set_current_quiz: async (signer: AccountInterface, question_id: number, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
           contractCalls.community.buildSetCurrentQuizCalldata(
-            bigintToHex(quiz_id),
+            bigintToHex(question_id),
           ),
         ]
         return await _executeTransaction(signer, calls, key)
       },
-      answer_quiz: async (signer: AccountInterface, quiz_id: BigNumberish, answer_number: BigNumberish, key?: string): Promise<boolean> => {
+      answer_quiz: async (signer: AccountInterface, question_id: BigNumberish, answer_number: BigNumberish, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
           contractCalls.community.buildAnswerQuizCalldata(  
-            bigintToHex(quiz_id),
+            bigintToHex(question_id),
             bigintToHex(answer_number),
           ),
         ]

@@ -162,7 +162,7 @@ function QuizAdminPanel() {
   const [isCreating, setIsCreating] = useState(false)
   const _createQuiz = async () => {
     setIsCreating(true)
-    await community.create_quiz(account, eventName)
+    await community.create_quiz_question(account, eventName)
   }
   useEffect(() => {
     if (isCreating && quizIds.length > 0) {

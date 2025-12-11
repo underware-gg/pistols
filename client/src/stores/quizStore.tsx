@@ -67,7 +67,7 @@ export const useQuizQuestionsByEventName = (eventName: string) => {
   const models = useAllStoreModels<models.QuizQuestion>(entities, 'QuizQuestion')
   const quizIds = useMemo(() => (
     models.filter((model) => feltToString(model.quiz_event ?? 0) === eventName)
-      .map((model) => Number(model.quiz_id))
+      .map((model) => Number(model.question_id))
       .sort((a, b) => (a - b))
   ), [models, eventName])
   return {
@@ -110,7 +110,7 @@ export const useQuizAnswers = (quizId: number) => {
   const models = useAllStoreModels<models.QuizAnswer>(entities, 'QuizAnswer')
   const answers = useMemo(() => (
     models
-      .filter((model) => Number(model?.quiz_id ?? 0) == quizId)
+      .filter((model) => Number(model?.question_id ?? 0) == quizId)
       .sort((a, b) => (Number(a.timestamp) - Number(b.timestamp)))
   ), [models, quizId])
   const playersByAnswer = useMemo(() => (
@@ -157,6 +157,7 @@ export const useQuizWinners = (quizId: number) => {
 //
 const query_get_entities: PistolsQueryBuilder = new PistolsQueryBuilder()
   .withEntityModels([
+    'pistols-QuizEvent',
     'pistols-QuizQuestion',
     'pistols-QuizAnswer',
   ])

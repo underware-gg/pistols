@@ -67,7 +67,7 @@ pub mod tester {
         },
         pool::{Pool, PoolType},
         player::{PlayerDuelistStack},
-        quiz::{QuizQuestion},
+        quiz::{QuizParty, QuizQuestion},
         events::{SocialPlatform, PlayerSetting, PlayerSettingValue},
         // tournament::{TournamentRound},
     };
@@ -521,6 +521,7 @@ pub mod tester {
         if (deploy_community) {
             resources.append(TestResource::Contract(community::TEST_CLASS_HASH.into()));
             resources.append(TestResource::Model(pistols::models::quiz::m_QuizConfig::TEST_CLASS_HASH.into()));
+            resources.append(TestResource::Model(pistols::models::quiz::m_QuizParty::TEST_CLASS_HASH.into()));
             resources.append(TestResource::Model(pistols::models::quiz::m_QuizQuestion::TEST_CLASS_HASH.into()));
             resources.append(TestResource::Model(pistols::models::quiz::m_QuizAnswer::TEST_CLASS_HASH.into()));
             resources.append(TestResource::Event(pistols::models::events::e_PlayerBookmarkEvent::TEST_CLASS_HASH.into()));
@@ -1161,47 +1162,74 @@ pub mod tester {
     }
 
     // ::community
-    pub fn execute_create_quiz(sys: @TestSystems, sender: ContractAddress,
-        quiz_event: felt252,
+    pub fn execute_create_quiz_party(sys: @TestSystems, sender: ContractAddress,
+        name: ByteArray,
+        description: ByteArray,
+        start: u64,
+        end: u64,
+    ) -> QuizParty {
+        impersonate(sender);
+        let quiz_party: QuizParty = (*sys.community).create_quiz_party(name, description, start, end);
+        _next_block();
+        (quiz_party)
+    }
+    pub fn execute_edit_quiz_party(sys: @TestSystems, sender: ContractAddress,
+        party_id: u32,
+        name: ByteArray,
+        description: ByteArray,
+        start: u64,
+        end: u64,
+    ) -> QuizParty {
+        impersonate(sender);
+        let quiz_party: QuizParty = (*sys.community).edit_quiz_party(party_id, name, description, start, end);
+        _next_block();
+        (quiz_party)
+    }
+    pub fn execute_create_quiz_question(sys: @TestSystems, sender: ContractAddress,
+        party_id: u32,
     ) -> QuizQuestion {
         impersonate(sender);
-        let quiz_question: QuizQuestion = (*sys.community).create_quiz(quiz_event);
+        let quiz_question: QuizQuestion = (*sys.community).create_quiz_question(party_id);
         _next_block();
         (quiz_question)
     }
     pub fn execute_open_quiz(sys: @TestSystems, sender: ContractAddress,
-        quiz_id: u32,
+        party_id: u32,
+        question_id: u32,
         question: ByteArray,
         description: ByteArray,
         options: Array<ByteArray>,
     ) -> QuizQuestion {
         impersonate(sender);
-        let quiz_question: QuizQuestion = (*sys.community).open_quiz(quiz_id, question, description, options);
+        let quiz_question: QuizQuestion = (*sys.community).open_quiz(party_id, question_id, question, description, options);
         _next_block();
         (quiz_question)
     }
     pub fn execute_close_quiz(sys: @TestSystems, sender: ContractAddress,
-        quiz_id: u32,
+        party_id: u32,
+        question_id: u32,
         answer_number: u8,
     ) -> QuizQuestion {
         impersonate(sender);
-        let quiz_question: QuizQuestion = (*sys.community).close_quiz(quiz_id, answer_number);
+        let quiz_question: QuizQuestion = (*sys.community).close_quiz(party_id, question_id, answer_number);
         _next_block();
         (quiz_question)
     }
     pub fn execute_set_current_quiz(sys: @TestSystems, sender: ContractAddress,
-        quiz_id: u32,
+        party_id: u32,
+        question_id: u32,
     ) {
         impersonate(sender);
-        (*sys.community).set_current_quiz(quiz_id);
+        (*sys.community).set_current_quiz(party_id, question_id);
         _next_block();
     }
     pub fn execute_answer_quiz(sys: @TestSystems, sender: ContractAddress,
-        quiz_id: u32,
+        party_id: u32,
+        question_id: u32,
         answer_number: u8,
     ) {
         impersonate(sender);
-        (*sys.community).answer_quiz(quiz_id, answer_number);
+        (*sys.community).answer_quiz(party_id, question_id, answer_number);
         _next_block();
     }
 
