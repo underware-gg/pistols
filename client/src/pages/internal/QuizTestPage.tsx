@@ -12,6 +12,7 @@ import {
   useQuizQuestion,
   useQuizQuestionsByParty,
   useQuizQuestionWinners,
+  useQuizPartyLeaderboards,
 } from '/src/stores/quizStore'
 import { InternalPageMenu, InternalPageWrapper } from '/src/pages/internal/InternalPageIndex'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
@@ -76,8 +77,7 @@ function QuizPlayerPanel({
   const { partyName, timestamp_start } = useQuizParty(currentPartyId)
   const { question, description, options, answerNumber, isOpen, isClosed } = useQuizQuestion(currentPartyId, currentQuestionId)
   const { playerAnswerNumber } = useQuizPlayerAnswer(currentPartyId, currentQuestionId, address)
-  const { playersByAnswer, answerCounts } = useQuizAnswers(currentPartyId, currentQuestionId)
-  const { winners } = useQuizQuestionWinners(currentPartyId, currentQuestionId)
+  const { answerCounts } = useQuizAnswers(currentPartyId, currentQuestionId)
 
   const _asnwer = async (selectedAnswerNumber: number) => {
     await community.answer_quiz_question(account, currentPartyId, currentQuestionId, selectedAnswerNumber)
@@ -102,7 +102,7 @@ function QuizPlayerPanel({
           {(full && currentPartyId > 0) && (
             <>
               <Row>
-                <Cell>Start Time:</Cell>
+                <Cell>Start Time (local):</Cell>
                 <Cell className='Code'>{formatTimestampLocal(timestamp_start)}</Cell>
               </Row>
             </>
@@ -150,16 +150,49 @@ function QuizPlayerPanel({
                 </Row>
               )
             })}
-            <Row>
-              <Cell className='Important'>Winners:</Cell>
-              <Cell className='Code Smallest'>
-                {winners.map((winner) => <React.Fragment key={winner.address}><Address address={winner.address} />({winner.name})<br /></React.Fragment>)}
-              </Cell>
-              <Cell></Cell>
-            </Row>
+            <QuizResults partyId={currentPartyId} questionId={currentQuestionId} />
           </Body>
         </Table>
       )}
+    </>
+  )
+}
+
+function QuizResults({
+  partyId,
+  questionId,
+}: {
+  partyId: number,
+  questionId: number,
+}) {
+  const { winners } = useQuizQuestionWinners(partyId, questionId)
+  const { leaderboards } = useQuizPartyLeaderboards(partyId)
+  return (
+    <>
+      <Row>
+        <Cell className='Important'>Winners:</Cell>
+        <Cell className='Code Smallest'>
+          {winners.map((winner) =>
+            <React.Fragment key={winner.address}>
+              <Address address={winner.address} />
+              ({winner.name}) / score: {winner.score}<br />
+            </React.Fragment>
+          )}
+        </Cell>
+        <Cell></Cell>
+      </Row>
+      <Row>
+        <Cell className='Important'>Leaderboards:</Cell>
+        <Cell className='Code Smallest'>
+          {leaderboards.map((leaderboard) =>
+            <React.Fragment key={leaderboard.address}>
+              <Address address={leaderboard.address} />
+              ({leaderboard.name}) / score: {leaderboard.score} / {leaderboard.wins} wins<br />
+            </React.Fragment>
+          )}
+        </Cell>
+        <Cell></Cell>
+      </Row>
     </>
   )
 }
@@ -471,9 +504,8 @@ function QuizAdminQuestionOnChain({
   partyId: number,
   questionId: number,
 }) {
-  const { playersByAnswer, answerCounts } = useQuizAnswers(partyId, questionId)
+  const { answerCounts } = useQuizAnswers(partyId, questionId)
   const { question, description, options, answerNumber, isOpen, isClosed } = useQuizQuestion(partyId, questionId)
-  const { winners } = useQuizQuestionWinners(partyId, questionId)
 
   const fields = useMemo<QuestionFields>(() => ({
     question: question,
@@ -485,12 +517,7 @@ function QuizAdminQuestionOnChain({
   return (
     <>
       <QuizAdminQuestionForm partyId={partyId} questionId={questionId} fields={fields} answerNumber={answerNumber} answerCounts={answerCounts} isOpen={isOpen} isClosed={isClosed} />
-      <Row>
-        <Cell className='Important'>Winners:</Cell>
-        <Cell className='Code Smallest'>
-          {winners.map((winner) => <React.Fragment key={winner.address}><Address address={winner.address} />({winner.name})<br /></React.Fragment>)}
-        </Cell>
-      </Row>
+      <QuizResults partyId={partyId} questionId={questionId} />
     </>
   )
 }

@@ -56,6 +56,7 @@ export const useQuizQuestion = (partyId: number, questionId: number) => {
   const isOffChain = useMemo(() => (timestamp_start == 0), [timestamp_start])
   const isOpen = useMemo(() => (timestamp_start > 0 && timestamp_end == 0), [timestamp_start, timestamp_end])
   const isClosed = useMemo(() => (timestamp_end > 0), [timestamp_end])
+  const vrf = useMemo(() => BigInt(model?.vrf ?? 0), [model])
   // console.log(`useQuizQuestion() =>`, questionId, timestamp_start, timestamp_end, isOffChain, isOpen, isClosed)
   return {
     question,
@@ -65,6 +66,7 @@ export const useQuizQuestion = (partyId: number, questionId: number) => {
     isOffChain,
     isOpen,
     isClosed,
+    vrf,
   }
 }
 
@@ -138,21 +140,94 @@ export const useQuizAnswers = (partyId: number, questionId: number) => {
   }
 }
 
+
+//--------------------------------
+// Leaderboards
+//
+
+export type QuizPlayer = {
+  address: BigNumberish,
+  name: string,
+  score: number,
+  wins?: number,
+}
+
 export const useQuizQuestionWinners = (partyId: number, questionId: number) => {
-  const { answerNumber } = useQuizQuestion(partyId, questionId)
-  const { playersByAnswer } = useQuizAnswers(partyId, questionId)
-  const winners = useMemo(() => {
-    if (answerNumber == 0) return [];
-    const addresses = (playersByAnswer[answerNumber] ?? []);
-    return addresses.map((address) => ({
-      address: bigintToAddress(address),
-      name: getPlayernameFromAddress(address) // ?? shortAddress(address),
-    }));
-  }, [playersByAnswer, answerNumber])
-  // console.log('>>>>>>>>> useQuizQuestionWinners() =>', questionId, answerNumber, winners)
+  const entities = useQuizStore((state) => state.entities);
+  const question_models = useAllStoreModels<models.QuizQuestion>(entities, 'QuizQuestion')
+  const answers_models = useAllStoreModels<models.QuizAnswer>(entities, 'QuizAnswer')
+  const winners = useMemo<QuizPlayer[]>(() => (
+    _getQuestionWinners(partyId, questionId, question_models, answers_models)
+  ), [partyId, questionId, question_models, answers_models])
   return {
     winners,
   }
+}
+
+export const useQuizPartyLeaderboards = (partyId: number) => {
+  const entities = useQuizStore((state) => state.entities);
+  const question_models = useAllStoreModels<models.QuizQuestion>(entities, 'QuizQuestion')
+  const answers_models = useAllStoreModels<models.QuizAnswer>(entities, 'QuizAnswer')
+  const leaderboards = useMemo<QuizPlayer[]>(() => (
+    _getQuizPartyLeaderboards(partyId, question_models, answers_models)
+  ), [partyId, question_models, answers_models])
+  return {
+    leaderboards,
+  }
+}
+
+
+const _getQuestionWinners = (partyId: number, questionId: number, question_models: models.QuizQuestion[], answer_models: models.QuizAnswer[]): QuizPlayer[] => {
+  // find question and correct answer
+  const question = question_models
+    .find((model) => Number(model?.party_id ?? 0) == partyId && Number(model?.question_id ?? 0) == questionId)
+  const answerNumber = Number(question?.answer_number ?? 0)
+  // find all players who answered the correct answer, sorted by timestamp
+  const answers = answer_models
+    .filter((model) => Number(model?.party_id ?? 0) == partyId)
+    .filter((model) => Number(model?.question_id ?? 0) == questionId)
+    .filter((model) => Number(model?.answer_number ?? 0) == answerNumber)
+    .sort((a, b) => (Number(a.timestamp) - Number(b.timestamp)))
+  // calculate score for each player
+  const players = answers
+    .map((model, i) => ({
+      address: bigintToAddress(model.player_address),
+      name: getPlayernameFromAddress(model.player_address),
+      score: 1000 + ((answers.length - i - 1) * 10),
+      wins: 1,
+    }))
+  // decide winners from question vrf
+  const vrf = BigInt(question?.vrf ?? 0)
+  const result = players.sort((a, b) => {
+    const aa = Number((BigInt(a.address) ^ vrf) & 0xffffffffn)
+    const bb = Number((BigInt(b.address) ^ vrf) & 0xffffffffn)
+    console.log(`_getQuestionWinners() =>`, aa, bb)
+    return (bb - aa)
+  })
+  return result;
+}
+
+const _getQuizPartyLeaderboards = (partyId: number, question_models: models.QuizQuestion[], answer_models: models.QuizAnswer[]): QuizPlayer[] => {
+  const result: QuizPlayer[] = [];
+  // find all questions for this party
+  const questions = question_models
+    .filter((model) => Number(model?.party_id ?? 0) == partyId)
+  // combine winners of all questions
+  questions.forEach((question) => {
+    const winners = _getQuestionWinners(partyId, Number(question?.question_id ?? 0), question_models, answer_models)
+    winners.forEach((winner) => {
+      const index = result.findIndex((player) => player.address == winner.address);
+      if (index == -1) {
+        result.push(winner)
+      } else {
+        result[index].score += winner.score
+        result[index].wins += winner.wins
+      }
+    })
+  })
+  // sort result by score
+  result.sort((a, b) => (b.score - a.score))
+  return result;
 }
 
 
