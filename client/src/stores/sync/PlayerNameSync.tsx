@@ -25,6 +25,21 @@ export function PlayerNameSync() {
     setIsInitialized(true)
   }, [])
 
+  // fill predeployed accounts
+  const { connectorId, isControllerConnected } = useConnectedController()
+  const { selectedNetworkConfig } = useDojoSetup()
+  useEffect(() => {
+    if (connectorId == supportedConnetorIds.PREDEPLOYED) {
+      // use predeployed accounts
+      console.log("PlayerNameSync() PREDEPLOYED =>", selectedNetworkConfig.predeployedAccounts)
+      updateUsernames(
+        selectedNetworkConfig.predeployedAccounts.reduce((acc, account) => {
+          acc.set(account.address, account.name)
+          return acc
+        }, new Map<string, string>())
+      )    }
+  }, [selectedNetworkConfig])
+
   // fetch names for new players
   const { playersAccounts } = usePlayersAccounts()
   const players_names = usePlayerDataStore((state) => state.players_names)
@@ -35,20 +50,8 @@ export function PlayerNameSync() {
       .slice(0, 999) // avoid rate limiting (will fetch the rest when players_names is updated with this batch)
   ), [playersAccounts, players_names])
 
-  const { connectorId, isControllerConnected } = useConnectedController()
-  const { selectedNetworkConfig } = useDojoSetup()
-
   useEffect(() => {
-    if (newPlayerAddresses.length == 0 || !isInitialized) return
-    if (connectorId == supportedConnetorIds.PREDEPLOYED) {
-      // use predeployed accounts
-      updateUsernames(
-        selectedNetworkConfig.predeployedAccounts.reduce((acc, account) => {
-          acc.set(account.address, account.name)
-          return acc
-        }, new Map<string, string>())
-      )
-    } else if (isControllerConnected) {
+    if (isInitialized && isControllerConnected && newPlayerAddresses.length > 0) {
       // fetch controller names
       // console.log(`PlayerNameSync() =================> controllers:`, Object.keys(players_names).length, 'NEW>>', newPlayerAddresses.length)
       lookupAddresses(newPlayerAddresses).then((result) => {
@@ -56,7 +59,7 @@ export function PlayerNameSync() {
         updateUsernames(result)
       })
     } 
-  }, [newPlayerAddresses, connectorId, isControllerConnected, selectedNetworkConfig, isInitialized])
+  }, [isInitialized, isControllerConnected, newPlayerAddresses])
 
   return (<></>)
 }
