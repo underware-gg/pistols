@@ -78,7 +78,7 @@ function QuizPlayerPanel({
   const { winners } = useQuizQuestionWinners(currentPartyId, currentQuestionId)
 
   const _asnwer = async (selectedAnswerNumber: number) => {
-    await community.answer_quiz(account, currentPartyId, currentQuestionId, selectedAnswerNumber)
+    await community.answer_quiz_question(account, currentPartyId, currentQuestionId, selectedAnswerNumber)
   }
 
   return (
@@ -391,10 +391,10 @@ function QuizAdminQuestion({
   const { account } = useAccount()
   const { community } = useDojoSystemCalls()
   const _start = () => {
-    community.open_quiz(account, partyId, questionId, fields.question, fields.description, fields.options)
+    community.open_quiz_question(account, partyId, questionId, fields.question, fields.description, fields.options)
   }
   const _stop = () => {
-    community.close_quiz(account, partyId, questionId, answerNumber)
+    community.close_quiz_question(account, partyId, questionId, answerNumber)
   }
 
   const canStart = useMemo(() => (isOffChain && validated), [isOffChain, validated])

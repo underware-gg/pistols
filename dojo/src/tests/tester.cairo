@@ -1166,10 +1166,9 @@ pub mod tester {
         name: ByteArray,
         description: ByteArray,
         start: u64,
-        end: u64,
     ) -> QuizParty {
         impersonate(sender);
-        let quiz_party: QuizParty = (*sys.community).create_quiz_party(name, description, start, end);
+        let quiz_party: QuizParty = (*sys.community).create_quiz_party(name, description, start);
         _next_block();
         (quiz_party)
     }
@@ -1178,10 +1177,17 @@ pub mod tester {
         name: ByteArray,
         description: ByteArray,
         start: u64,
-        end: u64,
     ) -> QuizParty {
         impersonate(sender);
-        let quiz_party: QuizParty = (*sys.community).edit_quiz_party(party_id, name, description, start, end);
+        let quiz_party: QuizParty = (*sys.community).edit_quiz_party(party_id, name, description, start);
+        _next_block();
+        (quiz_party)
+    }
+    pub fn execute_close_quiz_party(sys: @TestSystems, sender: ContractAddress,
+        party_id: u32,
+    ) -> QuizParty {
+        impersonate(sender);
+        let quiz_party: QuizParty = (*sys.community).close_quiz_party(party_id);
         _next_block();
         (quiz_party)
     }
@@ -1193,7 +1199,7 @@ pub mod tester {
         _next_block();
         (quiz_question)
     }
-    pub fn execute_open_quiz(sys: @TestSystems, sender: ContractAddress,
+    pub fn execute_open_quiz_question(sys: @TestSystems, sender: ContractAddress,
         party_id: u32,
         question_id: u32,
         question: ByteArray,
@@ -1201,17 +1207,17 @@ pub mod tester {
         options: Array<ByteArray>,
     ) -> QuizQuestion {
         impersonate(sender);
-        let quiz_question: QuizQuestion = (*sys.community).open_quiz(party_id, question_id, question, description, options);
+        let quiz_question: QuizQuestion = (*sys.community).open_quiz_question(party_id, question_id, question, description, options);
         _next_block();
         (quiz_question)
     }
-    pub fn execute_close_quiz(sys: @TestSystems, sender: ContractAddress,
+    pub fn execute_close_quiz_question(sys: @TestSystems, sender: ContractAddress,
         party_id: u32,
         question_id: u32,
         answer_number: u8,
     ) -> QuizQuestion {
         impersonate(sender);
-        let quiz_question: QuizQuestion = (*sys.community).close_quiz(party_id, question_id, answer_number);
+        let quiz_question: QuizQuestion = (*sys.community).close_quiz_question(party_id, question_id, answer_number);
         _next_block();
         (quiz_question)
     }
@@ -1223,13 +1229,13 @@ pub mod tester {
         (*sys.community).set_current_quiz(party_id, question_id);
         _next_block();
     }
-    pub fn execute_answer_quiz(sys: @TestSystems, sender: ContractAddress,
+    pub fn execute_answer_quiz_question(sys: @TestSystems, sender: ContractAddress,
         party_id: u32,
         question_id: u32,
         answer_number: u8,
     ) {
         impersonate(sender);
-        (*sys.community).answer_quiz(party_id, question_id, answer_number);
+        (*sys.community).answer_quiz_question(party_id, question_id, answer_number);
         _next_block();
     }
 

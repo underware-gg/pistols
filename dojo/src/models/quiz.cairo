@@ -76,22 +76,25 @@ pub impl QuizConfigImpl of QuizConfigTrait {
 
 #[generate_trait]
 pub impl QuizPartyImpl of QuizPartyTrait {
+    fn exists(self: @QuizParty) -> bool {
+        (self.name.len().is_non_zero())
+    }
     fn create_quiz_party(ref store: Store,
         name: ByteArray,
         description: ByteArray,
         start: u64,
-        end: u64,
     ) -> QuizParty {
         // increment quiz count
         let mut quiz_config: QuizConfig = store.get_quiz_config();
         quiz_config.quiz_party_count += 1;
         store.set_quiz_config(@quiz_config);
         // create question
+        assert(name.len().is_non_zero(), CommunityErrors::INVALID_NAME);
         let quiz_party: QuizParty = QuizParty {
             party_id: quiz_config.quiz_party_count,
             name,
             description,
-            timestamps: Period { start, end },
+            timestamps: Period { start, end: 0 },
             quiz_question_count: 0,
         };
         store.set_quiz_party(@quiz_party);
@@ -102,14 +105,24 @@ pub impl QuizPartyImpl of QuizPartyTrait {
         name: ByteArray,
         description: ByteArray,
         start: u64,
-        end: u64,
     ) -> QuizParty {
-        // increment quiz count
         let mut quiz_party: QuizParty = store.get_quiz_party(party_id);
+        assert(quiz_party.exists(), CommunityErrors::INVALID_PARTY);
+        assert(quiz_party.timestamps.end.is_zero(), CommunityErrors::PARTY_IS_CLOSED);
+        assert(name.len().is_non_zero(), CommunityErrors::INVALID_NAME);
         quiz_party.name = name;
         quiz_party.description = description;
         quiz_party.timestamps.start = start;
-        quiz_party.timestamps.end = end;
+        store.set_quiz_party(@quiz_party);
+        (quiz_party)
+    }
+    fn close_quiz_party(ref store: Store,
+        party_id: u32,
+    ) -> QuizParty {
+        let mut quiz_party: QuizParty = store.get_quiz_party(party_id);
+        assert(quiz_party.exists(), CommunityErrors::INVALID_PARTY);
+        assert(quiz_party.timestamps.end.is_zero(), CommunityErrors::PARTY_IS_CLOSED);
+        quiz_party.timestamps.end = starknet::get_block_timestamp();
         store.set_quiz_party(@quiz_party);
         (quiz_party)
     }
@@ -128,6 +141,8 @@ pub impl QuizQuestionImpl of QuizQuestionTrait {
     ) -> QuizQuestion {
         // increment quiz count
         let mut quiz_party: QuizParty = store.get_quiz_party(party_id);
+        assert(quiz_party.exists(), CommunityErrors::INVALID_PARTY);
+        assert(quiz_party.timestamps.end.is_zero(), CommunityErrors::PARTY_IS_CLOSED);
         quiz_party.quiz_question_count += 1;
         store.set_quiz_party(@quiz_party);
         // create question
@@ -144,13 +159,18 @@ pub impl QuizQuestionImpl of QuizQuestionTrait {
         store.set_quiz_question(@quiz_question);
         (quiz_question)
     }
-    fn open_quiz(ref store: Store,
+    fn open_quiz_question(ref store: Store,
         party_id: u32,
         question_id: u32,
         question: ByteArray,
         description: ByteArray,
         options: Array<ByteArray>
     ) -> QuizQuestion {
+        // party must be open
+        let quiz_party: QuizParty = store.get_quiz_party(party_id);
+        assert(quiz_party.exists(), CommunityErrors::INVALID_PARTY);
+        assert(quiz_party.timestamps.end.is_zero(), CommunityErrors::PARTY_IS_CLOSED);
+        // open question
         let mut quiz_question: QuizQuestion = store.get_quiz_question(party_id, question_id);
         assert(quiz_question.timestamps.start.is_zero(), CommunityErrors::QUESTION_IS_OPEN);
         assert(quiz_question.timestamps.end.is_zero(), CommunityErrors::QUESTION_IS_CLOSED);
@@ -165,7 +185,7 @@ pub impl QuizQuestionImpl of QuizQuestionTrait {
         // returns the quiz question
         (quiz_question)
     }
-    fn close_quiz(ref store: Store,
+    fn close_quiz_question(ref store: Store,
         party_id: u32,
         question_id: u32,
         answer_number: u8,
@@ -180,7 +200,7 @@ pub impl QuizQuestionImpl of QuizQuestionTrait {
         store.set_quiz_question(@quiz_question);
         (quiz_question)
     }
-    fn answer_quiz(ref store: Store,
+    fn answer_quiz_question(ref store: Store,
         party_id: u32,
         question_id: u32,
         answer_number: u8,
