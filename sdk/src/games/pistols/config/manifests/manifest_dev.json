@@ -91,8 +91,8 @@
       ]
     },
     {
-      "address": "0x6075cf9a11ac6d9acf6b9223d96855fd28d87940b89856106a94a36ea20ba4b",
-      "class_hash": "0x42bae4776edf21e64c0992beedbd9c33369f568d084ed5613e3b62950e42812",
+      "address": "0x5f819b0e5ee654fbcb496f34823ea514bf52b878029d5cd2d3188a6cb4b390b",
+      "class_hash": "0x4f08db7512557674e93b682478b7cf3e236df5fdacfa22853d8af909e40e28e",
       "init_calldata": [],
       "tag": "pistols-community",
       "selector": "0x7348885054faf5239115b952a0812295ca08f3be01216dd6c03a9fcc22d1dba",
@@ -107,10 +107,11 @@
         "set_current_quiz",
         "create_quiz_party",
         "edit_quiz_party",
+        "close_quiz_party",
         "create_quiz_question",
-        "open_quiz",
-        "close_quiz",
-        "answer_quiz",
+        "open_quiz_question",
+        "close_quiz_question",
+        "answer_quiz_question",
         "upgrade"
       ]
     },
@@ -8278,10 +8279,6 @@
             {
               "name": "start",
               "type": "core::integer::u64"
-            },
-            {
-              "name": "end",
-              "type": "core::integer::u64"
             }
           ],
           "outputs": [
@@ -8310,10 +8307,22 @@
             {
               "name": "start",
               "type": "core::integer::u64"
-            },
+            }
+          ],
+          "outputs": [
             {
-              "name": "end",
-              "type": "core::integer::u64"
+              "type": "pistols::models::quiz::QuizParty"
+            }
+          ],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "close_quiz_party",
+          "inputs": [
+            {
+              "name": "party_id",
+              "type": "core::integer::u32"
             }
           ],
           "outputs": [
@@ -8341,7 +8350,7 @@
         },
         {
           "type": "function",
-          "name": "open_quiz",
+          "name": "open_quiz_question",
           "inputs": [
             {
               "name": "party_id",
@@ -8373,7 +8382,7 @@
         },
         {
           "type": "function",
-          "name": "close_quiz",
+          "name": "close_quiz_question",
           "inputs": [
             {
               "name": "party_id",
@@ -8397,7 +8406,7 @@
         },
         {
           "type": "function",
-          "name": "answer_quiz",
+          "name": "answer_quiz_question",
           "inputs": [
             {
               "name": "party_id",

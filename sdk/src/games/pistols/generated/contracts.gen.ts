@@ -572,19 +572,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_community_answerQuiz_calldata = (partyId: BigNumberish, questionId: BigNumberish, answerNumber: BigNumberish): DojoCall => {
+	const build_community_answerQuizQuestion_calldata = (partyId: BigNumberish, questionId: BigNumberish, answerNumber: BigNumberish): DojoCall => {
 		return {
 			contractName: "community",
-			entrypoint: "answer_quiz",
+			entrypoint: "answer_quiz_question",
 			calldata: [partyId, questionId, answerNumber],
 		};
 	};
 
-	const community_answerQuiz = async (snAccount: Account | AccountInterface, partyId: BigNumberish, questionId: BigNumberish, answerNumber: BigNumberish) => {
+	const community_answerQuizQuestion = async (snAccount: Account | AccountInterface, partyId: BigNumberish, questionId: BigNumberish, answerNumber: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_community_answerQuiz_calldata(partyId, questionId, answerNumber),
+				build_community_answerQuizQuestion_calldata(partyId, questionId, answerNumber),
 				"pistols",
 			);
 		} catch (error) {
@@ -635,19 +635,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_community_closeQuiz_calldata = (partyId: BigNumberish, questionId: BigNumberish, answerNumber: BigNumberish): DojoCall => {
+	const build_community_closeQuizParty_calldata = (partyId: BigNumberish): DojoCall => {
 		return {
 			contractName: "community",
-			entrypoint: "close_quiz",
-			calldata: [partyId, questionId, answerNumber],
+			entrypoint: "close_quiz_party",
+			calldata: [partyId],
 		};
 	};
 
-	const community_closeQuiz = async (snAccount: Account | AccountInterface, partyId: BigNumberish, questionId: BigNumberish, answerNumber: BigNumberish) => {
+	const community_closeQuizParty = async (snAccount: Account | AccountInterface, partyId: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_community_closeQuiz_calldata(partyId, questionId, answerNumber),
+				build_community_closeQuizParty_calldata(partyId),
 				"pistols",
 			);
 		} catch (error) {
@@ -656,19 +656,40 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_community_createQuizParty_calldata = (name: string, description: string, start: BigNumberish, end: BigNumberish): DojoCall => {
+	const build_community_closeQuizQuestion_calldata = (partyId: BigNumberish, questionId: BigNumberish, answerNumber: BigNumberish): DojoCall => {
 		return {
 			contractName: "community",
-			entrypoint: "create_quiz_party",
-			calldata: [name, description, start, end],
+			entrypoint: "close_quiz_question",
+			calldata: [partyId, questionId, answerNumber],
 		};
 	};
 
-	const community_createQuizParty = async (snAccount: Account | AccountInterface, name: string, description: string, start: BigNumberish, end: BigNumberish) => {
+	const community_closeQuizQuestion = async (snAccount: Account | AccountInterface, partyId: BigNumberish, questionId: BigNumberish, answerNumber: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_community_createQuizParty_calldata(name, description, start, end),
+				build_community_closeQuizQuestion_calldata(partyId, questionId, answerNumber),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_community_createQuizParty_calldata = (name: string, description: string, start: BigNumberish): DojoCall => {
+		return {
+			contractName: "community",
+			entrypoint: "create_quiz_party",
+			calldata: [name, description, start],
+		};
+	};
+
+	const community_createQuizParty = async (snAccount: Account | AccountInterface, name: string, description: string, start: BigNumberish) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_community_createQuizParty_calldata(name, description, start),
 				"pistols",
 			);
 		} catch (error) {
@@ -740,19 +761,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_community_editQuizParty_calldata = (partyId: BigNumberish, name: string, description: string, start: BigNumberish, end: BigNumberish): DojoCall => {
+	const build_community_editQuizParty_calldata = (partyId: BigNumberish, name: string, description: string, start: BigNumberish): DojoCall => {
 		return {
 			contractName: "community",
 			entrypoint: "edit_quiz_party",
-			calldata: [partyId, name, description, start, end],
+			calldata: [partyId, name, description, start],
 		};
 	};
 
-	const community_editQuizParty = async (snAccount: Account | AccountInterface, partyId: BigNumberish, name: string, description: string, start: BigNumberish, end: BigNumberish) => {
+	const community_editQuizParty = async (snAccount: Account | AccountInterface, partyId: BigNumberish, name: string, description: string, start: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_community_editQuizParty_calldata(partyId, name, description, start, end),
+				build_community_editQuizParty_calldata(partyId, name, description, start),
 				"pistols",
 			);
 		} catch (error) {
@@ -858,19 +879,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_community_openQuiz_calldata = (partyId: BigNumberish, questionId: BigNumberish, question: string, description: string, options: Array<string>): DojoCall => {
+	const build_community_openQuizQuestion_calldata = (partyId: BigNumberish, questionId: BigNumberish, question: string, description: string, options: Array<string>): DojoCall => {
 		return {
 			contractName: "community",
-			entrypoint: "open_quiz",
+			entrypoint: "open_quiz_question",
 			calldata: [partyId, questionId, question, description, options],
 		};
 	};
 
-	const community_openQuiz = async (snAccount: Account | AccountInterface, partyId: BigNumberish, questionId: BigNumberish, question: string, description: string, options: Array<string>) => {
+	const community_openQuizQuestion = async (snAccount: Account | AccountInterface, partyId: BigNumberish, questionId: BigNumberish, question: string, description: string, options: Array<string>) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_community_openQuiz_calldata(partyId, questionId, question, description, options),
+				build_community_openQuizQuestion_calldata(partyId, questionId, question, description, options),
 				"pistols",
 			);
 		} catch (error) {
@@ -5093,14 +5114,16 @@ export function setupWorld(provider: DojoProvider) {
 			buildTransferToWinnerCalldata: build_bot_player_transferToWinner_calldata,
 		},
 		community: {
-			answerQuiz: community_answerQuiz,
-			buildAnswerQuizCalldata: build_community_answerQuiz_calldata,
+			answerQuizQuestion: community_answerQuizQuestion,
+			buildAnswerQuizQuestionCalldata: build_community_answerQuizQuestion_calldata,
 			clearCallToChallenge: community_clearCallToChallenge,
 			buildClearCallToChallengeCalldata: build_community_clearCallToChallenge_calldata,
 			clearPlayerSocialLink: community_clearPlayerSocialLink,
 			buildClearPlayerSocialLinkCalldata: build_community_clearPlayerSocialLink_calldata,
-			closeQuiz: community_closeQuiz,
-			buildCloseQuizCalldata: build_community_closeQuiz_calldata,
+			closeQuizParty: community_closeQuizParty,
+			buildCloseQuizPartyCalldata: build_community_closeQuizParty_calldata,
+			closeQuizQuestion: community_closeQuizQuestion,
+			buildCloseQuizQuestionCalldata: build_community_closeQuizQuestion_calldata,
 			createQuizParty: community_createQuizParty,
 			buildCreateQuizPartyCalldata: build_community_createQuizParty_calldata,
 			createQuizQuestion: community_createQuizQuestion,
@@ -5121,8 +5144,8 @@ export function setupWorld(provider: DojoProvider) {
 			buildGetDuelistLeaderboardPositionCalldata: build_community_getDuelistLeaderboardPosition_calldata,
 			getLeaderboard: community_getLeaderboard,
 			buildGetLeaderboardCalldata: build_community_getLeaderboard_calldata,
-			openQuiz: community_openQuiz,
-			buildOpenQuizCalldata: build_community_openQuiz_calldata,
+			openQuizQuestion: community_openQuizQuestion,
+			buildOpenQuizQuestionCalldata: build_community_openQuizQuestion_calldata,
 			setCurrentQuiz: community_setCurrentQuiz,
 			buildSetCurrentQuizCalldata: build_community_setCurrentQuiz_calldata,
 		},

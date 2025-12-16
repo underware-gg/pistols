@@ -36,10 +36,11 @@ export const INTERFACE_DESCRIPTIONS: any = {
     set_current_quiz: 'Set current quiz id (admin)',
     create_quiz_party: 'Create a quiz event (admin)',
     edit_quiz_party: 'Create a quiz event (admin)',
+    close_quiz_party: 'Close a quiz event (admin)',
     create_quiz_question: 'Create a quiz question (admin)',
-    open_quiz: 'Open a quiz question (admin)',
-    close_quiz: 'Close a quiz question (admin)',
-    answer_quiz: 'Answer a quiz question (players)',
+    open_quiz_question: 'Open a quiz question (admin)',
+    close_quiz_question: 'Close a quiz question (admin)',
+    answer_quiz_question: 'Answer a quiz question (players)',
   },
   // from: ../dojo/src/systems/game.cairo
   IGame: {
