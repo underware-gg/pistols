@@ -128,12 +128,12 @@ asdf plugin add katana https://github.com/dojoengine/asdf-katana.git
 asdf plugin add torii https://github.com/dojoengine/asdf-torii.git
 asdf plugin add sozo https://github.com/dojoengine/asdf-sozo.git
 asdf install scarb 2.13.1
-asdf install sozo 1.8.3
+asdf install sozo 1.8.4
 asdf install katana 1.7.0
 asdf install torii 1.8.7
 # enable to your user account (optional)
 # asdf set -u scarb 2.13.1
-# asdf set -u sozo 1.8.3
+# asdf set -u sozo 1.8.4
 # asdf set -u katana 1.7.0
 # asdf set -u torii 1.8.7
 
