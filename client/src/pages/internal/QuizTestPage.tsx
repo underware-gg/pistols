@@ -23,6 +23,7 @@ import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppDojo from '/src/components/AppDojo'
 import { FormInputTimestampUTC } from '/src/components/ui/Form'
 import { formatTimestampLocal } from '@underware/pistols-sdk/utils'
+import { ActionButton } from '/src/components/ui/Buttons'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -74,7 +75,7 @@ function QuizPlayerPanel({
   const { account, address, isConnected } = useAccount()
   const { community } = useDojoSystemCalls()
   const { currentPartyId, currentQuestionId } = useQuizConfig()
-  const { partyName, timestamp_start } = useQuizParty(currentPartyId)
+  const { partyName, timestamp_start, isPartyClosed } = useQuizParty(currentPartyId)
   const { question, description, options, answerNumber, isOpen, isClosed } = useQuizQuestion(currentPartyId, currentQuestionId)
   const { playerAnswerNumber } = useQuizPlayerAnswer(currentPartyId, currentQuestionId, address)
   const { answerCounts } = useQuizAnswers(currentPartyId, currentQuestionId)
@@ -91,6 +92,7 @@ function QuizPlayerPanel({
             <Cell width={3}>Active Party:</Cell>
             <Cell className='Important'>
               {currentPartyId}: {partyName == '' ? <span>None</span> : <span>{partyName}</span>}
+              {isPartyClosed && ' (Closed)'}
             </Cell>
           </Row>
           <Row>
@@ -247,7 +249,7 @@ function QuizAdminPartyPanel() {
   const [isNewParty, setIsNewParty] = useState<boolean>(false)
 
   // update from on-chain data
-  const { partyName, description, timestamp_start, timestamp_end } = useQuizParty(selectedPartyId)
+  const { partyName, description, timestamp_start, timestamp_end, isPartyClosed } = useQuizParty(selectedPartyId)
   useEffect(() => {
     if (selectedPartyId == 0) {
       setIsNewParty(true);
@@ -293,6 +295,11 @@ function QuizAdminPartyPanel() {
     await community.edit_quiz_party(account, selectedPartyId, fields.name, fields.description, fields.timestamp_start)
     setIsBusy(false);
   }
+  const _closeParty = async () => {
+    setIsBusy(true);
+    await community.close_quiz_party(account, selectedPartyId)
+    setIsBusy(false);
+  }
 
   return (
     <>
@@ -302,28 +309,44 @@ function QuizAdminPartyPanel() {
           <Row>
             <Cell width={3}>Name:</Cell>
             <Cell className='Code'>
-              <Input value={fields.name} onChange={(e) => _setName(e.target.value.toString())} maxLength={100} style={{ width: '500px' }} />
+              <Input value={fields.name} disabled={isPartyClosed} onChange={(e) => _setName(e.target.value.toString())} maxLength={100} style={{ width: '500px' }} />
             </Cell>
           </Row>
           <Row>
             <Cell width={3}>Description:</Cell>
             <Cell className='Code'>
-              <Input value={fields.description} onChange={(e) => _setDescription(e.target.value.toString())} maxLength={100} style={{ width: '500px' }} />
+              <Input value={fields.description} disabled={isPartyClosed} onChange={(e) => _setDescription(e.target.value.toString())} maxLength={100} style={{ width: '500px' }} />
             </Cell>
           </Row>
           <Row>
             <Cell width={3}>Start Time (UTC):</Cell>
             <Cell className='Code'>
-              <FormInputTimestampUTC timestamp={fields.timestamp_start} setTimestamp={_setStartTime} style={{ width: '250px' }} />
+              <FormInputTimestampUTC timestamp={fields.timestamp_start} disabled={isPartyClosed} setTimestamp={_setStartTime} style={{ width: '250px' }} />
             </Cell>
           </Row>
-          <Row>
-            <Cell width={3}></Cell>
-            <Cell className='Code'>
-              {isNewParty && <Button disabled={!isValid || isBusy} onClick={_createParty}>Create New Party</Button>}
-              {!isNewParty && <Button disabled={!isValid || isBusy} onClick={_editParty}>Update Party</Button>}
-            </Cell>
-          </Row>
+          {!isPartyClosed && (
+            <Row>
+              <Cell width={3}></Cell>
+              <Cell className='Code'>
+                {isNewParty && <Button disabled={!isValid || isBusy} onClick={_createParty}>Create New Party</Button>}
+                {!isNewParty && (
+                  <>
+                    <Button disabled={!isValid || isBusy} onClick={_editParty}>Update Party</Button>
+                    {' | '}
+                    <ActionButton negative label='Close Party' disabled={isPartyClosed} loading={isBusy} onClick={_closeParty} confirm confirmMessage='Closing a party is irreversible!' />
+                  </>
+                )}
+              </Cell>
+            </Row>
+          )}
+          {isPartyClosed && (
+            <Row>
+              <Cell width={3}>End Time (UTC):</Cell>
+              <Cell className='Code'>
+                <FormInputTimestampUTC timestamp={fields.timestamp_end} disabled={isPartyClosed} setTimestamp={undefined} style={{ width: '250px' }} />
+              </Cell>
+            </Row>
+          )}
         </Body>
       </Table>
     </>
@@ -386,6 +409,7 @@ function QuizPartySelectorRows({
 function QuizAdminQuestionsPanel() {
   // admin params
   const { selectedPartyId, selectedQuestionId, setSelectedQuestionId } = useSelectedQuiz()
+  const { isPartyClosed } = useQuizParty(selectedPartyId)
   const { questionIds } = useQuizQuestionsByParty(selectedPartyId)
   useEffect(() => {
     if (selectedQuestionId == 0 && questionIds.length > 0) {
@@ -419,8 +443,12 @@ function QuizAdminQuestionsPanel() {
               {questionIds.map((q) =>
                 <Button key={q} onClick={() => setSelectedQuestionId(q)} active={q == selectedQuestionId}>{q}</Button>
               )}
-              {' | '}
-              <Button onClick={_createQuiz} disabled={isCreating || selectedPartyId == 0}>New Question</Button>
+              {!isPartyClosed && (
+                <>
+                  {' | '}
+                  <Button onClick={_createQuiz} disabled={isCreating || selectedPartyId == 0}>New Question</Button>
+                </>
+              )}
             </Cell>
           </Row>
         </Body>
@@ -437,7 +465,8 @@ function QuizAdminQuestion({
   partyId: number,
   questionId: number,
 }) {
-  const { isOffChain, isOpen, isClosed } = useQuizQuestion(partyId, questionId)
+  const { isPartyClosed } = useQuizParty(partyId)
+  const { isOffChain, isOpen } = useQuizQuestion(partyId, questionId)
   const COOKIE_NAME = useMemo(() => _questionCookieName(partyId, questionId), [partyId, questionId]);
   const COOKIE_NAME_ANSWER = useMemo(() => _answerCookieName(partyId, questionId), [partyId, questionId]);
   const [cookies, setCookie] = useCookies([COOKIE_NAME, COOKIE_NAME_ANSWER]);
@@ -468,9 +497,9 @@ function QuizAdminQuestion({
           <Cell>
             {isOffChain ? 'off-chain' : isOpen ? 'Open' : 'Closed'}
             {' | '}
-            <Button disabled={!canStart} active={canStart} onClick={_start}>DEPLOY / START</Button>
+            <ActionButton disabled={!canStart || isPartyClosed} active={canStart} onClick={_start} label='DEPLOY / START' confirm confirmMessage='Deploying a question is irreversible!' />
             {' | '}
-            <Button disabled={!canStop} active={canStop} onClick={_stop}>STOP / FINISH</Button>
+            <ActionButton disabled={!canStop} active={canStop} onClick={_stop} label='STOP / FINISH' confirm confirmMessage='Stopping a question is irreversible!' />
           </Cell>
         </Row>
         {isOffChain && <QuizAdminQuestionOffChain partyId={partyId} questionId={questionId} />}
@@ -516,7 +545,15 @@ function QuizAdminQuestionOnChain({
 
   return (
     <>
-      <QuizAdminQuestionForm partyId={partyId} questionId={questionId} fields={fields} answerNumber={answerNumber} answerCounts={answerCounts} isOpen={isOpen} isClosed={isClosed} />
+      <QuizAdminQuestionForm
+        partyId={partyId}
+        questionId={questionId}
+        fields={fields}
+        answerNumber={answerNumber}
+        answerCounts={answerCounts}
+        isOpen={isOpen}
+        isClosed={isClosed}
+      />
       <QuizResults partyId={partyId} questionId={questionId} />
     </>
   )
@@ -548,7 +585,14 @@ function QuizAdminQuestionOffChain({
     // setFields(fields)
   }
 
-  return <QuizAdminQuestionForm partyId={partyId} questionId={questionId} fields={fields} setFields={_setFields} />
+  return (
+    <QuizAdminQuestionForm
+      partyId={partyId}
+      questionId={questionId}
+      fields={fields}
+      setFields={_setFields}
+    />
+  )
 }
 
 
@@ -573,6 +617,8 @@ function QuizAdminQuestionForm({
   isClosed?: boolean,
   setFields?: (fields: QuestionFields) => void,
 }) {
+  const { isPartyClosed } = useQuizParty(partyId)
+
   const _setQuestion = (question: string) => {
     setFields({ ...fields, question })
   }
@@ -602,7 +648,7 @@ function QuizAdminQuestionForm({
     setCookie(COOKIE_NAME_ANSWER, answerNumber)
   }
 
-  const editable = useMemo(() => (!isOpen && !isClosed), [isOpen, isClosed])
+  const editable = useMemo(() => (!isOpen && !isClosed && !isPartyClosed), [isOpen, isClosed, isPartyClosed])
   const isFinished = useMemo(() => (answerNumber > 0), [answerNumber])
   const _answerNumber = useMemo(() => (answerNumber || cookies[COOKIE_NAME_ANSWER] || 0), [answerNumber, cookies[COOKIE_NAME_ANSWER]])
   const _answerIndex = useMemo(() => (_answerNumber - 1), [_answerNumber])
@@ -635,7 +681,7 @@ function QuizAdminQuestionForm({
             {' | '}
             <Button key={index}
               active={index == _answerIndex}
-              disabled={isFinished}
+              disabled={isFinished || isPartyClosed}
               onClick={() => _setAnswerNumber(index + 1)}
             >
               {index == _answerIndex ? 'THE ANSWER' : 'Answer'}

@@ -40,6 +40,7 @@ export const useQuizParty = (quizPartyId: number) => {
     description,
     timestamp_start,
     timestamp_end,
+    isPartyClosed: (timestamp_end > 0),
   }
 }
 
