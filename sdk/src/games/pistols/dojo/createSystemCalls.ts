@@ -2,13 +2,13 @@ import { DojoCall, DojoProvider, getContractByName } from '@dojoengine/core'
 import { AccountInterface, BigNumberish, CairoCustomEnum, Call, CallData, UniversalDetails, CairoOption, CairoOptionVariant } from 'starknet'
 import { arrayClean, shortAddress, isPositiveBigint, bigintToHex, bigintToAddress } from 'src/utils/misc/types'
 import { NAMESPACE, getLordsAddress, getBankAddress, getVrfAddress, DojoManifest, getMatchmakerAddress } from 'src/games/pistols/config/config'
-import { bigintToU256, stringToFelt } from 'src/starknet/starknet'
-import { makeCustomEnum } from 'src/starknet/starknet_enum'
 import { DojoNetworkConfig } from 'src/games/pistols/config/networks'
+import { DuelistProfileKey } from 'src/games/pistols/misc/profiles'
+import { bigintToU256 } from 'src/starknet/starknet'
+import { makeCustomEnum } from 'src/starknet/starknet_enum'
 import { setupWorld } from 'src/games/pistols/generated/contracts.gen'
 import { emitter } from 'src/dojo/hooks/useDojoEmitterEvent'
 import * as constants from 'src/games/pistols/generated/constants'
-import { DuelistProfileKey } from '../misc/profiles'
 
 export type SystemCalls = ReturnType<typeof createSystemCalls>;
 export type DojoCalls = Array<DojoCall | Call>

@@ -1,16 +1,11 @@
 import {
-  Account,
-  AccountInterface,
-  InvocationsDetails,
-  InvokeFunctionResponse,
   shortString,
   BigNumberish,
   Uint256,
   uint256,
-  encode,
-  Abi,
   ec,
   byteArray,
+  ByteArray,
 } from 'starknet'
 import { bigintToHex, isBigint, isPositiveBigint } from 'src/utils/misc/types'
 import { encodeBase64 } from 'src/utils/misc/decoder'
@@ -24,12 +19,13 @@ export const poseidonString = (v: string): bigint => poseidon(byteArray.byteArra
 //
 // Cairo type conversions
 export const validateCairoString = (v: string): string => (v ? v.slice(0, 31) : '')
-export const stringToFelt = (v: string): BigNumberish => (v ? shortString.encodeShortString(v) : '0x0')
-export const feltToString = (v: BigNumberish): string => (BigInt(v) > 0n ? shortString.decodeShortString(bigintToHex(v)) : '')
 export const chainIdToString = (chainId: string | bigint | null | undefined): string | undefined => (chainId ? (typeof chainId === 'string' ? chainId : feltToString(chainId)) : undefined)
 export const chainIdToBigInt = (chainId: string | bigint | null | undefined): bigint | undefined => (chainId ? (typeof chainId === 'bigint' ? chainId : BigInt(chainId.startsWith('0x') ? chainId : stringToFelt(chainId))) : undefined)
 export const U256ToBigint = (v: Uint256): bigint => (uint256.uint256ToBN(v))
 export const bigintToU256 = (v: BigNumberish): Uint256 => (uint256.bnToUint256(v))
+export const feltToString = (v: BigNumberish): string => (BigInt(v) > 0n ? shortString.decodeShortString(bigintToHex(v)) : '')
+export const stringToFelt = (v: string): BigNumberish => (v ? shortString.encodeShortString(v) : '0x0')
+export const stringToByteArray = (v: string): ByteArray => byteArray.byteArrayFromString(v ?? '')
 
 
 //
