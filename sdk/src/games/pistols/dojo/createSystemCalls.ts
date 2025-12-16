@@ -253,25 +253,31 @@ export function createSystemCalls(
       },
       //
       // quiz
-      create_quiz_party: async (signer: AccountInterface, name: string, description: string, start: number, end: number, key?: string): Promise<boolean> => {
+      create_quiz_party: async (signer: AccountInterface, name: string, description: string, start: number, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
           contractCalls.community.buildCreateQuizPartyCalldata(
             name,
             description,
             bigintToHex(start),
-            bigintToHex(end),
           ),
         ]
         return await _executeTransaction(signer, calls, key)
       },
-      edit_quiz_party: async (signer: AccountInterface, party_id: number, name: string, description: string, start: number, end: number, key?: string): Promise<boolean> => {
+      edit_quiz_party: async (signer: AccountInterface, party_id: number, name: string, description: string, start: number, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
           contractCalls.community.buildEditQuizPartyCalldata(
             bigintToHex(party_id),
             name,
             description,
             bigintToHex(start),
-            bigintToHex(end),
+          ),
+        ]
+        return await _executeTransaction(signer, calls, key)
+      },
+      close_quiz_party: async (signer: AccountInterface, party_id: number, key?: string): Promise<boolean> => {
+        const calls: DojoCalls = [
+          contractCalls.community.buildCloseQuizPartyCalldata(
+            bigintToHex(party_id),
           ),
         ]
         return await _executeTransaction(signer, calls, key)
@@ -284,9 +290,9 @@ export function createSystemCalls(
         ]
         return await _executeTransaction(signer, calls, key)
       },
-      open_quiz: async (signer: AccountInterface, quiz_party_id: number, question_id: number, question: string, description: string, options: Array<string>, key?: string): Promise<boolean> => {
+      open_quiz_question: async (signer: AccountInterface, quiz_party_id: number, question_id: number, question: string, description: string, options: Array<string>, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
-          contractCalls.community.buildOpenQuizCalldata(
+          contractCalls.community.buildOpenQuizQuestionCalldata(
             bigintToHex(quiz_party_id),
             bigintToHex(question_id),
             question,
@@ -296,10 +302,10 @@ export function createSystemCalls(
         ]
         return await _executeTransaction(signer, calls, key)
       },
-      close_quiz: async (signer: AccountInterface, quiz_party_id: number, question_id: number, answer_number: BigNumberish, key?: string): Promise<boolean> => {
+      close_quiz_question: async (signer: AccountInterface, quiz_party_id: number, question_id: number, answer_number: BigNumberish, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
           vrf_request_call('community', signer.address),
-          contractCalls.community.buildCloseQuizCalldata(
+          contractCalls.community.buildCloseQuizQuestionCalldata(
             bigintToHex(quiz_party_id),
             bigintToHex(question_id),
             bigintToHex(answer_number),
@@ -316,9 +322,9 @@ export function createSystemCalls(
         ]
         return await _executeTransaction(signer, calls, key)
       },
-      answer_quiz: async (signer: AccountInterface, quiz_party_id: number, question_id: number, answer_number: BigNumberish, key?: string): Promise<boolean> => {
+      answer_quiz_question: async (signer: AccountInterface, quiz_party_id: number, question_id: number, answer_number: BigNumberish, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
-          contractCalls.community.buildAnswerQuizCalldata(  
+          contractCalls.community.buildAnswerQuizQuestionCalldata(  
             bigintToHex(quiz_party_id),
             bigintToHex(question_id),
             bigintToHex(answer_number),

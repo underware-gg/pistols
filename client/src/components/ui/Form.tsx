@@ -76,7 +76,7 @@ export function FormInputNumber({
   className?: string
 }) {
   const maxLength = useMemo(() => (maxValue.toString().length), [maxValue])
-  const style = useMemo(() => ({ width: `${maxLength+1}em` }), [maxLength])
+  const style = useMemo(() => ({ width: `${maxLength + 1}em` }), [maxLength])
   const _setValue = (v: string) => {
     if (isNumber(v)) {
       const n = parseInt(v)
@@ -96,6 +96,57 @@ export function FormInputNumber({
       fluid={fluid}
       disabled={disabled}
       className={className}
+      style={style}
+    />
+  )
+}
+
+
+export function FormInputTimestampUTC({
+  timestamp,
+  setTimestamp,
+  disabled = true,
+  style = {},
+}: {
+  timestamp: number
+  setTimestamp: (timestamp: number) => void
+  disabled?: boolean
+  style?: React.CSSProperties
+}) {
+  const pad = (n: number) => n.toString().padStart(2, '0')
+  // Converts timestamp (seconds) to 'YYYY-MM-DDTHH:mm' string for input
+  const value = useMemo(() => {
+    if (!timestamp) return ''
+    const date = new Date(timestamp * 1000)
+    const year = date.getUTCFullYear()
+    const month = pad(date.getUTCMonth() + 1)
+    const day = pad(date.getUTCDate())
+    const hours = pad(date.getUTCHours())
+    const minutes = pad(date.getUTCMinutes())
+    const result = `${year}-${month}-${day}T${hours}:${minutes}`
+    console.log('_time_VALUE >>>', result);
+    return result;
+  }, [timestamp])
+
+  const _setValue = (datetime: string) => {
+    console.log('_time_FORM >>>', datetime, typeof datetime);
+    if (datetime) {
+      // Safari safe: add ':00Z' if not present
+      const safeString = datetime.length === 16 ? `${datetime}:00Z` : datetime
+      const parsedDate = new Date(safeString)
+      if (isNaN(parsedDate.getTime())) {
+        return
+      }
+      setTimestamp(Math.floor(parsedDate.getTime() / 1000))
+    }
+  }
+
+  return (
+    <Input
+      type='datetime-local'
+      disabled={disabled}
+      value={value}
+      onChange={(e) => _setValue(e.target.value)}
       style={style}
     />
   )

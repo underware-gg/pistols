@@ -20,6 +20,8 @@ import { Address } from '/src/components/ui/Address'
 import { Connect } from '/src/pages/tests/ConnectTestPage'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppDojo from '/src/components/AppDojo'
+import { FormInputTimestampUTC } from '/src/components/ui/Form'
+import { formatTimestampLocal } from '@underware/pistols-sdk/utils'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -71,7 +73,7 @@ function QuizPlayerPanel({
   const { account, address, isConnected } = useAccount()
   const { community } = useDojoSystemCalls()
   const { currentPartyId, currentQuestionId } = useQuizConfig()
-  const { partyName } = useQuizParty(currentPartyId)
+  const { partyName, timestamp_start } = useQuizParty(currentPartyId)
   const { question, description, options, answerNumber, isOpen, isClosed } = useQuizQuestion(currentPartyId, currentQuestionId)
   const { playerAnswerNumber } = useQuizPlayerAnswer(currentPartyId, currentQuestionId, address)
   const { playersByAnswer, answerCounts } = useQuizAnswers(currentPartyId, currentQuestionId)
@@ -82,28 +84,38 @@ function QuizPlayerPanel({
   }
 
   return (
-    <Table celled striped size='small' color='green'>
-      <Body className='ModalText'>
-        <Row>
-          <Cell width={3}>Active Party:</Cell>
-          <Cell className='Important'>
-            {currentPartyId}: {partyName == '' ? <span>None</span> : <span>{partyName}</span>}
-          </Cell>
-          <Cell></Cell>
-        </Row>
-        <Row>
-          <Cell>Active Question:</Cell>
-          <Cell className='Important'>
-            {currentQuestionId == 0 ? <span>None</span> : <span>{currentQuestionId}: ({isOpen ? 'Open' : 'Closed'})</span>}
-          </Cell>
-          <Cell></Cell>
-        </Row>
-        {(full && currentQuestionId > 0) && (
-          <>
+    <>
+      <Table celled striped size='small' color='green'>
+        <Body className='ModalText'>
+          <Row>
+            <Cell width={3}>Active Party:</Cell>
+            <Cell className='Important'>
+              {currentPartyId}: {partyName == '' ? <span>None</span> : <span>{partyName}</span>}
+            </Cell>
+          </Row>
+          <Row>
+            <Cell>Active Question:</Cell>
+            <Cell className='Important'>
+              {currentQuestionId == 0 ? <span>None</span> : <span>{currentQuestionId}: ({isOpen ? 'Open' : 'Closed'})</span>}
+            </Cell>
+          </Row>
+          {(full && currentPartyId > 0) && (
+            <>
+              <Row>
+                <Cell>Start Time:</Cell>
+                <Cell className='Code'>{formatTimestampLocal(timestamp_start)}</Cell>
+              </Row>
+            </>
+          )}
+        </Body>
+      </Table>
+      {(full && currentQuestionId > 0) && (
+        <Table celled striped size='small' color='green'>
+          <Body className='ModalText'>
             <Row>
-              <Cell>Question:</Cell>
+              <Cell width={3}>Question:</Cell>
               <Cell className='Important'>{question}</Cell>
-              <Cell></Cell>
+              <Cell width={3}></Cell>
             </Row>
             <Row>
               <Cell>Description:</Cell>
@@ -143,11 +155,12 @@ function QuizPlayerPanel({
               <Cell className='Code Smallest'>
                 {winners.map((winner) => <React.Fragment key={winner.address}><Address address={winner.address} />({winner.name})<br /></React.Fragment>)}
               </Cell>
+              <Cell></Cell>
             </Row>
-          </>
-        )}
-      </Body>
-    </Table>
+          </Body>
+        </Table>
+      )}
+    </>
   )
 }
 
@@ -169,6 +182,7 @@ function useSelectedQuiz() {
   const selectedQuestionId = useMemo(() => cookies[COOKIE_QUESTION_ID], [cookies[COOKIE_QUESTION_ID]])
   const setSelectedPartyId = (selectedPartyId: number) => {
     setCookie(COOKIE_PARTY_ID, selectedPartyId)
+    setCookie(COOKIE_QUESTION_ID, 0)
   }
   const setSelectedQuestionId = (selectedQuestionId: number) => {
     setCookie(COOKIE_QUESTION_ID, selectedQuestionId)
@@ -203,16 +217,16 @@ function QuizAdminPartyPanel() {
   const { partyName, description, timestamp_start, timestamp_end } = useQuizParty(selectedPartyId)
   useEffect(() => {
     if (selectedPartyId == 0) {
-      setIsNewParty(true)
-      setFields(EMPTY_PARTY)
+      setIsNewParty(true);
+      setFields(EMPTY_PARTY);
     } else {
-      setIsNewParty(false)
+      setIsNewParty(false);
       setFields({
         name: partyName,
         description: description,
         timestamp_start: timestamp_start,
         timestamp_end: timestamp_end,
-      })
+      });
     }
   }, [selectedPartyId, partyName, description, timestamp_start, timestamp_end])
   const isValid = useMemo(() => (
@@ -220,11 +234,14 @@ function QuizAdminPartyPanel() {
   ), [fields])
 
   const _setName = (name: string) => {
-    setFields({ ...fields, name })
+    setFields({ ...fields, name });
   }
   const _setDescription = (description: string) => {
-    console.log(`PARTY description <<< set:`, description, typeof description)
-    setFields({ ...fields, description })
+    setFields({ ...fields, description });
+  }
+  const _setStartTime = (timestamp: number) => {
+    console.log('_setStartTime >>>', timestamp, typeof timestamp);
+    setFields({ ...fields, timestamp_start: timestamp })
   }
 
   // create
@@ -234,14 +251,13 @@ function QuizAdminPartyPanel() {
   const { community } = useDojoSystemCalls()
   const _createParty = async () => {
     setIsBusy(true);
-    await community.create_quiz_party(account, fields.name, fields.description, fields.timestamp_start, fields.timestamp_end)
+    await community.create_quiz_party(account, fields.name, fields.description, fields.timestamp_start)
     setIsBusy(false);
     setSelectedPartyId(partyCount + 1)
   }
   const _editParty = async () => {
     setIsBusy(true);
-    console.log(`PARTY description <<< edit:`, fields.description, typeof fields.description)
-    await community.edit_quiz_party(account, selectedPartyId, fields.name, fields.description, fields.timestamp_start, fields.timestamp_end)
+    await community.edit_quiz_party(account, selectedPartyId, fields.name, fields.description, fields.timestamp_start)
     setIsBusy(false);
   }
 
@@ -263,8 +279,9 @@ function QuizAdminPartyPanel() {
             </Cell>
           </Row>
           <Row>
-            <Cell width={3}>Start Time:</Cell>
+            <Cell width={3}>Start Time (UTC):</Cell>
             <Cell className='Code'>
+              <FormInputTimestampUTC timestamp={fields.timestamp_start} setTimestamp={_setStartTime} style={{ width: '250px' }} />
             </Cell>
           </Row>
           <Row>
@@ -286,16 +303,23 @@ function QuizPartySelectorRows({
 }: {
   editable?: boolean,
 }) {
+  const { currentPartyId } = useQuizConfig()
   const { selectedPartyId, setSelectedPartyId, setSelectedQuestionId } = useSelectedQuiz()
   const { partyNamesById } = useQuizAllParties()
   const _selectParty = (partyId: number) => {
     setSelectedPartyId(partyId)
     setSelectedQuestionId(0)
   }
+  const { account } = useAccount()
+  const { community } = useDojoSystemCalls()
+  const _setCurrent = () => {
+    community.set_current_quiz(account, selectedPartyId, 0)
+  }
+  const isCurrentParty = useMemo(() => (selectedPartyId == currentPartyId), [selectedPartyId, currentPartyId])
   return (
     <>
       <Row>
-        <Cell width={3}>Party:</Cell>
+        <Cell width={3}>Party: {selectedPartyId}</Cell>
         <Cell className='Code'>
           <Dropdown
             value={selectedPartyId}
@@ -309,6 +333,8 @@ function QuizPartySelectorRows({
           />
           {editable && (
             <>
+              {' | '}
+              <Button active={true} onClick={() => _setCurrent()} disabled={isCurrentParty}>{isCurrentParty ? 'Current' : 'Set Current'}</Button>
               {' | '}
               <Button onClick={() => _selectParty(0)} disabled={selectedPartyId == 0}>New Party</Button>
             </>
