@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { create } from 'zustand'
 import { createDojoStore } from '@dojoengine/sdk/react'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
@@ -6,8 +6,8 @@ import { useAllStoreModels, useSdkEntitiesGet, useStoreModelsByKeys } from '@und
 import { PistolsSchemaType, PistolsQueryBuilder, PistolsEntity } from '@underware/pistols-sdk/pistols/sdk'
 import { models } from '@underware/pistols-sdk/pistols/gen'
 import { BigNumberish } from 'starknet'
-import { bigintToAddress } from '@underware/pistols-sdk/utils'
 import { getPlayernameFromAddress } from './playerStore'
+import { calculateQuestionWinners_v2_complex } from './quizScoring'
 
 export const useQuizStore = createDojoStore<PistolsSchemaType>();
 
@@ -218,34 +218,15 @@ export const useQuizPartyLeaderboards = (partyId: number, questionsLimit?: numbe
 }
 
 
+// See quizScoring.ts for full implementation
 const _getQuestionWinners = (partyId: number, questionId: number, question_models: models.QuizQuestion[], answer_models: models.QuizAnswer[]): QuizPlayer[] => {
-  // find question and correct answer
-  const question = question_models
-    .find((model) => Number(model?.party_id ?? 0) == partyId && Number(model?.question_id ?? 0) == questionId)
-  const answerNumber = Number(question?.answer_number ?? 0)
-  // find all players who answered the correct answer, sorted by timestamp
-  const answers = answer_models
-    .filter((model) => Number(model?.party_id ?? 0) == partyId)
-    .filter((model) => Number(model?.question_id ?? 0) == questionId)
-    .filter((model) => Number(model?.answer_number ?? 0) == answerNumber)
-    .sort((a, b) => (Number(a.timestamp) - Number(b.timestamp)))
-  // calculate score for each player
-  const players = answers
-    .map((model, i) => ({
-      address: bigintToAddress(model.player_address),
-      name: getPlayernameFromAddress(model.player_address),
-      score: 1000 + ((answers.length - i - 1) * 10),
-      wins: 1,
-    }))
-  // decide winners from question vrf
-  const vrf = BigInt(question?.vrf ?? 0)
-  const result = players.sort((a, b) => {
-    const aa = Number((BigInt(a.address) ^ vrf) & 0xffffffffn)
-    const bb = Number((BigInt(b.address) ^ vrf) & 0xffffffffn)
-    console.log(`_getQuestionWinners() =>`, aa, bb)
-    return (bb - aa)
-  })
-  return result;
+  return calculateQuestionWinners_v2_complex(
+    partyId,
+    questionId,
+    question_models,
+    answer_models,
+    getPlayernameFromAddress
+  )
 }
 
 const _getQuizPartyLeaderboards = (partyId: number, question_models: models.QuizQuestion[], answer_models: models.QuizAnswer[]): QuizPlayer[] => {
