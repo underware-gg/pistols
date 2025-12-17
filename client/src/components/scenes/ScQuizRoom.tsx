@@ -65,7 +65,6 @@ export default function ScQuizRoom() {
   const { winners } = useQuizQuestionWinners(partyId, questionId);
   const { leaderboards } = useQuizPartyLeaderboards(partyId);
   
-  //TODO reset showWinnerForQuestion when question is changed
   const [isInfoPanelOpen, setIsInfoPanelOpen] = useState(false);
   const [showWinnerForQuestion, setShowWinnerForQuestion] = useState(false);
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
@@ -90,6 +89,50 @@ export default function ScQuizRoom() {
       setSelectedQuestionId(0);
     }
   }, [isPartyClosed, selectedQuestionId]);
+
+  const hasTriggeredConfetti = useRef(false);
+  useEffect(() => {
+    if (isPartyClosed && questionId === 0 && !hasTriggeredConfetti.current) {
+      hasTriggeredConfetti.current = true;
+      
+      import('canvas-confetti').then((confettiModule) => {
+        const confetti = confettiModule.default;
+        const timer = setTimeout(() => {
+          const duration = 1000;
+          const end = Date.now() + duration;
+
+          const colors = ['#ef9758', '#006400', '#dc143c', '#1a1a1a'];
+
+          (function frame() {
+            const topPositions = [0.2, 0.4, 0.6, 0.8];
+            
+            topPositions.forEach((x) => {
+              confetti({
+                particleCount: 6,
+                angle: -90,
+                spread: 90,
+                startVelocity: 50,
+                origin: { x, y: -0.5 },
+                colors: colors,
+                gravity: 1,
+              });
+            });
+
+            if (Date.now() < end) {
+              requestAnimationFrame(frame);
+            }
+          }());
+        }, 500);
+
+        return () => clearTimeout(timer);
+      }).catch(() => {
+      });
+    }
+    
+    if (questionId !== 0) {
+      hasTriggeredConfetti.current = false;
+    }
+  }, [isPartyClosed, questionId]);
 
   const isQuizNotStarted = useMemo(() => {
     if (partyId && !isPartyClosed && activeQuestionIds.length === 0) return true;
