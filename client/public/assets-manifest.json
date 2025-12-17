@@ -1,6 +1,6 @@
 {
-  "version": "e8a9056df01e",
-  "generatedAt": 1762524022261,
+  "version": "ff18db99715d",
+  "generatedAt": 1765921400114,
   "assets": {
     "audioBiodecaySong6Mp3": {
       "path": "/audio/biodecay-song6.mp3",
@@ -18,13 +18,13 @@
       "path": "/audio/sfx/bell-broken.mp3",
       "hash": "v1_5b85819f0723a6b2",
       "size": 5424,
-      "mtime": 1760481145992
+      "mtime": 1764681322511
     },
     "audioSfxBellWorkingMp3": {
       "path": "/audio/sfx/bell-working.mp3",
       "hash": "v1_9338098350666c5c",
       "size": 23784,
-      "mtime": 1760481145995
+      "mtime": 1764681322511
     },
     "audioSfxBodyFallMp3": {
       "path": "/audio/sfx/body-fall.mp3",
@@ -36,61 +36,61 @@
       "path": "/audio/sfx/env/door-creaking.mp3",
       "hash": "v1_712009995b86a433",
       "size": 35582,
-      "mtime": 1745930535759
+      "mtime": 1764681322511
     },
     "audioSfxEnvDoorKnockingMp3": {
       "path": "/audio/sfx/env/door-knocking.mp3",
       "hash": "v1_0d7b197140a8e61e",
       "size": 46080,
-      "mtime": 1745930535760
+      "mtime": 1764681322512
     },
     "audioSfxEnvDoorkeepGrunting1Mp3": {
       "path": "/audio/sfx/env/doorkeep-grunting-1.mp3",
       "hash": "v1_7ffdbe8081f8fd2d",
       "size": 34598,
-      "mtime": 1745930535760
+      "mtime": 1764681322512
     },
     "audioSfxEnvDoorkeepGrunting2Mp3": {
       "path": "/audio/sfx/env/doorkeep-grunting-2.mp3",
       "hash": "v1_0dfd5f9f5587a7e6",
       "size": 24422,
-      "mtime": 1745930535761
+      "mtime": 1764681322512
     },
     "audioSfxEnvDoorkeepGrunting3Mp3": {
       "path": "/audio/sfx/env/doorkeep-grunting-3.mp3",
       "hash": "v1_a4ebced7d98c3b00",
       "size": 35654,
-      "mtime": 1745930535761
+      "mtime": 1764681322512
     },
     "audioSfxEnvDoorkeepGrunting4Mp3": {
       "path": "/audio/sfx/env/doorkeep-grunting-4.mp3",
       "hash": "v1_34a4b053cb1e89d9",
       "size": 21830,
-      "mtime": 1745930535761
+      "mtime": 1764681322512
     },
     "audioSfxEnvKnifeImpactMp3": {
       "path": "/audio/sfx/env/knife-impact.mp3",
       "hash": "v1_52e4ca76509bc262",
       "size": 11654,
-      "mtime": 1745930535762
+      "mtime": 1764681322512
     },
     "audioSfxEnvKnifeSharpenMp3": {
       "path": "/audio/sfx/env/knife-sharpen.mp3",
       "hash": "v1_775dc5b88fb9032f",
       "size": 7286,
-      "mtime": 1745930535762
+      "mtime": 1764681322513
     },
     "audioSfxEnvKnifeSwishMp3": {
       "path": "/audio/sfx/env/knife-swish.mp3",
       "hash": "v1_7bf2fc7b9daa057f",
       "size": 4238,
-      "mtime": 1745930535762
+      "mtime": 1764681322513
     },
     "audioSfxEnvNotificationMp3": {
       "path": "/audio/sfx/env/notification.mp3",
       "hash": "v1_da21479f53e0d58b",
       "size": 18432,
-      "mtime": 1748946674664
+      "mtime": 1764681322513
     },
     "audioSfxGruntFemaleMp3": {
       "path": "/audio/sfx/grunt-female.mp3",
@@ -144,7 +144,7 @@
       "path": "/favicon.ico",
       "hash": "v1_97a2e3df78822bda",
       "size": 15406,
-      "mtime": 1746225408424
+      "mtime": 1764681322513
     },
     "fontsEbgaramondItalicVariablefontWghtTtf": {
       "path": "/fonts/EBGaramond-Italic-VariableFont_wght.ttf",
@@ -162,7 +162,7 @@
       "path": "/fonts/PinyonScript-Regular.ttf",
       "hash": "v1_d475e64cdb8d5670",
       "size": 148956,
-      "mtime": 1747248294399
+      "mtime": 1764681322514
     },
     "fontsXanhmonoItalicTtf": {
       "path": "/fonts/XanhMono-Italic.ttf",
@@ -228,13 +228,13 @@
       "path": "/icons/icon_back_arrow.png",
       "hash": "v1_a26d59f7287a5a67",
       "size": 1474412,
-      "mtime": 1749114876722
+      "mtime": 1764681322515
     },
     "iconsIconClosePng": {
       "path": "/icons/icon_close.png",
       "hash": "v1_a84531083cc1f131",
       "size": 1566843,
-      "mtime": 1749114876727
+      "mtime": 1764681322516
     },
     "iconsIconCopySvg": {
       "path": "/icons/icon_copy.svg",
@@ -246,7 +246,7 @@
       "path": "/icons/icon_home.png",
       "hash": "v1_761fa855a9172f9d",
       "size": 1515943,
-      "mtime": 1749115169381
+      "mtime": 1764681322518
     },
     "iconsIconLeftArrowSvg": {
       "path": "/icons/icon_left-arrow.svg",
@@ -276,43 +276,43 @@
       "path": "/images/archive/bg_duels_live.jpg",
       "hash": "v1_1a1ea6a50e668eb6",
       "size": 643750,
-      "mtime": 1745565517775
+      "mtime": 1764681322519
     },
     "imagesArchiveBgDuelsPastJpg": {
       "path": "/images/archive/bg_duels_past.jpg",
       "hash": "v1_d287f36e83d0e237",
       "size": 451044,
-      "mtime": 1745565517776
+      "mtime": 1764681322521
     },
     "imagesArchiveBgDuelsYoursJpg": {
       "path": "/images/archive/bg_duels_yours.jpg",
       "hash": "v1_88af20238421dd3e",
       "size": 449809,
-      "mtime": 1745565517777
+      "mtime": 1764681322522
     },
     "imagesArchiveTornaCardsPsd": {
       "path": "/images/archive/torna_cards.psd",
       "hash": "v1_fac68707f7b02497",
       "size": 3847248,
-      "mtime": 1745565517789
+      "mtime": 1764681322534
     },
     "imagesArchiveTornaCards1Jpg": {
       "path": "/images/archive/torna_cards_1.jpg",
       "hash": "v1_837777388d511f46",
       "size": 104531,
-      "mtime": 1745565517790
+      "mtime": 1764681322535
     },
     "imagesArchiveTornaCards2Jpg": {
       "path": "/images/archive/torna_cards_2.jpg",
       "hash": "v1_753a7089d1ad5fb2",
       "size": 121329,
-      "mtime": 1745565517790
+      "mtime": 1764681322535
     },
     "imagesArchiveTornaCards3Jpg": {
       "path": "/images/archive/torna_cards_3.jpg",
       "hash": "v1_af23bf9969911113",
       "size": 120462,
-      "mtime": 1745565517791
+      "mtime": 1764681322536
     },
     "imagesDuelistFemaleHonourablePng": {
       "path": "/images/duelist_female_honourable.png",
@@ -336,1123 +336,1165 @@
       "path": "/images/logo/RealmsWorld.svg",
       "hash": "v1_314d306c97486ef5",
       "size": 14878,
-      "mtime": 1745930744414
+      "mtime": 1764681322536
     },
     "imagesLogoCartridgeSvg": {
       "path": "/images/logo/cartridge.svg",
       "hash": "v1_d4f757b2a554c62a",
       "size": 5202,
-      "mtime": 1745930744414
+      "mtime": 1764681322536
     },
     "imagesLogoDojoSvg": {
       "path": "/images/logo/dojo.svg",
       "hash": "v1_e9b9c96a911e2f78",
       "size": 3830,
-      "mtime": 1745930744414
+      "mtime": 1764681322536
     },
     "imagesLogoLogoPng": {
       "path": "/images/logo/logo.png",
       "hash": "v1_87c45578c01a5aea",
       "size": 479936,
-      "mtime": 1746225408458
+      "mtime": 1764681322537
     },
     "imagesLogoLogoSvg": {
       "path": "/images/logo/logo.svg",
       "hash": "v1_db3f0a0ebc7da167",
       "size": 77693,
-      "mtime": 1746225408459
+      "mtime": 1764681322537
     },
     "imagesLogoLogoHighPng": {
       "path": "/images/logo/logo_high.png",
       "hash": "v1_dd93b9d5cf308531",
       "size": 1655046,
-      "mtime": 1746225408552
+      "mtime": 1764681322539
     },
     "imagesLogoLogoTextPng": {
       "path": "/images/logo/logo_text.png",
       "hash": "v1_d8fcb3f7066bf630",
       "size": 310719,
-      "mtime": 1745565517802
+      "mtime": 1764681322541
     },
     "imagesLogoLogoTextSvg": {
       "path": "/images/logo/logo_text.svg",
       "hash": "v1_45825c74fd4cd120",
       "size": 52341,
-      "mtime": 1745930535764
+      "mtime": 1764681322541
     },
     "imagesLogoLogoTextSquarePng": {
       "path": "/images/logo/logo_text_square.png",
       "hash": "v1_2e39a8b4c965e8d9",
       "size": 750047,
-      "mtime": 1745565517804
+      "mtime": 1764681322544
     },
     "imagesLogoSplashPng": {
       "path": "/images/logo/splash.png",
       "hash": "v1_fec5aeb65fbf699f",
       "size": 909612,
-      "mtime": 1745565517805
+      "mtime": 1764681322545
     },
     "imagesLogoSplashOgPng": {
       "path": "/images/logo/splash_og.png",
       "hash": "v1_8e8aac505286bab4",
       "size": 1230833,
-      "mtime": 1746225408594
+      "mtime": 1764681322546
     },
     "imagesLogoSplashOgPsd": {
       "path": "/images/logo/splash_og.psd",
       "hash": "v1_71b948f303d98532",
       "size": 4283474,
-      "mtime": 1746225408786
+      "mtime": 1764681322559
     },
     "imagesLogoStarknetPng": {
       "path": "/images/logo/starknet.png",
       "hash": "v1_5b3cbb6b76a44824",
       "size": 5200,
-      "mtime": 1745930744415
+      "mtime": 1764681322560
     },
     "imagesLogoUnderwareSvg": {
       "path": "/images/logo/underware.svg",
       "hash": "v1_57f44b48318e722c",
       "size": 23014,
-      "mtime": 1745930744415
+      "mtime": 1764681322560
     },
     "imagesLogoUnderwareTextSvg": {
       "path": "/images/logo/underware_text.svg",
       "hash": "v1_6c0d3d65fa30cb33",
       "size": 28853,
-      "mtime": 1745930744415
+      "mtime": 1764681322560
     },
     "imagesScenesCryptBgGraveyardBackgroundJpg": {
       "path": "/images/scenes/crypt/bg_graveyard_background.jpg",
       "hash": "v1_e72826cdf6858b92",
       "size": 595893,
-      "mtime": 1761697996000
+      "mtime": 1764681322562
     },
     "imagesScenesCryptBgGraveyardItemsKtx2": {
       "path": "/images/scenes/crypt/bg_graveyard_items.ktx2",
       "hash": "v1_cd51ec4fb58dc5f4",
       "size": 99612,
-      "mtime": 1762274038796
+      "mtime": 1764767316567
     },
     "imagesScenesCryptBgGraveyardItemsPng": {
       "path": "/images/scenes/crypt/bg_graveyard_items.png",
       "hash": "v1_5dabf10f977270ad",
       "size": 70763,
-      "mtime": 1762274038797
+      "mtime": 1764767316569
     },
     "imagesScenesCryptBgGraveyardItemsMaskKtx2": {
       "path": "/images/scenes/crypt/bg_graveyard_items_mask.ktx2",
       "hash": "v1_a7759d94a2575be9",
       "size": 14887,
-      "mtime": 1762274038797
+      "mtime": 1764767316569
     },
     "imagesScenesCryptBgGraveyardItemsMaskPng": {
       "path": "/images/scenes/crypt/bg_graveyard_items_mask.png",
       "hash": "v1_d86b1fe208b2c4de",
       "size": 16341,
-      "mtime": 1762274038798
+      "mtime": 1764767316569
     },
     "imagesScenesDoorBgDoorBackgroundKtx2": {
       "path": "/images/scenes/door/bg_door_background.ktx2",
       "hash": "v1_d06e77d00db95013",
       "size": 4787,
-      "mtime": 1762274038798
+      "mtime": 1764767316569
     },
     "imagesScenesDoorBgDoorBackgroundPng": {
       "path": "/images/scenes/door/bg_door_background.png",
       "hash": "v1_dc6dfccd243baead",
       "size": 14083,
-      "mtime": 1762274038799
+      "mtime": 1764767316570
     },
     "imagesScenesDoorBgDoorDoorKtx2": {
       "path": "/images/scenes/door/bg_door_door.ktx2",
       "hash": "v1_3b00cc8106f32670",
       "size": 738957,
-      "mtime": 1762274038799
+      "mtime": 1764767316570
     },
     "imagesScenesDoorBgDoorDoorPng": {
       "path": "/images/scenes/door/bg_door_door.png",
       "hash": "v1_aacca8409e919d51",
       "size": 539929,
-      "mtime": 1762274038802
+      "mtime": 1764767316576
     },
     "imagesScenesDoorBgDoorFaceKtx2": {
       "path": "/images/scenes/door/bg_door_face.ktx2",
       "hash": "v1_cb7f205714e3c915",
       "size": 359088,
-      "mtime": 1762274038803
+      "mtime": 1764767316577
     },
     "imagesScenesDoorBgDoorFacePng": {
       "path": "/images/scenes/door/bg_door_face.png",
       "hash": "v1_bcfcb0399c69d0e4",
       "size": 258076,
-      "mtime": 1762274038805
+      "mtime": 1764767316600
     },
     "imagesScenesDoorBgDoorFaceAngryKtx2": {
       "path": "/images/scenes/door/bg_door_face_angry.ktx2",
       "hash": "v1_94d06a27b3ec272f",
       "size": 163874,
-      "mtime": 1762274038805
+      "mtime": 1764767316600
     },
     "imagesScenesDoorBgDoorFaceAngryPng": {
       "path": "/images/scenes/door/bg_door_face_angry.png",
       "hash": "v1_1c88ab24309a7905",
       "size": 112638,
-      "mtime": 1762274038807
+      "mtime": 1764767316603
     },
     "imagesScenesDoorBgDoorFaceAngryBlinkKtx2": {
       "path": "/images/scenes/door/bg_door_face_angry_blink.ktx2",
       "hash": "v1_4e7f12e676bb578b",
       "size": 155787,
-      "mtime": 1762274038808
+      "mtime": 1764767316604
     },
     "imagesScenesDoorBgDoorFaceAngryBlinkPng": {
       "path": "/images/scenes/door/bg_door_face_angry_blink.png",
       "hash": "v1_f7eefdb4e2e424e8",
       "size": 112083,
-      "mtime": 1762274038809
+      "mtime": 1764767316606
     },
     "imagesScenesDoorBgDoorFaceBlinkKtx2": {
       "path": "/images/scenes/door/bg_door_face_blink.ktx2",
       "hash": "v1_ba8fb94e8df1c11e",
       "size": 354931,
-      "mtime": 1762274038811
+      "mtime": 1764767316609
     },
     "imagesScenesDoorBgDoorFaceBlinkPng": {
       "path": "/images/scenes/door/bg_door_face_blink.png",
       "hash": "v1_9f0cf715e45139cd",
       "size": 262613,
-      "mtime": 1762274038814
+      "mtime": 1764767316613
     },
     "imagesScenesDuelistsBgDuelistsBackgroundKtx2": {
       "path": "/images/scenes/duelists/bg_duelists_background.ktx2",
       "hash": "v1_4b8b86f7ebe94536",
       "size": 678352,
-      "mtime": 1762274038816
+      "mtime": 1764767316618
     },
     "imagesScenesDuelistsBgDuelistsBackgroundPng": {
       "path": "/images/scenes/duelists/bg_duelists_background.png",
       "hash": "v1_74092c5ed268d223",
       "size": 584306,
-      "mtime": 1762274038819
+      "mtime": 1764767316626
     },
     "imagesScenesDuelistsBgDuelistsItemsKtx2": {
       "path": "/images/scenes/duelists/bg_duelists_items.ktx2",
       "hash": "v1_b9d599d5c8374cf6",
       "size": 41916,
-      "mtime": 1762274038819
+      "mtime": 1764767316626
     },
     "imagesScenesDuelistsBgDuelistsItemsPng": {
       "path": "/images/scenes/duelists/bg_duelists_items.png",
       "hash": "v1_631a429c4b554a3d",
       "size": 31533,
-      "mtime": 1762274038821
+      "mtime": 1764767316627
     },
     "imagesScenesDuelistsBgDuelistsItemsMaskKtx2": {
       "path": "/images/scenes/duelists/bg_duelists_items_mask.ktx2",
       "hash": "v1_7641a09d4c036b88",
       "size": 6909,
-      "mtime": 1762274038821
+      "mtime": 1764767316627
     },
     "imagesScenesDuelistsBgDuelistsItemsMaskPng": {
       "path": "/images/scenes/duelists/bg_duelists_items_mask.png",
       "hash": "v1_9e06227359996891",
       "size": 7452,
-      "mtime": 1762274038821
+      "mtime": 1764767316627
     },
     "imagesScenesDuelistsBgDuelistsMatchmakingMaskKtx2": {
       "path": "/images/scenes/duelists/bg_duelists_matchmaking_mask.ktx2",
       "hash": "v1_60f22aec2e815be9",
       "size": 8108,
-      "mtime": 1762274038821
+      "mtime": 1764767316627
     },
     "imagesScenesDuelistsBgDuelistsMatchmakingMaskPng": {
       "path": "/images/scenes/duelists/bg_duelists_matchmaking_mask.png",
       "hash": "v1_6b36d083e9d9c5bc",
       "size": 7648,
-      "mtime": 1762274038821
+      "mtime": 1764767316628
     },
     "imagesScenesDuelistsBgDuelistsMatchmakingRankedKtx2": {
       "path": "/images/scenes/duelists/bg_duelists_matchmaking_ranked.ktx2",
       "hash": "v1_391264645e6b12e4",
       "size": 143861,
-      "mtime": 1762274038822
+      "mtime": 1764767316628
     },
     "imagesScenesDuelistsBgDuelistsMatchmakingRankedPng": {
       "path": "/images/scenes/duelists/bg_duelists_matchmaking_ranked.png",
       "hash": "v1_dad80d2191466e56",
       "size": 227974,
-      "mtime": 1762274038823
+      "mtime": 1764767316631
     },
     "imagesScenesDuelistsBgDuelistsMatchmakingSingleplayerKtx2": {
       "path": "/images/scenes/duelists/bg_duelists_matchmaking_singleplayer.ktx2",
       "hash": "v1_80bcd4c1f99a35d9",
       "size": 141735,
-      "mtime": 1762274038824
+      "mtime": 1764767316632
     },
     "imagesScenesDuelistsBgDuelistsMatchmakingSingleplayerPng": {
       "path": "/images/scenes/duelists/bg_duelists_matchmaking_singleplayer.png",
       "hash": "v1_3fe68236b0ef1f93",
       "size": 222886,
-      "mtime": 1762274038825
+      "mtime": 1764767316637
     },
     "imagesScenesDuelistsBgDuelistsMatchmakingUnrankedKtx2": {
       "path": "/images/scenes/duelists/bg_duelists_matchmaking_unranked.ktx2",
       "hash": "v1_0c0d66c20b1b52f8",
       "size": 141897,
-      "mtime": 1762274038826
+      "mtime": 1764767316639
     },
     "imagesScenesDuelistsBgDuelistsMatchmakingUnrankedPng": {
       "path": "/images/scenes/duelists/bg_duelists_matchmaking_unranked.png",
       "hash": "v1_b5b3c9af6e36f39f",
       "size": 216709,
-      "mtime": 1762274038829
+      "mtime": 1764767316645
     },
     "imagesScenesDuelistsBgDuelistsModeButtonKtx2": {
       "path": "/images/scenes/duelists/bg_duelists_mode_button.ktx2",
       "hash": "v1_5e6436afc0061b14",
       "size": 9748,
-      "mtime": 1762274038829
+      "mtime": 1764767316645
     },
     "imagesScenesDuelistsBgDuelistsModeButtonPng": {
       "path": "/images/scenes/duelists/bg_duelists_mode_button.png",
       "hash": "v1_d4e5852ae68bf8a1",
       "size": 33296,
-      "mtime": 1762274038830
+      "mtime": 1764767316646
     },
     "imagesScenesDuelistsBgDuelistsModeButtonMaskKtx2": {
       "path": "/images/scenes/duelists/bg_duelists_mode_button_mask.ktx2",
       "hash": "v1_e44a5c960f230eb1",
       "size": 2742,
-      "mtime": 1762274038830
+      "mtime": 1764767316646
     },
     "imagesScenesDuelistsBgDuelistsModeButtonMaskPng": {
       "path": "/images/scenes/duelists/bg_duelists_mode_button_mask.png",
       "hash": "v1_2399283874e23654",
       "size": 3893,
-      "mtime": 1762274038830
+      "mtime": 1764767316646
     },
     "imagesScenesDuelistsBgDuelistsPistolKtx2": {
       "path": "/images/scenes/duelists/bg_duelists_pistol.ktx2",
       "hash": "v1_125f47421e295729",
       "size": 104714,
-      "mtime": 1762274038830
+      "mtime": 1764767316646
     },
     "imagesScenesDuelistsBgDuelistsPistolPng": {
       "path": "/images/scenes/duelists/bg_duelists_pistol.png",
       "hash": "v1_d4a0b9abf57a5534",
       "size": 62276,
-      "mtime": 1762274038831
+      "mtime": 1764767316648
     },
     "imagesScenesDuelistsBgDuelistsPistolMaskKtx2": {
       "path": "/images/scenes/duelists/bg_duelists_pistol_mask.ktx2",
       "hash": "v1_c08c9d93b05fdefe",
       "size": 13822,
-      "mtime": 1762274038832
+      "mtime": 1764767316649
     },
     "imagesScenesDuelistsBgDuelistsPistolMaskPng": {
       "path": "/images/scenes/duelists/bg_duelists_pistol_mask.png",
       "hash": "v1_6a83840798917774",
       "size": 11722,
-      "mtime": 1762274038832
+      "mtime": 1764767316651
     },
     "imagesScenesDuelistsBgDuelistsTutorialKtx2": {
       "path": "/images/scenes/duelists/bg_duelists_tutorial.ktx2",
       "hash": "v1_3be5a8f64ce5c921",
       "size": 28843,
-      "mtime": 1762274038832
+      "mtime": 1764767316652
     },
     "imagesScenesDuelistsBgDuelistsTutorialPng": {
       "path": "/images/scenes/duelists/bg_duelists_tutorial.png",
       "hash": "v1_ae3c78d5bda15d09",
       "size": 24094,
-      "mtime": 1762274038833
+      "mtime": 1764767316652
     },
     "imagesScenesDuelistsBgDuelistsTutorialMaskKtx2": {
       "path": "/images/scenes/duelists/bg_duelists_tutorial_mask.ktx2",
       "hash": "v1_ec19441a619329ef",
       "size": 7664,
-      "mtime": 1762274038833
+      "mtime": 1764767316653
     },
     "imagesScenesDuelistsBgDuelistsTutorialMaskPng": {
       "path": "/images/scenes/duelists/bg_duelists_tutorial_mask.png",
       "hash": "v1_faf2c3c088f19054",
       "size": 7106,
-      "mtime": 1762274038833
+      "mtime": 1764767316653
     },
     "imagesScenesDuelsBoardBgDuelsBackgroundKtx2": {
       "path": "/images/scenes/duels_board/bg_duels_background.ktx2",
       "hash": "v1_0e54dbe636961313",
       "size": 618951,
-      "mtime": 1762274038834
+      "mtime": 1764767316654
     },
     "imagesScenesDuelsBoardBgDuelsBackgroundPng": {
       "path": "/images/scenes/duels_board/bg_duels_background.png",
       "hash": "v1_c46c1e195cd02465",
       "size": 425720,
-      "mtime": 1762274038836
+      "mtime": 1764767316658
     },
     "imagesScenesDuelsBoardBgDuelsItemsKtx2": {
       "path": "/images/scenes/duels_board/bg_duels_items.ktx2",
       "hash": "v1_5d90f31b1c68c801",
       "size": 84280,
-      "mtime": 1762274038837
+      "mtime": 1764767316658
     },
     "imagesScenesDuelsBoardBgDuelsItemsPng": {
       "path": "/images/scenes/duels_board/bg_duels_items.png",
       "hash": "v1_f44108cfaaca63a6",
       "size": 56619,
-      "mtime": 1762274038837
+      "mtime": 1764767316660
     },
     "imagesScenesDuelsBoardBgDuelsItemsMaskKtx2": {
       "path": "/images/scenes/duels_board/bg_duels_items_mask.ktx2",
       "hash": "v1_23bb06f734ab19c9",
       "size": 9266,
-      "mtime": 1762274038838
+      "mtime": 1764767316660
     },
     "imagesScenesDuelsBoardBgDuelsItemsMaskPng": {
       "path": "/images/scenes/duels_board/bg_duels_items_mask.png",
       "hash": "v1_6bd0a9e20ee2adf8",
       "size": 10718,
-      "mtime": 1762274038838
+      "mtime": 1764767316660
     },
     "imagesScenesDuelsBoardBgDuelsLightingPng": {
       "path": "/images/scenes/duels_board/bg_duels_lighting.png",
       "hash": "v1_bf35dfa5e4302c13",
       "size": 139078,
-      "mtime": 1762274038840
+      "mtime": 1764767316663
     },
     "imagesScenesGateBgEntranceBackgroundKtx2": {
       "path": "/images/scenes/gate/bg_entrance_background.ktx2",
       "hash": "v1_3a70894f8f409ab6",
       "size": 639389,
-      "mtime": 1762274038841
+      "mtime": 1764767316664
     },
     "imagesScenesGateBgEntranceBackgroundPng": {
       "path": "/images/scenes/gate/bg_entrance_background.png",
       "hash": "v1_06238c7bbdb8ea15",
       "size": 336974,
-      "mtime": 1762274038845
+      "mtime": 1764767316672
     },
     "imagesScenesGateBgEntranceDoorMaskKtx2": {
       "path": "/images/scenes/gate/bg_entrance_door_mask.ktx2",
       "hash": "v1_f34c3a01529ca941",
       "size": 8129,
-      "mtime": 1762274038845
+      "mtime": 1764767316672
     },
     "imagesScenesGateBgEntranceDoorMaskPng": {
       "path": "/images/scenes/gate/bg_entrance_door_mask.png",
       "hash": "v1_88ecb40092fda345",
       "size": 12182,
-      "mtime": 1762274038845
+      "mtime": 1764767316673
     },
     "imagesScenesGateBgEntranceFogBackgroundKtx2": {
       "path": "/images/scenes/gate/bg_entrance_fog_background.ktx2",
       "hash": "v1_d1fe1ddfa1685014",
       "size": 144276,
-      "mtime": 1762274038846
+      "mtime": 1764767316673
     },
     "imagesScenesGateBgEntranceFogBackgroundPng": {
       "path": "/images/scenes/gate/bg_entrance_fog_background.png",
       "hash": "v1_88bea752031f698c",
       "size": 121031,
-      "mtime": 1762274038847
+      "mtime": 1764767316680
     },
     "imagesScenesGateBgEntranceFogForegroundKtx2": {
       "path": "/images/scenes/gate/bg_entrance_fog_foreground.ktx2",
       "hash": "v1_4323f89d7b8e8891",
       "size": 203553,
-      "mtime": 1762274038847
+      "mtime": 1764767316681
     },
     "imagesScenesGateBgEntranceFogForegroundPng": {
       "path": "/images/scenes/gate/bg_entrance_fog_foreground.png",
       "hash": "v1_bd4ae2b2fb860726",
       "size": 157230,
-      "mtime": 1762274038848
+      "mtime": 1764767316683
     },
     "imagesScenesGateBgEntranceForegroundKtx2": {
       "path": "/images/scenes/gate/bg_entrance_foreground.ktx2",
       "hash": "v1_7567105cc720c93c",
       "size": 462876,
-      "mtime": 1762274038849
+      "mtime": 1764767316683
     },
     "imagesScenesGateBgEntranceForegroundPng": {
       "path": "/images/scenes/gate/bg_entrance_foreground.png",
       "hash": "v1_727e075b15de7d17",
       "size": 272981,
-      "mtime": 1762274038852
+      "mtime": 1764767316692
     },
     "imagesScenesGateBgEntrancePlayerKtx2": {
       "path": "/images/scenes/gate/bg_entrance_player.ktx2",
       "hash": "v1_95d46c31735d421c",
       "size": 155786,
-      "mtime": 1762274038852
+      "mtime": 1764767316693
     },
     "imagesScenesGateBgEntrancePlayerPng": {
       "path": "/images/scenes/gate/bg_entrance_player.png",
       "hash": "v1_25c628938627f2e0",
       "size": 98009,
-      "mtime": 1762274038853
+      "mtime": 1764767316695
     },
     "imagesScenesGateBgEntranceSignKtx2": {
       "path": "/images/scenes/gate/bg_entrance_sign.ktx2",
       "hash": "v1_e3d6ac98498da8a9",
       "size": 157094,
-      "mtime": 1762274038853
+      "mtime": 1764767316695
     },
     "imagesScenesGateBgEntranceSignPng": {
       "path": "/images/scenes/gate/bg_entrance_sign.png",
       "hash": "v1_e2be232c624652a5",
       "size": 112815,
-      "mtime": 1762274038855
+      "mtime": 1764767316699
     },
     "imagesScenesGateBgEntranceTavernKtx2": {
       "path": "/images/scenes/gate/bg_entrance_tavern.ktx2",
       "hash": "v1_5c0679faca4ad313",
       "size": 1911125,
-      "mtime": 1762274038856
+      "mtime": 1764767316706
     },
     "imagesScenesGateBgEntranceTavernPng": {
       "path": "/images/scenes/gate/bg_entrance_tavern.png",
       "hash": "v1_f71291ada90d3a55",
       "size": 1144171,
-      "mtime": 1762274038862
+      "mtime": 1764767316719
     },
     "imagesScenesLeaderboardsBgLeaderboardsKtx2": {
       "path": "/images/scenes/leaderboards/bg_leaderboards.ktx2",
       "hash": "v1_727c02ce53423bca",
       "size": 1567394,
-      "mtime": 1762274038864
+      "mtime": 1764767316721
     },
     "imagesScenesLeaderboardsBgLeaderboardsPng": {
       "path": "/images/scenes/leaderboards/bg_leaderboards.png",
       "hash": "v1_6f8399ef22e2875d",
       "size": 969939,
-      "mtime": 1762274038869
+      "mtime": 1764767316735
     },
     "imagesScenesLeaderboardsBgLeaderboardsSignPng": {
       "path": "/images/scenes/leaderboards/bg_leaderboards_sign.png",
       "hash": "v1_745f269d7b87d6bb",
       "size": 23791,
-      "mtime": 1762274038870
+      "mtime": 1764767316737
     },
     "imagesScenesLeaderboardsBgLeaderboardsSignForbiddenPng": {
       "path": "/images/scenes/leaderboards/bg_leaderboards_sign_forbidden.png",
       "hash": "v1_8e9c8110141e4076",
       "size": 40798,
-      "mtime": 1762274038871
+      "mtime": 1764767316739
     },
     "imagesScenesMatchmakingBgMatchmakingBellKtx2": {
       "path": "/images/scenes/matchmaking/bg_matchmaking_bell.ktx2",
       "hash": "v1_b1cb9d1b94dd3a9d",
       "size": 75863,
-      "mtime": 1762274038871
+      "mtime": 1764767316739
     },
     "imagesScenesMatchmakingBgMatchmakingBellPng": {
       "path": "/images/scenes/matchmaking/bg_matchmaking_bell.png",
       "hash": "v1_a781c28c43ce9c71",
       "size": 174308,
-      "mtime": 1762274038874
+      "mtime": 1764767316742
     },
     "imagesScenesMatchmakingBgMatchmakingBellMaskKtx2": {
       "path": "/images/scenes/matchmaking/bg_matchmaking_bell_mask.ktx2",
       "hash": "v1_1009799801e22b0f",
       "size": 6615,
-      "mtime": 1762274038874
+      "mtime": 1764767316742
     },
     "imagesScenesMatchmakingBgMatchmakingBellMaskPng": {
       "path": "/images/scenes/matchmaking/bg_matchmaking_bell_mask.png",
       "hash": "v1_9eee9efc6d8dcc16",
       "size": 6929,
-      "mtime": 1762274038874
+      "mtime": 1764767316743
     },
     "imagesScenesMatchmakingBgMatchmakingRankedKtx2": {
       "path": "/images/scenes/matchmaking/bg_matchmaking_ranked.ktx2",
       "hash": "v1_fab7651159481847",
       "size": 1104420,
-      "mtime": 1762274038877
+      "mtime": 1764767316744
     },
     "imagesScenesMatchmakingBgMatchmakingRankedPng": {
       "path": "/images/scenes/matchmaking/bg_matchmaking_ranked.png",
       "hash": "v1_abe987729eba1434",
       "size": 633570,
-      "mtime": 1762274038882
+      "mtime": 1764767316749
     },
     "imagesScenesMatchmakingBgMatchmakingUnrankedKtx2": {
       "path": "/images/scenes/matchmaking/bg_matchmaking_unranked.ktx2",
       "hash": "v1_ab36cdbcc4f03a18",
       "size": 1244574,
-      "mtime": 1762274038883
+      "mtime": 1764767316751
     },
     "imagesScenesMatchmakingBgMatchmakingUnrankedPng": {
       "path": "/images/scenes/matchmaking/bg_matchmaking_unranked.png",
       "hash": "v1_a8febfd6bfff400d",
       "size": 775276,
-      "mtime": 1762274038886
+      "mtime": 1764767316757
     },
     "imagesScenesProfileBgProfileBackgroundKtx2": {
       "path": "/images/scenes/profile/bg_profile_background.ktx2",
       "hash": "v1_f4295e44b0ae6a0c",
       "size": 1091850,
-      "mtime": 1762274038887
+      "mtime": 1764767316759
     },
     "imagesScenesProfileBgProfileBackgroundPng": {
       "path": "/images/scenes/profile/bg_profile_background.png",
       "hash": "v1_6c2aa0200e6b4bc0",
       "size": 711933,
-      "mtime": 1762274038891
+      "mtime": 1764767316772
     },
     "imagesScenesProfileBgProfileBookMaskKtx2": {
       "path": "/images/scenes/profile/bg_profile_book_mask.ktx2",
       "hash": "v1_d9670046fb684439",
       "size": 8635,
-      "mtime": 1762274038892
+      "mtime": 1764767316772
     },
     "imagesScenesProfileBgProfileBookMaskPng": {
       "path": "/images/scenes/profile/bg_profile_book_mask.png",
       "hash": "v1_b889d023191ef679",
       "size": 12290,
-      "mtime": 1762274038892
+      "mtime": 1764767316773
     },
     "imagesScenesProfileBgProfileChestMaskKtx2": {
       "path": "/images/scenes/profile/bg_profile_chest_mask.ktx2",
       "hash": "v1_de62bc26aedd4815",
       "size": 14211,
-      "mtime": 1762274038892
+      "mtime": 1764767316774
     },
     "imagesScenesProfileBgProfileChestMaskPng": {
       "path": "/images/scenes/profile/bg_profile_chest_mask.png",
       "hash": "v1_d6113aae57e8512c",
       "size": 17134,
-      "mtime": 1762274038892
+      "mtime": 1764767316774
     },
     "imagesScenesProfileBgProfileDoorMaskKtx2": {
       "path": "/images/scenes/profile/bg_profile_door_mask.ktx2",
       "hash": "v1_f6d78070d3fdd8c3",
       "size": 14560,
-      "mtime": 1762274038893
+      "mtime": 1764767316775
     },
     "imagesScenesProfileBgProfileDoorMaskPng": {
       "path": "/images/scenes/profile/bg_profile_door_mask.png",
       "hash": "v1_6a31872f83689bb4",
       "size": 18832,
-      "mtime": 1762274038893
+      "mtime": 1764767316775
     },
     "imagesScenesProfileBgProfileDoormanKtx2": {
       "path": "/images/scenes/profile/bg_profile_doorman.ktx2",
       "hash": "v1_e7e150a6802caa42",
       "size": 58042,
-      "mtime": 1762274038893
+      "mtime": 1764767316775
     },
     "imagesScenesProfileBgProfileDoormanPng": {
       "path": "/images/scenes/profile/bg_profile_doorman.png",
       "hash": "v1_da9d2e7b3a50a0ec",
       "size": 44093,
-      "mtime": 1762274038894
+      "mtime": 1764767316777
     },
     "imagesScenesProfileBgProfileItemsKtx2": {
       "path": "/images/scenes/profile/bg_profile_items.ktx2",
       "hash": "v1_d0950135eb082c1b",
       "size": 463847,
-      "mtime": 1762274038894
+      "mtime": 1764767316779
     },
     "imagesScenesProfileBgProfileItemsPng": {
       "path": "/images/scenes/profile/bg_profile_items.png",
       "hash": "v1_f1c2670abeb33a22",
       "size": 247606,
-      "mtime": 1762274038896
+      "mtime": 1764767316782
     },
     "imagesScenesProfileBgProfilePlayerKtx2": {
       "path": "/images/scenes/profile/bg_profile_player.ktx2",
       "hash": "v1_f65db0dab5479813",
       "size": 218114,
-      "mtime": 1762274038896
+      "mtime": 1764767316782
     },
     "imagesScenesProfileBgProfilePlayerPng": {
       "path": "/images/scenes/profile/bg_profile_player.png",
       "hash": "v1_9568c19181833d4f",
       "size": 151908,
-      "mtime": 1762274038897
+      "mtime": 1764767316790
     },
     "imagesScenesProfileBgProfileSkyKtx2": {
       "path": "/images/scenes/profile/bg_profile_sky.ktx2",
       "hash": "v1_e74897599b2bd598",
       "size": 927884,
-      "mtime": 1762274038898
+      "mtime": 1764767316798
     },
     "imagesScenesProfileBgProfileSkyPng": {
       "path": "/images/scenes/profile/bg_profile_sky.png",
       "hash": "v1_5d4561fdc103f0c4",
       "size": 516952,
-      "mtime": 1762274038901
+      "mtime": 1764767316812
     },
     "imagesScenesProfileBgProfileTableKtx2": {
       "path": "/images/scenes/profile/bg_profile_table.ktx2",
       "hash": "v1_0defbe1959595268",
       "size": 168247,
-      "mtime": 1762274038902
+      "mtime": 1764767316814
     },
     "imagesScenesProfileBgProfileTablePng": {
       "path": "/images/scenes/profile/bg_profile_table.png",
       "hash": "v1_f04fec7b5b707e99",
       "size": 88908,
-      "mtime": 1762274038902
+      "mtime": 1764767316823
     },
     "imagesScenesProfileCardpacksBgCardpackBoxKtx2": {
       "path": "/images/scenes/profile/cardpacks/bg_cardpack_box.ktx2",
       "hash": "v1_d612b62cfecfd08f",
       "size": 973083,
-      "mtime": 1762274038903
+      "mtime": 1764767316827
     },
     "imagesScenesProfileCardpacksBgCardpackBoxPng": {
       "path": "/images/scenes/profile/cardpacks/bg_cardpack_box.png",
       "hash": "v1_34b3a2cf8bb0f5fd",
       "size": 1136231,
-      "mtime": 1762274038911
+      "mtime": 1764767316846
     },
     "imagesScenesProfileCardpacksBgCardpackFrontBoxPng": {
       "path": "/images/scenes/profile/cardpacks/bg_cardpack_front_box.png",
       "hash": "v1_97faa29639c0db05",
       "size": 146244,
-      "mtime": 1762274038913
+      "mtime": 1764767316854
     },
     "imagesScenesProfileDuelistbookBgDuelistbookTableKtx2": {
       "path": "/images/scenes/profile/duelistbook/bg_duelistbook_table.ktx2",
       "hash": "v1_b22273158a25a58f",
       "size": 1393625,
-      "mtime": 1762274038915
+      "mtime": 1764767316868
     },
     "imagesScenesProfileDuelistbookBgDuelistbookTablePng": {
       "path": "/images/scenes/profile/duelistbook/bg_duelistbook_table.png",
       "hash": "v1_9d1b48411c0c0c42",
       "size": 1295486,
-      "mtime": 1762274038920
+      "mtime": 1764767316969
+    },
+    "imagesScenesQuizBgQuizroomKtx2": {
+      "path": "/images/scenes/quiz/bg_quizroom.ktx2",
+      "hash": "v1_92c2daac0a4c4084",
+      "size": 1645632,
+      "mtime": 1765843481018
+    },
+    "imagesScenesQuizBgQuizroomPng": {
+      "path": "/images/scenes/quiz/bg_quizroom.png",
+      "hash": "v1_4c37cbdeccaca168",
+      "size": 1017175,
+      "mtime": 1765381374018
+    },
+    "imagesScenesQuizBgQuizroomCumberlordKtx2": {
+      "path": "/images/scenes/quiz/bg_quizroom_cumberlord.ktx2",
+      "hash": "v1_4ae5ad70d099ca15",
+      "size": 50932,
+      "mtime": 1765843363048
+    },
+    "imagesScenesQuizBgQuizroomCumberlordPng": {
+      "path": "/images/scenes/quiz/bg_quizroom_cumberlord.png",
+      "hash": "v1_0019bcc7c47d993a",
+      "size": 38461,
+      "mtime": 1765843316560
+    },
+    "imagesScenesQuizBgQuizroomCumberlordMaskKtx2": {
+      "path": "/images/scenes/quiz/bg_quizroom_cumberlord_mask.ktx2",
+      "hash": "v1_78614380f8ad0c3e",
+      "size": 7071,
+      "mtime": 1765843363528
+    },
+    "imagesScenesQuizBgQuizroomCumberlordMaskPng": {
+      "path": "/images/scenes/quiz/bg_quizroom_cumberlord_mask.png",
+      "hash": "v1_5a6efb65a5009ad8",
+      "size": 8098,
+      "mtime": 1765843316518
+    },
+    "imagesScenesQuizQuizLeaderboardPng": {
+      "path": "/images/scenes/quiz/quiz_leaderboard.png",
+      "hash": "v1_6e969da0e71a1d8d",
+      "size": 97128,
+      "mtime": 1765830431480
     },
     "imagesScenesSplashPistolsLoadingPng": {
       "path": "/images/scenes/splash/pistols_loading.png",
       "hash": "v1_610bfea0cdfaaa04",
       "size": 343611,
-      "mtime": 1762274038921
+      "mtime": 1764767316983
     },
     "imagesScenesTavernBgTavernBackgroundKtx2": {
       "path": "/images/scenes/tavern/bg_tavern_background.ktx2",
       "hash": "v1_2e0d02bc06b07b96",
       "size": 1159723,
-      "mtime": 1762274038922
+      "mtime": 1764767316994
     },
     "imagesScenesTavernBgTavernBackgroundPng": {
       "path": "/images/scenes/tavern/bg_tavern_background.png",
       "hash": "v1_d8bdc0d2c0a5a2d7",
       "size": 738056,
-      "mtime": 1762274038926
+      "mtime": 1764767317051
     },
     "imagesScenesTavernBgTavernBarKtx2": {
       "path": "/images/scenes/tavern/bg_tavern_bar.ktx2",
       "hash": "v1_e8667d3ae718f6a3",
       "size": 466955,
-      "mtime": 1762274038927
+      "mtime": 1764767317053
     },
     "imagesScenesTavernBgTavernBarPng": {
       "path": "/images/scenes/tavern/bg_tavern_bar.png",
       "hash": "v1_7e62181385115a57",
       "size": 265427,
-      "mtime": 1762274038931
+      "mtime": 1764767317059
     },
     "imagesScenesTavernBgTavernBartenderKtx2": {
       "path": "/images/scenes/tavern/bg_tavern_bartender.ktx2",
       "hash": "v1_50753a40e7c2ffb4",
       "size": 167150,
-      "mtime": 1762274038934
+      "mtime": 1764767317060
     },
     "imagesScenesTavernBgTavernBartenderPng": {
       "path": "/images/scenes/tavern/bg_tavern_bartender.png",
       "hash": "v1_c377d6948f16c701",
       "size": 120784,
-      "mtime": 1762274038936
+      "mtime": 1764767317062
     },
     "imagesScenesTavernBgTavernBartenderMaskKtx2": {
       "path": "/images/scenes/tavern/bg_tavern_bartender_mask.ktx2",
       "hash": "v1_a18832585812897d",
       "size": 15005,
-      "mtime": 1762274038937
+      "mtime": 1764767317062
     },
     "imagesScenesTavernBgTavernBartenderMaskPng": {
       "path": "/images/scenes/tavern/bg_tavern_bartender_mask.png",
       "hash": "v1_aedfee4630a4371c",
       "size": 15951,
-      "mtime": 1762274038937
+      "mtime": 1764767317063
     },
     "imagesScenesTavernBgTavernCryptMaskKtx2": {
       "path": "/images/scenes/tavern/bg_tavern_crypt_mask.ktx2",
       "hash": "v1_d55511d474b5353a",
       "size": 15744,
-      "mtime": 1762274038938
+      "mtime": 1764767317063
     },
     "imagesScenesTavernBgTavernCryptMaskPng": {
       "path": "/images/scenes/tavern/bg_tavern_crypt_mask.png",
       "hash": "v1_69786dae021ebd98",
       "size": 19794,
-      "mtime": 1762274038941
+      "mtime": 1764767317067
     },
     "imagesScenesTavernBgTavernPistolMaskKtx2": {
       "path": "/images/scenes/tavern/bg_tavern_pistol_mask.ktx2",
       "hash": "v1_2e5d5ad7377cedcb",
       "size": 11505,
-      "mtime": 1762274038942
+      "mtime": 1764767317068
     },
     "imagesScenesTavernBgTavernPistolMaskPng": {
       "path": "/images/scenes/tavern/bg_tavern_pistol_mask.png",
       "hash": "v1_408a6093a9331c57",
       "size": 11616,
-      "mtime": 1762274038943
+      "mtime": 1764767317068
     },
     "imagesScenesTavernBgTavernTrophyMaskKtx2": {
       "path": "/images/scenes/tavern/bg_tavern_trophy_mask.ktx2",
       "hash": "v1_18b79ff1141f2c92",
       "size": 10513,
-      "mtime": 1762274038943
+      "mtime": 1764767317072
     },
     "imagesScenesTavernBgTavernTrophyMaskPng": {
       "path": "/images/scenes/tavern/bg_tavern_trophy_mask.png",
       "hash": "v1_ee4db333f65e760c",
       "size": 14754,
-      "mtime": 1762274038943
+      "mtime": 1764767317073
     },
     "imagesScenesTutorialBarkeepBgBarkeepBackgroundKtx2": {
       "path": "/images/scenes/tutorial/barkeep/bg_barkeep_background.ktx2",
       "hash": "v1_6ff584cd713ecc47",
       "size": 1258812,
-      "mtime": 1762274038945
+      "mtime": 1764767317076
     },
     "imagesScenesTutorialBarkeepBgBarkeepBackgroundPng": {
       "path": "/images/scenes/tutorial/barkeep/bg_barkeep_background.png",
       "hash": "v1_71eb89fed5b8d280",
       "size": 679457,
-      "mtime": 1762274038951
+      "mtime": 1764767317083
     },
     "imagesScenesTutorialBarkeepBgBarkeepCrowdBackKtx2": {
       "path": "/images/scenes/tutorial/barkeep/bg_barkeep_crowd_back.ktx2",
       "hash": "v1_52ae8dc1e74cce14",
       "size": 271272,
-      "mtime": 1762274038954
+      "mtime": 1764767317084
     },
     "imagesScenesTutorialBarkeepBgBarkeepCrowdBackPng": {
       "path": "/images/scenes/tutorial/barkeep/bg_barkeep_crowd_back.png",
       "hash": "v1_ce22e4c3bccc4992",
       "size": 158378,
-      "mtime": 1762274038959
+      "mtime": 1764767317087
     },
     "imagesScenesTutorialBarkeepBgBarkeepCrowdFrontKtx2": {
       "path": "/images/scenes/tutorial/barkeep/bg_barkeep_crowd_front.ktx2",
       "hash": "v1_4ee755f32836d967",
       "size": 234226,
-      "mtime": 1762274038961
+      "mtime": 1764767317087
     },
     "imagesScenesTutorialBarkeepBgBarkeepCrowdFrontPng": {
       "path": "/images/scenes/tutorial/barkeep/bg_barkeep_crowd_front.png",
       "hash": "v1_f5d6810b54c3a12f",
       "size": 157790,
-      "mtime": 1762274038963
+      "mtime": 1764767317090
     },
     "imagesScenesTutorialBarkeepBgBarkeepPlayerKtx2": {
       "path": "/images/scenes/tutorial/barkeep/bg_barkeep_player.ktx2",
       "hash": "v1_c3ec468fd31fb975",
       "size": 256494,
-      "mtime": 1762274038964
+      "mtime": 1764767317091
     },
     "imagesScenesTutorialBarkeepBgBarkeepPlayerPng": {
       "path": "/images/scenes/tutorial/barkeep/bg_barkeep_player.png",
       "hash": "v1_b39fdfcd8b90333d",
       "size": 164428,
-      "mtime": 1762274038966
+      "mtime": 1764767317095
     },
     "imagesScenesTutorialBarkeepBgBarkeepTableKtx2": {
       "path": "/images/scenes/tutorial/barkeep/bg_barkeep_table.ktx2",
       "hash": "v1_4ec20b4b395553b3",
       "size": 88050,
-      "mtime": 1762274038966
+      "mtime": 1764767317096
     },
     "imagesScenesTutorialBarkeepBgBarkeepTablePng": {
       "path": "/images/scenes/tutorial/barkeep/bg_barkeep_table.png",
       "hash": "v1_a0f5937764b54345",
       "size": 59099,
-      "mtime": 1762274038967
+      "mtime": 1764767317097
     },
     "imagesScenesTutorialConflictBgConflictBackgroundKtx2": {
       "path": "/images/scenes/tutorial/conflict/bg_conflict_background.ktx2",
       "hash": "v1_683a5474de151850",
       "size": 813607,
-      "mtime": 1762274038969
+      "mtime": 1764767317099
     },
     "imagesScenesTutorialConflictBgConflictBackgroundPng": {
       "path": "/images/scenes/tutorial/conflict/bg_conflict_background.png",
       "hash": "v1_065dc3a1fde2d4a4",
       "size": 532052,
-      "mtime": 1762274039003
+      "mtime": 1764767317111
     },
     "imagesScenesTutorialConflictBgConflictBarKtx2": {
       "path": "/images/scenes/tutorial/conflict/bg_conflict_bar.ktx2",
       "hash": "v1_e0544cb98e87b869",
       "size": 521250,
-      "mtime": 1762274039009
+      "mtime": 1764767317113
     },
     "imagesScenesTutorialConflictBgConflictBarPng": {
       "path": "/images/scenes/tutorial/conflict/bg_conflict_bar.png",
       "hash": "v1_e2381e796879115f",
       "size": 269846,
-      "mtime": 1762274039021
+      "mtime": 1764767317125
     },
     "imagesScenesTutorialConflictBgConflictBarkeepKtx2": {
       "path": "/images/scenes/tutorial/conflict/bg_conflict_barkeep.ktx2",
       "hash": "v1_a6b0642827c8b73d",
       "size": 176677,
-      "mtime": 1762274039023
+      "mtime": 1764767317125
     },
     "imagesScenesTutorialConflictBgConflictBarkeepPng": {
       "path": "/images/scenes/tutorial/conflict/bg_conflict_barkeep.png",
       "hash": "v1_58d803af98118fff",
       "size": 127050,
-      "mtime": 1762274039027
+      "mtime": 1764767317127
     },
     "imagesScenesTutorialConflictBgConflictDrunkardKtx2": {
       "path": "/images/scenes/tutorial/conflict/bg_conflict_drunkard.ktx2",
       "hash": "v1_a7f895041c358bc3",
       "size": 145772,
-      "mtime": 1762274039029
+      "mtime": 1764767317129
     },
     "imagesScenesTutorialConflictBgConflictDrunkardPng": {
       "path": "/images/scenes/tutorial/conflict/bg_conflict_drunkard.png",
       "hash": "v1_86dce811628886d1",
       "size": 104576,
-      "mtime": 1762274039036
+      "mtime": 1764767317134
     },
     "imagesScenesTutorialConflictBgConflictPlayerKtx2": {
       "path": "/images/scenes/tutorial/conflict/bg_conflict_player.ktx2",
       "hash": "v1_4fe94d5a952e177a",
       "size": 265439,
-      "mtime": 1762274039036
+      "mtime": 1764767317136
     },
     "imagesScenesTutorialConflictBgConflictPlayerPng": {
       "path": "/images/scenes/tutorial/conflict/bg_conflict_player.png",
       "hash": "v1_4c12782cda5f16c5",
       "size": 194704,
-      "mtime": 1762274039043
+      "mtime": 1764767317139
     },
     "imagesScenesTutorialDemonBgDemonKtx2": {
       "path": "/images/scenes/tutorial/demon/bg_demon.ktx2",
       "hash": "v1_b620e1de23cbc7b2",
       "size": 222374,
-      "mtime": 1762274039043
+      "mtime": 1764767317140
     },
     "imagesScenesTutorialDemonBgDemonPng": {
       "path": "/images/scenes/tutorial/demon/bg_demon.png",
       "hash": "v1_9f55f654b89d0b58",
       "size": 163213,
-      "mtime": 1762274039056
+      "mtime": 1764767317144
     },
     "imagesScenesTutorialDemonBgDemonBackgroundKtx2": {
       "path": "/images/scenes/tutorial/demon/bg_demon_background.ktx2",
       "hash": "v1_cd7192e4e92f5b84",
       "size": 555399,
-      "mtime": 1762274039057
+      "mtime": 1764767317146
     },
     "imagesScenesTutorialDemonBgDemonBackgroundPng": {
       "path": "/images/scenes/tutorial/demon/bg_demon_background.png",
       "hash": "v1_c8b8410271143d6f",
       "size": 351055,
-      "mtime": 1762274039086
+      "mtime": 1764767317155
     },
     "imagesScenesTutorialDemonBgDemonLeftHandKtx2": {
       "path": "/images/scenes/tutorial/demon/bg_demon_left_hand.ktx2",
       "hash": "v1_9175c09e9e722ca7",
       "size": 132654,
-      "mtime": 1762274039091
+      "mtime": 1764767317155
     },
     "imagesScenesTutorialDemonBgDemonLeftHandPng": {
       "path": "/images/scenes/tutorial/demon/bg_demon_left_hand.png",
       "hash": "v1_0d3260f813c2b52f",
       "size": 103217,
-      "mtime": 1762274039099
+      "mtime": 1764767317159
     },
     "imagesScenesTutorialDemonBgDemonLeftHandMaskKtx2": {
       "path": "/images/scenes/tutorial/demon/bg_demon_left_hand_mask.ktx2",
       "hash": "v1_462fcb3591e92498",
       "size": 31248,
-      "mtime": 1762274039101
+      "mtime": 1764767317160
     },
     "imagesScenesTutorialDemonBgDemonLeftHandMaskPng": {
       "path": "/images/scenes/tutorial/demon/bg_demon_left_hand_mask.png",
       "hash": "v1_2b0497f42f8387d2",
       "size": 32752,
-      "mtime": 1762274039106
+      "mtime": 1764767317161
     },
     "imagesScenesTutorialDemonBgDemonRightHandKtx2": {
       "path": "/images/scenes/tutorial/demon/bg_demon_right_hand.ktx2",
       "hash": "v1_8751a5e4e078e1f9",
       "size": 114888,
-      "mtime": 1762274039113
+      "mtime": 1764767317161
     },
     "imagesScenesTutorialDemonBgDemonRightHandPng": {
       "path": "/images/scenes/tutorial/demon/bg_demon_right_hand.png",
       "hash": "v1_ed6fbb96b17c5db9",
       "size": 87161,
-      "mtime": 1762274039118
+      "mtime": 1764767317162
     },
     "imagesScenesTutorialDemonBgDemonRightHandMaskKtx2": {
       "path": "/images/scenes/tutorial/demon/bg_demon_right_hand_mask.ktx2",
       "hash": "v1_a0a2bc364f6e8d93",
       "size": 15787,
-      "mtime": 1762274039120
+      "mtime": 1764767317162
     },
     "imagesScenesTutorialDemonBgDemonRightHandMaskPng": {
       "path": "/images/scenes/tutorial/demon/bg_demon_right_hand_mask.png",
       "hash": "v1_dc38cb80955c004e",
       "size": 17714,
-      "mtime": 1762274039121
+      "mtime": 1764767317162
     },
     "imagesScenesTutorialDemonBgDemonVictimKtx2": {
       "path": "/images/scenes/tutorial/demon/bg_demon_victim.ktx2",
       "hash": "v1_4cf56cb9e715fb31",
       "size": 165049,
-      "mtime": 1762274039131
+      "mtime": 1764767317163
     },
     "imagesScenesTutorialDemonBgDemonVictimPng": {
       "path": "/images/scenes/tutorial/demon/bg_demon_victim.png",
       "hash": "v1_f505b59ba4e805de",
       "size": 117212,
-      "mtime": 1762274039140
+      "mtime": 1764767317164
     },
     "imagesScenesTutorialEntryBgEntryBackgroundKtx2": {
       "path": "/images/scenes/tutorial/entry/bg_entry_background.ktx2",
       "hash": "v1_239a0d916670f000",
       "size": 579391,
-      "mtime": 1762274039171
+      "mtime": 1764767317175
     },
     "imagesScenesTutorialEntryBgEntryBackgroundPng": {
       "path": "/images/scenes/tutorial/entry/bg_entry_background.png",
       "hash": "v1_975499efc4dc381d",
       "size": 336856,
-      "mtime": 1762274039249
+      "mtime": 1764767317181
     },
     "imagesScenesTutorialEntryBgEntryBarKtx2": {
       "path": "/images/scenes/tutorial/entry/bg_entry_bar.ktx2",
       "hash": "v1_b356244cd71ce076",
       "size": 473546,
-      "mtime": 1762274039262
+      "mtime": 1764767317182
     },
     "imagesScenesTutorialEntryBgEntryBarPng": {
       "path": "/images/scenes/tutorial/entry/bg_entry_bar.png",
       "hash": "v1_03ec3e4c8dfc541f",
       "size": 290391,
-      "mtime": 1762274039306
+      "mtime": 1764767317187
     },
     "imagesScenesTutorialEntryBgEntryBarkeepKtx2": {
       "path": "/images/scenes/tutorial/entry/bg_entry_barkeep.ktx2",
       "hash": "v1_3caadec522caec46",
       "size": 84254,
-      "mtime": 1762274039312
+      "mtime": 1764767317188
     },
     "imagesScenesTutorialEntryBgEntryBarkeepPng": {
       "path": "/images/scenes/tutorial/entry/bg_entry_barkeep.png",
       "hash": "v1_24c0f94b88c0ec72",
       "size": 70702,
-      "mtime": 1762274039318
+      "mtime": 1764767317189
     },
     "imagesScenesTutorialEntryBgEntryCrowdKtx2": {
       "path": "/images/scenes/tutorial/entry/bg_entry_crowd.ktx2",
       "hash": "v1_3bbb0f0045488791",
       "size": 504285,
-      "mtime": 1762274039335
+      "mtime": 1764767317191
     },
     "imagesScenesTutorialEntryBgEntryCrowdPng": {
       "path": "/images/scenes/tutorial/entry/bg_entry_crowd.png",
       "hash": "v1_9d33f8d1f713040a",
       "size": 302646,
-      "mtime": 1762274039342
+      "mtime": 1764767317196
     },
     "imagesScenesTutorialEntryBgEntryPlayerKtx2": {
       "path": "/images/scenes/tutorial/entry/bg_entry_player.ktx2",
       "hash": "v1_50481501836f39f9",
       "size": 469148,
-      "mtime": 1762274039349
+      "mtime": 1764767317197
     },
     "imagesScenesTutorialEntryBgEntryPlayerPng": {
       "path": "/images/scenes/tutorial/entry/bg_entry_player.png",
       "hash": "v1_5736e717b17ddbd2",
       "size": 276033,
-      "mtime": 1762274039354
+      "mtime": 1764767317202
     },
     "imagesScenesTutorialResurrectionBgResurrectionBackgroundKtx2": {
       "path": "/images/scenes/tutorial/resurrection/bg_resurrection_background.ktx2",
       "hash": "v1_299fa3dace542341",
       "size": 416724,
-      "mtime": 1762274039357
+      "mtime": 1764767317202
     },
     "imagesScenesTutorialResurrectionBgResurrectionBackgroundPng": {
       "path": "/images/scenes/tutorial/resurrection/bg_resurrection_background.png",
       "hash": "v1_5162811455f38638",
       "size": 270439,
-      "mtime": 1762274039361
+      "mtime": 1764767317207
     },
     "imagesScenesTutorialResurrectionBgResurrectionBarkeepKtx2": {
       "path": "/images/scenes/tutorial/resurrection/bg_resurrection_barkeep.ktx2",
       "hash": "v1_15fd39a8c65f6db0",
       "size": 146425,
-      "mtime": 1762274039363
+      "mtime": 1764767317208
     },
     "imagesScenesTutorialResurrectionBgResurrectionBarkeepPng": {
       "path": "/images/scenes/tutorial/resurrection/bg_resurrection_barkeep.png",
       "hash": "v1_5b80909b071e5fd1",
       "size": 102028,
-      "mtime": 1762274039366
+      "mtime": 1764767317213
     },
     "imagesScenesTutorialResurrectionBgResurrectionPlayerKtx2": {
       "path": "/images/scenes/tutorial/resurrection/bg_resurrection_player.ktx2",
       "hash": "v1_b6b98673c93aac7e",
       "size": 194065,
-      "mtime": 1762274039368
+      "mtime": 1764767317214
     },
     "imagesScenesTutorialResurrectionBgResurrectionPlayerPng": {
       "path": "/images/scenes/tutorial/resurrection/bg_resurrection_player.png",
       "hash": "v1_5b3821d5893e9330",
       "size": 130051,
-      "mtime": 1762274039370
+      "mtime": 1764767317218
     },
     "imagesScenesTutorialResurrectionBgResurrectionTableKtx2": {
       "path": "/images/scenes/tutorial/resurrection/bg_resurrection_table.ktx2",
       "hash": "v1_3de75cccfdabb109",
       "size": 268735,
-      "mtime": 1762274039374
+      "mtime": 1764767317218
     },
     "imagesScenesTutorialResurrectionBgResurrectionTablePng": {
       "path": "/images/scenes/tutorial/resurrection/bg_resurrection_table.png",
       "hash": "v1_6ee32fd14e11d7f6",
       "size": 170381,
-      "mtime": 1762274039376
+      "mtime": 1764767317223
     },
     "imagesSplashJpg": {
       "path": "/images/splash.jpg",
       "hash": "v1_6e348d5eafb6f47d",
       "size": 283210,
-      "mtime": 1746225408885
+      "mtime": 1764681322813
     },
     "imagesSplashOgJpg": {
       "path": "/images/splash_og.jpg",
       "hash": "v1_20a71b944831fb8e",
       "size": 215233,
-      "mtime": 1746225408887
+      "mtime": 1764681322813
     },
     "imagesTutorialOverlayDuelFullBladeCardsFrame01Png": {
       "path": "/images/tutorial/overlay/duel_full_blade_cards_frame_01.png",
       "hash": "v1_fa3e89f7177f0f5a",
       "size": 312188,
-      "mtime": 1745565517952
+      "mtime": 1764681322824
     },
     "imagesTutorialOverlayDuelFullBladeCardsFrame02Png": {
       "path": "/images/tutorial/overlay/duel_full_blade_cards_frame_02.png",
       "hash": "v1_7da0b8e167b6eab4",
       "size": 151225,
-      "mtime": 1745565517953
+      "mtime": 1764681322825
     },
     "imagesTutorialOverlayDuelFullCardRevealFrame01Gif": {
       "path": "/images/tutorial/overlay/duel_full_card_reveal_frame_01.gif",
@@ -1464,7 +1506,7 @@
       "path": "/images/tutorial/overlay/duel_full_damage_frame_01.png",
       "hash": "v1_d87d8fa872c0180c",
       "size": 425291,
-      "mtime": 1745565517954
+      "mtime": 1764681322828
     },
     "imagesTutorialOverlayDuelFullDuelCardDetailsFrame01Gif": {
       "path": "/images/tutorial/overlay/duel_full_duel_card_details_frame_01.gif",
@@ -1476,13 +1518,13 @@
       "path": "/images/tutorial/overlay/duel_full_duel_conclusion_frame_01.png",
       "hash": "v1_9b0ee564c0527018",
       "size": 421463,
-      "mtime": 1745565517956
+      "mtime": 1764681322831
     },
     "imagesTutorialOverlayDuelFullEnvironmentCardDeckFrame01Png": {
       "path": "/images/tutorial/overlay/duel_full_environment_card_deck_frame_01.png",
       "hash": "v1_c82ff065f12e9ab8",
       "size": 333855,
-      "mtime": 1745565517960
+      "mtime": 1764681322834
     },
     "imagesTutorialOverlayDuelFullEnvironmentCardDrawFrame01Gif": {
       "path": "/images/tutorial/overlay/duel_full_environment_card_draw_frame_01.gif",
@@ -1494,139 +1536,139 @@
       "path": "/images/tutorial/overlay/duel_full_hit_chance_frame_01.png",
       "hash": "v1_6babeee66980f545",
       "size": 568794,
-      "mtime": 1745565517963
+      "mtime": 1764681322837
     },
     "imagesTutorialOverlayDuelFullIntroFrame01Png": {
       "path": "/images/tutorial/overlay/duel_full_intro_frame_01.png",
       "hash": "v1_a7d9f4e8dd2c96aa",
       "size": 505451,
-      "mtime": 1745565517964
+      "mtime": 1764681322839
     },
     "imagesTutorialOverlayDuelFullSelectingCardsFrame01Png": {
       "path": "/images/tutorial/overlay/duel_full_selecting_cards_frame_01.png",
       "hash": "v1_f11d925cdd54ad9e",
       "size": 291394,
-      "mtime": 1745565517966
+      "mtime": 1764681322841
     },
     "imagesTutorialOverlayDuelFullSelectingCardsFrame02Png": {
       "path": "/images/tutorial/overlay/duel_full_selecting_cards_frame_02.png",
       "hash": "v1_4fdcf2a145f51f8d",
       "size": 452700,
-      "mtime": 1745565517968
+      "mtime": 1764681322843
     },
     "imagesTutorialOverlayDuelFullTacticCardsFrame01Png": {
       "path": "/images/tutorial/overlay/duel_full_tactic_cards_frame_01.png",
       "hash": "v1_50b3a207ea321b66",
       "size": 285836,
-      "mtime": 1745565517969
+      "mtime": 1764681322845
     },
     "imagesTutorialOverlayDuelSimpleCommitingFrame01Png": {
       "path": "/images/tutorial/overlay/duel_simple_commiting_frame_01.png",
       "hash": "v1_05bd749de9942546",
       "size": 163635,
-      "mtime": 1745565517972
+      "mtime": 1764681322848
     },
     "imagesTutorialOverlayDuelSimpleDodgingFrame01Png": {
       "path": "/images/tutorial/overlay/duel_simple_dodging_frame_01.png",
       "hash": "v1_4639b9eb3c607bed",
       "size": 200920,
-      "mtime": 1745565517973
+      "mtime": 1764681322850
     },
     "imagesTutorialOverlayDuelSimpleDuelControlsFrame01Png": {
       "path": "/images/tutorial/overlay/duel_simple_duel_controls_frame_01.png",
       "hash": "v1_6ac4637f73241c20",
       "size": 320426,
-      "mtime": 1745565517974
+      "mtime": 1764681322853
     },
     "imagesTutorialOverlayDuelSimpleDuelInfoFrame01Png": {
       "path": "/images/tutorial/overlay/duel_simple_duel_info_frame_01.png",
       "hash": "v1_967cc0a24f484ae9",
       "size": 197026,
-      "mtime": 1745565517975
+      "mtime": 1764681322854
     },
     "imagesTutorialOverlayDuelSimpleDuelNavigationFrame01Png": {
       "path": "/images/tutorial/overlay/duel_simple_duel_navigation_frame_01.png",
       "hash": "v1_02c22f8b45008bf2",
       "size": 318804,
-      "mtime": 1745565517976
+      "mtime": 1764681322855
     },
     "imagesTutorialOverlayDuelSimpleIntroFrame01Png": {
       "path": "/images/tutorial/overlay/duel_simple_intro_frame_01.png",
       "hash": "v1_84ba938bf2761a63",
       "size": 413755,
-      "mtime": 1745565517977
+      "mtime": 1764681322857
     },
     "imagesTutorialOverlayDuelSimplePlayerInfoFrame01Png": {
       "path": "/images/tutorial/overlay/duel_simple_player_info_frame_01.png",
       "hash": "v1_d5e2ffc1b97735ca",
       "size": 372290,
-      "mtime": 1745565517981
+      "mtime": 1764681322858
     },
     "imagesTutorialOverlayDuelSimpleProgressBubblesFrame01Png": {
       "path": "/images/tutorial/overlay/duel_simple_progress_bubbles_frame_01.png",
       "hash": "v1_b0272c8a6aa4a23e",
       "size": 222592,
-      "mtime": 1745565517982
+      "mtime": 1764681322860
     },
     "imagesTutorialOverlayDuelSimpleRevealingFrame01Png": {
       "path": "/images/tutorial/overlay/duel_simple_revealing_frame_01.png",
       "hash": "v1_06015e01b71ec14d",
       "size": 384518,
-      "mtime": 1745565517983
+      "mtime": 1764681322862
     },
     "imagesTutorialOverlayDuelSimpleShootDodgeCardsFrame01Png": {
       "path": "/images/tutorial/overlay/duel_simple_shoot_dodge_cards_frame_01.png",
       "hash": "v1_080ecb7c305e7c98",
       "size": 300979,
-      "mtime": 1745565517985
+      "mtime": 1764681322864
     },
     "imagesTutorialOverlayDuelSimpleShootingFrame01Png": {
       "path": "/images/tutorial/overlay/duel_simple_shooting_frame_01.png",
       "hash": "v1_1265539339488c3b",
       "size": 236652,
-      "mtime": 1745565517986
+      "mtime": 1764681322868
     },
     "imagesTutorialOverlayDuelistTutorialCardPackFrame01Png": {
       "path": "/images/tutorial/overlay/duelist_tutorial_card_pack_frame_01.png",
       "hash": "v1_9238370d0d18c2a9",
       "size": 202065,
-      "mtime": 1745565517989
+      "mtime": 1764681322871
     },
     "imagesTutorialOverlayDuelistTutorialCardPackFrame02Gif": {
       "path": "/images/tutorial/overlay/duelist_tutorial_card_pack_frame_02.gif",
       "hash": "v1_5d8ac606fbdad7d8",
       "size": 2144296,
-      "mtime": 1745565517994
+      "mtime": 1764681322903
     },
     "imagesTutorialOverlayDuelistTutorialDuelistArchetypeFrame01Png": {
       "path": "/images/tutorial/overlay/duelist_tutorial_duelist_archetype_frame_01.png",
       "hash": "v1_0dbbd76a64a08523",
       "size": 416125,
-      "mtime": 1745565517999
+      "mtime": 1764681322911
     },
     "imagesTutorialOverlayDuelistTutorialDuelistFameFrame01Png": {
       "path": "/images/tutorial/overlay/duelist_tutorial_duelist_fame_frame_01.png",
       "hash": "v1_cfcf0dbf88cbef9c",
       "size": 107502,
-      "mtime": 1745565518000
+      "mtime": 1764681322913
     },
     "imagesTutorialOverlayDuelistTutorialDuelistFameFrame02Png": {
       "path": "/images/tutorial/overlay/duelist_tutorial_duelist_fame_frame_02.png",
       "hash": "v1_70a1e4febbd11017",
       "size": 104532,
-      "mtime": 1745565518001
+      "mtime": 1764681322913
     },
     "imagesTutorialOverlayDuelistTutorialDuelistFrame01Png": {
       "path": "/images/tutorial/overlay/duelist_tutorial_duelist_frame_01.png",
       "hash": "v1_e68be2b49d23d34d",
       "size": 282343,
-      "mtime": 1745565518003
+      "mtime": 1764681322944
     },
     "imagesUiCardPackPng": {
       "path": "/images/ui/card_pack.png",
       "hash": "v1_a8a50c7f18a9557a",
       "size": 509256,
-      "mtime": 1746441209907
+      "mtime": 1764681323051
     },
     "imagesUiCardPackEdgePng": {
       "path": "/images/ui/card_pack_edge.png",
@@ -1680,31 +1722,31 @@
       "path": "/images/ui/card_rank.png",
       "hash": "v1_d54a0e96a3212ddb",
       "size": 23932,
-      "mtime": 1759325116346
+      "mtime": 1764681323054
     },
     "imagesUiCardRank1Png": {
       "path": "/images/ui/card_rank_1.png",
       "hash": "v1_fa1a9ea103d291f2",
       "size": 20052,
-      "mtime": 1759325116277
+      "mtime": 1764681323056
     },
     "imagesUiCardRank2Png": {
       "path": "/images/ui/card_rank_2.png",
       "hash": "v1_6c995d95db86e6e0",
       "size": 21467,
-      "mtime": 1759325116300
+      "mtime": 1764681323058
     },
     "imagesUiCardRank3Png": {
       "path": "/images/ui/card_rank_3.png",
       "hash": "v1_d874aebfc122598e",
       "size": 21607,
-      "mtime": 1759325116323
+      "mtime": 1764681323073
     },
     "imagesUiCardSoulsPng": {
       "path": "/images/ui/card_souls.png",
       "hash": "v1_28cfef361689a831",
       "size": 67206,
-      "mtime": 1746456519350
+      "mtime": 1764681323105
     },
     "imagesUiDuelBottomNavPng": {
       "path": "/images/ui/duel/bottom_nav.png",
@@ -1716,25 +1758,25 @@
       "path": "/images/ui/duel/bubble_speech.png",
       "hash": "v1_6c7bd01be6ac7b7b",
       "size": 36044,
-      "mtime": 1752259624028
+      "mtime": 1764681323109
     },
     "imagesUiDuelBubbleSpeechMePng": {
       "path": "/images/ui/duel/bubble_speech_me.png",
       "hash": "v1_e5c33c453844fc04",
       "size": 36388,
-      "mtime": 1752259623995
+      "mtime": 1764681323113
     },
     "imagesUiDuelBubbleThinkingPng": {
       "path": "/images/ui/duel/bubble_thinking.png",
       "hash": "v1_f93d8fcf2c31026a",
       "size": 40581,
-      "mtime": 1752259624056
+      "mtime": 1764681323114
     },
     "imagesUiDuelBubbleThinkingMePng": {
       "path": "/images/ui/duel/bubble_thinking_me.png",
       "hash": "v1_f21d1b4bc69c6557",
       "size": 40898,
-      "mtime": 1752259624043
+      "mtime": 1764681323114
     },
     "imagesUiDuelCardDetailsBoxLeftPng": {
       "path": "/images/ui/duel/card_details/box_left.png",
@@ -1836,13 +1878,13 @@
       "path": "/images/ui/duel/player_profile.png",
       "hash": "v1_902dfecf0cf58b10",
       "size": 114240,
-      "mtime": 1752259584842
+      "mtime": 1764681323115
     },
     "imagesUiDuelPlayerProfileStampPng": {
       "path": "/images/ui/duel/player_profile_stamp.png",
       "hash": "v1_a2ae262fde0bc391",
       "size": 112806,
-      "mtime": 1752259584880
+      "mtime": 1764681323115
     },
     "imagesUiDuelSideNavPng": {
       "path": "/images/ui/duel/side_nav.png",
@@ -1902,13 +1944,13 @@
       "path": "/images/ui/hand_sweep.png",
       "hash": "v1_afc85ef8d784ff3a",
       "size": 134665,
-      "mtime": 1745565518004
+      "mtime": 1764681323116
     },
     "imagesUiHandThrowPng": {
       "path": "/images/ui/hand_throw.png",
       "hash": "v1_6e862b8ed8e3a830",
       "size": 201443,
-      "mtime": 1745565518005
+      "mtime": 1764681323117
     },
     "imagesUiLeaderboardsButtonBackgroundAllPng": {
       "path": "/images/ui/leaderboards/button_background_all.png",
@@ -2022,73 +2064,73 @@
       "path": "/images/ui/modes/bg_ranked.png",
       "hash": "v1_41c00265d66f1c06",
       "size": 1789439,
-      "mtime": 1758865552722
+      "mtime": 1764681323122
     },
     "imagesUiModesBgSingleplayerPng": {
       "path": "/images/ui/modes/bg_singleplayer.png",
       "hash": "v1_c0276cf6ac9c101d",
       "size": 1065165,
-      "mtime": 1758865552723
+      "mtime": 1764681323139
     },
     "imagesUiModesBgUnrankedPng": {
       "path": "/images/ui/modes/bg_unranked.png",
       "hash": "v1_b96561937ab81326",
       "size": 1355884,
-      "mtime": 1758865552727
+      "mtime": 1764681323208
     },
     "imagesUiModesQueueFrameFastPng": {
       "path": "/images/ui/modes/queue_frame_fast.png",
       "hash": "v1_0914fb2d5cf3a793",
       "size": 119033,
-      "mtime": 1758865552728
+      "mtime": 1764681323209
     },
     "imagesUiModesQueueFrameSlowPng": {
       "path": "/images/ui/modes/queue_frame_slow.png",
       "hash": "v1_2aae42693a8ca8bb",
       "size": 115102,
-      "mtime": 1758865552728
+      "mtime": 1764681323210
     },
     "imagesUiModesSettingsBoardPng": {
       "path": "/images/ui/modes/settings_board.png",
       "hash": "v1_02d9d30cccb28371",
       "size": 584923,
-      "mtime": 1758865552729
+      "mtime": 1764681323214
     },
     "imagesUiNotificationBartenderHeadPng": {
       "path": "/images/ui/notification_bartender_head.png",
       "hash": "v1_f3d3563426d6cb4d",
       "size": 59344,
-      "mtime": 1748946674677
+      "mtime": 1764681323215
     },
     "imagesUiNotificationExclamationPng": {
       "path": "/images/ui/notification_exclamation.png",
       "hash": "v1_22d90059d794cde1",
       "size": 165353,
-      "mtime": 1748946674678
+      "mtime": 1764681323216
     },
     "imagesUiPistolPng": {
       "path": "/images/ui/pistol.png",
       "hash": "v1_1a88a4e98fa4a4eb",
       "size": 191321,
-      "mtime": 1745565518006
+      "mtime": 1764681323218
     },
     "imagesUiRingsGoldringPng": {
       "path": "/images/ui/rings/GoldRing.png",
       "hash": "v1_09a3c78a2e990491",
       "size": 990582,
-      "mtime": 1753790615053
+      "mtime": 1764681323221
     },
     "imagesUiRingsLeadringPng": {
       "path": "/images/ui/rings/LeadRing.png",
       "hash": "v1_c74e0c2b579923ae",
       "size": 1058451,
-      "mtime": 1753790615088
+      "mtime": 1764681323228
     },
     "imagesUiRingsSilverringPng": {
       "path": "/images/ui/rings/SilverRing.png",
       "hash": "v1_7054c5227bb0f2fc",
       "size": 959375,
-      "mtime": 1753790615095
+      "mtime": 1764681323235
     },
     "imagesUiSealPng": {
       "path": "/images/ui/seal.png",
@@ -2100,31 +2142,31 @@
       "path": "/images/ui/stamps/black_stamp_cork.png",
       "hash": "v1_90797b173c619b15",
       "size": 179510,
-      "mtime": 1753789141315
+      "mtime": 1764681323238
     },
     "imagesUiStampsGoldStampCorkPng": {
       "path": "/images/ui/stamps/gold_stamp_cork.png",
       "hash": "v1_7602be10565b7cf4",
       "size": 421821,
-      "mtime": 1753789141412
+      "mtime": 1764681323239
     },
     "imagesUiStampsLeadStampCorkPng": {
       "path": "/images/ui/stamps/lead_stamp_cork.png",
       "hash": "v1_919745437053e51b",
       "size": 348858,
-      "mtime": 1753789141534
+      "mtime": 1764681323240
     },
     "imagesUiStampsSilverStampCorkPng": {
       "path": "/images/ui/stamps/silver_stamp_cork.png",
       "hash": "v1_02a0dde0e3d2261c",
       "size": 377178,
-      "mtime": 1753789141589
+      "mtime": 1764681323240
     },
     "imagesUiStampsTeamStampCorkPng": {
       "path": "/images/ui/stamps/team_stamp_cork.png",
       "hash": "v1_163d343e244c9140",
       "size": 369830,
-      "mtime": 1753789141628
+      "mtime": 1764681323241
     },
     "imagesUiTavernBannerPng": {
       "path": "/images/ui/tavern/banner.png",
@@ -2136,13 +2178,13 @@
       "path": "/images/ui/tavern/bg_menu_item_button.png",
       "hash": "v1_0157265338b44d92",
       "size": 433821,
-      "mtime": 1748946674681
+      "mtime": 1764681323243
     },
     "imagesUiTavernBoardPng": {
       "path": "/images/ui/tavern/board.png",
       "hash": "v1_5cabc72930088502",
       "size": 149133,
-      "mtime": 1759095164749
+      "mtime": 1764681323245
     },
     "imagesUiTavernBubbleDoorPng": {
       "path": "/images/ui/tavern/bubble_door.png",
@@ -2232,49 +2274,49 @@
       "path": "/logos/logo_fools.svg",
       "hash": "v1_f35dded5d6823c4c",
       "size": 16694,
-      "mtime": 1759311133378
+      "mtime": 1764681323245
     },
     "logosLogoFools0Svg": {
       "path": "/logos/logo_fools0.svg",
       "hash": "v1_280e79e4939a41f8",
       "size": 1392,
-      "mtime": 1746225408889
+      "mtime": 1764681323246
     },
     "logosLogoFools1Svg": {
       "path": "/logos/logo_fools1.svg",
       "hash": "v1_e6c7c701452b1186",
       "size": 2489,
-      "mtime": 1759311133378
+      "mtime": 1764681323246
     },
     "logosLogoFools2Svg": {
       "path": "/logos/logo_fools2.svg",
       "hash": "v1_970e9c6fd4ef39f1",
       "size": 4867,
-      "mtime": 1759311133378
+      "mtime": 1764681323246
     },
     "logosLogoFools3Svg": {
       "path": "/logos/logo_fools3.svg",
       "hash": "v1_fb620e429c81c0b1",
       "size": 16718,
-      "mtime": 1759311133378
+      "mtime": 1764681323246
     },
     "logosLogoFools4Svg": {
       "path": "/logos/logo_fools4.svg",
       "hash": "v1_8804569dfd108bfa",
       "size": 16814,
-      "mtime": 1759311133379
+      "mtime": 1764681323246
     },
     "logosLogoFools5Svg": {
       "path": "/logos/logo_fools5.svg",
       "hash": "v1_f35dded5d6823c4c",
       "size": 16694,
-      "mtime": 1759311133379
+      "mtime": 1764681323247
     },
     "logosLogoFoolsBagSvg": {
       "path": "/logos/logo_fools_bag.svg",
       "hash": "v1_c450183c53ae8dfa",
       "size": 4411,
-      "mtime": 1759311133379
+      "mtime": 1764681323247
     },
     "logosLogoInstagramSvg": {
       "path": "/logos/logo_instagram.svg",
@@ -2328,7 +2370,7 @@
       "path": "/logos/logo_starknet.svg",
       "hash": "v1_87dadc11c4392920",
       "size": 3369,
-      "mtime": 1748946674562
+      "mtime": 1764681323247
     },
     "logosLogoTelegramSvg": {
       "path": "/logos/logo_telegram.svg",
@@ -2388,31 +2430,31 @@
       "path": "/profiles/bots/01.jpg",
       "hash": "v1_036a04c9be2afac4",
       "size": 434795,
-      "mtime": 1753686278771
+      "mtime": 1764681323250
     },
     "profilesBots02Jpg": {
       "path": "/profiles/bots/02.jpg",
       "hash": "v1_30545f0e2241dd9e",
       "size": 440967,
-      "mtime": 1753686278773
+      "mtime": 1764681323297
     },
     "profilesBots03Jpg": {
       "path": "/profiles/bots/03.jpg",
       "hash": "v1_30cbee86912ee48c",
       "size": 488533,
-      "mtime": 1753686278775
+      "mtime": 1764681323315
     },
     "profilesBots04Jpg": {
       "path": "/profiles/bots/04.jpg",
       "hash": "v1_2cfbe52989416e9f",
       "size": 390063,
-      "mtime": 1758865430060
+      "mtime": 1764681323315
     },
     "profilesCharacters00Jpg": {
       "path": "/profiles/characters/00.jpg",
       "hash": "v1_d60a3c0995b40066",
       "size": 105478,
-      "mtime": 1762517381265
+      "mtime": 1764681323324
     },
     "profilesCharacters01Jpg": {
       "path": "/profiles/characters/01.jpg",
@@ -2442,553 +2484,553 @@
       "path": "/profiles/characters/05.jpg",
       "hash": "v1_4a9a198c5d755f9d",
       "size": 410786,
-      "mtime": 1753686278776
+      "mtime": 1764681323326
     },
     "profilesGenesis00Jpg": {
       "path": "/profiles/genesis/00.jpg",
       "hash": "v1_2cf64af198e5cd66",
       "size": 130403,
-      "mtime": 1746225408889
+      "mtime": 1764681323326
     },
     "profilesGenesis01Jpg": {
       "path": "/profiles/genesis/01.jpg",
       "hash": "v1_b2630961dbe44503",
       "size": 216410,
-      "mtime": 1746441209501
+      "mtime": 1764681323328
     },
     "profilesGenesis02Jpg": {
       "path": "/profiles/genesis/02.jpg",
       "hash": "v1_2e9ea2ef933af53b",
       "size": 242464,
-      "mtime": 1746441209503
+      "mtime": 1764681323331
     },
     "profilesGenesis03Jpg": {
       "path": "/profiles/genesis/03.jpg",
       "hash": "v1_6ca6cf638df00faa",
       "size": 229717,
-      "mtime": 1746441209504
+      "mtime": 1764681323334
     },
     "profilesGenesis04Jpg": {
       "path": "/profiles/genesis/04.jpg",
       "hash": "v1_a109f22680797d38",
       "size": 220883,
-      "mtime": 1746441209506
+      "mtime": 1764681323335
     },
     "profilesGenesis05Jpg": {
       "path": "/profiles/genesis/05.jpg",
       "hash": "v1_daab467dd941cfb3",
       "size": 321354,
-      "mtime": 1746441209507
+      "mtime": 1764681323335
     },
     "profilesGenesis06Jpg": {
       "path": "/profiles/genesis/06.jpg",
       "hash": "v1_4ef12127d959b720",
       "size": 155758,
-      "mtime": 1746441209508
+      "mtime": 1764681323336
     },
     "profilesGenesis07Jpg": {
       "path": "/profiles/genesis/07.jpg",
       "hash": "v1_6d8f30db5fad12fd",
       "size": 85561,
-      "mtime": 1746441209509
+      "mtime": 1764681323336
     },
     "profilesGenesis08Jpg": {
       "path": "/profiles/genesis/08.jpg",
       "hash": "v1_4dbf37975ce2f8e9",
       "size": 278096,
-      "mtime": 1746441209510
+      "mtime": 1764681323337
     },
     "profilesGenesis09Jpg": {
       "path": "/profiles/genesis/09.jpg",
       "hash": "v1_27968d1d18709d39",
       "size": 352174,
-      "mtime": 1746441209513
+      "mtime": 1764681323338
     },
     "profilesGenesis10Jpg": {
       "path": "/profiles/genesis/10.jpg",
       "hash": "v1_1fda96ec084e242f",
       "size": 302213,
-      "mtime": 1746441209515
+      "mtime": 1764681323339
     },
     "profilesGenesis11Jpg": {
       "path": "/profiles/genesis/11.jpg",
       "hash": "v1_0cb73e347ff84940",
       "size": 175408,
-      "mtime": 1746441209517
+      "mtime": 1764681323339
     },
     "profilesGenesis12Jpg": {
       "path": "/profiles/genesis/12.jpg",
       "hash": "v1_72a856424ab6fb7b",
       "size": 317745,
-      "mtime": 1746441209518
+      "mtime": 1764681323340
     },
     "profilesGenesis13Jpg": {
       "path": "/profiles/genesis/13.jpg",
       "hash": "v1_4a7af13bc598cd2e",
       "size": 382665,
-      "mtime": 1746441209520
+      "mtime": 1764681323341
     },
     "profilesGenesis14Jpg": {
       "path": "/profiles/genesis/14.jpg",
       "hash": "v1_db74cb50ba656b0e",
       "size": 288628,
-      "mtime": 1746441209521
+      "mtime": 1764681323341
     },
     "profilesGenesis15Jpg": {
       "path": "/profiles/genesis/15.jpg",
       "hash": "v1_bc8c8850ea3f49a5",
       "size": 255557,
-      "mtime": 1746441209523
+      "mtime": 1764681323342
     },
     "profilesGenesis16Jpg": {
       "path": "/profiles/genesis/16.jpg",
       "hash": "v1_62580175e4c1b932",
       "size": 173565,
-      "mtime": 1746441209525
+      "mtime": 1764681323343
     },
     "profilesGenesis17Jpg": {
       "path": "/profiles/genesis/17.jpg",
       "hash": "v1_d97a30f85a5395ea",
       "size": 275382,
-      "mtime": 1746441209527
+      "mtime": 1764681323344
     },
     "profilesGenesis18Jpg": {
       "path": "/profiles/genesis/18.jpg",
       "hash": "v1_cbcb570b8a7833bd",
       "size": 267235,
-      "mtime": 1746441209528
+      "mtime": 1764681323345
     },
     "profilesGenesis19Jpg": {
       "path": "/profiles/genesis/19.jpg",
       "hash": "v1_48490a6853030218",
       "size": 287775,
-      "mtime": 1746554326201
+      "mtime": 1764681323347
     },
     "profilesGenesis20Jpg": {
       "path": "/profiles/genesis/20.jpg",
       "hash": "v1_378dd2a5cd937db2",
       "size": 171415,
-      "mtime": 1746441209531
+      "mtime": 1764681323347
     },
     "profilesGenesis21Jpg": {
       "path": "/profiles/genesis/21.jpg",
       "hash": "v1_52b3011d79456927",
       "size": 308278,
-      "mtime": 1746441209532
+      "mtime": 1764681323348
     },
     "profilesGenesis22Jpg": {
       "path": "/profiles/genesis/22.jpg",
       "hash": "v1_6a6e602c29af2cff",
       "size": 341767,
-      "mtime": 1746441209534
+      "mtime": 1764681323349
     },
     "profilesGenesis23Jpg": {
       "path": "/profiles/genesis/23.jpg",
       "hash": "v1_193eb747d7fd9444",
       "size": 376903,
-      "mtime": 1746441209536
+      "mtime": 1764681323356
     },
     "profilesGenesis24Jpg": {
       "path": "/profiles/genesis/24.jpg",
       "hash": "v1_6075d06bf1e0511e",
       "size": 279296,
-      "mtime": 1746441209538
+      "mtime": 1764681323362
     },
     "profilesGenesis25Jpg": {
       "path": "/profiles/genesis/25.jpg",
       "hash": "v1_f354a350882c8c7f",
       "size": 241393,
-      "mtime": 1746554326203
+      "mtime": 1764681323364
     },
     "profilesGenesis26Jpg": {
       "path": "/profiles/genesis/26.jpg",
       "hash": "v1_143e36e93e4130ff",
       "size": 228303,
-      "mtime": 1746441209540
+      "mtime": 1764681323367
     },
     "profilesGenesis27Jpg": {
       "path": "/profiles/genesis/27.jpg",
       "hash": "v1_612757ad34ad8c31",
       "size": 316158,
-      "mtime": 1746441209541
+      "mtime": 1764681323369
     },
     "profilesGenesis28Jpg": {
       "path": "/profiles/genesis/28.jpg",
       "hash": "v1_27203da908160bd1",
       "size": 330084,
-      "mtime": 1746441209543
+      "mtime": 1764681323370
     },
     "profilesGenesis29Jpg": {
       "path": "/profiles/genesis/29.jpg",
       "hash": "v1_ac767caea970b1cb",
       "size": 287607,
-      "mtime": 1746554326206
+      "mtime": 1764681323372
     },
     "profilesGenesis30Jpg": {
       "path": "/profiles/genesis/30.jpg",
       "hash": "v1_df8582ef8cdd2fdd",
       "size": 305952,
-      "mtime": 1746441209546
+      "mtime": 1764681323373
     },
     "profilesGenesis31Jpg": {
       "path": "/profiles/genesis/31.jpg",
       "hash": "v1_ddbf7b5f3e4a9b10",
       "size": 327084,
-      "mtime": 1746441209548
+      "mtime": 1764681323374
     },
     "profilesGenesis32Jpg": {
       "path": "/profiles/genesis/32.jpg",
       "hash": "v1_97ae757cc754406f",
       "size": 259480,
-      "mtime": 1746441209550
+      "mtime": 1764681323376
     },
     "profilesGenesis33Jpg": {
       "path": "/profiles/genesis/33.jpg",
       "hash": "v1_e3a9805579b6e665",
       "size": 319254,
-      "mtime": 1746554326208
+      "mtime": 1764681323379
     },
     "profilesGenesis34Jpg": {
       "path": "/profiles/genesis/34.jpg",
       "hash": "v1_b08d1e5d4d0a31b1",
       "size": 294581,
-      "mtime": 1746554326211
+      "mtime": 1764681323380
     },
     "profilesGenesis35Jpg": {
       "path": "/profiles/genesis/35.jpg",
       "hash": "v1_bd0f82a7827e1b76",
       "size": 244297,
-      "mtime": 1746554326213
+      "mtime": 1764681323382
     },
     "profilesGenesis36Jpg": {
       "path": "/profiles/genesis/36.jpg",
       "hash": "v1_0af4f2e50adce86a",
       "size": 268311,
-      "mtime": 1746441209559
+      "mtime": 1764681323388
     },
     "profilesGenesis37Jpg": {
       "path": "/profiles/genesis/37.jpg",
       "hash": "v1_1287d5c3b79b3194",
       "size": 326702,
-      "mtime": 1746441209560
+      "mtime": 1764681323390
     },
     "profilesGenesis38Jpg": {
       "path": "/profiles/genesis/38.jpg",
       "hash": "v1_3c97a85e942a3cfd",
       "size": 330288,
-      "mtime": 1746441209562
+      "mtime": 1764681323392
     },
     "profilesGenesis39Jpg": {
       "path": "/profiles/genesis/39.jpg",
       "hash": "v1_c7129a9d05d48dc5",
       "size": 310944,
-      "mtime": 1746441209564
+      "mtime": 1764681323396
     },
     "profilesGenesis40Jpg": {
       "path": "/profiles/genesis/40.jpg",
       "hash": "v1_ead9ddabcaa8db87",
       "size": 288070,
-      "mtime": 1746441209567
+      "mtime": 1764681323401
     },
     "profilesGenesis41Jpg": {
       "path": "/profiles/genesis/41.jpg",
       "hash": "v1_8518d0e178207f60",
       "size": 327186,
-      "mtime": 1746441209569
+      "mtime": 1764681323403
     },
     "profilesGenesis42Jpg": {
       "path": "/profiles/genesis/42.jpg",
       "hash": "v1_1cc3a438cdd1822b",
       "size": 343236,
-      "mtime": 1746554326215
+      "mtime": 1764681323407
     },
     "profilesGenesis43Jpg": {
       "path": "/profiles/genesis/43.jpg",
       "hash": "v1_122ba7134b21ae8d",
       "size": 370456,
-      "mtime": 1748375923721
+      "mtime": 1764681323408
     },
     "profilesGenesis44Jpg": {
       "path": "/profiles/genesis/44.jpg",
       "hash": "v1_4a63bc39593900bd",
       "size": 275923,
-      "mtime": 1746554326219
+      "mtime": 1764681323409
     },
     "profilesGenesis45Jpg": {
       "path": "/profiles/genesis/45.jpg",
       "hash": "v1_6b3299c53ee5c928",
       "size": 400167,
-      "mtime": 1746554326222
+      "mtime": 1764681323410
     },
     "profilesGenesis46Jpg": {
       "path": "/profiles/genesis/46.jpg",
       "hash": "v1_6ae951df6648414b",
       "size": 253134,
-      "mtime": 1746554326225
+      "mtime": 1764681323411
     },
     "profilesGenesis47Jpg": {
       "path": "/profiles/genesis/47.jpg",
       "hash": "v1_08961074987abddb",
       "size": 275253,
-      "mtime": 1746441209578
+      "mtime": 1764681323414
     },
     "profilesGenesis48Jpg": {
       "path": "/profiles/genesis/48.jpg",
       "hash": "v1_8bdb1af129377450",
       "size": 314063,
-      "mtime": 1746441209580
+      "mtime": 1764681323415
     },
     "profilesGenesis49Jpg": {
       "path": "/profiles/genesis/49.jpg",
       "hash": "v1_49d548cf3d282b01",
       "size": 242852,
-      "mtime": 1746441209581
+      "mtime": 1764681323416
     },
     "profilesGenesis50Jpg": {
       "path": "/profiles/genesis/50.jpg",
       "hash": "v1_54b07dc8e1bb1583",
       "size": 185555,
-      "mtime": 1746441209582
+      "mtime": 1764681323416
     },
     "profilesGenesis51Jpg": {
       "path": "/profiles/genesis/51.jpg",
       "hash": "v1_17af3de2cf75d364",
       "size": 308666,
-      "mtime": 1746441209583
+      "mtime": 1764681323417
     },
     "profilesGenesis52Jpg": {
       "path": "/profiles/genesis/52.jpg",
       "hash": "v1_5611f1cb29f13912",
       "size": 228297,
-      "mtime": 1746441209585
+      "mtime": 1764681323418
     },
     "profilesGenesis53Jpg": {
       "path": "/profiles/genesis/53.jpg",
       "hash": "v1_9a53cc77fa1af314",
       "size": 248572,
-      "mtime": 1746441209587
+      "mtime": 1764681323419
     },
     "profilesGenesis54Jpg": {
       "path": "/profiles/genesis/54.jpg",
       "hash": "v1_b76937eaafd120fd",
       "size": 357977,
-      "mtime": 1746441209588
+      "mtime": 1764681323420
     },
     "profilesGenesis55Jpg": {
       "path": "/profiles/genesis/55.jpg",
       "hash": "v1_ba40f9c5be43bfa9",
       "size": 306098,
-      "mtime": 1746441209589
+      "mtime": 1764681323421
     },
     "profilesGenesis56Jpg": {
       "path": "/profiles/genesis/56.jpg",
       "hash": "v1_4ffd1bf16d0a0cd3",
       "size": 325116,
-      "mtime": 1746441209591
+      "mtime": 1764681323424
     },
     "profilesGenesis57Jpg": {
       "path": "/profiles/genesis/57.jpg",
       "hash": "v1_6595129cc4c88bed",
       "size": 325014,
-      "mtime": 1746441209593
+      "mtime": 1764681323425
     },
     "profilesGenesis58Jpg": {
       "path": "/profiles/genesis/58.jpg",
       "hash": "v1_14a7e1820ef50a21",
       "size": 227075,
-      "mtime": 1746441209595
+      "mtime": 1764681323426
     },
     "profilesGenesis59Jpg": {
       "path": "/profiles/genesis/59.jpg",
       "hash": "v1_2374138ae4140846",
       "size": 302940,
-      "mtime": 1746441209596
+      "mtime": 1764681323429
     },
     "profilesGenesis60Jpg": {
       "path": "/profiles/genesis/60.jpg",
       "hash": "v1_a672e0d656f1328f",
       "size": 292906,
-      "mtime": 1746441209599
+      "mtime": 1764681323430
     },
     "profilesGenesis61Jpg": {
       "path": "/profiles/genesis/61.jpg",
       "hash": "v1_eeb07024965d8cf5",
       "size": 196186,
-      "mtime": 1746441209600
+      "mtime": 1764681323431
     },
     "profilesGenesis62Jpg": {
       "path": "/profiles/genesis/62.jpg",
       "hash": "v1_06aedc14145bbf8c",
       "size": 237219,
-      "mtime": 1746441209601
+      "mtime": 1764681323432
     },
     "profilesGenesis63Jpg": {
       "path": "/profiles/genesis/63.jpg",
       "hash": "v1_c09f684ae0e3fcfa",
       "size": 294587,
-      "mtime": 1746441209603
+      "mtime": 1764681323434
     },
     "profilesGenesis64Jpg": {
       "path": "/profiles/genesis/64.jpg",
       "hash": "v1_63ef75aa48f63815",
       "size": 345590,
-      "mtime": 1746554326229
+      "mtime": 1764681323437
     },
     "profilesGenesis65Jpg": {
       "path": "/profiles/genesis/65.jpg",
       "hash": "v1_43101687013a9079",
       "size": 340620,
-      "mtime": 1746869333869
+      "mtime": 1764681323438
     },
     "profilesGenesis66Jpg": {
       "path": "/profiles/genesis/66.jpg",
       "hash": "v1_68b0884476be5fd4",
       "size": 252982,
-      "mtime": 1746554326231
+      "mtime": 1764681323441
     },
     "profilesGenesis67Jpg": {
       "path": "/profiles/genesis/67.jpg",
       "hash": "v1_f226693e04174b2f",
       "size": 356592,
-      "mtime": 1746554326234
+      "mtime": 1764681323457
     },
     "profilesGenesis68Jpg": {
       "path": "/profiles/genesis/68.jpg",
       "hash": "v1_2d38d262f7fa0f02",
       "size": 301117,
-      "mtime": 1746441209607
+      "mtime": 1764681323474
     },
     "profilesGenesis69Jpg": {
       "path": "/profiles/genesis/69.jpg",
       "hash": "v1_83443aa24dbc029a",
       "size": 266447,
-      "mtime": 1746554326235
+      "mtime": 1764681323480
     },
     "profilesLegends00Jpg": {
       "path": "/profiles/legends/00.jpg",
       "hash": "v1_2cf64af198e5cd66",
       "size": 130403,
-      "mtime": 1752236926509
+      "mtime": 1764681323484
     },
     "profilesLegends01Jpg": {
       "path": "/profiles/legends/01.jpg",
       "hash": "v1_abd5d62efd5d2ded",
       "size": 334779,
-      "mtime": 1753778085194
+      "mtime": 1764681323487
     },
     "profilesLegends02Jpg": {
       "path": "/profiles/legends/02.jpg",
       "hash": "v1_726a5b4bebeaebe0",
       "size": 371177,
-      "mtime": 1754991218562
+      "mtime": 1764681323490
     },
     "profilesLegends03Jpg": {
       "path": "/profiles/legends/03.jpg",
       "hash": "v1_ca323792ef15f815",
       "size": 262975,
-      "mtime": 1762517381267
+      "mtime": 1764681323491
     },
     "profilesLegends04Jpg": {
       "path": "/profiles/legends/04.jpg",
       "hash": "v1_141b91d193af98b2",
       "size": 143610,
-      "mtime": 1762517381275
+      "mtime": 1764681323493
     },
     "profilesPirates00Jpg": {
       "path": "/profiles/pirates/00.jpg",
       "hash": "v1_2cf64af198e5cd66",
       "size": 130403,
-      "mtime": 1762517381290
+      "mtime": 1764681323493
     },
     "profilesPirates01Jpg": {
       "path": "/profiles/pirates/01.jpg",
       "hash": "v1_7682d7fc75fd348a",
       "size": 380955,
-      "mtime": 1762517381296
+      "mtime": 1764681323497
     },
     "profilesPirates02Jpg": {
       "path": "/profiles/pirates/02.jpg",
       "hash": "v1_db886af9d6de6d31",
       "size": 303607,
-      "mtime": 1762517381300
+      "mtime": 1764681323499
     },
     "profilesPirates03Jpg": {
       "path": "/profiles/pirates/03.jpg",
       "hash": "v1_a8dfeb57f4931cb2",
       "size": 283433,
-      "mtime": 1762517381314
+      "mtime": 1764681323500
     },
     "profilesPirates04Jpg": {
       "path": "/profiles/pirates/04.jpg",
       "hash": "v1_1e0011c7c87e2ab1",
       "size": 363584,
-      "mtime": 1762517381322
+      "mtime": 1764681323502
     },
     "profilesPirates05Jpg": {
       "path": "/profiles/pirates/05.jpg",
       "hash": "v1_268b8d2f7e29cc27",
       "size": 275530,
-      "mtime": 1762517381328
+      "mtime": 1764681323504
     },
     "profilesPirates06Jpg": {
       "path": "/profiles/pirates/06.jpg",
       "hash": "v1_3eeb4d9621e0f26a",
       "size": 316944,
-      "mtime": 1762517381332
+      "mtime": 1764681323506
     },
     "profilesPirates07Jpg": {
       "path": "/profiles/pirates/07.jpg",
       "hash": "v1_000165036e20bd70",
       "size": 361597,
-      "mtime": 1762517381334
+      "mtime": 1764681323507
     },
     "profilesPirates08Jpg": {
       "path": "/profiles/pirates/08.jpg",
       "hash": "v1_38be52856ea7db61",
       "size": 371672,
-      "mtime": 1762517381344
+      "mtime": 1764681323508
     },
     "profilesPirates09Jpg": {
       "path": "/profiles/pirates/09.jpg",
       "hash": "v1_b4d1add8ea713eac",
       "size": 424307,
-      "mtime": 1762517381357
+      "mtime": 1764681323509
     },
     "profilesPirates10Jpg": {
       "path": "/profiles/pirates/10.jpg",
       "hash": "v1_75e022b0361796e2",
       "size": 270182,
-      "mtime": 1762517381363
+      "mtime": 1764681323511
     },
     "profilesPirates11Jpg": {
       "path": "/profiles/pirates/11.jpg",
       "hash": "v1_703a7df6ca076c15",
       "size": 501840,
-      "mtime": 1762517381371
+      "mtime": 1764681323512
     },
     "profilesPirates12Jpg": {
       "path": "/profiles/pirates/12.jpg",
       "hash": "v1_fb9532174337809d",
       "size": 301691,
-      "mtime": 1762517381378
+      "mtime": 1764681323513
     },
     "profilesPirates13Jpg": {
       "path": "/profiles/pirates/13.jpg",
       "hash": "v1_4fa0770f198ecdaf",
       "size": 331730,
-      "mtime": 1762517381380
+      "mtime": 1764681323514
     },
     "profilesPirates14Jpg": {
       "path": "/profiles/pirates/14.jpg",
       "hash": "v1_70d4d51bf3d312e8",
       "size": 370029,
-      "mtime": 1762517381387
+      "mtime": 1764681323515
     },
     "profilesUndefined00Jpg": {
       "path": "/profiles/undefined/00.jpg",
       "hash": "v1_2cf64af198e5cd66",
       "size": 130403,
-      "mtime": 1746554326236
+      "mtime": 1764681323516
     },
     "texturesWaterPuddlesKtx2": {
       "path": "/textures/Water_Puddles.ktx2",
@@ -3000,175 +3042,175 @@
       "path": "/textures/animations/Card/Burn/frame_001.ktx2",
       "hash": "v1_a40f925832f4a314",
       "size": 7352,
-      "mtime": 1746225408949
+      "mtime": 1764681323516
     },
     "texturesAnimationsCardBurnFrame002Ktx2": {
       "path": "/textures/animations/Card/Burn/frame_002.ktx2",
       "hash": "v1_ee65c216710378c4",
       "size": 21416,
-      "mtime": 1746225408950
+      "mtime": 1764681323516
     },
     "texturesAnimationsCardBurnFrame003Ktx2": {
       "path": "/textures/animations/Card/Burn/frame_003.ktx2",
       "hash": "v1_84a8f75058e37ad3",
       "size": 22905,
-      "mtime": 1746225408950
+      "mtime": 1764681323516
     },
     "texturesAnimationsCardBurnFrame004Ktx2": {
       "path": "/textures/animations/Card/Burn/frame_004.ktx2",
       "hash": "v1_6fb442d94b0b9b92",
       "size": 27874,
-      "mtime": 1746225408950
+      "mtime": 1764681323517
     },
     "texturesAnimationsCardBurnFrame005Ktx2": {
       "path": "/textures/animations/Card/Burn/frame_005.ktx2",
       "hash": "v1_4913780b39ef7edf",
       "size": 32246,
-      "mtime": 1746225408950
+      "mtime": 1764681323517
     },
     "texturesAnimationsCardBurnFrame006Ktx2": {
       "path": "/textures/animations/Card/Burn/frame_006.ktx2",
       "hash": "v1_796f1b11b92b6172",
       "size": 16102,
-      "mtime": 1746225408953
+      "mtime": 1764681323517
     },
     "texturesAnimationsCardBurnFrame007Ktx2": {
       "path": "/textures/animations/Card/Burn/frame_007.ktx2",
       "hash": "v1_c6ceb4b546d57d7b",
       "size": 2583,
-      "mtime": 1746225408953
+      "mtime": 1764681323517
     },
     "texturesAnimationsCardIdleFrame001Ktx2": {
       "path": "/textures/animations/Card/Idle/frame_001.ktx2",
       "hash": "v1_894a64af3ece1c58",
       "size": 2373,
-      "mtime": 1746225408954
+      "mtime": 1764681323517
     },
     "texturesAnimationsCardIdleFrame002Ktx2": {
       "path": "/textures/animations/Card/Idle/frame_002.ktx2",
       "hash": "v1_19fe7993f93c76a6",
       "size": 2478,
-      "mtime": 1746225408954
+      "mtime": 1764681323517
     },
     "texturesAnimationsCardIdleFrame003Ktx2": {
       "path": "/textures/animations/Card/Idle/frame_003.ktx2",
       "hash": "v1_c09a96dd078cecad",
       "size": 2679,
-      "mtime": 1746225408954
+      "mtime": 1764681323517
     },
     "texturesAnimationsExplosionExplodeFrame001Ktx2": {
       "path": "/textures/animations/Explosion/Explode/frame_001.ktx2",
       "hash": "v1_9f0bcf78da30ac92",
       "size": 25194,
-      "mtime": 1746225408954
+      "mtime": 1764681323518
     },
     "texturesAnimationsExplosionExplodeFrame002Ktx2": {
       "path": "/textures/animations/Explosion/Explode/frame_002.ktx2",
       "hash": "v1_1a60fa213c96e606",
       "size": 47825,
-      "mtime": 1746225408954
+      "mtime": 1764681323518
     },
     "texturesAnimationsExplosionExplodeFrame003Ktx2": {
       "path": "/textures/animations/Explosion/Explode/frame_003.ktx2",
       "hash": "v1_ac8ce8da27865253",
       "size": 80387,
-      "mtime": 1746225408955
+      "mtime": 1764681323518
     },
     "texturesAnimationsExplosionExplodeFrame004Ktx2": {
       "path": "/textures/animations/Explosion/Explode/frame_004.ktx2",
       "hash": "v1_97afa167f7139442",
       "size": 116353,
-      "mtime": 1746225408955
+      "mtime": 1764681323518
     },
     "texturesAnimationsExplosionExplodeFrame005Ktx2": {
       "path": "/textures/animations/Explosion/Explode/frame_005.ktx2",
       "hash": "v1_17770565f2e71d6f",
       "size": 118432,
-      "mtime": 1746225408956
+      "mtime": 1764681323518
     },
     "texturesAnimationsExplosionExplodeFrame006Ktx2": {
       "path": "/textures/animations/Explosion/Explode/frame_006.ktx2",
       "hash": "v1_5f799b3193eab346",
       "size": 24247,
-      "mtime": 1746225408957
+      "mtime": 1764681323518
     },
     "texturesAnimationsFemaleDuelistDodgeBackFrame001Ktx2": {
       "path": "/textures/animations/Female Duelist/Dodge_Back/frame_001.ktx2",
       "hash": "v1_f471eac79aca6b62",
       "size": 14723,
-      "mtime": 1748415504684
+      "mtime": 1764681323519
     },
     "texturesAnimationsFemaleDuelistDodgeBackFrame002Ktx2": {
       "path": "/textures/animations/Female Duelist/Dodge_Back/frame_002.ktx2",
       "hash": "v1_5bbbe93c72e6ad67",
       "size": 13488,
-      "mtime": 1748415504710
+      "mtime": 1764681323519
     },
     "texturesAnimationsFemaleDuelistDodgeBackFrame003Ktx2": {
       "path": "/textures/animations/Female Duelist/Dodge_Back/frame_003.ktx2",
       "hash": "v1_5bbbe93c72e6ad67",
       "size": 13488,
-      "mtime": 1748415504751
+      "mtime": 1764681323519
     },
     "texturesAnimationsFemaleDuelistDodgeBackFrame004Ktx2": {
       "path": "/textures/animations/Female Duelist/Dodge_Back/frame_004.ktx2",
       "hash": "v1_89a2dfb73160c494",
       "size": 10977,
-      "mtime": 1748415504771
+      "mtime": 1764681323520
     },
     "texturesAnimationsFemaleDuelistDodgeBackFrame005Ktx2": {
       "path": "/textures/animations/Female Duelist/Dodge_Back/frame_005.ktx2",
       "hash": "v1_89a2dfb73160c494",
       "size": 10977,
-      "mtime": 1748415504800
+      "mtime": 1764681323520
     },
     "texturesAnimationsFemaleDuelistDodgeBackFrame006Ktx2": {
       "path": "/textures/animations/Female Duelist/Dodge_Back/frame_006.ktx2",
       "hash": "v1_9023f22c2b54f9f4",
       "size": 11981,
-      "mtime": 1748415504834
+      "mtime": 1764681323520
     },
     "texturesAnimationsFemaleDuelistDodgeBackFrame007Ktx2": {
       "path": "/textures/animations/Female Duelist/Dodge_Back/frame_007.ktx2",
       "hash": "v1_3aa0ef3a0de0fd31",
       "size": 14355,
-      "mtime": 1748415504853
+      "mtime": 1764681323520
     },
     "texturesAnimationsFemaleDuelistDodgeBackFrame008Ktx2": {
       "path": "/textures/animations/Female Duelist/Dodge_Back/frame_008.ktx2",
       "hash": "v1_cbf9efa1f840ab2e",
       "size": 14475,
-      "mtime": 1748415504881
+      "mtime": 1764681323521
     },
     "texturesAnimationsFemaleDuelistDodgeBackFrame009Ktx2": {
       "path": "/textures/animations/Female Duelist/Dodge_Back/frame_009.ktx2",
       "hash": "v1_f8d03a8c63cca248",
       "size": 13607,
-      "mtime": 1748415504898
+      "mtime": 1764681323521
     },
     "texturesAnimationsFemaleDuelistDodgeBackFrame010Ktx2": {
       "path": "/textures/animations/Female Duelist/Dodge_Back/frame_010.ktx2",
       "hash": "v1_65ee5114784fa05a",
       "size": 12398,
-      "mtime": 1748415504931
+      "mtime": 1764681323521
     },
     "texturesAnimationsFemaleDuelistDodgeBackFrame011Ktx2": {
       "path": "/textures/animations/Female Duelist/Dodge_Back/frame_011.ktx2",
       "hash": "v1_1871286ad0bdaf9e",
       "size": 10711,
-      "mtime": 1748415504963
+      "mtime": 1764681323521
     },
     "texturesAnimationsFemaleDuelistDodgeBackFrame012Ktx2": {
       "path": "/textures/animations/Female Duelist/Dodge_Back/frame_012.ktx2",
       "hash": "v1_41edcfb6bd5379f8",
       "size": 12398,
-      "mtime": 1748415504981
+      "mtime": 1764681323521
     },
     "texturesAnimationsFemaleDuelistDodgeBackFrame013Ktx2": {
       "path": "/textures/animations/Female Duelist/Dodge_Back/frame_013.ktx2",
       "hash": "v1_41edcfb6bd5379f8",
       "size": 12398,
-      "mtime": 1748415505020
+      "mtime": 1764681323522
     },
     "texturesAnimationsFemaleDuelistDodgeBackFrame014Ktx2": {
       "path": "/textures/animations/Female Duelist/Dodge_Back/frame_014.ktx2",
@@ -3192,97 +3234,97 @@
       "path": "/textures/animations/Female Duelist/Dodge_Front/frame_001.ktx2",
       "hash": "v1_28ae52a504cbe4ee",
       "size": 14123,
-      "mtime": 1746225408958
+      "mtime": 1764681323522
     },
     "texturesAnimationsFemaleDuelistDodgeFrontFrame002Ktx2": {
       "path": "/textures/animations/Female Duelist/Dodge_Front/frame_002.ktx2",
       "hash": "v1_28ae52a504cbe4ee",
       "size": 14123,
-      "mtime": 1746225408958
+      "mtime": 1764681323522
     },
     "texturesAnimationsFemaleDuelistDodgeFrontFrame003Ktx2": {
       "path": "/textures/animations/Female Duelist/Dodge_Front/frame_003.ktx2",
       "hash": "v1_28ae52a504cbe4ee",
       "size": 14123,
-      "mtime": 1746225408959
+      "mtime": 1764681323522
     },
     "texturesAnimationsFemaleDuelistDodgeFrontFrame004Ktx2": {
       "path": "/textures/animations/Female Duelist/Dodge_Front/frame_004.ktx2",
       "hash": "v1_28ae52a504cbe4ee",
       "size": 14123,
-      "mtime": 1746225408959
+      "mtime": 1764681323523
     },
     "texturesAnimationsFemaleDuelistDodgeFrontFrame005Ktx2": {
       "path": "/textures/animations/Female Duelist/Dodge_Front/frame_005.ktx2",
       "hash": "v1_28ae52a504cbe4ee",
       "size": 14123,
-      "mtime": 1746225408960
+      "mtime": 1764681323524
     },
     "texturesAnimationsFemaleDuelistDodgeFrontFrame006Ktx2": {
       "path": "/textures/animations/Female Duelist/Dodge_Front/frame_006.ktx2",
       "hash": "v1_28ae52a504cbe4ee",
       "size": 14123,
-      "mtime": 1746225408960
+      "mtime": 1764681323524
     },
     "texturesAnimationsFemaleDuelistDodgeFrontFrame007Ktx2": {
       "path": "/textures/animations/Female Duelist/Dodge_Front/frame_007.ktx2",
       "hash": "v1_4e946ab19cf1819f",
       "size": 19727,
-      "mtime": 1746225408962
+      "mtime": 1764681323524
     },
     "texturesAnimationsFemaleDuelistDodgeFrontFrame008Ktx2": {
       "path": "/textures/animations/Female Duelist/Dodge_Front/frame_008.ktx2",
       "hash": "v1_98f917a6290422d2",
       "size": 17151,
-      "mtime": 1746225408963
+      "mtime": 1764681323525
     },
     "texturesAnimationsFemaleDuelistDodgeFrontFrame009Ktx2": {
       "path": "/textures/animations/Female Duelist/Dodge_Front/frame_009.ktx2",
       "hash": "v1_3e2e62f41839da41",
       "size": 13851,
-      "mtime": 1746225408965
+      "mtime": 1764681323525
     },
     "texturesAnimationsFemaleDuelistDodgeFrontFrame010Ktx2": {
       "path": "/textures/animations/Female Duelist/Dodge_Front/frame_010.ktx2",
       "hash": "v1_92c4b96b56eb7262",
       "size": 15720,
-      "mtime": 1746225408966
+      "mtime": 1764681323525
     },
     "texturesAnimationsFemaleDuelistDodgeFrontFrame011Ktx2": {
       "path": "/textures/animations/Female Duelist/Dodge_Front/frame_011.ktx2",
       "hash": "v1_9a8ef53863371414",
       "size": 15957,
-      "mtime": 1746225408966
+      "mtime": 1764681323526
     },
     "texturesAnimationsFemaleDuelistDodgeFrontFrame012Ktx2": {
       "path": "/textures/animations/Female Duelist/Dodge_Front/frame_012.ktx2",
       "hash": "v1_3b23208aaecf0cff",
       "size": 14364,
-      "mtime": 1746225408967
+      "mtime": 1764681323526
     },
     "texturesAnimationsFemaleDuelistDodgeFrontFrame013Ktx2": {
       "path": "/textures/animations/Female Duelist/Dodge_Front/frame_013.ktx2",
       "hash": "v1_8616c3e38bd0aa75",
       "size": 14489,
-      "mtime": 1746225408967
+      "mtime": 1764681323526
     },
     "texturesAnimationsFemaleDuelistDodgeFrontFrame014Ktx2": {
       "path": "/textures/animations/Female Duelist/Dodge_Front/frame_014.ktx2",
       "hash": "v1_28ae52a504cbe4ee",
       "size": 14123,
-      "mtime": 1746225408968
+      "mtime": 1764681323526
     },
     "texturesAnimationsFemaleDuelistDodgeFrontFrame015Ktx2": {
       "path": "/textures/animations/Female Duelist/Dodge_Front/frame_015.ktx2",
       "hash": "v1_28ae52a504cbe4ee",
       "size": 14123,
-      "mtime": 1746225408969
+      "mtime": 1764681323527
     },
     "texturesAnimationsFemaleDuelistDodgeFrontFrame016Ktx2": {
       "path": "/textures/animations/Female Duelist/Dodge_Front/frame_016.ktx2",
       "hash": "v1_28ae52a504cbe4ee",
       "size": 14123,
-      "mtime": 1746225408970
+      "mtime": 1764681323527
     },
     "texturesAnimationsFemaleDuelistSeppukuFrame001Ktx2": {
       "path": "/textures/animations/Female Duelist/Seppuku/frame_001.ktx2",
@@ -3990,49 +4032,49 @@
       "path": "/textures/animations/Female Duelist/Still_Blade/frame_001.ktx2",
       "hash": "v1_8ce8fe6d1a5da8ae",
       "size": 15885,
-      "mtime": 1746225408971
+      "mtime": 1764681323527
     },
     "texturesAnimationsFemaleDuelistStillBladeFrame002Ktx2": {
       "path": "/textures/animations/Female Duelist/Still_Blade/frame_002.ktx2",
       "hash": "v1_d62a12d3e1817bc1",
       "size": 16407,
-      "mtime": 1746225408971
+      "mtime": 1764681323527
     },
     "texturesAnimationsFemaleDuelistStillBladeFrame003Ktx2": {
       "path": "/textures/animations/Female Duelist/Still_Blade/frame_003.ktx2",
       "hash": "v1_d62a12d3e1817bc1",
       "size": 16407,
-      "mtime": 1746225408972
+      "mtime": 1764681323528
     },
     "texturesAnimationsFemaleDuelistStillBladeFrame004Ktx2": {
       "path": "/textures/animations/Female Duelist/Still_Blade/frame_004.ktx2",
       "hash": "v1_8ce8fe6d1a5da8ae",
       "size": 15885,
-      "mtime": 1746225408972
+      "mtime": 1764681323528
     },
     "texturesAnimationsFemaleDuelistStillBladeFrame005Ktx2": {
       "path": "/textures/animations/Female Duelist/Still_Blade/frame_005.ktx2",
       "hash": "v1_8ce8fe6d1a5da8ae",
       "size": 15885,
-      "mtime": 1746225408973
+      "mtime": 1764681323528
     },
     "texturesAnimationsFemaleDuelistStillBladeFrame006Ktx2": {
       "path": "/textures/animations/Female Duelist/Still_Blade/frame_006.ktx2",
       "hash": "v1_0c33a02ee3d77f94",
       "size": 15950,
-      "mtime": 1746225408974
+      "mtime": 1764681323529
     },
     "texturesAnimationsFemaleDuelistStillBladeFrame007Ktx2": {
       "path": "/textures/animations/Female Duelist/Still_Blade/frame_007.ktx2",
       "hash": "v1_0c33a02ee3d77f94",
       "size": 15950,
-      "mtime": 1746225408975
+      "mtime": 1764681323529
     },
     "texturesAnimationsFemaleDuelistStillBladeFrame008Ktx2": {
       "path": "/textures/animations/Female Duelist/Still_Blade/frame_008.ktx2",
       "hash": "v1_8ce8fe6d1a5da8ae",
       "size": 15885,
-      "mtime": 1746225408975
+      "mtime": 1764681323529
     },
     "texturesAnimationsFemaleDuelistStrikeFrame001Ktx2": {
       "path": "/textures/animations/Female Duelist/Strike/frame_001.ktx2",
@@ -4116,61 +4158,61 @@
       "path": "/textures/animations/Female Duelist/Struck_Dead/frame_001.ktx2",
       "hash": "v1_0c33a02ee3d77f94",
       "size": 15950,
-      "mtime": 1746225408976
+      "mtime": 1764681323529
     },
     "texturesAnimationsFemaleDuelistStruckDeadFrame002Ktx2": {
       "path": "/textures/animations/Female Duelist/Struck_Dead/frame_002.ktx2",
       "hash": "v1_0275c9a26c07f6b6",
       "size": 20786,
-      "mtime": 1746225408983
+      "mtime": 1764681323529
     },
     "texturesAnimationsFemaleDuelistStruckDeadFrame003Ktx2": {
       "path": "/textures/animations/Female Duelist/Struck_Dead/frame_003.ktx2",
       "hash": "v1_41d80c4cb6d7913b",
       "size": 23654,
-      "mtime": 1746225408987
+      "mtime": 1764681323530
     },
     "texturesAnimationsFemaleDuelistStruckDeadFrame004Ktx2": {
       "path": "/textures/animations/Female Duelist/Struck_Dead/frame_004.ktx2",
       "hash": "v1_bfc5ee05a4de56f5",
       "size": 26606,
-      "mtime": 1746225408989
+      "mtime": 1764681323530
     },
     "texturesAnimationsFemaleDuelistStruckDeadFrame005Ktx2": {
       "path": "/textures/animations/Female Duelist/Struck_Dead/frame_005.ktx2",
       "hash": "v1_9bfde2806ce97ee3",
       "size": 24508,
-      "mtime": 1746225408991
+      "mtime": 1764681323530
     },
     "texturesAnimationsFemaleDuelistStruckDeadFrame006Ktx2": {
       "path": "/textures/animations/Female Duelist/Struck_Dead/frame_006.ktx2",
       "hash": "v1_f8398df36b4db175",
       "size": 22452,
-      "mtime": 1746225408993
+      "mtime": 1764681323530
     },
     "texturesAnimationsFemaleDuelistStruckDeadFrame007Ktx2": {
       "path": "/textures/animations/Female Duelist/Struck_Dead/frame_007.ktx2",
       "hash": "v1_8d49cfc05979b46d",
       "size": 19903,
-      "mtime": 1746225408998
+      "mtime": 1764681323531
     },
     "texturesAnimationsFemaleDuelistStruckDeadFrame008Ktx2": {
       "path": "/textures/animations/Female Duelist/Struck_Dead/frame_008.ktx2",
       "hash": "v1_2053d291f7e7b09b",
       "size": 15878,
-      "mtime": 1746225409002
+      "mtime": 1764681323531
     },
     "texturesAnimationsFemaleDuelistStruckDeadFrame009Ktx2": {
       "path": "/textures/animations/Female Duelist/Struck_Dead/frame_009.ktx2",
       "hash": "v1_ed073dbd996eb776",
       "size": 13783,
-      "mtime": 1746225409006
+      "mtime": 1764681323531
     },
     "texturesAnimationsFemaleDuelistStruckDeadFrame010Ktx2": {
       "path": "/textures/animations/Female Duelist/Struck_Dead/frame_010.ktx2",
       "hash": "v1_ce4d43700a7626b7",
       "size": 13277,
-      "mtime": 1746225409008
+      "mtime": 1764681323532
     },
     "texturesAnimationsFemaleDuelistStruckInjuredFrame001Ktx2": {
       "path": "/textures/animations/Female Duelist/Struck_Injured/frame_001.ktx2",
@@ -4308,193 +4350,193 @@
       "path": "/textures/animations/Male Duelist/Dodge_Back/frame_001.ktx2",
       "hash": "v1_fdddcbe6f6dc0985",
       "size": 16911,
-      "mtime": 1746554372136
+      "mtime": 1764681323532
     },
     "texturesAnimationsMaleDuelistDodgeBackFrame002Ktx2": {
       "path": "/textures/animations/Male Duelist/Dodge_Back/frame_002.ktx2",
       "hash": "v1_a9a68cfadced985f",
       "size": 15936,
-      "mtime": 1746554372141
+      "mtime": 1764681323532
     },
     "texturesAnimationsMaleDuelistDodgeBackFrame003Ktx2": {
       "path": "/textures/animations/Male Duelist/Dodge_Back/frame_003.ktx2",
       "hash": "v1_6233e29b11b7376c",
       "size": 13220,
-      "mtime": 1746554372145
+      "mtime": 1764681323532
     },
     "texturesAnimationsMaleDuelistDodgeBackFrame004Ktx2": {
       "path": "/textures/animations/Male Duelist/Dodge_Back/frame_004.ktx2",
       "hash": "v1_d3e360069e15ef3b",
       "size": 11188,
-      "mtime": 1746554372148
+      "mtime": 1764681323532
     },
     "texturesAnimationsMaleDuelistDodgeBackFrame005Ktx2": {
       "path": "/textures/animations/Male Duelist/Dodge_Back/frame_005.ktx2",
       "hash": "v1_4cd3399cae42243e",
       "size": 12754,
-      "mtime": 1746554372153
+      "mtime": 1764681323533
     },
     "texturesAnimationsMaleDuelistDodgeBackFrame006Ktx2": {
       "path": "/textures/animations/Male Duelist/Dodge_Back/frame_006.ktx2",
       "hash": "v1_ab8cb282b9f8f095",
       "size": 14337,
-      "mtime": 1746554372155
+      "mtime": 1764681323533
     },
     "texturesAnimationsMaleDuelistDodgeBackFrame007Ktx2": {
       "path": "/textures/animations/Male Duelist/Dodge_Back/frame_007.ktx2",
       "hash": "v1_65bd9da6e01e4468",
       "size": 15016,
-      "mtime": 1746554372158
+      "mtime": 1764681323533
     },
     "texturesAnimationsMaleDuelistDodgeBackFrame008Ktx2": {
       "path": "/textures/animations/Male Duelist/Dodge_Back/frame_008.ktx2",
       "hash": "v1_5ac5d32df734476b",
       "size": 13888,
-      "mtime": 1746554372161
+      "mtime": 1764681323533
     },
     "texturesAnimationsMaleDuelistDodgeBackFrame009Ktx2": {
       "path": "/textures/animations/Male Duelist/Dodge_Back/frame_009.ktx2",
       "hash": "v1_71ab61e83a35586e",
       "size": 14170,
-      "mtime": 1746554372167
+      "mtime": 1764681323534
     },
     "texturesAnimationsMaleDuelistDodgeBackFrame010Ktx2": {
       "path": "/textures/animations/Male Duelist/Dodge_Back/frame_010.ktx2",
       "hash": "v1_7b48df32c1f3b34c",
       "size": 12966,
-      "mtime": 1746554372174
+      "mtime": 1764681323534
     },
     "texturesAnimationsMaleDuelistDodgeBackFrame011Ktx2": {
       "path": "/textures/animations/Male Duelist/Dodge_Back/frame_011.ktx2",
       "hash": "v1_4055ec56351f18b5",
       "size": 12771,
-      "mtime": 1746554372178
+      "mtime": 1764681323534
     },
     "texturesAnimationsMaleDuelistDodgeBackFrame012Ktx2": {
       "path": "/textures/animations/Male Duelist/Dodge_Back/frame_012.ktx2",
       "hash": "v1_73eeb73c934340ed",
       "size": 11191,
-      "mtime": 1746554372179
+      "mtime": 1764681323534
     },
     "texturesAnimationsMaleDuelistDodgeBackFrame013Ktx2": {
       "path": "/textures/animations/Male Duelist/Dodge_Back/frame_013.ktx2",
       "hash": "v1_0ceb218de9891b7a",
       "size": 11937,
-      "mtime": 1746554372182
+      "mtime": 1764681323535
     },
     "texturesAnimationsMaleDuelistDodgeBackFrame014Ktx2": {
       "path": "/textures/animations/Male Duelist/Dodge_Back/frame_014.ktx2",
       "hash": "v1_4b2a22fe92312f1a",
       "size": 13787,
-      "mtime": 1746554372183
+      "mtime": 1764681323535
     },
     "texturesAnimationsMaleDuelistDodgeBackFrame015Ktx2": {
       "path": "/textures/animations/Male Duelist/Dodge_Back/frame_015.ktx2",
       "hash": "v1_8e6a8815acd0d411",
       "size": 15509,
-      "mtime": 1746554372189
+      "mtime": 1764681323535
     },
     "texturesAnimationsMaleDuelistDodgeBackFrame016Ktx2": {
       "path": "/textures/animations/Male Duelist/Dodge_Back/frame_016.ktx2",
       "hash": "v1_217efce690b02b12",
       "size": 16745,
-      "mtime": 1746554372189
+      "mtime": 1764681323536
     },
     "texturesAnimationsMaleDuelistDodgeFrontFrame001Ktx2": {
       "path": "/textures/animations/Male Duelist/Dodge_Front/frame_001.ktx2",
       "hash": "v1_b3f0c890c44867a8",
       "size": 12808,
-      "mtime": 1746225409008
+      "mtime": 1764681323536
     },
     "texturesAnimationsMaleDuelistDodgeFrontFrame002Ktx2": {
       "path": "/textures/animations/Male Duelist/Dodge_Front/frame_002.ktx2",
       "hash": "v1_b3f0c890c44867a8",
       "size": 12808,
-      "mtime": 1746225409008
+      "mtime": 1764681323537
     },
     "texturesAnimationsMaleDuelistDodgeFrontFrame003Ktx2": {
       "path": "/textures/animations/Male Duelist/Dodge_Front/frame_003.ktx2",
       "hash": "v1_b3f0c890c44867a8",
       "size": 12808,
-      "mtime": 1746225409009
+      "mtime": 1764681323537
     },
     "texturesAnimationsMaleDuelistDodgeFrontFrame004Ktx2": {
       "path": "/textures/animations/Male Duelist/Dodge_Front/frame_004.ktx2",
       "hash": "v1_b3f0c890c44867a8",
       "size": 12808,
-      "mtime": 1746225409010
+      "mtime": 1764681323537
     },
     "texturesAnimationsMaleDuelistDodgeFrontFrame005Ktx2": {
       "path": "/textures/animations/Male Duelist/Dodge_Front/frame_005.ktx2",
       "hash": "v1_b3f0c890c44867a8",
       "size": 12808,
-      "mtime": 1746225409010
+      "mtime": 1764681323538
     },
     "texturesAnimationsMaleDuelistDodgeFrontFrame006Ktx2": {
       "path": "/textures/animations/Male Duelist/Dodge_Front/frame_006.ktx2",
       "hash": "v1_b3f0c890c44867a8",
       "size": 12808,
-      "mtime": 1746225409011
+      "mtime": 1764681323538
     },
     "texturesAnimationsMaleDuelistDodgeFrontFrame007Ktx2": {
       "path": "/textures/animations/Male Duelist/Dodge_Front/frame_007.ktx2",
       "hash": "v1_652cc02d7e62c2ba",
       "size": 18749,
-      "mtime": 1746225409011
+      "mtime": 1764681323539
     },
     "texturesAnimationsMaleDuelistDodgeFrontFrame008Ktx2": {
       "path": "/textures/animations/Male Duelist/Dodge_Front/frame_008.ktx2",
       "hash": "v1_ce5cda455ad85a97",
       "size": 14884,
-      "mtime": 1746225409016
+      "mtime": 1764681323539
     },
     "texturesAnimationsMaleDuelistDodgeFrontFrame009Ktx2": {
       "path": "/textures/animations/Male Duelist/Dodge_Front/frame_009.ktx2",
       "hash": "v1_ce5cda455ad85a97",
       "size": 14884,
-      "mtime": 1746225409017
+      "mtime": 1764681323539
     },
     "texturesAnimationsMaleDuelistDodgeFrontFrame010Ktx2": {
       "path": "/textures/animations/Male Duelist/Dodge_Front/frame_010.ktx2",
       "hash": "v1_02c7f4c2e878fbd6",
       "size": 15118,
-      "mtime": 1746225409017
+      "mtime": 1764681323540
     },
     "texturesAnimationsMaleDuelistDodgeFrontFrame011Ktx2": {
       "path": "/textures/animations/Male Duelist/Dodge_Front/frame_011.ktx2",
       "hash": "v1_373dc73d38770887",
       "size": 15911,
-      "mtime": 1746225409018
+      "mtime": 1764681323541
     },
     "texturesAnimationsMaleDuelistDodgeFrontFrame012Ktx2": {
       "path": "/textures/animations/Male Duelist/Dodge_Front/frame_012.ktx2",
       "hash": "v1_b3f0c890c44867a8",
       "size": 12808,
-      "mtime": 1746225409019
+      "mtime": 1764681323541
     },
     "texturesAnimationsMaleDuelistDodgeFrontFrame013Ktx2": {
       "path": "/textures/animations/Male Duelist/Dodge_Front/frame_013.ktx2",
       "hash": "v1_b3f0c890c44867a8",
       "size": 12808,
-      "mtime": 1746225409019
+      "mtime": 1764681323542
     },
     "texturesAnimationsMaleDuelistDodgeFrontFrame014Ktx2": {
       "path": "/textures/animations/Male Duelist/Dodge_Front/frame_014.ktx2",
       "hash": "v1_b3f0c890c44867a8",
       "size": 12808,
-      "mtime": 1746225409020
+      "mtime": 1764681323542
     },
     "texturesAnimationsMaleDuelistDodgeFrontFrame015Ktx2": {
       "path": "/textures/animations/Male Duelist/Dodge_Front/frame_015.ktx2",
       "hash": "v1_b3f0c890c44867a8",
       "size": 12808,
-      "mtime": 1746225409020
+      "mtime": 1764681323542
     },
     "texturesAnimationsMaleDuelistDodgeFrontFrame016Ktx2": {
       "path": "/textures/animations/Male Duelist/Dodge_Front/frame_016.ktx2",
       "hash": "v1_b3f0c890c44867a8",
       "size": 12808,
-      "mtime": 1746225409021
+      "mtime": 1764681323542
     },
     "texturesAnimationsMaleDuelistSeppukuFrame001Ktx2": {
       "path": "/textures/animations/Male Duelist/Seppuku/frame_001.ktx2",
@@ -5076,97 +5118,97 @@
       "path": "/textures/animations/Male Duelist/Step_1/frame_001.ktx2",
       "hash": "v1_fdddcbe6f6dc0985",
       "size": 16911,
-      "mtime": 1746225409021
+      "mtime": 1764681323543
     },
     "texturesAnimationsMaleDuelistStep1Frame002Ktx2": {
       "path": "/textures/animations/Male Duelist/Step_1/frame_002.ktx2",
       "hash": "v1_a9a68cfadced985f",
       "size": 15936,
-      "mtime": 1746225409022
+      "mtime": 1764681323544
     },
     "texturesAnimationsMaleDuelistStep1Frame003Ktx2": {
       "path": "/textures/animations/Male Duelist/Step_1/frame_003.ktx2",
       "hash": "v1_206d28080241173a",
       "size": 13238,
-      "mtime": 1746225409024
+      "mtime": 1764681323544
     },
     "texturesAnimationsMaleDuelistStep1Frame004Ktx2": {
       "path": "/textures/animations/Male Duelist/Step_1/frame_004.ktx2",
       "hash": "v1_d3e360069e15ef3b",
       "size": 11188,
-      "mtime": 1746225409028
+      "mtime": 1764681323545
     },
     "texturesAnimationsMaleDuelistStep1Frame005Ktx2": {
       "path": "/textures/animations/Male Duelist/Step_1/frame_005.ktx2",
       "hash": "v1_4cd3399cae42243e",
       "size": 12754,
-      "mtime": 1746225409031
+      "mtime": 1764681323545
     },
     "texturesAnimationsMaleDuelistStep1Frame006Ktx2": {
       "path": "/textures/animations/Male Duelist/Step_1/frame_006.ktx2",
       "hash": "v1_2edb79902af3d33b",
       "size": 13278,
-      "mtime": 1746225409032
+      "mtime": 1764681323545
     },
     "texturesAnimationsMaleDuelistStep1Frame007Ktx2": {
       "path": "/textures/animations/Male Duelist/Step_1/frame_007.ktx2",
       "hash": "v1_1d25c6a176c74ca3",
       "size": 14107,
-      "mtime": 1746225409033
+      "mtime": 1764681323546
     },
     "texturesAnimationsMaleDuelistStep1Frame008Ktx2": {
       "path": "/textures/animations/Male Duelist/Step_1/frame_008.ktx2",
       "hash": "v1_e632720ee689e710",
       "size": 14636,
-      "mtime": 1746225409035
+      "mtime": 1764681323546
     },
     "texturesAnimationsMaleDuelistStep2Frame001Ktx2": {
       "path": "/textures/animations/Male Duelist/Step_2/frame_001.ktx2",
       "hash": "v1_e632720ee689e710",
       "size": 14636,
-      "mtime": 1746225409039
+      "mtime": 1764681323546
     },
     "texturesAnimationsMaleDuelistStep2Frame002Ktx2": {
       "path": "/textures/animations/Male Duelist/Step_2/frame_002.ktx2",
       "hash": "v1_ccecf2ca4c91c574",
       "size": 14011,
-      "mtime": 1746225409041
+      "mtime": 1764681323547
     },
     "texturesAnimationsMaleDuelistStep2Frame003Ktx2": {
       "path": "/textures/animations/Male Duelist/Step_2/frame_003.ktx2",
       "hash": "v1_4055ec56351f18b5",
       "size": 12771,
-      "mtime": 1746225409043
+      "mtime": 1764681323547
     },
     "texturesAnimationsMaleDuelistStep2Frame004Ktx2": {
       "path": "/textures/animations/Male Duelist/Step_2/frame_004.ktx2",
       "hash": "v1_ff89ac19ea1bc43f",
       "size": 11191,
-      "mtime": 1746225409045
+      "mtime": 1764681323547
     },
     "texturesAnimationsMaleDuelistStep2Frame005Ktx2": {
       "path": "/textures/animations/Male Duelist/Step_2/frame_005.ktx2",
       "hash": "v1_0ceb218de9891b7a",
       "size": 11937,
-      "mtime": 1746225409046
+      "mtime": 1764681323548
     },
     "texturesAnimationsMaleDuelistStep2Frame006Ktx2": {
       "path": "/textures/animations/Male Duelist/Step_2/frame_006.ktx2",
       "hash": "v1_4b2a22fe92312f1a",
       "size": 13787,
-      "mtime": 1746225409050
+      "mtime": 1764681323548
     },
     "texturesAnimationsMaleDuelistStep2Frame007Ktx2": {
       "path": "/textures/animations/Male Duelist/Step_2/frame_007.ktx2",
       "hash": "v1_8e6a8815acd0d411",
       "size": 15509,
-      "mtime": 1746225409052
+      "mtime": 1764681323548
     },
     "texturesAnimationsMaleDuelistStep2Frame008Ktx2": {
       "path": "/textures/animations/Male Duelist/Step_2/frame_008.ktx2",
       "hash": "v1_217efce690b02b12",
       "size": 16745,
-      "mtime": 1746225409054
+      "mtime": 1764681323549
     },
     "texturesAnimationsMaleDuelistStillFrame001Ktx2": {
       "path": "/textures/animations/Male Duelist/Still/frame_001.ktx2",
@@ -5220,49 +5262,49 @@
       "path": "/textures/animations/Male Duelist/Still_Blade/frame_001.ktx2",
       "hash": "v1_55c9478e76bb4eb9",
       "size": 15590,
-      "mtime": 1746225409054
+      "mtime": 1764681323549
     },
     "texturesAnimationsMaleDuelistStillBladeFrame002Ktx2": {
       "path": "/textures/animations/Male Duelist/Still_Blade/frame_002.ktx2",
       "hash": "v1_03634ae762bda33d",
       "size": 15378,
-      "mtime": 1746225409055
+      "mtime": 1764681323549
     },
     "texturesAnimationsMaleDuelistStillBladeFrame003Ktx2": {
       "path": "/textures/animations/Male Duelist/Still_Blade/frame_003.ktx2",
       "hash": "v1_03634ae762bda33d",
       "size": 15378,
-      "mtime": 1746225409055
+      "mtime": 1764681323550
     },
     "texturesAnimationsMaleDuelistStillBladeFrame004Ktx2": {
       "path": "/textures/animations/Male Duelist/Still_Blade/frame_004.ktx2",
       "hash": "v1_89a9939957430a56",
       "size": 15217,
-      "mtime": 1746225409056
+      "mtime": 1764681323550
     },
     "texturesAnimationsMaleDuelistStillBladeFrame005Ktx2": {
       "path": "/textures/animations/Male Duelist/Still_Blade/frame_005.ktx2",
       "hash": "v1_89a9939957430a56",
       "size": 15217,
-      "mtime": 1746225409057
+      "mtime": 1764681323550
     },
     "texturesAnimationsMaleDuelistStillBladeFrame006Ktx2": {
       "path": "/textures/animations/Male Duelist/Still_Blade/frame_006.ktx2",
       "hash": "v1_03634ae762bda33d",
       "size": 15378,
-      "mtime": 1746225409057
+      "mtime": 1764681323550
     },
     "texturesAnimationsMaleDuelistStillBladeFrame007Ktx2": {
       "path": "/textures/animations/Male Duelist/Still_Blade/frame_007.ktx2",
       "hash": "v1_03634ae762bda33d",
       "size": 15378,
-      "mtime": 1746225409057
+      "mtime": 1764681323550
     },
     "texturesAnimationsMaleDuelistStillBladeFrame008Ktx2": {
       "path": "/textures/animations/Male Duelist/Still_Blade/frame_008.ktx2",
       "hash": "v1_55c9478e76bb4eb9",
       "size": 15590,
-      "mtime": 1746225409058
+      "mtime": 1764681323551
     },
     "texturesAnimationsMaleDuelistStrikeFrame001Ktx2": {
       "path": "/textures/animations/Male Duelist/Strike/frame_001.ktx2",
@@ -5346,49 +5388,49 @@
       "path": "/textures/animations/Male Duelist/Struck_Dead/frame_001.ktx2",
       "hash": "v1_55c9478e76bb4eb9",
       "size": 15590,
-      "mtime": 1746225409058
+      "mtime": 1764681323551
     },
     "texturesAnimationsMaleDuelistStruckDeadFrame002Ktx2": {
       "path": "/textures/animations/Male Duelist/Struck_Dead/frame_002.ktx2",
       "hash": "v1_ee7e200de408182c",
       "size": 26619,
-      "mtime": 1746225409059
+      "mtime": 1764681323552
     },
     "texturesAnimationsMaleDuelistStruckDeadFrame003Ktx2": {
       "path": "/textures/animations/Male Duelist/Struck_Dead/frame_003.ktx2",
       "hash": "v1_ee7e200de408182c",
       "size": 26619,
-      "mtime": 1746225409059
+      "mtime": 1764681323552
     },
     "texturesAnimationsMaleDuelistStruckDeadFrame004Ktx2": {
       "path": "/textures/animations/Male Duelist/Struck_Dead/frame_004.ktx2",
       "hash": "v1_0eb358b258b473d9",
       "size": 33515,
-      "mtime": 1746225409064
+      "mtime": 1764681323553
     },
     "texturesAnimationsMaleDuelistStruckDeadFrame005Ktx2": {
       "path": "/textures/animations/Male Duelist/Struck_Dead/frame_005.ktx2",
       "hash": "v1_0eb358b258b473d9",
       "size": 33515,
-      "mtime": 1746225409064
+      "mtime": 1764681323553
     },
     "texturesAnimationsMaleDuelistStruckDeadFrame006Ktx2": {
       "path": "/textures/animations/Male Duelist/Struck_Dead/frame_006.ktx2",
       "hash": "v1_e4af46db06cd2320",
       "size": 25382,
-      "mtime": 1746225409070
+      "mtime": 1764681323554
     },
     "texturesAnimationsMaleDuelistStruckDeadFrame007Ktx2": {
       "path": "/textures/animations/Male Duelist/Struck_Dead/frame_007.ktx2",
       "hash": "v1_e4af46db06cd2320",
       "size": 25382,
-      "mtime": 1746225409070
+      "mtime": 1764681323554
     },
     "texturesAnimationsMaleDuelistStruckDeadFrame008Ktx2": {
       "path": "/textures/animations/Male Duelist/Struck_Dead/frame_008.ktx2",
       "hash": "v1_c7eed50b8b38febf",
       "size": 14758,
-      "mtime": 1746225409071
+      "mtime": 1764681323555
     },
     "texturesAnimationsMaleDuelistStruckInjuredFrame001Ktx2": {
       "path": "/textures/animations/Male Duelist/Struck_Injured/frame_001.ktx2",
@@ -5592,7 +5634,7 @@
       "path": "/textures/cards/card_back.png",
       "hash": "v1_9601d2850e1cdb1d",
       "size": 2718231,
-      "mtime": 1749555325838
+      "mtime": 1764681323576
     },
     "texturesCardsCardCircularHonourablePng": {
       "path": "/textures/cards/card_circular_honourable.png",
@@ -5676,13 +5718,13 @@
       "path": "/textures/cards/illustrations/Bananas.png",
       "hash": "v1_410172797f6d8ef4",
       "size": 949626,
-      "mtime": 1746554372206
+      "mtime": 1764681323577
     },
     "texturesCardsIllustrationsBeheadPng": {
       "path": "/textures/cards/illustrations/Behead.png",
       "hash": "v1_e6451dce5716197e",
       "size": 880586,
-      "mtime": 1746554372220
+      "mtime": 1764681323577
     },
     "texturesCardsIllustrationsBladeMissPng": {
       "path": "/textures/cards/illustrations/Blade_Miss.png",
@@ -5694,7 +5736,7 @@
       "path": "/textures/cards/illustrations/Coin_Flip.png",
       "hash": "v1_8f09532404f1171b",
       "size": 934107,
-      "mtime": 1746554372252
+      "mtime": 1764681323578
     },
     "texturesCardsIllustrationsDecapitationPng": {
       "path": "/textures/cards/illustrations/Decapitation.png",
@@ -5742,13 +5784,13 @@
       "path": "/textures/cards/illustrations/Grapple.png",
       "hash": "v1_c07553f83171bb11",
       "size": 916615,
-      "mtime": 1746554372273
+      "mtime": 1764681323579
     },
     "texturesCardsIllustrationsInsultPng": {
       "path": "/textures/cards/illustrations/Insult.png",
       "hash": "v1_07fb6c610316c8b9",
       "size": 921124,
-      "mtime": 1746554372306
+      "mtime": 1764681323580
     },
     "texturesCardsIllustrationsPistolCloseupPng": {
       "path": "/textures/cards/illustrations/Pistol_Closeup.png",
@@ -5766,19 +5808,19 @@
       "path": "/textures/cards/illustrations/Pocket_Pistol.png",
       "hash": "v1_02725a612cea14a2",
       "size": 906202,
-      "mtime": 1746554372333
+      "mtime": 1764681323581
     },
     "texturesCardsIllustrationsReversalPng": {
       "path": "/textures/cards/illustrations/Reversal.png",
       "hash": "v1_88d7e4ef508e39cc",
       "size": 881286,
-      "mtime": 1746554372348
+      "mtime": 1764681323583
     },
     "texturesCardsIllustrationsRunAwayPng": {
       "path": "/textures/cards/illustrations/Run_Away.png",
       "hash": "v1_a80892e5288e7dc4",
       "size": 866552,
-      "mtime": 1746554372369
+      "mtime": 1764681323586
     },
     "texturesCardsIllustrationsSecondReactionPng": {
       "path": "/textures/cards/illustrations/Second_Reaction.png",
@@ -5790,7 +5832,7 @@
       "path": "/textures/cards/illustrations/Seppuku.png",
       "hash": "v1_1aa4671d8b95d0eb",
       "size": 930547,
-      "mtime": 1746554372390
+      "mtime": 1764681323589
     },
     "texturesCardsIllustrationsSuccessfulBlockPng": {
       "path": "/textures/cards/illustrations/Successful_Block.png",
@@ -5802,13 +5844,13 @@
       "path": "/textures/cards/illustrations/Thick_Coat.png",
       "hash": "v1_5d60ef3fdc69fa91",
       "size": 763661,
-      "mtime": 1746554372401
+      "mtime": 1764681323593
     },
     "texturesCardsIllustrationsVengefulPng": {
       "path": "/textures/cards/illustrations/Vengeful.png",
       "hash": "v1_36ff710cb18475e6",
       "size": 867956,
-      "mtime": 1746554372422
+      "mtime": 1764681323596
     },
     "texturesCliffsPng": {
       "path": "/textures/cliffs.png",
@@ -5880,61 +5922,61 @@
       "path": "/tokens/Unknown.jpg",
       "hash": "v1_150a67cde5b9c354",
       "size": 518587,
-      "mtime": 1747248294445
+      "mtime": 1764681323599
     },
     "tokensPacksFreeduelistPng": {
       "path": "/tokens/packs/FreeDuelist.png",
       "hash": "v1_e023d33aa8476495",
       "size": 592061,
-      "mtime": 1752236926512
+      "mtime": 1764681323601
     },
     "tokensPacksGenesisduelists5xPng": {
       "path": "/tokens/packs/GenesisDuelists5x.png",
       "hash": "v1_77a440eb4b170ae5",
       "size": 545171,
-      "mtime": 1752236926515
+      "mtime": 1764681323602
     },
     "tokensPacksPiratesduelists5xPng": {
       "path": "/tokens/packs/PiratesDuelists5x.png",
       "hash": "v1_0ff29bc2e3280f57",
       "size": 550447,
-      "mtime": 1762517381398
+      "mtime": 1764681323603
     },
     "tokensPacksSingleduelistPng": {
       "path": "/tokens/packs/SingleDuelist.png",
       "hash": "v1_ca64cd82196b9280",
       "size": 597304,
-      "mtime": 1752236926518
+      "mtime": 1764681323604
     },
     "tokensPacksStarterpackJpg": {
       "path": "/tokens/packs/StarterPack.jpg",
       "hash": "v1_33aa63d8464425fc",
       "size": 375468,
-      "mtime": 1752236926523
+      "mtime": 1764681323605
     },
     "tokensPacksUnknownJpg": {
       "path": "/tokens/packs/Unknown.jpg",
       "hash": "v1_33aa63d8464425fc",
       "size": 375468,
-      "mtime": 1752236926525
+      "mtime": 1764681323606
     },
     "tokensRingsGoldringPng": {
       "path": "/tokens/rings/GoldRing.png",
       "hash": "v1_a24ac5f0928e8855",
       "size": 1375892,
-      "mtime": 1753789286730
+      "mtime": 1764681323608
     },
     "tokensRingsLeadringPng": {
       "path": "/tokens/rings/LeadRing.png",
       "hash": "v1_aca2f86c842ba88f",
       "size": 1438584,
-      "mtime": 1753789286793
+      "mtime": 1764681323610
     },
     "tokensRingsSilverringPng": {
       "path": "/tokens/rings/SilverRing.png",
       "hash": "v1_14ec2b78a018e957",
       "size": 1344956,
-      "mtime": 1753789286813
+      "mtime": 1764681323611
     }
   }
 }

@@ -13,6 +13,7 @@ const SCENE_PRIORITIES: Record<SceneName, GroupName[]> = {
   [SceneName.DuelsBoard]: [GroupName.DuelsBoard, GroupName.TavernUI, GroupName.Duelists, GroupName.Profile, GroupName.Graveyard],
   [SceneName.Leaderboards]: [GroupName.Leaderboards, GroupName.LeaderboardsUI, GroupName.TavernUI, GroupName.Profile],
   [SceneName.Graveyard]: [GroupName.Graveyard, GroupName.TavernUI, GroupName.Profile, GroupName.DuelsBoard],
+  [SceneName.QuizRoom]: [GroupName.Quiz, GroupName.TavernUI, GroupName.Profile],
   [SceneName.Tournament]: [],
   [SceneName.IRLTournament]: [],
   [SceneName.Invite]: [],
@@ -231,6 +232,10 @@ const TEXTURES: Record<AssetKey, TextureAttributes> = {
   [TextureName.bg_cardpacks_front_box]: { path: '/images/scenes/profile/cardpacks/bg_cardpack_front_box.png', groups: [GroupName.CardPacks], version: 1 },
 
   [TextureName.bg_leaderboards]: { path: '/images/scenes/leaderboards/bg_leaderboards.ktx2', groups: [GroupName.Leaderboards], version: 1 },
+  
+  [TextureName.bg_quizroom]: { path: '/images/scenes/quiz/bg_quizroom.ktx2', groups: [GroupName.Quiz], version: 1 },
+  [TextureName.bg_quizroom_cumberlord]: { path: '/images/scenes/quiz/bg_quizroom_cumberlord.ktx2', groups: [GroupName.Quiz], version: 1 },
+  [TextureName.bg_quizroom_cumberlord_mask]: { path: '/images/scenes/quiz/bg_quizroom_cumberlord_mask.ktx2', groups: [GroupName.Quiz], version: 1 },
 
   // Tutorial Overlay Images
   [UIImagesName.tutorial_duelist_frame_01]: { path: '/images/tutorial/overlay/duelist_tutorial_duelist_frame_01.png', groups: [GroupName.TutorialOverlay], version: 1 },
@@ -613,6 +618,15 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
       { name: 'left arrow', color: '00ff00', description: 'Previous Page', mask: TextureName.bg_graveyard_items_mask, renderOrder: 1 },
       { name: 'right arrow', color: 'ff0000', description: 'Next Page', mask: TextureName.bg_graveyard_items_mask, renderOrder: 1 },
     ]
+  },
+  [SceneName.QuizRoom]: {
+    backgrounds: [
+      { texture: TextureName.bg_quizroom, shiftMultiplier: 0, renderOrder: 0 },
+    ],
+    items: [
+      { name: 'cumberlord', color: 'ff0000', description: 'Click me to find out more about this question!', mask: TextureName.bg_quizroom_cumberlord_mask, renderOrder: 0 },
+    ],
+    scaleAddon: 0.02
   },
   [SceneName.Tournament]: { backgrounds: [] },
   [SceneName.IRLTournament]: { backgrounds: [] },

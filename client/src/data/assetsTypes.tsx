@@ -18,6 +18,7 @@ enum SceneName {
   DuelsBoard = "Your Duels",
   Leaderboards = "Leaderboards",
   Graveyard = "Graveyard",
+  QuizRoom = "QuizRoom",
 
   Tournament = "Tournament",
   IRLTournament = "IRL Tournament",
@@ -142,6 +143,10 @@ enum TextureName {
   bg_cardpacks_front_box = "bg_cardpacks_front_box",
 
   bg_leaderboards = "bg_leaderboards",
+  
+  bg_quizroom = "bg_quizroom",
+  bg_quizroom_cumberlord = "bg_quizroom_cumberlord",
+  bg_quizroom_cumberlord_mask = "bg_quizroom_cumberlord_mask",
 }
 
 enum UIImagesName {
@@ -365,6 +370,7 @@ enum GroupName {
   DuelsBoard,
   Graveyard,
   Leaderboards,
+  Quiz,
   Profile,
   CardPacks,
   DuelistBook,
@@ -537,4 +543,3 @@ export type {
   Animations,
   ProfileCollectionAsset,
 };
-

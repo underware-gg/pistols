@@ -28,7 +28,6 @@ const useQuizFetchStore = createStore();
 //
 
 export const useQuizParty = (quizPartyId: number) => {
-  useFetchAllQuiz();
   const entities = useQuizStore((state) => state.entities);
   const model = useStoreModelsByKeys<models.QuizParty>(entities, 'QuizParty', [quizPartyId])
   const partyName = useMemo(() => (model?.name ?? ''), [model])
@@ -45,7 +44,6 @@ export const useQuizParty = (quizPartyId: number) => {
 }
 
 export const useQuizQuestion = (partyId: number, questionId: number) => {
-  useFetchAllQuiz();
   const entities = useQuizStore((state) => state.entities);
   const model = useStoreModelsByKeys<models.QuizQuestion>(entities, 'QuizQuestion', [partyId, questionId])
   const question = useMemo(() => model?.question ?? '', [model])
@@ -72,7 +70,6 @@ export const useQuizQuestion = (partyId: number, questionId: number) => {
 }
 
 export const useQuizQuestionsByParty = (partyId: number) => {
-  useFetchAllQuiz();
   const entities = useQuizStore((state) => state.entities);
   const models = useAllStoreModels<models.QuizQuestion>(entities, 'QuizQuestion')
   const questionIds = useMemo(() => (
@@ -85,8 +82,20 @@ export const useQuizQuestionsByParty = (partyId: number) => {
   }
 }
 
+export const useActiveQuizQuestionsByParty = (partyId: number) => {
+  const entities = useQuizStore((state) => state.entities);
+  const models = useAllStoreModels<models.QuizQuestion>(entities, 'QuizQuestion')
+  const activeQuestionIds = useMemo(() => (
+    models.filter((model) => Number(model.party_id ?? 0) === partyId && Number(model.timestamps.start ?? 0) > 0)
+      .map((model) => Number(model.question_id))
+      .sort((a, b) => (a - b))
+  ), [models, partyId])
+  return {
+    activeQuestionIds
+  }
+}
+
 export const useQuizAllParties = () => {
-  useFetchAllQuiz();
   const entities = useQuizStore((state) => state.entities);
   const models = useAllStoreModels<models.QuizParty>(entities, 'QuizParty')
   const partyNamesById = useMemo(() => (
@@ -101,6 +110,31 @@ export const useQuizAllParties = () => {
     partyNamesById,
   }
 }
+
+export const useQuizPartyByName = (partyName: string) => {
+  const entities = useQuizStore((state) => state.entities);
+  const models = useAllStoreModels<models.QuizParty>(entities, "QuizParty");
+
+  const partyData = useMemo(() => {
+    if (!partyName) return null;
+    return models.find((model) => model.name.toLowerCase().replaceAll(' ', '') === partyName.toLowerCase().replaceAll(' ', '')) ?? null;
+  }, [models, partyName]);
+
+  const partyId = useMemo(() => {
+    return partyData ? Number(partyData.party_id ?? 0) : 0;
+  }, [partyData]);
+
+  return {
+    partyId,
+    partyName: partyData?.name ?? "",
+    description: partyData?.description ?? "",
+    timestamp_start: Number(partyData?.timestamps.start ?? 0),
+    timestamp_end: Number(partyData?.timestamps.end ?? 0),
+    isPartyClosed: Number(partyData?.timestamps.end ?? 0) > 0,
+    quizQuestionCount: Number(partyData?.quiz_question_count ?? 0),
+  };
+};
+
 
 export const useQuizPlayerAnswer = (partyId: number, questionId: number, player_address: BigNumberish) => {
   const entities = useQuizStore((state) => state.entities);
@@ -133,11 +167,15 @@ export const useQuizAnswers = (partyId: number, questionId: number) => {
       acc[answerNumber] = playersByAnswer[answerNumber].length
       return acc
     }, {} as Record<number, number>)
-  ), [answers])
+  ), [playersByAnswer])
+  const totalAnswers = useMemo(() => (
+    Object.values(answerCounts).reduce((sum, count) => sum + count, 0)
+  ), [answerCounts])
   // console.log('>>>>>>>>> useQuizAnswers() =>', answers, playersByAnswer, answerCounts)
   return {
     playersByAnswer,
     answerCounts,
+    totalAnswers,
   }
 }
 
@@ -165,13 +203,13 @@ export const useQuizQuestionWinners = (partyId: number, questionId: number) => {
   }
 }
 
-export const useQuizPartyLeaderboards = (partyId: number) => {
+export const useQuizPartyLeaderboards = (partyId: number, questionsLimit?: number) => {
   const entities = useQuizStore((state) => state.entities);
   const question_models = useAllStoreModels<models.QuizQuestion>(entities, 'QuizQuestion')
   const answers_models = useAllStoreModels<models.QuizAnswer>(entities, 'QuizAnswer')
   const leaderboards = useMemo<QuizPlayer[]>(() => (
-    _getQuizPartyLeaderboards(partyId, question_models, answers_models)
-  ), [partyId, question_models, answers_models])
+    _getQuizPartyLeaderboards(partyId, question_models.filter((model) => !questionsLimit || Number(model?.question_id ?? 0) <= questionsLimit), answers_models)
+  ), [partyId, question_models, answers_models, questionsLimit])
   return {
     leaderboards,
   }
@@ -237,35 +275,38 @@ const _getQuizPartyLeaderboards = (partyId: number, question_models: models.Quiz
 //--------------------------------
 // fetch all quizes into client
 //
-const query_get_entities: PistolsQueryBuilder = new PistolsQueryBuilder()
-  .withEntityModels([
-    'pistols-QuizParty',
-    'pistols-QuizQuestion',
-    'pistols-QuizAnswer',
-  ])
-  .withLimit(1000)
-  .includeHashedKeys();
 export const useFetchAllQuiz = () => {
   const quizFetchStore = useQuizFetchStore((state) => state);
   const quizState = useQuizStore((state) => state);
 
   const mounted = useMounted();
-  const enabled = (mounted && !quizFetchStore.fetched);
+
+  const query = useMemo(
+    () =>
+      new PistolsQueryBuilder()
+        .withEntityModels([
+          'pistols-QuizParty',
+          'pistols-QuizQuestion',
+          'pistols-QuizAnswer',
+        ])
+        .withLimit(1000)
+        .includeHashedKeys(),
+    []
+  );
+
+  const enabled = mounted && !quizFetchStore.fetched;
 
   useSdkEntitiesGet({
-    query: query_get_entities,
+    query,
     enabled,
     setEntities: (entities: PistolsEntity[]) => {
       // console.log('>>>>>>>>> useFetchAllQuiz() setEntities =>', entities)
       entities.forEach((entity) => {
         quizState.updateEntity(entity)
       })
-      quizFetchStore.setFetched(true)
+      if (entities.length > 0) quizFetchStore.setFetched(true)
     },
   })
-  useEffect(() => {
-    if (enabled) quizFetchStore.setFetched(false)
-  }, [enabled])
 
   return {}
 }

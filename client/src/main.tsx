@@ -70,6 +70,8 @@ const router = createBrowserRouter(
       { path: "graveyard", element: <MainPage /> },
       { path: "invite/:referrer_username", element: <MainPage /> },
       { path: "duel/:duel_id", element: <MainPage /> },
+      { path: "quizroom/:quiz_name", element: <MainPage /> },
+      { path: "quizroom", element: <MainPage /> },
       { path: "dueldata/:duel_id", element: <DuelDataPage /> },
       { path: "status", element: <StatusPage /> },
     ],

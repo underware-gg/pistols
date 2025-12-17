@@ -94,6 +94,8 @@ export class InteractibleScene extends THREE.Scene {
     ]
   }
 
+  private showHoverDescription: boolean = true
+
   private boundOnMouseMove: (e: MouseEvent) => void;
   private boundOnMouseClick: (e: PointerEvent) => void;
   private boundOnResize: () => void;
@@ -576,9 +578,11 @@ export class InteractibleScene extends THREE.Scene {
         emitter.emit('hover_item', hoverItemName)
       }
       
-      if (this.lastHoverDescription !== hoverDescription) {
+      if (this.showHoverDescription && this.lastHoverDescription !== hoverDescription) {
         this.lastHoverDescription = hoverDescription
         emitter.emit('hover_description', hoverDescription)
+      } else {
+        emitter.emit('hover_description', null)
       }
     }
   }
@@ -900,6 +904,10 @@ export class InteractibleScene extends THREE.Scene {
     if (!this.isClickable) {
       this.pickColor(0, 0, 0)
     }
+  }
+
+  public setShowHoverDescription(show: boolean) {
+    this.showHoverDescription = show
   }
 
   public canClick() {

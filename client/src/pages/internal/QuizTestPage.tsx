@@ -5,6 +5,7 @@ import { useCookies } from 'react-cookie'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { useQuizConfig } from '/src/stores/configStore'
 import {
+  useFetchAllQuiz,
   useQuizParty,
   useQuizAllParties,
   useQuizAnswers,
@@ -79,6 +80,8 @@ function QuizPlayerPanel({
   const { question, description, options, answerNumber, isOpen, isClosed } = useQuizQuestion(currentPartyId, currentQuestionId)
   const { playerAnswerNumber } = useQuizPlayerAnswer(currentPartyId, currentQuestionId, address)
   const { answerCounts } = useQuizAnswers(currentPartyId, currentQuestionId)
+
+  useFetchAllQuiz();
 
   const _asnwer = async (selectedAnswerNumber: number) => {
     await community.answer_quiz_question(account, currentPartyId, currentQuestionId, selectedAnswerNumber)
@@ -658,7 +661,7 @@ function QuizAdminQuestionForm({
       <Row>
         <Cell>Question:</Cell>
         <Cell className='Code'>
-          <Input disabled={!editable} value={fields.question} onChange={(e) => _setQuestion(e.target.value.toString())} maxLength={100} style={{ width: '500px' }} />
+          <Input disabled={!editable} value={fields.question} onChange={(e) => _setQuestion(e.target.value.toString())} maxLength={360} style={{ width: '500px' }} />
         </Cell>
       </Row>
       <Row>
@@ -671,7 +674,7 @@ function QuizAdminQuestionForm({
         <Row key={index} className={index == _answerIndex ? 'BgDark' : ''}>
           <Cell className='Important'>Option {index + 1}: {answerCounts[index + 1]}</Cell>
           <Cell className='Code'>
-            <Input disabled={!editable} value={option} onChange={(e) => _setOption(index, e.target.value.toString())} maxLength={100} style={{ width: '500px' }} />
+            <Input disabled={!editable} value={option} onChange={(e) => _setOption(index, e.target.value.toString())} maxLength={120} style={{ width: '500px' }} />
             {editable && (
               <>
                 {' | '}

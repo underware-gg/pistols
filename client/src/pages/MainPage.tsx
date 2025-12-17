@@ -33,6 +33,7 @@ import ScGraveyard from '/src/components/scenes/ScGraveyard'
 import ScTutorial from '/src/components/scenes/ScTutorial'
 import ScCardPacks from '/src/components/scenes/ScCardPacks'
 import ScDuelistBook from '/src/components/scenes/ScDuelistBook'
+import ScQuizRoom from '/src/components/scenes/ScQuizRoom'
 import StoreSync from '/src/stores/sync/StoreSync'
 import ScLeaderboards from '/src/components/scenes/ScLeaderboards'
 import ScGate from '/src/components/scenes/ScGate'
@@ -121,7 +122,7 @@ function MainUI() {
   const { gameImpl } = useThreeJsContext()
   const { qualityConfig } = useQuality()
   const { currentDuel, tutorialLevel } = usePistolsContext()
-  const { atGate, atProfile, atInvite, atTavern, atDuel, atDoor, atDuelsBoard, atDuelists, atGraveyard, atTutorial, atLeaderboards, atCardPacks, atDuelistBook, atMatchmaking } = usePistolsScene()
+  const { atGate, atProfile, atInvite, atTavern, atDuel, atDoor, atDuelsBoard, atDuelists, atGraveyard, atTutorial, atLeaderboards, atCardPacks, atDuelistBook, atMatchmaking, atQuizRoom } = usePistolsScene()
 
   useEffect(() => {
     if (!gameImpl) return;
@@ -168,6 +169,7 @@ function MainUI() {
     matchmaking: <ScMatchmaking />,
     graveyard: <ScGraveyard />,
     leaderboards: <ScLeaderboards />,
+    quizRoom: <ScQuizRoom />,
     tavern: <ScTavern />,
     tutorial: <TutorialUI />,
     invite: <></>,
@@ -187,12 +189,13 @@ function MainUI() {
       else if (atMatchmaking) setCurrentScene(sceneComponents.matchmaking);
       else if (atGraveyard) setCurrentScene(sceneComponents.graveyard);
       else if (atLeaderboards) setCurrentScene(sceneComponents.leaderboards);
+      else if (atQuizRoom) setCurrentScene(sceneComponents.quizRoom);
       else if (atInvite) setCurrentScene(sceneComponents.invite);
       else setCurrentScene(sceneComponents.tavern);
     }, SCENE_CHANGE_ANIMATION_DURATION);
 
     return () => clearTimeout(timer);
-  }, [atGate, atDoor, atDuel, atProfile, atTavern, atDuelsBoard, atDuelists, atMatchmaking, atGraveyard, atLeaderboards, atCardPacks, atDuelistBook, currentDuel, tutorialLevel, sceneComponents]);
+  }, [atGate, atDoor, atDuel, atProfile, atTavern, atDuelsBoard, atDuelists, atMatchmaking, atGraveyard, atLeaderboards, atQuizRoom, atCardPacks, atDuelistBook, currentDuel, tutorialLevel, sceneComponents]);
 
   if (!gameImpl) return <></>
 

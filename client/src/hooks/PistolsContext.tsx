@@ -591,6 +591,7 @@ type SceneRoute = {
   baseUrl: string
   title?: string
   hasDuelId?: boolean
+  hasQuizId?: boolean
   // makeRoute: (state: PistolsContextStateType) => string
 }
 
@@ -610,6 +611,7 @@ export const sceneRoutes: Record<SceneName, SceneRoute> = {
   [SceneName.DuelsBoard]: { baseUrl: '/duels', title: 'Pistols - Your Duels' },
   [SceneName.Leaderboards]: { baseUrl: '/leaderboards', title: 'Pistols - Leaderboards' },
   [SceneName.Graveyard]: { baseUrl: '/graveyard', title: 'Pistols - Past Duels' },
+  [SceneName.QuizRoom]: { baseUrl: '/quizroom', hasQuizId: true, title: 'Pistols - Quiz Room' },
   [SceneName.Tournament]: { baseUrl: '/__tournament__', title: 'Pistols - Tournament' },
   [SceneName.IRLTournament]: { baseUrl: '/__irltournament__', title: 'Pistols - IRL Tournament' },
   
@@ -644,6 +646,7 @@ export const sceneRoutes: Record<SceneName, SceneRoute> = {
 type SceneSlug = {
   duelId?: BigNumberish,
   username?: string,
+  quizId?: BigNumberish,
 }
 export const usePistolsScene = () => {
   const { currentScene, sceneStack, selectedDuelId, currentDuel, dispatchSetDuel, __dispatchSetScene, __dispatchSceneBack, __dispatchResetValues } = usePistolsContext()
@@ -661,6 +664,8 @@ export const usePistolsScene = () => {
       if (!bigintEquals(slug, currentDuel)) {
         dispatchSetDuel(slug)
       }
+    } else if (sceneRoutes[newScene].hasQuizId) {
+      slug = setSlug.quizId ? `${bigintToDecimal(setSlug.quizId)}` : ''
     } else if (setSlug.username) {
       slug = setSlug.username
     }
@@ -721,6 +726,7 @@ export const usePistolsScene = () => {
     atDuelsBoard: (currentScene == SceneName.DuelsBoard),
     atLeaderboards: (currentScene == SceneName.Leaderboards),
     atGraveyard: (currentScene == SceneName.Graveyard),
+    atQuizRoom: (currentScene == SceneName.QuizRoom),
     atDuel: (currentScene == SceneName.Duel || currentScene == SceneName.TutorialDuel),
     atTutorial: tutorialScenes.includes(currentScene as typeof tutorialScenes[number]),
     atTutorialScene1: (currentScene == SceneName.Tutorial),
