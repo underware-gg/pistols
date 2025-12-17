@@ -108,7 +108,7 @@ const GameAudios = ({
 export const TavernAudios = () => {
   const { musicEnabled, sfxEnabled, musicVolume, sfxVolume } = useSettings()
   const { gameImpl, audioLoaded } = useThreeJsContext()
-  const { atGate, atDoor, atDuel, atTutorial } = usePistolsScene()
+  const { atGate, atDoor, atDuel, atTutorial, atQuizRoom } = usePistolsScene()
 
   useEffect(() => {
     return () => {
@@ -125,8 +125,8 @@ export const TavernAudios = () => {
   }, [sfxVolume, gameImpl])
 
   useEffect(() => {
-    gameImpl?.playAudio(AudioName.MUSIC_MENUS, musicEnabled && audioLoaded && !atGate && !atDoor && !atDuel && !atTutorial, 2)
-  }, [gameImpl, musicEnabled, audioLoaded, atGate, atDoor, atDuel])
+    gameImpl?.playAudio(AudioName.MUSIC_MENUS, musicEnabled && audioLoaded && !atGate && !atDoor && !atDuel && !atTutorial && !atQuizRoom, 2)
+  }, [gameImpl, musicEnabled, audioLoaded, atGate, atDoor, atDuel, atTutorial, atQuizRoom])
 
   useEffect(() => {
     const handleClick = () => {
