@@ -38,6 +38,7 @@ pub struct QuizQuestion {
     pub timestamps: Period,
     pub answer_number: u8,
     pub vrf: felt252,
+    pub hint: ByteArray,
 }
 
 #[derive(Copy, Drop, Serde)]
@@ -151,6 +152,7 @@ pub impl QuizQuestionImpl of QuizQuestionTrait {
             question_id: quiz_party.quiz_question_count,
             question: "",
             description: "",
+            hint: "",
             options: array![],
             timestamps: Default::default(),
             answer_number: 0,
@@ -164,6 +166,7 @@ pub impl QuizQuestionImpl of QuizQuestionTrait {
         question_id: u32,
         question: ByteArray,
         description: ByteArray,
+        hint: ByteArray,
         options: Array<ByteArray>
     ) -> QuizQuestion {
         // party must be open
@@ -179,6 +182,7 @@ pub impl QuizQuestionImpl of QuizQuestionTrait {
         quiz_question.question = question;
         quiz_question.description = description;
         quiz_question.options = options;
+        quiz_question.hint = hint;
         store.set_quiz_question(@quiz_question);
         // change current quiz
         QuizConfigTrait::set_current_quiz(ref store, party_id, question_id);

@@ -1204,10 +1204,11 @@ pub mod tester {
         question_id: u32,
         question: ByteArray,
         description: ByteArray,
+        hint: ByteArray,
         options: Array<ByteArray>,
     ) -> QuizQuestion {
         impersonate(sender);
-        let quiz_question: QuizQuestion = (*sys.community).open_quiz_question(party_id, question_id, question, description, options);
+        let quiz_question: QuizQuestion = (*sys.community).open_quiz_question(party_id, question_id, question, description, hint, options);
         _next_block();
         (quiz_question)
     }

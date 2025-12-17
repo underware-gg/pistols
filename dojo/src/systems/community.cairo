@@ -26,7 +26,7 @@ pub trait ICommunity<TState> {
     fn edit_quiz_party(ref self: TState, party_id: u32, name: ByteArray, description: ByteArray, start: u64) -> QuizParty; //@description: Create a quiz event (admin)
     fn close_quiz_party(ref self: TState, party_id: u32) -> QuizParty; //@description: Close a quiz event (admin)
     fn create_quiz_question(ref self: TState, party_id: u32) -> QuizQuestion; //@description: Create a quiz question (admin)
-    fn open_quiz_question(ref self: TState, party_id: u32, question_id: u32, question: ByteArray, description: ByteArray, options: Array<ByteArray>) -> QuizQuestion; //@description: Open a quiz question (admin)
+    fn open_quiz_question(ref self: TState, party_id: u32, question_id: u32, question: ByteArray, description: ByteArray, hint: ByteArray, options: Array<ByteArray>) -> QuizQuestion; //@description: Open a quiz question (admin)
     fn close_quiz_question(ref self: TState, party_id: u32, question_id: u32, answer_number: u8) -> QuizQuestion; //@description: Close a quiz question (admin)
     fn answer_quiz_question(ref self: TState, party_id: u32, question_id: u32, answer_number: u8) -> QuizAnswer; //@description: Answer a quiz question (players)
 }
@@ -175,10 +175,10 @@ pub mod community {
             self._assert_caller_is_admin();
             (QuizQuestionTrait::create_quiz_question(ref store, party_id))
         }
-        fn open_quiz_question(ref self: ContractState, party_id: u32, question_id: u32, question: ByteArray, description: ByteArray, options: Array<ByteArray>) -> QuizQuestion {
+        fn open_quiz_question(ref self: ContractState, party_id: u32, question_id: u32, question: ByteArray, description: ByteArray, hint: ByteArray, options: Array<ByteArray>) -> QuizQuestion {
             let mut store: Store = StoreTrait::new(self.world_default());
             self._assert_caller_is_admin();
-            (QuizQuestionTrait::open_quiz_question(ref store, party_id, question_id, question, description, options))
+            (QuizQuestionTrait::open_quiz_question(ref store, party_id, question_id, question, description, hint, options))
         }
         fn close_quiz_question(ref self: ContractState, party_id: u32, question_id: u32, answer_number: u8) -> QuizQuestion {
             let mut store: Store = StoreTrait::new(self.world_default());
