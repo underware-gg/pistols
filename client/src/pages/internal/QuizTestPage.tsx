@@ -142,7 +142,7 @@ function QuizPlayerPanel({
               const isYourAnswer = (playerAnswerNumber == (i + 1));
               return (
                 <Row key={i} className={isTheAnswer ? 'BgDark' : ''}>
-                  <Cell className='Important'>Option {i + 1}: {answerCounts[i + 1]}</Cell>
+                  <Cell className='Important'>Option {i + 1} ({answerCounts[i + 1]})</Cell>
                   <Cell className={isYourAnswer ? 'Important' : ''}>
                     {q}
                   </Cell>
@@ -222,8 +222,10 @@ function QuizResults({
 // Admin Panel (Party)
 //
 
+// const _cookieOptions = { path: '/' }
 const COOKIE_PARTY_ID = 'quiz_party_id'
 const COOKIE_QUESTION_ID = 'quiz_question_id'
+
 function useSelectedQuiz() {
   const [cookies, setCookie] = useCookies([COOKIE_PARTY_ID, COOKIE_QUESTION_ID]);
   const selectedPartyId = useMemo(() => cookies[COOKIE_PARTY_ID], [cookies[COOKIE_PARTY_ID]])
@@ -425,15 +427,16 @@ type QuestionFields = {
   description: string,
   hint: string,
   options: string[],
+  answerNumber: number,
 }
 const EMPTY_QUESTION: QuestionFields = {
   question: '',
   description: '',
   hint: '',
   options: [],
+  answerNumber: 0,
 }
 const _questionCookieName = (partyId: number, questionId: number) => `quiz_${partyId}_${questionId}`;
-const _answerCookieName = (partyId: number, questionId: number) => `quiz_${partyId}_${questionId}_answer`;
 
 function QuizAdminQuestionsPanel() {
   // admin params
@@ -507,10 +510,8 @@ function QuizAdminQuestion({
   const { isPartyClosed } = useQuizParty(partyId)
   const { isOffChain, isOpen } = useQuizQuestion(partyId, questionId)
   const COOKIE_NAME = useMemo(() => _questionCookieName(partyId, questionId), [partyId, questionId]);
-  const COOKIE_NAME_ANSWER = useMemo(() => _answerCookieName(partyId, questionId), [partyId, questionId]);
-  const [cookies, setCookie] = useCookies([COOKIE_NAME, COOKIE_NAME_ANSWER]);
+  const [cookies, setCookie] = useCookies([COOKIE_NAME]);
   const fields = useMemo<QuestionFields>(() => (cookies[COOKIE_NAME] ?? EMPTY_QUESTION), [cookies[COOKIE_NAME]]);
-  const answerNumber = useMemo(() => (cookies[COOKIE_NAME_ANSWER] ?? 0), [cookies[COOKIE_NAME_ANSWER]])
   const validated = useMemo(() => (
     fields.question.length > 0 && fields.options.length >= 2 && fields.options.every((option) => option.length > 0)
   ), [fields]);
@@ -522,11 +523,11 @@ function QuizAdminQuestion({
     community.open_quiz_question(account, partyId, questionId, fields.question, fields.description, fields.hint, quotedOptions)
   }
   const _stop = () => {
-    community.close_quiz_question(account, partyId, questionId, answerNumber)
+    community.close_quiz_question(account, partyId, questionId, fields.answerNumber)
   }
 
   const canStart = useMemo(() => (isOffChain && validated), [isOffChain, validated])
-  const canStop = useMemo(() => (isOpen && answerNumber > 0), [isOpen, answerNumber])
+  const canStop = useMemo(() => (isOpen && fields.answerNumber > 0), [isOpen, fields.answerNumber])
 
   if (questionId == 0) return <></>;
   return (
@@ -563,13 +564,20 @@ function QuizAdminQuestionOnChain({
   const { answerCounts } = useQuizAnswers(partyId, questionId)
   const { question, description, hint, options, answerNumber, isOpen, isClosed } = useQuizQuestion(partyId, questionId)
 
+  // cookies used for the answerNumber only
+  const COOKIE_NAME = useMemo(() => _questionCookieName(partyId, questionId), [partyId, questionId]);
+  const [cookies, setCookie] = useCookies([COOKIE_NAME]);
+  const _setFields = (fields: QuestionFields) => {
+    setCookie(COOKIE_NAME, fields)
+  }
+
   const fields = useMemo<QuestionFields>(() => ({
     question: question,
     description: description,
     hint: hint,
     options: options,
-    answerNumber,
-  }), [question, description, options, answerNumber]);
+    answerNumber: answerNumber || cookies[COOKIE_NAME]?.answerNumber || 0,
+  }), [question, description, options, answerNumber, cookies[COOKIE_NAME]]);
 
   return (
     <>
@@ -577,10 +585,10 @@ function QuizAdminQuestionOnChain({
         partyId={partyId}
         questionId={questionId}
         fields={fields}
-        answerNumber={answerNumber}
         answerCounts={answerCounts}
         isOpen={isOpen}
         isClosed={isClosed}
+        setFields={_setFields}
       />
       <QuizResults partyId={partyId} questionId={questionId} />
     </>
@@ -601,7 +609,7 @@ function QuizAdminQuestionOffChain({
   const [fields, setFields] = useState<QuestionFields>({ ...EMPTY_QUESTION })
   useEffect(() => {
     if (cookies[COOKIE_NAME]) {
-      console.log(`QUIZ[${partyId}][${questionId}] cookie[${COOKIE_NAME}] >>> read:`, cookies[COOKIE_NAME])
+      // console.log(`QUIZ[${partyId}][${questionId}] cookie[${COOKIE_NAME}] >>> read:`, cookies[COOKIE_NAME])
       setFields(cookies[COOKIE_NAME])
     } else {
       setFields({ ...EMPTY_QUESTION })
@@ -630,7 +638,6 @@ function QuizAdminQuestionForm({
   partyId,
   questionId,
   fields,
-  answerNumber = 0,
   answerCounts = {},
   isOpen,
   isClosed,
@@ -639,7 +646,6 @@ function QuizAdminQuestionForm({
   partyId: number,
   questionId: number,
   fields: QuestionFields,
-  answerNumber?: number,
   answerCounts?: Record<number, number>,
   isOpen?: boolean,
   isClosed?: boolean,
@@ -661,6 +667,9 @@ function QuizAdminQuestionForm({
     options[index] = option
     setFields({ ...fields, options })
   }
+  const _setAnswerNumber = (value: number) => {
+    setFields({ ...fields, answerNumber: value })
+  }
   const _addOption = () => {
     const options = [...fields.options]
     options.push('')
@@ -672,17 +681,9 @@ function QuizAdminQuestionForm({
     setFields({ ...fields, options })
   }
 
-  // available to all
-  const COOKIE_NAME_ANSWER = useMemo(() => _answerCookieName(partyId, questionId), [partyId, questionId]);
-  const [cookies, setCookie] = useCookies([COOKIE_NAME_ANSWER]);
-  const _setAnswerNumber = (answerNumber: number) => {
-    setCookie(COOKIE_NAME_ANSWER, answerNumber)
-  }
-
   const editable = useMemo(() => (!isOpen && !isClosed && !isPartyClosed), [isOpen, isClosed, isPartyClosed])
-  const isFinished = useMemo(() => (answerNumber > 0), [answerNumber])
-  const _answerNumber = useMemo(() => (answerNumber || cookies[COOKIE_NAME_ANSWER] || 0), [answerNumber, cookies[COOKIE_NAME_ANSWER]])
-  const _answerIndex = useMemo(() => (_answerNumber - 1), [_answerNumber])
+  const answerIndex = useMemo(() => (fields.answerNumber - 1), [fields.answerNumber])
+  // console.log(`quiz answer(${partyId},${questionId}) [${COOKIE_NAME_ANSWER}]`, answerNumber, _answerNumber, _answerIndex, 'cookies:', cookies[COOKIE_NAME_ANSWER], cookies, Object.keys(cookies))
 
   return (
     <>
@@ -705,8 +706,8 @@ function QuizAdminQuestionForm({
         </Cell>
       </Row>
       {fields.options.map((option, index) => (
-        <Row key={index} className={index == _answerIndex ? 'BgDark' : ''}>
-          <Cell className='Important'>Option {index + 1}: {answerCounts[index + 1]}</Cell>
+        <Row key={index} className={index == answerIndex ? 'BgDark' : ''}>
+          <Cell className='Important'>Option {index + 1} ({answerCounts[index + 1]})</Cell>
           <Cell className='Code'>
             <Input disabled={!editable} value={option} onChange={(e) => _setOption(index, e.target.value.toString())} maxLength={120} style={{ width: '500px' }} />
             {editable && (
@@ -717,11 +718,11 @@ function QuizAdminQuestionForm({
             )}
             {' | '}
             <Button key={index}
-              active={index == _answerIndex}
-              disabled={isFinished || isPartyClosed}
+              active={index == answerIndex}
+              disabled={isClosed || isPartyClosed}
               onClick={() => _setAnswerNumber(index + 1)}
             >
-              {index == _answerIndex ? 'THE ANSWER' : 'Answer'}
+              {index == answerIndex ? 'THE ANSWER' : 'Answer'}
             </Button>
           </Cell>
         </Row>
