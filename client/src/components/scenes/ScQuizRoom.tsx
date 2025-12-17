@@ -79,8 +79,14 @@ export default function ScQuizRoom() {
   const { clientTimestamp } = useClientTimestamp({ autoUpdate: !countdownFinished, updateSeconds: 1 });
 
   useEffect(() => {
-    if (partyTimestampStart > 0 && partyTimestampStart > clientTimestamp) {
-      setCountdownFinished(true);
+    if (partyTimestampStart > 0 && clientTimestamp > 0) {
+      if (partyTimestampStart - clientTimestamp <= 0) {
+        setCountdownFinished(true);
+      } else {
+        setCountdownFinished(false);
+      }
+    } else {
+      setCountdownFinished(false);
     }
   }, [partyTimestampStart, clientTimestamp]);
 
