@@ -91,8 +91,8 @@
       ]
     },
     {
-      "address": "0x5f819b0e5ee654fbcb496f34823ea514bf52b878029d5cd2d3188a6cb4b390b",
-      "class_hash": "0x4f08db7512557674e93b682478b7cf3e236df5fdacfa22853d8af909e40e28e",
+      "address": "0x57f460a66af0fdea6ed830402cc38d6bdadd033e1535cfdc57c4404573e71e0",
+      "class_hash": "0x7feb706b40dba82cc3dee3693ceec36f6372a9eae9b4ab60e975e61010a684",
       "init_calldata": [],
       "tag": "pistols-community",
       "selector": "0x7348885054faf5239115b952a0812295ca08f3be01216dd6c03a9fcc22d1dba",
@@ -1126,9 +1126,14 @@
           "name": "vrf",
           "type": "core::felt252",
           "key": false
+        },
+        {
+          "name": "hint",
+          "type": "core::byte_array::ByteArray",
+          "key": false
         }
       ],
-      "class_hash": "0xc7f1c796f79e6742c9d0bfb2d01b717a72f1898ceaa0060b0c50d5f28f05a9",
+      "class_hash": "0x35319e279d0e9c95555b258436f070299dd112a88fd39a60a98ff85cb352d93",
       "tag": "pistols-QuizQuestion",
       "selector": "0x8bc324c97c68995ba6d970f9c4ee775a533f8c0f41b8676fb8850e20dc4ccb"
     },
@@ -7296,6 +7301,10 @@
         {
           "name": "vrf",
           "type": "core::felt252"
+        },
+        {
+          "name": "hint",
+          "type": "core::byte_array::ByteArray"
         }
       ]
     },
@@ -7326,6 +7335,10 @@
         {
           "name": "vrf",
           "type": "core::felt252"
+        },
+        {
+          "name": "hint",
+          "type": "core::byte_array::ByteArray"
         }
       ]
     },
@@ -8366,6 +8379,10 @@
             },
             {
               "name": "description",
+              "type": "core::byte_array::ByteArray"
+            },
+            {
+              "name": "hint",
               "type": "core::byte_array::ByteArray"
             },
             {

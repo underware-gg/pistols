@@ -283,6 +283,7 @@ export interface QuizQuestion {
 	timestamps: Period;
 	answer_number: BigNumberish;
 	vrf: BigNumberish;
+	hint: string;
 }
 
 // Type definition for `pistols::models::ring::Ring` struct
@@ -1450,6 +1451,7 @@ export const schema: SchemaType = {
 		timestamps: { start: 0, end: 0, },
 			answer_number: 0,
 			vrf: 0,
+		hint: "",
 		},
 		Ring: {
 			ring_id: 0,

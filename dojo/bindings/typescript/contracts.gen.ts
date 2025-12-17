@@ -879,19 +879,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_community_openQuizQuestion_calldata = (partyId: BigNumberish, questionId: BigNumberish, question: string, description: string, options: Array<string>): DojoCall => {
+	const build_community_openQuizQuestion_calldata = (partyId: BigNumberish, questionId: BigNumberish, question: string, description: string, hint: string, options: Array<string>): DojoCall => {
 		return {
 			contractName: "community",
 			entrypoint: "open_quiz_question",
-			calldata: [partyId, questionId, question, description, options],
+			calldata: [partyId, questionId, question, description, hint, options],
 		};
 	};
 
-	const community_openQuizQuestion = async (snAccount: Account | AccountInterface, partyId: BigNumberish, questionId: BigNumberish, question: string, description: string, options: Array<string>) => {
+	const community_openQuizQuestion = async (snAccount: Account | AccountInterface, partyId: BigNumberish, questionId: BigNumberish, question: string, description: string, hint: string, options: Array<string>) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_community_openQuizQuestion_calldata(partyId, questionId, question, description, options),
+				build_community_openQuizQuestion_calldata(partyId, questionId, question, description, hint, options),
 				"pistols",
 			);
 		} catch (error) {
