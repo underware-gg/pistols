@@ -48,6 +48,7 @@ export const useQuizQuestion = (partyId: number, questionId: number) => {
   const model = useStoreModelsByKeys<models.QuizQuestion>(entities, 'QuizQuestion', [partyId, questionId])
   const question = useMemo(() => model?.question ?? '', [model])
   const description = useMemo(() => model?.description ?? '', [model])
+  const hint = useMemo(() => model?.hint ?? '', [model])
   const options = useMemo(() => model?.options ?? [], [model])
   const answerNumber = useMemo(() => Number(model?.answer_number ?? 0), [model])
   const timestamp_start = useMemo(() => Number(model?.timestamps.start ?? 0), [model])
@@ -60,6 +61,7 @@ export const useQuizQuestion = (partyId: number, questionId: number) => {
   return {
     question,
     description,
+    hint,
     options,
     answerNumber,
     isOffChain,

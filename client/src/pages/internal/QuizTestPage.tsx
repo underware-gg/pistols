@@ -77,7 +77,7 @@ function QuizPlayerPanel({
   const { community } = useDojoSystemCalls()
   const { currentPartyId, currentQuestionId } = useQuizConfig()
   const { partyName, timestamp_start, isPartyClosed } = useQuizParty(currentPartyId)
-  const { question, description, options, answerNumber, isOpen, isClosed } = useQuizQuestion(currentPartyId, currentQuestionId)
+  const { question, description, hint, options, answerNumber, isOpen, isClosed } = useQuizQuestion(currentPartyId, currentQuestionId)
   const { playerAnswerNumber } = useQuizPlayerAnswer(currentPartyId, currentQuestionId, address)
   const { answerCounts } = useQuizAnswers(currentPartyId, currentQuestionId)
 
@@ -130,6 +130,11 @@ function QuizPlayerPanel({
             <Row>
               <Cell>Description:</Cell>
               <Cell className='Important'>{description}</Cell>
+              <Cell></Cell>
+            </Row>
+            <Row>
+              <Cell>Hint:</Cell>
+              <Cell className='Important'>{hint}</Cell>
               <Cell></Cell>
             </Row>
             {options.map((q, i) => {
@@ -414,6 +419,22 @@ function QuizPartySelectorRows({
 //--------------------------------
 // Admin Panel (Questions)
 //
+
+type QuestionFields = {
+  question: string,
+  description: string,
+  hint: string,
+  options: string[],
+}
+const EMPTY_QUESTION: QuestionFields = {
+  question: '',
+  description: '',
+  hint: '',
+  options: [],
+}
+const _questionCookieName = (partyId: number, questionId: number) => `quiz_${partyId}_${questionId}`;
+const _answerCookieName = (partyId: number, questionId: number) => `quiz_${partyId}_${questionId}_answer`;
+
 function QuizAdminQuestionsPanel() {
   // admin params
   const { currentPartyId, currentQuestionId } = useQuizConfig()
@@ -498,7 +519,7 @@ function QuizAdminQuestion({
   const { community } = useDojoSystemCalls()
   const _start = () => {
     const quotedOptions = fields.options.map(option => `"${option}"`) //TODO test and replace later
-    community.open_quiz_question(account, partyId, questionId, fields.question, fields.description, quotedOptions)
+    community.open_quiz_question(account, partyId, questionId, fields.question, fields.description, fields.hint, quotedOptions)
   }
   const _stop = () => {
     community.close_quiz_question(account, partyId, questionId, answerNumber)
@@ -530,19 +551,6 @@ function QuizAdminQuestion({
 
 
 
-type QuestionFields = {
-  question: string,
-  description: string,
-  options: string[],
-}
-const EMPTY_QUESTION: QuestionFields = {
-  question: '',
-  description: '',
-  options: [],
-}
-const _questionCookieName = (partyId: number, questionId: number) => `quiz_${partyId}_${questionId}`;
-const _answerCookieName = (partyId: number, questionId: number) => `quiz_${partyId}_${questionId}_answer`;
-
 //
 // Question form when form data is on-chain
 function QuizAdminQuestionOnChain({
@@ -553,11 +561,12 @@ function QuizAdminQuestionOnChain({
   questionId: number,
 }) {
   const { answerCounts } = useQuizAnswers(partyId, questionId)
-  const { question, description, options, answerNumber, isOpen, isClosed } = useQuizQuestion(partyId, questionId)
+  const { question, description, hint, options, answerNumber, isOpen, isClosed } = useQuizQuestion(partyId, questionId)
 
   const fields = useMemo<QuestionFields>(() => ({
     question: question,
     description: description,
+    hint: hint,
     options: options,
     answerNumber,
   }), [question, description, options, answerNumber]);
@@ -644,6 +653,9 @@ function QuizAdminQuestionForm({
   const _setDescription = (description: string) => {
     setFields({ ...fields, description })
   }
+  const _setHint = (hint: string) => {
+    setFields({ ...fields, hint })
+  }
   const _setOption = (index: number, option: string) => {
     const options = [...fields.options]
     options[index] = option
@@ -684,6 +696,12 @@ function QuizAdminQuestionForm({
         <Cell>Description:</Cell>
         <Cell className='Code'>
           <Input disabled={!editable} value={fields.description} onChange={(e) => _setDescription(e.target.value.toString())} maxLength={100} style={{ width: '500px' }} />
+        </Cell>
+      </Row>
+      <Row>
+        <Cell>Hint (optional):</Cell>
+        <Cell className='Code'>
+          <Input disabled={!editable} value={fields.hint} onChange={(e) => _setHint(e.target.value.toString())} maxLength={100} style={{ width: '500px' }} />
         </Cell>
       </Row>
       {fields.options.map((option, index) => (

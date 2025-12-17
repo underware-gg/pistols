@@ -290,13 +290,14 @@ export function createSystemCalls(
         ]
         return await _executeTransaction(signer, calls, key)
       },
-      open_quiz_question: async (signer: AccountInterface, quiz_party_id: number, question_id: number, question: string, description: string, options: Array<string>, key?: string): Promise<boolean> => {
+      open_quiz_question: async (signer: AccountInterface, quiz_party_id: number, question_id: number, question: string, description: string, hint: string, options: Array<string>, key?: string): Promise<boolean> => {
         const calls: DojoCalls = [
           contractCalls.community.buildOpenQuizQuestionCalldata(
             bigintToHex(quiz_party_id),
             bigintToHex(question_id),
             question,
             description,
+            hint,
             options,
           ),
         ]
