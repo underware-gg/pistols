@@ -93,9 +93,14 @@ function QuizPlayerPanel({
         <Body className='ModalText'>
           <Row>
             <Cell width={3}>Active Party:</Cell>
-            <Cell className='Important'>
-              {currentPartyId}: {partyName == '' ? <span>None</span> : <span>{partyName}</span>}
+            <Cell>
+              <span className='Important'>
+                {currentPartyId}: {partyName == '' ? <span>None</span> : <span>{partyName}</span>}
+              </span>
               {isPartyClosed && ' (Closed)'}
+
+              {' | '}
+              <a href={`/quizroom/${partyName.replaceAll(' ', '')}`} target='_blank'>LINK</a>
             </Cell>
           </Row>
           <Row>
@@ -393,7 +398,7 @@ function QuizPartySelectorRows({
           {editable && (
             <>
               {' | '}
-              <Button active={true} onClick={() => _setCurrent()} disabled={isCurrentParty}>{isCurrentParty ? 'Current' : 'Set Current'}</Button>
+              <Button active={true} onClick={() => _setCurrent()} disabled={isCurrentParty}>{isCurrentParty ? 'Active' : 'Set Active'}</Button>
               {' | '}
               <Button onClick={() => _selectParty(0)} disabled={selectedPartyId == 0}>New Party</Button>
             </>
@@ -411,6 +416,7 @@ function QuizPartySelectorRows({
 //
 function QuizAdminQuestionsPanel() {
   // admin params
+  const { currentPartyId, currentQuestionId } = useQuizConfig()
   const { selectedPartyId, selectedQuestionId, setSelectedQuestionId } = useSelectedQuiz()
   const { isPartyClosed } = useQuizParty(selectedPartyId)
   const { questionIds } = useQuizQuestionsByParty(selectedPartyId)
@@ -443,9 +449,18 @@ function QuizAdminQuestionsPanel() {
           <Row>
             <Cell>Questions:</Cell>
             <Cell className='Important'>
-              {questionIds.map((q) =>
-                <Button key={q} onClick={() => setSelectedQuestionId(q)} active={q == selectedQuestionId}>{q}</Button>
-              )}
+              {questionIds.map((q) => {
+                const isCurrentParty = (selectedPartyId == currentPartyId);
+                const isPast = isCurrentParty && (q < currentQuestionId);
+                const isCurrent = isCurrentParty && (q == currentQuestionId);
+                return (<Button key={q}
+                  className={isCurrent ? 'Important' : isPast ? 'Negative' : ''}
+                  onClick={() => setSelectedQuestionId(q)}
+                  active={q == selectedQuestionId}
+                >
+                  {q}
+                </Button>)
+              })}
               {!isPartyClosed && (
                 <>
                   {' | '}
