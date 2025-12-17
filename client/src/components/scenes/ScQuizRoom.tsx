@@ -30,6 +30,8 @@ import { _currentScene, emitter } from "/src/three/game";
 import { InteractibleScene } from "/src/three/InteractibleScene";
 import { formatTimestampDeltaCountdown } from "@underware/pistols-sdk/utils";
 import { useClientTimestamp } from "@underware/pistols-sdk/utils/hooks";
+import { useThreeJsContext } from "/src/hooks/ThreeJsContext";
+import { AudioName, AUDIO_ASSETS } from "/src/data/audioAssets";
 
 export default function ScQuizRoom() {
   const { aspectWidth } = useGameAspect();
@@ -38,8 +40,35 @@ export default function ScQuizRoom() {
   const { connectOpener } = usePistolsContext();
   const { quiz_name: quizName } = useParams<{ quiz_name: string }>();
   const { value: hoveredItem } = useGameEvent("hover_item", null);
+  const { gameImpl } = useThreeJsContext();
   
   useFetchAllQuiz();
+
+  const musicStateRef = useRef<{ menus: boolean; ingame: boolean } | null>(null);
+  
+  useEffect(() => {
+    if (gameImpl) {
+      const menusWasPlaying = AUDIO_ASSETS[AudioName.MUSIC_MENUS]?.object?.isPlaying ?? false;
+      const ingameWasPlaying = AUDIO_ASSETS[AudioName.MUSIC_INGAME]?.object?.isPlaying ?? false;
+      
+      musicStateRef.current = { menus: menusWasPlaying, ingame: ingameWasPlaying };
+      
+      gameImpl.pauseAudio(AudioName.MUSIC_MENUS);
+      gameImpl.pauseAudio(AudioName.MUSIC_INGAME);
+    }
+    
+    return () => {
+      if (gameImpl && musicStateRef.current) {
+        const { menus, ingame } = musicStateRef.current;
+        if (menus) {
+          gameImpl.playAudio(AudioName.MUSIC_MENUS, true);
+        }
+        if (ingame) {
+          gameImpl.playAudio(AudioName.MUSIC_INGAME, true);
+        }
+      }
+    };
+  }, [gameImpl]);
 
   const { 
     partyId, 
