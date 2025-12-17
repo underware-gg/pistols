@@ -44,35 +44,8 @@ export default function ScQuizRoom() {
   
   useFetchAllQuiz();
 
-  const musicStateRef = useRef<{ menus: boolean; ingame: boolean } | null>(null);
-  
-  useEffect(() => {
-    if (gameImpl) {
-      const menusWasPlaying = AUDIO_ASSETS[AudioName.MUSIC_MENUS]?.object?.isPlaying ?? false;
-      const ingameWasPlaying = AUDIO_ASSETS[AudioName.MUSIC_INGAME]?.object?.isPlaying ?? false;
-      
-      musicStateRef.current = { menus: menusWasPlaying, ingame: ingameWasPlaying };
-      
-      gameImpl.pauseAudio(AudioName.MUSIC_MENUS);
-      gameImpl.pauseAudio(AudioName.MUSIC_INGAME);
-    }
-    
-    return () => {
-      if (gameImpl && musicStateRef.current) {
-        const { menus, ingame } = musicStateRef.current;
-        if (menus) {
-          gameImpl.playAudio(AudioName.MUSIC_MENUS, true);
-        }
-        if (ingame) {
-          gameImpl.playAudio(AudioName.MUSIC_INGAME, true);
-        }
-      }
-    };
-  }, [gameImpl]);
-
   const { 
     partyId, 
-    partyName,
     description: partyDescription, 
     timestamp_start: partyTimestampStart,
     isPartyClosed,
@@ -89,7 +62,7 @@ export default function ScQuizRoom() {
 
   const questionId = selectedQuestionId ?? activeQuestionId;
 
-  const { question, description, options, isOpen, isClosed } = useQuizQuestion(partyId, questionId);
+  const { question, description, hint, options, isOpen, isClosed } = useQuizQuestion(partyId, questionId);
   const { playerAnswerNumber } = useQuizPlayerAnswer(partyId, questionId, address);
   const { winners } = useQuizQuestionWinners(partyId, questionId);
   const { leaderboards } = useQuizPartyLeaderboards(partyId);
@@ -236,9 +209,35 @@ export default function ScQuizRoom() {
 
   useEffect(() => {
     if (hoveredItem === "cumberlord") {
-      emitter.emit("hover_description", description || "Quiz hint");
+      emitter.emit("hover_description", hint || "No hint for this question!");
     }
-  }, [hoveredItem, description]);
+  }, [hoveredItem, hint]);
+
+  const musicStateRef = useRef<{ menus: boolean; ingame: boolean } | null>(null);
+  
+  useEffect(() => {
+    if (gameImpl) {
+      const menusWasPlaying = AUDIO_ASSETS[AudioName.MUSIC_MENUS]?.object?.isPlaying ?? false;
+      const ingameWasPlaying = AUDIO_ASSETS[AudioName.MUSIC_INGAME]?.object?.isPlaying ?? false;
+      
+      musicStateRef.current = { menus: menusWasPlaying, ingame: ingameWasPlaying };
+      
+      gameImpl.pauseAudio(AudioName.MUSIC_MENUS);
+      gameImpl.pauseAudio(AudioName.MUSIC_INGAME);
+    }
+    
+    return () => {
+      if (gameImpl && musicStateRef.current) {
+        const { menus, ingame } = musicStateRef.current;
+        if (menus) {
+          gameImpl.playAudio(AudioName.MUSIC_MENUS, true);
+        }
+        if (ingame) {
+          gameImpl.playAudio(AudioName.MUSIC_INGAME, true);
+        }
+      }
+    };
+  }, [gameImpl]);
 
   
   //------------------
@@ -489,19 +488,17 @@ export default function ScQuizRoom() {
                 
                 return (
                   <div key={rank} className="quiz-runners-up-item">
-                    <div className="quiz-runners-up-top-row">
-                      <div className="quiz-runners-up-rank-container">
-                        <div
-                          className="quiz-runners-up-ribbon"
-                          style={{ backgroundImage: `url("${ribbonImage}")` }}
-                        />
-                        <span className="quiz-runners-up-rank">#{rank}</span>
-                      </div>
-                      <div className="quiz-runners-up-name" title={player?.name || ''}>
-                        <span className="quiz-runners-up-name-text">
-                          {player?.name || `No player finished ${rank === 2 ? '2nd' : rank === 3 ? '3rd' : `${rank}th`}`}
-                        </span>
-                      </div>
+                    <div className="quiz-runners-up-rank-container">
+                      <div
+                        className="quiz-runners-up-ribbon"
+                        style={{ backgroundImage: `url("${ribbonImage}")` }}
+                      />
+                      <span className="quiz-runners-up-rank">#{rank}</span>
+                    </div>
+                    <div className="quiz-runners-up-name" title={player?.name || ''}>
+                      <span className="quiz-runners-up-name-text">
+                        {player?.name || `No player finished ${rank === 2 ? '2nd' : rank === 3 ? '3rd' : `${rank}th`}`}
+                      </span>
                     </div>
                     {player && (
                       <span className="quiz-runners-up-score">{player.score}</span>
