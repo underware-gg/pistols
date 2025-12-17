@@ -482,7 +482,8 @@ function QuizAdminQuestion({
   const { account } = useAccount()
   const { community } = useDojoSystemCalls()
   const _start = () => {
-    community.open_quiz_question(account, partyId, questionId, fields.question, fields.description, fields.options)
+    const quotedOptions = fields.options.map(option => `"${option}"`) //TODO test and replace later
+    community.open_quiz_question(account, partyId, questionId, fields.question, fields.description, quotedOptions)
   }
   const _stop = () => {
     community.close_quiz_question(account, partyId, questionId, answerNumber)
