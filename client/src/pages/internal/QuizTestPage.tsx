@@ -529,6 +529,8 @@ function QuizAdminQuestion({
   const canStart = useMemo(() => (isOffChain && validated), [isOffChain, validated])
   const canStop = useMemo(() => (isOpen && fields.answerNumber > 0), [isOpen, fields.answerNumber])
 
+  console.log('QuizAdminQuestion >>>', questionId, isOffChain, validated, canStart, fields, fields.options)
+
   if (questionId == 0) return <></>;
   return (
     <Table celled striped size='small' color={isOffChain ? 'red' : isOpen ? 'green' : 'orange'}>
