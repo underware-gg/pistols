@@ -8,7 +8,7 @@ import { QuizPlayer } from './quizStore'
 //
 
 const BASE_SCORE = 1000
-const POINTS_PER_10_SECONDS = 50 // Points removed per 10 seconds of question duration
+const POINTS_PER_SECOND = 4 // Points removed per second of question duration
 const MAX_POINTS_REMOVED = 500 // Maximum points that can be removed
 const EXTREME_GAP_MULTIPLIER = 3 // Gaps >3x average are considered extreme
 const BONUS_CAP_RATIO = 0.75 // Bonus (faster blocks) capped at 75% of per-block difference - generous!
@@ -27,7 +27,7 @@ const calculateMinScore = (questionDuration: number): number => {
   if (questionDuration <= 0) return BASE_SCORE - MAX_POINTS_REMOVED // Default fallback
   
   const pointsToRemove = Math.min(
-    Math.floor(questionDuration / 10) * POINTS_PER_10_SECONDS,
+    Math.floor(questionDuration) * POINTS_PER_SECOND,
     MAX_POINTS_REMOVED
   )
   
@@ -149,8 +149,9 @@ export const calculateQuestionWinners_v2_complex = (
   // 4. Calculate dynamic min score based on question duration
   //
   
-  const questionDuration = questionEnd > 0 ? questionEnd - questionStart : 0
-  const minScore = calculateMinScore(questionDuration)
+  const numAllBlocks = allSortedTimestamps.length
+  const timeRange = lastAnswerTime - firstAnswerTime
+  const minScore = calculateMinScore(timeRange)
   const maxScore = BASE_SCORE
   
   //--------------------------------
@@ -161,29 +162,22 @@ export const calculateQuestionWinners_v2_complex = (
   const averageBlockInterval = calculateAverageBlockInterval(allSortedTimestamps)
   
   //--------------------------------
-  // 6. Calculate base scores: evenly distribute ALL blocks (wrong + correct) between first and last
+  // 6. Calculate base scores: evenly distribute ALL blocks between first and last
   //
   
-  const numAllBlocks = allSortedTimestamps.length
-  const timeRange = questionEnd > 0 ? questionEnd - firstAnswerTime : 0
   
-  // Calculate score for last based on their timestamp positions
-  const lastBlockPosition = timeRange > 0 ? (lastAnswerTime - firstAnswerTime) / timeRange : 0
-  const lastBlockScore = maxScore - (lastBlockPosition * (maxScore - minScore))
-
-  // Calculate per-block difference for gap adjustments
-  const perBlockDifference = numAllBlocks > 1 ? (maxScore - lastBlockScore) / (numAllBlocks - 1) : 0
+  // Calculate per-block difference for even distribution
+  const perBlockDifference = numAllBlocks > 1 ? (maxScore - minScore) / (numAllBlocks - 1) : 0
   
-  // Create score map for ALL blocks - evenly distributed
+  // Create score map: evenly distribute all blocks
   const allBlockScores = new Map<number, number>()
   allSortedTimestamps.forEach((timestamp, index) => {
     if (index === 0) {
       allBlockScores.set(timestamp, maxScore)
     } else if (index === numAllBlocks - 1) {
-      allBlockScores.set(timestamp, lastBlockScore)
+      allBlockScores.set(timestamp, minScore)
     } else {
       // Evenly distributed between first and last
-      
       const baseScore = maxScore - (index * perBlockDifference)
       allBlockScores.set(timestamp, baseScore)
     }
