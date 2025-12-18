@@ -45,6 +45,7 @@ export const initialState = {
   selectionHistory: [] as Array<SelectionState>,
 
   currentDuel: 0n,
+  currentQuizName: '',
   currentScene: undefined as SceneName,
   tutorialLevel: undefined as DuelTutorialLevel,
   sceneStack: [] as SceneName[],
@@ -70,6 +71,7 @@ const PistolsActions = {
   SET_SCENE: 'SET_SCENE',
   POP_SCENE: 'POP_SCENE',
   SET_DUEL: 'SET_DUEL',
+  SET_QUIZ_NAME: 'SET_QUIZ_NAME',
   SELECT_DUEL: 'SELECT_DUEL',
   SELECT_DUELIST_ID: 'SELECT_DUELIST_ID',
   SELECT_PLAYER_ADDRESS: 'SELECT_PLAYER_ADDRESS',
@@ -93,6 +95,7 @@ type ActionType =
   | { type: 'SET_SCENE', payload: SceneName }
   | { type: 'POP_SCENE', payload: null }
   | { type: 'SET_DUEL', payload: bigint }
+  | { type: 'SET_QUIZ_NAME', payload: string }
   | { type: 'SELECT_DUEL', payload: bigint }
   | { type: 'SELECT_DUELIST_ID', payload: bigint }
   | { type: 'SELECT_PLAYER_ADDRESS', payload: bigint }
@@ -242,6 +245,10 @@ const PistolsProvider = ({
         newState = clearSelections(newState)
         newState.selectionHistory = []
         newState.currentDuel = action.payload as bigint
+        break
+      }
+      case PistolsActions.SET_QUIZ_NAME: {
+        newState.currentQuizName = action.payload as string
         break
       }
       case PistolsActions.SELECT_DUEL: {
@@ -464,6 +471,13 @@ export const usePistolsContext = () => {
     })
   }, [dispatch])
 
+  const dispatchSetQuizName = useCallback((quizName: string) => {
+    dispatch({
+      type: PistolsActions.SET_QUIZ_NAME,
+      payload: quizName,
+    })
+  }, [dispatch])
+
   const dispatchSelectDuelistId = useCallback((newId: BigNumberish, playerAddress?: BigNumberish) => {
     if (!isPositiveBigint(newId) && isPositiveBigint(playerAddress)) {
       dispatch({
@@ -564,6 +578,7 @@ export const usePistolsContext = () => {
     dispatch,
     dispatchSetSig,
     dispatchSetDuel,
+    dispatchSetQuizName,
     dispatchSelectDuel,
     dispatchSelectDuelistId,
     dispatchRequeueDuelist,
@@ -646,10 +661,10 @@ export const sceneRoutes: Record<SceneName, SceneRoute> = {
 type SceneSlug = {
   duelId?: BigNumberish,
   username?: string,
-  quizId?: BigNumberish,
+  quizId?: string,
 }
 export const usePistolsScene = () => {
-  const { currentScene, sceneStack, selectedDuelId, currentDuel, dispatchSetDuel, __dispatchSetScene, __dispatchSceneBack, __dispatchResetValues } = usePistolsContext()
+  const { currentScene, sceneStack, selectedDuelId, currentDuel, currentQuizName, dispatchSetDuel, dispatchSetQuizName, __dispatchSetScene, __dispatchSceneBack, __dispatchResetValues } = usePistolsContext()
 
   const location = useLocation()
   const navigate = useNavigate()
@@ -665,7 +680,11 @@ export const usePistolsScene = () => {
         dispatchSetDuel(slug)
       }
     } else if (sceneRoutes[newScene].hasQuizId) {
-      slug = setSlug.quizId ? `${bigintToDecimal(setSlug.quizId)}` : ''
+      slug = setSlug.quizId || currentQuizName || ''
+      if (slug && slug !== currentQuizName) {
+        console.log(`dispatchSetQuizName >>>>> [${slug}]`)
+        dispatchSetQuizName(slug)
+      }
     } else if (setSlug.username) {
       slug = setSlug.username
     }
@@ -688,6 +707,8 @@ export const usePistolsScene = () => {
       let slug = ''
       if (route.hasDuelId) {
         slug = `${bigintToDecimal(currentDuel)}`
+      } else if (route.hasQuizId) {
+        slug = currentQuizName
       }
       url += slug ? `/${slug}` : ''
       if (url != location.pathname) {
@@ -742,7 +763,7 @@ export const usePistolsScene = () => {
 
 // use only once!!!!
 export const usePistolsSceneFromRoute = () => {
-  const { dispatchSetDuel, __dispatchSetScene, currentScene } = usePistolsContext()
+  const { dispatchSetDuel, dispatchSetQuizName, __dispatchSetScene, currentScene } = usePistolsContext()
 
   // URL slugs (/path/slug)
   // https://api.reactrouter.com/v7/functions/react_router.useParams.html
@@ -767,6 +788,9 @@ export const usePistolsSceneFromRoute = () => {
           __dispatchSetScene(newScene)
           if (route.hasDuelId) {
             dispatchSetDuel(params['duel_id'] || '0x0')
+          } else if (route.hasQuizId) {
+            console.log(`dispatchSetQuizName >>>>> [${params['quiz_name']}]`)
+            dispatchSetQuizName(params['quiz_name'] || '')
           }
         }
       }

@@ -9,7 +9,7 @@
   width: aspect-width(12);
   height: aspect-height(32);
   max-height: aspect-height(32);
-  z-index: 15;
+  z-index: 1;
   pointer-events: auto;
   background: rgba($color-darkest, 0.9);
   border: aspect-width(0.15) solid rgba($color-bright, 0.3);
@@ -402,7 +402,7 @@
   left: 50%;
   transform: translateX(-50%);
   pointer-events: none;
-  z-index: 10;
+  z-index: 2;
 }
 
 .quiz-board-champion {
