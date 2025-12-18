@@ -4,7 +4,7 @@ import { SceneName, TextureAttributes, TextureName, UIImagesName, GroupName, Sce
 const SCENE_PRIORITIES: Record<SceneName, GroupName[]> = {
   [SceneName.Gate]: [GroupName.Entrance, GroupName.Door, GroupName.Tavern, GroupName.TavernUI],
   [SceneName.Door]: [GroupName.Door, GroupName.Entrance, GroupName.Tavern, GroupName.TavernUI],
-  [SceneName.Tavern]: [GroupName.Tavern, GroupName.TavernUI, GroupName.Profile, GroupName.Graveyard, GroupName.Duelists, GroupName.Leaderboards, GroupName.LeaderboardsUI],
+  [SceneName.Tavern]: [GroupName.Tavern, GroupName.TavernUI, GroupName.Profile, GroupName.Backrooms, GroupName.Duelists, GroupName.Leaderboards, GroupName.LeaderboardsUI],
   [SceneName.Profile]: [GroupName.Profile, GroupName.CardPacks, GroupName.CardPackUI, GroupName.DuelistBook, GroupName.DuelistImages, GroupName.CardUI, GroupName.TavernUI],
   [SceneName.CardPacks]: [GroupName.CardPacks, GroupName.CardPackUI, GroupName.Profile, GroupName.DuelistBook, GroupName.DuelistImages, GroupName.CardUI, GroupName.TavernUI],
   [SceneName.DuelistBook]: [GroupName.DuelistBook, GroupName.DuelistImages, GroupName.CardUI, GroupName.Profile, GroupName.CardPacks, GroupName.CardPackUI, GroupName.TavernUI],
@@ -13,6 +13,8 @@ const SCENE_PRIORITIES: Record<SceneName, GroupName[]> = {
   [SceneName.DuelsBoard]: [GroupName.DuelsBoard, GroupName.TavernUI, GroupName.Duelists, GroupName.Profile, GroupName.Graveyard],
   [SceneName.Leaderboards]: [GroupName.Leaderboards, GroupName.LeaderboardsUI, GroupName.TavernUI, GroupName.Profile],
   [SceneName.Graveyard]: [GroupName.Graveyard, GroupName.TavernUI, GroupName.Profile, GroupName.DuelsBoard],
+  [SceneName.Backrooms]: [GroupName.Backrooms, GroupName.TavernUI, GroupName.Profile, GroupName.Quiz, GroupName.Graveyard],
+  [SceneName.QuizRoomList]: [GroupName.Quiz, GroupName.TavernUI, GroupName.Profile],
   [SceneName.QuizRoom]: [GroupName.Quiz, GroupName.TavernUI, GroupName.Profile],
   [SceneName.Tournament]: [],
   [SceneName.IRLTournament]: [],
@@ -236,6 +238,11 @@ const TEXTURES: Record<AssetKey, TextureAttributes> = {
   [TextureName.bg_quizroom]: { path: '/images/scenes/quiz/bg_quizroom.ktx2', groups: [GroupName.Quiz], version: 1 },
   [TextureName.bg_quizroom_cumberlord]: { path: '/images/scenes/quiz/bg_quizroom_cumberlord.ktx2', groups: [GroupName.Quiz], version: 1 },
   [TextureName.bg_quizroom_cumberlord_mask]: { path: '/images/scenes/quiz/bg_quizroom_cumberlord_mask.ktx2', groups: [GroupName.Quiz], version: 1 },
+  [TextureName.bg_quiz_entry]: { path: '/images/scenes/quizdoor/bg_quiz_entry.ktx2', groups: [GroupName.Quiz], version: 1 },
+  
+  [TextureName.bg_back_room]: { path: '/images/scenes/backrooms/bg_back_room.ktx2', groups: [GroupName.Backrooms], version: 1 },
+  [TextureName.bg_back_room_crypt_mask]: { path: '/images/scenes/backrooms/bg_back_room_crypt_mask.ktx2', groups: [GroupName.Backrooms], version: 1 },
+  [TextureName.bg_back_room_quiz_door_mask]: { path: '/images/scenes/backrooms/bg_back_room_quiz_door_mask.ktx2', groups: [GroupName.Backrooms], version: 1 },
 
   // Tutorial Overlay Images
   [UIImagesName.tutorial_duelist_frame_01]: { path: '/images/tutorial/overlay/duelist_tutorial_duelist_frame_01.png', groups: [GroupName.TutorialOverlay], version: 1 },
@@ -618,6 +625,22 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
       { name: 'left arrow', color: '00ff00', description: 'Previous Page', mask: TextureName.bg_graveyard_items_mask, renderOrder: 1 },
       { name: 'right arrow', color: 'ff0000', description: 'Next Page', mask: TextureName.bg_graveyard_items_mask, renderOrder: 1 },
     ]
+  },
+  [SceneName.Backrooms]: {
+    backgrounds: [
+      { texture: TextureName.bg_back_room, shiftMultiplier: 0, renderOrder: 0 },
+    ],
+    items: [
+      { name: 'crypt', color: 'ff0000', description: 'Past Duels', mask: TextureName.bg_back_room_crypt_mask, renderOrder: 0 },
+      { name: 'quiz_door', color: '00ff00', description: 'Enter Quiz Room', mask: TextureName.bg_back_room_quiz_door_mask, renderOrder: 0 },
+    ],
+    scaleAddon: 0.014
+  },
+  [SceneName.QuizRoomList]: {
+    backgrounds: [
+      { texture: TextureName.bg_quiz_entry, shiftMultiplier: 0, renderOrder: 0 },
+    ],
+    scaleAddon: 0.02
   },
   [SceneName.QuizRoom]: {
     backgrounds: [

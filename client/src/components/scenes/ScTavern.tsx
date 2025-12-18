@@ -35,7 +35,7 @@ export default function ScTavern() {
           dispatchSetScene(SceneName.Duelists)
           break
         case 'shovel':
-          dispatchSetScene(SceneName.Graveyard)
+          dispatchSetScene(SceneName.Backrooms)
           break
         case 'bartender':
           (_currentScene as InteractibleScene)?.excludeItem(TextureName.bg_tavern_bartender_mask);

@@ -269,7 +269,7 @@ const FilterStateButtonGroup = memo(function FilterStateButtonGroup({ states, cu
 
 export const Header = memo(function Header() {
 
-  const { atDuel, atGate, atDoor, atProfile, atTavern, atTutorial, atDuelistBook, atCardPacks, atLeaderboards, atMatchmaking, atQuizRoom } = usePistolsScene()
+  const { atDuel, atGate, atDoor, atProfile, atTavern, atTutorial, atDuelistBook, atCardPacks, atLeaderboards, atMatchmaking, atQuizRoom, atQuizRoomList, atBackrooms } = usePistolsScene()
   const { aspectWidth } = useGameAspect()
 
   const [show, setShow] = useState(false);
@@ -296,8 +296,8 @@ export const Header = memo(function Header() {
       <VisibilityWrapper visible={show}>
         <>
           <div className='UIHeader NoMouse NoDrag NoSelection' style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <CurtainUI visible={!atTavern && !atTutorial && !atLeaderboards && !atMatchmaking && !atQuizRoom} short={true} />
-            <BannerButton button={<SettingsGearButton size='big'/>} visible={atTavern || atProfile || atQuizRoom} right={true} />
+            <CurtainUI visible={!atTavern && !atTutorial && !atLeaderboards && !atMatchmaking && !atQuizRoom && !atQuizRoomList && !atBackrooms} short={true} />
+            <BannerButton button={<SettingsGearButton size='big'/>} visible={atTavern || atProfile || atQuizRoom || atQuizRoomList} right={true} />
           </div>
           <Image className='NoMouse NoDrag NoSelection' src='/images/ui/tavern/wooden_corners.png' style={{ position: 'absolute' }} />
           <div className='UIHeaderCorner' style={{ padding: `${aspectWidth(1)}px ${aspectWidth(2)}px` }}>

@@ -1,6 +1,6 @@
 {
-  "version": "ff18db99715d",
-  "generatedAt": 1765970303737,
+  "version": "dbee3df721a9",
+  "generatedAt": 1766073708095,
   "assets": {
     "audioBiodecaySong6Mp3": {
       "path": "/audio/biodecay-song6.mp3",
@@ -421,6 +421,42 @@
       "hash": "v1_6c0d3d65fa30cb33",
       "size": 28853,
       "mtime": 1764681322560
+    },
+    "imagesScenesBackroomsBgBackRoomKtx2": {
+      "path": "/images/scenes/backrooms/bg_back_room.ktx2",
+      "hash": "v1_c97095aabe75704d",
+      "size": 3201356,
+      "mtime": 1766073199773
+    },
+    "imagesScenesBackroomsBgBackRoomPng": {
+      "path": "/images/scenes/backrooms/bg_back_room.png",
+      "hash": "v1_89033e468ca162da",
+      "size": 1894680,
+      "mtime": 1766073199831
+    },
+    "imagesScenesBackroomsBgBackRoomCryptMaskKtx2": {
+      "path": "/images/scenes/backrooms/bg_back_room_crypt_mask.ktx2",
+      "hash": "v1_fe6041538633c4bc",
+      "size": 8916,
+      "mtime": 1766070390830
+    },
+    "imagesScenesBackroomsBgBackRoomCryptMaskPng": {
+      "path": "/images/scenes/backrooms/bg_back_room_crypt_mask.png",
+      "hash": "v1_b22fe84daded2242",
+      "size": 10829,
+      "mtime": 1766070375538
+    },
+    "imagesScenesBackroomsBgBackRoomQuizDoorMaskKtx2": {
+      "path": "/images/scenes/backrooms/bg_back_room_quiz_door_mask.ktx2",
+      "hash": "v1_06a84a48be3b2e52",
+      "size": 6822,
+      "mtime": 1766073199666
+    },
+    "imagesScenesBackroomsBgBackRoomQuizDoorMaskPng": {
+      "path": "/images/scenes/backrooms/bg_back_room_quiz_door_mask.png",
+      "hash": "v1_442235f150b69277",
+      "size": 11833,
+      "mtime": 1766073199723
     },
     "imagesScenesCryptBgGraveyardBackgroundJpg": {
       "path": "/images/scenes/crypt/bg_graveyard_background.jpg",
@@ -1070,6 +1106,18 @@
       "size": 97128,
       "mtime": 1765830431480
     },
+    "imagesScenesQuizdoorBgQuizEntryKtx2": {
+      "path": "/images/scenes/quizdoor/bg_quiz_entry.ktx2",
+      "hash": "v1_d54e7df4bf27cb74",
+      "size": 2517702,
+      "mtime": 1766072113490
+    },
+    "imagesScenesQuizdoorBgQuizEntryPng": {
+      "path": "/images/scenes/quizdoor/bg_quiz_entry.png",
+      "hash": "v1_00984ffc7dd174f9",
+      "size": 1620434,
+      "mtime": 1766071926560
+    },
     "imagesScenesSplashPistolsLoadingPng": {
       "path": "/images/scenes/splash/pistols_loading.png",
       "hash": "v1_610bfea0cdfaaa04",
@@ -1078,15 +1126,15 @@
     },
     "imagesScenesTavernBgTavernBackgroundKtx2": {
       "path": "/images/scenes/tavern/bg_tavern_background.ktx2",
-      "hash": "v1_2e0d02bc06b07b96",
-      "size": 1159723,
-      "mtime": 1764767316994
+      "hash": "v1_3fc41db19973b1bb",
+      "size": 1146007,
+      "mtime": 1766070594450
     },
     "imagesScenesTavernBgTavernBackgroundPng": {
       "path": "/images/scenes/tavern/bg_tavern_background.png",
-      "hash": "v1_d8bdc0d2c0a5a2d7",
-      "size": 738056,
-      "mtime": 1764767317051
+      "hash": "v1_ebdfa93e4229cf03",
+      "size": 723262,
+      "mtime": 1766070594580
     },
     "imagesScenesTavernBgTavernBarKtx2": {
       "path": "/images/scenes/tavern/bg_tavern_bar.ktx2",
