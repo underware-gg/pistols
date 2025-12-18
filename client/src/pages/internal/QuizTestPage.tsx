@@ -99,8 +99,12 @@ function QuizPlayerPanel({
               </span>
               {isPartyClosed && ' (Closed)'}
 
-              {' | '}
-              <a href={`/quizroom/${partyName.replaceAll(' ', '')}`} target='_blank'>LINK</a>
+              {currentPartyId > 0 &&
+                <>
+                  {' | '}
+                  <a href={`/quizroom/${partyName.replaceAll(' ', '')}`} target='_blank'>LINK</a>
+                </>
+              }
             </Cell>
           </Row>
           <Row>
@@ -376,6 +380,7 @@ function QuizPartySelectorRows({
 }) {
   const { currentPartyId } = useQuizConfig()
   const { selectedPartyId, setSelectedPartyId, setSelectedQuestionId } = useSelectedQuiz()
+  const { partyName } = useQuizParty(selectedPartyId)
   const { partyNamesById } = useQuizAllParties()
   const _selectParty = (partyId: number) => {
     setSelectedPartyId(partyId)
@@ -390,7 +395,11 @@ function QuizPartySelectorRows({
   return (
     <>
       <Row>
-        <Cell width={3}>Party: {selectedPartyId}</Cell>
+        <Cell width={3}>
+          Party: {selectedPartyId}
+          {' '}
+          (<a href={`/quizroom/${partyName.replaceAll(' ', '')}`} target='_blank'>LINK</a>)
+        </Cell>
         <Cell className='Code'>
           <Dropdown
             value={selectedPartyId}

@@ -138,6 +138,7 @@ export function EntityStoreSync() {
       // debug.log("EntityStoreSync() SET PLAYERS =======> [PlayerOnline]:", filterEntitiesByModels(entities, ['PlayerOnline']))
       // debug.log("EntityStoreSync() SET PLAYERS =======> [Ring]:", filterEntitiesByModels(entities, ['Ring']))
       // debug.log("EntityStoreSync() SET PLAYERS =======> [RingBalance]:", filterEntitiesByModels(entities, ['RingBalance']))
+      debug.log("EntityStoreSync() SET =======> [QuizParty,QuizQuestion,QuizAnswer]:", filterEntitiesByModels(entities, ['QuizParty', 'QuizQuestion', 'QuizAnswer']))
       configState.setEntities(filterEntitiesByModels(entities, ['Config', 'QuizConfig']))
       tokenState.setEntities(filterEntitiesByModels(entities, ['TokenConfig']))
       bankState.setEntities(filterEntitiesByModels(entities, ['Pool']))
@@ -215,6 +216,7 @@ export function EntityStoreSync() {
   // useEffect(() => debug.log("EntityStoreSync() [duelistStackStore.entities] =>", Object.values(duelistStackState.entities).length), [duelistStackState.entities])
   // useEffect(() => debug.log("EntityStoreSync() [playerDataState.players] =>", Object.values(playerDataState.players_names).length), [playerDataState.players_names])
   // useEffect(() => debug.log("EntityStoreSync() [playerDataState.players_online] =>", Object.values(playerDataState.players_online).length), [playerDataState.players_online])
+  useEffect(() => debug.log("EntityStoreSync() [quizState.entities] =>", Object.values(quizState.entities).length), [quizState.entities])
 
   return (<></>)
 }
