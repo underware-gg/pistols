@@ -195,11 +195,13 @@
   display: flex;
   flex-direction: column;
   gap: aspect-width(0.4);
-  max-height: aspect-height(20);
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
   padding-right: aspect-width(0.6);
   scroll-behavior: smooth;
+  margin-bottom: aspect-width(1);
   
   &::-webkit-scrollbar {
     width: aspect-width(0.4);
@@ -256,60 +258,8 @@
     0 0 aspect-width(0.8) rgba($color-medium, 0.3);
 }
 
-.quiz-question-item-final {
-  justify-content: center;
-  text-align: center;
-  margin-top: aspect-width(0.8);
-  padding: aspect-width(0.6) aspect-width(0.9);
-  border-color: rgba($color-brightest, 0.3);
-  background: linear-gradient(135deg, rgba($color-medium-bg, 0.4), rgba($color-dark, 0.6));
-  position: relative;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba($color-brightest, 0.05), transparent);
-    border-radius: aspect-width(0.4);
-    pointer-events: none;
-  }
-  
-  &:hover {
-    background: linear-gradient(135deg, rgba($color-medium-bg, 0.5), rgba($color-dark, 0.7));
-    border-color: rgba($color-brightest, 0.5);
-    transform: translateX(0);
-  }
-}
-
-.quiz-question-item-final.quiz-question-item-selected {
-  background: linear-gradient(135deg, rgba($color-medium-bg, 0.6), rgba($color-dark, 0.8));
-  border-color: rgba($color-brightest, 0.7);
-  box-shadow: 
-    0 aspect-width(0.2) aspect-width(0.6) rgba(0,0,0,0.4),
-    0 0 aspect-width(1) rgba($color-brightest, 0.3),
-    inset 0 0 aspect-width(0.5) rgba($color-brightest, 0.1);
-  
-  &::before {
-    background: linear-gradient(135deg, rgba($color-brightest, 0.1), transparent);
-  }
-}
-
 .quiz-question-number {
   font-weight: 700;
-}
-
-.quiz-question-number-final {
-  font-weight: 700;
-  font-size: aspect-width(0.95);
-  text-align: center;
-  width: 100%;
-  letter-spacing: 0.05em;
-  color: $color-brightest;
-  position: relative;
-  z-index: 1;
 }
 
 .quiz-question-badge {
@@ -339,6 +289,105 @@
   color: rgba($color-bright, 0.5);
   border: 1px solid rgba($color-bright, 0.2);
   opacity: 0.7;
+}
+
+.quiz-leaderboard-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: aspect-width(0.7) aspect-width(1);
+  border-radius: aspect-width(0.4);
+  color: $color-brightest;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: aspect-width(0.85);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  outline: none;
+  margin-top: auto;
+  flex-shrink: 0;
+  border: aspect-width(0.12) solid;
+  
+  &:focus {
+    outline: none;
+  }
+  
+  &:active {
+    transform: translateY(0) scale(0.98);
+  }
+}
+
+// Leaderboard button (in-progress) - yellow/warning color
+.quiz-leaderboard-button-leaderboard {
+  background: rgba($color-dark, 0.5);
+  border-color: rgba($color-warning, 0.4);
+  color: $color-bright;
+  
+  &:hover {
+    background: rgba($color-dark, 0.8);
+    border-color: rgba($color-warning, 0.6);
+    transform: translateY(aspect-width(-0.15));
+  }
+  
+  &.quiz-leaderboard-button-selected {
+    background: rgba($color-warning, 0.25);
+    border-color: rgba($color-warning, 0.7);
+    color: $color-brightest;
+    box-shadow: 
+      0 aspect-width(0.2) aspect-width(0.6) rgba(0,0,0,0.4),
+      0 0 aspect-width(0.8) rgba($color-warning, 0.3);
+  }
+}
+
+// Final Score button (quiz ended) - green/positive color
+.quiz-leaderboard-button-final {
+  background: rgba($color-dark, 0.5);
+  border-color: rgba($color-positive, 0.4);
+  color: $color-bright;
+  
+  &:hover {
+    background: rgba($color-dark, 0.8);
+    border-color: rgba($color-positive, 0.6);
+    transform: translateY(aspect-width(-0.15));
+  }
+  
+  &.quiz-leaderboard-button-selected {
+    background: rgba($color-positive, 0.25);
+    border-color: rgba($color-positive, 0.7);
+    color: $color-brightest;
+    box-shadow: 
+      0 aspect-width(0.2) aspect-width(0.6) rgba(0,0,0,0.4),
+      0 0 aspect-width(0.8) rgba($color-positive, 0.3);
+  }
+}
+
+.quiz-leaderboard-button-text {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  width: 100%;
+}
+
+// Disabled state - when there's no leaderboard data
+.quiz-leaderboard-button-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+  
+  &:hover {
+    transform: none;
+    background: rgba($color-dark, 0.5);
+  }
+  
+  &.quiz-leaderboard-button-leaderboard {
+    border-color: rgba($color-warning, 0.1);
+  }
+  
+  &.quiz-leaderboard-button-final {
+    border-color: rgba($color-positive, 0.1);
+  }
 }
 
 // ========================================
@@ -540,18 +589,6 @@
   position: absolute;
   bottom: aspect-width(-1);
   pointer-events: all;
-}
-
-.quiz-waiting {
-  margin-top: aspect-width(1);
-  color: rgba($color-brightest, 0.7);
-  font-size: aspect-width(1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: aspect-width(0.5);
-  text-shadow: 
-    0 aspect-width(0.1) aspect-width(0.3) rgba(0,0,0,0.8);
 }
 
 
@@ -1366,50 +1403,6 @@
   pointer-events: auto;
 }
 
-// ========================================
-// MESSAGE BAR
-// ========================================
-
-.quiz-message-bar {
-  position: absolute;
-  bottom: aspect-height(42);
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: aspect-width(1);
-  align-items: center;
-  justify-content: center;
-  z-index: 20;
-  pointer-events: none;
-}
-
-.quiz-message-error {
-  color: $color-negative;
-  font-size: aspect-width(1.1);
-  font-weight: 600;
-  padding: aspect-width(0.8) aspect-width(1.5);
-  background: rgba($color-darkest, 0.9);
-  border: aspect-width(0.15) solid rgba($color-negative, 0.6);
-  border-radius: aspect-width(0.5);
-  text-shadow: 
-    0 aspect-width(0.1) aspect-width(0.3) rgba(0,0,0,0.9);
-  box-shadow: 
-    0 aspect-width(0.3) aspect-width(0.8) rgba(0,0,0,0.6);
-}
-
-.quiz-message-success {
-  color: $color-positive;
-  font-size: aspect-width(1.1);
-  font-weight: 600;
-  padding: aspect-width(0.8) aspect-width(1.5);
-  background: rgba($color-darkest, 0.9);
-  border: aspect-width(0.15) solid rgba($color-positive, 0.6);
-  border-radius: aspect-width(0.5);
-  text-shadow: 
-    0 aspect-width(0.1) aspect-width(0.3) rgba(0,0,0,0.9);
-  box-shadow: 
-    0 aspect-width(0.3) aspect-width(0.8) rgba(0,0,0,0.6);
-}
 
 // ========================================
 // ANIMATIONS

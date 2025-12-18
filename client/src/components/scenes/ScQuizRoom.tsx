@@ -199,13 +199,13 @@ export default function ScQuizRoom() {
   //----------------
   useEffect(() => {
     (_currentScene as InteractibleScene)?.setShowHoverDescription(false);
-    (_currentScene as InteractibleScene)?.setClickable(!isQuizNotStarted && !shouldShowWinner && !isInfoPanelOpen && !(isPartyClosed && questionId === 0));
+    (_currentScene as InteractibleScene)?.setClickable(!isQuizNotStarted && !shouldShowWinner && !isInfoPanelOpen && questionId !== 0);
 
     return () => {
       (_currentScene as InteractibleScene)?.setShowHoverDescription(true);
       (_currentScene as InteractibleScene)?.setClickable(true);
     }
-  }, [_currentScene, isQuizNotStarted, shouldShowWinner, isInfoPanelOpen, isPartyClosed, questionId]);
+  }, [_currentScene, isQuizNotStarted, shouldShowWinner, isInfoPanelOpen, questionId]);
 
   useEffect(() => {
     if (hoveredItem === "cumberlord") {
@@ -244,7 +244,7 @@ export default function ScQuizRoom() {
   // Leaderboard handling
   //------------------
   useEffect(() => {
-    if (hasWinner && isViewingActiveQuestion && leaderboards.length > 0) {
+    if (isClosed && isViewingActiveQuestion && leaderboards.length > 0 && !isPartyClosed) {
       toggleLeaderboard(true);
     }
   }, [hasWinner, isViewingActiveQuestion, leaderboards.length]);
@@ -259,7 +259,7 @@ export default function ScQuizRoom() {
     if (show) {
       leaderboardTimerRef.current = setTimeout(() => {
         setIsLeaderboardOpen(false);
-      }, 5000);
+      }, 10000);
     }
   }, [setIsLeaderboardOpen]);
 
@@ -286,8 +286,8 @@ export default function ScQuizRoom() {
     if (!quizName) return "No Quiz Selected";
     if (!partyId) return `Quiz "${quizName}" not found`;
     
-    // PRIORITY 1: If quiz ended but viewing a question, show ultimate winner
-    if (isPartyClosed && questionId == 0 && leaderboards.length > 0) {
+    // PRIORITY 1: If viewing leaderboard (questionId === 0), show current leader
+    if (questionId === 0 && leaderboards.length > 0) {
       return `${leaderboards[0].name}`;
     }
     
@@ -355,9 +355,13 @@ export default function ScQuizRoom() {
       return `Cannot find a quiz party named "${quizName}". Check the name and try again.`;
     }
     
-    // Quiz ended message
-    if (isPartyClosed && questionId === 0) {
-      return partyDescription || "The quiz has concluded! Check out the final standings.";
+    // Leaderboard message
+    if (questionId === 0) {
+      if (isPartyClosed) {
+        return partyDescription || "The quiz has concluded! Check out the final standings.";
+      } else {
+        return partyDescription || "Current leaderboard standings. The quiz is still in progress.";
+      }
     }
     
     if (isQuizNotStarted) {
@@ -399,7 +403,7 @@ export default function ScQuizRoom() {
       />
 
       {/* Main board */}
-      <div className={`quiz-board ${isPartyClosed && questionId === 0 ? 'quiz-board-champion' : ''}`}>
+      <div className={`quiz-board ${questionId === 0 && !isQuizNotStarted ? 'quiz-board-champion' : ''}`}>
         <div className="quiz-board-backdrop" />
         <div className="quiz-board-body">
           {isViewingClosedNonActiveQuestion && questionId !== 0 && (
@@ -412,13 +416,15 @@ export default function ScQuizRoom() {
             />
           )}
 
-          {((shouldShowWinner && questionId !== 0) || (isPartyClosed && questionId === 0)) && (
+          {((shouldShowWinner && questionId !== 0) || (questionId === 0 && !isQuizNotStarted)) && (
             <div className="quiz-winner-title">
-              {questionId === 0 ? "Quiz Champion:" : `Question ${questionId} Winner:`}
+              {questionId === 0 
+                ? (isPartyClosed ? "Quiz Champion:" : "Current Leader:")
+                : `Question ${questionId} Winner:`}
             </div>
           )}
 
-          {isPartyClosed && questionId === 0 && leaderboards.length > 0 ? (
+          {questionId === 0 && leaderboards.length > 0 ? (
             <div className="quiz-champion-display">
               <div className="quiz-champion-row">
                 <div className="quiz-champion-ribbon-container">
@@ -474,8 +480,8 @@ export default function ScQuizRoom() {
           errorMessage={errorMessage}
         />
       ) : (
-        // Runners-up podium (positions 2-5)
-        isPartyClosed && (
+        // Runners-up podium (positions 2-5) - show when viewing leaderboard (questionId === 0)
+        questionId === 0 && leaderboards.length > 0 && (
           <div className="quiz-runners-up">
             <div className="quiz-runners-up-gradient" />
             <div className="quiz-runners-up-grid">
@@ -497,7 +503,9 @@ export default function ScQuizRoom() {
                     </div>
                     <div className="quiz-runners-up-name" title={player?.name || ''}>
                       <span className="quiz-runners-up-name-text">
-                        {player?.name || `No player finished ${rank === 2 ? '2nd' : rank === 3 ? '3rd' : `${rank}th`}`}
+                        {player?.name || (isPartyClosed 
+                          ? `No player finished ${rank === 2 ? '2nd' : rank === 3 ? '3rd' : `${rank}th`}`
+                          : `No player in ${rank === 2 ? '2nd' : rank === 3 ? '3rd' : `${rank}th`} position`)}
                       </span>
                     </div>
                     {player && (

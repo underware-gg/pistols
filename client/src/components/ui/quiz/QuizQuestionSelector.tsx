@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 import { emitter } from "/src/three/game";
-import { useQuizParty, useActiveQuizQuestionsByParty, useQuizQuestion } from "/src/stores/quizStore";
+import { useQuizParty, useActiveQuizQuestionsByParty, useQuizQuestion, useQuizPartyLeaderboards } from "/src/stores/quizStore";
 
 interface QuizQuestionItemProps {
   partyId: number;
@@ -70,37 +70,39 @@ const QuizQuestionItem: React.FC<QuizQuestionItemProps> = ({
 
 interface FinalResultsCardProps {
   isSelected: boolean;
+  isPartyClosed: boolean;
+  hasLeaderboardData: boolean;
   onSelect: () => void;
 }
 
 const FinalResultsCard: React.FC<FinalResultsCardProps> = ({
   isSelected,
+  isPartyClosed,
+  hasLeaderboardData,
   onSelect,
 }) => {
-  const itemRef = useRef<HTMLButtonElement>(null);
-
-  // Auto-scroll to this item when it becomes selected
-  useEffect(() => {
-    if (isSelected && itemRef.current) {
-      itemRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-      });
+  const handleClick = () => {
+    if (hasLeaderboardData) {
+      onSelect();
     }
-  }, [isSelected]);
+  };
 
   return (
     <button
-      ref={itemRef}
-      className={`quiz-question-item quiz-question-item-final ${
-        isSelected ? "quiz-question-item-selected" : ""
+      className={`quiz-leaderboard-button ${
+        isPartyClosed ? "quiz-leaderboard-button-final" : "quiz-leaderboard-button-leaderboard"
+      } ${
+        isSelected ? "quiz-leaderboard-button-selected" : ""
+      } ${
+        !hasLeaderboardData ? "quiz-leaderboard-button-disabled" : ""
       }`}
-      onClick={onSelect}
+      onClick={handleClick}
+      disabled={!hasLeaderboardData}
       data-question-id="final"
-      aria-label="View final results"
+      aria-label={isPartyClosed ? "View final results" : "View leaderboard"}
     >
-      <span className="quiz-question-number quiz-question-number-final">
-        Final Results
+      <span className="quiz-leaderboard-button-text">
+        {isPartyClosed ? "Final Score" : "Leaderboard"}
       </span>
     </button>
   );
@@ -127,6 +129,7 @@ export const QuizQuestionSelector = ({
 }: QuizQuestionSelectorProps) => {
   const { partyName, description: partyDescription, isPartyClosed } = useQuizParty(partyId);
   const { activeQuestionIds } = useActiveQuizQuestionsByParty(partyId);
+  const { leaderboards } = useQuizPartyLeaderboards(partyId);
 
   // Compute activeQuestionId from activeQuestionIds
   const activeQuestionId = useMemo(() => {
@@ -209,13 +212,17 @@ export const QuizQuestionSelector = ({
                 onSelect={onQuestionSelect}
               />
             ))}
-            {isPartyClosed && (
-              <FinalResultsCard
-                isSelected={questionId === 0}
-                onSelect={() => onQuestionSelect(0)}
-              />
-            )}
           </div>
+        )}
+        
+        {/* Leaderboard/Final Score button - always visible when there are questions or party is closed */}
+        {(activeQuestionIds.length > 0 || isPartyClosed) && (
+          <FinalResultsCard
+            isSelected={questionId === 0}
+            isPartyClosed={isPartyClosed}
+            hasLeaderboardData={leaderboards.length > 0}
+            onSelect={() => onQuestionSelect(0)}
+          />
         )}
       </div>
 
