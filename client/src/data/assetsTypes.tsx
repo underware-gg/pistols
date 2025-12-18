@@ -357,7 +357,6 @@ enum UIImagesName {
 type TextureAttributes = {
   path: string;
   groups: GroupName[];
-  version: number;
 };
 
 type AssetKey = TextureName | UIImagesName
@@ -512,7 +511,6 @@ interface ProfileCollectionAsset {
   path: string;
   totalCount: number;
   groups: GroupName[];
-  version: number;
 }
 
 type Spritesheets = {
