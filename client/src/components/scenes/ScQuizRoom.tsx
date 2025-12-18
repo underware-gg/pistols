@@ -54,7 +54,8 @@ export default function ScQuizRoom() {
   
   const questionListRef = useRef<HTMLDivElement>(null);
   const [selectedQuestionId, setSelectedQuestionId] = useState<number | null>(null);
-
+  
+  const previousActiveQuestionIdRef = useRef<number>(0);
   const activeQuestionId = useMemo(() => {
     if (!partyId) return 0;
     return activeQuestionIds[activeQuestionIds.length - 1] ?? 0;
@@ -93,10 +94,20 @@ export default function ScQuizRoom() {
   }, [partyTimestampStart, clientTimestamp]);
 
   useEffect(() => {
-    if (isPartyClosed && selectedQuestionId === null) {
+    if (isPartyClosed) {
       setSelectedQuestionId(0);
     }
-  }, [isPartyClosed, selectedQuestionId]);
+  }, [isPartyClosed]);
+
+  const { isOpen: activeQuestionIsOpen } = useQuizQuestion(partyId, activeQuestionId);
+  useEffect(() => {
+    if (activeQuestionId > 0 && activeQuestionIsOpen && activeQuestionId !== previousActiveQuestionIdRef.current && !isPartyClose) {
+      setSelectedQuestionId(activeQuestionId);
+      previousActiveQuestionIdRef.current = activeQuestionId;
+    } else if (activeQuestionId !== previousActiveQuestionIdRef.current) {
+      previousActiveQuestionIdRef.current = activeQuestionId;
+    }
+  }, [activeQuestionId, activeQuestionIsOpen, isPartyClosed]);
 
   const hasTriggeredConfetti = useRef(false);
   useEffect(() => {
@@ -243,12 +254,6 @@ export default function ScQuizRoom() {
   //------------------
   // Leaderboard handling
   //------------------
-  useEffect(() => {
-    if (isClosed && isViewingActiveQuestion && leaderboards.length > 0 && !isPartyClosed) {
-      toggleLeaderboard(true);
-    }
-  }, [hasWinner, isViewingActiveQuestion, leaderboards.length]);
-  
   const toggleLeaderboard = useCallback((show: boolean) => {
     if (leaderboardTimerRef.current) {
       clearTimeout(leaderboardTimerRef.current);
@@ -261,7 +266,13 @@ export default function ScQuizRoom() {
         setIsLeaderboardOpen(false);
       }, 10000);
     }
-  }, [setIsLeaderboardOpen]);
+  }, []);
+
+  useEffect(() => {
+    if (isClosed && isViewingActiveQuestion && leaderboards.length > 0 && !isPartyClosed) {
+      toggleLeaderboard(true);
+    }
+  }, [isClosed, isViewingActiveQuestion, leaderboards.length, isPartyClosed, toggleLeaderboard]);
 
   //------------------
   //Board handling
