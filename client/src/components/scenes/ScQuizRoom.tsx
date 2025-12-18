@@ -93,16 +93,20 @@ export default function ScQuizRoom() {
     }
   }, [partyTimestampStart, clientTimestamp]);
 
+  const { isOpen: activeQuestionIsOpen } = useQuizQuestion(partyId, activeQuestionId);
   useEffect(() => {
     if (isPartyClosed) {
       setSelectedQuestionId(0);
+      if (isLeaderboardOpen) {
+        toggleLeaderboard(false, true);
+      }
     }
-  }, [isPartyClosed]);
 
-  const { isOpen: activeQuestionIsOpen } = useQuizQuestion(partyId, activeQuestionId);
-  useEffect(() => {
-    if (activeQuestionId > 0 && activeQuestionIsOpen && activeQuestionId !== previousActiveQuestionIdRef.current && !isPartyClose) {
+    if (activeQuestionId > 0 && activeQuestionIsOpen && activeQuestionId !== previousActiveQuestionIdRef.current && !isPartyClosed) {
       setSelectedQuestionId(activeQuestionId);
+      if (isLeaderboardOpen) {
+        toggleLeaderboard(false, true);
+      }
       previousActiveQuestionIdRef.current = activeQuestionId;
     } else if (activeQuestionId !== previousActiveQuestionIdRef.current) {
       previousActiveQuestionIdRef.current = activeQuestionId;
@@ -254,12 +258,16 @@ export default function ScQuizRoom() {
   //------------------
   // Leaderboard handling
   //------------------
-  const toggleLeaderboard = useCallback((show: boolean) => {
+  const toggleLeaderboard = useCallback((show: boolean, userClicked: boolean = false) => {
     if (leaderboardTimerRef.current) {
       clearTimeout(leaderboardTimerRef.current);
     }
-
+    
     setIsLeaderboardOpen(show);
+    
+    if (userClicked) {
+      return;
+    }
 
     if (show) {
       leaderboardTimerRef.current = setTimeout(() => {
@@ -476,7 +484,7 @@ export default function ScQuizRoom() {
         partyId={partyId}
         isPartyClosed={isPartyClosed}
         isLeaderboardOpen={isLeaderboardOpen}
-        onToggleLeaderboard={() => toggleLeaderboard(!isLeaderboardOpen)}
+        onToggleLeaderboard={() => toggleLeaderboard(!isLeaderboardOpen, true)}
       />
 
       {questionId !== 0 ? (
