@@ -15,6 +15,7 @@ import { useHasClaimedRing } from '/src/hooks/usePistolsContractCalls'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import TavernRingsModal from '../modals/TavernRingsModal'
 import { ExclamationIndicator } from '../ui/ExclamationIndicator'
+import TavernQuizInviteChecker from './TavernQuizInviteChecker'
 
 // TEMP cheat to stop the rings popup from showing multiple times in a session
 let hasShownInThisSession = false
@@ -61,6 +62,7 @@ export default function ScTavern() {
     <div>
       <NotificationExclamation />
       <TavernRingsChecker />
+      <TavernQuizInviteChecker />
       
       <BarkeepModal />
 
