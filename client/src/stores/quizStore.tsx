@@ -181,6 +181,23 @@ export const useQuizAnswers = (partyId: number, questionId: number) => {
   }
 }
 
+export const useQuizPartyUniquePlayers = (partyId: number) => {
+  const entities = useQuizStore((state) => state.entities);
+  const models = useAllStoreModels<models.QuizAnswer>(entities, 'QuizAnswer')
+  const uniquePlayers = useMemo(() => {
+    const playerSet = new Set<string>()
+    models
+      .filter((model) => Number(model?.party_id ?? 0) === partyId)
+      .forEach((model) => {
+        playerSet.add(model.player_address.toString())
+      })
+    return playerSet.size
+  }, [models, partyId])
+  return {
+    uniquePlayers
+  }
+}
+
 
 //--------------------------------
 // Leaderboards

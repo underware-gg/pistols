@@ -18,6 +18,8 @@ enum SceneName {
   DuelsBoard = "Your Duels",
   Leaderboards = "Leaderboards",
   Graveyard = "Graveyard",
+  Backrooms = "Backrooms",
+  QuizRoomList = "QuizRoomList",
   QuizRoom = "QuizRoom",
 
   Tournament = "Tournament",
@@ -147,6 +149,11 @@ enum TextureName {
   bg_quizroom = "bg_quizroom",
   bg_quizroom_cumberlord = "bg_quizroom_cumberlord",
   bg_quizroom_cumberlord_mask = "bg_quizroom_cumberlord_mask",
+  bg_quiz_entry = "bg_quiz_entry",
+  
+  bg_back_room = "bg_back_room",
+  bg_back_room_crypt_mask = "bg_back_room_crypt_mask",
+  bg_back_room_quiz_door_mask = "bg_back_room_quiz_door_mask",
 }
 
 enum UIImagesName {
@@ -350,7 +357,6 @@ enum UIImagesName {
 type TextureAttributes = {
   path: string;
   groups: GroupName[];
-  version: number;
 };
 
 type AssetKey = TextureName | UIImagesName
@@ -369,6 +375,7 @@ enum GroupName {
   Matchmaking,
   DuelsBoard,
   Graveyard,
+  Backrooms,
   Leaderboards,
   Quiz,
   Profile,
@@ -504,7 +511,6 @@ interface ProfileCollectionAsset {
   path: string;
   totalCount: number;
   groups: GroupName[];
-  version: number;
 }
 
 type Spritesheets = {

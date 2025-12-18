@@ -84,47 +84,38 @@ const AnswerCard = ({
   return (
     <button
       className={`quiz-answer ${stateClasses}`}
-      onClick={() => onAnswerClick(choice) }
+      onClick={() => onAnswerClick(choice)}
       disabled={selectionLocked || !isConnected}
       aria-label={`Answer ${getAnswerLetter(index)}: ${option}`}
     >
       <div className="quiz-answer-letter-box">
-        <div className="quiz-answer-letter">
-          {getAnswerLetter(index)}
-        </div>
+        <div className="quiz-answer-letter">{getAnswerLetter(index)}</div>
         {answerNumber > 0 && (
-          <div className="quiz-answer-percentage">
-            {percentage}%
-          </div>
+          <div className="quiz-answer-percentage">{percentage}%</div>
         )}
       </div>
       <div className="quiz-answer-text">
-        {option || `Option ${choice}`}
+        {option.slice(1, -1) || `Option ${choice}`}
       </div>
       {isPlayerCorrect && (
-        <div className="quiz-answer-icon quiz-answer-icon-correct">
-          ✓
-        </div>
+        <div className="quiz-answer-icon quiz-answer-icon-correct">✓</div>
       )}
       {isPlayerWrong && (
-        <div className="quiz-answer-icon quiz-answer-icon-wrong">
-          ✗
-        </div>
+        <div className="quiz-answer-icon quiz-answer-icon-wrong">✗</div>
       )}
       {showRewardChip && (
-        <div 
+        <div
           className={`quiz-reward-chip ${
-            showRewardChip.type === 'Error' ? 'quiz-reward-chip-error' : 
-            showRewardChip.type === 'Success' ? 'quiz-reward-chip-success' : ''
+            showRewardChip.type === "Error"
+              ? "quiz-reward-chip-error"
+              : showRewardChip.type === "Success"
+              ? "quiz-reward-chip-success"
+              : ""
           }`}
           aria-label={showRewardChip.type}
         >
-          <span className="quiz-reward-chip-label">
-            {showRewardChip.type}
-          </span>
-          <span className="quiz-reward-chip-value">
-            {showRewardChip.value}
-          </span>
+          <span className="quiz-reward-chip-label">{showRewardChip.type}</span>
+          <span className="quiz-reward-chip-value">{showRewardChip.value}</span>
         </div>
       )}
     </button>

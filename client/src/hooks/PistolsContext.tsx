@@ -626,6 +626,8 @@ export const sceneRoutes: Record<SceneName, SceneRoute> = {
   [SceneName.DuelsBoard]: { baseUrl: '/duels', title: 'Pistols - Your Duels' },
   [SceneName.Leaderboards]: { baseUrl: '/leaderboards', title: 'Pistols - Leaderboards' },
   [SceneName.Graveyard]: { baseUrl: '/graveyard', title: 'Pistols - Past Duels' },
+  [SceneName.Backrooms]: { baseUrl: '/backrooms', title: 'Pistols - Backrooms' },
+  [SceneName.QuizRoomList]: { baseUrl: '/quizdoor', title: 'Pistols - Quiz Door' },
   [SceneName.QuizRoom]: { baseUrl: '/quizroom', hasQuizId: true, title: 'Pistols - Quiz Room' },
   [SceneName.Tournament]: { baseUrl: '/__tournament__', title: 'Pistols - Tournament' },
   [SceneName.IRLTournament]: { baseUrl: '/__irltournament__', title: 'Pistols - IRL Tournament' },
@@ -747,6 +749,8 @@ export const usePistolsScene = () => {
     atDuelsBoard: (currentScene == SceneName.DuelsBoard),
     atLeaderboards: (currentScene == SceneName.Leaderboards),
     atGraveyard: (currentScene == SceneName.Graveyard),
+    atBackrooms: (currentScene == SceneName.Backrooms),
+    atQuizRoomList: (currentScene == SceneName.QuizRoomList),
     atQuizRoom: (currentScene == SceneName.QuizRoom),
     atDuel: (currentScene == SceneName.Duel || currentScene == SceneName.TutorialDuel),
     atTutorial: tutorialScenes.includes(currentScene as typeof tutorialScenes[number]),
@@ -779,9 +783,25 @@ export const usePistolsSceneFromRoute = () => {
   useEffect(() => {
     // console.log(`ROUTE  >>>>>`, location, location.pathname, params)
     if (location.pathname) {
-      const newScene = Object.keys(sceneRoutes).find(key => {
-        return location.pathname.startsWith(sceneRoutes[key].baseUrl)
-      }) as SceneName
+      const normalizedPath = (location.pathname.endsWith('/') && location.pathname.length > 1)
+        ? location.pathname.slice(0, -1)
+        : location.pathname
+      const quizSlug = params['quiz_name']
+
+      const matchingScenes = (Object.keys(sceneRoutes) as SceneName[])
+        .filter((key) => normalizedPath.startsWith(sceneRoutes[key].baseUrl))
+        .sort((a, b) => sceneRoutes[b].baseUrl.length - sceneRoutes[a].baseUrl.length)
+
+      const newScene = matchingScenes.find((key) => {
+        const route = sceneRoutes[key]
+        if (route.hasQuizId) {
+          return Boolean(quizSlug)
+        }
+        if (route.baseUrl === sceneRoutes[SceneName.QuizRoom].baseUrl && quizSlug) {
+          return false
+        }
+        return true
+      })
       if (newScene && newScene != currentScene) {
         const route = sceneRoutes[newScene]
         if (route.baseUrl != currentScene) {
