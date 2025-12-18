@@ -277,7 +277,9 @@ export const useFetchAllQuiz = () => {
     []
   );
 
-  const enabled = mounted && !quizFetchStore.fetched;
+  // TEMP: load all quizzes
+  // const enabled = mounted && !quizFetchStore.fetched;
+  const enabled = false;
 
   useSdkEntitiesGet({
     query,
