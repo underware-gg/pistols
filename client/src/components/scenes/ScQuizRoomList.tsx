@@ -18,6 +18,8 @@ import { _currentScene } from '/src/three/game'
 import { InteractibleScene } from '/src/three/InteractibleScene'
 import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
 import { AudioName, AUDIO_ASSETS } from '/src/data/audioAssets'
+import { usePlayer } from '/src/stores/playerStore'
+import { useAccount } from '@starknet-react/core'
 
 type QuizPartyListItem = {
   id: number
@@ -27,6 +29,8 @@ type QuizPartyListItem = {
   timestampEnd: number
   questionCount: number
 }
+
+const FILTERED_QUIZ_IDS = [1]
 
 const slugifyQuizName = (name: string) => name.toLowerCase().replaceAll(' ', '')
 
@@ -181,6 +185,8 @@ export default function ScQuizRoomList() {
   const { dispatchSetScene } = usePistolsScene()
   const { clientTimestamp } = useClientTimestamp({ autoUpdate: true, updateSeconds: 10 })
   const { gameImpl } = useThreeJsContext()
+  const { address } = useAccount()
+  const { name, isAdmin, isTeamMember } = usePlayer(address);
 
   useEffect(() => {
     const scene = _currentScene as Partial<InteractibleScene> | null
@@ -237,7 +243,11 @@ export default function ScQuizRoomList() {
         timestampEnd: Number(party.timestamps.end ?? 0),
         questionCount: Number(party.quiz_question_count ?? 0),
       }))
-      .filter((party) => party.id > 0)
+      .filter((party) => {
+        if (party.id <= 0) return false
+        if (isAdmin || isTeamMember) return true
+        return !FILTERED_QUIZ_IDS.includes(party.id)
+      })
   ), [parties])
 
   // Get all question models to check active questions
