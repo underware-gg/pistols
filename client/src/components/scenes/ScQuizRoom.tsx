@@ -26,6 +26,7 @@ import { usePistolsContext } from "/src/hooks/PistolsContext";
 import { QuizQuestionSelector } from "../ui/quiz/QuizQuestionSelector";
 import { QuizLeaderboard } from "../ui/quiz/QuizLeaderboard";
 import { QuizAnswerGrid } from "../ui/quiz/QuizAnswerGrid";
+import { ConnectButton } from "/src/components/scenes/ScDoor";
 import { _currentScene, emitter } from "/src/three/game";
 import { InteractibleScene } from "/src/three/InteractibleScene";
 import { formatTimestampDeltaCountdown } from "@underware/pistols-sdk/utils";
@@ -488,16 +489,28 @@ export default function ScQuizRoom() {
       />
 
       {questionId !== 0 ? (
-        <QuizAnswerGrid
-          partyId={partyId}
-          questionId={questionId}
-          selectedAnswer={selectedAnswer}
-          isSubmitting={isSubmitting}
-          isWaitingForIndexer={isWaitingForIndexer}
-          onAnswerClick={handleAnswerClick}
-          successMessage={successMessage}
-          errorMessage={errorMessage}
-        />
+        <div className="quiz-answers-container">
+          <QuizAnswerGrid
+            partyId={partyId}
+            questionId={questionId}
+            selectedAnswer={selectedAnswer}
+            isSubmitting={isSubmitting}
+            isWaitingForIndexer={isWaitingForIndexer}
+            onAnswerClick={handleAnswerClick}
+            successMessage={successMessage}
+            errorMessage={errorMessage}
+          />
+          {!isConnected && isOpen && options.length > 0 && (
+            <div className="quiz-answers-overlay">
+              <div className="quiz-connect-prompt">
+                <ConnectButton
+                  label="Connect to answer"
+                  large
+                />
+              </div>
+            </div>
+          )}
+        </div>
       ) : (
         // Runners-up podium (positions 2-5) - show when viewing leaderboard (questionId === 0)
         questionId === 0 && leaderboards.length > 0 && (
@@ -552,18 +565,6 @@ export default function ScQuizRoom() {
         </div>
       )}
 
-      {/* Connection prompt */}
-      {!isConnected && isOpen && options.length > 0 && (
-        <div className="quiz-connect-prompt">
-          <ActionButton
-            label="Connect wallet to answer"
-            important
-            onClick={() => connectOpener?.open()}
-            disabled={false}
-            large
-          />
-        </div>
-      )}
 
     </>
   );

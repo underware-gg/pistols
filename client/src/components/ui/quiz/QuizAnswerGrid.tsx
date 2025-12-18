@@ -55,7 +55,7 @@ const AnswerCard = ({
   const isPlayerWrong = isClosed && isPlayerAnswer && answerNumber !== choice && answerNumber > 0;
   
   const isAnswerSubmitting = isSelected && (isSubmitting || isWaitingForIndexer);
-  const disabled = selectionLocked && !isPlayerAnswer;
+  const disabled = (selectionLocked && !isPlayerAnswer) || !isConnected;
 
   const playerWinner = !playerAddress || !winners || winners.length === 0 ? null : winners.find(winner => BigInt(winner.address) === BigInt(playerAddress));
 
@@ -84,10 +84,8 @@ const AnswerCard = ({
   return (
     <button
       className={`quiz-answer ${stateClasses}`}
-      onClick={() =>
-        !isConnected ? connectOpener?.open() : onAnswerClick(choice)
-      }
-      disabled={selectionLocked && isConnected}
+      onClick={() => onAnswerClick(choice) }
+      disabled={selectionLocked || !isConnected}
       aria-label={`Answer ${getAnswerLetter(index)}: ${option}`}
     >
       <div className="quiz-answer-letter-box">
