@@ -103,6 +103,7 @@ default = "pistols"
 # migration
 #
 [migration]
+manifest_abi_format = "per_contract"
 order_inits = []
 skip_contracts = [
   "pistols-lords_mock",
