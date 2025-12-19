@@ -182,6 +182,7 @@ export default function ScQuizRoom() {
     transactionCall: (partyIdArg, questionIdArg, answerNumberArg, key) =>
       community.answer_quiz_question(account, partyIdArg, questionIdArg, answerNumberArg, key),
     onComplete: onCompleteAnswer,
+    indexerCheck: playerAnswerNumber !== 0,
   });
 
   const hasAnswered = selectedAnswer > 0;
