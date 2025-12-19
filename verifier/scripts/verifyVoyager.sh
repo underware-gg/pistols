@@ -59,10 +59,13 @@ verify_contract "game" # verified 2025-11-04
 verify_contract "game_loop" # verified 2025-11-04
 verify_contract "tutorial" # verified 2025-11-04
 verify_contract "admin" # verified 2025-11-04
-# verify_contract "bank"
-# verify_contract "fame_coin" # verified 2025-11-04
-# verify_contract "fools_coin" # verified 2025-11-04
+verify_contract "fame_coin" # verified 2025-11-04
+verify_contract "fools_coin" # verified 2025-11-04
 verify_contract "duel_token" # verified 2025-11-04
-# verify_contract "duelist_token" # verified 2025-11-04
+verify_contract "duelist_token" # verified 2025-11-04
 verify_contract "pack_token" # verified 2025-11-04
-
+verify_contract "ring_token"
+verify_contract "bot_player"
+verify_contract "matchmaker"
+verify_contract "community"
+verify_contract "bank"
