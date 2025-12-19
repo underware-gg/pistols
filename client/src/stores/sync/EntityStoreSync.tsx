@@ -26,10 +26,6 @@ const _modelsGet = [
   "pistols-QuizConfig",
   "pistols-TokenConfig",
   "pistols-Pool",
-  // quiz
-  "pistols-QuizParty",
-  "pistols-QuizQuestion",
-  "pistols-QuizAnswer",
   // season
   "pistols-SeasonConfig",
   "pistols-Leaderboard",
