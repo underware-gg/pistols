@@ -30,7 +30,7 @@ type QuizPartyListItem = {
   questionCount: number
 }
 
-const FILTERED_QUIZ_IDS = [1]
+const FILTERED_QUIZ_IDS = [1, 3]
 
 const slugifyQuizName = (name: string) => name.toLowerCase().replaceAll(' ', '')
 
