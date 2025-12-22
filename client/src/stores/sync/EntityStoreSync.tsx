@@ -40,10 +40,6 @@ const _modelsGet = [
   "pistols-RingBalance",
   // off-chain signed messages
   "pistols-PlayerOnline",
-  // TEMP: load all quizzes
-  "pistols-QuizParty",
-  "pistols-QuizQuestion",
-  "pistols-QuizAnswer",
 ];
 
 //-------------------------
@@ -63,10 +59,9 @@ const _modelsSubscribed = [
   // Misc
   "pistols-Pack",
   "pistols-SeasonScoreboard",
-  // TEMP: load all quizzes
-  // "pistols-QuizParty",
-  // "pistols-QuizQuestion",
-  // "pistols-QuizAnswer",
+  "pistols-QuizParty",
+  "pistols-QuizQuestion",
+  "pistols-QuizAnswer",
 ];
 
 
