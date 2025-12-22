@@ -48,11 +48,13 @@ export const useQueryChallengeIdsForMatchmaking = (
     conditions.push(`(A.duel_type = "${duelType}")`);
 
     // filter to only include duel IDs that are in requiredDuelIds
-    conditions.push(
-      `A.duel_id in (${requiredDuelIds
-        .map((id) => `"${bigintToHex128(id)}"`)
-        .join(",")})`
-    );
+    if (requiredDuelIds.length > 0) {
+      conditions.push(
+        `A.duel_id in (${requiredDuelIds
+          .map((id) => `"${bigintToHex128(id)}"`)
+          .join(",")})`
+      );
+    }
 
     // build query
     let query = `select ${columns.join(", ")}`;
@@ -69,10 +71,12 @@ export const useQueryChallengeIdsForMatchmaking = (
     formatFn,
   });
 
+  const challengeIds = useMemo(() => data?.duelIds ?? [], [data?.duelIds]);
+
   // If no required duel IDs, return empty results immediately
   if (requiredDuelIds.length === 0) {
     return {
-      challengeIds: [],
+      challengeIds,
       totalCount: 0,
       isLoading: false,
       queryHash: 0n,
@@ -80,7 +84,7 @@ export const useQueryChallengeIdsForMatchmaking = (
   }
 
   return {
-    challengeIds: data?.duelIds ?? [],
+    challengeIds,
     totalCount: data?.totalCount ?? 0,
     isLoading,
     queryHash,
@@ -192,10 +196,13 @@ export const useQueryChallengeIds = (
     formatFn,
   });
 
+  // Stabilise the returned ids so dependent effects only run when data changes
+  const challengeIds = useMemo(() => data?.duelIds ?? [], [data?.duelIds])
+
   console.log('useQueryChallengeIds() DATA =>', data?.duelIds)
 
   // fetch only NEW duels (not already in the store)
-  useFetchChallengeIds(data?.duelIds ?? []);
+  useFetchChallengeIds(challengeIds);
 
   useEffect(() => console.log('CHALLENGE SQL QUERY:', query), [query])
   // useEffect(() => console.log('SQL CHALLENGE IDs:', isLoading, data), [isLoading, data])
@@ -204,7 +211,7 @@ export const useQueryChallengeIds = (
   const pageCount = useMemo(() => (pageSize > 0 ? Math.ceil(totalCount / pageSize) : 0), [totalCount, pageSize])
 
   return {
-    challengeIds: data?.duelIds ?? [],
+    challengeIds,
     totalCount,
     pageCount,
     isLoading,

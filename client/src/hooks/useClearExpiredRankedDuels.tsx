@@ -13,7 +13,7 @@ import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 
 export const useClearExpiredRankedDuels = (duelIds: BigNumberish[]) => {
   const { account, address } = useAccount()
-  const { game, community } = useDojoSystemCalls()
+  const { community } = useDojoSystemCalls()
   
   const { requiredDuelIds } = useCallToChallenges()
   const { seasonId: currentSeasonId } = useCurrentSeason()
@@ -23,7 +23,7 @@ export const useClearExpiredRankedDuels = (duelIds: BigNumberish[]) => {
   const clearedDuelIdsRef = useRef<Set<string>>(new Set())
 
   const duelsToClear = useMemo(() => {
-    if (!account || !game || !address || duelIds.length === 0) {
+    if (!account || !community || !address || duelIds.length === 0) {
       return []
     }
 
@@ -79,10 +79,10 @@ export const useClearExpiredRankedDuels = (duelIds: BigNumberish[]) => {
     })
 
     return toClear
-  }, [duelIds, account, game, address, entities, requiredDuelIds, currentSeasonId])
+  }, [duelIds, account, community, address, entities, requiredDuelIds, currentSeasonId])
 
   useEffect(() => {
-    if (duelsToClear.length === 0 || !account || !game) {
+    if (duelsToClear.length === 0 || !account || !community) {
       return
     }
 

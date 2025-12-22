@@ -561,9 +561,16 @@ export class ProgressDialogMesh {
     
     const name = this.element.querySelector('.dialog-duelist') as HTMLElement
     name.textContent = this.duelistName
-    name.dataset.contentlength = Math.floor(this.duelistName?.length / 10).toString()
     name.style.color = textColor
     name.style.textAlign = this.isLeft ? 'left' : 'right'
+    if (this.duelistName?.length <= 16) {
+      name.dataset.contentlength = "0";
+    } else if (this.duelistName?.length <= 25) {
+      name.dataset.contentlength = "2"
+    } else {
+      name.dataset.contentlength = "3" 
+    }
+    
     name.classList.remove('Left', 'Right')
     name.classList.add(this.isLeft ? 'Left' : 'Right')
 

@@ -23,7 +23,7 @@ export default function ScMatchmaking() {
   const { selectedMode, dispatchSetting } = useSettings()
   const { requeueDuelist, dispatchRequeueDuelist } = usePistolsContext()
   
-  const [matchmakingType, setMatchmakingType] = useState<constants.QueueId>(constants.QueueId.Unranked);
+  const [matchmakingType, setMatchmakingType] = useState<constants.QueueId>(selectedMode === 'ranked' ? constants.QueueId.Ranked : constants.QueueId.Unranked);
   const [showModeInfo, setShowModeInfo] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   
@@ -167,7 +167,7 @@ export default function ScMatchmaking() {
   }, [])
 
   const handleActionComplete = useCallback((status: boolean, duelistId: bigint, error: string | null) => {
-    setDuelistInAction({ duelistId, status, error, action: duelistInAction?.action })
+    setDuelistInAction(prev => ({ duelistId, status, error, action: prev?.action }))
   }, [])
 
   // Handle scene clicks
@@ -244,33 +244,31 @@ export default function ScMatchmaking() {
   ), [isAnimating, duelistInAction, handleActionStart, handleActionComplete, handleDuelistRemoved])
 
   const slowSlots = useMemo(() => {
-    return slowSlotsData.slice(currentPage * duelistsPerPage, (currentPage + 1) * duelistsPerPage).map(({ slotIndex, duelistId, duelId }) => {
-            return (
-              <div
-                key={slotIndex}
-                style={{ display: 'flex', justifyContent: 'center' }}
-              >
-                <DuelistMatchmakingSlot
-                  ref={instance => {
-                    if (instance) {
-                      slowSlotRefs.current.set(slotIndex, instance)
-                    } else {
-                      slowSlotRefs.current.delete(slotIndex)
-                    }
-                  }}
-                  matchmakingType={matchmakingType}
-                  queueMode={constants.QueueMode.Slow}
-                  duelistId={duelistId}
-                  duelId={duelId}
-                  width={DUELIST_CARD_WIDTH * 1.1}
-                  height={DUELIST_CARD_HEIGHT * 1.1}
-                  mouseDisabled={isAnimating || (duelistInAction && duelistInAction.status === null)}
-                  onDuelistPromoted={handlePromoteDuelist}
-                  onRequeueDuelist={handleRequeueDuelist}
-                />
-              </div>
-            )
-          })
+    return slowSlotsData.slice(currentPage * duelistsPerPage, (currentPage + 1) * duelistsPerPage).map(({ slotIndex, duelistId, duelId }) => (
+      <div
+        key={`${slotIndex}:${duelId?.toString() ?? 'none'}:${duelistId?.toString() ?? 'none'}`}
+        style={{ display: 'flex', justifyContent: 'center' }}
+      >
+        <DuelistMatchmakingSlot
+          ref={instance => {
+            if (instance) {
+              slowSlotRefs.current.set(slotIndex, instance)
+            } else {
+              slowSlotRefs.current.delete(slotIndex)
+            }
+          }}
+          matchmakingType={matchmakingType}
+          queueMode={constants.QueueMode.Slow}
+          duelistId={duelistId}
+          duelId={duelId}
+          width={DUELIST_CARD_WIDTH * 1.1}
+          height={DUELIST_CARD_HEIGHT * 1.1}
+          mouseDisabled={isAnimating || (duelistInAction && duelistInAction.status === null)}
+          onDuelistPromoted={handlePromoteDuelist}
+          onRequeueDuelist={handleRequeueDuelist}
+        />
+      </div>
+    ))
   }, [currentPage, duelistsPerPage, matchmakingType, isAnimating, duelistInAction, handlePromoteDuelist, handleRequeueDuelist, slowSlotsData])
   return (
     <>
@@ -535,13 +533,22 @@ export default function ScMatchmaking() {
           {slowSlots}
 
           <div
-            key={isRankedMode ? 'ranked-slot-container' : 'unranked-slot-container'}
+            key="ranked-slot-container"
             style={{ 
-              display: currentPage == totalPages - 1 ? 'flex' : 'none', 
+              display: (currentPage == totalPages - 1 && isRankedMode) ? 'flex' : 'none', 
               justifyContent: 'center' 
             }}
           >
-            {isRankedMode ? emptySlotRanked : emptySlotUnranked}
+            {emptySlotRanked}
+          </div>
+          <div
+            key="unranked-slot-container"
+            style={{ 
+              display: (currentPage == totalPages - 1 && !isRankedMode) ? 'flex' : 'none', 
+              justifyContent: 'center' 
+            }}
+          >
+            {emptySlotUnranked}
           </div>
 
           {/* Pagination Controls - Minimal and Flat */}
