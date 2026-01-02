@@ -1,24 +1,11 @@
 import { Manifest, getContractByName } from '@dojoengine/core'
 import { ChainId, getNetworkConfig, NetworkId } from './networks'
-import _pistols_manifest_dev from './manifests/manifest_dev.json'
+import pistols_manifest_dev from './manifests/manifest_dev.json'
 import pistols_manifest_slot from './manifests/manifest_slot.json'
 import pistols_manifest_staging from './manifests/manifest_staging.json'
-import _pistols_manifest_sepolia from './manifests/manifest_sepolia.json'
-import _pistols_manifest_mainnet from './manifests/manifest_mainnet.json'
+import pistols_manifest_sepolia from './manifests/manifest_sepolia.json'
+import pistols_manifest_mainnet from './manifests/manifest_mainnet.json'
 import { bigintToAddress } from 'src/utils/misc/types'
-
-const _convert_manifest = (manifest: any) => ({
-  ...manifest,
-  // world: { ...manifest.world, abi: manifest.abis },
-  // contracts: manifest.contracts.map((contract: any) => ({
-  //   ...contract,
-  //   abi: manifest.abis,
-  // })),
-})
-
-const pistols_manifest_dev = _convert_manifest(_pistols_manifest_dev);
-const pistols_manifest_sepolia = _convert_manifest(_pistols_manifest_sepolia);
-const pistols_manifest_mainnet = _convert_manifest(_pistols_manifest_mainnet);
 
 export const NAMESPACE = 'pistols'
 
