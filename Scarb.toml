@@ -12,7 +12,5 @@ edition = "2024_07"
 # Dojo profiles declaration
 #
 [profile.dev]
-[profile.slot]
-[profile.staging]
 [profile.sepolia]
 [profile.mainnet]
