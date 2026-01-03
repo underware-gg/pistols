@@ -32,23 +32,28 @@ export const contractPolicyDescriptions_pistols: ContractPolicyDescriptions = {
   },
   game_loop: {
     name: 'Game loop',
-    description: 'Game loop contract',
+    description: 'Game loop',
     // interfaces: ['IGameLoop'],
   },
   matchmaker: {
     name: 'Match Maker',
-    description: 'Match Maker contract',
+    description: 'Match Maker',
     interfaces: ['IMatchMakerPublic'],
   },
   community: {
     name: 'Community',
-    description: 'Community functions contract',
+    description: 'Community interface',
     interfaces: ['ICommunity'],
   },
   tutorial: {
     name: 'Tutorial',
-    description: 'Tutorial game contract',
+    description: 'Tutorial entry point',
     interfaces: ['ITutorial'],
+  },
+  bot_player: {
+    name: 'Bot player',
+    description: 'Bot player interface',
+    // interfaces: ['IBotPlayer'],
   },
   bank: {
     name: 'Bank',
@@ -57,7 +62,7 @@ export const contractPolicyDescriptions_pistols: ContractPolicyDescriptions = {
   },
   admin: {
     name: 'Admin',
-    description: 'Admin contract',
+    description: 'Admin interface',
     // interfaces: ['IAdmin'],
   },
   //

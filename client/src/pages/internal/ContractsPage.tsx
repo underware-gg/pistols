@@ -64,6 +64,7 @@ function Contracts() {
         <ContractRow name='bot_player' />
         <ContractRow name='matchmaker' foolsBalance />
         <ContractRow name='tutorial' />
+        <ContractRow name='community' />
         <ContractRow name='admin' />
         <ContractRow name='bank' lordsBalance fameBalance={true} />
       </Body>

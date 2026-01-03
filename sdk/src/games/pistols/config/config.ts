@@ -1,24 +1,9 @@
 import { Manifest, getContractByName } from '@dojoengine/core'
-import { ChainId, getNetworkConfig, NetworkId } from './networks'
-import _pistols_manifest_dev from './manifests/manifest_dev.json'
-import pistols_manifest_slot from './manifests/manifest_slot.json'
-import pistols_manifest_staging from './manifests/manifest_staging.json'
-import _pistols_manifest_sepolia from './manifests/manifest_sepolia.json'
-import _pistols_manifest_mainnet from './manifests/manifest_mainnet.json'
 import { bigintToAddress } from 'src/utils/misc/types'
-
-const _convert_manifest = (manifest: any) => ({
-  ...manifest,
-  // world: { ...manifest.world, abi: manifest.abis },
-  // contracts: manifest.contracts.map((contract: any) => ({
-  //   ...contract,
-  //   abi: manifest.abis,
-  // })),
-})
-
-const pistols_manifest_dev = _convert_manifest(_pistols_manifest_dev);
-const pistols_manifest_sepolia = _convert_manifest(_pistols_manifest_sepolia);
-const pistols_manifest_mainnet = _convert_manifest(_pistols_manifest_mainnet);
+import { ChainId, getNetworkConfig, NetworkId } from './networks'
+import pistols_manifest_dev from './manifests/manifest_dev.json'
+import pistols_manifest_sepolia from './manifests/manifest_sepolia.json'
+import pistols_manifest_mainnet from './manifests/manifest_mainnet.json'
 
 export const NAMESPACE = 'pistols'
 
@@ -33,14 +18,11 @@ export type DojoManifest = Manifest & any
 const manifests_per_network: Record<NetworkId, DojoManifest> = {
   [NetworkId.MAINNET]: pistols_manifest_mainnet as DojoManifest,
   [NetworkId.SEPOLIA]: pistols_manifest_sepolia as DojoManifest,
-  [NetworkId.STAGING]: pistols_manifest_staging as DojoManifest,
-  [NetworkId.KATANA_SLOT]: pistols_manifest_slot as DojoManifest,
   [NetworkId.KATANA_LOCAL]: pistols_manifest_dev as DojoManifest,
 }
 const manifests_per_chain: Record<ChainId, DojoManifest> = {
   [ChainId.SN_MAIN]: pistols_manifest_mainnet as DojoManifest,
   [ChainId.SN_SEPOLIA]: pistols_manifest_sepolia as DojoManifest,
-  [ChainId.KATANA_SLOT]: pistols_manifest_slot as DojoManifest,
   [ChainId.KATANA_LOCAL]: pistols_manifest_dev as DojoManifest,
 }
 

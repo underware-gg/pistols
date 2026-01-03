@@ -17,8 +17,6 @@ import { stringToFelt } from 'src/starknet/starknet'
 export enum NetworkId {
   MAINNET = 'MAINNET',
   SEPOLIA = 'SEPOLIA',
-  STAGING = 'STAGING',
-  KATANA_SLOT = 'KATANA_SLOT',
   KATANA_LOCAL = 'KATANA_LOCAL',
 }
 
@@ -28,7 +26,6 @@ export enum NetworkId {
 export enum ChainId {
   SN_MAIN = 'SN_MAIN',
   SN_SEPOLIA = 'SN_SEPOLIA',
-  KATANA_SLOT = 'WP_KATANA_SLOT',
   KATANA_LOCAL = 'KATANA_LOCAL',
 }
 
@@ -195,91 +192,9 @@ const localKatanaConfig: DojoNetworkConfig = {
 } as const
 
 
-//--------------------------------
-// Slot Katana
-//
-const katanaSlotConfig: DojoNetworkConfig = {
-  networkId: undefined, // derive from NETWORKS
-  chain: undefined,     // derive from this
-  chainId: ChainId.KATANA_SLOT,
-  name: 'Katana Slot',
-  clientUrl: undefined,
-  assetsServerUrl: 'https://assets.underware.gg',
-  slotName: 'pistols-slot',
-  rpcUrl: 'https://api.cartridge.gg/x/pistols-slot/katana',
-  toriiUrl: undefined,    // derive from slotName
-  graphqlUrl: undefined,  // derive from slotName
-  sqlUrl: undefined,      // derive from slotName
-  etherAddress: KATANA_ETH_CONTRACT_ADDRESS,
-  lordsFaucet: true,
-  lordsAddress: undefined,
-  vrfAddress: undefined,
-  strkAddress: undefined,
-  useRevealServer: false,
-  predeployedAccounts: [
-    {
-      name: 'Katana 1',
-      address: '0x13d9ee239f33fea4f8785b9e3870ade909e20a9599ae7cd62c1c292b73af1b7',
-      privateKey: '0x1c9053c053edf324aec366a34c6901b1095b07af69495bffec7d7fe21effb1b',
-      // active: true,
-    },
-    {
-      name: 'Katana 2',
-      address: '0x17cc6ca902ed4e8baa8463a7009ff18cc294fa85a94b4ce6ac30a9ebd6057c7',
-      privateKey: '0x14d6672dcb4b77ca36a887e9a11cd9d637d5012468175829e9c6e770c61642',
-      // active: true,
-    },
-    {
-      name: 'Katana 3',
-      address: '0x2af9427c5a277474c079a1283c880ee8a6f0f8fbf73ce969c08d88befec1bba',
-      privateKey: '0x1800000000300000180000000000030000000000003006001800006600',
-      active: true,
-    },
-    {
-      name: 'Katana 9',
-      address: '0x6677fe62ee39c7b07401f754138502bab7fac99d2d3c5d37df7d1c6fab10819',
-      privateKey: '0x3e3979c1ed728490308054fe357a9f49cf67f80f9721f44cc57235129e090f4',
-      active: true,
-    },
-  ],
-  connectorIds: [
-    supportedConnetorIds.PREDEPLOYED,
-  ],
-  // starknet Chain
-  nativeCurrency: ETH_KATANA,
-  explorers: WORLD_EXPLORER,
-} as const
-
-
 //-------------------------------
 // Starknet
 //
-
-const pistolsStagingConfig: DojoNetworkConfig = {
-  networkId: undefined, // derive from NETWORKS
-  chain: { ...sepolia },
-  chainId: ChainId.SN_SEPOLIA,
-  isTestnet: true,
-  name: 'Sepolia Staging',
-  clientUrl: 'https://stage.pistols.gg',
-  assetsServerUrl: 'https://assets.underware.gg',
-  slotName: 'pistols-staging',
-  rpcUrl: 'https://api.cartridge.gg/x/starknet/sepolia/rpc/v0_9',
-  toriiUrl: undefined,    // derive from slotName
-  graphqlUrl: undefined,  // derive from slotName
-  sqlUrl: undefined,      // derive from slotName
-  etherAddress: sepolia.nativeCurrency.address,
-  lordsFaucet: true,
-  // lordsFaucet: 'https://sepolia.voyager.online/contract/0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210#writeContract',
-  lordsAddress: '0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210',
-  vrfAddress: '0x051fea4450da9d6aee758bdeba88b2f665bcbf549d2c61421aa724e9ac0ced8f',
-  strkAddress: '0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d',
-  useRevealServer: true,
-  predeployedAccounts: [],
-  connectorIds: [
-    supportedConnetorIds.CONTROLLER,
-  ],
-} as const
 
 const snSepoliaConfig: DojoNetworkConfig = {
   networkId: undefined, // derive from NETWORKS
@@ -341,8 +256,6 @@ const snMainnetConfig: DojoNetworkConfig = {
 const NETWORKS: Record<NetworkId, DojoNetworkConfig> = {
   [NetworkId.MAINNET]: snMainnetConfig,
   [NetworkId.SEPOLIA]: snSepoliaConfig,
-  [NetworkId.STAGING]: pistolsStagingConfig,
-  [NetworkId.KATANA_SLOT]: katanaSlotConfig,
   [NetworkId.KATANA_LOCAL]: localKatanaConfig,
 }
 

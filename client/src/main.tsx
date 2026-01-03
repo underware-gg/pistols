@@ -7,21 +7,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router'
 import { SettingsProvider } from '/src/hooks/SettingsContext'
 import { PistolsProvider } from '/src/hooks/PistolsContext'
 import ErrorModal from '/src/components/modals/ErrorModal'
-import MainPage from '/src/pages/MainPage'
-import MaintenancePage from '/src/pages/MaintenancePage'
-import InternalPageIndex from '/src/pages/internal/InternalPageIndex'
-import AdminPage from '/src/pages/internal/AdminPage'
-import AirdropPage from '/src/pages/internal/AirdropPage'
-import PoolsPage from '/src/pages/internal/PoolsPage'
-import SeasonsPage from '/src/pages/internal/SeasonsPage'
-import PlayersPage from '/src/pages/internal/PlayersPage'
-import SnapshotPage from '/src/pages/internal/SnapshotPage'
-import ContractsPage from '/src/pages/internal/ContractsPage'
-import MatchmakingTestPage from './pages/internal/MatchmakingTestPage'
-import QuizTestPage from './pages/internal/QuizTestPage'
-import DuelDataPage from '/src/pages/DuelDataPage'
-import StatusPage from '/src/pages/StatusPage'
-import ErrorPage from '/src/pages/error/ErrorPage'
+// test pages
 import TestPageIndex from '/src/pages/tests/TestPageIndex'
 import ConnectTestPage from '/src/pages/tests/ConnectTestPage'
 import IconsTestPage from '/src/pages/tests/IconsTestPage'
@@ -32,6 +18,24 @@ import ProfilesTestPage from '/src/pages/tests/ProfilesTestPage'
 import TutorialTestPage from '/src/pages/tests/TutorialTestPage'
 import ChainSwitchPage from '/src/pages/tests/ChainSwitchPage'
 import SocialsTestPage from '/src/pages/tests/SocialsTestPage'
+// internal pages
+import InternalPageIndex from '/src/pages/internal/InternalPageIndex'
+import AdminPage from '/src/pages/internal/AdminPage'
+import AirdropPage from '/src/pages/internal/AirdropPage'
+import PoolsPage from '/src/pages/internal/PoolsPage'
+import SeasonsPage from '/src/pages/internal/SeasonsPage'
+import PlayersPage from '/src/pages/internal/PlayersPage'
+import SnapshotPage from '/src/pages/internal/SnapshotPage'
+import ContractsPageInternal from '/src/pages/internal/ContractsPage'
+import MatchmakingTestPage from '/src/pages/internal/MatchmakingTestPage'
+// mian pages
+import MainPage from '/src/pages/MainPage'
+import MaintenancePage from '/src/pages/MaintenancePage'
+import QuizTestPage from '/src/pages/internal/QuizTestPage'
+import DuelDataPage from '/src/pages/DuelDataPage'
+import StatusPage from '/src/pages/StatusPage'
+import ContractsPage from '/src/pages/ContractsPage'
+import ErrorPage from '/src/pages/error/ErrorPage'
 import * as ENV from '/src/utils/env'
 
 //
@@ -46,6 +50,7 @@ const router = createBrowserRouter(
       { path: '', element: <MaintenancePage /> },
       { path: '*', element: <MaintenancePage /> },
       { path: "status", element: <StatusPage /> },
+      { path: "contracts", element: <ContractsPage /> },
     ] : [
       { path: "", element: <MainPage /> },
       { path: "gate", element: <MainPage /> },
@@ -75,6 +80,7 @@ const router = createBrowserRouter(
       { path: "quizroom/:quiz_name", element: <MainPage /> },
       { path: "dueldata/:duel_id", element: <DuelDataPage /> },
       { path: "status", element: <StatusPage /> },
+      { path: "contracts", element: <ContractsPage /> },
     ],
     errorElement: <ErrorPage />,
   },
@@ -105,7 +111,7 @@ const router = createBrowserRouter(
       { path: "seasons", element: <SeasonsPage /> },
       { path: "players", element: <PlayersPage /> },
       { path: "snapshot", element: <SnapshotPage /> },
-      { path: "contracts", element: <ContractsPage /> },
+      { path: "contracts", element: <ContractsPageInternal /> },
       { path: "matchmaking", element: <MatchmakingTestPage /> },
       { path: "quiz", element: <QuizTestPage /> },
     ],
