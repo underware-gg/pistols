@@ -62,6 +62,9 @@ echo "--------------------------------------------------------------------------
 echo ">>> Copying manifest [$MANIFEST_FILE_PATH] to [$SDK_MANIFEST_PATH/]"
 mkdir -p $SDK_MANIFEST_PATH
 cp $MANIFEST_FILE_PATH $SDK_MANIFEST_PATH/
+# strip unnecessary nodes...
+jq '.models = []' $SDK_MANIFEST_FILE_PATH > manifest.json.tmp && mv manifest.json.tmp $SDK_MANIFEST_FILE_PATH
+jq '.events = []' $SDK_MANIFEST_FILE_PATH > manifest.json.tmp && mv manifest.json.tmp $SDK_MANIFEST_FILE_PATH
 echo "👍"
 
 #
