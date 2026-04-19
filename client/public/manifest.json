@@ -1,0 +1,39 @@
+{
+  "name": "Pistols at Dawn",
+  "short_name": "Pistols",
+  "description": "10 paces, one shot. Whether you are duelling for honour or vengeance, be sure to put the bastard in the dirt.",
+  "start_url": "/tavern",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "theme_color": "#4A2508",
+  "background_color": "#4A2508",
+  "scope": "/",
+  "id": "/",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    {
+      "src": "/icons/pwa/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/pwa/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/pwa/icon-maskable-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/pwa/icon-maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

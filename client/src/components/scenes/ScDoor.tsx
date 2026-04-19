@@ -335,7 +335,7 @@ export function ConnectButton({
             dispatchSetScene(SceneName.Tavern)
           }
         }, 1000)
-      } 
+      }
     } else {
       setLoading?.(false)
     }

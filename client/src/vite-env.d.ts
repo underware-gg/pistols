@@ -30,3 +30,14 @@ declare module '*.fs' {
   const content: string;
   export default content;
 }
+
+// PWA globals set by index.html
+interface Window {
+  __pwaIsMobile?: boolean
+  __pwaIsStandalone?: boolean
+}
+
+// iOS 13+ DeviceOrientationEvent permission API
+interface DeviceOrientationEvent {
+  requestPermission?: () => Promise<'granted' | 'denied' | 'default'>
+}

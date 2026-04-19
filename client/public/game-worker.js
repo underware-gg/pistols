@@ -197,10 +197,24 @@ function queueManifestRefresh(reason) {
   return loadManifest(reason);
 }
 
+// App shell URLs for offline PWA support
+const APP_SHELL_CACHE = 'pistols-app-shell';
+const APP_SHELL_URLS = [
+  '/',
+  '/images/logo/logo.svg',
+  '/images/logo/logo_text.svg',
+  '/images/scenes/splash/pistols_loading.png',
+];
+
 // Event handlers
 self.addEventListener('install', (event) => {
   console.log('🐙 Pistols Assets Service Worker installing...');
-  event.waitUntil(loadManifest().then(() => self.skipWaiting()));
+  event.waitUntil(
+    Promise.all([
+      loadManifest().catch(err => console.warn('⚠️ Manifest load failed during install (non-fatal):', err)),
+      caches.open(APP_SHELL_CACHE).then(cache => cache.addAll(APP_SHELL_URLS)).catch(err => console.warn('⚠️ App shell cache failed (non-fatal):', err)),
+    ]).then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener('activate', (event) => {
@@ -262,11 +276,27 @@ self.addEventListener('fetch', (event) => {
   if (reloadReason) {
     event.waitUntil(queueManifestRefresh(reloadReason));
   }
-  
+
+  // Offline navigation fallback for SPA routing
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request).catch(() =>
+        caches.match('/').then(cachedResponse => {
+          if (cachedResponse) return cachedResponse;
+          return new Response(
+            '<!DOCTYPE html><html><body style="background:#4A2508;color:#c8b6a8;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;font-family:serif"><div style="text-align:center"><h1>Pistols at Dawn</h1><p>You appear to be offline.</p><p>Please check your connection and reload.</p></div></body></html>',
+            { headers: { 'Content-Type': 'text/html' } }
+          );
+        })
+      )
+    );
+    return;
+  }
+
   if (request.method !== 'GET' || !shouldInterceptRequest(url)) {
     return;
   }
-  
+
   event.respondWith(handleAssetFetch(request));
 });
 

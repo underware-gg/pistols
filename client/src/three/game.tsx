@@ -1768,9 +1768,34 @@ export function updateInteractibeSceneSettings(sceneShiftEnabled: boolean, blurE
   // Save current settings
   _currentQualitySettings.sceneShiftEnabled = sceneShiftEnabled;
   _currentQualitySettings.blurEnabled = blurEnabled;
-  
+
   // Update the single static scene instance 🐙
   if (_staticScene instanceof InteractibleScene) {
     _staticScene.updateSettings(sceneShiftEnabled, blurEnabled)
+  }
+}
+
+export async function requestGyroPermission(): Promise<boolean> {
+  if (_staticScene instanceof InteractibleScene) {
+    return _staticScene.requestGyroPermission()
+  }
+  return false
+}
+
+export function enableGyro() {
+  if (_staticScene instanceof InteractibleScene) {
+    _staticScene.enableGyro()
+  }
+}
+
+export function disableGyro() {
+  if (_staticScene instanceof InteractibleScene) {
+    _staticScene.disableGyro()
+  }
+}
+
+export function calibrateGyro() {
+  if (_staticScene instanceof InteractibleScene) {
+    _staticScene.calibrateGyro()
   }
 }

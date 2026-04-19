@@ -4,6 +4,7 @@ import { usePistolsContext, usePistolsScene, usePistolsSceneFromRoute, useSyncRo
 import { useSetPageTitle } from '/src/hooks/useSetPageTitle'
 import { useEffectOnce } from '@underware/pistols-sdk/utils/hooks'
 import { useQuality } from '/src/hooks/useQuality'
+import { getDeviceInfo } from '/src/utils/deviceDetection'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { useCheckPendingTransactions } from '/src/stores/transactionStore'
 import { DojoStatus, emitter } from '@underware/pistols-sdk/dojo'
@@ -155,6 +156,29 @@ function MainUI() {
       qualityConfig.blurEnabled
     );
   }, [gameImpl, qualityConfig]);
+
+  // Auto-request gyroscope permission on first user interaction for mobile PWA
+  useEffect(() => {
+    if (!gameImpl) return
+
+    const deviceInfo = getDeviceInfo()
+    if (!deviceInfo.isMobilePWA) return
+
+    const handleFirstInteraction = async () => {
+      const granted = await gameImpl.requestGyroPermission()
+      if (granted) {
+        gameImpl.enableGyro()
+      }
+    }
+
+    document.addEventListener('click', handleFirstInteraction, { once: true })
+    document.addEventListener('touchstart', handleFirstInteraction, { once: true })
+
+    return () => {
+      document.removeEventListener('click', handleFirstInteraction)
+      document.removeEventListener('touchstart', handleFirstInteraction)
+    }
+  }, [gameImpl])
 
   const [currentScene, setCurrentScene] = useState<JSX.Element | null>(null);
   

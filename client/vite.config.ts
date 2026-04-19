@@ -26,6 +26,9 @@ export const config: UserConfig = {
       root: '/'
     }),
   ],
+  server: {
+    host: true,
+  },
   css: {
     preprocessorOptions: {
       scss: {

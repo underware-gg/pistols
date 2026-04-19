@@ -96,6 +96,25 @@ export class InteractibleScene extends THREE.Scene {
 
   private showHoverDescription: boolean = true
 
+  // Gyroscope input
+  private gyroEnabled: boolean = false
+  private gyroPermissionGranted: boolean = false
+  private gyroAvailable: boolean = false
+  private boundOnDeviceOrientation: ((e: DeviceOrientationEvent) => void) | null = null
+  private boundOnDeviceMotion: ((e: DeviceMotionEvent) => void) | null = null
+  private gyroFilterStrength: number = 0.4
+  private gyroCalX: number = 0
+  private gyroCalY: number = 0
+  private gyroCalibrated: boolean = false
+  private gyroCalibrationTimer: ReturnType<typeof setTimeout> | null = null
+  private gyroRafId: number | null = null
+  private gyroLastX: number = 0
+  private gyroLastY: number = 0
+  private gyroUsingOrientation: boolean = false
+  private readonly GYRO_AUTO_CALIBRATE_DELAY = 500
+  private readonly GYRO_X_DIVISOR = 40
+  private readonly GYRO_Y_DIVISOR = 30
+
   private boundOnMouseMove: (e: MouseEvent) => void;
   private boundOnMouseClick: (e: PointerEvent) => void;
   private boundOnResize: () => void;
@@ -403,6 +422,7 @@ export class InteractibleScene extends THREE.Scene {
   }
 
   public dispose() {
+    this.disableGyro();
     document.removeEventListener('mousemove', this.boundOnMouseMove, false);
     document.removeEventListener('click', this.boundOnMouseClick, false);
     window.removeEventListener('resize', this.boundOnResize, false);
@@ -489,8 +509,9 @@ export class InteractibleScene extends THREE.Scene {
     if (this.isClickable && this.sceneShiftEnabled) {
       // Update filtered mouse position continuously
       if (this.mouseScreenPos) {
-        this.filteredMouseScreenPos.x += (this.mouseScreenPos.x - this.filteredMouseScreenPos.x) * this.mouseFilterStrength
-        this.filteredMouseScreenPos.y += (this.mouseScreenPos.y - this.filteredMouseScreenPos.y) * this.mouseFilterStrength
+        const filterStrength = this.gyroEnabled ? this.gyroFilterStrength : this.mouseFilterStrength
+        this.filteredMouseScreenPos.x += (this.mouseScreenPos.x - this.filteredMouseScreenPos.x) * filterStrength
+        this.filteredMouseScreenPos.y += (this.mouseScreenPos.y - this.filteredMouseScreenPos.y) * filterStrength
       }
       
       this.calculateTextureShifts()
@@ -650,10 +671,158 @@ export class InteractibleScene extends THREE.Scene {
     }
   }
 
+  private getOrientationAngle(): number {
+    if (screen.orientation?.angle != null) return screen.orientation.angle
+    return (window as any).orientation ?? 0
+  }
+
+  private mapGyroToScreen(beta: number, gamma: number): { x: number, y: number } {
+    const angle = this.getOrientationAngle()
+
+    // In landscape the physical axes swap relative to screen axes.
+    // angle 90  = landscape-primary  (CCW rotation, home button right)
+    // angle 270 / -90 = landscape-secondary (CW rotation, home button left)
+    let x: number, y: number
+    if (angle === 90) {
+      x = beta / this.GYRO_X_DIVISOR
+      y = -gamma / this.GYRO_Y_DIVISOR
+    } else if (angle === 270 || angle === -90) {
+      x = -beta / this.GYRO_X_DIVISOR
+      y = gamma / this.GYRO_Y_DIVISOR
+    } else {
+      // portrait fallback
+      x = gamma / this.GYRO_X_DIVISOR
+      y = beta / this.GYRO_Y_DIVISOR
+    }
+
+    return { x, y }
+  }
+
+  private pushGyroValues = () => {
+    if (!this.gyroEnabled || !this.sceneShiftEnabled) {
+      this.gyroRafId = null
+      return
+    }
+    const x = clamp(-(this.gyroLastX - this.gyroCalX), -1, 1)
+    const y = clamp(this.gyroLastY - this.gyroCalY, -1, 1)
+    this.mouseScreenPos.set(x, y)
+    this.gyroRafId = null
+  }
+
+  private onDeviceOrientation(event: DeviceOrientationEvent) {
+    if (!this.gyroEnabled) return
+    const { beta, gamma } = event
+    if (beta === null || gamma === null) return
+    const mapped = this.mapGyroToScreen(beta, gamma)
+    this.gyroLastX = mapped.x
+    this.gyroLastY = mapped.y
+    if (this.gyroRafId === null) {
+      this.gyroRafId = requestAnimationFrame(this.pushGyroValues)
+    }
+  }
+
+  private onDeviceMotion(event: DeviceMotionEvent) {
+    if (!this.gyroEnabled) return
+    const b = event.rotationRate?.beta
+    const g = event.rotationRate?.gamma
+    if (b == null || g == null) return
+    const mapped = this.mapGyroToScreen(b, g)
+    this.gyroLastX = mapped.x
+    this.gyroLastY = mapped.y
+    if (this.gyroRafId === null) {
+      this.gyroRafId = requestAnimationFrame(this.pushGyroValues)
+    }
+  }
+
+  public async requestGyroPermission(): Promise<boolean> {
+    if (typeof window === 'undefined') {
+      this.gyroAvailable = false
+      return false
+    }
+
+    const DOE = window.DeviceOrientationEvent as any
+    if (DOE && typeof DOE.requestPermission === 'function') {
+      // iOS 13+ requires explicit permission
+      try {
+        const response = await DOE.requestPermission()
+        this.gyroPermissionGranted = response === 'granted'
+        this.gyroAvailable = this.gyroPermissionGranted
+        return this.gyroPermissionGranted
+      } catch (err) {
+        console.warn('Gyro permission request failed:', err)
+        this.gyroAvailable = false
+        return false
+      }
+    }
+
+    // Android / non-iOS: no permission needed
+    const hasAPIs = !!window.DeviceOrientationEvent || !!window.DeviceMotionEvent
+    this.gyroAvailable = hasAPIs
+    this.gyroPermissionGranted = hasAPIs
+    return hasAPIs
+  }
+
+  public calibrateGyro() {
+    this.gyroCalX = this.gyroLastX
+    this.gyroCalY = this.gyroLastY
+    this.gyroCalibrated = true
+  }
+
+  public enableGyro() {
+    if (!this.gyroAvailable || this.gyroEnabled) return
+    this.gyroEnabled = true
+    this.gyroCalibrated = false
+
+    this.boundOnDeviceOrientation = this.onDeviceOrientation.bind(this)
+    this.boundOnDeviceMotion = this.onDeviceMotion.bind(this)
+
+    // Try DeviceOrientation first
+    if (window.DeviceOrientationEvent) {
+      window.addEventListener('deviceorientation', this.boundOnDeviceOrientation, { passive: true })
+      this.gyroUsingOrientation = true
+    }
+    // Fallback to DeviceMotion
+    if (!this.gyroUsingOrientation && window.DeviceMotionEvent) {
+      window.addEventListener('devicemotion', this.boundOnDeviceMotion, { passive: true })
+    }
+
+    // Auto-calibrate after a short delay so the "resting" position becomes zero
+    this.gyroCalibrationTimer = setTimeout(() => {
+      this.calibrateGyro()
+      this.gyroCalibrationTimer = null
+    }, this.GYRO_AUTO_CALIBRATE_DELAY)
+  }
+
+  public disableGyro() {
+    this.gyroEnabled = false
+    if (this.gyroCalibrationTimer) {
+      clearTimeout(this.gyroCalibrationTimer)
+      this.gyroCalibrationTimer = null
+    }
+    if (this.gyroRafId !== null) {
+      cancelAnimationFrame(this.gyroRafId)
+      this.gyroRafId = null
+    }
+    if (this.boundOnDeviceOrientation) {
+      window.removeEventListener('deviceorientation', this.boundOnDeviceOrientation)
+      this.boundOnDeviceOrientation = null
+    }
+    if (this.boundOnDeviceMotion) {
+      window.removeEventListener('devicemotion', this.boundOnDeviceMotion)
+      this.boundOnDeviceMotion = null
+    }
+    this.gyroUsingOrientation = false
+  }
+
   public activate() {
     if (this.sceneData.backgrounds && this.sceneData.backgrounds.length > 0) {
       document.addEventListener('mousemove', this.boundOnMouseMove, false);
-    } 
+
+      // Auto-enable gyro if permission already granted
+      if (this.gyroAvailable && this.gyroPermissionGranted && this.sceneShiftEnabled) {
+        this.enableGyro()
+      }
+    }
     if (this.sceneData.items && this.sceneData.items.length > 0) {
       document.addEventListener('click', this.boundOnMouseClick, false);
     }
@@ -663,22 +832,23 @@ export class InteractibleScene extends THREE.Scene {
   public deactivate() {
     if (this.renderer) {
       this.renderer.setRenderTarget(null);
-      
+
       if (this.fbo_blur_background) {
         this.renderer.setRenderTarget(this.fbo_blur_background);
         this.renderer.clear();
       }
-      
+
       if (this.fbo_mask) {
         this.renderer.setRenderTarget(this.fbo_mask);
         this.renderer.clear();
       }
-      
+
       this.renderer.setRenderTarget(null);
       this.renderer.clear();
     }
     this.pickColor(0, 0, 0);
     this.pickedItem = null;
+    this.disableGyro();
     document.removeEventListener('mousemove', this.boundOnMouseMove, false);
     document.removeEventListener('click', this.boundOnMouseClick, false);
     window.removeEventListener('resize', this.boundOnResize, false);
@@ -780,6 +950,7 @@ export class InteractibleScene extends THREE.Scene {
     this.toggleBlur(false)
 
     if (!this.sceneShiftEnabled) {
+      this.disableGyro()
       this.layerShiftAmounts = this.sceneData.backgrounds.map(() => 0);
       this.maskShader.setUniformValue('uShiftAmountLayer', this.layerShiftAmounts);
       
@@ -804,6 +975,11 @@ export class InteractibleScene extends THREE.Scene {
             });
           }
         });
+      }
+    } else {
+      // Re-enable gyro if available and scene shift is re-enabled
+      if (this.gyroAvailable && this.gyroPermissionGranted) {
+        this.enableGyro()
       }
     }
   }

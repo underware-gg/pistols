@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { useSettings } from './SettingsContext'
 import { PCFShadowMap, PCFSoftShadowMap, BasicShadowMap, ShadowMapType } from 'three'
+import { getDeviceInfo } from '/src/utils/deviceDetection'
 
 // Quality presets
 export enum QualityPreset {
@@ -143,7 +144,22 @@ export const useQuality = () => {
   
   // Get the current quality configuration based on preset
   const qualityConfig = useMemo(() => {
-    return qualityConfigs[currentQualityPreset] || qualityConfigs[QualityPreset.High]
+    const deviceInfo = getDeviceInfo()
+
+    // Cap quality to Medium on mobile PWA for performance
+    let effectivePreset = currentQualityPreset
+    if (deviceInfo.isMobilePWA && effectivePreset === QualityPreset.High) {
+      effectivePreset = QualityPreset.Medium
+    }
+
+    const config = { ...(qualityConfigs[effectivePreset] || qualityConfigs[QualityPreset.High]) }
+
+    // Force blur disabled on mobile PWA installs
+    if (deviceInfo.isMobilePWA) {
+      config.blurEnabled = false
+    }
+
+    return config
   }, [currentQualityPreset])
   
   return {

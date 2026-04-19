@@ -16,8 +16,19 @@
 
   <title>Pistols at Dawn</title>
   <meta name="description" content="10 paces, one shot. Whether you are duelling for honour or vengeance, be sure to put the bastard in the dirt. Made with love by Underware.gg" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <link rel="icon" href="/favicon.ico" />
+
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#4A2508" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Pistols at Dawn" />
+  <link rel="apple-touch-icon" href="/icons/pwa/apple-touch-icon.png" />
+  <link rel="apple-touch-icon" sizes="120x120" href="/icons/pwa/apple-touch-icon-120x120.png" />
+  <link rel="apple-touch-icon" sizes="152x152" href="/icons/pwa/apple-touch-icon-152x152.png" />
+  <link rel="apple-touch-icon" sizes="167x167" href="/icons/pwa/apple-touch-icon-167x167.png" />
 
   <meta property="og:title" content="Pistols at Dawn" />
   <meta property="og:description" content="10 paces, one shot. Whether you are duelling for honour or vengeance, be sure to put the bastard in the dirt. Made with love by Underware.gg" />
@@ -47,6 +58,7 @@
       padding: 0;
       background: #4A2508;
     }
+
 
     #pre-loading-screen {
       position: fixed;
@@ -220,9 +232,17 @@
       z-index: 10;
     }
 
-    /* Instantly hide when loading is complete */
+    /* Hide logo text on installed PWA */
+    @media (display-mode: standalone), (display-mode: fullscreen) {
+      #pre-loading-logo .logo-text {
+        display: none;
+      }
+    }
+
+    /* Fade out when loading is complete (uses existing transition: opacity 0.3s) */
     #pre-loading-screen.loading-complete {
-      display: none;
+      opacity: 0;
+      pointer-events: none;
     }
 
     #pre-loading-text-maintenance {
@@ -259,10 +279,285 @@
     #pre-loading-screen.stuck #pre-loading-stuck-hint {
       display: block;
     }
+
+    /* ===== PWA Install Gate ===== */
+    #pwa-install-gate {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 99999;
+      background: #4A2508;
+      background-size: cover;
+      background-position: center;
+    }
+    #pwa-install-gate::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+    }
+    #pwa-install-gate.visible {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #pwa-gate-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 6vw;
+      width: 100%;
+      max-width: 500px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      max-height: 100vh;
+    }
+    /* Landscape: horizontal split */
+    @media screen and (orientation: landscape) {
+      #pwa-gate-content {
+        flex-direction: row;
+        align-items: center;
+        max-width: 900px;
+        padding: 3vh 4vw;
+        gap: 0;
+      }
+      #pwa-gate-left {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding-right: 3vw;
+      }
+      #pwa-gate-left .logo-image {
+        width: 12vh !important;
+        max-width: 100px !important;
+      }
+      #pwa-gate-left .logo-text {
+        width: 22vh !important;
+        max-width: 200px !important;
+        margin-top: 1.5vh !important;
+      }
+      #pwa-gate-title {
+        font-size: clamp(16px, 3vh, 24px) !important;
+        margin: 2vh 0 1vh 0 !important;
+      }
+      #pwa-gate-subtitle {
+        font-size: clamp(12px, 2vh, 16px) !important;
+        margin: 0 0 2vh 0 !important;
+      }
+      #pwa-gate-vdivider {
+        display: block !important;
+        width: 1px;
+        align-self: stretch;
+        background: rgba(200, 182, 168, 0.25);
+        flex-shrink: 0;
+      }
+      #pwa-gate-right {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding-left: 3vw;
+      }
+      .pwa-gate-step {
+        padding: clamp(8px, 1.5vh, 14px) !important;
+        margin-bottom: 1.5vh !important;
+        gap: 2vw !important;
+      }
+      .pwa-gate-step-num {
+        width: clamp(24px, 4vh, 32px) !important;
+        height: clamp(24px, 4vh, 32px) !important;
+        font-size: clamp(12px, 2vh, 16px) !important;
+      }
+      .pwa-gate-step-text {
+        font-size: clamp(12px, 2vh, 15px) !important;
+      }
+      .pwa-gate-btn {
+        padding: clamp(10px, 2vh, 14px) clamp(16px, 4vw, 32px) !important;
+        font-size: clamp(14px, 2.5vh, 18px) !important;
+      }
+      .pwa-gate-warning {
+        font-size: clamp(11px, 1.8vh, 14px) !important;
+        padding: clamp(8px, 1.5vh, 12px) !important;
+        margin-bottom: 1.5vh !important;
+      }
+      /* Hide horizontal divider in landscape — vertical divider is used instead */
+      .pwa-gate-hdivider { display: none !important; }
+    }
+    /* Portrait: vertical flow (default) */
+    #pwa-gate-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    #pwa-gate-vdivider { display: none; }
+    #pwa-gate-right {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    #pwa-gate-left .logo-image {
+      width: 30vw;
+      max-width: 160px;
+      height: auto;
+    }
+    #pwa-gate-left .logo-text {
+      width: 55vw;
+      max-width: 300px;
+      height: auto;
+      margin-top: 3vw;
+    }
+    #pwa-gate-title {
+      color: #efe1d7;
+      font-size: clamp(22px, 6vw, 32px);
+      font-weight: 700;
+      font-family: Georgia, 'Times New Roman', serif;
+      margin: 6vw 0 2vw 0;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+    #pwa-gate-subtitle {
+      color: #c8b6a8;
+      font-size: clamp(15px, 4vw, 20px);
+      font-family: Georgia, 'Times New Roman', serif;
+      line-height: 1.5;
+      margin: 0 0 4vw 0;
+    }
+    #pwa-gate-action {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .pwa-gate-step {
+      display: flex;
+      align-items: center;
+      gap: 3.5vw;
+      width: 100%;
+      text-align: left;
+      background: rgba(32, 26, 24, 0.7);
+      border-radius: 12px;
+      padding: clamp(12px, 3.5vw, 18px);
+      margin-bottom: 3vw;
+      border: 1px solid rgba(200, 182, 168, 0.15);
+      box-sizing: border-box;
+    }
+    .pwa-gate-step-num {
+      flex-shrink: 0;
+      width: clamp(28px, 8vw, 36px);
+      height: clamp(28px, 8vw, 36px);
+      border-radius: 50%;
+      background: #ef9758;
+      color: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: clamp(14px, 3.5vw, 18px);
+      font-family: Georgia, 'Times New Roman', serif;
+    }
+    .pwa-gate-step-text {
+      color: #c8b6a8;
+      font-size: clamp(14px, 3.8vw, 18px);
+      line-height: 1.5;
+      font-family: Georgia, 'Times New Roman', serif;
+    }
+    .pwa-gate-step-text strong {
+      color: #efe1d7;
+    }
+    .pwa-gate-btn {
+      background: #ef9758;
+      color: #000;
+      border: none;
+      border-radius: 10px;
+      padding: clamp(14px, 4vw, 18px) clamp(24px, 8vw, 48px);
+      font-size: clamp(16px, 4.5vw, 22px);
+      font-weight: 700;
+      font-family: Georgia, 'Times New Roman', serif;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      width: 100%;
+      max-width: 320px;
+      align-self: center;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .pwa-gate-btn:active {
+      transform: scale(0.97);
+      background: #ce6f2c;
+    }
+    .pwa-gate-btn:disabled {
+      background: #57493e;
+      color: rgba(239, 225, 215, 0.35);
+    }
+    .pwa-gate-warning {
+      color: #f1d242;
+      font-size: clamp(13px, 3.5vw, 16px);
+      font-family: Georgia, 'Times New Roman', serif;
+      padding: clamp(10px, 3vw, 14px);
+      background: rgba(241, 210, 66, 0.08);
+      border-radius: 10px;
+      border: 1px solid rgba(241, 210, 66, 0.2);
+      width: 100%;
+      text-align: center;
+      line-height: 1.5;
+      margin-bottom: 3vw;
+      box-sizing: border-box;
+    }
+    .pwa-gate-share-icon {
+      display: inline-block;
+      vertical-align: middle;
+      width: clamp(18px, 5vw, 24px);
+      height: clamp(18px, 5vw, 24px);
+    }
+    .pwa-gate-hdivider {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      margin: 4vw 0;
+      gap: 3vw;
+    }
+    .pwa-gate-hdivider::before,
+    .pwa-gate-hdivider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(200, 182, 168, 0.25);
+    }
+    .pwa-gate-hdivider-text {
+      color: #c8b6a8;
+      font-size: clamp(12px, 3vw, 14px);
+      font-family: Georgia, 'Times New Roman', serif;
+      white-space: nowrap;
+      opacity: 0.7;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
   </style>
 </head>
 
 <body>
+  <!-- PWA Install Gate — shown instantly on mobile before anything loads -->
+  <div id="pwa-install-gate">
+    <div id="pwa-gate-content">
+      <div id="pwa-gate-left">
+        <img src="/images/logo/logo.svg" alt="Pistols" class="logo-image" />
+        <img src="/images/logo/logo_text.svg" alt="at Dawn" class="logo-text" />
+        <div id="pwa-gate-title">Install Required</div>
+        <div id="pwa-gate-subtitle">Install the app to play.</div>
+        <div id="pwa-gate-action"></div>
+      </div>
+      <div id="pwa-gate-vdivider"></div>
+      <div id="pwa-gate-right">
+        <div id="pwa-gate-steps"></div>
+      </div>
+    </div>
+  </div>
+
   <div id="pre-loading-screen">
     <div id="pre-loading-content">
       <div id="pre-loading-logo">
@@ -289,6 +584,192 @@
   <div id="root"></div>
   
   <script>
+    // ===== PWA Install Gate Detection (runs FIRST, before anything else) =====
+    (function() {
+      var ua = navigator.userAgent || '';
+      var isIOS = /iPhone|iPod/.test(ua) || (/iPad/.test(ua)) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+      var isAndroid = /Android/.test(ua);
+      var isMobile = isIOS || isAndroid;
+      var isStandalone = window.matchMedia('(display-mode: standalone)').matches
+        || window.matchMedia('(display-mode: fullscreen)').matches
+        || (navigator.standalone === true);
+      var isInApp = /FBAN|FBAV|Instagram|Twitter|Line|Discord|Telegram/i.test(ua) || /wv\)/.test(ua);
+      var isSafari = /Safari/.test(ua) && !/Chrome/.test(ua) && !/CriOS/.test(ua) && !/FxiOS/.test(ua);
+      var isIPad = /iPad/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+
+      window.__pwaIsMobile = isMobile;
+      window.__pwaIsStandalone = isStandalone;
+
+      // Force landscape lock when running as installed PWA
+      if (isMobile && isStandalone) {
+        try {
+          var lockTarget = screen.orientation || screen.mozOrientation || screen.msOrientation;
+          if (lockTarget && lockTarget.lock) {
+            lockTarget.lock('landscape').catch(function() {});
+          } else if (screen.lockOrientation) {
+            screen.lockOrientation('landscape');
+          } else if (screen.mozLockOrientation) {
+            screen.mozLockOrientation('landscape');
+          } else if (screen.msLockOrientation) {
+            screen.msLockOrientation('landscape');
+          }
+        } catch(e) {}
+
+        // Watch for Cartridge controller popup — unlock orientation when it opens,
+        // re-lock to landscape when it closes. The controller creates div#controller
+        // on document.body and toggles display:none/flex.
+        (function() {
+          function lockLandscape() {
+            try { screen.orientation.lock('landscape').catch(function(){}); } catch(e) {}
+          }
+          function lockPortrait() {
+            try { screen.orientation.lock('portrait').catch(function(){}); } catch(e) {}
+          }
+
+          var controllerVisible = false;
+
+          function checkControllerVisibility(el) {
+            var isVisible = el && el.style.display !== 'none' && el.style.display !== '';
+            if (isVisible && !controllerVisible) {
+              controllerVisible = true;
+              lockPortrait();
+            } else if (!isVisible && controllerVisible) {
+              controllerVisible = false;
+              lockLandscape();
+            }
+          }
+
+          // Watch for #controller being added to body
+          var bodyObserver = new MutationObserver(function(mutations) {
+            for (var i = 0; i < mutations.length; i++) {
+              var added = mutations[i].addedNodes;
+              for (var j = 0; j < added.length; j++) {
+                if (added[j].id === 'controller') {
+                  var controllerEl = added[j];
+                  checkControllerVisibility(controllerEl);
+                  // Watch style changes on the controller element
+                  var styleObserver = new MutationObserver(function() {
+                    checkControllerVisibility(controllerEl);
+                  });
+                  styleObserver.observe(controllerEl, { attributes: true, attributeFilter: ['style'] });
+                }
+              }
+            }
+          });
+          bodyObserver.observe(document.body, { childList: true });
+        })();
+      }
+
+      if (isMobile && !isStandalone) {
+        // BLOCK: Show install gate, hide loading screen, prevent React from loading
+        var gate = document.getElementById('pwa-install-gate');
+        var loading = document.getElementById('pre-loading-screen');
+        var actionEl = document.getElementById('pwa-gate-action');
+        var stepsEl = document.getElementById('pwa-gate-steps');
+        if (gate) gate.classList.add('visible');
+        if (loading) loading.style.display = 'none';
+
+        // Load background image for gate
+        var bgImg = new Image();
+        bgImg.src = '/images/scenes/splash/pistols_loading.png';
+        bgImg.onload = function() { if (gate) gate.style.backgroundImage = "url('" + bgImg.src + "')"; };
+
+        // Remove the React module script so the game doesn't load
+        var mainScript = document.querySelector('script[type="module"][src="/src/main.tsx"]');
+        if (mainScript) mainScript.remove();
+
+        // Register service worker — required for PWA installability
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register('/game-worker.js', { scope: '/' });
+        }
+
+        // Build install steps based on platform
+        if (isInApp) {
+          actionEl.innerHTML =
+            '<div class="pwa-gate-warning">You\'re in an in-app browser. Open <strong>play.pistols.gg</strong> in your device\'s browser to install.</div>' +
+            '<button class="pwa-gate-btn" id="pwa-copy-btn">Copy URL to Clipboard</button>';
+          setupCopyBtn();
+        } else if (isIOS && !isSafari) {
+          // iOS but not Safari — can't install from here
+          var deviceName = isIPad ? 'iPad' : 'iPhone';
+          actionEl.innerHTML =
+            '<div class="pwa-gate-warning">On ' + deviceName + ', apps can only be installed from <strong>Safari</strong>.</div>' +
+            '<button class="pwa-gate-btn" id="pwa-copy-btn">Copy URL to Clipboard</button>';
+          stepsEl.innerHTML =
+            '<div class="pwa-gate-step"><div class="pwa-gate-step-num">1</div><div class="pwa-gate-step-text">Copy this URL: <strong>play.pistols.gg</strong></div></div>' +
+            '<div class="pwa-gate-step"><div class="pwa-gate-step-num">2</div><div class="pwa-gate-step-text">Open <strong>Safari</strong> and paste the URL</div></div>' +
+            '<div class="pwa-gate-step"><div class="pwa-gate-step-num">3</div><div class="pwa-gate-step-text">Follow the install instructions in Safari</div></div>';
+          setupCopyBtn();
+        } else if (isIOS) {
+          // iOS Safari — standard Add to Home Screen
+          stepsEl.innerHTML =
+            '<div class="pwa-gate-step"><div class="pwa-gate-step-num">1</div><div class="pwa-gate-step-text">Tap the <strong>Share</strong> button <svg class="pwa-gate-share-icon" viewBox="0 0 50 50" fill="none"><path d="M25 2L17 10H23V30H27V10H33L25 2Z" fill="#ef9758"/><path d="M40 18H32V22H38V44H12V22H18V18H10V48H40V18Z" fill="#ef9758"/></svg> at the bottom of your screen</div></div>' +
+            '<div class="pwa-gate-step"><div class="pwa-gate-step-num">2</div><div class="pwa-gate-step-text">Scroll down and tap <strong>"Add to Home Screen"</strong></div></div>' +
+            '<div class="pwa-gate-step"><div class="pwa-gate-step-num">3</div><div class="pwa-gate-step-text">Tap <strong>"Add"</strong> in the top right corner</div></div>' +
+            '<div class="pwa-gate-step"><div class="pwa-gate-step-num">4</div><div class="pwa-gate-step-text">Open <strong>Pistols at Dawn</strong> from your home screen</div></div>';
+        } else {
+          // Android — install button in left column, manual steps in right column
+          actionEl.innerHTML =
+            '<button class="pwa-gate-btn" id="pwa-install-btn" style="display:none;">Install Game</button>';
+          stepsEl.innerHTML =
+            '<div class="pwa-gate-hdivider" id="pwa-android-divider" style="display:none;"><span class="pwa-gate-hdivider-text">or install manually</span></div>' +
+            '<div class="pwa-gate-step"><div class="pwa-gate-step-num">1</div><div class="pwa-gate-step-text">Tap the <strong>menu icon</strong> (&#8942;) in your browser</div></div>' +
+            '<div class="pwa-gate-step"><div class="pwa-gate-step-num">2</div><div class="pwa-gate-step-text">Select <strong>"Install app"</strong> or <strong>"Add to Home screen"</strong></div></div>' +
+            '<div class="pwa-gate-step"><div class="pwa-gate-step-num">3</div><div class="pwa-gate-step-text">Open the app from your home screen</div></div>';
+
+          var installBtn = document.getElementById('pwa-install-btn');
+          var divider = document.getElementById('pwa-android-divider');
+          var deferredPrompt = null;
+
+          window.addEventListener('beforeinstallprompt', function(e) {
+            e.preventDefault();
+            deferredPrompt = e;
+            if (installBtn) installBtn.style.display = 'block';
+            if (divider) divider.style.display = 'flex';
+          });
+
+          if (installBtn) {
+            installBtn.addEventListener('click', function() {
+              if (!deferredPrompt) return;
+              deferredPrompt.prompt();
+              deferredPrompt.userChoice.then(function(result) {
+                deferredPrompt = null;
+                if (installBtn) installBtn.style.display = 'none';
+                if (divider) divider.style.display = 'none';
+              });
+            });
+          }
+
+          // Gate NEVER disappears — user must open from home screen
+        }
+
+        function setupCopyBtn() {
+          var copyBtn = document.getElementById('pwa-copy-btn');
+          if (!copyBtn) return;
+          copyBtn.addEventListener('click', function() {
+            var url = 'https://play.pistols.gg';
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(url).then(function() {
+                copyBtn.textContent = 'Copied!';
+                setTimeout(function() { copyBtn.textContent = 'Copy URL to Clipboard'; }, 2000);
+              });
+            } else {
+              var input = document.createElement('input');
+              input.value = url;
+              document.body.appendChild(input);
+              input.select();
+              document.execCommand('copy');
+              document.body.removeChild(input);
+              copyBtn.textContent = 'Copied!';
+              setTimeout(function() { copyBtn.textContent = 'Copy URL to Clipboard'; }, 2000);
+            }
+          });
+        }
+
+        return; // Stop here — don't run any loading logic
+      }
+    })();
+
     // Preload background image and only show when fully loaded
     (function() {
       const screen = document.getElementById('pre-loading-screen');
