@@ -33,6 +33,8 @@ docs/
 │   ├── plans/               # how we're going to build it (append-only)
 │   │   ├── README.md
 │   │   └── TEMPLATE.md
+│   ├── research/            # external/upstream investigations that inform designs
+│   │   └── README.md
 │   └── wip/                 # transient working state
 │       ├── README.md
 │       ├── STATUS.md
@@ -56,9 +58,10 @@ About the **process of building**.
 
 - **`design/`** — what we're building and why. Mutable but historicized. Numbered by topic group (e.g. `01-wire-protocol.md`), not chronology. Decisions tracked inline (`Open` / `Closed` sections); no separate ADRs.
 - **`plans/`** — how we're going to build it. Append-only. Numbered chronologically (`0001-*.md`); plan numbers don't change once assigned.
+- **`research/`** — external/upstream investigations that inform designs but don't themselves drive code. Snapshots at a point in time (e.g. an upstream-bug post-mortem, a competitor-protocol breakdown, a benchmarking report). Topic-named, no numeric prefix. Lighter frontmatter (`kind: research`, `date`); not subject to the design↔plan sync rule. Designs may cite research; research need not cite back.
 - **`wip/`** — transient working state: STATUS, CHANGELOG, TASKS.
 
-A design may be implemented by several plans; a plan may implement parts of several designs. Every design lists every plan that implements it; every plan lists every design it implements. Both ends must agree.
+A design may be implemented by several plans; a plan may implement parts of several designs. Every design lists every plan that implements it; every plan lists every design it implements. Both ends must agree. Research sits outside this graph — designs reference it the way they reference any external source.
 
 ### System (`docs/system/`)
 
@@ -139,9 +142,9 @@ Work on this branch (`torii-emulator`) is recorded as WIP commits. The branch is
 ### Per-commit rules
 
 - **Granular but complete.** A commit is a self-contained unit of work, kept as small as it can sensibly be. Don't bundle unrelated changes; don't split mid-thought changes.
-- **Bump the version.** Each commit increments the SEMVER version per the rules at the top of [`docs/shaping/wip/CHANGELOG.md`](./docs/shaping/wip/CHANGELOG.md).
-- **Append to changelog.** Each commit adds an entry to `docs/shaping/wip/CHANGELOG.md` describing what changed. Never edit historic entries.
-- **Update STATUS.md** if the commit changes design/plan status, ownership, or current focus.
+- **Update STATUS.md** if the commit changes design/plan/research status, ownership, or current focus, or adds a notable shaping change to the _Recently changed_ table.
+- **Code or `docs/system/` changes also:** bump the SEMVER version per the rules at the top of [`docs/shaping/wip/CHANGELOG.md`](./docs/shaping/wip/CHANGELOG.md) and append a changelog entry. Never edit historic changelog entries.
+- **Shaping-only and meta-only commits do not bump the version or touch the changelog.** Edits confined to `docs/shaping/`, `AGENTS.md`, `README.md`, `.gitignore`, and similar working/meta files are recorded in git history and (where notable) in `STATUS.md`'s _Recently changed_ section. The changelog is reserved for the as-built artifact.
 
 ### Pre-PR review
 
@@ -149,7 +152,7 @@ Before opening a PR to `main`, walk through every changed shaping and system doc
 1. Linked-side shaping documents are consistent (no stale references; status values match reality).
 2. System docs reflect what was actually built (`last-verified` and `version` updated where applicable).
 3. `docs/shaping/wip/STATUS.md` reflects current state.
-4. `docs/shaping/wip/CHANGELOG.md` entries accurately describe the changes and the final version is appropriate for the PR's overall scope.
+4. If the PR touches code or system docs, `docs/shaping/wip/CHANGELOG.md` entries accurately describe the changes and the final version is appropriate for the PR's overall scope. If the PR is shaping-only, the changelog should be untouched.
 
 ## Implementation conventions
 

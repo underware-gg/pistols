@@ -6,6 +6,7 @@ The process of building. Mutable but historicized — once a doc reaches a termi
 
 - **[`design/`](./design/)** — what we're building and why. Topic-numbered (mutable). Index lives in `design/README.md`.
 - **[`plans/`](./plans/)** — how we're going to build it. Chronologically numbered (append-only). Index lives in `plans/README.md`.
+- **[`research/`](./research/)** — external/upstream investigations that inform designs but don't drive code directly. Topic-named, point-in-time. Index lives in `research/README.md`.
 - **[`wip/`](./wip/)** — current working state: status, changelog, transient tasks.
 
 ## How shaping relates to the system
