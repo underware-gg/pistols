@@ -695,27 +695,7 @@ This is worth testing, but it is not the main theory:
 
 I consider this a lower-confidence hardening lever, not the main fix. It helps validate whether the reader is pulling an unexpected schema snapshot, but it does not address the selector-only versioning problem above.
 
-#### 6. If logging shows the failing enum is not `PlayerActivityEvent`
-
-This branch was not taken in the local replay. It is kept here as discarded contingency logic from the live investigation.
-
-If logging shows a different enum in a future case, stop optimizing around `PlayerActivityEvent` entirely and fix the schema/model that actually appears in the log.
-
-#### 7. If logging still points at `PlayerActivityEvent`
-
-This is the branch the local replay confirmed. Once logging still points at `PlayerActivityEvent`, the problem is no longer "Pistols forgot to publish variant 18". The two realistic explanations become:
-
-- torii is binding the wrong historical event schema version to the selector
-- or there is a higher-level enum-deserializer bug in `dojo_types`
-
-At that point the first validation step is to inspect torii's stored `models` row for `pistols-PlayerActivityEvent` while the replay is failing:
-
-- if `contract_address` / `class_hash` still point at the old pre-18 resource, torii's historical event-schema state is the issue
-- if they point at the upgraded resource and the schema JSON still lacks the option, the problem is deeper in schema persistence / deserialization
-
-If either of those checks confirms stale event-schema state, the torii versioning fix above becomes the first code change I would try before touching `dojo_types`.
-
-#### 8. Not recommended: generic "ignore unknown enum selector"
+#### 6. Not recommended: generic "ignore unknown enum selector"
 
 Do not apply a blanket parser patch that swallows unknown enum discriminants globally.
 
@@ -723,7 +703,7 @@ The reason is structural: once enum decoding accepts an unknown selector, torii 
 
 If a local workaround is needed, it should be narrow and model-specific.
 
-#### 9. Last-resort local workaround
+#### 7. Last-resort local workaround
 
 If we need to get a cold reindex through before the trigger bug is fixed upstream, a local torii patch could catch the exact logged deserialization failure and drop that historical event instead of rolling back the whole chunk.
 
@@ -883,11 +863,11 @@ And after those crossings:
 
 That is the local end-to-end confirmation that the current torii patch fixes the historical replay trigger and allows the missing schema upgrades to land.
 
-### Patched replay breakthrough: exact trigger captured
+### Patched replay: trigger captured and fix confirmed
 
-The patched local torii build has now captured the exact failing historical event in instrumented logs.
+#### Captured trigger (2026-04-30)
 
-At `2026-04-30T09:12:46Z`, `EventMessageProcessor` logged:
+The patched torii build with `EventMessageProcessor` instrumentation captured the exact failing historical event. At `2026-04-30T09:12:46Z`:
 
 ```text
 ERROR torii::indexer::processors::event_message:
@@ -903,7 +883,7 @@ ERROR torii::indexer::processors::event_message:
   error=InvalidEnumSelector { actual_selector: 18 }
 ```
 
-Immediately after that same replay window, torii logged:
+Immediately after, in the same replay window:
 
 ```text
 INFO  upgrade_event: Upgraded event. namespace=pistols name=PlayerActivityEvent
@@ -915,61 +895,40 @@ ERROR engine: Processing fetched data. error=Processors(TaskNetworkError(TaskErr
       PrimitiveError(InvalidEnumSelector { actual_selector: 18 }))))
 ```
 
-This is the clearest root-cause evidence gathered so far:
+So:
 
-- the failing processor is **definitively** `EventMessageProcessor`
-- the failing event is **definitively** `pistols-PlayerActivityEvent`
-- the failing selector is **definitively** `activity = 18`
-- the failing decode is using the **pre-upgrade** event resource contract `0x463f225e…`
-- in the same replay window, torii also processes the `PlayerActivityEvent` upgrade to the first `18`-capable resource `0x22c12429…` and the `Config` model upgrade
+- the failing processor is `EventMessageProcessor`
+- the failing event is `pistols-PlayerActivityEvent`
+- the failing discriminant is `activity = 18`
+- the failing decode used the pre-upgrade event resource contract `0x463f225e…`
+- the same replay window also processes the `PlayerActivityEvent` upgrade to the first `18`-capable resource `0x22c12429…` and the `Config` model upgrade
 
-So the confirmed failure chain is:
+#### Chain follow-up — same-player history in the same chunk
 
-1. torii reaches a historical `PlayerActivityEvent` payload whose `activity` discriminant is `18`
-2. it tries to decode that payload against the **older pre-18 resource schema**
-3. the same replay window also contains the `EventUpgraded(PlayerActivityEvent)` and `ModelUpgraded(Config)` events
-4. the deserialize failure aborts the chunk
-5. the rollback/cache bug then turns that trigger into the reported poisoned-DB state
-
-This also demotes the remaining ambiguity sharply. We no longer need to ask "is the failing path really `PlayerActivityEvent`?" or "is `18` really the `activity` enum?". Those two questions are now answered.
-
-Targeted chain follow-up narrows the torii-side mechanism further.
-
-- the failing payload timestamp `0x68d89396` decodes to **`2025-09-28 01:47:02 UTC`**
-- `starknet_getEvents` confirms that exact payload is the world `EventEmitted` at **block `2271871`**, tx `0x69d9c453…`
-- the same event's third key is system address `0x16f7e3c1…`, which resolves to **`pistols-matchmaker`**
+- the failing payload timestamp `0x68d89396` decodes to `2025-09-28 01:47:02 UTC`
+- `starknet_getEvents` confirms that exact payload is the world `EventEmitted` at block `2271871`, tx `0x69d9c453…`
+- the same event's third key is system address `0x16f7e3c1…`, which resolves to `pistols-matchmaker`
 - the same query also shows the same player (`0x550212d3…`) already had multiple earlier `PlayerActivityEvent`s in the same chunk at blocks `2268329`, `2268359`, `2268364`, `2268403`, `2268406`, `2268420`, `2268449`, `2269979`, and `2270482`
-- those earlier events all use pre-18 `activity` values (`7`, `10`, `11`, `13`, …), so they are compatible with the old schema and can create the historical event task before the upgrade is reached
+- those earlier events all use pre-18 `activity` values (`7`, `10`, `11`, `13`, …) compatible with the old schema, so they create the historical event task before the upgrade is reached
 
-That is the strongest current explanation for why torii is still on the old schema at block `2271871`: the task was created from earlier same-player events and the later `activity = 18` event was appended to it without acquiring the schema-upgrade dependency.
+The task is created from earlier same-player events; the later `activity = 18` event at block `2271871` is appended to that existing task without acquiring the `EventUpgraded(PlayerActivityEvent)` dependency, and runs against the old cached schema.
 
-### Patch confirmation: dependency merge + storage-backed rollback recovery
+#### Patch
 
-After the exact trigger was captured, the local torii checkout was patched in the direction the repro now points:
+Four changes to the local torii checkout:
 
-- preserve selector-upgrade dependencies when later historical events are appended to an already-existing task
-- keep unresolved dependencies in `TaskNetwork` until the prerequisite task is inserted
-- clear rollback-sensitive cache state (`models`, `balances_diff`) on chunk rollback
-- make replay processors reload model definitions from committed storage after rollback instead of crashing on an empty model cache
+- `TaskManager::add_parallelized_event_with_dependencies` merges newly discovered dependencies into an existing task instead of only appending the event
+- `TaskNetwork` retains unresolved dependencies and activates them once the prerequisite task is inserted, instead of dropping them as "non-existent"
+- engine rollback handling clears `models` and `balances_diff` cache state
+- processors read model definitions via `ctx.storage.model(...)` rather than `ctx.cache.model(...)`, so rollback-time cache clears can repopulate from committed sqlite instead of failing with `CacheError(ModelNotFound(...))`
 
-This is the first local patch that actually matches the current root-cause picture. It is broader than the original one-line `clear_models()` rollback fix, but still narrowly targeted at the two failure modes the repro has already shown:
+#### Validation (2026-05-01)
 
-1. the exact `PlayerActivityEvent.activity = 18` task/dependency bug
-2. the follow-on `CacheError(ModelNotFound(...))` caused by emptying model cache without a storage-backed recovery path
-
-Validation status:
-
-- the patch builds successfully (`cargo build -p torii`)
-- targeted `torii-task-network` tests pass after the dependency changes
-- the replay has now crossed Sepolia block `2271871` cleanly
-- schema state flipped from stale to upgraded in the DB itself, not just in logs
-- `PlayerActivityEvent` rows from the captured failing system continue to be stored after the former trigger point
-
-That is enough to treat the current torii patch as **locally confirmed**:
-
-1. the trigger bug is the missing dependency merge for existing historical event tasks
-2. the rollback bug still needs cache invalidation, but in practice that invalidation must be paired with storage-backed model reloads rather than a bare empty cache
-3. together, those changes get the Pistols Sepolia replay through the known failure window and land the missing schema changes
+- `cargo build -p torii` succeeds for the patched binary
+- `cargo test -p torii-task-network` passes, including new tests covering late-added dependencies and dependency merges into existing tasks
+- patched Sepolia cold replay from pre-critical head `2262908` crosses earlier same-player events (`2268329`), the schema upgrade (`2270724`), and the captured failing payload block (`2271871`)
+- after the crossing, `pistols-Config` gains `realms_address`, `pistols-PlayerActivityEvent` gains `EnlistedRankedDuelist`, the `activity_check` constraint now includes `EnlistedRankedDuelist`, and torii continues storing `PlayerActivityEvent` rows from `pistols-matchmaker` (`0x16f7e3c1…`) without `InvalidEnumSelector`
+- world head continued to `2273149`, then `2283390`, then `2293631` after the trigger window
 
 ## Repairing a poisoned DB
 
