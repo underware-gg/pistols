@@ -12,7 +12,9 @@ plans: []
 
 The Pistols client uses a small, well-defined subset of the [torii](https://github.com/dojoengine/torii) interface. Our server must speak exactly this subset at the wire level — no client code changes — but everything else can be omitted.
 
-Source-of-truth research is the v1.8.0 torii crate inventory and the Pistols client/SDK call-site inventory done 2026-04-30. The client pins `@dojoengine/{core,sdk,torii-client,utils}@1.8.0` (see `../../../../sdk/package.json` and `../../../../pnpm-workspace.yaml`).
+We pin against torii **v1.8.0** (the version the Pistols SDK pins via `@dojoengine/{core,sdk,torii-client,utils}@1.8.0`; see `../../../../sdk/package.json` and `../../../../pnpm-workspace.yaml`). Wire-format internals (proto definitions, gRPC server impl, sqlite migrations, CORS handling) should be verified against the upstream torii repo at [https://github.com/dojoengine/torii](https://github.com/dojoengine/torii) — read code there, or via a local clone if you have one (see `AGENTS.local.md`).
+
+Source-of-truth research is the v1.8.0 torii crate inventory and the Pistols client/SDK call-site inventory done 2026-04-30.
 
 ## Goals
 
@@ -56,9 +58,9 @@ All other RPCs (`RetrieveTransactions`, `SubscribeTransactions`, `RetrieveContro
 
 ### Wire-format invariants
 
-These will bite if missed:
+These will bite if missed. Verify against the upstream torii source when implementing.
 
-- **gRPC-Web with proper trailers** (`grpc-status`, `grpc-message`). Must use `tonic` + `tonic-web`; vanilla `tonic` won't work for browsers.
+- **gRPC-Web with proper trailers** (`grpc-status`, `grpc-message`). Must use `tonic` + `tonic-web`; vanilla `tonic` won't work for browsers. (See torii's `crates/server/src/proxy.rs`.)
 - **CORS** must echo `application/grpc-web+proto`, `x-grpc-web`, `x-grpc-timeout`, `x-user-agent`, etc. and expose `grpc-status`, `grpc-message`, `grpc-status-details-bin`, `grpc-encoding`. (See torii's `proxy.rs:51-71`.)
 - **Felt encoding**: 32-byte big-endian on the wire; `0x`-prefixed lowercase 64-nybble hex in SQL columns.
 - **Tag format**: `namespace-Model` (single hyphen, e.g. `pistols-Challenge`), used both as `Query.models[]` entries and as quoted SQLite table names.

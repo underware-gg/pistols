@@ -2,11 +2,21 @@
 
 This is the canonical agent-instructions file for the `torii-emulator` subproject. `CLAUDE.md` and `AGENT.md` in this directory are symlinks to this file — edit only this file.
 
+For machine-specific overrides (local clone paths, env-specific notes), see [`AGENTS.local.md`](./AGENTS.local.md) — gitignored, present only on developer machines.
+
 ## Project context
 
 `torii-emulator` is a Rust server that re-implements the subset of the [torii](https://github.com/dojoengine/torii) indexer wire interface used by the Pistols client, so the game can run while torii itself is being refactored upstream. See [`README.md`](./README.md) for the overview, [`docs/`](./docs/) for all documentation, and [`docs/shaping/wip/STATUS.md`](./docs/shaping/wip/STATUS.md) for current state at a glance.
 
-The wider Pistols repository this lives in is a Starknet/Dojo game. The Cairo contracts at `../dojo/` and the TypeScript SDK at `../sdk/` are load-bearing context for any wire-format or data-model decision — read those before designing details that touch them.
+## External references
+
+Code and documentation outside this subproject that agents will need to consult:
+
+- **Upstream torii**: [https://github.com/dojoengine/torii](https://github.com/dojoengine/torii). Wire-format internals, sqlite migrations, crate boundaries. We pin against torii **v1.8.0** (the version the Pistols SDK pins). If a local clone is available, see `AGENTS.local.md` for the path and prefer reading code locally.
+- **Pistols Cairo contracts**: `../dojo/src/` — the world's models, systems, and events. Source of truth for the data model.
+- **Pistols TypeScript SDK**: `../sdk/src/` — wraps torii on the client side. Read to understand exact call shapes the emulator must serve.
+- **Pistols client**: `../client/src/` — the consumer. SQL queries, subscription patterns, and Cartridge Controller wiring all live here.
+- **Pistols manifests**: `../manifest_mainnet.json`, `../manifest_sepolia.json`, `../manifest_dev.json` — deployed world addresses, contract addresses, model selectors.
 
 ## Documentation structure
 
@@ -19,10 +29,10 @@ docs/
 │   ├── README.md
 │   ├── design/              # what we're building & why
 │   │   ├── README.md
-│   │   └── 00-template.md
+│   │   └── TEMPLATE.md
 │   ├── plans/               # how we're going to build it (append-only)
 │   │   ├── README.md
-│   │   └── 0000-template.md
+│   │   └── TEMPLATE.md
 │   └── wip/                 # transient working state
 │       ├── README.md
 │       ├── STATUS.md
@@ -38,7 +48,7 @@ docs/
     # ops/ added later, when there's something to operate
 ```
 
-Every folder has a `README.md` as its "start here" entry.
+Every folder has a `README.md` as its "start here" entry. Templates use the all-caps `TEMPLATE.md` name (no number prefix) so they're not confused with real numbered docs.
 
 ### Shaping (`docs/shaping/`)
 

@@ -10,7 +10,7 @@ What we're building and why. Mutable but historicized.
 - Once `status` is `implemented` or `deprecated`, the doc is frozen. To change shipped behavior, supersede with a new design and link it here.
 - Each design lists the plans that implement it. Plans link back. Both ends must agree.
 
-Use [`00-template.md`](./00-template.md) as the starting point for a new design.
+Use [`TEMPLATE.md`](./TEMPLATE.md) as the starting point for a new design.
 
 ## Index
 

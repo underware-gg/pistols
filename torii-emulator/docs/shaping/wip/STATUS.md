@@ -4,7 +4,7 @@ Snapshot of design and plan state. Updated as part of any commit that changes de
 
 ## Current focus
 
-Initial designs drafted. Next step is to review and promote them from `draft` to `shaping`, decompose into plans (starting with Plan 0001 for the Phase 0 spike), and resolve the highest-stakes open decision: VRF on private katana ([`05-onchain-boundary`](../design/05-onchain-boundary.md)).
+Initial designs drafted and tightened around the chosen architecture (private katana + slim indexer). A review pass is pending — open question on whether to reconsider toward a fully-offchain emulator (no katana) before promoting designs out of `draft`. Awaiting the upstream torii bug-investigation report; once delivered, integrate its findings into [`00-overview`](../design/00-overview.md) and [`04-state-seeding`](../design/04-state-seeding.md).
 
 ## Designs
 
@@ -29,4 +29,5 @@ _None yet._
 
 | Date | What | Where |
 |------|------|-------|
+| 2026-04-30 | Tightened designs around chosen architecture; renamed templates; introduced `AGENTS.local.md`; switched torii refs to GitHub URL (0.1.1) | `AGENTS*.md`, `docs/shaping/`, `.gitignore` |
 | 2026-04-30 | Subproject scaffolded with docs structure and initial design drafts (0.1.0) | `torii-emulator/` |

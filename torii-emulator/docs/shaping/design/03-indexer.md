@@ -45,7 +45,14 @@ Each gRPC subscription has a filter (entity model + clauses, or event topic). Th
 
 ### Reusing torii crates
 
-The torii repo's `crates/sqlite/sqlite/`, `crates/grpc/server/`, and proto definitions may be importable as libraries. If usable, we save weeks. Worth investigating before writing fresh.
+Investigate the upstream torii crates as candidate libraries (read at [https://github.com/dojoengine/torii](https://github.com/dojoengine/torii) or via a local clone — see `AGENTS.local.md`), in priority order:
+
+- `crates/proto/` — gRPC service definitions and message types. Almost certainly directly importable.
+- `crates/grpc/server/` — server skeleton. Could save weeks if usable.
+- `crates/sqlite/sqlite/` — schema and query helpers.
+- `crates/migrations/` — read for reference; we don't import the migration runner (deliberately, see [`02-data-model`](./02-data-model.md)).
+
+A first-pass investigation is required before committing to "write from scratch" or "import wholesale". This is one of the open decisions in [`00-overview`](./00-overview.md).
 
 ## Decisions
 

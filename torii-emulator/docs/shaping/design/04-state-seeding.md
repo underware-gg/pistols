@@ -14,6 +14,8 @@ Pistols has 6+ months of mainnet game history: live duelists, leaderboards, ring
 
 This design covers how we seed the private katana from current mainnet state so existing players retain continuity.
 
+**Note on data freshness**: the upstream torii bug (post-v1.7 schema-upgrade skip) means a torii sqlite dump's freshness varies by model. Models that haven't gained new fields since v1.7 may still be tracked correctly; models that have been upgraded since then will have stale or missing data in any torii dump. Direct mainnet RPC reads (`getStorageAt`) are authoritative regardless. The bug-investigation report (in progress) will help quantify which Pistols models are still trackable via a torii dump vs. which require direct RPC reads.
+
 ## Goals
 
 - Existing duelists, duels (settled and in-flight), rings, pack ownership, season scores, and leaderboards survive the transition.
@@ -42,7 +44,7 @@ For each entity in each Dojo model on mainnet, read storage via `provider.getSto
 - Sets `Config`, `SeasonConfig`, `Pool`, `Leaderboard`, `Player`, `Duelist`, `RingBalance` directly via admin entrypoints.
 - Skips ephemeral state (active matchmaking queues, duels mid-commit-reveal — those players re-enter).
 
-Alternatively pull from a recent torii sqlite dump if we can get one (faster than mainnet RPC for bulk reads).
+For models known to be unaffected by the schema-upgrade bug (per the investigation report), we may pull from a recent torii sqlite dump if obtainable — significantly faster than mainnet RPC for bulk reads. For models that *are* affected, direct RPC reads are required.
 
 ### Option C: Event replay
 
@@ -54,7 +56,7 @@ Replay all `PlayerActivityEvent` + system events from genesis to rebuild state i
 
 ### Open
 
-- _2026-04-30_: Source of mainnet snapshot — direct `getStorageAt` polling vs. obtaining a recent torii sqlite dump (from Cartridge or a self-hosted instance). Lean: try torii dump first if obtainable.
+- _2026-04-30_: Source of mainnet snapshot per model — direct `getStorageAt` polling vs. recent torii sqlite dump. Decision split by model based on the bug-investigation report findings.
 - _2026-04-30_: Whether to seed historical events too, or only current-state models. Lean: current-state only initially; historical events accumulate from cutover forward.
 - _2026-04-30_: Communication plan for in-flight duels/queues that won't survive the migration.
 

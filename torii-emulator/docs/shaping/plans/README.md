@@ -10,7 +10,7 @@ How we're going to build it. Append-only.
 - Each plan lists the designs it implements. Designs link back. Both ends must agree.
 - Each plan lists the system-doc deltas it produces in its `## Implementation docs` acceptance criteria — these land or update when the plan reaches `implemented`.
 
-Use [`0000-template.md`](./0000-template.md) as the starting point for a new plan.
+Use [`TEMPLATE.md`](./TEMPLATE.md) as the starting point for a new plan.
 
 ## Index
 

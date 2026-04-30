@@ -1,0 +1,5 @@
+# Machine-specific agent instructions (AGENTS.local.md, CLAUDE.local.md, etc.)
+*.local.md
+
+# macOS
+.DS_Store

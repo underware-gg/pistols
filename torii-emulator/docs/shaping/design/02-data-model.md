@@ -12,7 +12,9 @@ plans: []
 
 The torii client expects a particular sqlite shape because its hand-written SQL queries reference torii's table names directly (e.g. `select * from "pistols-Challenge"`). Our server's storage must mirror torii's schema closely enough that those queries return correct results unchanged.
 
-The Pistols Cairo world (in `../../../../dojo/src/`) defines 21 models and 9 events (5 historical, 4 transient). See research synthesized 2026-04-30 for the full inventory.
+The Pistols Cairo world (in `../../../../dojo/src/`) defines 21 models and 9 events (5 historical, 4 transient). See research synthesized 2026-04-30 for the full inventory. Reference torii's migration files at [`crates/migrations/`](https://github.com/dojoengine/torii/tree/v1.8.0/crates/migrations) when implementing the schema (or read locally; see `AGENTS.local.md`).
+
+**We are not exposed to the upstream bug** that motivates this project. That bug is specifically in torii's incremental schema-upgrade path: torii skips applying column-add migrations when models gain new fields. Our server re-derives the entire schema from the Cairo manifest at every startup — there is no incremental upgrade path to skip.
 
 ## Goals
 
@@ -24,6 +26,7 @@ The Pistols Cairo world (in `../../../../dojo/src/`) defines 21 models and 9 eve
 
 - Generic Dojo schema generation for other worlds. Pistols-specific bindings welcome.
 - Schema versioning across the indexer's lifetime — at this stage we wipe and rebuild on Cairo schema changes.
+- Replicating torii's incremental schema-migration system (which is what's broken upstream).
 
 ## Detail
 
@@ -46,6 +49,8 @@ At world bootstrap, for each registered Dojo model we synthesize a sqlite table 
 - Primitives → typed columns.
 - Struct/enum/array members → JSON columns.
 - Struct member access via dotted paths (e.g. `[pistols-Challenge].[premise.value]`).
+
+Because the Cairo manifest is the schema source-of-truth and we rebuild from it on startup, schema upgrades happen by redeploying contracts and restarting the emulator — not by an in-place migration path. This is what avoids the upstream bug.
 
 ### Pistols model clusters
 
@@ -72,13 +77,14 @@ We rely on the upstream `dojo-types` crate for `Ty` decoding/encoding so `Model.
 
 ### Open
 
-- _2026-04-30_: Borrow torii's migration files directly vs. write fresh schema. Lean: borrow as reference, write fresh (cleaner for our subset).
+- _2026-04-30_: Borrow torii's migration files directly vs. write fresh schema. Lean: read torii's migrations as reference, write fresh (cleaner for our subset, and we don't need its incremental migration machinery).
 - _2026-04-30_: Historical event retention — keep all events forever (matches torii) vs. cap by season/age.
 - _2026-04-30_: Whether to expose a torii-emulator-specific schema version table for our own bookkeeping.
 
 ### Closed
 
 - _2026-04-30_: SQLite is the storage backend. Reason: matches torii (so client SQL works unchanged), and our scale fits comfortably.
+- _2026-04-30_: Rebuild schema from Cairo manifest at startup; no in-place migration path. Reason: avoids the upstream torii v1.7+ schema-upgrade-skip bug class entirely. Cost: schema changes require an emulator restart, but at our scale that's fine.
 
 ## Plans
 
