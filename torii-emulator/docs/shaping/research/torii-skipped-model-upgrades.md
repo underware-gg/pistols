@@ -1,10 +1,3 @@
----
-title: "Torii skipped-model-upgrade bug"
-kind: research
-date: 2026-05-01
-informs: [00, 04]
----
-
 # Torii skipped-model-upgrade bug — investigation
 
 ## Research brief
@@ -728,6 +721,8 @@ Four changes to the local torii checkout:
 - engine rollback handling clears `models` and `balances_diff` cache state
 - processors read model definitions via `ctx.storage.model(...)` rather than `ctx.cache.model(...)`, so rollback-time cache clears can repopulate from committed sqlite instead of failing with `CacheError(ModelNotFound(...))`
 
+An earlier iteration of the patch with only `clear_models()` (without the storage-backed processor reads) reached the exact `PlayerActivityEvent.activity = 18` failure but then surfaced `CacheError(ModelNotFound(...))` on subsequent replay work — that observation is what motivated parts (3) and (4) being paired together rather than (3) alone.
+
 #### Validation (2026-05-01)
 
 - `cargo build -p torii` succeeds for the patched binary
@@ -735,6 +730,57 @@ Four changes to the local torii checkout:
 - patched Sepolia cold replay from pre-critical head `2262908` crosses earlier same-player events (`2268329`), the schema upgrade (`2270724`), and the captured failing payload block (`2271871`)
 - after the crossing, `pistols-Config` gains `realms_address`, `pistols-PlayerActivityEvent` gains `EnlistedRankedDuelist`, the `activity_check` constraint now includes `EnlistedRankedDuelist`, and torii continues storing `PlayerActivityEvent` rows from `pistols-matchmaker` (`0x16f7e3c1…`) without `InvalidEnumSelector`
 - world head continued to `2273149`, then `2283390`, then `2293631` after the trigger window
+
+#### Diagnostic instrumentation
+
+The captured trigger above was produced by two diagnostic-only patches applied alongside the runtime fix in WIP commit `84ab46a1`. They are not part of the runtime fix, but they are what made the failing payload visible.
+
+`crates/processors/src/processors/event_message.rs` — `error!` log on deserialize failure with all fields needed to identify the failing payload:
+
+```diff
+@@ -103,10 +102,27 @@
+             "Store event message."
+         );
+
+-        let mut keys_and_unpacked = [event.keys.clone(), event.values].concat();
++        let raw_keys = event.keys.clone();
++        let raw_values = event.values.clone();
++        let mut keys_and_unpacked = [raw_keys.clone(), raw_values.clone()].concat();
+
+         let mut entity = model.schema.clone();
+-        entity.deserialize(&mut keys_and_unpacked, model.use_legacy_store)?;
++        if let Err(e) = entity.deserialize(&mut keys_and_unpacked, model.use_legacy_store) {
++            error!(
++                target: LOG_TARGET,
++                namespace = %model.namespace,
++                name = %model.name,
++                selector = %format!("{:#x}", model.selector),
++                model_contract_address = %format!("{:#x}", model.contract_address),
++                class_hash = %format!("{:#x}", model.class_hash),
++                use_legacy_store = model.use_legacy_store,
++                raw_keys = ?raw_keys,
++                raw_values = ?raw_values,
++                error = ?e,
++                "Failed to deserialize event message."
++            );
++            return Err(e.into());
++        }
+```
+
+`crates/processors/src/processors/upgrade_event.rs` — added `contract_address` and `class_hash` to the existing "Upgraded event." info-level log so the historical resource transition is visible inline:
+
+```diff
+@@ -115,6 +114,8 @@
+             target: LOG_TARGET,
+             namespace = %namespace,
+             name = %name,
++            contract_address = %format!("{:#x}", event.address.0),
++            class_hash = %format!("{:#x}", event.class_hash.0),
+             "Upgraded event."
+         );
+```
+
+These two log points produced the captured `actual_selector: 18` payload and the matching `Upgraded event` line shown in [Captured trigger (2026-04-30)](#captured-trigger-2026-04-30) above.
 
 ## Repairing a poisoned DB
 
@@ -788,9 +834,10 @@ This is the recovery procedure for a DB already in the poisoned state: torii's `
 ## Pistols-side mitigations until upstream is fixed
 
 1. If running an **unpatched** torii, pin `blocks_chunk_size ≤ 1024` for fresh cold indexes. This was verified locally to avoid the column-loss path by separating the upgrade from the failing event into different chunks.
-2. If the DB is already poisoned, use the repair procedure above. The important invariant is: fix the table DDL, not the `models.schema` JSON.
-3. If using the local torii patch confirmed in this investigation, prefer a clean cold replay rather than continuing from a previously poisoned DB.
-4. Once an upstream fix is available, redeploy on a torii ≥ that version and re-index from genesis.
+2. Avoid `delete + create` of any indexer that has been working continuously since before torii **v1.8.1** — those long-running mainnet instances never tripped the trigger payload inside an upgrade chunk, so they are the cleanest pre-fix DB state available. Do not throw them away by recreating them on a vulnerable torii version.
+3. If the DB is already poisoned, use the repair procedure above. The important invariant is: fix the table DDL, not the `models.schema` JSON.
+4. If using the local torii patch confirmed in this investigation, prefer a clean cold replay rather than continuing from a previously poisoned DB.
+5. Once an upstream fix is available, redeploy on a torii ≥ that version and re-index from genesis.
 
 ## File pointers (torii)
 
@@ -1098,6 +1145,16 @@ Retired as a live lead.
 
 Conclusion: `TrophyProgression` is not the best use of investigation time unless instrumented replay explicitly points there.
 
+Exhaustive elimination across the configured historical event set (verified against `dojo/src/models/events.cairo` and the pinned `achievement` rev `a4de9f4c`):
+
+- `PlayerActivityEvent` carries `activity: Activity`, and `Activity` defines variant `18 = EnlistedRankedDuelist` — the only plausible enum-at-18 in this set
+- `LordsReleaseEvent` carries `bill: LordsReleaseBill`, whose only enum is `reason: ReleaseReason` with five variants (`0..=4`)
+- `FamePegEvent` carries `source_pool_id` and `target_pool_id` of type `PoolType`, which has seven variants (`0..=6`)
+- `PurchaseDistributionEvent` has no enum field at all (only `ContractAddress`, `Array<u128>`, and `u128` columns)
+- `TrophyProgression` (from `achievement::events::index`) has no enum payload — only `felt252` keys, `count: u128`, `time: u64`
+
+So among the configured historical event set, only `PlayerActivityEvent` has a rollout-era enum value at index `18`.
+
 ## Appendix C — Alternative and rejected fix approaches
 
 These are approaches considered during the investigation that were not chosen as part of the confirmed fix (see [Patched replay: trigger captured and fix confirmed](#patched-replay-trigger-captured-and-fix-confirmed) for what was applied). Each entry preserves the wording from the live investigation; some are still-open hardening directions, others are explicit "do not do this" callouts.
@@ -1117,6 +1174,8 @@ So the cleaner upstream remediation is not "clear models only", but "restore cac
 - add explicit rollback invalidators for both model cache and token-registration cache, then lazily repopulate from storage on retry
 
 The current patched replay makes the first option look stronger than it did earlier in the investigation. Emptying the model cache entirely after rollback appears to leave later processors without required model definitions, which turns the original poison bug into a different `CacheError(ModelNotFound)` failure mode.
+
+A bare `cache.clear_models()` call wired into the engine's rollback `Err` arm would also cover the parallel rollback hazard in `register_event.rs` / `upgrade_event.rs`, since those processors share the same write-cache-then-queue-SQL pattern as the model upgrade processors. The `Cache` trait already exposes `clear_models` on the torii versions checked (v1.7.5 and v1.8.15), so wiring it into the rollback path is purely a call-site change, not an API surface change.
 
 ### F2 — Defer cache writes until after `storage.execute()`
 
