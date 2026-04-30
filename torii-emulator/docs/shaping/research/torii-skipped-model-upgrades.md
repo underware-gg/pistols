@@ -7,24 +7,65 @@ informs: [00, 04]
 
 # Torii skipped-model-upgrade bug — investigation
 
-## TL;DR
+## Research brief
 
-Torii's indexer keeps an in-memory `ModelCache` in sync with the model schema, but **does not clear that cache when a chunk-level rollback occurs**. When an `InvalidEnumSelector` (or any other) error fires inside the same chunk as a `ModelUpgraded` event, the SQL transaction is rolled back (so `ALTER TABLE … ADD COLUMN` is discarded) while `ModelCache::register_model` remains updated to the new schema. On retry, `UpgradeModelProcessor` reads `prev_schema` from the (now-poisoned) cache, computes `new_schema.diff(prev_schema) == None`, and silently returns without re-issuing the `ALTER TABLE`. That is the clean code-level explanation for the **reported poisoned-DB state** where torii's schema metadata knows about a field but SQLite does not.
+Briefing date: **2026-04-30**
 
-The structural hazard is **older than the standalone torii repo**: it effectively dates to **Nov 14 2024** in the `dojoengine/dojo` monorepo (see "Origin of the hazard" below) and has been present in every tagged torii release since **v1.5.0 (2025-04-29)** — including HEAD (v1.8.15) at time of writing. The parser failure that exposes it is now identified as well. Checking torii's pinned `dojo-types` source shows `Primitive` only accepts numeric selectors `0..=15`, so `actual_selector: 18` is **not** a real `Primitive` discriminant; it is a higher-level enum decode failure surfacing through `PrimitiveError`. Direct historical chain reads and the instrumented local replay prove the captured failing payload is the `pistols-matchmaker` `PlayerActivityEvent` at **Sepolia block `2271871`**, with `activity = 18`, and that this occurs **after** the `PlayerActivityEvent` schema upgrade at block `2270724`. The decisive local replay result is now in: historical `PlayerActivityEvent` work is grouped by `(world, selector, player)`, the same player already has multiple pre-upgrade activity events earlier in the same chunk, and later post-upgrade events were being appended to that existing task **without gaining the selector-upgrade dependency**. Once torii was patched to merge dependencies into existing historical event tasks, retain late prerequisite links, and reload model definitions from committed storage after rollback, the replay crossed block `2271871` cleanly, stored `PlayerActivityEvent` rows from `pistols-matchmaker` without `InvalidEnumSelector`, landed `Config.realms_address`, and upgraded `PlayerActivityEvent` to include `EnlistedRankedDuelist`. The older `GenesisKey::Groggus = 18` model path remains in this document as historical context only; it is not the confirmed explanation for the shared replay failure. As long as Pistols was being indexed continuously by older mainnet torii instances, the rolled-back-then-retry codepath never executed for the relevant upgrade chunks, so the latent cache-poison stayed invisible. Re-indexing cold under torii ≥ 1.8.1 hits the deserialize failure, exposes the latent bug, and drops the column.
+### Problem
 
-The bug is still present on `main` (v1.8.15) as of writing. PR [#356](https://github.com/dojoengine/torii/pull/356) (v1.8.1, `refactor(processors): model upgrades to use cache`) is *not* the culprit — it just made the cache dependency direct; `Sql::model()` had been cache-first since PR #353 in v1.8.0 and v1.7.5's `UpgradeModelProcessor` was already reading from `ctx.cache.model(...)`.
+Pistols torii cold re-indexes are failing. Fresh recreates are coming back with missing columns even though the relevant `ModelUpgraded` migrations have succeeded on chain. The failure is visible on **Sepolia**, and cold-indexed **mainnet** recreates are also affected.
 
-## Pistols world addresses
+The visible failure pattern is:
 
-Both networks share the same world address (the same Cairo class is deployed on both).
+- torii logs a model or event upgrade
+- the schema output may show the new field
+- the SQLite table is still missing the column
+- subsequent reads and writes fail with `no such column` / `has no column named`
 
-| Network | World address |
-|---|---|
-| **mainnet** | `0x8b4838140a3cbd36ebe64d4b5aaf56a30cc3753c928a79338bf56c53f506c5` |
-| **sepolia** | `0x8b4838140a3cbd36ebe64d4b5aaf56a30cc3753c928a79338bf56c53f506c5` |
+### Known environment
 
-(Verified in `manifest_mainnet.json` and `manifest_sepolia.json` at the repo root — `world.address` field.)
+Both networks are indexing the same world address:
+
+- `mainnet`: `0x8b4838140a3cbd36ebe64d4b5aaf56a30cc3753c928a79338bf56c53f506c5`
+- `sepolia`: `0x8b4838140a3cbd36ebe64d4b5aaf56a30cc3753c928a79338bf56c53f506c5`
+
+The issue is known on fresh recreates on torii **`v1.8.1`**, **`v1.8.2`**, and **`v1.8.7`**.
+
+The historically relevant Sepolia incident config uses:
+
+- `world_block = 23920`
+- `blocks_chunk_size = 10240`
+
+Lowering `blocks_chunk_size` to `1024` avoids the missing-column outcome locally. Existing long-running indexers can continue working until they are cold-reindexed, so the problem appears tied to replay rather than steady-state indexing.
+
+### Observed reports
+
+The first clearly reported case is **2025-10-10 06:15** on **Sepolia**, on torii **`v1.8.1`**:
+
+- `pistols-Config.realms_address` is missing from SQLite
+- gRPC/entity reads fail with `no such column: pistols-Config.realms_address`
+- the field does not appear in the SQL schema
+- another recently-added field, `pistols-Player.referrer_address`, is indexing correctly
+
+By **2025-10-14**, local replay logs are already showing `PrimitiveError(InvalidEnumSelector { actual_selector: 18 })` immediately after the `PlayerActivityEvent` and `Config` upgrade window.
+
+By **2025-10-28**, the same failure class has spread to additional fields from the Oct 2025 rollout:
+
+- `pistols-DuelistAssignment.season_id`
+- `pistols-Duelist.released_fame`
+- `pistols-MatchQueue.enlisted_duelist_ids`
+
+Later reports also include broken reads for `pistols-Pack.pegged_lords_amount`, and recreated mainnet indexers show the same general missing-column / stale-schema failure class.
+
+### Research objectives
+
+This investigation needs to:
+
+- identify and verify the cause of the indexing bug
+- establish the root cause of the failure
+- determine what, if anything, in the replay path is triggering it
+- produce a verified patch that mitigates the failure
+- document any operator workaround for keeping cold re-indexes working until an upstream fix exists
 
 ## The reported symptom
 
