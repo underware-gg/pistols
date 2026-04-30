@@ -1,17 +1,16 @@
----
-title: "Torii skipped-model-upgrade bug"
-kind: research
-date: 2026-05-01
-informs: [00, 04]
----
-
 # Torii skipped-model-upgrade bug — confirmed report
+
+**Date:** 2026-05-01
 
 ## Preamble
 
 In **Oct 2025**, fresh torii recreates for Pistols on **Sepolia** began returning missing-column failures. On **2025-10-10**, mataleone reported that `pistols-Config.realms_address`, added two weeks earlier, was absent from the SQL schema, and gRPC entity reads were failing with `no such column: pistols-Config.realms_address`. The same missing-column symptom was also seen on cold-indexed **mainnet** torii recreates. In **Dec 2025**, the last previously working mainnet torii was cold-reindexed. From the outside, the issue presented as torii recreates dropping columns during replay. This report explains the confirmed cause, the exact historical replay window, the local repro, and the torii patch that now gets the known Pistols path through cleanly.
 
 As of **2026-05-01**, we did not have a working upstream fix for this blocking issue, so we conducted our own investigation. That investigation reproduced the stale-schema failure on unpatched **torii `1.8.7`**, captured the exact historical trigger, identified the root cause of both the replay failure and the poisoned-DB state, and confirmed a working local fix against the patched torii **`v1.8.15`** source tree by replaying the bad Sepolia window cleanly. We can make the local patch available on request.
+
+## TL;DR
+
+Two latent torii bugs combine on cold replay: a task/dependency merge bug that produces `InvalidEnumSelector { actual_selector: 18 }`, and a rollback/cache divergence bug that silently skips `ALTER TABLE` on retry. Both have existed in every torii release since `v1.5.0` (April 2025). A four-part patch against `v1.8.15` closes both and replays the Sepolia incident window cleanly.
 
 ## What the issue is
 
@@ -27,7 +26,7 @@ The hazard has been latent in every torii release since **v1.5.0 (2025-04-29)** 
 
 ## How to fix it
 
-The local torii patch validated against the Sepolia trigger window has four parts:
+The local torii patch — applied against torii `v1.8.15` (WIP commit `84ab46a1`, one commit on top of the `v1.8.15` tag) and validated against the Sepolia trigger window — has four parts:
 
 1. **`TaskManager::add_parallelized_event_with_dependencies`** merges newly discovered dependencies into an existing task instead of only appending the event.
 2. **`TaskNetwork`** retains unresolved dependencies and activates them once the prerequisite task is inserted, instead of dropping them as "non-existent".
@@ -37,6 +36,49 @@ The local torii patch validated against the Sepolia trigger window has four part
 Parts (1) and (2) close the trigger bug. Parts (3) and (4) together close the rollback/cache divergence bug — bare cache-clearing on rollback is not enough on its own, because processors then fail to find model definitions in the empty cache.
 
 The patch was validated by replaying the Sepolia incident window from a pre-critical head. The replay crosses the captured failing block (`2271871`) cleanly, lands `Config.realms_address` and `PlayerActivityEvent.EnlistedRankedDuelist` in the DB, and continues storing `PlayerActivityEvent` rows from `pistols-matchmaker` without `InvalidEnumSelector`.
+
+## Key fixes
+
+The substantive runtime changes against torii `v1.8.15` (WIP commit `84ab46a1`):
+
+**`crates/indexer/engine/src/engine.rs`** — clear commit-sensitive cache state on chunk rollback (line 235-237 in the modified file):
+
+```diff
+                  self.storage.rollback().await?;
++                 self.cache.clear_balances_diff().await;
++                 self.cache.clear_models().await;
+                  self.task_manager.clear_tasks();
+```
+
+**`crates/processors/src/task_manager.rs`** — `TaskManager::add_parallelized_event_with_dependencies` (lines 93-110 in the modified file): when the task already exists, merge new dependencies into it instead of silently dropping them:
+
+```diff
+-        if let Some(task_data) = self.task_network.get_mut(&task_identifier) {
++        if self.task_network.contains_key(&task_identifier) {
++            if let Err(e) =
++                self.task_network.add_dependencies(task_identifier, dependencies.clone())
++            { … }
++
++            let task_data = self
++                .task_network
++                .get_mut(&task_identifier)
++                .expect("Task should exist after contains_key check");
+             match parallelized_event.indexing_mode {
+```
+
+**`crates/task-network/src/lib.rs`** — adds a `pending_dependents: HashMap<K, HashSet<K>>` to `TaskNetwork`, plus `add_dependency_or_defer` and `resolve_pending_dependents` helpers. Dependencies whose prerequisite task does not yet exist are now deferred and resolved when the prerequisite is added, instead of being silently dropped. ~114 lines of additions; see the WIP commit for the full hunks. New tests: `test_late_dependency_becomes_active`, `test_add_dependencies_to_existing_task`.
+
+**Processor model lookups** — replace `ctx.cache.model(...)` with `ctx.storage.model(...)` across `event_message.rs:84`, `store_set_record.rs:76`, `store_update_record.rs:82`, `store_update_member.rs:87`, `store_del_record.rs:74`, `upgrade_event.rs:64`, `upgrade_model.rs:62`. Storage is cache-first-then-DB, so when rollback empties the cache the next read repopulates from committed sqlite instead of throwing `CacheError(ModelNotFound(...))`. The pattern in each file is identical:
+
+```diff
+-        let model = match ctx.cache.model(ctx.contract_address, event.selector).await {
++        let model = match ctx.storage.model(ctx.contract_address, event.selector).await {
+             Ok(m) => m,
+-            Err(CacheError::ModelNotFound(_)) if !ctx.config.namespaces.is_empty() => {
++            Err(_) if !ctx.config.namespaces.is_empty() => {
+```
+
+The diagnostic instrumentation used during the investigation to capture the trigger payload is not part of the runtime fix — see [Patched replay → Diagnostic instrumentation](./torii-skipped-model-upgrades.md#diagnostic-instrumentation) in the research doc for the full diffs.
 
 We can make the local patch available on request.
 
