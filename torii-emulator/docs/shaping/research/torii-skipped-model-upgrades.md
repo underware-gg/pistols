@@ -11,7 +11,7 @@ informs: [00, 04]
 
 Torii's indexer keeps an in-memory `ModelCache` in sync with the model schema, but **does not clear that cache when a chunk-level rollback occurs**. When an `InvalidEnumSelector` (or any other) error fires inside the same chunk as a `ModelUpgraded` event, the SQL transaction is rolled back (so `ALTER TABLE … ADD COLUMN` is discarded) while `ModelCache::register_model` remains updated to the new schema. On retry, `UpgradeModelProcessor` reads `prev_schema` from the (now-poisoned) cache, computes `new_schema.diff(prev_schema) == None`, and silently returns without re-issuing the `ALTER TABLE`. That is the clean code-level explanation for the **reported poisoned-DB state** where torii's schema metadata knows about a field but SQLite does not.
 
-The structural hazard is **older than the standalone torii repo**: it effectively dates to **Nov 14 2024** in the `dojoengine/dojo` monorepo (see "Origin of the hazard" below) and has been present in every tagged torii release since **v1.5.0 (2025-04-29)** — including HEAD (v1.8.15) at time of writing. The parser failure that exposes it is now also effectively identified. Checking torii's pinned `dojo-types` source shows `Primitive` only accepts numeric selectors `0..=15`, so `actual_selector: 18` is almost certainly **not** a real `Primitive` discriminant; it is a higher-level enum decode failure surfacing through `PrimitiveError`. Direct historical chain reads prove the captured failing payload is the `pistols-matchmaker` `PlayerActivityEvent` at **Sepolia block `2271871`**, with `activity = 18`, and that this occurs **after** the `PlayerActivityEvent` schema upgrade at block `2270724`. The decisive local replay result is now in: historical `PlayerActivityEvent` work is grouped by `(world, selector, player)`, the same player already has multiple pre-upgrade activity events earlier in the same chunk, and later post-upgrade events were being appended to that existing task **without gaining the selector-upgrade dependency**. Once torii was patched to merge dependencies into existing historical event tasks and retain late prerequisite links, the replay crossed block `2271871` cleanly, stored `PlayerActivityEvent` rows from `pistols-matchmaker` without `InvalidEnumSelector`, landed `Config.realms_address`, and upgraded `PlayerActivityEvent` to include `EnlistedRankedDuelist`. The older `GenesisKey::Groggus = 18` model path is now only a secondary fallback, because the current mainnet world definitively postdates that May 2025 enum addition and sepolia only leaves a narrow overlap window. As long as Pistols was being indexed continuously by torii ≤ 1.8.0 (mainnet) the rolled-back-then-retry codepath never executed for a `Config` upgrade chunk, so the latent cache-poison stayed invisible. Re-indexing cold under torii ≥ 1.8.1 hits the deserialize failure, exposes the latent bug, and drops the column.
+The structural hazard is **older than the standalone torii repo**: it effectively dates to **Nov 14 2024** in the `dojoengine/dojo` monorepo (see "Origin of the hazard" below) and has been present in every tagged torii release since **v1.5.0 (2025-04-29)** — including HEAD (v1.8.15) at time of writing. The parser failure that exposes it is now identified as well. Checking torii's pinned `dojo-types` source shows `Primitive` only accepts numeric selectors `0..=15`, so `actual_selector: 18` is **not** a real `Primitive` discriminant; it is a higher-level enum decode failure surfacing through `PrimitiveError`. Direct historical chain reads and the instrumented local replay prove the captured failing payload is the `pistols-matchmaker` `PlayerActivityEvent` at **Sepolia block `2271871`**, with `activity = 18`, and that this occurs **after** the `PlayerActivityEvent` schema upgrade at block `2270724`. The decisive local replay result is now in: historical `PlayerActivityEvent` work is grouped by `(world, selector, player)`, the same player already has multiple pre-upgrade activity events earlier in the same chunk, and later post-upgrade events were being appended to that existing task **without gaining the selector-upgrade dependency**. Once torii was patched to merge dependencies into existing historical event tasks, retain late prerequisite links, and reload model definitions from committed storage after rollback, the replay crossed block `2271871` cleanly, stored `PlayerActivityEvent` rows from `pistols-matchmaker` without `InvalidEnumSelector`, landed `Config.realms_address`, and upgraded `PlayerActivityEvent` to include `EnlistedRankedDuelist`. The older `GenesisKey::Groggus = 18` model path remains in this document as historical context only; it is not the confirmed explanation for the shared replay failure. As long as Pistols was being indexed continuously by older mainnet torii instances, the rolled-back-then-retry codepath never executed for the relevant upgrade chunks, so the latent cache-poison stayed invisible. Re-indexing cold under torii ≥ 1.8.1 hits the deserialize failure, exposes the latent bug, and drops the column.
 
 The bug is still present on `main` (v1.8.15) as of writing. PR [#356](https://github.com/dojoengine/torii/pull/356) (v1.8.1, `refactor(processors): model upgrades to use cache`) is *not* the culprit — it just made the cache dependency direct; `Sql::model()` had been cache-first since PR #353 in v1.8.0 and v1.7.5's `UpgradeModelProcessor` was already reading from `ctx.cache.model(...)`.
 
@@ -36,7 +36,7 @@ From mataleone's reports (Oct 10 → Dec 19):
 - gRPC `useSdkEntitiesGet` fails with: `no such column: pistols-Config.realms_address`.
 - `INSERT/UPDATE` from `StoreUpdateMember` events fail in the executor:
   `Failed to execute query. … "table pistols-Config has no column named realms_address"`.
-- Reproduces on a fresh delete+create of the Slot Sepolia indexer on torii ≥ 1.8.1 (still failing on 1.8.7). Mainnet (which had been continuously indexed under an older binary) was unaffected initially.
+- Reproduces on a fresh delete+create of the Slot Sepolia indexer on torii ≥ 1.8.1 (still failing on 1.8.7). Older continuously indexed mainnet instances did not surface it initially, but cold-indexed mainnet recreates later showed the same failure class.
 - `blocks_chunk_size = 10240` triggers it; **lowering to `1024` works around it** locally. This matters because `10240` is torii's own default (`crates/indexer/fetcher/src/lib.rs`, `crates/cli/src/options.rs`), so the bad case is not an unusual custom configuration.
 - A telltale log line appears immediately after the offending upgrade:
   ```
@@ -55,7 +55,7 @@ From mataleone's reports (Oct 10 → Dec 19):
   - it shows the cold-reindex failure was present from the start of the v1.8.1 Sepolia rollout, not only after later December rebuilds
   - it shows **not every recent upgrade was poisoned**
   - it fits a chunk-local failure much better than a global "torii 1.8.1 cannot apply upgrades correctly" theory
-- A local repro from **2025-10-14** makes the suspected event/model pairing much sharper. With the Sepolia config from the thread, torii logged:
+- A local repro from **2025-10-14** already showed the event/model pairing clearly. With the Sepolia config from the thread, torii logged:
   ```text
   INFO  torii::indexer::processors::upgrade_event: Upgraded event. namespace=pistols name=PlayerActivityEvent
   INFO  torii::indexer::processors::upgrade_model: Upgraded model. namespace=pistols name=Config
@@ -155,7 +155,7 @@ This also matches nas's debugging note in the thread:
 
 ## Why `blocks_chunk_size` matters
 
-The blast radius is a single chunk. With `blocks_chunk_size = 10240`, the failing event (`InvalidEnumSelector { actual_selector: 18 }`) is very likely to fall in the same chunk as the `Config` upgrade, so every retry of that chunk hits the cache-poison path and the column never lands. The exact offender is still a historical/event-deserialization problem, but direct chain checks make the earlier "it must be `PlayerActivityEvent.activity = 18` against missing on-chain metadata" story too weak to treat as the lead anymore.
+The blast radius is a single chunk. With `blocks_chunk_size = 10240`, the failing event (`PlayerActivityEvent.activity = 18` at block `2271871`) falls in the same chunk as the `Config` upgrade, so every retry of that chunk hits the cache-poison path and the column never lands.
 
 With `blocks_chunk_size = 1024` the upgrade event and the failing event end up in different chunks roughly 9× out of 10. The upgrade chunk commits cleanly on its first attempt (cache and DB stay aligned); the *failing* chunk just keeps retrying forever (or skipping forward, depending on backoff config) but it no longer corrupts the schema of unrelated models.
 
@@ -250,7 +250,7 @@ That matters because the pinned `dojo_types::primitive::Primitive` source is eff
 
 The first code-only reading was:
 
-- the failing value looked very likely to be `PlayerActivityEvent.activity = EnlistedRankedDuelist (18)`
+- the failing value mapped cleanly to `PlayerActivityEvent.activity = EnlistedRankedDuelist (18)`
 - the schema torii used for that event therefore looked like it lacked option index `18`
 - on a fresh DB, that made a pure torii cache-ordering explanation look weaker, because `RegisterEventProcessor` fetches chain schema directly and `EventMessageProcessor` declares a same-selector dependency on the register/upgrade task
 
@@ -363,7 +363,7 @@ That clustering fits the torii bug better than any model-specific theory. Multip
 
 ## Bug remediations
 
-### 1. Immediate patch: clear model cache on rollback
+### 1. Immediate rollback fix: clear model cache on rollback, then repopulate from committed storage
 
 `crates/indexer/engine/src/engine.rs:230-242`:
 
@@ -377,7 +377,7 @@ Err(e) => {
 }
 ```
 
-The `Cache` trait already exposes `clear_models` on the versions checked (including v1.7.5 and v1.8.15), so the code change is just wiring that existing invalidation call into the rollback path. Re-population happens lazily via `RegisterModelProcessor` / `UpgradeModelProcessor` on the next pass; or you can eagerly rebuild via `storage.models(&[], &[]).await`.
+The `Cache` trait already exposes `clear_models` on the versions checked (including v1.7.5 and v1.8.15), so the first code change is just wiring that existing invalidation call into the rollback path. The later local replay work showed that the practical fix must also repopulate model definitions from committed storage on the next pass; a bare empty-cache retry turns the original poison bug into `CacheError(ModelNotFound(...))`.
 
 This is the smallest code change and the right first thing to test, because it directly targets the skipped-upgrade / poisoned-schema bug described above and also covers the same rollback hazard for event schema upgrades in `register_event.rs` / `upgrade_event.rs`.
 
@@ -423,7 +423,7 @@ Revert PR #356 so `UpgradeModelProcessor` reads `prev_schema` via `ctx.storage.m
 
 ## Reproducing and testing
 
-You do **not** need a full Sepolia replay to prove the skipped-upgrade / poisoned-cache bug. You probably do need **one** instrumented real replay to prove the exact `actual_selector: 18` trigger payload.
+You do **not** need a full Sepolia replay to prove the skipped-upgrade / poisoned-cache bug. This investigation did use one instrumented real replay to prove the exact `actual_selector: 18` trigger payload and then a patched replay to confirm the fix.
 
 ### 1. Deterministic regression test for the torii rollback bug
 
@@ -464,7 +464,7 @@ Log:
 - raw event keys and values
 - which processor path raised the error
 
-One cold replay with that patch should turn the current trigger hypothesis into proof.
+That replay turned the trigger hypothesis into proof.
 
 Current local status from this investigation:
 
@@ -537,9 +537,9 @@ For a practical repro, the highest-signal replay window is the Oct 15-28 2025 ra
 
 ## Trigger investigation: `InvalidEnumSelector { actual_selector: 18 }`
 
-Whatever event produces `PrimitiveError(InvalidEnumSelector { actual_selector: 18 })` is its own bug. Even with the immediate rollback patch above, that chunk will keep rolling back forever and indexing won't progress past it.
+`PrimitiveError(InvalidEnumSelector { actual_selector: 18 })` turned out to be a separate trigger bug. Even with the immediate rollback patch above, that chunk would keep rolling back forever until the trigger bug was fixed as well.
 
-The torii-side failure site is very likely one of the entity/event deserializers, not the upgrade processors themselves:
+The torii-side failure site is one of the entity/event deserializers, not the upgrade processors themselves:
 
 - `StoreSetRecordProcessor` -> `entity.deserialize(...)`
 - `StoreUpdateRecordProcessor` -> `entity.deserialize(...)`
@@ -571,9 +571,9 @@ Taken alone, the code/chain review would still leave room for another event mode
 - the same thread also shows repeated SQLite `CHECK constraint failed: activity_check`
 - in Pistols code, the relevant event model carrying an `activity` enum column is `pistols-PlayerActivityEvent`, and `Activity::EnlistedRankedDuelist` is exactly variant `18`
 
-So the failing event family is now best treated as effectively identified: the replay is almost certainly tripping on `pistols-PlayerActivityEvent.activity = 18`, and the remaining uncertainty is about **which torii-side state is stale at that moment** (deserializer schema, SQL constraint, or both).
+So the failing event family is now confirmed: the replay is tripping on `pistols-PlayerActivityEvent.activity = 18`, and the remaining question that this investigation resolved was **which torii-side state was stale at that moment**.
 
-Why `PlayerActivityEvent` is still the lead:
+Why `PlayerActivityEvent` was the right lead:
 
 - `dojo/src/models/events.cairo` defines `Activity::EnlistedRankedDuelist` at **selector 18**
 - the same file marks `PlayerActivityEvent` as `#[dojo::event(historical:true)]`, so torii replays it through `EventMessageProcessor` on cold index
@@ -609,15 +609,15 @@ That removes one more world-side explanation: for this selector, the historical 
 
 ### Other plausible `18` sources to keep in mind
 
-Among the configured historical event set (`PlayerActivityEvent`, `LordsReleaseEvent`, `FamePegEvent`, `PurchaseDistributionEvent`, `TrophyProgression`), only `PlayerActivityEvent` has a plausible rollout-era enum value at `18`. `LordsReleaseEvent` and `FamePegEvent` only carry small enums, `PurchaseDistributionEvent` has no enum-at-18 field, and `TrophyProgression` has no enum payload at all. That keeps `PlayerActivityEvent` as the best **historical event** lead, but it also means the strongest non-event fallback matters more than it did earlier in the investigation.
+Among the configured historical event set (`PlayerActivityEvent`, `LordsReleaseEvent`, `FamePegEvent`, `PurchaseDistributionEvent`, `TrophyProgression`), only `PlayerActivityEvent` has a rollout-era enum value at `18` that matches the captured failure. `LordsReleaseEvent` and `FamePegEvent` only carry small enums, `PurchaseDistributionEvent` has no enum-at-18 field, and `TrophyProgression` has no enum payload at all.
 
-If the instrumented replay shows the failure is **not** in `EventMessageProcessor` for `PlayerActivityEvent`, the next most useful local reference is:
+Before the local replay confirmed `EventMessageProcessor`, the main non-event fallback considered was:
 
 - a full-record model path carrying `DuelistProfile`, most likely `Duelist` or `PlayerDuelistStack`
   - `Duelist` carries `duelist_profile: DuelistProfile` and is directly adjacent to one of the poisoned upgrades: `Duelist.released_fame`
   - `PlayerDuelistStack` also carries `duelist_profile: DuelistProfile` and is rewritten during `memorialize_duelists(...)`
   - both are only relevant if the failing processor is `StoreSetRecordProcessor` or `StoreUpdateRecordProcessor`; `StoreUpdateMemberProcessor` only deserializes the changed member type
-  - `GenesisKey::Groggus = 18` remains the most concrete model-side `18`, but it is now a weaker fallback than earlier in the investigation because the current mainnet world postdates the `Groggus` source change and sepolia only leaves a narrow deployment overlap window
+  - `GenesisKey::Groggus = 18` remains the most concrete model-side `18`, but it is only historical context now: the current mainnet world postdates the `Groggus` source change and sepolia only leaves a narrow deployment overlap window
 
 The earlier `Trophy::TricksterDeath = 18` branch is now retired as a lead. The stored historical achievement event torii indexes here is `TrophyProgression`, and that payload does **not** carry a `Trophy` enum field.
 
@@ -720,7 +720,7 @@ Conclusion: `TrophyProgression` is not the best use of investigation time unless
 
 #### 1. Immediate diagnostic patch
 
-Before trying to "fix" the trigger, make torii tell us exactly what is failing. Add temporary logging around `PrimitiveError::InvalidEnumSelector` in:
+The first useful step was to make torii tell us exactly what was failing. Add temporary logging around `PrimitiveError::InvalidEnumSelector` in:
 
 - `crates/processors/src/processors/event_message.rs`
 - `crates/processors/src/processors/store_set_record.rs`
@@ -734,7 +734,7 @@ On failure, log at least:
 - raw event keys / values
 - whether the failing path was event-message or store-update
 
-One replay with that patch should turn the current hypothesis into proof.
+One replay with that patch did turn the hypothesis into proof.
 
 #### 2. Confirmed torii-side fix: preserve selector-upgrade dependencies for existing historical event tasks
 
@@ -814,13 +814,13 @@ I consider this a lower-confidence hardening lever, not the main fix. It helps v
 
 #### 6. If logging shows the failing enum is not `PlayerActivityEvent`
 
-Then stop optimizing around `PlayerActivityEvent` entirely and fix the schema/model that actually appears in the log.
+This branch was not taken in the local replay. It is kept here as discarded contingency logic from the live investigation.
 
-That sounds obvious, but it matters because the original `PlayerActivityEvent` thesis was strong enough to bias implementation in the wrong direction. The next replay should be used to identify the exact failing processor + namespace/model/event combination before any parser patch is merged.
+If logging shows a different enum in a future case, stop optimizing around `PlayerActivityEvent` entirely and fix the schema/model that actually appears in the log.
 
 #### 7. If logging still points at `PlayerActivityEvent`
 
-Then the problem is no longer "Pistols forgot to publish variant 18". The two realistic explanations become:
+This is the branch the local replay confirmed. Once logging still points at `PlayerActivityEvent`, the problem is no longer "Pistols forgot to publish variant 18". The two realistic explanations become:
 
 - torii is binding the wrong historical event schema version to the selector
 - or there is a higher-level enum-deserializer bug in `dojo_types`
@@ -883,8 +883,8 @@ This is the compact reconstruction reference for recreating the bug across **tor
 | `2025-10-20 16:30:17 -03:00` | Pistols code | `028e2893` | mainnet `3100000` | `MatchQueue.enlisted_duelist_ids` indexing added |
 | `2025-10-20 18:31:51 -03:00` | Pistols code | `720655ce` | mainnet `3100000` | `PlayerActivityEvent` variant `21` added |
 | `2025-10-22` | torii | `v1.8.7` / `21031a24` | n/a | user still reproduces poisoned cold indexes here |
-| `2025-10-22 14:27:30 -03:00` | Pistols deploy | `d0c79771` (`migrate sepolia`) | sepolia `2640000` | good sepolia replay point inside the poisoned-model rollout |
-| `2025-10-22 14:50:20 -03:00` | Pistols deploy | `871b572f` (`migrate mainnet`) | mainnet `3150000` | good mainnet replay point inside the poisoned-model rollout |
+| `2025-10-22 14:27:30 -03:00` | Pistols deploy | `d0c79771` (`migrate sepolia`) | sepolia `2640000` | sepolia replay anchor inside the poisoned-model rollout |
+| `2025-10-22 14:50:20 -03:00` | Pistols deploy | `871b572f` (`migrate mainnet`) | mainnet `3150000` | mainnet replay anchor inside the poisoned-model rollout |
 | `2025-10-23 01:14:32 UTC` | chain check | mainnet `3033226` | `EventUpgraded`: `0x05d875a0… -> 0x05be8170…` | direct proof the later mainnet `PlayerActivityEvent` upgrade was also emitted on chain |
 | `2025-10-28 10:43` | Discord report | mataleone | fresh `v1.8.7` sepolia recreate | repeated `table pistols-Config has no column named realms_address` on Slot and local |
 | `2025-10-28 16:52:32 UTC` | user log | mata executor errors | sepolia `2710000`, mainnet `3210000` are nearby replay anchors | first concrete multi-column poisoned-DB log captured in this investigation |
@@ -914,10 +914,10 @@ For a developer starting fresh, the shortest useful sequence is:
    - raw keys / values
    - block number
    - if reproducing from this repo, use [`dojo/torii_sepolia_repro.toml`](../../../dojo/torii_sepolia_repro.toml) to pin the historically relevant Sepolia settings explicitly (`world_block = 23920`, `blocks_chunk_size = 10240`, narrower historical event list)
-4. if the failure is in `EventMessageProcessor`, test the **historical task/dependency** theory first:
-   - did earlier same-player events create the task before the selector upgrade?
-   - did the later post-upgrade event get appended without acquiring the upgrade dependency?
-5. if the failure is in a store-update processor instead, pivot to the concrete enum-at-`18` model types listed above
+4. in this investigation, the failure **was** in `EventMessageProcessor`, and the decisive follow-up was the **historical task/dependency** check:
+   - earlier same-player events had already created the task before the selector upgrade
+   - the later post-upgrade event was appended without acquiring the upgrade dependency
+5. the store-update processor path remains documented above only as discarded fallback context; it was not the failing path in the confirmed local repro
 
 ### Current local repro status
 
@@ -1040,7 +1040,7 @@ This is the clearest root-cause evidence gathered so far:
 - the failing decode is using the **pre-upgrade** event resource contract `0x463f225e…`
 - in the same replay window, torii also processes the `PlayerActivityEvent` upgrade to the first `18`-capable resource `0x22c12429…` and the `Config` model upgrade
 
-So the working theory is now substantially stronger than before:
+So the confirmed failure chain is:
 
 1. torii reaches a historical `PlayerActivityEvent` payload whose `activity` discriminant is `18`
 2. it tries to decode that payload against the **older pre-18 resource schema**
@@ -1139,10 +1139,10 @@ This is the recovery procedure for a DB already in the poisoned state: torii's `
 
 ## Pistols-side mitigations until upstream is fixed
 
-1. Pin Slot torii config to `blocks_chunk_size ≤ 1024` for **fresh** Sepolia indexes. Already verified by mataleone to avoid the column-loss path on local indexes.
-2. Avoid `delete + create` of the indexer when an upgrade chunk has already been observed to fail. The mainnet DB that survived from before 1.8.1 is the cleanest thing we have; we should not throw it away.
-3. If we hit the missing-column state again, use the repair procedure above. The important invariant is: fix the table DDL, not the `models.schema` JSON.
-4. Once a fix is merged upstream, redeploy on a torii ≥ that version and re-index sepolia from genesis.
+1. If running an **unpatched** torii, pin `blocks_chunk_size ≤ 1024` for fresh cold indexes. This was verified locally to avoid the column-loss path by separating the upgrade from the failing event into different chunks.
+2. If the DB is already poisoned, use the repair procedure above. The important invariant is: fix the table DDL, not the `models.schema` JSON.
+3. If using the local torii patch confirmed in this investigation, prefer a clean cold replay rather than continuing from a previously poisoned DB.
+4. Once an upstream fix is available, redeploy on a torii ≥ that version and re-index from genesis.
 
 ## File pointers (torii)
 
