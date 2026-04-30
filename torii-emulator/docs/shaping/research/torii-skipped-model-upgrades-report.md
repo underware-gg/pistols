@@ -26,7 +26,7 @@ The hazard has been latent in every torii release since **v1.5.0 (2025-04-29)** 
 
 ## How to fix it
 
-The local torii patch — applied against torii `v1.8.15` (WIP commit `84ab46a1`, one commit on top of the `v1.8.15` tag) and validated against the Sepolia trigger window — has four parts:
+The local torii patch — applied on top of torii `v1.8.15` and validated against the Sepolia trigger window — has four parts:
 
 1. **`TaskManager::add_parallelized_event_with_dependencies`** merges newly discovered dependencies into an existing task instead of only appending the event.
 2. **`TaskNetwork`** retains unresolved dependencies and activates them once the prerequisite task is inserted, instead of dropping them as "non-existent".
@@ -39,7 +39,7 @@ The patch was validated by replaying the Sepolia incident window from a pre-crit
 
 ## Key fixes
 
-The substantive runtime changes against torii `v1.8.15` (WIP commit `84ab46a1`):
+The substantive runtime changes, applied on top of torii `v1.8.15`:
 
 **`crates/indexer/engine/src/engine.rs`** — clear commit-sensitive cache state on chunk rollback (line 235-237 in the modified file):
 
@@ -66,7 +66,7 @@ The substantive runtime changes against torii `v1.8.15` (WIP commit `84ab46a1`):
              match parallelized_event.indexing_mode {
 ```
 
-**`crates/task-network/src/lib.rs`** — adds a `pending_dependents: HashMap<K, HashSet<K>>` to `TaskNetwork`, plus `add_dependency_or_defer` and `resolve_pending_dependents` helpers. Dependencies whose prerequisite task does not yet exist are now deferred and resolved when the prerequisite is added, instead of being silently dropped. ~114 lines of additions; see the WIP commit for the full hunks. New tests: `test_late_dependency_becomes_active`, `test_add_dependencies_to_existing_task`.
+**`crates/task-network/src/lib.rs`** — adds a `pending_dependents: HashMap<K, HashSet<K>>` to `TaskNetwork`, plus `add_dependency_or_defer` and `resolve_pending_dependents` helpers. Dependencies whose prerequisite task does not yet exist are now deferred and resolved when the prerequisite is added, instead of being silently dropped. ~114 lines of additions. New tests: `test_late_dependency_becomes_active`, `test_add_dependencies_to_existing_task`.
 
 **Processor model lookups** — replace `ctx.cache.model(...)` with `ctx.storage.model(...)` across `event_message.rs:84`, `store_set_record.rs:76`, `store_update_record.rs:82`, `store_update_member.rs:87`, `store_del_record.rs:74`, `upgrade_event.rs:64`, `upgrade_model.rs:62`. Storage is cache-first-then-DB, so when rollback empties the cache the next read repopulates from committed sqlite instead of throwing `CacheError(ModelNotFound(...))`. The pattern in each file is identical:
 

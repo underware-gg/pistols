@@ -733,7 +733,7 @@ An earlier iteration of the patch with only `clear_models()` (without the storag
 
 #### Diagnostic instrumentation
 
-The captured trigger above was produced by two diagnostic-only patches applied alongside the runtime fix in WIP commit `84ab46a1`. They are not part of the runtime fix, but they are what made the failing payload visible.
+The captured trigger above was produced by two diagnostic-only patches applied to the local torii checkout alongside the runtime fix. They are not part of the runtime fix, but they are what made the failing payload visible.
 
 `crates/processors/src/processors/event_message.rs` — `error!` log on deserialize failure with all fields needed to identify the failing payload:
 
