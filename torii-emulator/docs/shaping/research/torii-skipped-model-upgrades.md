@@ -29,6 +29,8 @@ Both networks are indexing the same world address:
 - `mainnet`: `0x8b4838140a3cbd36ebe64d4b5aaf56a30cc3753c928a79338bf56c53f506c5`
 - `sepolia`: `0x8b4838140a3cbd36ebe64d4b5aaf56a30cc3753c928a79338bf56c53f506c5`
 
+(Verified in `manifest_mainnet.json` and `manifest_sepolia.json` at the repo root — `world.address` field.)
+
 The issue is known on fresh recreates on torii **`v1.8.1`**, **`v1.8.2`**, and **`v1.8.7`**.
 
 The historically relevant Sepolia incident config uses:
