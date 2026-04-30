@@ -599,115 +599,6 @@ Direct world-event reads now tighten that further. Querying `starknet_getEvents`
 
 That removes one more world-side explanation: for this selector, the historical upgrade events were not merely implied by `resource(...)` state changes; they were actually published on chain. The remaining failure is therefore inside torii's replay/tasking behavior, not in missing upgrade publication.
 
-### Other plausible `18` sources to keep in mind
-
-Among the configured historical event set (`PlayerActivityEvent`, `LordsReleaseEvent`, `FamePegEvent`, `PurchaseDistributionEvent`, `TrophyProgression`), only `PlayerActivityEvent` has a rollout-era enum value at `18` that matches the captured failure. `LordsReleaseEvent` and `FamePegEvent` only carry small enums, `PurchaseDistributionEvent` has no enum-at-18 field, and `TrophyProgression` has no enum payload at all.
-
-Before the local replay confirmed `EventMessageProcessor`, the main non-event fallback considered was:
-
-- a full-record model path carrying `DuelistProfile`, most likely `Duelist` or `PlayerDuelistStack`
-  - `Duelist` carries `duelist_profile: DuelistProfile` and is directly adjacent to one of the poisoned upgrades: `Duelist.released_fame`
-  - `PlayerDuelistStack` also carries `duelist_profile: DuelistProfile` and is rewritten during `memorialize_duelists(...)`
-  - both are only relevant if the failing processor is `StoreSetRecordProcessor` or `StoreUpdateRecordProcessor`; `StoreUpdateMemberProcessor` only deserializes the changed member type
-  - `GenesisKey::Groggus = 18` remains the most concrete model-side `18`, but it is only historical context now: the current mainnet world postdates the `Groggus` source change and sepolia only leaves a narrow deployment overlap window
-
-The earlier `Trophy::TricksterDeath = 18` branch is now retired as a lead. The stored historical achievement event torii indexes here is `TrophyProgression`, and that payload does **not** carry a `Trophy` enum field.
-
-## Ruled-out theories
-
-This is the compact list of explanations that looked plausible earlier in the investigation but no longer fit the code and chain evidence.
-
-### 1. "`actual_selector: 18` means torii needs a new `Primitive` variant"
-
-Ruled out by torii's pinned `dojo-types` source.
-
-- inspected Dojo revs `711cb72` and `0afeb1bc`
-- `dojo_types::primitive::Primitive` only accepts numeric selectors `0..=15`
-- `18` therefore cannot be a legitimate primitive discriminant
-
-Conclusion: this is a **higher-level enum decode failure** surfacing through `PrimitiveError`, not a missing primitive type.
-
-### 2. "The event/schema upgrade was ignored because only a nested enum changed"
-
-Ruled out by `dojo_types::schema::Ty::diff()`.
-
-- the pinned `schema.rs` implementation diffs enum options by name
-- appending a new enum variant produces a non-`None` diff
-- `PlayerActivityEvent.Activity` gaining `EnlistedRankedDuelist` is therefore a real schema upgrade from torii's perspective
-
-Conclusion: the `18` trigger is not explained by `Ty::diff()` silently treating the upgrade as a no-op.
-
-### 3. "torii fetched the wrong schema because `ModelRPCReader` ignored the historical resource address"
-
-Ruled out by torii's pinned `dojo-world` source.
-
-- `ModelRPCReader::new(namespace, name, address, class_hash, world)` stores the passed `address`
-- it constructs `ModelContractReader::new(address, world.provider())`
-- schema reads therefore target the concrete resource contract address carried by the world event
-
-Conclusion: this is not "torii resolved latest schema by selector/tag even though the world event pointed at an older resource."
-
-### 4. "`PlayerActivityEvent.activity = 18` failed because Pistols never published variant `18` on chain"
-
-Ruled out by direct historical chain reads.
-
-- `resource(selector)` checks show variant `18` already live on sepolia by block `2272000`
-- the same check shows variant `18` already live on mainnet by block `2544507` and certainly by `2831000`
-- later rollout-era resource versions only add `19`, `20`, and `21`; they do not make `18` invalid again
-
-Conclusion: the simple "missing on-chain metadata" story is false for the replay window that matters.
-
-### 5. "The world resource changed, but no `EventUpgraded` was emitted for torii to follow"
-
-Ruled out for `pistols-PlayerActivityEvent` by direct `starknet_getEvents` queries.
-
-- sepolia emits `EventUpgraded` at blocks `2270724` and `2568610`
-- mainnet emits `EventUpgraded` at blocks `2544507` and `3033226`
-- the event data shows the old and new event resource contract addresses for the same selector
-
-Conclusion: for the leading selector, Pistols/Dojo did publish the upgrade events torii would need. If torii is still stale later, the failure is in torii's replay state, not in the absence of upgrade publication.
-
-### 6. "torii just processed the payload before the upgrade because of a simple ordering race"
-
-Partially revived, but in a **more specific** form than the original theory.
-
-What is still ruled out:
-
-- this is not a generic provider race where Starknet returned the `activity = 18` payload before the earlier `EventUpgraded`
-- direct `starknet_getEvents` queries show the relevant world events in ascending block order
-- the captured failing payload is at **block `2271871`**, while the `PlayerActivityEvent` upgrade is at **block `2270724`**
-
-What is now supported by code and chain evidence:
-
-- the failing player already had earlier `PlayerActivityEvent`s in the same chunk before block `2270724`
-- `EventMessageProcessor` groups those historical events into one task keyed by `(world, selector, player)`
-- `TaskManager::add_parallelized_event_with_dependencies(...)` does not merge dependencies when appending to an existing task
-- `TaskNetwork::add_task_with_dependencies(...)` also ignores dependencies whose prerequisite task does not yet exist
-
-Conclusion: a **specific task/dependency ordering bug** now looks like the best explanation for the observed failure. What is ruled out is only the weaker version of the theory: "torii randomly saw the later event first."
-
-### 7. "The real culprit is a model-side `GenesisKey::Groggus = 18` decode"
-
-Demoted to a narrow fallback, effectively ruled out as the **general** explanation.
-
-- the current mainnet world does not exist at block `1375000` (`2025-05-05 12:56:03 UTC`)
-- it does exist by block `1500000` (`2025-06-18 04:29:30 UTC`)
-- `Groggus = 18` lands on `2025-05-04`, before the current mainnet world even exists
-- sepolia only leaves a narrow deployment overlap window (`740000` not found, `750000` exists)
-
-Conclusion: `Groggus` remains a conceivable sepolia-only fallback if the failing processor is a full-record `Duelist` or `PlayerDuelistStack` path, but it is not a strong cross-network explanation for the shared trigger.
-
-### 8. "The `18` is `Trophy::TricksterDeath` from `TrophyProgression`"
-
-Retired as a live lead.
-
-- `TricksterDeath = 18` is real in `dojo/src/types/trophies.cairo`
-- but the historical event torii indexes is `TrophyProgression`
-- that payload does **not** carry a `Trophy` enum field in the way `PlayerActivityEvent` carries `Activity`
-- it also does not line up cleanly with the Oct 15-22 ranked-queue / FAME rollout that clusters the poisoned model upgrades
-
-Conclusion: `TrophyProgression` is not the best use of investigation time unless instrumented replay explicitly points there.
-
 ### Trigger bug remediations
 
 #### 1. Immediate diagnostic patch
@@ -1152,7 +1043,7 @@ This is the recovery procedure for a DB already in the poisoned state: torii's `
 - `TaskManager` (per-task sequential, cross-task parallel): `crates/processors/src/task_manager.rs`
 - Executor (single sqlx transaction per chunk, rollback): `crates/sqlite/sqlite/src/executor/mod.rs:186,291,298,1154,1302-1312`
 
-## Source material
+## Appendix A — Source material
 
 This is the raw evidence the investigation entered with — Discord pastes from the Pistols / Cartridge thread, attached screenshots, and config files checked into this repo. The narrative above cites these by anchor (`S1` … `S10`). Anything not anchored here was produced *during* the investigation, not before it.
 
@@ -1346,3 +1237,98 @@ A separate torii server-log capture from the same window shows repeated gRPC sub
 2025-12-19T15:02:40.908267Z ERROR torii::server::handlers::grpc: gRPC request timeout after 60s
 2025-12-19T15:02:40.908279Z ERROR torii::server::handlers::grpc: gRPC request timeout after 60s
 ```
+
+## Appendix B — Investigation branches ruled out
+
+This is the compact list of explanations that looked plausible earlier in the investigation but no longer fit the code and chain evidence.
+
+### R1 — "`actual_selector: 18` means torii needs a new `Primitive` variant"
+
+Ruled out by torii's pinned `dojo-types` source.
+
+- inspected Dojo revs `711cb72` and `0afeb1bc`
+- `dojo_types::primitive::Primitive` only accepts numeric selectors `0..=15`
+- `18` therefore cannot be a legitimate primitive discriminant
+
+Conclusion: this is a **higher-level enum decode failure** surfacing through `PrimitiveError`, not a missing primitive type.
+
+### R2 — "The event/schema upgrade was ignored because only a nested enum changed"
+
+Ruled out by `dojo_types::schema::Ty::diff()`.
+
+- the pinned `schema.rs` implementation diffs enum options by name
+- appending a new enum variant produces a non-`None` diff
+- `PlayerActivityEvent.Activity` gaining `EnlistedRankedDuelist` is therefore a real schema upgrade from torii's perspective
+
+Conclusion: the `18` trigger is not explained by `Ty::diff()` silently treating the upgrade as a no-op.
+
+### R3 — "torii fetched the wrong schema because `ModelRPCReader` ignored the historical resource address"
+
+Ruled out by torii's pinned `dojo-world` source.
+
+- `ModelRPCReader::new(namespace, name, address, class_hash, world)` stores the passed `address`
+- it constructs `ModelContractReader::new(address, world.provider())`
+- schema reads therefore target the concrete resource contract address carried by the world event
+
+Conclusion: this is not "torii resolved latest schema by selector/tag even though the world event pointed at an older resource."
+
+### R4 — "`PlayerActivityEvent.activity = 18` failed because Pistols never published variant `18` on chain"
+
+Ruled out by direct historical chain reads.
+
+- `resource(selector)` checks show variant `18` already live on sepolia by block `2272000`
+- the same check shows variant `18` already live on mainnet by block `2544507` and certainly by `2831000`
+- later rollout-era resource versions only add `19`, `20`, and `21`; they do not make `18` invalid again
+
+Conclusion: the simple "missing on-chain metadata" story is false for the replay window that matters.
+
+### R5 — "The world resource changed, but no `EventUpgraded` was emitted for torii to follow"
+
+Ruled out for `pistols-PlayerActivityEvent` by direct `starknet_getEvents` queries.
+
+- sepolia emits `EventUpgraded` at blocks `2270724` and `2568610`
+- mainnet emits `EventUpgraded` at blocks `2544507` and `3033226`
+- the event data shows the old and new event resource contract addresses for the same selector
+
+Conclusion: for the leading selector, Pistols/Dojo did publish the upgrade events torii would need. If torii is still stale later, the failure is in torii's replay state, not in the absence of upgrade publication.
+
+### R6 — "torii just processed the payload before the upgrade because of a simple ordering race"
+
+Partially revived, but in a **more specific** form than the original theory.
+
+What is still ruled out:
+
+- this is not a generic provider race where Starknet returned the `activity = 18` payload before the earlier `EventUpgraded`
+- direct `starknet_getEvents` queries show the relevant world events in ascending block order
+- the captured failing payload is at **block `2271871`**, while the `PlayerActivityEvent` upgrade is at **block `2270724`**
+
+What is now supported by code and chain evidence:
+
+- the failing player already had earlier `PlayerActivityEvent`s in the same chunk before block `2270724`
+- `EventMessageProcessor` groups those historical events into one task keyed by `(world, selector, player)`
+- `TaskManager::add_parallelized_event_with_dependencies(...)` does not merge dependencies when appending to an existing task
+- `TaskNetwork::add_task_with_dependencies(...)` also ignores dependencies whose prerequisite task does not yet exist
+
+Conclusion: a **specific task/dependency ordering bug** now looks like the best explanation for the observed failure. What is ruled out is only the weaker version of the theory: "torii randomly saw the later event first."
+
+### R7 — "The real culprit is a model-side `GenesisKey::Groggus = 18` decode"
+
+Demoted to a narrow fallback, effectively ruled out as the **general** explanation.
+
+- the current mainnet world does not exist at block `1375000` (`2025-05-05 12:56:03 UTC`)
+- it does exist by block `1500000` (`2025-06-18 04:29:30 UTC`)
+- `Groggus = 18` lands on `2025-05-04`, before the current mainnet world even exists
+- sepolia only leaves a narrow deployment overlap window (`740000` not found, `750000` exists)
+
+Conclusion: `Groggus` remains a conceivable sepolia-only fallback if the failing processor is a full-record `Duelist` or `PlayerDuelistStack` path, but it is not a strong cross-network explanation for the shared trigger.
+
+### R8 — "The `18` is `Trophy::TricksterDeath` from `TrophyProgression`"
+
+Retired as a live lead.
+
+- `TricksterDeath = 18` is real in `dojo/src/types/trophies.cairo`
+- but the historical event torii indexes is `TrophyProgression`
+- that payload does **not** carry a `Trophy` enum field in the way `PlayerActivityEvent` carries `Activity`
+- it also does not line up cleanly with the Oct 15-22 ranked-queue / FAME rollout that clusters the poisoned model upgrades
+
+Conclusion: `TrophyProgression` is not the best use of investigation time unless instrumented replay explicitly points there.
