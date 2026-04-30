@@ -104,7 +104,7 @@ ctx.cache.register_model(ctx.contract_address, event.selector, Model { … schem
 
 - `ctx.storage.register_model` enqueues `INSERT INTO models …` and `ALTER TABLE [pistols-Config] ADD COLUMN [realms_address] …` on the executor's mpsc channel (`crates/sqlite/sqlite/src/storage.rs:1726-1815` → `crates/sqlite/sqlite/src/lib.rs:259-413`).
 - These queries run inside a single sqlx transaction held by the executor (`crates/sqlite/sqlite/src/executor/mod.rs:186,291,298`). The transaction is **only committed at the end of a chunk** via `self.storage.execute().await` (`crates/indexer/engine/src/engine.rs:228`).
-- `ctx.cache.register_model` writes to the in-memory `RwLock<HashMap<…>>` immediately and is not transactional (`crates/cache/src/lib.rs:227-233`).
+- `ctx.cache.register_model` writes to the in-memory `RwLock<HashMap<…>>` immediately and is not transactional (`crates/cache/src/lib.rs:125`, delegating to `ModelCache::set` at `227-233`).
 
 ### 3. Chunk-level rollback drops the SQL but **not** the cache
 
@@ -706,7 +706,7 @@ So:
 
 - the failing payload timestamp `0x68d89396` decodes to `2025-09-28 01:47:02 UTC`
 - `starknet_getEvents` confirms that exact payload is the world `EventEmitted` at block `2271871`, tx `0x69d9c453…`
-- the same event's third key is system address `0x16f7e3c1…`, which resolves to `pistols-matchmaker`
+- the third key in that on-chain `EventEmitted.keys` tuple (distinct from the model's `raw_keys` shown above — the on-chain layout includes routing keys the deserializer strips) is system address `0x16f7e3c1…`, which resolves to `pistols-matchmaker`
 - the same query also shows the same player (`0x550212d3…`) already had multiple earlier `PlayerActivityEvent`s in the same chunk at blocks `2268329`, `2268359`, `2268364`, `2268403`, `2268406`, `2268420`, `2268449`, `2269979`, and `2270482`
 - those earlier events all use pre-18 `activity` values (`7`, `10`, `11`, `13`, …) compatible with the old schema, so they create the historical event task before the upgrade is reached
 
