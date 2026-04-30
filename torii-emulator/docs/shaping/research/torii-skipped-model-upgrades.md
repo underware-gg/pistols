@@ -64,7 +64,7 @@ This investigation needs to:
 
 ## Root cause walk-through
 
-References below are to the local checkout at `~/Development/torii` (HEAD = v1.8.15).
+Code references below resolve against torii tag `v1.8.15` in the local checkout at `~/Development/torii`.
 
 ### 1. `UpgradeModelProcessor` reads `prev_schema` from cache
 
@@ -221,7 +221,7 @@ Verified directly against v1.7.5 source: `engine.rs` rollback path (`storage.rol
 
 ### What actually changed in v1.8: the trigger, not the hazard
 
-I initially suspected PR [#356](https://github.com/dojoengine/torii/pull/356) introduced the bug. Verifying against v1.7.5 disproves that — see above. The two often-cited recent commits were both behaviour-preserving refactors:
+PR [#356](https://github.com/dojoengine/torii/pull/356) was an early suspect; verifying against v1.7.5 disproved that — see above. The two often-cited recent commits were both behaviour-preserving refactors:
 
 - [`04a7733b`](https://github.com/dojoengine/torii/pull/353) — `refactor(processors): try retrieve model from storage that uses cache (#353)`. Made `Sql::model()` consult `ModelCache` first and only fall back to SQLite on a miss (`crates/sqlite/sqlite/src/storage.rs:56-83`). **Shipped in v1.8.0** (2025-10-08). No-op vs. v1.7.5, which already did this.
 - [`e74d8fc3`](https://github.com/dojoengine/torii/pull/356) — `refactor(processors): model upgrades to use cache (#356)`. Replaced `ctx.storage.model(...)` with `ctx.cache.model(...)` directly inside `UpgradeModelProcessor` and `UpgradeEventProcessor`. **Shipped in v1.8.1** (2025-10-09). No-op vs. v1.8.0 since `Sql::model()` was already cache-first.
@@ -252,7 +252,7 @@ mataleone's report — "I wasn't seeing this problem in the 1.8.0 mainnet deploy
 
 ### Historical on-chain verification
 
-I checked the chain directly by calling the Pistols world's `resource(selector)` entrypoint for `pistols-PlayerActivityEvent` (`0x46a192c105a4598953e7aeaf3809703964eb9e6d65403156d0458dcd2ee379b`), then calling `schema()` on the resolved event resource contract at specific historical blocks.
+Direct chain reads called the Pistols world's `resource(selector)` entrypoint for `pistols-PlayerActivityEvent` (`0x46a192c105a4598953e7aeaf3809703964eb9e6d65403156d0458dcd2ee379b`), then `schema()` on the resolved event resource contract at specific historical blocks.
 
 The exact replayable command pattern is:
 
@@ -340,7 +340,7 @@ The observed poisoned columns are not random. They line up with a tight Oct 17-2
 
 That clustering fits the torii bug better than any model-specific theory. Multiple additive `ModelUpgraded` events landed close together, then a later deserialize failure inside the same large replay chunk poisoned whichever upgrades shared that chunk.
 
-**Summary.** The hazard has been latent in *every* torii release since at least v1.5.0 (April 2025), originating from two dojoengine/dojo monorepo commits that were both in tree by **Nov 14 2024** (one authored earlier on Nov 4). The user-visible bug for Pistols first appeared in **cold re-indexes on the v1.8.x line** because replay hit a deserialize failure inside the same chunk as a model upgrade. The rollback/cache bug is definite. The trigger is now effectively nailed down too: torii was replaying a **later** `PlayerActivityEvent.activity = 18` payload while the active schema bound to that player's historical event task was still **pre-18**, because the task had been created by earlier same-player events and later post-upgrade events were appended without gaining the selector-upgrade dependency. A local torii patch that merges dependencies into existing historical event tasks, retains late prerequisite links in `TaskNetwork`, and rebuilds post-rollback model reads from committed storage has now replayed the Sepolia trigger window cleanly and landed the missing schema changes.
+**Summary.** The hazard has been latent in *every* torii release since at least v1.5.0 (April 2025), originating from two dojoengine/dojo monorepo commits that were both in tree by **Nov 14 2024** (one authored earlier on Nov 4). The user-visible bug for Pistols first appeared in **cold re-indexes on the v1.8.x line** because replay hit a deserialize failure inside the same chunk as a model upgrade. The rollback/cache bug is definite. The trigger is also nailed down: torii was replaying a **later** `PlayerActivityEvent.activity = 18` payload while the active schema bound to that player's historical event task was still **pre-18**, because the task had been created by earlier same-player events and later post-upgrade events were appended without gaining the selector-upgrade dependency. A local torii patch that merges dependencies into existing historical event tasks, retains late prerequisite links in `TaskNetwork`, and rebuilds post-rollback model reads from committed storage replays the Sepolia trigger window cleanly and lands the missing schema changes.
 
 ## Reproducing and testing
 
@@ -598,7 +598,7 @@ For a developer starting fresh, the shortest useful sequence is:
 
 ### Current local repro status
 
-We now have a real cold-replay result from this repo, not just historical logs.
+A real cold-replay result from this repo grounds the description below, not just historical logs.
 
 Using unpatched **torii `1.8.7`** with [`dojo/torii_sepolia_repro.toml`](../../../dojo/torii_sepolia_repro.toml) against a fresh sqlite DB, the replay has already advanced past the critical Sepolia window:
 

@@ -71,7 +71,7 @@ The substantive runtime changes, applied on top of torii `v1.8.15`:
          } else {
 ```
 
-**`crates/task-network/src/lib.rs`** — adds a `pending_dependents: HashMap<K, HashSet<K>>` to `TaskNetwork`, plus `add_dependency_or_defer` and `resolve_pending_dependents` helpers. Dependencies whose prerequisite task does not yet exist are now deferred and resolved when the prerequisite is added, instead of being silently dropped. ~114 lines of additions. New tests: `test_late_dependency_becomes_active`, `test_add_dependencies_to_existing_task`.
+**`crates/task-network/src/lib.rs`** — adds a `pending_dependents: HashMap<K, HashSet<K>>` to `TaskNetwork`, plus `add_dependency_or_defer` and `resolve_pending_dependents` helpers. Dependencies whose prerequisite task does not yet exist are now deferred and resolved when the prerequisite is added, instead of being silently dropped. ~104 lines of additions. New tests: `test_late_dependency_becomes_active`, `test_add_dependencies_to_existing_task`.
 
 **Processor model lookups** — replace `ctx.cache.model(...)` with `ctx.storage.model(...)` across `event_message.rs:84`, `store_set_record.rs:76`, `store_update_record.rs:82`, `store_update_member.rs:87`, `store_del_record.rs:74`, `upgrade_event.rs:64`, `upgrade_model.rs:62`. Storage is cache-first-then-DB, so when rollback empties the cache the next read repopulates from committed sqlite instead of throwing `CacheError(ModelNotFound(...))`. The pattern in each file is identical:
 
@@ -84,8 +84,6 @@ The substantive runtime changes, applied on top of torii `v1.8.15`:
 ```
 
 The diagnostic instrumentation used during the investigation to capture the trigger payload is not part of the runtime fix — see [Patched replay → Diagnostic instrumentation](./torii-skipped-model-upgrades.md#diagnostic-instrumentation) in the research doc for the full diffs.
-
-We can make the local patch available on request.
 
 ## Operational notes
 
@@ -100,7 +98,7 @@ For implementation detail, evidence, and procedures, see the companion research 
 - **[Research brief](./torii-skipped-model-upgrades.md#research-brief)** — what was known going into the investigation
 - **[Root cause walk-through](./torii-skipped-model-upgrades.md#root-cause-walk-through)** — line-by-line code trace of the rollback/cache poison mechanism
 - **[When the bug was introduced / made visible](./torii-skipped-model-upgrades.md#when-the-bug-was-introduced--made-visible)** — origin in the dojo monorepo, earliest tagged release, and what changed in v1.8.x
-- **Trigger investigation** — task/dependency mechanism, supporting code paths, world-event chain reads (in `## Trigger investigation` of the research doc)
+- **[Trigger investigation](./torii-skipped-model-upgrades.md#trigger-investigation-invalidenumselector--actual_selector-18-)** — task/dependency mechanism, supporting code paths, world-event chain reads
 - **[Patched replay: trigger captured and fix confirmed](./torii-skipped-model-upgrades.md#patched-replay-trigger-captured-and-fix-confirmed)** — captured trigger log, chain follow-up, the four-part patch, and the validation replay
 - **[Repairing a poisoned DB](./torii-skipped-model-upgrades.md#repairing-a-poisoned-db)** — manual SQL recovery procedure for an already-poisoned DB
 - **[Pistols-side mitigations until upstream is fixed](./torii-skipped-model-upgrades.md#pistols-side-mitigations-until-upstream-is-fixed)** — operator workarounds and redeploy plan
