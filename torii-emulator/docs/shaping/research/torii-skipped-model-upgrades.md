@@ -292,7 +292,7 @@ This matters a lot:
 
 So the simple thesis "`PlayerActivityEvent.activity = 18` is failing because the world never exposed variant 18" is **false** for the actual replay window under discussion.
 
-One more detail from the Oct 10 Discord report now lines up extremely well with the chain history:
+One more detail from the Oct 10 Discord report lines up well with the chain history:
 
 - on sepolia, `pistols-Player` only shows a `ModelUpgraded` at block **`2202995`**
 - on sepolia, `pistols-Config` shows a later `ModelUpgraded` at block **`2270724`**
@@ -372,7 +372,7 @@ Recommended shape:
    - `new_schema.diff(prev_schema) == None`
    - no second `ALTER TABLE` is emitted
    - the table remains missing the added column
-5. apply the rollback patch (`self.cache.clear_models().await`) and assert the retry now replays the upgrade and lands the column
+5. apply the rollback fix (clear `models` cache state on rollback AND have processors read model definitions from `ctx.storage.model(...)` so the empty cache repopulates from committed sqlite — see [Patched replay → Patch](#patched-replay-trigger-captured-and-fix-confirmed) for the full four-part patch) and assert the retry now replays the upgrade and lands the column
 
 This is easiest as a local integration test rather than a pure unit test because `UpgradeModelProcessor` fetches the latest schema from a provider.
 
@@ -465,7 +465,7 @@ For a practical repro, the highest-signal replay window is the Oct 15-28 2025 ra
 
 ## Trigger investigation: `InvalidEnumSelector { actual_selector: 18 }`
 
-`PrimitiveError(InvalidEnumSelector { actual_selector: 18 })` turned out to be a separate trigger bug. Even with the immediate rollback patch above, that chunk would keep rolling back forever until the trigger bug was fixed as well.
+`PrimitiveError(InvalidEnumSelector { actual_selector: 18 })` turned out to be a separate trigger bug. Even with the rollback/cache fix from [Patched replay → Patch](#patched-replay-trigger-captured-and-fix-confirmed), that chunk would keep rolling back forever until the trigger bug was fixed as well.
 
 The torii-side failure site is one of the entity/event deserializers, not the upgrade processors themselves:
 
@@ -485,7 +485,7 @@ The key implication is on a **fresh DB**:
 - `strict_model_reader` defaults to `false`, so that fetch is against the provider's latest state unless explicitly overridden
 - `EventMessageProcessor` declares a same-selector dependency on the register/upgrade task before it deserializes the event payload
 
-That address/class-hash point is now directly verified against torii's pinned `dojo-world` source (`dojo` rev `0afeb1bc`): `ModelRPCReader::new(...)` constructs `ModelContractReader::new(address, world.provider())` and does **not** re-resolve the model or event by tag.
+That address/class-hash point is verified against torii's pinned `dojo-world` source (`dojo` rev `0afeb1bc`): `ModelRPCReader::new(...)` constructs `ModelContractReader::new(address, world.provider())` and does **not** re-resolve the model or event by tag.
 
 That dependency declaration was not enough. The local replay showed the failing player already had multiple earlier `PlayerActivityEvent`s in the same chunk, and `TaskManager::add_parallelized_event_with_dependencies(...)` does not merge dependencies into an already-existing task — a same-chunk task/dependency bug. The "nested enum changed → upgrade ignored" theory was also ruled out by `Ty::diff()` (see [R2](#r2--the-eventschema-upgrade-was-ignored-because-only-a-nested-enum-changed)).
 
@@ -521,7 +521,7 @@ The mechanism is torii-specific and backed by both code and chain history:
 - `TaskManager::add_parallelized_event_with_dependencies(...)` appends to an existing historical task without merging dependencies (`crates/processors/src/task_manager.rs`)
 - `TaskNetwork::add_task_with_dependencies(...)` silently ignores dependencies whose prerequisite task does not yet exist (`crates/task-network/src/lib.rs`)
 
-Direct world-event reads now tighten that further. Querying `starknet_getEvents` on the Pistols world confirms the world did emit the relevant `EventUpgraded` records for `pistols-PlayerActivityEvent`:
+Direct world-event reads tighten that further. Querying `starknet_getEvents` on the Pistols world confirms the world did emit the relevant `EventUpgraded` records for `pistols-PlayerActivityEvent`:
 
 - **sepolia `2270724`**: `0x0280394e… -> 0x022c1242…` (pre-18 -> includes `18`)
 - **mainnet `2544507`**: `0x05fbad80… -> 0x05d875a0…` (pre-18 -> includes `18`)
@@ -549,12 +549,12 @@ This is the compact reconstruction reference for recreating the bug across **tor
 | `2025-09-28 05:50:51 UTC` | chain check | mainnet `2500000` | event resource `0x05fbad80…` | mainnet still on the pre-upgrade `PlayerActivityEvent` resource here |
 | `2025-09-29 18:07:42 -03:00` | Pistols deploy | `9a3171a1` (`migrate mainnet`) | mainnet later confirmed upgraded by `2831000` | early mainnet deployment point for the same era |
 | `2025-09-29 19:44:47 UTC` | chain check | mainnet `2544507` | `EventUpgraded`: `0x05fbad80… -> 0x05d875a0…` | direct proof the world emitted the mainnet `PlayerActivityEvent` upgrade that makes `18` valid |
-| `2025-09-30` | torii | `v1.7.3` / `0155915d` | n/a | hazard already present before Pistols starts seeing it |
-| `2025-10-01 22:19:21 UTC` | chain check | mainnet `2600000` | event resource `0x05d875a0…` | mainnet has already switched to the `PlayerActivityEvent` resource that later proves variant `18` is live |
+| `2025-09-30` | torii | `v1.7.3` / `0155915d` | n/a | hazard already present before Pistols started seeing it |
+| `2025-10-01 22:19:21 UTC` | chain check | mainnet `2600000` | event resource `0x05d875a0…` | mainnet had already switched to the `PlayerActivityEvent` resource that later proves variant `18` is live |
 | `2025-10-06` | torii | `v1.7.5` / `e0ba3fc5` | n/a | verified locally to have the same rollback/cache bug as HEAD |
-| `2025-10-08` | torii | `v1.8.0` / `dffb1c36` | Dojo pin `6daa3d0` | mainnet continuous indexing still not visibly poisoned |
-| `2025-10-09` | torii | `v1.8.1` / `053de409` | Dojo pin `711cb72` | first version that bites cold re-indexes in user reports |
-| `2025-10-09 13:25:29 UTC` | chain check | mainnet `2831000` | event resource `0x05d875a0…`, variants `0..18` | proves `PlayerActivityEvent` variant `18` is already live on mainnet before the later replay window |
+| `2025-10-08` | torii | `v1.8.0` / `dffb1c36` | Dojo pin `6daa3d0` | mainnet continuous indexing was still not visibly poisoned |
+| `2025-10-09` | torii | `v1.8.1` / `053de409` | Dojo pin `711cb72` | first version that bit cold re-indexes in user reports |
+| `2025-10-09 13:25:29 UTC` | chain check | mainnet `2831000` | event resource `0x05d875a0…`, variants `0..18` | proves `PlayerActivityEvent` variant `18` was already live on mainnet before the later replay window |
 | `2025-10-10 06:15` | Discord report | mataleone -> nas | fresh sepolia `delete+create` on `v1.8.1` | first public report: `Config.realms_address` missing while `Player.referrer_address` is fine |
 | `2025-10-14 14:03:08 UTC` | local torii log | thread repro | sepolia config with `world_block = 23920`, default chunking | `UpgradeEvent(PlayerActivityEvent)` then `UpgradeModel(Config)` immediately followed by `PrimitiveError(InvalidEnumSelector { actual_selector: 18 })` |
 | `2025-10-15 17:20:37 -03:00` | Pistols code | `bc5ad295` | sepolia `2560000` already includes variant `18` | adds `PlayerActivityEvent` variants `19` and `20` to the queue/activity rollout; `18` was already live |
@@ -566,7 +566,7 @@ This is the compact reconstruction reference for recreating the bug across **tor
 | `2025-10-20 11:29:39 -03:00` | Pistols code | `6dc79473` | mainnet `3100000` | `Duelist.released_fame` added |
 | `2025-10-20 16:30:17 -03:00` | Pistols code | `028e2893` | mainnet `3100000` | `MatchQueue.enlisted_duelist_ids` indexing added |
 | `2025-10-20 18:31:51 -03:00` | Pistols code | `720655ce` | mainnet `3100000` | `PlayerActivityEvent` variant `21` added |
-| `2025-10-22` | torii | `v1.8.7` / `21031a24` | n/a | user still reproduces poisoned cold indexes here |
+| `2025-10-22` | torii | `v1.8.7` / `21031a24` | n/a | user still reproduced poisoned cold indexes on this version |
 | `2025-10-22 14:27:30 -03:00` | Pistols deploy | `d0c79771` (`migrate sepolia`) | sepolia `2640000` | sepolia replay anchor inside the poisoned-model rollout |
 | `2025-10-22 14:50:20 -03:00` | Pistols deploy | `871b572f` (`migrate mainnet`) | mainnet `3150000` | mainnet replay anchor inside the poisoned-model rollout |
 | `2025-10-23 01:14:32 UTC` | chain check | mainnet `3033226` | `EventUpgraded`: `0x05d875a0… -> 0x05be8170…` | direct proof the later mainnet `PlayerActivityEvent` upgrade was also emitted on chain |
@@ -667,22 +667,7 @@ That result matters for two reasons:
 2. It shows the unpatched replay can advance **well past** the known upgrade block (`2270724`) without ever landing either the `Config` additive column or the `PlayerActivityEvent` enum expansion. So the problem is not just "one noisy log line near the transition"; it leaves the DB observably stale after the replay has moved on.
 3. It suggests the broader cold-replay failure is at least partly **historical-event-specific**. The replay head continues advancing, but the indexed historical event tables stop days earlier than the reported trigger window.
 
-By contrast, the current patched local replay from a copied pre-critical DB state **does** pass the same window cleanly. Starting from head `2262908`, it crossed the three decisive milestones:
-
-- earlier same-player `PlayerActivityEvent`s in the chunk
-- `EventUpgraded(PlayerActivityEvent)` at `2270724`
-- the captured failing payload block `2271871`
-
-And after those crossings:
-
-- world head continued to **`2273149`**, then **`2283390`**, then **`2293631`**
-- `pistols-Config` flipped from `Config|0` to `Config|1` and `PRAGMA table_info([pistols-Config])` now includes `realms_address`
-- `pistols-PlayerActivityEvent` flipped from `PlayerActivityEvent|0` to `PlayerActivityEvent|1`
-- the table DDL now includes `EnlistedRankedDuelist` in `activity_check`
-- the table contains `EnlistedRankedDuelist` rows
-- torii logs continue to show `Store event message. namespace=pistols name=PlayerActivityEvent system=0x16f7e3c1…` after the upgrade window, with **no** `InvalidEnumSelector`
-
-That is the local end-to-end confirmation that the current torii patch fixes the historical replay trigger and allows the missing schema upgrades to land.
+The patched local replay from the same baseline crosses the trigger window cleanly — see the next section for captured logs and validation.
 
 ### Patched replay: trigger captured and fix confirmed
 
