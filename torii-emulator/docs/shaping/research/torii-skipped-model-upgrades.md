@@ -67,67 +67,6 @@ This investigation needs to:
 - produce a verified patch that mitigates the failure
 - document any operator workaround for keeping cold re-indexes working until an upstream fix exists
 
-## Background
-
-### Reported symptom
-
-From mataleone's reports (Oct 10 → Dec 19):
-
-- `pistols-Config.realms_address` was added to the Cairo model on mainnet via a `ModelUpgraded`. The migration ran successfully — `world.upgrade_model` is on chain, and torii logs `Upgraded model. namespace=pistols name=Config`.
-- The schema returned by torii's RPC (`/schema`) **does** include `realms_address`.
-- But the SQLite table `pistols-Config` **does not** have a column for `realms_address`.
-- gRPC `useSdkEntitiesGet` fails with: `no such column: pistols-Config.realms_address`.
-- `INSERT/UPDATE` from `StoreUpdateMember` events fail in the executor:
-  `Failed to execute query. … "table pistols-Config has no column named realms_address"`.
-- Reproduces on a fresh delete+create of the Slot Sepolia indexer on torii ≥ 1.8.1 (still failing on 1.8.7). Older continuously indexed mainnet instances did not surface it initially, but cold-indexed mainnet recreates later showed the same failure class.
-- `blocks_chunk_size = 10240` triggers it; **lowering to `1024` works around it** locally. This matters because `10240` is torii's own default (`crates/indexer/fetcher/src/lib.rs`, `crates/cli/src/options.rs`), so the bad case is not an unusual custom configuration.
-- A telltale log line appears immediately after the offending upgrade:
-  ```
-  INFO upgrade_model: Upgraded model. namespace=pistols name=Config
-  ERROR engine: Processing fetched data. error=Processors(TaskNetworkError(TaskError(
-      PrimitiveError(InvalidEnumSelector { actual_selector: 18 }))))
-  ```
-  i.e. *something else in the same chunk* fails to deserialize, the chunk is rolled back, and the column never lands.
-- A later log capture from **2025-10-28** shows the same failure pattern on three more fields introduced during the same ranked-queue / FAME rollout window:
-  - `pistols-DuelistAssignment.season_id`
-  - `pistols-Duelist.released_fame`
-  - `pistols-MatchQueue.enlisted_duelist_ids`
-  This clusters the poisoned upgrades around the Oct 15-22 2025 matchmaker changes rather than a one-off `Config` migration issue.
-- A later **mainnet** recreate on torii `1.8.7` did not just miss columns; it entered an error loop with `ModelMemberNotFound("0x1583394ac5a692ac2860830bae36b55101ec515479ae3ada3135bdd13f021e1")`. Resolving that selector gives `released_fame`, so even the later mainnet failure loop points back to the same Oct 17-20 rollout wave rather than a separate unrelated schema issue.
-- The first public Sepolia report is even earlier: **2025-10-10 06:15**. mataleone reported that a fresh torii **v1.8.1** `delete+create` indexer already had `pistols-Config.realms_address` missing, while another recently-added field, `pistols-Player.referrer_address`, was indexing correctly. That is important evidence:
-  - it shows the cold-reindex failure was present from the start of the v1.8.1 Sepolia rollout, not only after later December rebuilds
-  - it shows **not every recent upgrade was poisoned**
-  - it fits a chunk-local failure much better than a global "torii 1.8.1 cannot apply upgrades correctly" theory
-- A local repro from **2025-10-14** already showed the event/model pairing clearly. With the Sepolia config from the thread, torii logged:
-  ```text
-  INFO  torii::indexer::processors::upgrade_event: Upgraded event. namespace=pistols name=PlayerActivityEvent
-  INFO  torii::indexer::processors::upgrade_model: Upgraded model. namespace=pistols name=Config
-  ERROR torii::indexer::engine: Processing fetched data. error=Processors(TaskNetworkError(TaskError(PrimitiveError(InvalidEnumSelector { actual_selector: 18 }))))
-  ```
-  i.e. the first clearly reported cold-replay failure is not just "near" the `PlayerActivityEvent` upgrade; it happens immediately after torii says it upgraded `PlayerActivityEvent` and `Config` in the same pass.
-- An earlier Oct 9 local log from the same thread also showed repeated SQLite errors `CHECK constraint failed: activity_check` after the `PrimitiveError`. In Pistols code, the relevant stored event model with an `activity` enum column is `pistols-PlayerActivityEvent`, and `activity = 18` is exactly `Activity::EnlistedRankedDuelist`. That makes the failing event family effectively identified even though the deserializer error itself only reports `actual_selector: 18`.
-- A later capture from **2025-12-19 / 2025-12-20** confirms the poisoned state can persist while torii still advances:
-  - executor writes fail with
-    - `table pistols-DuelistAssignment has no column named season_id`
-    - `table pistols-MatchQueue has no column named enlisted_duelist_ids`
-  - query/read paths fail with
-    - `no such column: pistols-Pack.pegged_lords_amount`
-    - `no such column: pistols-Duelist.released_fame`
-  - Luca noted that the indexer still appeared to be indexing rather than crashing
-  This is consistent with torii's executor design: most entity/model writes are queued fire-and-forget, so row-level SQL failures are logged by the executor without necessarily aborting the main indexing loop.
-
-By Dec 20 the same class of error had spread to `pistols-DuelistAssignment.season_id`, `pistols-MatchQueue.enlisted_duelist_ids`, `pistols-Duelist.released_fame`, `pistols-Pack.pegged_lords_amount`, etc. — anything added by a `ModelUpgraded` whose chunk also contained a failing event. glihm summarised it as "Torii somehow skips some upgrade of the schema of the model. which causes future inserts to not work due to the column not being added properly."
-
-### Timeline of reported events
-
-| Date / time | Context | Reported state |
-|---|---|---|
-| `2025-10-10 06:15` | first public Sepolia recreate on `v1.8.1` | `pistols-Config.realms_address` missing; `pistols-Player.referrer_address` indexing correctly |
-| `2025-10-14 14:03:08 UTC` | local replay using the incident-style Sepolia config | `UpgradeEvent(PlayerActivityEvent)` then `UpgradeModel(Config)` immediately followed by `PrimitiveError(InvalidEnumSelector { actual_selector: 18 })` |
-| `2025-10-28` | fresh Sepolia recreates on `v1.8.7` | repeated missing-column failures on `realms_address`, then `season_id`, `released_fame`, and `enlisted_duelist_ids` |
-| `2025-10-28` | recreated mainnet torii | same general failure class appears on mainnet cold replay, including `ModelMemberNotFound(...released_fame...)` |
-| `2025-12-19 / 2025-12-20` | later production/operator follow-up | poisoned DB state persists with repeated write-side `has no column named` errors and read-side `no such column` errors while torii still appears to be indexing |
-
 ## Root cause walk-through
 
 References below are to the local checkout at `~/Development/torii` (HEAD = v1.8.15).
@@ -909,7 +848,7 @@ This is the compact reconstruction reference for recreating the bug across **tor
 | `2024-11-14` | dojo/torii ancestry | `45a0a650` | n/a | model/event upgrade path lands with immediate cache mutation |
 | `2025-04-25 13:47:39 +10:00` | Pistols code | `64fb06ba` | n/a | `PlayerDuelistStack` model lands |
 | `2025-04-29` | torii | `v1.5.0` / `d392987f` | n/a | first standalone torii release carrying the latent rollback/cache bug |
-| `2025-05-04 20:04:01 -03:00` | Pistols code | `28a3f8c9` | n/a | `GenesisKey::Groggus = 18` lands after `PlayerDuelistStack` already exists |
+| `2025-05-04 20:04:01 -03:00` | Pistols code | `28a3f8c9` | n/a | `GenesisKey` variant 18 renamed `Brutus` → `Groggus` (slot 18 was already in use; commit message is `renamed team keys`) |
 | `2025-05-05 12:56:03 UTC` | chain check | mainnet `1375000` | `ContractNotFound` for current world | current mainnet world definitely does **not** exist yet; this makes pre-Groggus mainnet schema replay a weak explanation |
 | `2025-05-06 19:48:47 UTC` | chain check | sepolia `750000` | world exists | current sepolia world appears only in a narrow May 2-6 window around `Groggus`, so it is not a strong cross-network explanation |
 | `2025-09-27 18:45:27 -03:00` | Pistols code | `b9840a17` | sepolia `2270000` -> old schema, `2272000` -> upgraded schema | `PlayerActivityEvent` first gains `EnlistedRankedDuelist` locally; chain confirms sepolia publishes it within this window |
