@@ -314,9 +314,7 @@ It also matches torii's default chunking mechanically. With the actual Sepolia c
 
 ### Current world deployment window
 
-I also checked when the **current** Pistols world address first appears on chain, because that determines whether older enum candidates like `GenesisKey::Groggus = 18` can even be part of this world's historical schema.
-
-Using the same `world.resource(selector)` call against `pistols-PlayerActivityEvent`:
+Chain reads against `world.resource(selector)` for `pistols-PlayerActivityEvent` establish when the **current** Pistols world address first appears on chain. This bounds older enum candidates like `GenesisKey::Groggus = 18` (see [R7](#r7--the-real-culprit-is-a-model-side-genesiskeygroggus--18-decode)) — they can only be part of this world's historical schema if the world existed when they were introduced.
 
 | Network | Block | UTC time | Result |
 |---|---:|---|---|
@@ -325,11 +323,7 @@ Using the same `world.resource(selector)` call against `pistols-PlayerActivityEv
 | sepolia | `740000` | `2025-05-02 10:48:58` | `ContractNotFound` |
 | sepolia | `750000` | `2025-05-06 19:48:47` | world exists |
 
-This changes the fallback ranking materially:
-
-- on **mainnet**, the current world address definitely postdates the `2025-05-04` `GenesisKey::Groggus = 18` source change, so a **pre-Groggus** model schema on this world is not a serious mainnet explanation
-- on **sepolia**, the deployment window only narrowly overlaps the `Groggus` commit window, so it remains theoretically possible there but is no longer a strong **cross-network** trigger
-- by contrast, `PlayerActivityEvent.activity = 18` is a **post-deployment** enum addition on both networks, which is exactly what we would expect for a replay that later trips on `actual_selector: 18`
+The mainnet world definitely postdates the `2025-05-04` `Brutus` → `Groggus` rename at slot 18, so a pre-Groggus model schema is not a viable mainnet explanation. The sepolia world's deployment window only narrowly overlaps the rename. `PlayerActivityEvent.activity = 18` is a post-deployment enum addition on both networks, which fits a replay that later trips on `actual_selector: 18`.
 
 What the chain data does show is that the same selector moved across **different event resource contracts** over time on both networks, and that the old contracts stay deployed with their old schema. That is relevant because torii does **not** version event schemas by resource contract:
 
@@ -338,7 +332,7 @@ What the chain data does show is that the same selector moved across **different
 - `EventMessageProcessor` looks up the schema with `ctx.cache.model(ctx.contract_address, event.selector)` and ignores the emitting event resource `contract_address` (`crates/processors/src/processors/event_message.rs`)
 - `RegisterEventProcessor` and `UpgradeEventProcessor` do fetch the schema from the **concrete** `event.address` and `event.class_hash` carried by the world event, via `ModelRPCReader::new(...)` (`crates/processors/src/processors/register_event.rs`, `upgrade_event.rs`)
 
-That last point matters because it rules out a weaker theory: torii is **not** asking the world for "whatever schema currently owns this selector". The lossy step happens after the fetch, when torii stores and later reloads event schemas by selector alone. If the failing payload is `PlayerActivityEvent.activity = 18`, the exact failure is therefore not "torii saw the Oct 2025 schema transition and got confused by `19/20/21`". It is "torii somehow reached an `18` payload while its active schema slot for that selector was still **pre-Sep-27 pre-18**". If the failing payload is not `PlayerActivityEvent`, the remaining concrete fallback is a model/entity path carrying `GenesisKey::Groggus = 18`, but that is now substantially weaker than it was earlier in the investigation.
+The last bullet matters because torii is **not** asking the world for "whatever schema currently owns this selector" — the schema fetch is bound to the concrete resource address. The lossy step happens after the fetch: torii stores and later reloads event schemas by selector alone. The captured failure is therefore not "torii saw the Oct 2025 schema transition and got confused by `19/20/21`" — it is that torii reached an `18` payload while its active schema slot for that selector was still pre-Sep-27 pre-18 (full mechanism in [Patched replay](#patched-replay-trigger-captured-and-fix-confirmed)). Selector-only event-schema versioning remains a separate hardening direction (see [F4](#f4--version-historical-event-schemas-by-resource-contract)).
 
 ### Missing-column rollout map
 
@@ -493,20 +487,16 @@ The key implication is on a **fresh DB**:
 
 That address/class-hash point is now directly verified against torii's pinned `dojo-world` source (`dojo` rev `0afeb1bc`): `ModelRPCReader::new(...)` constructs `ModelContractReader::new(address, world.provider())` and does **not** re-resolve the model or event by tag.
 
-That dependency declaration turned out **not** to be enough. The later local replay showed the failing player already had multiple earlier `PlayerActivityEvent`s in the same chunk, and `TaskManager::add_parallelized_event_with_dependencies(...)` does not merge dependencies into an already-existing task. So a same-chunk ordering/tasking bug is now very much back on the table; the remaining question is the exact shape of that bug, not whether ordering can matter at all.
+That dependency declaration was not enough. The local replay showed the failing player already had multiple earlier `PlayerActivityEvent`s in the same chunk, and `TaskManager::add_parallelized_event_with_dependencies(...)` does not merge dependencies into an already-existing task — a same-chunk task/dependency bug. The "nested enum changed → upgrade ignored" theory was also ruled out by `Ty::diff()` (see [R2](#r2--the-eventschema-upgrade-was-ignored-because-only-a-nested-enum-changed)).
 
-One generic explanation is still ruled out by code:
-
-- `dojo_types::schema::Ty::diff()` explicitly treats enum-option additions as real diffs, so "the upgrade was ignored because only a nested enum changed" does **not** fit the pinned code
-
-Taken alone, the code/chain review would still leave room for another event model. But the thread evidence now closes most of that gap:
+Thread evidence narrowed the failing event family:
 
 - on **2025-10-14**, torii logs `Upgraded event. namespace=pistols name=PlayerActivityEvent` immediately before the first clearly reported `PrimitiveError(InvalidEnumSelector { actual_selector: 18 })`
 - in Pistols code, the relevant event model carrying an `activity` enum column is `pistols-PlayerActivityEvent`, and `Activity::EnlistedRankedDuelist` is exactly variant `18`
 
-So the failing event family is now confirmed: the replay is tripping on `pistols-PlayerActivityEvent.activity = 18`, and the remaining question that this investigation resolved was **which torii-side state was stale at that moment**.
+The failing event family is `pistols-PlayerActivityEvent.activity = 18`. The remaining question this investigation resolved was **which torii-side state was stale at the failing decode**.
 
-Why `PlayerActivityEvent` was the right lead:
+Supporting evidence for the `PlayerActivityEvent` family:
 
 - `dojo/src/models/events.cairo` defines `Activity::EnlistedRankedDuelist` at **selector 18**
 - the same file marks `PlayerActivityEvent` as `#[dojo::event(historical:true)]`, so torii replays it through `EventMessageProcessor` on cold index
@@ -514,16 +504,16 @@ Why `PlayerActivityEvent` was the right lead:
 - the `Activity` enum first gains `18` in `b9840a17` on **2025-09-27**; variants `19` and `20` land later in `bc5ad295` on **2025-10-15**; variant `21` follows in `720655ce` on **2025-10-20**
 - on **mainnet**, the same selector is still on the old resource `0x05fbad80…` at block `2500000` (`2025-09-28 05:50:51 UTC`) and has moved to the new resource `0x05d875a0…` by block `2600000` (`2025-10-01 22:19:21 UTC`), so the historical resource boundary is real on both networks
 - the poisoned-column log cluster from **2025-10-28** (`season_id`, `released_fame`, `enlisted_duelist_ids`) lines up with the same Oct 15-22 ranked-queue / FAME rollout window as those new `Activity` variants
-- the very first public Sepolia failure report on **2025-10-10** already fits this path: `pistols-Config` upgrades at sepolia block `2270724`, which is the same block where `pistols-PlayerActivityEvent` first upgrades to an `18`-capable schema, while `pistols-Player` upgraded much earlier at `2202995` and was reported healthy
+- the first public Sepolia failure report on **2025-10-10** fits this path: `pistols-Config` upgrades at sepolia block `2270724`, the same block where `pistols-PlayerActivityEvent` first upgrades to an `18`-capable schema, while `pistols-Player` upgraded earlier at `2202995` and was reported healthy
 
-But the historical chain reads also prove something stricter: the **later** rollout-era resource transitions only add `19`, `20`, and `21`. They do not make `18` invalid. Combined with the local replay, the directed trigger theory is now:
+The later rollout-era resource transitions only add `19`, `20`, and `21` — they do not make `18` invalid. Combined with the local replay, the captured failure mechanism is:
 
-1. torii reaches the later `PlayerActivityEvent.activity = 18` payload at block `2271871` while the active schema it is using for that player's historical event task is still **pre-18**
+1. torii reaches the `PlayerActivityEvent.activity = 18` payload at block `2271871` while the active schema for that player's historical event task is still **pre-18**
 2. the task already exists because earlier pre-upgrade `PlayerActivityEvent`s for the same player occurred earlier in the chunk
 3. the later `activity = 18` event is appended to that task without gaining the `EventUpgraded(PlayerActivityEvent)` dependency
-4. the task therefore runs against old cached schema and fails on `actual_selector: 18`
+4. the task runs against old cached schema and fails on `actual_selector: 18`
 
-That theory is torii-specific and backed directly by both code and chain history:
+The mechanism is torii-specific and backed by both code and chain history:
 
 - `ModelCache` is keyed only by `(world_address, selector)` (`crates/cache/src/lib.rs`)
 - `storage.register_model` upserts one `models` row per `world_address:model_selector`, not per event resource contract version (`crates/sqlite/sqlite/src/storage.rs:1726-1788`)
@@ -538,7 +528,7 @@ Direct world-event reads now tighten that further. Querying `starknet_getEvents`
 - **sepolia `2568610`**: `0x022c1242… -> 0x0130d4f2…` (adds later variants after `18`)
 - **mainnet `3033226`**: `0x05d875a0… -> 0x05be8170…` (adds later variants after `18`)
 
-That removes one more world-side explanation: for this selector, the historical upgrade events were not merely implied by `resource(...)` state changes; they were actually published on chain. The remaining failure is therefore inside torii's replay/tasking behavior, not in missing upgrade publication.
+For this selector, the historical upgrade events were not merely implied by `resource(...)` state changes; they were actually published on chain (also see [R5](#r5--the-world-resource-changed-but-no-eventupgraded-was-emitted-for-torii-to-follow)). The captured failure is therefore inside torii's replay/tasking behavior, not in missing upgrade publication.
 
 ## Reference timeline
 
