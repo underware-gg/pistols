@@ -1,7 +1,7 @@
 ---
 title: "Torii skipped-model-upgrade bug"
 kind: research
-date: 2026-04-30
+date: 2026-05-01
 informs: [00, 04]
 ---
 
@@ -9,9 +9,9 @@ informs: [00, 04]
 
 ## TL;DR
 
-Torii's indexer keeps an in-memory `ModelCache` in sync with the model schema, but **does not clear that cache when a chunk-level rollback occurs**. When an `InvalidEnumSelector` (or any other) error fires inside the same chunk as a `ModelUpgraded` event, the SQL transaction is rolled back (so `ALTER TABLE … ADD COLUMN` is discarded) while `ModelCache::register_model` remains updated to the new schema. On retry, `UpgradeModelProcessor` reads `prev_schema` from the (now-poisoned) cache, computes `new_schema.diff(prev_schema) == None`, and silently returns without re-issuing the `ALTER TABLE`. That is the clean code-level explanation for the **reported poisoned-DB state** where torii's schema metadata knows about a field but SQLite does not. The current local repro has also exposed a likely earlier stale-schema state where both the table DDL and persisted `models.schema` row remain old after replay advances; that second state is probably part of the trigger path and should not be conflated with the rollback-poison bug itself.
+Torii's indexer keeps an in-memory `ModelCache` in sync with the model schema, but **does not clear that cache when a chunk-level rollback occurs**. When an `InvalidEnumSelector` (or any other) error fires inside the same chunk as a `ModelUpgraded` event, the SQL transaction is rolled back (so `ALTER TABLE … ADD COLUMN` is discarded) while `ModelCache::register_model` remains updated to the new schema. On retry, `UpgradeModelProcessor` reads `prev_schema` from the (now-poisoned) cache, computes `new_schema.diff(prev_schema) == None`, and silently returns without re-issuing the `ALTER TABLE`. That is the clean code-level explanation for the **reported poisoned-DB state** where torii's schema metadata knows about a field but SQLite does not.
 
-The structural hazard is **older than the standalone torii repo**: it effectively dates to **Nov 14 2024** in the `dojoengine/dojo` monorepo (see "Origin of the hazard" below) and has been present in every tagged torii release since **v1.5.0 (2025-04-29)** — including HEAD (v1.8.15) at time of writing. The parser failure that exposes it is still separate, but the evidence is now much tighter than when this investigation started. Checking torii's pinned `dojo-types` source shows `Primitive` only accepts numeric selectors `0..=15`, so `actual_selector: 18` is almost certainly **not** a real `Primitive` discriminant; it is a higher-level enum decode failure surfacing through `PrimitiveError`. Direct historical chain reads now prove the captured failing payload is the `pistols-matchmaker` `PlayerActivityEvent` at **Sepolia block `2271871`**, with `activity = 18`, and that this occurs **after** the `PlayerActivityEvent` schema upgrade at block `2270724`. The remaining torii-side mechanism is now much narrower: historical `PlayerActivityEvent` work is grouped by `(world, selector, player)`, the same player already has multiple pre-upgrade activity events earlier in the same chunk, and later post-upgrade events are appended to that existing task **without gaining the selector-upgrade dependency**. That lets the later `activity = 18` event run against the old pre-18 cached schema even though the upgrade is earlier on chain in the same chunk. The older `GenesisKey::Groggus = 18` model path is now only a secondary fallback, because the current mainnet world definitively postdates that May 2025 enum addition and sepolia only leaves a narrow overlap window. As long as Pistols was being indexed continuously by torii ≤ 1.8.0 (mainnet) the rolled-back-then-retry codepath never executed for a `Config` upgrade chunk, so the latent cache-poison stayed invisible. Re-indexing cold under torii ≥ 1.8.1 hits the deserialize failure, exposes the latent bug, and drops the column.
+The structural hazard is **older than the standalone torii repo**: it effectively dates to **Nov 14 2024** in the `dojoengine/dojo` monorepo (see "Origin of the hazard" below) and has been present in every tagged torii release since **v1.5.0 (2025-04-29)** — including HEAD (v1.8.15) at time of writing. The parser failure that exposes it is now also effectively identified. Checking torii's pinned `dojo-types` source shows `Primitive` only accepts numeric selectors `0..=15`, so `actual_selector: 18` is almost certainly **not** a real `Primitive` discriminant; it is a higher-level enum decode failure surfacing through `PrimitiveError`. Direct historical chain reads prove the captured failing payload is the `pistols-matchmaker` `PlayerActivityEvent` at **Sepolia block `2271871`**, with `activity = 18`, and that this occurs **after** the `PlayerActivityEvent` schema upgrade at block `2270724`. The decisive local replay result is now in: historical `PlayerActivityEvent` work is grouped by `(world, selector, player)`, the same player already has multiple pre-upgrade activity events earlier in the same chunk, and later post-upgrade events were being appended to that existing task **without gaining the selector-upgrade dependency**. Once torii was patched to merge dependencies into existing historical event tasks and retain late prerequisite links, the replay crossed block `2271871` cleanly, stored `PlayerActivityEvent` rows from `pistols-matchmaker` without `InvalidEnumSelector`, landed `Config.realms_address`, and upgraded `PlayerActivityEvent` to include `EnlistedRankedDuelist`. The older `GenesisKey::Groggus = 18` model path is now only a secondary fallback, because the current mainnet world definitively postdates that May 2025 enum addition and sepolia only leaves a narrow overlap window. As long as Pistols was being indexed continuously by torii ≤ 1.8.0 (mainnet) the rolled-back-then-retry codepath never executed for a `Config` upgrade chunk, so the latent cache-poison stayed invisible. Re-indexing cold under torii ≥ 1.8.1 hits the deserialize failure, exposes the latent bug, and drops the column.
 
 The bug is still present on `main` (v1.8.15) as of writing. PR [#356](https://github.com/dojoengine/torii/pull/356) (v1.8.1, `refactor(processors): model upgrades to use cache`) is *not* the culprit — it just made the cache dependency direct; `Sql::model()` had been cache-first since PR #353 in v1.8.0 and v1.7.5's `UpgradeModelProcessor` was already reading from `ctx.cache.model(...)`.
 
@@ -359,7 +359,7 @@ The observed poisoned columns are not random. They line up with a tight Oct 17-2
 
 That clustering fits the torii bug better than any model-specific theory. Multiple additive `ModelUpgraded` events landed close together, then a later deserialize failure inside the same large replay chunk poisoned whichever upgrades shared that chunk.
 
-**Summary.** The hazard has been latent in *every* torii release since at least v1.5.0 (April 2025), originating from two dojoengine/dojo monorepo commits that were both in tree by **Nov 14 2024** (one authored earlier on Nov 4). The user-visible bug for Pistols first appeared in **cold re-indexes on the v1.8.x line** because replay hit a deserialize failure inside the same chunk as a model upgrade. The rollback/cache bug is definite. The exact `actual_selector: 18` trigger is still separate, but the direct chain evidence now points away from both "missing `PlayerActivityEvent` variant 18 on chain" and "ancient pre-Groggus model schema on the current world" and toward a narrower torii-side event-schema problem: the replay is most likely reaching a **later** `PlayerActivityEvent.activity = 18` payload while the active schema torii is using for that selector is still **pre-18**.
+**Summary.** The hazard has been latent in *every* torii release since at least v1.5.0 (April 2025), originating from two dojoengine/dojo monorepo commits that were both in tree by **Nov 14 2024** (one authored earlier on Nov 4). The user-visible bug for Pistols first appeared in **cold re-indexes on the v1.8.x line** because replay hit a deserialize failure inside the same chunk as a model upgrade. The rollback/cache bug is definite. The trigger is now effectively nailed down too: torii was replaying a **later** `PlayerActivityEvent.activity = 18` payload while the active schema bound to that player's historical event task was still **pre-18**, because the task had been created by earlier same-player events and later post-upgrade events were appended without gaining the selector-upgrade dependency. A local torii patch that merges dependencies into existing historical event tasks, retains late prerequisite links in `TaskNetwork`, and rebuilds post-rollback model reads from committed storage has now replayed the Sepolia trigger window cleanly and landed the missing schema changes.
 
 ## Bug remediations
 
@@ -384,15 +384,16 @@ This is the smallest code change and the right first thing to test, because it d
 Status after the current local replay work:
 
 - **confirmed as the right direction for the poisoned-DB / skipped-upgrade bug class**
-- **not sufficient as a standalone operational hotfix in the current replay**
-- **not yet the full remediation for the broader cold-replay failure**
+- **confirmed as insufficient as a standalone hotfix**
+- **confirmed to need a storage-backed recovery path rather than an empty-cache retry**
 
-That distinction matters. The Oct / Dec 2025 reports clearly show the poisoned state this patch is designed to fix: schema metadata says the field exists, SQLite says it does not. But two newer local replay results tighten the picture:
+That distinction matters. The Oct / Dec 2025 reports clearly show the poisoned state this patch is designed to fix: schema metadata says the field exists, SQLite says it does not. The later local replay work now closes the loop:
 
 - the unpatched local `v1.8.7` replay gets stuck in an earlier stale state where both `models.schema` and the table DDL remain old even after the replay passes the historical upgrade window
 - the patched replay with bare `clear_models()` reaches the exact `PlayerActivityEvent.activity = 18` failure, then starts throwing `CacheError(ModelNotFound(...))` on subsequent replay work
+- the replay only stabilizes once processors reload model definitions via committed storage after rollback instead of trusting an emptied cache
 
-So `clear_models()` on rollback is still the right idea, but in practice the cache likely needs to be **rebuilt from committed storage** rather than simply emptied.
+So `clear_models()` on rollback is still the right idea, but the practical fix is to **pair rollback-time cache clearing with storage-backed model reloads**.
 
 ### 2. Broader rollback hardening: rebuild all commit-sensitive cache state
 
@@ -735,7 +736,7 @@ On failure, log at least:
 
 One replay with that patch should turn the current hypothesis into proof.
 
-#### 2. Primary torii-side fix to test: preserve selector-upgrade dependencies for existing historical event tasks
+#### 2. Confirmed torii-side fix: preserve selector-upgrade dependencies for existing historical event tasks
 
 The current local replay points to a tasking bug more directly than to a schema-versioning design bug.
 
@@ -759,7 +760,23 @@ The most direct torii fix is therefore:
 - when `add_parallelized_event_with_dependencies` sees an existing task, merge in any new dependencies instead of ignoring them
 - and/or teach `TaskNetwork` to retain unresolved dependencies instead of logging `Ignoring non-existent dependency.`
 
-For this specific Pistols failure, that now looks like the first fix to try before any deeper schema-versioning redesign.
+For this specific Pistols failure, that is now the first fix that has been **validated locally** before any deeper schema-versioning redesign.
+
+That local torii patch now exists and is the one confirmed by the live replay. The changes are:
+
+- `TaskManager::add_parallelized_event_with_dependencies` now merges newly discovered dependencies into an existing task instead of only appending the event
+- `TaskNetwork` now retains unresolved dependencies and activates them once the prerequisite task is inserted, instead of dropping them as "non-existent"
+- rollback handling now clears `balances_diff` as well as model cache state
+- processors that need model definitions now read them via `ctx.storage.model(...)` rather than `ctx.cache.model(...)`, so rollback-time cache clears can repopulate from committed storage instead of failing with `CacheError(ModelNotFound(...))`
+
+Local validation status:
+
+- `cargo test -p torii-task-network` passes, including new tests covering late-added dependencies and dependency merges into existing tasks
+- `cargo build -p torii` passes for the patched binary
+- the patched Sepolia cold replay crossed **all three decisive points**: earlier same-player events (`2268329`), the schema upgrade (`2270724`), and the captured failing payload block (`2271871`)
+- after that crossing, `pistols-Config` gained `realms_address`, `pistols-PlayerActivityEvent` gained `EnlistedRankedDuelist`, and torii continued storing `PlayerActivityEvent` messages from `pistols-matchmaker` (`0x16f7e3c1…`) without `InvalidEnumSelector`
+
+That is enough to treat the task/dependency fix as **locally confirmed** for the historical replay trigger.
 
 #### 3. Secondary torii-side hardening: version historical event schemas by resource contract
 
@@ -877,6 +894,8 @@ This is the compact reconstruction reference for recreating the bug across **tor
 | `2026-02-17` | torii | `v1.8.15` / `2193fc5d` | Dojo pin `0afeb1bc` | local HEAD checked during this research; bug still present |
 | `2026-04-30` | local repro | unpatched torii `1.8.7` + `dojo/torii_sepolia_repro.toml` | sepolia head `2344836` after replaying past critical window `2266480 .. 2276720` | `pistols-Config` still lacks `realms_address`, `pistols-PlayerActivityEvent` still ends at `ClaimedRing`, and historical event tables truncate around `2025-10-03` / `2025-10-06` |
 | `2026-04-30 09:12:46 UTC` | local repro | patched torii with event-message instrumentation | sepolia replay window around `2270724` | direct proof: `EventMessageProcessor` fails on `pistols-PlayerActivityEvent` with `raw_values=[0x68d89396, 0x12, 0x351, 0x1]`, `actual_selector: 18`, while using pre-upgrade resource `0x463f225e…`; same window also logs `UpgradeEvent(PlayerActivityEvent -> 0x22c12429…)` and `UpgradeModel(Config)` |
+| `2026-04-30` | local torii patch | dependency-merge + storage-backed rollback recovery | n/a | local fix lands: merge dependencies into existing historical event tasks, retain late prerequisite links in `TaskNetwork`, clear rollback-sensitive cache state, and rebuild model reads from committed storage after rollback |
+| `2026-05-01` | local confirmation | patched torii replay from pre-critical head `2262908` | sepolia heads `2273149`, `2283390`, `2293631` | replay crosses the exact trigger window cleanly: `Config.realms_address` flips `0 -> 1`, `PlayerActivityEvent.EnlistedRankedDuelist` flips `0 -> 1`, `activity_check` now includes `EnlistedRankedDuelist`, and torii continues storing `PlayerActivityEvent` rows from `pistols-matchmaker` without `InvalidEnumSelector` |
 
 ### Minimal reproduction map
 
@@ -964,7 +983,22 @@ That result matters for two reasons:
 2. It shows the unpatched replay can advance **well past** the known upgrade block (`2270724`) without ever landing either the `Config` additive column or the `PlayerActivityEvent` enum expansion. So the problem is not just "one noisy log line near the transition"; it leaves the DB observably stale after the replay has moved on.
 3. It suggests the broader cold-replay failure is at least partly **historical-event-specific**. The replay head continues advancing, but the indexed historical event tables stop days earlier than the reported trigger window.
 
-At the same time, a patched local torii build is still replaying from the same repro config. As of the latest check it had not yet reached the critical Sepolia range, so the rollback-cache fix has not been validated end-to-end yet.
+By contrast, the current patched local replay from a copied pre-critical DB state **does** pass the same window cleanly. Starting from head `2262908`, it crossed the three decisive milestones:
+
+- earlier same-player `PlayerActivityEvent`s in the chunk
+- `EventUpgraded(PlayerActivityEvent)` at `2270724`
+- the captured failing payload block `2271871`
+
+And after those crossings:
+
+- world head continued to **`2273149`**, then **`2283390`**, then **`2293631`**
+- `pistols-Config` flipped from `Config|0` to `Config|1` and `PRAGMA table_info([pistols-Config])` now includes `realms_address`
+- `pistols-PlayerActivityEvent` flipped from `PlayerActivityEvent|0` to `PlayerActivityEvent|1`
+- the table DDL now includes `EnlistedRankedDuelist` in `activity_check`
+- the table contains `EnlistedRankedDuelist` rows
+- torii logs continue to show `Store event message. namespace=pistols name=PlayerActivityEvent system=0x16f7e3c1…` after the upgrade window, with **no** `InvalidEnumSelector`
+
+That is the local end-to-end confirmation that the current torii patch fixes the historical replay trigger and allows the missing schema upgrades to land.
 
 ### Patched replay breakthrough: exact trigger captured
 
@@ -1025,6 +1059,34 @@ Targeted chain follow-up narrows the torii-side mechanism further.
 - those earlier events all use pre-18 `activity` values (`7`, `10`, `11`, `13`, …), so they are compatible with the old schema and can create the historical event task before the upgrade is reached
 
 That is the strongest current explanation for why torii is still on the old schema at block `2271871`: the task was created from earlier same-player events and the later `activity = 18` event was appended to it without acquiring the schema-upgrade dependency.
+
+### Patch confirmation: dependency merge + storage-backed rollback recovery
+
+After the exact trigger was captured, the local torii checkout was patched in the direction the repro now points:
+
+- preserve selector-upgrade dependencies when later historical events are appended to an already-existing task
+- keep unresolved dependencies in `TaskNetwork` until the prerequisite task is inserted
+- clear rollback-sensitive cache state (`models`, `balances_diff`) on chunk rollback
+- make replay processors reload model definitions from committed storage after rollback instead of crashing on an empty model cache
+
+This is the first local patch that actually matches the current root-cause picture. It is broader than the original one-line `clear_models()` rollback fix, but still narrowly targeted at the two failure modes the repro has already shown:
+
+1. the exact `PlayerActivityEvent.activity = 18` task/dependency bug
+2. the follow-on `CacheError(ModelNotFound(...))` caused by emptying model cache without a storage-backed recovery path
+
+Validation status:
+
+- the patch builds successfully (`cargo build -p torii`)
+- targeted `torii-task-network` tests pass after the dependency changes
+- the replay has now crossed Sepolia block `2271871` cleanly
+- schema state flipped from stale to upgraded in the DB itself, not just in logs
+- `PlayerActivityEvent` rows from the captured failing system continue to be stored after the former trigger point
+
+That is enough to treat the current torii patch as **locally confirmed**:
+
+1. the trigger bug is the missing dependency merge for existing historical event tasks
+2. the rollback bug still needs cache invalidation, but in practice that invalidation must be paired with storage-backed model reloads rather than a bare empty cache
+3. together, those changes get the Pistols Sepolia replay through the known failure window and land the missing schema changes
 
 ## Repairing a poisoned DB
 
