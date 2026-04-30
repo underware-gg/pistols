@@ -67,7 +67,9 @@ This investigation needs to:
 - produce a verified patch that mitigates the failure
 - document any operator workaround for keeping cold re-indexes working until an upstream fix exists
 
-## The reported symptom
+## Background
+
+### Reported symptom
 
 From mataleone's reports (Oct 10 → Dec 19):
 
@@ -115,6 +117,16 @@ From mataleone's reports (Oct 10 → Dec 19):
   This is consistent with torii's executor design: most entity/model writes are queued fire-and-forget, so row-level SQL failures are logged by the executor without necessarily aborting the main indexing loop.
 
 By Dec 20 the same class of error had spread to `pistols-DuelistAssignment.season_id`, `pistols-MatchQueue.enlisted_duelist_ids`, `pistols-Duelist.released_fame`, `pistols-Pack.pegged_lords_amount`, etc. — anything added by a `ModelUpgraded` whose chunk also contained a failing event. glihm summarised it as "Torii somehow skips some upgrade of the schema of the model. which causes future inserts to not work due to the column not being added properly."
+
+### Timeline of reported events
+
+| Date / time | Context | Reported state |
+|---|---|---|
+| `2025-10-10 06:15` | first public Sepolia recreate on `v1.8.1` | `pistols-Config.realms_address` missing; `pistols-Player.referrer_address` indexing correctly |
+| `2025-10-14 14:03:08 UTC` | local replay using the incident-style Sepolia config | `UpgradeEvent(PlayerActivityEvent)` then `UpgradeModel(Config)` immediately followed by `PrimitiveError(InvalidEnumSelector { actual_selector: 18 })` |
+| `2025-10-28` | fresh Sepolia recreates on `v1.8.7` | repeated missing-column failures on `realms_address`, then `season_id`, `released_fame`, and `enlisted_duelist_ids` |
+| `2025-10-28` | recreated mainnet torii | same general failure class appears on mainnet cold replay, including `ModelMemberNotFound(...released_fame...)` |
+| `2025-12-19 / 2025-12-20` | later production/operator follow-up | poisoned DB state persists with repeated write-side `has no column named` errors and read-side `no such column` errors while torii still appears to be indexing |
 
 ## Root cause walk-through
 
@@ -1200,3 +1212,198 @@ This is the recovery procedure for a DB already in the poisoned state: torii's `
 - Token-registration cache mutation before commit: `crates/processors/src/erc.rs`
 - `TaskManager` (per-task sequential, cross-task parallel): `crates/processors/src/task_manager.rs`
 - Executor (single sqlx transaction per chunk, rollback): `crates/sqlite/sqlite/src/executor/mod.rs:186,291,298,1154,1302-1312`
+
+## Source material
+
+This is the raw evidence the investigation entered with — Discord pastes from the Pistols / Cartridge thread, attached screenshots, and config files checked into this repo. The narrative above cites these by anchor (`S1` … `S10`). Anything not anchored here was produced *during* the investigation, not before it.
+
+### S1 — First Sepolia report (mataleone, Discord, 2025-10-10 06:15)
+
+Fresh `delete + create` of the Slot Sepolia indexer on torii **v1.8.1**. mataleone reported `pistols-Config.realms_address` missing from SQLite. The field had been added two weeks earlier (Dojo 1.7.0). gRPC entity reads were failing:
+
+```
+useSdkEntitiesGet() exception: failed to get entities:
+  status: Internal, message: "error returned from database: (code: 1)
+  no such column: pistols-Config.realms_address"
+```
+
+The field was present in the Cairo struct (`dojo/src/models/config.cairo`):
+
+```rust
+pub struct Config {
+    #[key]
+    pub key: u8, // CONFIG::CONFIG_KEY
+    pub treasury_address: ContractAddress,
+    pub lords_address: ContractAddress,
+    pub vrf_address: ContractAddress,
+    pub current_season_id: u32,
+    pub is_paused: bool,
+    pub realms_address: ContractAddress,
+}
+```
+
+Sqlite browser screenshots in the same report showed `pistols-Config` columns ending at `is_paused` (no `realms_address`), and `pistols-Player` with `referrer_address` present and populated — i.e. another recently-added field on a different model was indexing correctly. mata noted the mainnet `1.8.0` deployment did not show the issue.
+
+### S2 — Initial diagnosis attempt (nas, Discord, 2025-10-10 06:39-07:54)
+
+nas confirmed torii's `/schema` output did include `realms_address`, isolating the failure to "schema knows about it, table doesn't":
+
+> ah mh its in the new schema but for some reason the column is missing
+> im looking into it
+
+After looking further:
+
+> mh so it seems like the cache has been updated but not the db
+> oh ok seems like thats why the DB migration hasnt been applied
+
+nas could not reproduce locally and asked mata to retry on **v1.8.2**. mata: "delete, create, field not there again." A mainnet recreate later the same day finished cleanly; sepolia did not.
+
+### S3 — Local repro with `InvalidEnumSelector` (mataleone, Discord, 2025-10-15 02:17)
+
+mata reproduced the failure locally. The attached log (timestamp **2025-10-14T14:03:08**) shows the offending three-line sequence:
+
+```
+2025-10-14T14:03:08.096778Z  INFO torii::indexer::processors::upgrade_event:
+    Upgraded event. namespace=pistols name=PlayerActivityEvent
+2025-10-14T14:03:08.914789Z  INFO torii::indexer::processors::upgrade_model:
+    Upgraded model. namespace=pistols name=Config
+2025-10-14T14:03:08.915278Z ERROR torii::indexer::engine:
+    Processing fetched data.
+    error=Processors(TaskNetworkError(TaskError(
+        PrimitiveError(InvalidEnumSelector { actual_selector: 18 }))))
+```
+
+i.e. `UpgradeEvent(PlayerActivityEvent)` and `UpgradeModel(Config)` arrive immediately before an `actual_selector: 18` deserialize failure in the same chunk.
+
+### S4 — Chunk-size workaround established (Discord, 2025-10-15 03:59-08:31)
+
+nas, after reading mata's config:
+
+> ok you can change it to 1024 blocks chunk it'll work for now, ill debug
+> and try to land a fix for 10240 chunk size
+
+mata confirmed the value had been increased away from `1024` earlier ("because of some other problem I already forgot"). Lowering back to `1024` fixed it locally but not on Slot:
+
+> if I reduce blocks_chunk_size and remove the world_block, it works
+> locally but not on slot...
+
+So `1024` is a local workaround only; Slot deployments did not stabilise with it.
+
+### S5 — Sepolia config at the first bug report
+
+mata's `dojo/torii_sepolia.toml` at the time of the first report (2025-10-10) was the version checked in at commit `4096850c` ("up: Torii 1.7.1, updated config", 2025-09-24):
+
+- `world_address = "0x8b48...506c5"`
+- `world_block = 23920`
+- `blocks_chunk_size` commented out → torii's default `10240`
+- `[sql] historical = ["pistols-PlayerActivityEvent", "pistols-LordsReleaseEvent", "pistols-TrophyProgression"]`
+
+This is also the config in effect for mata's local 2025-10-14 `actual_selector: 18` repro (S3). After that, the file evolved on its normal Pistols cadence:
+
+- `a84f0278` (2025-10-14 23:38) — mata applied the chunk-size workaround in-tree: `world_block` commented, `blocks_chunk_size = 1024`
+- `1a06ae57` (2025-10-17) — `pistols-PurchaseDistributionEvent` added to the historical list as part of the new purchase/pegging cycle rollout
+- subsequent `migrate sepolia` commits through Oct/Nov — broader rollout
+
+So the historical-event list mata was running varied across the reporting window: 3 events at the Oct 10 first report and the Oct 14 repro; 4 events from Oct 17 onward when the broader rollout cluster started failing.
+
+### S6 — Spread to additional fields (mataleone, Discord, 2025-10-28 10:43-22:25)
+
+Slot Sepolia, fresh `delete + create` on torii **v1.8.7** — same missing-column error:
+
+```
+2025-10-27T23:36:56.572772Z ERROR torii::sqlite::executor:
+  Failed to execute query.
+  error=Sqlx(Database(SqliteError { code: 1, message:
+    "table pistols-Config has no column named realms_address" }))
+```
+
+Local recreate the same day surfaced more affected fields:
+
+```
+2025-10-28T00:41:21.193198Z ERROR ... "table pistols-Config has no column named realms_address"
+2025-10-28T00:41:21.201851Z ERROR ... "table pistols-Duelist has no column named released_fame"
+2025-10-28T00:41:22.007100Z ERROR ... "table pistols-DuelistAssignment has no column named season_id"
+```
+
+Slot Pro and Epic tiers showed the same. mata noted continuously-running mainnet toriis ("our current toriis look ok!") were unaffected, but a fresh recreate of `pistols-mainnet` on **v1.8.7** entered an error loop:
+
+```
+2025-10-28T11:24:32.784479Z ERROR torii::indexer::engine:
+  Processing fetched data.
+  error=Processors(TaskNetworkError(TaskError(
+    ModelMemberNotFound("0x1583394ac5a692ac2860830bae36b55101ec515479ae3ada3135bdd13f021e1"))))
+```
+
+### S7 — Mainnet 1.8.2 cold recreate (mataleone, Discord, 2025-10-29 03:56)
+
+mata down-versioned to torii **v1.8.2** and recreated `pistols-mainnet`. Same failure class:
+
+```
+2025-10-28T16:52:32.674533Z ERROR ... "table pistols-DuelistAssignment has no column named season_id"
+2025-10-28T16:52:32.677529Z ERROR ... "table pistols-Duelist has no column named released_fame"
+2025-10-28T16:52:32.679636Z ERROR ... "table pistols-MatchQueue has no column named enlisted_duelist_ids"
+```
+
+### S8 — Escalation to glihm (recipromancer, Discord, 2025-11-01 09:25)
+
+> Hey @glihm | cartridge this is the thread re: not being able to create new torii's, this is a blocking issue for us
+
+### S9 — December follow-up: poisoned DB persists, indexer keeps moving (Luca / mataleone / glihm, Discord, 2025-12-20)
+
+Luca shared mata's mainnet config inline:
+
+- `world_address = "0x8b48...506c5"`
+- `world_block = 88597`
+- `blocks_chunk_size = 10240` (torii's default)
+- `[sql] historical = ["pistols-PlayerActivityEvent", "pistols-LordsReleaseEvent", "pistols-TrophyProgression"]`
+
+mata reported he could not spin up new mainnet indexers (crash-loop on Slot, then stabilised on Luca's redeploy but with the same missing-column errors). Luca's torii log from `pistols-mainnet` on **2025-12-19**:
+
+```
+2025-12-19T19:21:29.293609Z ERROR torii::sqlite::executor:
+  Failed to execute query.
+  error=Sqlx(Database(SqliteError { code: 1, message:
+    "table pistols-DuelistAssignment has no column named season_id" }))
+2025-12-19T19:21:29.298310Z ERROR ... "table pistols-MatchQueue has no column named enlisted_duelist_ids"
+2025-12-19T19:21:29.300186Z ERROR ... "table pistols-DuelistAssignment has no column named season_id"
+```
+
+Luca's key observation:
+
+> i don't see it crashing
+> are you sure it's the same error
+> I see it's still indexing
+
+glihm's summary in the same thread:
+
+> Torii somehow skips some upgrade of the schema of the model. which causes future inserts to not work due to the column not being added properly. And this prevents the team to have a new indexer with fresh parameters.
+
+### S10 — Client-side fallout from the poisoned DB (mataleone, Discord, 2025-12-20)
+
+mata posted browser console screenshots from the Pistols client running against the poisoned `pistols-mainnet`. gRPC-web read failures:
+
+```
+useSdkEntitiesGet() exception: failed to get entities:
+  status: Internal, message: "error returned from database: (code: 1)
+  no such column: pistols-Pack.pegged_lords_amount"
+
+failed to get event_messages: status: Internal, message:
+  "error returned from database: (code: 1)
+  no such column: pistols-Pack.pegged_lords_amount"
+
+useSdkEntitiesSub() promise error: failed to get entities:
+  status: Internal, message: "error returned from database: (code: 1)
+  no such column: pistols-Duelist.released_fame"
+  (PistolQueryBuilder)
+```
+
+A separate torii server-log capture from the same window shows repeated gRPC subscription timeouts:
+
+```
+2025-12-19T14:58:33.787328Z ERROR torii::server::handlers::grpc: gRPC request timeout after 60s
+2025-12-19T15:02:23.278938Z ERROR torii::server::handlers::grpc: gRPC request timeout after 60s
+2025-12-19T15:02:23.279133Z ERROR torii::server::handlers::grpc: gRPC request timeout after 60s
+2025-12-19T15:02:23.662152Z ERROR torii::server::handlers::grpc: gRPC request timeout after 60s
+2025-12-19T15:02:40.908267Z ERROR torii::server::handlers::grpc: gRPC request timeout after 60s
+2025-12-19T15:02:40.908279Z ERROR torii::server::handlers::grpc: gRPC request timeout after 60s
+```
