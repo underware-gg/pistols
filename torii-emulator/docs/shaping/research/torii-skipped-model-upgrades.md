@@ -353,66 +353,6 @@ That clustering fits the torii bug better than any model-specific theory. Multip
 
 **Summary.** The hazard has been latent in *every* torii release since at least v1.5.0 (April 2025), originating from two dojoengine/dojo monorepo commits that were both in tree by **Nov 14 2024** (one authored earlier on Nov 4). The user-visible bug for Pistols first appeared in **cold re-indexes on the v1.8.x line** because replay hit a deserialize failure inside the same chunk as a model upgrade. The rollback/cache bug is definite. The trigger is now effectively nailed down too: torii was replaying a **later** `PlayerActivityEvent.activity = 18` payload while the active schema bound to that player's historical event task was still **pre-18**, because the task had been created by earlier same-player events and later post-upgrade events were appended without gaining the selector-upgrade dependency. A local torii patch that merges dependencies into existing historical event tasks, retains late prerequisite links in `TaskNetwork`, and rebuilds post-rollback model reads from committed storage has now replayed the Sepolia trigger window cleanly and landed the missing schema changes.
 
-## Bug remediations
-
-### 1. Immediate rollback fix: clear model cache on rollback, then repopulate from committed storage
-
-`crates/indexer/engine/src/engine.rs:230-242`:
-
-```rust
-Err(e) => {
-    …
-    self.storage.rollback().await?;
-    self.task_manager.clear_tasks();
-    self.cache.clear_models().await;          // <-- new; or rebuild from storage.models()
-    …
-}
-```
-
-The `Cache` trait already exposes `clear_models` on the versions checked (including v1.7.5 and v1.8.15), so the first code change is just wiring that existing invalidation call into the rollback path. The later local replay work showed that the practical fix must also repopulate model definitions from committed storage on the next pass; a bare empty-cache retry turns the original poison bug into `CacheError(ModelNotFound(...))`.
-
-This is the smallest code change and the right first thing to test, because it directly targets the skipped-upgrade / poisoned-schema bug described above and also covers the same rollback hazard for event schema upgrades in `register_event.rs` / `upgrade_event.rs`.
-
-Status after the current local replay work:
-
-- **confirmed as the right direction for the poisoned-DB / skipped-upgrade bug class**
-- **confirmed as insufficient as a standalone hotfix**
-- **confirmed to need a storage-backed recovery path rather than an empty-cache retry**
-
-That distinction matters. The Oct / Dec 2025 reports clearly show the poisoned state this patch is designed to fix: schema metadata says the field exists, SQLite says it does not. The later local replay work now closes the loop:
-
-- the unpatched local `v1.8.7` replay gets stuck in an earlier stale state where both `models.schema` and the table DDL remain old even after the replay passes the historical upgrade window
-- the patched replay with bare `clear_models()` reaches the exact `PlayerActivityEvent.activity = 18` failure, then starts throwing `CacheError(ModelNotFound(...))` on subsequent replay work
-- the replay only stabilizes once processors reload model definitions via committed storage after rollback instead of trusting an emptied cache
-
-So `clear_models()` on rollback is still the right idea, but the practical fix is to **pair rollback-time cache clearing with storage-backed model reloads**.
-
-### 2. Broader rollback hardening: rebuild all commit-sensitive cache state
-
-The model cache is the bug Pistols is hitting, but it is not the only cache with the same shape. Torii also mutates token-registration cache before SQL commit:
-
-- `try_register_token_contract` enqueues `storage.register_token_contract(...)` and then immediately calls `cache.mark_token_registered(...)` in `crates/processors/src/erc.rs`.
-- `try_register_nft_token_metadata` does the same for NFT token rows, then also mutates balance-diff cache.
-
-If a later error in the same chunk triggers `storage.rollback()`, the DB can lose those token rows while cache still thinks the token is registered, causing the retry to skip re-registration.
-
-So the cleaner upstream remediation is not "clear models only", but "restore cache state to the last committed DB state on rollback". Concretely, that likely means one of:
-
-- add a cache `reload_from_storage` / `reset_from_storage` path and call it from the engine rollback arm
-- add explicit rollback invalidators for both model cache and token-registration cache, then lazily repopulate from storage on retry
-
-The current patched replay makes the first option look stronger than it did earlier in the investigation. Emptying the model cache entirely after rollback appears to leave later processors without required model definitions, which turns the original poison bug into a different `CacheError(ModelNotFound)` failure mode.
-
-### 3. Stronger invariant: defer cache writes until after `storage.execute()`
-
-Buffer `cache.register_model` calls in a per-chunk staging area (e.g. a `Vec<(Felt, Felt, Model)>` on the engine) and flush them only after `self.storage.execute().await?` returns `Ok`. On rollback, drop the staging buffer.
-
-This is a little more invasive than (A) but keeps the cache strictly in sync with committed SQL state, which is arguably the correct invariant. It also closes the (smaller) window where `set_entity` calls running concurrently in the same task can read a "future" schema from the cache.
-
-### 4. Not recommended: bypass cache when reading `prev_schema`
-
-Revert PR #356 so `UpgradeModelProcessor` reads `prev_schema` via `ctx.storage.model(...)`. This *alone* doesn't fix the bug because `Sql::model()` itself still preferentially returns from cache (since v1.8.0 / PR #353). To make this approach work you'd need to add a "skip cache" path for the upgrade processor specifically — i.e. read the `models` row directly from sqlx during an upgrade. Not recommended; (A) is cleaner.
-
 ## Reproducing and testing
 
 You do **not** need a full Sepolia replay to prove the skipped-upgrade / poisoned-cache bug. This investigation did use one instrumented real replay to prove the exact `actual_selector: 18` trigger payload and then a patched replay to confirm the fix.
@@ -598,116 +538,6 @@ Direct world-event reads now tighten that further. Querying `starknet_getEvents`
 - **mainnet `3033226`**: `0x05d875a0… -> 0x05be8170…` (adds later variants after `18`)
 
 That removes one more world-side explanation: for this selector, the historical upgrade events were not merely implied by `resource(...)` state changes; they were actually published on chain. The remaining failure is therefore inside torii's replay/tasking behavior, not in missing upgrade publication.
-
-### Trigger bug remediations
-
-#### 1. Immediate diagnostic patch
-
-The first useful step was to make torii tell us exactly what was failing. Add temporary logging around `PrimitiveError::InvalidEnumSelector` in:
-
-- `crates/processors/src/processors/event_message.rs`
-- `crates/processors/src/processors/store_set_record.rs`
-- `crates/processors/src/processors/store_update_record.rs`
-- `crates/processors/src/processors/store_update_member.rs`
-
-On failure, log at least:
-
-- namespace / model name
-- selector / member selector
-- raw event keys / values
-- whether the failing path was event-message or store-update
-
-One replay with that patch did turn the hypothesis into proof.
-
-#### 2. Confirmed torii-side fix: preserve selector-upgrade dependencies for existing historical event tasks
-
-The current local replay points to a tasking bug more directly than to a schema-versioning design bug.
-
-What the repro now shows:
-
-- the failing payload is the `PlayerActivityEvent` at **block `2271871`**
-- the same player (`0x550212d3…`) already has multiple earlier `PlayerActivityEvent`s in the same chunk, before block `2270724`
-- `EventMessageProcessor::task_identifier` groups historical event work by `(world, selector, entity_id)`; for `PlayerActivityEvent`, `entity_id` is the player key
-- `TaskManager::add_parallelized_event_with_dependencies` only attaches dependencies when it **creates** a task; if the task already exists, it just appends the event
-
-That means the likely exact failure mechanism is:
-
-1. a pre-upgrade `PlayerActivityEvent` for the same player creates the historical event task
-2. the later `EventUpgraded(PlayerActivityEvent)` task is inserted separately
-3. the post-upgrade `activity = 18` event at block `2271871` is appended to the already-existing player task
-4. because the task already exists, the selector-upgrade dependency is not added to it
-5. the task runs against old cached schema and `activity = 18` fails to deserialize
-
-The most direct torii fix is therefore:
-
-- when `add_parallelized_event_with_dependencies` sees an existing task, merge in any new dependencies instead of ignoring them
-- and/or teach `TaskNetwork` to retain unresolved dependencies instead of logging `Ignoring non-existent dependency.`
-
-For this specific Pistols failure, that is now the first fix that has been **validated locally** before any deeper schema-versioning redesign.
-
-That local torii patch now exists and is the one confirmed by the live replay. The changes are:
-
-- `TaskManager::add_parallelized_event_with_dependencies` now merges newly discovered dependencies into an existing task instead of only appending the event
-- `TaskNetwork` now retains unresolved dependencies and activates them once the prerequisite task is inserted, instead of dropping them as "non-existent"
-- rollback handling now clears `balances_diff` as well as model cache state
-- processors that need model definitions now read them via `ctx.storage.model(...)` rather than `ctx.cache.model(...)`, so rollback-time cache clears can repopulate from committed storage instead of failing with `CacheError(ModelNotFound(...))`
-
-Local validation status:
-
-- `cargo test -p torii-task-network` passes, including new tests covering late-added dependencies and dependency merges into existing tasks
-- `cargo build -p torii` passes for the patched binary
-- the patched Sepolia cold replay crossed **all three decisive points**: earlier same-player events (`2268329`), the schema upgrade (`2270724`), and the captured failing payload block (`2271871`)
-- after that crossing, `pistols-Config` gained `realms_address`, `pistols-PlayerActivityEvent` gained `EnlistedRankedDuelist`, and torii continued storing `PlayerActivityEvent` messages from `pistols-matchmaker` (`0x16f7e3c1…`) without `InvalidEnumSelector`
-
-That is enough to treat the task/dependency fix as **locally confirmed** for the historical replay trigger.
-
-#### 3. Secondary torii-side hardening: version historical event schemas by resource contract
-
-This is still a valid hardening direction, but it is no longer the best first explanation for the captured `activity = 18` failure.
-
-If torii needs to support non-additive historical event schema changes safely, the stronger long-term design is still:
-
-- key event schemas by `(world_address, selector, contract_address)` or `(world_address, selector, class_hash)`, not just `(world_address, selector)`
-- make `EventMessageProcessor` resolve the schema for the emitting historical event resource version, not merely the selector
-
-But the current Pistols repro now has a more direct task/dependency explanation, so this should be treated as a broader hardening improvement, not the primary fix for the observed bug.
-
-#### 4. Secondary torii hardening: self-heal on enum mismatch
-
-Torii can still be made more robust here.
-
-A targeted hardening patch would be:
-
-- in `EventMessageProcessor`, catch `PrimitiveError::InvalidEnumSelector`
-- refetch the event schema from chain for that selector
-- if the fetched schema differs from cached schema, update cache/storage and retry the deserialize once
-
-This is a **hardening** patch, not the primary root fix. It helps if torii has cached the wrong schema version or if DB state is lagging. It does **not** solve the task/dependency hole above by itself.
-
-#### 5. Low-confidence torii hardening: strict block-aligned schema reads
-
-Torii already has a `strict_model_reader` switch, but it defaults to `false`. That means `register_model`, `upgrade_model`, `register_event`, and `upgrade_event` fetch schema at the provider's latest block unless strict mode is enabled.
-
-This is worth testing, but it is not the main theory:
-
-- force `set_block(BlockId::Number(ctx.block_number))` for historical replay
-- or at least test cold replay with `strict_model_reader = true`
-
-I consider this a lower-confidence hardening lever, not the main fix. It helps validate whether the reader is pulling an unexpected schema snapshot, but it does not address the selector-only versioning problem above.
-
-#### 6. Not recommended: generic "ignore unknown enum selector"
-
-Do not apply a blanket parser patch that swallows unknown enum discriminants globally.
-
-The reason is structural: once enum decoding accepts an unknown selector, torii no longer knows how many felts to consume for that variant payload. For unit variants this might appear harmless; for payload-bearing variants it can desynchronize the rest of the decode stream and create harder-to-debug corruption.
-
-If a local workaround is needed, it should be narrow and model-specific.
-
-#### 7. Last-resort local workaround
-
-If we need to get a cold reindex through before the trigger bug is fixed upstream, a local torii patch could catch the exact logged deserialization failure and drop that historical event instead of rolling back the whole chunk.
-
-That would trade correctness in the affected historical event stream for forward progress of the indexer, so it should be treated as an emergency workaround, not the preferred fix.
 
 ## Reference timeline
 
@@ -1291,3 +1121,81 @@ Retired as a live lead.
 - it also does not line up cleanly with the Oct 15-22 ranked-queue / FAME rollout that clusters the poisoned model upgrades
 
 Conclusion: `TrophyProgression` is not the best use of investigation time unless instrumented replay explicitly points there.
+
+## Appendix C — Alternative and rejected fix approaches
+
+These are approaches considered during the investigation that were not chosen as part of the confirmed fix (see [Patched replay: trigger captured and fix confirmed](#patched-replay-trigger-captured-and-fix-confirmed) for what was applied). Each entry preserves the wording from the live investigation; some are still-open hardening directions, others are explicit "do not do this" callouts.
+
+### F1 — Broader rollback hardening: rebuild all commit-sensitive cache state
+
+The model cache is the bug Pistols is hitting, but it is not the only cache with the same shape. Torii also mutates token-registration cache before SQL commit:
+
+- `try_register_token_contract` enqueues `storage.register_token_contract(...)` and then immediately calls `cache.mark_token_registered(...)` in `crates/processors/src/erc.rs`.
+- `try_register_nft_token_metadata` does the same for NFT token rows, then also mutates balance-diff cache.
+
+If a later error in the same chunk triggers `storage.rollback()`, the DB can lose those token rows while cache still thinks the token is registered, causing the retry to skip re-registration.
+
+So the cleaner upstream remediation is not "clear models only", but "restore cache state to the last committed DB state on rollback". Concretely, that likely means one of:
+
+- add a cache `reload_from_storage` / `reset_from_storage` path and call it from the engine rollback arm
+- add explicit rollback invalidators for both model cache and token-registration cache, then lazily repopulate from storage on retry
+
+The current patched replay makes the first option look stronger than it did earlier in the investigation. Emptying the model cache entirely after rollback appears to leave later processors without required model definitions, which turns the original poison bug into a different `CacheError(ModelNotFound)` failure mode.
+
+### F2 — Defer cache writes until after `storage.execute()`
+
+Buffer `cache.register_model` calls in a per-chunk staging area (e.g. a `Vec<(Felt, Felt, Model)>` on the engine) and flush them only after `self.storage.execute().await?` returns `Ok`. On rollback, drop the staging buffer.
+
+This is a little more invasive than (A) but keeps the cache strictly in sync with committed SQL state, which is arguably the correct invariant. It also closes the (smaller) window where `set_entity` calls running concurrently in the same task can read a "future" schema from the cache.
+
+### F3 — Bypass cache when reading `prev_schema` (not recommended)
+
+Revert PR #356 so `UpgradeModelProcessor` reads `prev_schema` via `ctx.storage.model(...)`. This *alone* doesn't fix the bug because `Sql::model()` itself still preferentially returns from cache (since v1.8.0 / PR #353). To make this approach work you'd need to add a "skip cache" path for the upgrade processor specifically — i.e. read the `models` row directly from sqlx during an upgrade. Not recommended; (A) is cleaner.
+
+### F4 — Version historical event schemas by resource contract
+
+This is still a valid hardening direction, but it is no longer the best first explanation for the captured `activity = 18` failure.
+
+If torii needs to support non-additive historical event schema changes safely, the stronger long-term design is still:
+
+- key event schemas by `(world_address, selector, contract_address)` or `(world_address, selector, class_hash)`, not just `(world_address, selector)`
+- make `EventMessageProcessor` resolve the schema for the emitting historical event resource version, not merely the selector
+
+But the current Pistols repro now has a more direct task/dependency explanation, so this should be treated as a broader hardening improvement, not the primary fix for the observed bug.
+
+### F5 — Self-heal on enum mismatch
+
+Torii can still be made more robust here.
+
+A targeted hardening patch would be:
+
+- in `EventMessageProcessor`, catch `PrimitiveError::InvalidEnumSelector`
+- refetch the event schema from chain for that selector
+- if the fetched schema differs from cached schema, update cache/storage and retry the deserialize once
+
+This is a **hardening** patch, not the primary root fix. It helps if torii has cached the wrong schema version or if DB state is lagging. It does **not** solve the task/dependency hole above by itself.
+
+### F6 — Strict block-aligned schema reads (low confidence)
+
+Torii already has a `strict_model_reader` switch, but it defaults to `false`. That means `register_model`, `upgrade_model`, `register_event`, and `upgrade_event` fetch schema at the provider's latest block unless strict mode is enabled.
+
+This is worth testing, but it is not the main theory:
+
+- force `set_block(BlockId::Number(ctx.block_number))` for historical replay
+- or at least test cold replay with `strict_model_reader = true`
+
+I consider this a lower-confidence hardening lever, not the main fix. It helps validate whether the reader is pulling an unexpected schema snapshot, but it does not address the selector-only versioning problem above.
+
+### F7 — Generic "ignore unknown enum selector" (not recommended)
+
+Do not apply a blanket parser patch that swallows unknown enum discriminants globally.
+
+The reason is structural: once enum decoding accepts an unknown selector, torii no longer knows how many felts to consume for that variant payload. For unit variants this might appear harmless; for payload-bearing variants it can desynchronize the rest of the decode stream and create harder-to-debug corruption.
+
+If a local workaround is needed, it should be narrow and model-specific.
+
+### F8 — Last-resort local workaround
+
+If we need to get a cold reindex through before the trigger bug is fixed upstream, a local torii patch could catch the exact logged deserialization failure and drop that historical event instead of rolling back the whole chunk.
+
+That would trade correctness in the affected historical event stream for forward progress of the indexer, so it should be treated as an emergency workaround, not the preferred fix.
