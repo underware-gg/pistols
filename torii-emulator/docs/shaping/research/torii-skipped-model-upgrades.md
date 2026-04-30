@@ -428,7 +428,7 @@ These are the most useful breadcrumbs gathered in this session for anyone buildi
 - current torii HEAD in the local checkout pins Dojo deps to `0afeb1bc`
 - `PlayerActivityEvent.activity` first gains variant `18` (`EnlistedRankedDuelist`) in `b9840a17` on **2025-09-27**; variants `19` and `20` land later in `bc5ad295` on **2025-10-15**
 - `PlayerDuelistStack` lands in `64fb06ba` on **2025-04-25**
-- `GenesisKey::Groggus = 18` lands in `28a3f8c9` on **2025-05-04**
+- `GenesisKey` variant 18 renamed `Brutus` → `Groggus` in `28a3f8c9` on **2025-05-04** (slot 18 was already in use)
 - `Pack.pegged_lords_amount` lands in `1a06ae57` on **2025-10-17**
 - `DuelistAssignment.season_id` lands in `59c9e266` on **2025-10-17**
 - `Duelist.released_fame` lands in `6dc79473` on **2025-10-20**
@@ -502,7 +502,6 @@ One generic explanation is still ruled out by code:
 Taken alone, the code/chain review would still leave room for another event model. But the thread evidence now closes most of that gap:
 
 - on **2025-10-14**, torii logs `Upgraded event. namespace=pistols name=PlayerActivityEvent` immediately before the first clearly reported `PrimitiveError(InvalidEnumSelector { actual_selector: 18 })`
-- the same thread also shows repeated SQLite `CHECK constraint failed: activity_check`
 - in Pistols code, the relevant event model carrying an `activity` enum column is `pistols-PlayerActivityEvent`, and `Activity::EnlistedRankedDuelist` is exactly variant `18`
 
 So the failing event family is now confirmed: the replay is tripping on `pistols-PlayerActivityEvent.activity = 18`, and the remaining question that this investigation resolved was **which torii-side state was stale at that moment**.
@@ -1108,7 +1107,7 @@ Demoted to a narrow fallback, effectively ruled out as the **general** explanati
 
 - the current mainnet world does not exist at block `1375000` (`2025-05-05 12:56:03 UTC`)
 - it does exist by block `1500000` (`2025-06-18 04:29:30 UTC`)
-- `Groggus = 18` lands on `2025-05-04`, before the current mainnet world even exists
+- `GenesisKey` variant 18 was renamed `Brutus` → `Groggus` on `2025-05-04`, before the current mainnet world even exists; slot 18 was already in use
 - sepolia only leaves a narrow deployment overlap window (`740000` not found, `750000` exists)
 
 Conclusion: `Groggus` remains a conceivable sepolia-only fallback if the failing processor is a full-record `Duelist` or `PlayerDuelistStack` path, but it is not a strong cross-network explanation for the shared trigger.
