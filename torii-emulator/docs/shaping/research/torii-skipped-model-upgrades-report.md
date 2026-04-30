@@ -41,7 +41,7 @@ The patch was validated by replaying the Sepolia incident window from a pre-crit
 
 The substantive runtime changes, applied on top of torii `v1.8.15`:
 
-**`crates/indexer/engine/src/engine.rs`** — clear commit-sensitive cache state on chunk rollback (line 235-237 in the modified file):
+**`crates/indexer/engine/src/engine.rs`** — clear commit-sensitive cache state on chunk rollback (lines 236-237 in the modified file):
 
 ```diff
                   self.storage.rollback().await?;
@@ -50,20 +50,25 @@ The substantive runtime changes, applied on top of torii `v1.8.15`:
                   self.task_manager.clear_tasks();
 ```
 
-**`crates/processors/src/task_manager.rs`** — `TaskManager::add_parallelized_event_with_dependencies` (lines 93-110 in the modified file): when the task already exists, merge new dependencies into it instead of silently dropping them:
+**`crates/processors/src/task_manager.rs`** — `TaskManager::add_parallelized_event_with_dependencies` (around line 105): when the task already exists, merge newly-discovered dependencies into it after appending the event, instead of silently dropping them:
 
 ```diff
--        if let Some(task_data) = self.task_network.get_mut(&task_identifier) {
-+        if self.task_network.contains_key(&task_identifier) {
+                     task_data.events.push(parallelized_event);
+                 }
+             }
++
 +            if let Err(e) =
 +                self.task_network.add_dependencies(task_identifier, dependencies.clone())
-+            { … }
-+
-+            let task_data = self
-+                .task_network
-+                .get_mut(&task_identifier)
-+                .expect("Task should exist after contains_key check");
-             match parallelized_event.indexing_mode {
++            {
++                error!(
++                    target: LOG_TARGET,
++                    error = ?e,
++                    task_id = %task_identifier,
++                    dependencies = ?dependencies,
++                    "Failed to add dependencies to existing task."
++                );
++            }
+         } else {
 ```
 
 **`crates/task-network/src/lib.rs`** — adds a `pending_dependents: HashMap<K, HashSet<K>>` to `TaskNetwork`, plus `add_dependency_or_defer` and `resolve_pending_dependents` helpers. Dependencies whose prerequisite task does not yet exist are now deferred and resolved when the prerequisite is added, instead of being silently dropped. ~114 lines of additions. New tests: `test_late_dependency_becomes_active`, `test_add_dependencies_to_existing_task`.

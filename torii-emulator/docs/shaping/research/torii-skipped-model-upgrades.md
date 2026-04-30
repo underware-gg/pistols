@@ -735,17 +735,15 @@ An earlier iteration of the patch with only `clear_models()` (without the storag
 
 The captured trigger above was produced by two diagnostic-only patches applied to the local torii checkout alongside the runtime fix. They are not part of the runtime fix, but they are what made the failing payload visible.
 
-`crates/processors/src/processors/event_message.rs` — `error!` log on deserialize failure with all fields needed to identify the failing payload:
+`crates/processors/src/processors/event_message.rs` — `error!` log on deserialize failure with all fields needed to identify the failing payload. The `keys_and_unpacked` line also shifts from cloning `event.keys` to slicing it, so `event.keys` / `event.values` remain accessible to the error-log path:
 
 ```diff
-@@ -103,10 +102,27 @@
+@@ -103,10 +102,25 @@
              "Store event message."
          );
 
 -        let mut keys_and_unpacked = [event.keys.clone(), event.values].concat();
-+        let raw_keys = event.keys.clone();
-+        let raw_values = event.values.clone();
-+        let mut keys_and_unpacked = [raw_keys.clone(), raw_values.clone()].concat();
++        let mut keys_and_unpacked = [event.keys.as_slice(), event.values.as_slice()].concat();
 
          let mut entity = model.schema.clone();
 -        entity.deserialize(&mut keys_and_unpacked, model.use_legacy_store)?;
@@ -758,8 +756,8 @@ The captured trigger above was produced by two diagnostic-only patches applied t
 +                model_contract_address = %format!("{:#x}", model.contract_address),
 +                class_hash = %format!("{:#x}", model.class_hash),
 +                use_legacy_store = model.use_legacy_store,
-+                raw_keys = ?raw_keys,
-+                raw_values = ?raw_values,
++                raw_keys = ?event.keys,
++                raw_values = ?event.values,
 +                error = ?e,
 +                "Failed to deserialize event message."
 +            );
