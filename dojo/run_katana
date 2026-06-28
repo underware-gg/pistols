@@ -11,6 +11,7 @@ katana \
   --dev.no-fee \
   --cartridge.controllers \
   --cartridge.paymaster \
+  --explorer \
   # | grep -v \
   # -e starknet_call \
   # -e starknet_chainId \

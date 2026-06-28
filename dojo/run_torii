@@ -11,8 +11,8 @@ export START_BLOCK=1
 # export START_BLOCK=720000
 
 echo "* TORII   : $TORII_PATH"
-echo "* BLOCK   : $START_BLOCK"
 echo "* CFG     : $TORII_CONFIG_PATH"
+# echo "* BLOCK   : $START_BLOCK"
 echo "------------------------------------------------------------------------------"
 
 if [[

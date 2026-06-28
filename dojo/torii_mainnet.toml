@@ -2,7 +2,8 @@
 # torii config for profile [mainnet]
 #
 world_address = "0x8b4838140a3cbd36ebe64d4b5aaf56a30cc3753c928a79338bf56c53f506c5"
-rpc = "https://api.cartridge.gg/x/starknet/mainnet/rpc/v0_9"
+rpc = "https://api.cartridge.gg/x/starknet/mainnet/rpc/v0_10"
+# db_dir = "./data/torii-mainnet"
 
 [events]
 raw = true
@@ -20,7 +21,8 @@ historical = [
 # subscription_buffer_size = 10000
 
 [indexing]
-world_block = 88597
+# world_block = 1376382 # World deployment block
+world_block = 88597 # Lords deployment block
 # blocks_chunk_size = 10240 # default: 10240
 # max_concurrent_tasks = 40
 transactions = true

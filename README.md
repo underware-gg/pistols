@@ -128,19 +128,15 @@ asdf plugin add katana https://github.com/dojoengine/asdf-katana.git
 asdf plugin add torii https://github.com/dojoengine/asdf-torii.git
 asdf plugin add sozo https://github.com/dojoengine/asdf-sozo.git
 asdf install scarb 2.13.1
-asdf install sozo 1.8.5
-asdf install katana 1.7.0
-asdf install torii 1.8.7
+asdf install sozo 1.8.7
+asdf install katana 1.7.1
+asdf install torii 1.8.16
+asdf install starkli 0.4.2
 # enable to your user account (optional)
 # asdf set -u scarb 2.13.1
-# asdf set -u sozo 1.8.5
-# asdf set -u katana 1.7.0
-# asdf set -u torii 1.8.7
-
-# Install starkli
-# https://github.com/xJonathanLEI/starkli
-curl https://get.starkli.sh | sh
-starkliup
+# asdf set -u sozo 1.8.7
+# asdf set -u katana 1.7.1
+# asdf set -u torii 1.8.16
 
 # Install pnpm
 curl -fsSL https://get.pnpm.io/install.sh | sh -
