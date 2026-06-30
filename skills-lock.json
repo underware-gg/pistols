@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "skills": {
+    "dojo-client": {
+      "source": "dojoengine/book",
+      "sourceType": "github",
+      "skillPath": "skills/dojo-client/SKILL.md",
+      "computedHash": "e1e0aca472a2c766d263608dd134090aea6a20c142f580eb8fb58c6f4ce641f0"
+    },
+    "dojo-config": {
+      "source": "dojoengine/book",
+      "sourceType": "github",
+      "skillPath": "skills/dojo-config/SKILL.md",
+      "computedHash": "81f724fea662d5cd067e9b312823924c36fcd78db417f2e899407c44cf30fadf"
+    },
+    "dojo-deploy": {
+      "source": "dojoengine/book",
+      "sourceType": "github",
+      "skillPath": "skills/dojo-deploy/SKILL.md",
+      "computedHash": "64a4914ca51508231eb8d54392b8bdec36c1be07b464757c342ef4af01698409"
+    },
+    "dojo-indexer": {
+      "source": "dojoengine/book",
+      "sourceType": "github",
+      "skillPath": "skills/dojo-indexer/SKILL.md",
+      "computedHash": "b33c1c982011b0f0a4ea955b4f32111f94cd45f90006990f47f624de1a143206"
+    },
+    "dojo-init": {
+      "source": "dojoengine/book",
+      "sourceType": "github",
+      "skillPath": "skills/dojo-init/SKILL.md",
+      "computedHash": "68a1c0ed76ab8d6323688b655bcd24fb2549f9f22f5dba701eba6956011026d0"
+    },
+    "dojo-migrate": {
+      "source": "dojoengine/book",
+      "sourceType": "github",
+      "skillPath": "skills/dojo-migrate/SKILL.md",
+      "computedHash": "6e7be3150a5d1325ca66b61484245967eaec5ad0fa9123fffe77aaefd1d5fc57"
+    },
+    "dojo-model": {
+      "source": "dojoengine/book",
+      "sourceType": "github",
+      "skillPath": "skills/dojo-model/SKILL.md",
+      "computedHash": "385ea93cc42e27c0d431f5ed485b590f5c2e87bdd6a5de9402e9238ed1665b6f"
+    },
+    "dojo-review": {
+      "source": "dojoengine/book",
+      "sourceType": "github",
+      "skillPath": "skills/dojo-review/SKILL.md",
+      "computedHash": "50b13bb70e8eb8d4097e5787043faaa2bf6a3bab4ae168180f43916318ac3642"
+    },
+    "dojo-system": {
+      "source": "dojoengine/book",
+      "sourceType": "github",
+      "skillPath": "skills/dojo-system/SKILL.md",
+      "computedHash": "738709059c324fe19d370de88a5188cd52309bd08cbdae02888193a5e3321635"
+    },
+    "dojo-test": {
+      "source": "dojoengine/book",
+      "sourceType": "github",
+      "skillPath": "skills/dojo-test/SKILL.md",
+      "computedHash": "fbd363ed6ee2937f20bc4205d4b0984cbf3514b52149df184b819a4cc187ff0f"
+    },
+    "dojo-token": {
+      "source": "dojoengine/book",
+      "sourceType": "github",
+      "skillPath": "skills/dojo-token/SKILL.md",
+      "computedHash": "de851ec3a71bce280f39c5d0097975859c1335bd38c6006c851bc09c38a6f7d1"
+    },
+    "dojo-world": {
+      "source": "dojoengine/book",
+      "sourceType": "github",
+      "skillPath": "skills/dojo-world/SKILL.md",
+      "computedHash": "bb3ebcbd4622e5632a5406cde84a2e5235a1a2dea9614299febfd14a6c21cddf"
+    }
+  }
+}
