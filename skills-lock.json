@@ -1,6 +1,30 @@
 {
   "version": 1,
   "skills": {
+    "cairo-contract-authoring": {
+      "source": "keep-starknet-strange/starknet-agentic",
+      "sourceType": "github",
+      "skillPath": "skills/cairo-contract-authoring/SKILL.md",
+      "computedHash": "db76e38566b33bf20a0acecae2384a78262dbbf79600936fc0a77bd7732ccbed"
+    },
+    "cairo-optimization": {
+      "source": "keep-starknet-strange/starknet-agentic",
+      "sourceType": "github",
+      "skillPath": "skills/cairo-optimization/SKILL.md",
+      "computedHash": "f1d20d816bb7a132ee7ac7f5337e7c7c650d18f4de18ddaee6ea15d2a4f03322"
+    },
+    "cairo-testing": {
+      "source": "keep-starknet-strange/starknet-agentic",
+      "sourceType": "github",
+      "skillPath": "skills/cairo-testing/SKILL.md",
+      "computedHash": "ef6dece58ceefb239ee943b706e37d5404721e2afe239edfaa6aa67bcf606224"
+    },
+    "controller-cli": {
+      "source": "keep-starknet-strange/starknet-agentic",
+      "sourceType": "github",
+      "skillPath": "skills/controller-cli/SKILL.md",
+      "computedHash": "47eef480e78c1a926a9180e7a7c29fd63e32f2bb34a0ecee0dd23ee25bd1100e"
+    },
     "dojo-client": {
       "source": "dojoengine/book",
       "sourceType": "github",
@@ -72,6 +96,18 @@
       "sourceType": "github",
       "skillPath": "skills/dojo-world/SKILL.md",
       "computedHash": "bb3ebcbd4622e5632a5406cde84a2e5235a1a2dea9614299febfd14a6c21cddf"
+    },
+    "snip-36": {
+      "source": "keep-starknet-strange/starknet-agentic",
+      "sourceType": "github",
+      "skillPath": "skills/snip-36/SKILL.md",
+      "computedHash": "f8ba9aaf8f70c657f451400416184da8356c61e8cb2f2ff1cbeeb00aa5a9b474"
+    },
+    "starknet-js": {
+      "source": "keep-starknet-strange/starknet-agentic",
+      "sourceType": "github",
+      "skillPath": "skills/starknet-js/SKILL.md",
+      "computedHash": "31d5d5bfec50d52b04f417134bece826bf57e4856af475890ea7aa2a4083313e"
     }
   }
 }

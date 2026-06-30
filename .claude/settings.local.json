@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(git check-ignore *)",
-      "Bash(echo \"exit: $? \\(1 = not ignored, good\\)\")"
+      "Bash(echo \"exit: $? \\(1 = not ignored, good\\)\")",
+      "Read(//private/tmp/**)",
+      "Bash(gh api *)",
+      "Bash(python3 -c \"import sys,json; [print\\(x['name'], x['type']\\) for x in json.load\\(sys.stdin\\)]\")"
     ]
   }
 }

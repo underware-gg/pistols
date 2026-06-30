@@ -93,9 +93,13 @@ Operational/infrastructure notes (not API docs):
 
 ## Agent skills (`.agents/skills`)
 
-The canonical skills live in **`.agents/skills/`** (the cross-tool location). Claude Code discovers skills under `.claude/skills/`, so `.claude/skills` is a symlink → `../.agents/skills`. Both the symlink and the skills are committed; edit skills in `.agents/skills/` (the symlink target), never duplicate them. To add a skill, create `.agents/skills/<name>/SKILL.md` — it appears under `.claude/skills/<name>/` automatically.
+The canonical skills live in **`.agents/skills/`** (the cross-tool location). Claude Code discovers skills under `.claude/skills/`, so `.claude/skills` is a symlink → `../.agents/skills`. Both the symlink and the skills are committed; edit skills in `.agents/skills/` (the symlink target), never duplicate them.
 
-Each `SKILL.md` has `name` / `description` / `allowed-tools` frontmatter. Available skills (all Dojo workflow helpers — invoke when the task matches the description):
+Install third-party skills with `npx skills add <owner>/<repo>/skills/<name>` — they land in `.agents/skills/<name>/` and surface through the symlink automatically (the Starknet skills below came from [`keep-starknet-strange/starknet-agentic`](https://github.com/keep-starknet-strange/starknet-agentic/tree/main/skills)). To author one by hand, create `.agents/skills/<name>/SKILL.md`.
+
+Each `SKILL.md` has `name` / `description` / `allowed-tools` frontmatter. Invoke a skill when the task matches its description.
+
+**Dojo workflow helpers:**
 
 | Skill | Use when |
 |-------|----------|
@@ -112,7 +116,65 @@ Each `SKILL.md` has `name` / `description` / `allowed-tools` frontmatter. Availa
 | `dojo-client`  | Wiring frontends/game engines to the world; typed bindings |
 | `dojo-review`  | Auditing models/systems/tests for best practices & security |
 
+**Cairo / Starknet helpers** (from `starknet-agentic`):
+
+| Skill | Use when |
+|-------|----------|
+| `cairo-contract-authoring` | Writing/structuring raw Cairo contracts — storage, events, interfaces, component composition, security patterns |
+| `cairo-testing`            | Writing Cairo tests with `snforge` — unit/fuzz/integration tests, cheatcodes, coverage |
+| `cairo-optimization`       | Optimizing Cairo *after* correctness — gas/steps, profiling, storage packing, `BoundedInt` |
+| `snip-36`                  | SNIP-36 virtual-block proving — off-chain proofs, anonymous votes, heavy off-chain compute + on-chain verification |
+| `starknet-js`              | Building Starknet app code with starknet.js v9 — contract calls, accounts, transactions, fee estimation, wallet/paymaster flows (the TypeScript SDK reference; relevant to `/client` and `/sdk`) |
+| `controller-cli`           | Operating the Cartridge Controller CLI — human-approved sessions, scoped policies, paymaster control (this project uses Cartridge Controller) |
+| `starknet-wallet`          | Creating/managing agent wallets — transfers, balances, session keys, account deployment |
+| `starknet-defi`            | DeFi ops — swaps via AVNU, DCA, STRK staking, lending/borrowing, gasless txs |
+
+Note: `cairo-*` skills target raw Cairo/Starknet contracts; for this repo's Dojo-specific work (models, systems, `sozo`/`katana`/`torii`), prefer the `dojo-*` skills above.
+
 ## Conventions (from .cursor/rules)
 
 - **TS/React**: function components with `const` arrow functions and typed props; early returns; event handlers prefixed `handle`; keep code readable over clever.
 - **Cairo/Dojo**: reference the [Dojo Book](https://book.dojoengine.org/) and [Cairo Book](https://book.cairo-lang.org/) for current APIs.
+
+
+# Starknet Agent Configuration
+
+This project is configured with Starknet capabilities via the starknet-agentic MCP server.
+
+## Available Skills
+
+- starknet-js
+- starknet-wallet
+- starknet-defi
+
+## Network
+
+Currently configured for **mainnet**.
+
+## Usage
+
+Ask me to:
+- "What's my ETH balance on Starknet?"
+- "Transfer 0.1 ETH to 0x..."
+- "Swap 10 USDC for STRK"
+
+## MCP Server
+
+The Starknet MCP server provides these tools:
+- `get_balance` - Check token balances
+- `transfer` - Send tokens
+- `get_transaction` - Get transaction details
+- `swap_tokens` - Swap via AVNU aggregator
+- `get_swap_quote` - Get swap quotes
+
+## Credentials
+
+Set these environment variables in `.env`:
+- `STARKNET_PRIVATE_KEY` - Your wallet private key
+- `STARKNET_ACCOUNT_ADDRESS` - Your wallet address
+- `STARKNET_RPC_URL` - (optional) Custom RPC URL
+
+## Documentation
+
+- [Starknet Agentic Docs](https://starknet-agentic.vercel.app)
+- [Skills Reference](https://github.com/keep-starknet-strange/starknet-agentic/tree/main/skills)
