@@ -42,6 +42,17 @@ export default function ProfilesTestPage() {
 }
 
 
+const USERNAMES = [
+  'Patron', 'Lord Stirling', 'Captain Blood', 'Ser Walker', 'Lady Vengeance',
+  'Duke of Iron', 'Annie Oakley', 'Wild Bill', 'Doc Holliday', 'Billy the Kid',
+  'Baron von Dueling', 'Red Jack', 'Whiskey Joe', 'Madame Rouge', 'El Bandido',
+  'Blackbeard', 'Quick Draw McGhee', 'Silver Bullet', 'The Undertaker', 'Mataleone',
+  'Recipromancer', 'The Outlaw', 'Grim Reaper', 'Calico Jack', 'Lone Ranger',
+  'Copperhead', 'Dead-Eye Dan', 'Sheriff Stone', 'Baroness Raven', 'Marshal Dillon',
+];
+
+const _randomUsername = () => USERNAMES[Math.floor(Math.random() * USERNAMES.length)];
+
 const _randomFame = (archetype: constants.Archetype) => {
   const rookie = (archetype == constants.Archetype.Undefined);
   const dead = (Math.random() > 0.8);
@@ -64,22 +75,92 @@ const _randomArchetype = () => {
   return { archetype, honour }
 }
 
+const PREMISES = [
+  constants.Premise.Honour,
+  constants.Premise.Debt,
+  constants.Premise.Dispute,
+  constants.Premise.Hatred,
+  constants.Premise.Blood,
+  constants.Premise.Matter,
+  constants.Premise.Nothing,
+  constants.Premise.Tournament,
+  constants.Premise.Treaty,
+  constants.Premise.Lesson,
+];
+
 const _randomPremise = () => {
-  return constants.Premise[Math.floor(Math.random() * Object.keys(constants.Premise).length)] as constants.Premise
+  return PREMISES[Math.floor(Math.random() * PREMISES.length)];
 }
+
+const DUEL_TYPES = [
+  constants.DuelType.Seasonal,
+  constants.DuelType.Ranked,
+  constants.DuelType.Unranked,
+  constants.DuelType.Tournament,
+  constants.DuelType.Practice,
+  constants.DuelType.BotPlayer,
+];
+
+const _randomDuelType = () => DUEL_TYPES[Math.floor(Math.random() * DUEL_TYPES.length)];
+
+const _randomSeasonId = (duelType: constants.DuelType) => {
+  if (duelType === constants.DuelType.Practice || duelType === constants.DuelType.Unranked) {
+    return Math.random() > 0.5 ? 0 : Math.floor(1 + Math.random() * 3);
+  }
+  return Math.floor(1 + Math.random() * 4);
+};
+
+const QUOTES = [
+  "Choose your steps, quick!",
+  "Decide on your steps now!",
+  "What's your plan? Choose fast!",
+  "Make your move, no delay!",
+  "Pick your steps, time's short!",
+  "I demand satisfaction for your insolence!",
+  "Ten paces, then turn and fire.",
+  "You will regret crossing me!",
+  "Pay what you owe, coward.",
+  "Your honour is worth nothing to me.",
+  "May your aim be true, for you'll need it.",
+  "At dawn, one of us will not walk away.",
+  "Draw!",
+];
+
 const _randomQuote = () => {
-  const options = [
-    "Choose your steps, quick!",
-    "Decide on your steps now!",
-    "What's your plan? Choose fast!",
-    "Make your move, no delay!",
-    "Pick your steps, time's short!",
-  ];
-  return options[Math.floor(Math.random() * options.length)]
+  if (Math.random() < 0.60) return ''; // ~60% of duels do not include a message
+  return QUOTES[Math.floor(Math.random() * QUOTES.length)];
 }
-const _randomChallengeState = () => {
-  return constants.getChallengeStateFromValue(Math.floor(Math.random() * Object.keys(constants.ChallengeState).length))
-}
+
+const _randomChallengeStateAndWinner = () => {
+  const rand = Math.random();
+  if (rand < 0.35) {
+    return { state: constants.ChallengeState.Resolved, winner: 1 };
+  } else if (rand < 0.65) {
+    return { state: constants.ChallengeState.Resolved, winner: 2 };
+  } else if (rand < 0.76) {
+    return { state: constants.ChallengeState.Draw, winner: 0 };
+  } else if (rand < 0.85) {
+    return { state: constants.ChallengeState.Awaiting, winner: 0 };
+  } else if (rand < 0.92) {
+    return { state: constants.ChallengeState.InProgress, winner: 0 };
+  } else if (rand < 0.96) {
+    return { state: constants.ChallengeState.Expired, winner: 0 };
+  } else {
+    return {
+      state: Math.random() > 0.5 ? constants.ChallengeState.Withdrawn : constants.ChallengeState.Refused,
+      winner: 0
+    };
+  }
+};
+
+const PROFILE_TYPES = [
+  constants.DuelistProfile.Genesis,
+  constants.DuelistProfile.Legends,
+  constants.DuelistProfile.Pirates,
+  constants.DuelistProfile.Character,
+  constants.DuelistProfile.Bot,
+];
+const _randomProfileType = () => PROFILE_TYPES[Math.floor(Math.random() * PROFILE_TYPES.length)];
 
 function Profiles({
   profiles,
@@ -97,9 +178,9 @@ function Profiles({
       const is_dueling = (honour > 0 && !dead && Math.random() > 0.25);
       const prop: duelist_token.DuelistSvgProps = {
         // base_uri: 'https://localhost:5173',
-        duelist_id: 16,
-        owner: '0x057361297845238939',
-        username: 'Patron',
+        duelist_id: 10 + index,
+        owner: `0x05736129784523893${index}`,
+        username: _randomUsername(),
         honour,
         archetype,
         profile_type: profileType,
@@ -111,7 +192,7 @@ function Profiles({
         fame,
         lives,
         is_memorized: false,
-        duel_id: (is_dueling) ? Math.floor(Math.random() * 1000) : 0,
+        duel_id: (is_dueling) ? Math.floor(100 + Math.random() * 900) : 0,
         pass_id: (is_dueling) ? (Math.random() > 0.5 ? 100 : 0) : 0,
         timestamp_registered: 0x1,
         timestamp_active: 0x6814fbaa,
@@ -124,28 +205,33 @@ function Profiles({
   const rows = useMemo(() => {
     return props.map((e, index) => {
       const { profile, prop } = e;
-      const state = _randomChallengeState()
-      const is_finished = (state == constants.ChallengeState.Resolved || state == constants.ChallengeState.Draw);
-      const winner = is_finished ? (Math.floor(Math.random() * 3)) : 0;
-      let nextProfileIndex = (index < props.length - 1) ? index + 1 : 0;
+      const { state, winner } = _randomChallengeStateAndWinner();
+      const duel_type = _randomDuelType();
+      const season_id = _randomSeasonId(duel_type);
+      const nextProfileIndex = (index < props.length - 1) ? index + 1 : 0;
+      const oppProfileType = Math.random() > 0.4 ? _randomProfileType() : props[nextProfileIndex].prop.profile_type;
+      const oppProfileId = Math.random() > 0.4 ? Math.floor(Math.random() * 12) : props[nextProfileIndex].prop.profile_id;
+      const oppUsername = _randomUsername();
+
       const duel_prop: duel_token.DuelSvgProps = {
         // base_uri: 'https://localhost:5173',
-        duel_id: Math.floor(Math.random() * 1000),
-        duel_type: constants.DuelType.Seasonal,
+        duel_id: Math.floor(100 + Math.random() * 900),
+        duel_type,
         premise: _randomPremise(),
         message: _randomQuote(),
         state,
         winner,
-        season_id: 1,
+        season_id,
         profile_type_a: prop.profile_type,
-        profile_type_b: props[nextProfileIndex].prop.profile_type,
+        profile_type_b: oppProfileType,
         profile_id_a: prop.profile_id,
-        profile_id_b: props[nextProfileIndex].prop.profile_id,
+        profile_id_b: oppProfileId,
         username_a: prop.username,
-        username_b: props[nextProfileIndex].prop.username,
+        username_b: oppUsername,
         address_a: prop.owner,
-        address_b: props[nextProfileIndex].prop.owner,
+        address_b: `0x09876543210123456${index}`,
       };
+
       return (
         <Row key={`${profileType}-${prop.profile_id}`} className='ModalText'>
           <Cell className='Code'>
