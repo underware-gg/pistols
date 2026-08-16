@@ -37,11 +37,11 @@ export type DuelistProfileKey = GenesisKey | CharacterKey | BotKey | LegendsKey 
 // get numeric ID from profile key (string)
 export const getProfileId = (profileType: DuelistProfile, profileKey: DuelistProfileKey): number => {
   switch (profileType) {
-    case DuelistProfile.Genesis: return getGenesisKeyValue(profileKey as GenesisKey);
-    case DuelistProfile.Character: return getCharacterKeyValue(profileKey as CharacterKey);
-    case DuelistProfile.Bot: return getBotKeyValue(profileKey as BotKey);
-    case DuelistProfile.Legends: return getLegendsKeyValue(profileKey as LegendsKey);
-    case DuelistProfile.Pirates: return getPiratesKeyValue(profileKey as PiratesKey);
+    case DuelistProfile.Genesis: return getGenesisKeyValue(profileKey as GenesisKey) ?? 0;
+    case DuelistProfile.Character: return getCharacterKeyValue(profileKey as CharacterKey) ?? 0;
+    case DuelistProfile.Bot: return getBotKeyValue(profileKey as BotKey) ?? 0;
+    case DuelistProfile.Legends: return getLegendsKeyValue(profileKey as LegendsKey) ?? 0;
+    case DuelistProfile.Pirates: return getPiratesKeyValue(profileKey as PiratesKey) ?? 0;
     default: return 0;
   };
 }
@@ -49,11 +49,11 @@ export const getProfileId = (profileType: DuelistProfile, profileKey: DuelistPro
 // get profile key (string) from numeric ID
 export const getProfileKey = (profileType: DuelistProfile, profileId: number): DuelistProfileKey => {
   switch (profileType) {
-    case DuelistProfile.Genesis: return getGenesisKeyFromValue(profileId)
-    case DuelistProfile.Character: return getCharacterKeyFromValue(profileId);
-    case DuelistProfile.Bot: return getBotKeyFromValue(profileId);
-    case DuelistProfile.Legends: return getLegendsKeyFromValue(profileId);
-    case DuelistProfile.Pirates: return getPiratesKeyFromValue(profileId);
+    case DuelistProfile.Genesis: return getGenesisKeyFromValue(profileId) ?? GenesisKey.Unknown;
+    case DuelistProfile.Character: return getCharacterKeyFromValue(profileId) ?? CharacterKey.Unknown;
+    case DuelistProfile.Bot: return getBotKeyFromValue(profileId) ?? BotKey.Unknown;
+    case DuelistProfile.Legends: return getLegendsKeyFromValue(profileId) ?? LegendsKey.Unknown;
+    case DuelistProfile.Pirates: return getPiratesKeyFromValue(profileId) ?? PiratesKey.Unknown;
     default: return CharacterKey.Unknown;
   };
 }
@@ -65,20 +65,21 @@ export const getProfileKey = (profileType: DuelistProfile, profileId: number): D
 
 export const makeProfilePicUrl = (profileId: number | null, profileType = DuelistProfile.Genesis) => {
   const collection = getCollectionDescriptor(profileType);
-  return `/profiles/${collection.folder_name}/${('00' + profileId.toString()).slice(-2)}.jpg`;
+  const id = profileId ?? 0;
+  return `/profiles/${collection?.folder_name ?? 'genesis'}/${('00' + id.toString()).slice(-2)}.jpg`;
 }
 
 export const getCollectionDescriptor = (profile: DuelistProfile): CollectionDescriptor => {
-  return COLLECTIONS[profile];
+  return COLLECTIONS[profile] ?? COLLECTIONS[DuelistProfile.Genesis];
 }
 
 export const getProfileDescriptor = (profileType: DuelistProfile, profileKey: DuelistProfileKey): ProfileDescriptor => {
   switch (profileType) {
-    case DuelistProfile.Genesis: return GENESIS_PROFILES[profileKey as GenesisKey];
-    case DuelistProfile.Character: return CHARACTER_PROFILES[profileKey as CharacterKey];
-    case DuelistProfile.Bot: return BOT_PROFILES[profileKey as BotKey];
-    case DuelistProfile.Legends: return LEGENDS_PROFILES[profileKey as LegendsKey];
-    case DuelistProfile.Pirates: return PIRATES_PROFILES[profileKey as PiratesKey];
+    case DuelistProfile.Genesis: return GENESIS_PROFILES[profileKey as GenesisKey] ?? GENESIS_PROFILES.Unknown;
+    case DuelistProfile.Character: return CHARACTER_PROFILES[profileKey as CharacterKey] ?? CHARACTER_PROFILES.Unknown;
+    case DuelistProfile.Bot: return BOT_PROFILES[profileKey as BotKey] ?? BOT_PROFILES.Unknown;
+    case DuelistProfile.Legends: return LEGENDS_PROFILES[profileKey as LegendsKey] ?? LEGENDS_PROFILES.Unknown;
+    case DuelistProfile.Pirates: return PIRATES_PROFILES[profileKey as PiratesKey] ?? PIRATES_PROFILES.Unknown;
     default: return CHARACTER_PROFILES[CharacterKey.Unknown];
   };
 }
@@ -119,6 +120,11 @@ const profileKeys: Record<DuelistProfile, DuelistProfileKey[]> = {
 
 export const getCollectionProfileKeys = (profileType: DuelistProfile): DuelistProfileKey[] => {
   return profileKeys[profileType] ?? [];
+}
+
+export const getRandomProfileId = (profileType: DuelistProfile): number => {
+  const keys = getCollectionProfileKeys(profileType);
+  return keys.length > 0 ? Math.floor(Math.random() * keys.length) : 0;
 }
 
 

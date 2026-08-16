@@ -55,37 +55,50 @@ const escapeXml = (unsafe: string): string => {
     .replace(/'/g, '&apos;');
 };
 
-const formatDuelTypePremiseLabel = (duelType: constants.DuelType): string => {
-  if (!duelType || duelType === constants.DuelType.Undefined) return 'DUEL';
-  if (duelType === constants.DuelType.BotPlayer) return 'BOT DUEL';
-  return `${duelType.toUpperCase()} DUEL`;
+const formatDuelTypePremiseLabel = (duelType: constants.DuelType | string): string => {
+  const cleanType = String(duelType || '').replace(/^DuelType::/, '');
+  if (!cleanType || cleanType === constants.DuelType.Undefined || cleanType === 'Undefined') return 'DUEL';
+  if (cleanType === constants.DuelType.BotPlayer || cleanType === 'BotPlayer') return 'BOT DUEL';
+  return `${cleanType.toUpperCase()} DUEL`;
 };
 
 const formatPremisePhrase = (premise: constants.Premise | string): string => {
-  if (!premise || premise === constants.Premise.Undefined || premise === 'Undefined') return 'to defend their honour';
-  const desc = constants.PREMISES[premise as constants.Premise];
+  const cleanPremise = String(premise || '').replace(/^Premise::/, '');
+  if (!cleanPremise || cleanPremise === constants.Premise.Undefined || cleanPremise === 'Undefined') return 'to defend their honour';
+  const desc = constants.PREMISES[cleanPremise as constants.Premise];
   if (desc && desc.prefix) return desc.prefix;
-  return `for ${premise}`;
+  return `for ${cleanPremise}`;
 };
 
 export const renderSvg = async (props: DuelSvgProps, options: SvgRenderOptions = {}): Promise<string> => {
-  const profile_key_a = getProfileKey(props.profile_type_a, props.profile_id_a)
-  const profile_key_b = getProfileKey(props.profile_type_b, props.profile_id_b)
-  const profile_a = getProfileDescriptor(props.profile_type_a, profile_key_a)
-  const profile_b = getProfileDescriptor(props.profile_type_b, profile_key_b)
+  const cleanProfileTypeA = String(props.profile_type_a || '').replace(/^DuelistProfile::/, '') as constants.DuelistProfile;
+  const cleanProfileTypeB = String(props.profile_type_b || '').replace(/^DuelistProfile::/, '') as constants.DuelistProfile;
+  const profileIdA = Number(props.profile_id_a) || 0;
+  const profileIdB = Number(props.profile_id_b) || 0;
+  const winner = Number(props.winner);
+  const seasonId = Number(props.season_id) || 0;
 
-  const is_resolved = props.state === constants.ChallengeState.Resolved;
-  const is_draw = props.state === constants.ChallengeState.Draw || (is_resolved && props.winner === 0);
-  const is_finished = is_resolved || props.state === constants.ChallengeState.Draw;
+  const cleanState = String(props.state || '')
+    .replace(/^ChallengeState::/, '')
+    .replace(/\s+/g, '') as constants.ChallengeState;
 
-  const is_dead_a = is_finished && props.winner !== 1;
-  const is_dead_b = is_finished && props.winner !== 2;
+  const profile_key_a = getProfileKey(cleanProfileTypeA, profileIdA)
+  const profile_key_b = getProfileKey(cleanProfileTypeB, profileIdB)
+  const profile_a = getProfileDescriptor(cleanProfileTypeA, profile_key_a)
+  const profile_b = getProfileDescriptor(cleanProfileTypeB, profile_key_b)
+
+  const is_resolved = cleanState === constants.ChallengeState.Resolved;
+  const is_draw = cleanState === constants.ChallengeState.Draw || (is_resolved && winner === 0);
+  const is_finished = is_resolved || cleanState === constants.ChallengeState.Draw;
+
+  const is_dead_a = is_finished && winner !== 1;
+  const is_dead_b = is_finished && winner !== 2;
 
   const username_a = props.username_a || profile_a.name || 'Challenger';
   const username_b = props.username_b || profile_b.name || 'Challenged';
 
-  let image_duelist_a = makeProfilePicUrl(props.profile_id_a, props.profile_type_a)
-  let image_duelist_b = makeProfilePicUrl(props.profile_id_b, props.profile_type_b)
+  let image_duelist_a = makeProfilePicUrl(profileIdA, cleanProfileTypeA)
+  let image_duelist_b = makeProfilePicUrl(profileIdB, cleanProfileTypeB)
   let image_paper = `/images/ui/duel_paper.png`
 
   // Results text logic
@@ -100,35 +113,35 @@ export const renderSvg = async (props: DuelSvgProps, options: SvgRenderOptions =
       outcomeTitle = 'MUTUAL DEFEAT';
       outcomeSubtitle = 'Neither duelist survived the dawn';
       outcomeBadgeColor = '#5c3818';
-    } else if (props.winner === 1) {
+    } else if (winner === 1) {
       outcomeHeader = '★  VICTORIOUS  ★';
       outcomeTitle = escapeXml(username_a).toUpperCase();
       outcomeSubtitle = `Defeated ${escapeXml(username_b)} in mortal combat`;
       outcomeBadgeColor = '#8c2210';
-    } else if (props.winner === 2) {
+    } else if (winner === 2) {
       outcomeHeader = '★  VICTORIOUS  ★';
       outcomeTitle = escapeXml(username_b).toUpperCase();
       outcomeSubtitle = `Defeated ${escapeXml(username_a)} in mortal combat`;
       outcomeBadgeColor = '#8c2210';
     }
-  } else if (props.state === constants.ChallengeState.Awaiting) {
+  } else if (cleanState === constants.ChallengeState.Awaiting) {
     outcomeHeader = '📜  CHALLENGE ISSUED  📜';
     outcomeTitle = 'AWAITING DUEL';
     outcomeSubtitle = 'Awaiting acceptance of the challenge';
     outcomeBadgeColor = '#6b4c1b';
-  } else if (props.state === constants.ChallengeState.Expired) {
+  } else if (cleanState === constants.ChallengeState.Expired) {
     outcomeHeader = '⏳  CHALLENGE EXPIRED  ⏳';
     outcomeTitle = 'DUEL EXPIRED';
     outcomeSubtitle = 'The appointed hour has passed';
     outcomeBadgeColor = '#5c3818';
-  } else if (props.state === constants.ChallengeState.Withdrawn || props.state === constants.ChallengeState.Refused) {
+  } else if (cleanState === constants.ChallengeState.Withdrawn || cleanState === constants.ChallengeState.Refused) {
     outcomeHeader = '⚔  CHALLENGE VOID  ⚔';
-    outcomeTitle = props.state === constants.ChallengeState.Withdrawn ? 'WITHDRAWN' : 'REFUSED';
+    outcomeTitle = cleanState === constants.ChallengeState.Withdrawn ? 'WITHDRAWN' : 'REFUSED';
     outcomeSubtitle = 'The duel will not take place';
     outcomeBadgeColor = '#5c3818';
   }
 
-  const seasonText = props.season_id ? `SEASON ${props.season_id}` : 'SEASON —';
+  const seasonText = seasonId ? `SEASON ${seasonId}` : 'SEASON —';
   const premiseLabel = formatDuelTypePremiseLabel(props.duel_type);
   const premisePhrase = formatPremisePhrase(props.premise);
   const rawMessage = (props.message || '').trim();
@@ -301,10 +314,10 @@ ${is_dead_b ? `<image href='${await getAsset(cardsAssets, card_cross)}' x='${PRO
 
 // profile names below portraits
 <text class='NAME LEFT' x='${PROFILE_X1}' y='${PROFILE_Y + PROFILE_H + 24}'>
-  ${escapeXml(profile_a.name)} #${props.profile_id_a}
+  ${escapeXml(profile_a.name)} #${profileIdA}
 </text>
 <text class='NAME RIGHT' x='${WIDTH - PROFILE_X1}' y='${PROFILE_Y + PROFILE_H + 24}'>
-  ${escapeXml(profile_b.name)} #${props.profile_id_b}
+  ${escapeXml(profile_b.name)} #${profileIdB}
 </text>
 
 // decorative divider 1

@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { Container, Table } from 'semantic-ui-react'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
-import { makeProfilePicUrl } from '@underware/pistols-sdk/pistols'
+import { makeProfilePicUrl, getRandomProfileId } from '@underware/pistols-sdk/pistols'
 import { duelist_token, duel_token } from '@underware/pistols-sdk/pistols/tokens'
 import { DuelistTokenImage, DuelTokenImage } from '@underware/pistols-sdk/pistols/components'
 import { map } from '@underware/pistols-sdk/utils'
@@ -210,7 +210,7 @@ function Profiles({
       const season_id = _randomSeasonId(duel_type);
       const nextProfileIndex = (index < props.length - 1) ? index + 1 : 0;
       const oppProfileType = Math.random() > 0.4 ? _randomProfileType() : props[nextProfileIndex].prop.profile_type;
-      const oppProfileId = Math.random() > 0.4 ? Math.floor(Math.random() * 12) : props[nextProfileIndex].prop.profile_id;
+      const oppProfileId = getRandomProfileId(oppProfileType);
       const oppUsername = _randomUsername();
 
       const duel_prop: duel_token.DuelSvgProps = {

@@ -91,15 +91,23 @@ const _renderStat = (x: number, y: number, key: string, value: string) => {
 }
 
 export const renderSvg = async (props: DuelistSvgProps, options: SvgRenderOptions = {}): Promise<string> => {
-  const profile_key = getProfileKey(props.profile_type, props.profile_id)
-  const profile = getProfileDescriptor(props.profile_type, profile_key)
-  const profile_url = makeProfilePicUrl(props.profile_id, props.profile_type);
-  const card_url = ArchetypeCardUrl[props.archetype];
-  const life_bar_value = (props.fame % 1000);
-  const is_alive = (props.lives > 0);
-  const is_duelling = (BigInt(props.duel_id) > 0n);
+  const cleanProfileType = String(props.profile_type || '').replace(/^DuelistProfile::/, '') as constants.DuelistProfile;
+  const cleanArchetype = String(props.archetype || '').replace(/^Archetype::/, '') as constants.Archetype;
+  const profileId = Number(props.profile_id) || 0;
+  const fame = Number(props.fame) || 0;
+  const lives = Number(props.lives) || 0;
+  const totalLosses = Number(props.total_losses) || 0;
+  const totalDraws = Number(props.total_draws) || 0;
+
+  const profile_key = getProfileKey(cleanProfileType, profileId)
+  const profile = getProfileDescriptor(cleanProfileType, profile_key)
+  const profile_url = makeProfilePicUrl(profileId, cleanProfileType);
+  const card_url = ArchetypeCardUrl[cleanArchetype];
+  const life_bar_value = (fame % 1000);
+  const is_alive = (lives > 0);
+  const is_duelling = (BigInt(props.duel_id || 0) > 0n);
   const state = props.is_memorized ? 'Memorized' : (is_alive ? 'Alive' : 'Dead');
-  const total_losses = (props.total_losses + props.total_draws);
+  const total_losses = (totalLosses + totalDraws);
   const svg = `
 <svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' preserveAspectRatio='xMinYMin meet' viewBox='0 0 ${WIDTH} ${HEIGHT}'>
 <style>
@@ -195,16 +203,16 @@ ${(!is_alive && props.is_memorized === false) &&
 </text>
 <text class='TITLE' x='${SLOT_X2}' y='${SLOT_Y}'>
   ${is_duelling ? PISTOL
-    : props.archetype == constants.Archetype.Honourable ? '👑'
-      : props.archetype == constants.Archetype.Trickster ? '🃏'
-        : props.archetype == constants.Archetype.Villainous ? '👺'
+    : cleanArchetype == constants.Archetype.Honourable ? '👑'
+      : cleanArchetype == constants.Archetype.Trickster ? '🃏'
+        : cleanArchetype == constants.Archetype.Villainous ? '👺'
           : ''
   }
 </text>
 
 // FAME
 <text class='TITLE' x='${WIDTH / 2}' y='${FAME_Y}'>
-  ${STAR} ${props.lives}
+  ${STAR} ${lives}
 </text>
 <rect class='shadow' x='${BOX_GAP}' y='${BOX_Y}' width='${BOX_W}' height='${BOX_H}' rx='10' fill='#2004'/>
 ${is_alive &&
@@ -227,7 +235,7 @@ ${is_alive &&
 
 // STATS
 ${_renderStat(STAT_GAP, STAT1_Y, 'ID', `#${props.duelist_id}`)}
-${_renderStat(STAT_GAP, STAT2_Y, 'Fame', `${props.fame}`)}
+${_renderStat(STAT_GAP, STAT2_Y, 'Fame', `${fame}`)}
 ${_renderStat(STAT_GAP, STAT3_Y, 'Health', state)}
 ${is_duelling
   ? _renderStat(STAT_GAP, STAT4_Y, 'Duel', `#${props.duel_id.toString()}`)
@@ -238,7 +246,7 @@ ${_renderStat(WIDTH - STAT_GAP - STAT_W, STAT1_Y, 'Duels', `${props.total_duels 
 ${_renderStat(WIDTH - STAT_GAP - STAT_W, STAT2_Y, 'Wins', props.total_wins == 0 ? '-' : `${props.total_wins} (${Math.floor((props.total_wins / props.total_duels) * 100)}%)`)}
 ${_renderStat(WIDTH - STAT_GAP - STAT_W, STAT3_Y, 'Losses', total_losses == 0 ? '-' : `${(total_losses)} (${Math.floor(((total_losses) / props.total_duels) * 100)}%)`)}
 ${_renderStat(WIDTH - STAT_GAP - STAT_W, STAT4_Y, 'Honour', `${(props.honour / 10).toFixed(1)}`)}
-${_renderStat(WIDTH - STAT_GAP - STAT_W, STAT5_Y, props.archetype != constants.Archetype.Undefined ? `${props.archetype}` : '', '')}
+${_renderStat(WIDTH - STAT_GAP - STAT_W, STAT5_Y, cleanArchetype != constants.Archetype.Undefined ? `${cleanArchetype}` : '', '')}
 
 // pistols
 <text class='WEBSITE' x='${HALF_WIDTH}' y='${WEBSITE_Y}'>
