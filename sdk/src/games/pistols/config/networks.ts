@@ -205,12 +205,12 @@ const snSepoliaConfig: DojoNetworkConfig = {
   clientUrl: 'https://testnet.pistols.gg',
   assetsServerUrl: 'https://assets.underware.gg',
   // assetsServerUrl: 'https://assets-server-testnet.vercel.app',
-  slotName: 'pistols-sepolia',
+  slotName: undefined,
   rpcUrl: 'https://api.cartridge.gg/x/starknet/sepolia/rpc/v0_9',
-  toriiUrl: undefined,    // derive from slotName
+  toriiUrl: 'https://pistols-solitaire-sepolia.up.railway.app',
   // toriiUrl: 'http://127.0.0.1:8080',
-  graphqlUrl: undefined,  // derive from slotName
-  sqlUrl: undefined,      // derive from slotName
+  graphqlUrl: 'https://pistols-solitaire-sepolia.up.railway.app/sql',
+  sqlUrl: 'https://pistols-solitaire-sepolia.up.railway.app/graphql',
   etherAddress: sepolia.nativeCurrency.address,
   lordsFaucet: true,
   // lordsFaucet: 'https://sepolia.voyager.online/contract/0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210#writeContract',
@@ -231,11 +231,11 @@ const snMainnetConfig: DojoNetworkConfig = {
   name: 'Mainnet',
   clientUrl: 'https://play.pistols.gg',
   assetsServerUrl: 'https://assets.underware.gg',
-  slotName: 'pistols-mainnet',
+  slotName: undefined,
   rpcUrl: 'https://api.cartridge.gg/x/starknet/mainnet/rpc/v0_9',
-  toriiUrl: undefined,    // derive from slotName
-  graphqlUrl: undefined,  // derive from slotName
-  sqlUrl: undefined,      // derive from slotName
+  toriiUrl: 'https://pistols-solitaire-mainnet.up.railway.app',
+  graphqlUrl: 'https://pistols-solitaire-mainnet.up.railway.app/sql',
+  sqlUrl: 'https://pistols-solitaire-mainnet.up.railway.app/graphql',
   etherAddress: mainnet.nativeCurrency.address,
   lordsFaucet: 'https://app.ekubo.org/?inputCurrency=ETH&outputCurrency=LORDS',
   lordsAddress: '0x124aeb495b947201f5fac96fd1138e326ad86195b98df6dec9009158a533b49',
