@@ -367,7 +367,6 @@ async function handleManagedAsset(request, pathname, manifestAsset, manifestKey)
     hash: manifestAsset.hash,
     blob: blob,
     size: blob.size,
-    mtime: manifestAsset.mtime,
     contentType: response.headers.get('content-type') || 'application/octet-stream'
   };
   

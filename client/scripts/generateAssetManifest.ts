@@ -13,13 +13,11 @@ interface AssetInfo {
   path: string;
   hash: string;
   size: number;
-  mtime: number;
 }
 
 // Flat structure using path-based keys for O(1) access
 interface AssetManifest {
   version: string;
-  generatedAt: number;
   assets: Record<string, AssetInfo>; // Flat object with path-based keys
 }
 
@@ -61,7 +59,6 @@ function getFileInfo(filePath: string, relativePath: string): AssetInfo {
       path: `/${relativePath.replace(/\\/g, '/')}`,
       hash: generateFileHash(filePath),
       size: stats.size,
-      mtime: stats.mtime.getTime()
     };
   } catch (error) {
     console.warn(`Warning: Could not get file info for ${filePath}:`, error);
@@ -69,7 +66,6 @@ function getFileInfo(filePath: string, relativePath: string): AssetInfo {
       path: `/${relativePath.replace(/\\/g, '/')}`,
       hash: '',
       size: 0,
-      mtime: 0
     };
   }
 }
@@ -136,7 +132,6 @@ function generateManifest(): void {
   // Create nested asset structure based on folder hierarchy
   const manifest: AssetManifest = {
     version,
-    generatedAt: Date.now(),
     assets: {}
   };
   

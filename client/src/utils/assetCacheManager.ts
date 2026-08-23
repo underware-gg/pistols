@@ -4,12 +4,10 @@ import { SCENE_PRIORITIES, TEXTURES, SPRITESHEETS, PROFILE_COLLECTIONS } from '/
 
 export interface AssetManifest {
   version: string;
-  generatedAt: number;
   assets: Record<string, {
     path: string;
     hash: string;
     size: number;
-    mtime: number;
   }>;
 }
 
@@ -43,7 +41,6 @@ class PistolsAssetCache extends Dexie {
     cachedAt: number;
     size: number;
     blob: Blob;
-    mtime: number;
     contentType: string;
   }, string>;
   
@@ -230,14 +227,14 @@ export class AssetCacheManager {
           attempts++;
           if (attempts >= maxAttempts) {
             console.warn('❌ Max attempts reached, using fallback manifest');
-            this.manifest = { version: 'fallback', generatedAt: Date.now(), assets: {} };
+            this.manifest = { version: 'fallback', assets: {} };
           }
           await new Promise(resolve => setTimeout(resolve, 500));
         }
       }
       
     } catch (error) {
-      this.manifest = { version: 'fallback', generatedAt: Date.now(), assets: {} };
+      this.manifest = { version: 'fallback', assets: {} };
     }
   }
 
