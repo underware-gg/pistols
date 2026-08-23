@@ -158,6 +158,11 @@ understood.
 - `starkscan` still pins the old `axios` line. The override handles the
   advisories, but the dependency remains unmaintained.
 - Revisit `elliptic` when `starknet` next moves.
-- **`pnpm lint` is broken and was before this work**: ESLint 9 requires
-  `eslint.config.js` and the client has none, only the implicit legacy setup.
-  Unrelated to dependency policy, but it means lint is not a usable gate today.
+- ~~**`pnpm lint` is broken and was before this work**~~ — the config half is
+  fixed: the client now has a flat `eslint.config.js`, ported at exact parity.
+  Lint still exits non-zero on **195 `react-hooks/rules-of-hooks` violations
+  across 20 files**, which the broken config had been hiding. 187 are a naming
+  convention (19 underscore-prefixed components and hooks, e.g. `_BarkeepModal`,
+  `_usePool`, which the rule cannot recognise as components or hooks); 8 are
+  genuine conditional hook calls and the only ones with real bug potential.
+  Neither is a dependency concern.

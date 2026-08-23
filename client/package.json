@@ -14,7 +14,7 @@
     "build": "npx tsc -p tsconfig.json && vite build",
     "sync": "npx tsc -watch",
     "check-types": "npx tsc --noEmit",
-    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint": "eslint src --report-unused-disable-directives --max-warnings 0",
     "test": "vitest run",
     "test:watch": "vitest",
     "generate-constants": "npx --package=@underware/pistols-sdk generate-constants --src:\"../dojo/src\" --out:\"$npm_config_sdk/generated/constants.ts\"",
