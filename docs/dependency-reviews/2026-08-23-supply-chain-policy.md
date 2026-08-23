@@ -201,5 +201,8 @@ and yields a green install with no policy.
   resolves. Decide deliberately.
 - Convert the remaining direct dependency ranges to exact pins as each package
   is next reviewed.
-- `corepack enable` is now a prerequisite for `turbo` tasks. Worth stating in
-  the contributor setup notes.
+- Worth stating in the contributor setup notes: after changing
+  `pnpm-workspace.yaml` or the lockfile, `pnpm install` must be re-run before
+  any `turbo` task, because `verifyDepsBeforeRun` compares the installed tree
+  against current settings. No Corepack setup is needed — pnpm honours the
+  `packageManager` pin on its own.

@@ -25,21 +25,27 @@ reasoning behind what that file allows.
 ## Install workflow
 
 The package manager is pinned exactly in `package.json` and enforced by
-`packageManagerStrictVersion`. Make the pinned version available through
-Corepack:
+`packageManagerStrictVersion`. pnpm honours that pin itself — both a standalone
+pnpm installation and Corepack will run the pinned version for this repo, so no
+special setup is required:
 
 ```sh
-corepack enable        # once per machine, so `pnpm` resolves per-project
-corepack install       # installs the version this repo pins
 pnpm install --frozen-lockfile
 ```
 
-`corepack enable` matters more than it looks. `verifyDepsBeforeRun: error`
-compares the installed tree against the current settings, and `turbo` spawns
-`pnpm` from `PATH` for each task. If `PATH` resolves to a different pnpm than
-the one that wrote `node_modules`, every `turbo` task fails with
-`ERR_PNPM_VERIFY_DEPS_BEFORE_RUN`. A standalone pnpm installation earlier in
-`PATH` will shadow Corepack and cause exactly this.
+Corepack is an alternative rather than a requirement:
+
+```sh
+corepack install       # installs the version this repo pins, into the Corepack cache
+```
+
+**After any change to `pnpm-workspace.yaml` or the lockfile, run `pnpm install`
+before using `pnpm run` or `pnpm exec`.** `verifyDepsBeforeRun: error` compares
+the installed tree against the current settings and fails fast when they have
+drifted, which includes every `turbo` task, since `turbo` invokes `pnpm run`
+per package. The failure names the setting that moved, for example
+`ERR_PNPM_VERIFY_DEPS_BEFORE_RUN  The value of the dedupePeers setting has
+changed`. This is the setting working as intended, not a misconfiguration.
 
 ## Review records
 
