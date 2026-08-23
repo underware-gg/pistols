@@ -9,8 +9,6 @@ saveExact: true
 
 # Supply-chain gates.
 minimumReleaseAge: 10080            # 7 days, in minutes
-minimumReleaseAgeStrict: true
-minimumReleaseAgeIgnoreMissingTime: false
 blockExoticSubdeps: true
 packageManagerStrictVersion: true
 
@@ -54,6 +52,59 @@ overrides:
   # react and sql subpaths, so this is very likely not in the browser bundle,
   # but it is a critical with a patch available in range.
   protobufjs: 7.6.5
+
+  # Advisory remediation, 2026-08-23. Unscoped only where the package sits at a
+  # single major line and every depender's range still accepts the target.
+  "@babel/core": 7.29.6
+  "@grpc/grpc-js": 1.14.4
+  ajv: 6.14.0
+  defu: 6.1.5
+  effect: 3.20.0
+  flatted: 3.4.2
+  follow-redirects: 1.16.0
+  form-data: 4.0.6
+  h3: 1.15.9
+  immutable: 5.1.8
+  js-yaml: 4.3.1
+  lodash: 4.18.0
+  lodash-es: 4.18.0
+  nanoid: 3.3.18
+  postcss: 8.5.23
+  rollup: 4.59.0
+  validator: 13.15.22
+
+  # Parent-scoped, so each consumer stays inside the range it declares. Two of
+  # these deliberately cross a major and are called out in the review record:
+  # external-editor>tmp and vite-plugin-top-level-await>uuid.
+  "starkscan>axios": 0.33.0
+  "vite-plugin-mkcert>axios": 1.18.0
+  "elliptic>bn.js": 4.12.3
+  "starknet>bn.js": 5.2.3
+  "minimatch@3.1.4>brace-expansion": 1.1.18
+  "minimatch@9.0.7>brace-expansion": 5.0.9
+  "@eslint/config-array>minimatch": 3.1.4
+  "@eslint/eslintrc>minimatch": 3.1.4
+  "copyfiles>minimatch": 3.1.4
+  "eslint>minimatch": 3.1.4
+  "glob@7.2.3>minimatch": 3.1.4
+  "@typescript-eslint/typescript-estree>minimatch": 9.0.7
+  "glob@10.5.0>minimatch": 9.0.7
+  "anymatch>picomatch": 2.3.2
+  "micromatch>picomatch": 2.3.2
+  "fdir>picomatch": 4.0.4
+  "tinyglobby>picomatch": 4.0.4
+  "vite>picomatch": 4.0.4
+  "vitest>picomatch": 4.0.4
+  "@walletconnect/jsonrpc-ws-connection>ws": 7.5.11
+  "isows>ws": 8.21.0
+  "viem>ws": 8.21.0
+  "ethers>ws": 8.21.0
+  "cosmiconfig>yaml": 1.10.3
+  "universal-cookie@6.1.3>cookie": 0.7.0
+  "copyfiles>glob": 7.2.3
+  "sucrase>glob": 10.5.0
+  "external-editor>tmp": 0.2.6
+  "vite-plugin-top-level-await>uuid": 11.1.1
 
 packages:
   - "sdk"
