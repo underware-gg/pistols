@@ -38,14 +38,9 @@ peerDependencyRules:
     # starknetid.js 5.0.0 (latest) pins an exact peer on starknet 8.5.2; we run
     # 8.5.4. Upstream has no looser release. Retire when starknetid.js is
     # replaced at the starknet 10 crossing.
-    "starknetid.js>starknet": "8.5.4"
+    "starknetid.js>starknet": "8.9.2"
 
 overrides:
-  # @hpke/core <= 1.7.4 reuses AEAD nonces (critical). Reached in the browser
-  # via hpke-js -> @turnkey/sdk-browser -> @cartridge/controller 0.10.7.
-  # hpke-js requires ^1.7.4, so 1.7.5 satisfies it. Remove once we are on
-  # @cartridge/controller >= 0.13.13, which carries a fixed chain itself.
-  "@hpke/core": 1.7.5
 
   # protobufjs <= 7.5.4 allows arbitrary code execution (critical). Reached via
   # @grpc/proto-loader -> @grpc/grpc-js -> @dojoengine/sdk. We import only the
@@ -133,7 +128,7 @@ catalog:
   "@starknet-react/chains": ^5.0.1
   "@tanstack/react-query": ^5.62.16
   "@starknet-io/get-starknet-core": 4.0.7
-  starknet: 8.5.4
+  starknet: 8.9.2
   immer: ^10.1.1
   zustand: ^4.5.6
   "@types/react": ^18.3.1
@@ -144,8 +139,8 @@ catalog:
   #--------------------------------
   # misc
   #
-  "@cartridge/connector": 0.10.7
-  "@cartridge/controller": 0.10.7
+  "@cartridge/connector": 0.13.16
+  "@cartridge/controller": 0.13.16
   "@cartridge/presets": 0.5.4
   "@apollo/client": ^3.11.8
   "@types/node": "^22.10.2"
