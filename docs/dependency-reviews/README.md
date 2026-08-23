@@ -73,3 +73,4 @@ the exact targets, and run the relevant verification suite —
 ## Records
 
 - [2026-08-23 — Supply-chain policy adoption](2026-08-23-supply-chain-policy.md)
+- [2026-08-23 — Transitive advisory overrides](2026-08-23-transitive-overrides.md)

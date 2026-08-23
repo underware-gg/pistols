@@ -35,8 +35,7 @@ unreviewed version decisions, which is what this policy exists to prevent.
 
 ## Release Age
 
-Minimum policy: seven days (`minimumReleaseAge: 10080`), strict, and failing
-when release-age metadata is missing.
+Minimum policy: seven days (`minimumReleaseAge: 10080`).
 
 All targets pass with wide margin:
 
@@ -190,8 +189,9 @@ and yields a green install with no policy.
 
 ## Follow-ups
 
-- **`overrides` pass for the remaining 119 transitive alerts.** None are
-  critical. `pistols-web`'s override set is the starting point.
+- ~~**`overrides` pass for the remaining 119 transitive alerts.**~~ Done the
+  same day — see [Transitive advisory overrides](2026-08-23-transitive-overrides.md).
+  153 of 154 alerts now closed; only the unpatchable `elliptic` remains.
 - **Remove the `@hpke/core` override** once on `@cartridge/controller >=
   0.13.13`, which carries a fixed chain itself.
 - **Retire `get-starknet-core@4.0.0`** when `@starknet-react/core` is replaced.
