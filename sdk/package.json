@@ -155,13 +155,31 @@
     "zustand": "catalog:"
   },
   "devDependencies": {
+    "@apollo/client": "catalog:",
+    "@cartridge/connector": "catalog:",
+    "@cartridge/controller": "catalog:",
+    "@cartridge/presets": "catalog:",
+    "@dojoengine/core": "catalog:",
+    "@dojoengine/sdk": "catalog:",
+    "@dojoengine/torii-client": "catalog:",
+    "@dojoengine/utils": "catalog:",
+    "@starknet-io/get-starknet-core": "catalog:",
+    "@starknet-react/chains": "catalog:",
+    "@starknet-react/core": "catalog:",
+    "@tanstack/react-query": "catalog:",
     "@types/event-emitter": "^0.3.5",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "copyfiles": "^2.4.1",
+    "graphql": "16.14.2",
+    "react": "catalog:",
+    "starknet": "catalog:",
+    "starknetid.js": "catalog:",
     "tsup": "catalog:",
     "typescript": "catalog:",
-    "vitest": "^3.0.5"
+    "universal-cookie": "catalog:",
+    "vitest": "3.2.6",
+    "zustand": "catalog:"
   },
   "engines": {
     "node": ">=22"

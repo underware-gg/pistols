@@ -1,3 +1,60 @@
+# ---------------------------------------------------------------------------
+# Underware dependency policy. See docs/dependency-reviews/README.md.
+# This file is the policy source of truth; changes here are reviewed changes.
+# ---------------------------------------------------------------------------
+
+# Fixed pins / explicit-update review.
+savePrefix: ""
+saveExact: true
+
+# Supply-chain gates.
+minimumReleaseAge: 10080            # 7 days, in minutes
+minimumReleaseAgeStrict: true
+minimumReleaseAgeIgnoreMissingTime: false
+blockExoticSubdeps: true
+packageManagerStrictVersion: true
+
+# Runtime consistency.
+engineStrict: true
+verifyDepsBeforeRun: error
+
+# Install-script review. No package runs a lifecycle script without a
+# recorded decision. See the supply-chain policy review record.
+strictDepBuilds: true
+dangerouslyAllowAllBuilds: false
+allowBuilds:
+  "@parcel/watcher": false
+  "@reown/appkit": false
+  "@swc/core": false
+  cbor-extract: false
+  es5-ext: false
+  esbuild: false
+  protobufjs: false
+
+# Dependency-graph coherence. No package enters the tree undeclared.
+autoInstallPeers: false
+strictPeerDependencies: true
+
+peerDependencyRules:
+  allowedVersions:
+    # starknetid.js 5.0.0 (latest) pins an exact peer on starknet 8.5.2; we run
+    # 8.5.4. Upstream has no looser release. Retire when starknetid.js is
+    # replaced at the starknet 10 crossing.
+    "starknetid.js>starknet": "8.5.4"
+
+overrides:
+  # @hpke/core <= 1.7.4 reuses AEAD nonces (critical). Reached in the browser
+  # via hpke-js -> @turnkey/sdk-browser -> @cartridge/controller 0.10.7.
+  # hpke-js requires ^1.7.4, so 1.7.5 satisfies it. Remove once we are on
+  # @cartridge/controller >= 0.13.13, which carries a fixed chain itself.
+  "@hpke/core": 1.7.5
+
+  # protobufjs <= 7.5.4 allows arbitrary code execution (critical). Reached via
+  # @grpc/proto-loader -> @grpc/grpc-js -> @dojoengine/sdk. We import only the
+  # react and sql subpaths, so this is very likely not in the browser bundle,
+  # but it is a critical with a patch available in range.
+  protobufjs: 7.6.5
+
 packages:
   - "sdk"
   - "client"
@@ -25,7 +82,7 @@ catalog:
   "@starknet-react/chains": ^5.0.1
   "@tanstack/react-query": ^5.62.16
   "@starknet-io/get-starknet-core": 4.0.7
-  starknet: ^8.5.4
+  starknet: 8.5.4
   immer: ^10.1.1
   zustand: ^4.5.6
   "@types/react": ^18.3.1
@@ -41,7 +98,7 @@ catalog:
   "@cartridge/presets": 0.5.4
   "@apollo/client": ^3.11.8
   "@types/node": "^22.10.2"
-  starknetid.js: ^5.0.0
+  starknetid.js: 5.0.0
   typescript: ^5.5.4
   tsup: ^8.3.5
   universal-cookie: "^8.0.1"
