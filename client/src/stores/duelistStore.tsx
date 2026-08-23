@@ -270,7 +270,7 @@ export function useTotals(totals: models.Totals | undefined) {
 // Duelist Stack
 //
 
-const _useDuelistStackEntityId = (address: BigNumberish, profileType: constants.DuelistProfile, profileId: number): string | undefined => {
+const useDuelistStackEntityIdInternal = (address: BigNumberish, profileType: constants.DuelistProfile, profileId: number): string | undefined => {
   const { abi } = useDojoSystem('duelist_token')
   const _enum = makeAbiCustomEnum(abi, 'DuelistProfile', profileType, profileId)
   const entityId = useMemoGate(() => (keysToEntityId([address, _enum])), [address, _enum])
@@ -289,7 +289,7 @@ export const useDuelistStack = (duelist_id: BigNumberish) => {
   // get stack
   const { owner } = useOwnerOfDuelist(duelist_id)
   const stackEntities = useDuelistStackStore((state) => state.entities)
-  const stackEntityId = _useDuelistStackEntityId(owner, profileType, profileId)
+  const stackEntityId = useDuelistStackEntityIdInternal(owner, profileType, profileId)
   const stack = useStoreModelsById<models.PlayerDuelistStack>(stackEntities, 'PlayerDuelistStack', stackEntityId)
 
   const activeDuelistId = useMemo(() => (stack?.active_duelist_id ?? undefined), [stack])

@@ -16,10 +16,10 @@ type ModalStage = 'intro' | 'menu' | 'notifications'
 export default function BarkeepModal() {
   const { barkeepModalOpener } = usePistolsContext()
   const isOpen = useMemo(() => (barkeepModalOpener.isOpen), [barkeepModalOpener.isOpen])
-  return <>{isOpen && <_BarkeepModal opener={barkeepModalOpener} />}</>
+  return <>{isOpen && <BarkeepModalInner opener={barkeepModalOpener} />}</>
 }
 
-function _BarkeepModal({ opener }: { opener: Opener }) {  
+function BarkeepModalInner({ opener }: { opener: Opener }) {  
   const { dispatchSetScene } = usePistolsScene()
   const { tutorialOpener, tavernRingsOpener, dispatchSelectDuel } = usePistolsContext()
   

@@ -177,7 +177,7 @@ export const useFoolsBalance = (address: BigNumberish, fee: BigNumberish = 0n) =
   // fetch if not cached
   const accounts = useMemo(() => [address], [address])
   useFetchAccountsBalances(foolsContractAddress, accounts, balance == null)
-  const { canAffordFee } = _useCalcFee(balance, fee)
+  const { canAffordFee } = useCalcFeeInternal(balance, fee)
   return {
     balance: (balance ?? 0n),
     balance_eth: weiToEth(balance),
@@ -196,7 +196,7 @@ export const useLordsBalance = (address: BigNumberish, fee: BigNumberish = 0n) =
   // fetch if not cached
   const accounts = useMemo(() => [address], [address])
   useFetchAccountsBalances(lordsContractAddress, accounts, balance == null)
-  const { canAffordFee } = _useCalcFee(balance, fee)
+  const { canAffordFee } = useCalcFeeInternal(balance, fee)
   return {
     balance: (balance ?? 0n),
     balance_eth: weiToEth(balance),
@@ -206,7 +206,7 @@ export const useLordsBalance = (address: BigNumberish, fee: BigNumberish = 0n) =
 }
 
 
-const _useCalcFee = (
+const useCalcFeeInternal = (
   balance: BigNumberish | undefined,
   fee: BigNumberish,  // optionally calculate if there is enough balance to pay this fee
 ) => {

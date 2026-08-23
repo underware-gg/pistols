@@ -178,10 +178,10 @@ const ModePoster = ({ mode, onClick }: {
 export default function ModeSelectModal({ opener }: ModeSelectModalProps) {
   const isOpen = useMemo(() => opener.isOpen, [opener.isOpen])
 
-  return <>{isOpen && <_ModeSelectModal opener={opener} />}</>
+  return <>{isOpen && <ModeSelectModalInner opener={opener} />}</>
 }
 
-function _ModeSelectModal({ opener }: ModeSelectModalProps) {
+function ModeSelectModalInner({ opener }: ModeSelectModalProps) {
   const { selectedMode, dispatchSetting, SettingsActions } = useSettings()
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSetScene } = usePistolsScene()

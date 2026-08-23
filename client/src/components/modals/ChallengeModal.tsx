@@ -7,10 +7,10 @@ import { DuelPoster } from '/src/components/DuelPoster'
 export default function ChallengeModal() {
   const { selectedDuelId } = usePistolsContext()
   const isOpen = useMemo(() => (selectedDuelId > 0n), [selectedDuelId])
-  return <>{isOpen && <_ChallengeModal isOpen={isOpen} />}</>
+  return <>{isOpen && <ChallengeModalInner isOpen={isOpen} />}</>
 }
 
-function _ChallengeModal({
+function ChallengeModalInner({
   isOpen,
 }: {
   isOpen: boolean

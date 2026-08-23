@@ -84,13 +84,13 @@ export const useCurrentSeasonScoreboard = () => {
   const scoreboard = useMemo<DuelistScore[]>(() => (
     scoreboardState.scoreboard.filter(s => s.seasonId === currentSeasonId)
   ), [scoreboardState.scoreboard, currentSeasonId])
-  const seasonScoreboard = _useMergeScoreboardWithLeaderboard(scoreboard, currentSeasonId)
+  const seasonScoreboard = useMergeScoreboardWithLeaderboardInternal(scoreboard, currentSeasonId)
   return {
     seasonScoreboard,
   }
 }
 
-const _useMergeScoreboardWithLeaderboard = (scoreboard: DuelistScore[], seasonId: number): DuelistScore[] => {
+const useMergeScoreboardWithLeaderboardInternal = (scoreboard: DuelistScore[], seasonId: number): DuelistScore[] => {
   const { scores: leaderboardScores } = useLeaderboard(seasonId)
   const result = useMemo(() => {
     return [
@@ -192,7 +192,7 @@ export const useGetSeasonScoreboard = (season_id: number) => {
     scoreboardState.scoreboard.filter(s => s.seasonId === season_id)
   ), [scoreboardState.scoreboard, season_id])
 
-  const seasonScoreboard = _useMergeScoreboardWithLeaderboard(scoreboard, season_id)
+  const seasonScoreboard = useMergeScoreboardWithLeaderboardInternal(scoreboard, season_id)
 
   return {
     seasonScoreboard,

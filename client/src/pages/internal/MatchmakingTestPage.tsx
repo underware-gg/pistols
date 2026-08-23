@@ -3,7 +3,7 @@ import { Button, Container, Tab, Table, TabPane } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
-import { useMatchQueue, useMatchPlayer, _useDuelistsInMatchMakingByAddress } from '/src/stores/matchStore'
+import { useMatchQueue, useMatchPlayer, useDuelistsInMatchMakingByAddressInternal } from '/src/stores/matchStore'
 import { usePlayersAvailableForMatchmaking, getPlayernameFromAddress, useUsernameFromPlayerAddress } from '/src/stores/playerStore'
 import { useFetchAccountsBalances, useFoolsBalance } from '/src/stores/coinStore'
 import { PublishOnlineStatusButton } from '/src/stores/sync/PlayerOnlineSync'
@@ -158,7 +158,7 @@ function MatchQueue({
     duelsByDuelistId,
     // all duelist ids
     duelistIds,
-  } = _useDuelistsInMatchMakingByAddress(queueId, playerAddress);
+  } = useDuelistsInMatchMakingByAddressInternal(queueId, playerAddress);
   const { matchmaker } = useDojoSystemCalls();
   return (
     <>

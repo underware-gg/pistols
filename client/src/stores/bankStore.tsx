@@ -11,7 +11,7 @@ import { bigintToDecimal } from '@underware/pistols-sdk/utils'
 export const useBankStore = createDojoStore<PistolsSchemaType>();
 
 
-const _usePoolEntityId = (pool_type: string, value?: bigint): string | undefined => {
+const usePoolEntityIdInternal = (pool_type: string, value?: bigint): string | undefined => {
   const { abi } = useDojoSystem('bank')
   const _entityId = useMemo(() => keysToEntityId([
     makeAbiCustomEnum(abi, 'PoolType', pool_type, value)
@@ -19,9 +19,9 @@ const _usePoolEntityId = (pool_type: string, value?: bigint): string | undefined
   return _entityId
 }
 
-const _usePool = (pool_type: string, value?: bigint) => {
+const usePoolInternal = (pool_type: string, value?: bigint) => {
   const entities = useBankStore((state) => state.entities);
-  const entityId = _usePoolEntityId(pool_type, value)
+  const entityId = usePoolEntityIdInternal(pool_type, value)
   const pool = useStoreModelsById<models.Pool>(entities, 'Pool', entityId)
   // useEffect(() => console.log(`useConfig() =>`, config), [config])
 
@@ -43,18 +43,18 @@ const _usePool = (pool_type: string, value?: bigint) => {
 //--------------------------------
 // 'consumer' hooks
 //
-export type UsePoolResult = ReturnType<typeof _usePool>
+export type UsePoolResult = ReturnType<typeof usePoolInternal>
 
 export const usePool = (pool_type: string) => {
-  return _usePool(pool_type)
+  return usePoolInternal(pool_type)
 }
 
 export const useSeasonPool = (season_id: number) => {
-  return _usePool(constants.PoolType.Season, BigInt(season_id ?? 0))
+  return usePoolInternal(constants.PoolType.Season, BigInt(season_id ?? 0))
 }
 
 export const useTournamentPool = (tournament_id: BigNumberish) => {
-  return _usePool(constants.PoolType.Tournament, BigInt(tournament_id ?? 0))
+  return usePoolInternal(constants.PoolType.Tournament, BigInt(tournament_id ?? 0))
 }
 
 

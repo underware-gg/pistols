@@ -20,10 +20,10 @@ export default function WalletFinderModal({
 }: {
   opener: Opener
 }) {
-  return <>{opener.isOpen && <_WalletFinderModal opener={opener} />}</>
+  return <>{opener.isOpen && <WalletFinderModalInner opener={opener} />}</>
 }
 
-function _WalletFinderModal({
+function WalletFinderModalInner({
   opener,
 }: {
   opener: Opener

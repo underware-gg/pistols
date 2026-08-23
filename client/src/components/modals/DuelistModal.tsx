@@ -14,10 +14,10 @@ const HAND_CARD_HEIGHT = HAND_CARD_WIDTH * (1080/1920)
 export default function DuelistModal() {
   const { selectedDuelistId } = usePistolsContext()
   const isOpen = useMemo(() => (selectedDuelistId > 0n), [selectedDuelistId])
-  return <>{isOpen && <_DuelistModal isOpen={isOpen} />}</>
+  return <>{isOpen && <DuelistModalInner isOpen={isOpen} />}</>
 }
 
-function _DuelistModal({
+function DuelistModalInner({
   isOpen,
 }: {
   isOpen: boolean

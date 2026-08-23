@@ -43,7 +43,7 @@ interface RingAnimationProps {
 }
 
 export default function TavernRingsModal({ opener }: { opener: Opener }) {
-  return <>{opener.isOpen && <_TavernRingsModal opener={opener} />}</>
+  return <>{opener.isOpen && <TavernRingsModalInner opener={opener} />}</>
 }
 
 export function RingAnimationModal({ playerName, ringName, ringType, ringImage, onClose, opener }: RingAnimationProps) {
@@ -420,7 +420,7 @@ export const getRingName = (ringType: constants.RingType, ringId: number): strin
 
 const DELAY_PER_CHARACTER = 30
 
-function _TavernRingsModal({ opener }: { opener: Opener }) {
+function TavernRingsModalInner({ opener }: { opener: Opener }) {
   const { address } = useAccount()
   const { username } = usePlayer(address)
   const { ringAnimationOpener } = usePistolsContext()

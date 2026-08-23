@@ -61,10 +61,10 @@ interface CommitPacesModalProps {
 }
 
 export default function CommitPacesModal(props: CommitPacesModalProps) {
-  return <>{props.isOpen && <_CommitPacesModal {...props} />}</>
+  return <>{props.isOpen && <CommitPacesModalInner {...props} />}</>
 }
 
-function _CommitPacesModal({
+function CommitPacesModalInner({
   duelId,
   duelistId,
   isOpen,

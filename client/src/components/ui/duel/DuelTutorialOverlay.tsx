@@ -15,10 +15,10 @@ interface DuelTutorialOverlayProps {
 }
 
 export default function DuelTutorialOverlay(props: DuelTutorialOverlayProps) {
-  return <>{props.opener.isOpen && <_DuelTutorialOverlay {...props} />}</>
+  return <>{props.opener.isOpen && <DuelTutorialOverlayInner {...props} />}</>
 }
 
-function _DuelTutorialOverlay({ tutorialType, opener, onComplete }: DuelTutorialOverlayProps) {
+function DuelTutorialOverlayInner({ tutorialType, opener, onComplete }: DuelTutorialOverlayProps) {
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSetScene } = usePistolsScene()
   

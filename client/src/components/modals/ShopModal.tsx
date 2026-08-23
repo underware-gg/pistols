@@ -21,10 +21,10 @@ export default function ShopModal({
 }: {
   opener: Opener
 }) {
-  return <>{opener.isOpen && <_ShopModal opener={opener} />}</>
+  return <>{opener.isOpen && <ShopModalInner opener={opener} />}</>
 }
 
-function _ShopModal({
+function ShopModalInner({
   opener,
 }: {
   opener: Opener

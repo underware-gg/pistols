@@ -43,10 +43,10 @@ export default function SelectDuelistModal({
       opener.close()
     }
   }, [isOpen])
-  return <>{opener.isOpen && <_SelectDuelistModal opener={opener} />}</>
+  return <>{opener.isOpen && <SelectDuelistModalInner opener={opener} />}</>
 }
 
-function _SelectDuelistModal({
+function SelectDuelistModalInner({
   opener,
 }: {
   opener: Opener

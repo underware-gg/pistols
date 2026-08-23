@@ -31,10 +31,10 @@ export default function InviteModal() {
   }, [referrerAddress])
 
   const isOpen = atInvite;
-  return <>{isOpen && <_InviteModal isOpen={isOpen} referrerAddress={referrerAddress} />}</>
+  return <>{isOpen && <InviteModalInner isOpen={isOpen} referrerAddress={referrerAddress} />}</>
 }
 
-function _InviteModal({
+function InviteModalInner({
   isOpen,
   referrerAddress,
 }: {

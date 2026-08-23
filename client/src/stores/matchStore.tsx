@@ -89,10 +89,10 @@ export const useMatchPlayer = (playerAddress: BigNumberish, queueId: constants.Q
 
 export const useDuelistsInMatchMaking = (queueId: constants.QueueId) => {
   const { address } = useAccount();
-  return _useDuelistsInMatchMakingByAddress(queueId, address);
+  return useDuelistsInMatchMakingByAddressInternal(queueId, address);
 }
 
-export const _useDuelistsInMatchMakingByAddress = (queueId: constants.QueueId, address: BigNumberish) => {
+export const useDuelistsInMatchMakingByAddressInternal = (queueId: constants.QueueId, address: BigNumberish) => {
   useFetchDuelistIdsOwnedByAccount(address) // fetch duelists in the store, if not already fetched
 
   const { activeDuelists: allDuelistIds } = useDuelistsOrganizedByAddress(address);

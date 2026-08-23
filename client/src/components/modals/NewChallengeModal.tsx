@@ -45,10 +45,10 @@ export default function NewChallengeModal() {
     };
   }, [isOpen]);
 
-  return (<>{isOpen && <_NewChallengeModal isOpen={isOpen} />}</>)
+  return (<>{isOpen && <NewChallengeModalInner isOpen={isOpen} />}</>)
 }
 
-function _NewChallengeModal({
+function NewChallengeModalInner({
   isOpen,
 }: {
   isOpen: boolean

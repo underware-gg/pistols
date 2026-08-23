@@ -6,10 +6,10 @@ import { ProfilePoster } from '/src/components/ui/ProfilePoster'
 export default function PlayerModal() {
   const { selectedPlayerAddress } = usePistolsContext()
   const isOpen = useMemo(() => (selectedPlayerAddress > 0n), [selectedPlayerAddress])
-  return <>{isOpen && <_PlayerModal isOpen={isOpen} />}</>
+  return <>{isOpen && <PlayerModalInner isOpen={isOpen} />}</>
 }
 
-function _PlayerModal({
+function PlayerModalInner({
   isOpen,
 }: {
   isOpen: boolean
