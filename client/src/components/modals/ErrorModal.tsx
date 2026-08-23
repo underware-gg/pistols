@@ -36,16 +36,17 @@ export default function ErrorModal() {
 
   const { value: eventData, timestamp } = useDojoEmitterEvent('transaction_error', null)
   
-  if (!errorModalOpener || !bugReportOpener) {
-    return null
-  }
-  
   useEffect(() => {
     if (eventData && errorModalOpener) {
       errorModalOpener.open()
       setIsExpanded(false)
     }
   }, [eventData, timestamp, errorModalOpener])
+
+  // Every hook above must run on every render, so this guard sits below them.
+  if (!errorModalOpener || !bugReportOpener) {
+    return null
+  }
 
   const handleClose = () => {
     errorModalOpener.close()
