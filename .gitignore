@@ -141,3 +141,6 @@ dist
 
 # Pistols
 .chroma
+
+# Pre-commit canary receipt: transient local state, must stay untracked.
+.canary--pre-commit

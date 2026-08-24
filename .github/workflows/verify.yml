@@ -1,0 +1,47 @@
+name: verify
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+# The point of running this in CI is that the local gates are opt-in: they fire
+# when someone runs `pnpm verify` or installs the pre-commit hook. This makes them
+# unskippable for anything that reaches the remote.
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+        # Version comes from the packageManager field in package.json.
+
+      - uses: actions/setup-node@v5
+        with:
+          # .tool-versions pins the Cairo/Dojo toolchain and has no nodejs entry,
+          # so this tracks engines.node (">=22") in package.json instead.
+          node-version: '22'
+          cache: pnpm
+
+      # These three need no node_modules, so they run before install and before
+      # anything is fetched. check-lockfile-reviewed is the gate that catches a
+      # lockfile containing packages nobody reviewed, which .pnpmfile.cjs cannot
+      # see because pnpm skips resolution when the lockfile is already satisfied.
+      - run: node scripts/check-settings.mjs
+      - run: node scripts/check-pins.mjs
+      - run: node scripts/check-lockfile-reviewed.mjs
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: node scripts/check-advisories.mjs
+      - run: pnpm exec turbo build
+      - run: pnpm exec turbo check-types
+      - run: pnpm test
+
+      # Reports what this push changed in the resolved graph. Informational on
+      # purpose: a legitimate dependency update moves things, and the reviewed-set
+      # gate above is what decides whether the movement was permitted.
+      - name: resolved-graph movement vs base
+        if: github.event_name == 'pull_request'
+        run: node scripts/lockfile-diff.mjs origin/${{ github.base_ref }}
