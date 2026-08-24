@@ -76,3 +76,4 @@ the exact targets, and run the relevant verification suite —
 - [2026-08-23 — Transitive advisory overrides](2026-08-23-transitive-overrides.md)
 - [2026-08-23 — Climb to the old-side ceiling](2026-08-23-old-side-ceiling.md)
 - [2026-08-24 — dojo.js to the top of the old side](2026-08-24-dojo-js-old-side-top.md)
+- [2026-08-24 — Advisory regressions in tmp and react-router](2026-08-24-advisory-regressions.md)
