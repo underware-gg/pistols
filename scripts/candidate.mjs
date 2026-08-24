@@ -109,6 +109,31 @@ function inRange(version, range) {
   return true
 }
 
+// Does an installed version satisfy a declared range? Returns true / false /
+// null, where null means "could not evaluate" and is treated as NOT satisfied,
+// because assuming satisfaction is how an unreviewed version slips through.
+function satisfies(version, range) {
+  const v = parse(version)
+  if (!v) return null
+  const r = String(range).trim()
+  let m
+  if ((m = r.match(/^\^(\d+)\.(\d+)\.(\d+)$/))) {
+    const b = { nums: [+m[1], +m[2], +m[3]], pre: null }
+    if (cmp(v, b) < 0) return false
+    // Caret pins the leftmost non-zero component.
+    if (b.nums[0] !== 0) return v.nums[0] === b.nums[0]
+    if (b.nums[1] !== 0) return v.nums[0] === 0 && v.nums[1] === b.nums[1]
+    return v.nums[0] === 0 && v.nums[1] === 0 && v.nums[2] === b.nums[2]
+  }
+  if ((m = r.match(/^~(\d+)\.(\d+)\.(\d+)$/))) {
+    const b = { nums: [+m[1], +m[2], +m[3]], pre: null }
+    if (cmp(v, b) < 0) return false
+    return v.nums[0] === b.nums[0] && v.nums[1] === b.nums[1]
+  }
+  if (/^\d/.test(r)) { const b = parse(r); return b ? cmp(v, b) === 0 : null }
+  return null
+}
+
 // --- report ---------------------------------------------------------------
 let problems = 0, uncertain = 0
 const seen = new Set()
@@ -193,14 +218,26 @@ while (queue.length > 0) {
     for (const [dep, range] of Object.entries(v.dependencies ?? {})) {
       let dm
       try { dm = await meta(dep) } catch { console.log(`${indent}  (could not resolve ${dep})`); problems++; continue }
-      // Resolve to the highest published version satisfying a caret/exact range,
-      // which is what pnpm would pick absent an override. Ranges we cannot read
-      // are reported rather than guessed.
+      // An exact range is resolved exactly. Anything else is SUBSTITUTED with the
+      // latest published version, which is not necessarily what pnpm would pick
+      // and is often newer than the age gate admits. Say so, so a reader can see
+      // the substitution rather than trusting a row that may not be reachable.
       const exact = parse(range) && /^\d/.test(range) ? range : null
       const target = exact ?? dm['dist-tags']?.latest
-      const isNew = !installed.has(dep)
-      if (isNew) queue.push({ name: dep, version: target, level: level + 1, via: key })
-      else console.log(`${indent}  dep ${dep}@${range} — already in tree (${[...installed.get(dep)].join(', ')})`)
+      // Presence of the NAME in our tree is not satisfaction of the RANGE. A
+      // declared ^6.0.0 against an installed 7.0.0 means pnpm fetches a new 6.x
+      // that nothing has reviewed. Checking the name alone hid exactly that.
+      const present = [...(installed.get(dep) ?? [])]
+      const satisfied = present.filter((pv) => satisfies(pv, range) === true)
+      if (satisfied.length > 0) {
+        console.log(`${indent}  dep ${dep}@${range} — satisfied by ${satisfied.join(', ')} already in tree`)
+      } else {
+        const why = present.length > 0
+          ? ` [in tree at ${present.join(', ')}, which does NOT satisfy "${range}"]`
+          : ''
+        const sub = exact ? '' : ` [SUBSTITUTED: declared "${range}", examining dist-tags.latest; pnpm may resolve otherwise]`
+        queue.push({ name: dep, version: target, level: level + 1, via: `${key} -> ${dep}@${range}${why}${sub}` })
+      }
     }
   }
 }

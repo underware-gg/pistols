@@ -92,7 +92,7 @@ and none can introduce a dependency of its own.
 | Command | What it does |
 |---|---|
 | `pnpm verify` | The whole gate, in order. Run this before committing. |
-| `pnpm candidate <pkg>@<version>` | **Run this first.** Evidence for a candidate and everything new it would bring in: publish age against the gate, deprecation, install scripts, peers split into required and optional, and every advisory range checked against the target version. Read-only — installs nothing. |
+| `pnpm candidate <pkg>@<version>` | **Run this first.** Evidence for a candidate and everything new it would bring in: publish age against the gate, deprecation, install scripts, peers split into required and optional, and every advisory range checked against the target version. Read-only — installs nothing. The named candidate is resolved exactly; **recursive rows are advisory**, because a transitive dependency declared as a range is examined at `dist-tags.latest`, which pnpm may not pick and which is often newer than the age gate admits. Each such row says so. Use `node scripts/candidate.mjs` directly for flags such as `--depth`. |
 | `pnpm lockfile-diff [ref] [--strict]` | What entered, left or moved in the resolved graph. `--strict` fails on any movement; use it when a change is meant to be resolution-neutral. |
 | `pnpm check-settings` | Every key in `pnpm-workspace.yaml` must be in `scripts/known-settings.json` with recorded evidence. |
 | `pnpm check-pins` | Every specifier exact, bar enumerated waivers. |
