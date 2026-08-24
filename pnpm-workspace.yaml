@@ -9,6 +9,13 @@ saveExact: true
 
 # Supply-chain gates.
 minimumReleaseAge: 10080            # 7 days, in minutes
+# Fail rather than fall back when no version in range clears the age gate.
+# Defaults to true only because minimumReleaseAge is set explicitly; stated here
+# so the guarantee does not depend on that coupling.
+minimumReleaseAgeStrict: true
+# pnpm's default (true) SKIPS the age gate for any package whose registry
+# metadata has no `time` field. That is the hole; false closes it.
+minimumReleaseAgeIgnoreMissingTime: false
 blockExoticSubdeps: true
 packageManagerStrictVersion: true
 

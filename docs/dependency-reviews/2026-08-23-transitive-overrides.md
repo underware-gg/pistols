@@ -166,3 +166,32 @@ understood.
   `_usePool`, which the rule cannot recognise as components or hooks); 8 are
   genuine conditional hook calls and the only ones with real bug potential.
   Neither is a dependency concern.
+
+## Corrections applied 2026-08-24
+
+**The claim that `minimumReleaseAgeStrict` and
+`minimumReleaseAgeIgnoreMissingTime` "are not pnpm settings" is wrong.** Both are
+documented pnpm settings under *Dependency Resolution*, alongside
+`minimumReleaseAge`, `minimumReleaseAgeExclude` and
+`minimumReleaseAgeExcludePrune`. Removing them from `pnpm-workspace.yaml` was a
+regression, not a cleanup, and it was acted on without checking the settings
+reference.
+
+It also mattered. **`minimumReleaseAgeIgnoreMissingTime` defaults to `true`,
+which skips the release-age check entirely for any package whose registry
+metadata lacks a `time` field.** Deleting the explicit `false` reopened that
+bypass and left the policy file advertising a seven-day gate that a package with
+absent publish metadata could walk straight through. Both settings are restored,
+fail-closed, in
+[exact pinning made mandatory and enforced](2026-08-24-exact-pinning-enforced.md).
+
+**The method used to reach that conclusion was also invalid**, and so was the
+method used to correct it. `strings` on the pnpm binary returns zero exact hits
+for settings that demonstrably work (`strictDepBuilds`, `minimumReleaseAge`),
+because pnpm 10.34.4 ships as a compiled single-executable. `pnpm config get
+<key> --json` is no better as an existence test: it echoes back any key present
+in `pnpm-workspace.yaml`, including `totallyFakeSettingXyz`, verified with a
+control. Neither test distinguishes "pnpm implements this" from "this string is
+in my config file". Only the published settings reference does.
+
+The `overrides` content of this record stands as written.
