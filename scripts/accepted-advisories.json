@@ -1,0 +1,17 @@
+{
+  "$comment": [
+    "Advisories that are known, reviewed and accepted because no patched version",
+    "exists. Anything not listed here fails scripts/verify.sh. Each entry must",
+    "name the reason and what retires it. This list may not be used to silence a",
+    "finding that has a fix available."
+  ],
+  "accepted": {
+    "elliptic": {
+      "severity": "low",
+      "vulnerable": "<=6.6.1",
+      "why": "No patched version exists for any release of elliptic. Reached through starknet.",
+      "retires": "When starknet's dependency chain moves off elliptic, or upstream publishes a fix.",
+      "record": "docs/dependency-reviews/2026-08-23-transitive-overrides.md"
+    }
+  }
+}

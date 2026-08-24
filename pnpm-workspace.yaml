@@ -146,10 +146,10 @@ catalog:
   starknet: 8.9.2
   immer: ^10.1.1
   zustand: ^4.5.6
-  "@types/react": ^18.3.1
-  "@types/react-dom": ^18.3.1
+  "@types/react": 18.3.25
+  "@types/react-dom": 18.3.7
   react: ^18.3.1
-  react-dom: ^18.3.1
+  react-dom: 18.3.1
   
   #--------------------------------
   # misc
@@ -158,10 +158,10 @@ catalog:
   "@cartridge/controller": 0.13.16
   "@cartridge/presets": 0.5.4
   "@apollo/client": ^3.11.8
-  "@types/node": "^22.10.2"
+  "@types/node": 22.18.8
   starknetid.js: 5.0.0
-  typescript: ^5.5.4
-  tsup: ^8.3.5
+  typescript: 5.9.3
+  tsup: 8.5.0
   universal-cookie: "^8.0.1"
 
   # daydreams
