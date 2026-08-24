@@ -134,6 +134,8 @@ overrides:
   external-editor>tmp: 0.2.7
   vite-plugin-top-level-await>uuid: 11.1.1
 
+pnpmfileChecksum: sha256-8DIhuvQ1LgbYHjrxxPOVkahwlG3YAFptIDIEiue/2zY=
+
 importers:
 
   .:

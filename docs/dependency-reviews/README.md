@@ -63,6 +63,9 @@ These are requirements, not defaults or preferences.
 Adding or changing a dependency, in this order. **Steps 1–4 happen before
 anything touches a manifest.**
 
+0. **Run `pnpm candidate <pkg>@<version>`.** It performs steps 2 to 4 below and
+   exits non-zero on anything needing a decision. The steps are spelled out
+   because the tool can be wrong, not because it should be skipped.
 1. **Identify the exact candidate version.** Not a range — the specific version
    intended.
 2. **Gather registry metadata for that version**: `dependencies`,
@@ -81,15 +84,49 @@ anything touches a manifest.**
 Skipping to step 6 and auditing afterwards inverts the control. The gate only
 means something if nothing unreviewed is ever fetched.
 
+## Tooling
+
+Every script here uses only Node built-ins, so each runs before `pnpm install`
+and none can introduce a dependency of its own.
+
+| Command | What it does |
+|---|---|
+| `pnpm verify` | The whole gate, in order. Run this before committing. |
+| `pnpm candidate <pkg>@<version>` | **Run this first.** Evidence for a candidate and everything new it would bring in: publish age against the gate, deprecation, install scripts, peers split into required and optional, and every advisory range checked against the target version. Read-only — installs nothing. |
+| `pnpm lockfile-diff [ref] [--strict]` | What entered, left or moved in the resolved graph. `--strict` fails on any movement; use it when a change is meant to be resolution-neutral. |
+| `pnpm check-settings` | Every key in `pnpm-workspace.yaml` must be in `scripts/known-settings.json` with recorded evidence. |
+| `pnpm check-pins` | Every specifier exact, bar enumerated waivers. |
+| `pnpm check-lockfile` | Every resolved package version is in the reviewed set. |
+| `pnpm check-advisories` | No advisory outside the accepted set. |
+
+`.pnpmfile.cjs` is the strongest of these and the only one that acts *before*
+code arrives: it throws during pnpm's `resolveDependency` step for any package
+version absent from `scripts/reviewed-packages.json`, so nothing unreviewed
+reaches the store. It has one blind spot — pnpm skips resolution entirely when
+the lockfile already satisfies the manifests, so the pnpmfile cannot police a
+lockfile someone else resolved and committed. `pnpm check-lockfile` covers that
+gap, which is why CI runs it before installing.
+
+Optional but recommended locally:
+
+```sh
+git config core.hooksPath tools/git-hooks
+```
+
+That runs the no-install gates plus the canary receipt
+(`.canaries/pre-commit.md`) on every commit. The canary cannot confirm work
+happened; it forces a written claim per task, turning a silent skip into a
+visible one. CI runs the full gate regardless.
+
 ## Verification
 
 ```sh
 pnpm verify
 ```
 
-Runs, in order: exact-pin enforcement, `pnpm install --frozen-lockfile`,
-advisory check against the accepted set, `turbo build`, `turbo check-types`,
-`pnpm test`. Individual gates: `pnpm check-pins`, `pnpm check-advisories`.
+Runs, in order: settings validation, exact-pin enforcement, reviewed-set check,
+`pnpm install --frozen-lockfile`, advisory check, `turbo build`,
+`turbo check-types`, `pnpm test`.
 
 **After any change to `pnpm-workspace.yaml` or the lockfile, run `pnpm install`
 before using `pnpm run` or `pnpm exec`.** `verifyDepsBeforeRun: error` compares
@@ -136,3 +173,4 @@ both ways.
 - [2026-08-24 — dojo.js to the top of the old side](2026-08-24-dojo-js-old-side-top.md)
 - [2026-08-24 — Advisory regressions in tmp and react-router](2026-08-24-advisory-regressions.md)
 - [2026-08-24 — Exact pinning made mandatory and enforced](2026-08-24-exact-pinning-enforced.md)
+- [2026-08-24 — Reviewed-set bootstrap](2026-08-24-reviewed-set-bootstrap.md)

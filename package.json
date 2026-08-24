@@ -13,7 +13,11 @@
     "test": "cd sdk && pnpm test",
     "check-pins": "node scripts/check-pins.mjs",
     "check-advisories": "node scripts/check-advisories.mjs",
-    "verify": "sh scripts/verify.sh"
+    "verify": "sh scripts/verify.sh",
+    "check-settings": "node scripts/check-settings.mjs",
+    "check-lockfile": "node scripts/check-lockfile-reviewed.mjs",
+    "lockfile-diff": "node scripts/lockfile-diff.mjs",
+    "candidate": "node scripts/candidate.mjs"
   },
   "devDependencies": {
     "turbo": "2.9.14"

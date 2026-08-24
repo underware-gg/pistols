@@ -1,0 +1,50 @@
+{
+  "$comment": [
+    "Every top-level key permitted in pnpm-workspace.yaml, with how it was",
+    "verified. scripts/check-settings.mjs fails on any key absent from this file.",
+    "",
+    "This exists because pnpm silently ignores unrecognised settings: a fabricated",
+    "key such as `totallyFakeSettingXyz: true` sits in the file and reads back",
+    "cleanly from `pnpm config get`, so a policy file can advertise controls that",
+    "do not exist. That has already happened in this repository in both",
+    "directions - a real setting was deleted as fake, and a setting with no",
+    "demonstrable effect is still present.",
+    "",
+    "evidence values:",
+    "  documented - named in the pnpm settings reference; cite the page",
+    "  observed   - seen to change behaviour in this repository; cite the error",
+    "  tested     - behaviourally tested in isolation; cite the observation",
+    "  unverified - neither documented nor demonstrable; MUST NOT be relied on"
+  ],
+  "settings": {
+    "savePrefix": { "evidence": "tested", "note": "With no setting, `pnpm add is-odd` writes ^3.0.1; with savePrefix \"\" it writes 3.0.1." },
+    "saveExact": { "evidence": "tested", "note": "Independently produces 3.0.1 where the default produces ^3.0.1." },
+    "minimumReleaseAge": { "evidence": "documented", "source": "settings/dependency-resolution", "note": "Minutes. Default 1440 from pnpm v11, 0 before." },
+    "minimumReleaseAgeStrict": { "evidence": "documented", "source": "settings/dependency-resolution", "note": "Defaults true when minimumReleaseAge is set explicitly." },
+    "minimumReleaseAgeIgnoreMissingTime": { "evidence": "documented", "source": "settings/dependency-resolution", "note": "Defaults TRUE, which skips the age gate for packages whose registry metadata lacks a time field. Must be false." },
+    "blockExoticSubdeps": { "evidence": "documented", "source": "settings/dependency-resolution", "note": "Already defaults to true; stated explicitly." },
+    "packageManagerStrictVersion": {
+      "evidence": "unverified",
+      "note": "Not found in the pnpm settings reference. No behavioural difference observed in pnpm 10.34.4 across four configurations: exact mismatched pin, non-existent pin, range pin, and absent packageManager field, with the setting both true and false. pnpm's launcher honours the packageManager field on its own regardless (pnpm --version returned the pinned 10.20.0 in a directory pinning it). Retained rather than deleted because deleting a setting on weak evidence is how minimumReleaseAgeIgnoreMissingTime was lost, but it must not be counted as an active control.",
+      "action": "Confirm against pnpm source or a maintainer, then either document or remove."
+    },
+    "engineStrict": { "evidence": "documented", "source": "settings/cli" },
+    "verifyDepsBeforeRun": { "evidence": "observed", "note": "Fired ERR_PNPM_VERIFY_DEPS_BEFORE_RUN ('Catalogs cache outdated') and blocked turbo until pnpm install was re-run." },
+    "strictDepBuilds": { "evidence": "observed", "note": "Fired ERR_PNPM_IGNORED_BUILDS on msgpackr-extract and on an empty allowBuilds." },
+    "dangerouslyAllowAllBuilds": { "evidence": "documented", "source": "settings/build" },
+    "allowBuilds": { "evidence": "observed", "note": "Entries set to false appear in `pnpm config get ignoredBuiltDependencies --json`, and an empty map fails the install." },
+    "autoInstallPeers": { "evidence": "observed", "note": "With false, unmet peers surface as ERR_PNPM_PEER_DEP_ISSUES instead of being invented." },
+    "strictPeerDependencies": { "evidence": "observed", "note": "Turned the @effect/opentelemetry peer gap into an install failure." },
+    "peerDependencyRules": { "evidence": "documented", "source": "settings/peer-dependencies" },
+    "overrides": { "evidence": "documented", "source": "settings/dependency-resolution" },
+    "packages": { "evidence": "documented", "source": "workspace file", "structural": true },
+    "catalog": { "evidence": "documented", "source": "settings/catalogs", "structural": true }
+  },
+  "unadopted": {
+    "$comment": "Settings seen in the reference that look relevant and have not been assessed.",
+    "trustPolicy": "Supply-chain trust policy; default off. Assess.",
+    "trustLockfile": "Default false. Assess.",
+    "minimumReleaseAgeExclude": "Per-package age-gate exemptions. We deliberately have none; leaving it unset is the stricter choice.",
+    "ignoredOptionalDependencies": "Could exclude msgpackr-extract's native binaries outright rather than only denying its build."
+  }
+}

@@ -11,8 +11,14 @@ cd "$REPO_ROOT"
 
 step() { printf '\n=== %s ===\n' "$1"; }
 
+step 'declared settings are real'
+node scripts/check-settings.mjs
+
 step 'exact pinning'
 node scripts/check-pins.mjs
+
+step 'every resolved package version is reviewed'
+node scripts/check-lockfile-reviewed.mjs
 
 step 'lockfile integrity (no drift from committed manifests)'
 pnpm install --frozen-lockfile
