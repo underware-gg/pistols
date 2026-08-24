@@ -75,3 +75,4 @@ the exact targets, and run the relevant verification suite —
 - [2026-08-23 — Supply-chain policy adoption](2026-08-23-supply-chain-policy.md)
 - [2026-08-23 — Transitive advisory overrides](2026-08-23-transitive-overrides.md)
 - [2026-08-23 — Climb to the old-side ceiling](2026-08-23-old-side-ceiling.md)
+- [2026-08-24 — dojo.js to the top of the old side](2026-08-24-dojo-js-old-side-top.md)

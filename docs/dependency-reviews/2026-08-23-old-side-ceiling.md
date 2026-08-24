@@ -121,3 +121,28 @@ would be attributable. That is how the dojo.js OpenTelemetry cost surfaced.
 - `lodash@4.18.0` and `lodash-es@4.18.0`, the advisory-patched versions our
   overrides force, are themselves flagged deprecated by npm. Harmless but worth
   understanding before the next overrides pass.
+
+## Corrections applied 2026-08-24
+
+Two claims in this record were wrong, and both are corrected in
+[dojo.js to the top of the old side](2026-08-24-dojo-js-old-side-top.md).
+
+**The "Deferred: dojo.js 1.9.0" section above is factually wrong.** It states
+that 1.9.0 "pulls the entire OpenTelemetry SDK" into a browser bundle. It does
+not. `@effect/opentelemetry@0.59.3` has **zero `dependencies`** — all ten of its
+requirements are `peerDependencies`, and seven are marked `optional: true` in
+`peerDependenciesMeta`. With `autoInstallPeers: false` those seven are never
+installed; they appear in the lockfile only under `transitivePeerDependencies`.
+Verified by installing 1.9.0 and grepping the built client bundle: **zero**
+occurrences of `opentelemetry`, `sdk-trace`, `semantic-conventions`,
+`@effect/platform` or `msgpackr`. The reasoning was inferred from an install
+failure rather than measured, and the conclusion did not follow.
+
+**More importantly, this record's own title overstates what it achieved.** It
+claims a climb to the old-side ceiling while leaving `@dojoengine/*` at 1.8.0.
+The old side actually runs to **1.9.0** — nine releases further on. `1.8.5`
+through `1.8.13` and `1.9.0` all peer `starknet ^8.1.2`, so every one of them
+was in scope and none was taken. This was an incomplete climb, not a considered
+deferral.
+
+The `starknet` and Cartridge portions of this record stand as written.

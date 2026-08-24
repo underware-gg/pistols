@@ -27,6 +27,9 @@ allowBuilds:
   cbor-extract: false
   es5-ext: false
   esbuild: false
+  # Optional native accelerator for msgpackr (via @effect/platform); msgpackr
+  # falls back to pure JS. Node-only, never reaches the browser bundle.
+  msgpackr-extract: false
   protobufjs: false
 
 # Dependency-graph coherence. No package enters the tree undeclared.
@@ -111,10 +114,15 @@ catalog:
   #--------------------------------
   # dojo.js
   #
-  "@dojoengine/core": 1.8.0
-  "@dojoengine/sdk": 1.8.0
-  "@dojoengine/torii-client": 1.8.0
-  "@dojoengine/utils": 1.8.0
+  "@dojoengine/core": 1.8.8
+  "@dojoengine/sdk": 1.9.0
+  "@dojoengine/torii-client": 1.8.2
+  "@dojoengine/utils": 1.8.4
+  # Required (non-optional) peers of @effect/opentelemetry, which @dojoengine/grpc
+  # depends on from 1.8.6. Its other seven OpenTelemetry peers are optional and,
+  # with autoInstallPeers off, are not installed. Retires with @dojoengine/grpc.
+  "@effect/platform": 0.93.8
+  "@opentelemetry/semantic-conventions": 1.43.0
   # "@dojoengine/core": ../../dojo4js/packages/core
   # "@dojoengine/sdk": ../../dojo.js/packages/sdk
   # "@dojoengine/torii-client": ../../dojo.js/packages/torii-client
