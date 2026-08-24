@@ -80,6 +80,43 @@ for (const name of Object.keys(catalogWaivers)) {
   if (!waivers.reasons?.[reason]) failures.push(`catalog ${name}: waiver reason "${reason}" is not defined in scripts/pin-waivers.json`)
 }
 
+// --- named catalogs: only `peers`, and only reachable from peerDependencies --
+// Without this, the exactness rule is trivially bypassed: add `catalogs: loose:`
+// full of ranges and reference `catalog:loose` from dependencies. The default
+// catalog is the only one allowed to drive resolution.
+{
+  const lines = readFileSync('pnpm-workspace.yaml', 'utf8').split('\n')
+  const namedCatalogs = []
+  let inCatalogs = false
+  for (const line of lines) {
+    if (/^catalogs:\s*$/.test(line)) { inCatalogs = true; continue }
+    if (inCatalogs && line.length > 0 && !/^\s/.test(line)) break
+    if (!inCatalogs) continue
+    const m = line.match(/^ {2}([\w-]+):\s*$/)
+    if (m) namedCatalogs.push(m[1])
+  }
+  for (const name of namedCatalogs) {
+    if (name !== 'peers') {
+      failures.push(`pnpm-workspace.yaml defines named catalog "${name}". Only "peers" is permitted, and only for peerDependencies; any other named catalog can carry ranges into resolution and bypass this gate.`)
+    }
+  }
+  for (const file of MANIFESTS) {
+    const pkg = JSON.parse(readFileSync(file, 'utf8'))
+    for (const section of PINNED_SECTIONS) {
+      for (const [name, spec] of Object.entries(pkg[section] ?? {})) {
+        if (/^catalog:.+/.test(spec)) {
+          failures.push(`${file} [${section}] ${name}: "${spec}" — only the default "catalog:" may be used in a section that drives resolution. Named catalogs are for peerDependencies.`)
+        }
+      }
+    }
+    for (const [name, spec] of Object.entries(pkg.peerDependencies ?? {})) {
+      if (spec.startsWith('catalog:') && spec !== 'catalog:' && spec !== 'catalog:peers') {
+        failures.push(`${file} [peerDependencies] ${name}: "${spec}" references a named catalog other than "peers".`)
+      }
+    }
+  }
+}
+
 // --- report ----------------------------------------------------------------
 const waivedNames = Object.keys(catalogWaivers)
 if (waivedNames.length > 0) {

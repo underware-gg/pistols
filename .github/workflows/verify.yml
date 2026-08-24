@@ -33,6 +33,7 @@ jobs:
       # see because pnpm skips resolution when the lockfile is already satisfied.
       - run: node scripts/check-settings.mjs
       - run: node scripts/check-pins.mjs
+      - run: node scripts/check-catalog-drift.mjs
       - run: node scripts/check-lockfile-reviewed.mjs
 
       - run: pnpm install --frozen-lockfile

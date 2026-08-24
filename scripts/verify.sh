@@ -17,6 +17,9 @@ node scripts/check-settings.mjs
 step 'exact pinning'
 node scripts/check-pins.mjs
 
+step 'published peer ranges include what we pin'
+node scripts/check-catalog-drift.mjs
+
 step 'every resolved package version is reviewed'
 node scripts/check-lockfile-reviewed.mjs
 

@@ -8,22 +8,9 @@
     "shrink without a review record."
   ],
   "catalog": {
-    "@apollo/client": "sdk-peer-contract",
-    "@starknet-react/chains": "sdk-peer-contract",
-    "@starknet-react/core": "sdk-peer-contract",
-    "@tanstack/react-query": "sdk-peer-contract",
-    "immer": "sdk-peer-contract",
-    "react": "sdk-peer-contract",
-    "universal-cookie": "sdk-peer-contract",
-    "zustand": "sdk-peer-contract",
     "@daydreamsai/core": "dead-entry"
   },
   "reasons": {
-    "sdk-peer-contract": {
-      "why": "@underware/pistols-sdk is published (private: false, ~432 downloads/week) and declares this package in peerDependencies as 'catalog:'. pnpm rewrites 'catalog:' to the literal catalog version on publish, so pinning the catalog exactly would ship an exact peer requirement and break any consumer on a different patch (e.g. react 18.3.2 against a pinned react 18.3.1). A peer range is a deliberate contract, not laxity.",
-      "blocked_on": "Decoupling the SDK's peerDependencies from the catalog so the internal resolution policy (exact) and the published consumer contract (ranged) are separate concerns. Needs a maintainer decision because it changes a published package's contract.",
-      "retires": "When peerDependencies carry literal ranges instead of 'catalog:', at which point every entry above pins and this reason is deleted."
-    },
     "dead-entry": {
       "why": "The 'dreams' workspace is disabled in pnpm-workspace.yaml, so this catalog entry resolves to nothing and cannot enter the dependency graph. There is no resolved version to pin it to.",
       "blocked_on": "Dependency-removal handling, deliberately deferred until the foundation is stable.",

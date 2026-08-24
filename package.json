@@ -17,7 +17,8 @@
     "check-settings": "node scripts/check-settings.mjs",
     "check-lockfile": "node scripts/check-lockfile-reviewed.mjs",
     "lockfile-diff": "node scripts/lockfile-diff.mjs",
-    "candidate": "node scripts/candidate.mjs"
+    "candidate": "node scripts/candidate.mjs",
+    "check-catalog-drift": "node scripts/check-catalog-drift.mjs"
   },
   "devDependencies": {
     "turbo": "2.9.14"

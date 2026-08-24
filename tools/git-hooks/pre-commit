@@ -6,5 +6,6 @@ cd "$REPO_ROOT"
 git diff --cached --check
 node scripts/check-settings.mjs
 node scripts/check-pins.mjs
+node scripts/check-catalog-drift.mjs
 node scripts/check-lockfile-reviewed.mjs
 sh scripts/check-canary.sh

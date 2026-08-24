@@ -12,46 +12,73 @@ directory records the reasoning behind what that file allows. The scripts in
 
 These are requirements, not defaults or preferences.
 
-1. **Every dependency specifier is exact.** No caret, no tilde, no range, in
-   `dependencies`, `devDependencies`, `optionalDependencies`, or the catalog.
-   `catalog:` and `workspace:` references pass through to the thing they name.
-   `peerDependencies` are the sole exception, and deliberately so: a peer range
-   is a contract about what a *consumer* may supply, not a resolution we control.
+1. **Every specifier that drives resolution is exact.** No caret, no tilde, no
+   range, in `dependencies`, `devDependencies`, `optionalDependencies`, or the
+   default `catalog`. `catalog:` and `workspace:` references pass through to the
+   thing they name.
 
    This is a security control, not a style choice. A range means an unreviewed
    version can enter the tree on any install, which defeats advisory review, the
    release-age gate and the override set simultaneously. Enforced by
    `pnpm check-pins`, which fails the build on any range.
 
-2. **Review happens before installation, never after.** A package that has not
+2. **`peerDependencies` are ranges, on purpose, and live in the `peers`
+   catalog.** They are not an exemption from rule 1 — they are outside its
+   scope, because **a peer dependency is never installed.** Under
+   `autoInstallPeers: false` a peer declaration is purely a constraint on what a
+   *consumer* must supply; nothing in it can cause a version to resolve into
+   this tree. So a peer range cannot admit an unreviewed package.
+
+   Exactness protects whoever does the resolving. We resolve our tree, so we pin
+   it. A consumer resolves theirs, so they pin theirs. A peer declaration is the
+   interface between two independently-pinned trees; making the *interface*
+   exact adds no review step, it only removes the consumer's freedom to land on
+   a version they have reviewed — and in a version conflict it pushes them into
+   duplicate copies of `react` or `starknet`, which is a correctness and security
+   problem we would be exporting.
+
+   The mechanism is a named catalog. `pnpm-workspace.yaml` holds the exact
+   version under `catalog` and the published range under `catalogs.peers`; pnpm
+   rewrites `catalog:` and `catalog:peers` to their literals on publish, so each
+   package still has one source of truth. `peers` is the **only** named catalog
+   permitted, and only `peerDependencies` may reference it — otherwise rule 1 is
+   bypassed by putting ranges in a named catalog and pointing `dependencies` at
+   it. `pnpm check-pins` enforces both.
+
+   The cost of the split is that the two can drift, which `catalog:` in both
+   fields made impossible. If a peer range stops including the version we pin, we
+   publish a contract that excludes what we build and test against. pnpm does
+   not catch this; `pnpm check-catalog-drift` does.
+
+3. **Review happens before installation, never after.** A package that has not
    been reviewed must never be resolved into the local tree — including onto this
    machine's pnpm store. See *Order of operations* below. Discovering a problem
    in a package that is already installed is a policy failure even when the
    package turns out to be fine.
 
-3. **Candidate versions must be at least seven days old** unless a documented
+4. **Candidate versions must be at least seven days old** unless a documented
    exception is necessary (`minimumReleaseAge: 10080`). The gate is strict
    (`minimumReleaseAgeStrict: true`) and does **not** skip packages whose
    registry metadata lacks a publish time
    (`minimumReleaseAgeIgnoreMissingTime: false`).
 
-4. **Git, file, and URL-style transitive dependencies are blocked**
+5. **Git, file, and URL-style transitive dependencies are blocked**
    (`blockExoticSubdeps: true`).
 
-5. **Dependency lifecycle scripts require an explicit, reviewed decision.**
+6. **Dependency lifecycle scripts require an explicit, reviewed decision.**
    Absence of a decision fails the install; it does not default to "off"
    (`strictDepBuilds: true`, `dangerouslyAllowAllBuilds: false`).
 
-6. **No package enters the dependency graph undeclared.** Peers are not
+7. **No package enters the dependency graph undeclared.** Peers are not
    auto-installed and peer mismatches fail the install rather than warn
    (`autoInstallPeers: false`, `strictPeerDependencies: true`).
 
-7. **Production and CI installs use `pnpm install --frozen-lockfile`.**
+8. **Production and CI installs use `pnpm install --frozen-lockfile`.**
 
-8. **Transitive versions are forced through `overrides`**, each carrying a
+9. **Transitive versions are forced through `overrides`**, each carrying a
    comment stating why it exists and what retires it.
 
-9. **Exemptions are enumerated, justified, and self-invalidating.** There are
+10. **Exemptions are enumerated, justified, and self-invalidating.** There are
    exactly two exemption lists — `scripts/pin-waivers.json` and
    `scripts/accepted-advisories.json`. Both fail the build when an entry becomes
    stale, so neither can rot into a silent permanent exception, and both print
@@ -95,7 +122,8 @@ and none can introduce a dependency of its own.
 | `pnpm candidate <pkg>@<version>` | **Run this first.** Evidence for a candidate and everything new it would bring in: publish age against the gate, deprecation, install scripts, peers split into required and optional, and every advisory range checked against the target version. Read-only — installs nothing. The named candidate is resolved exactly; **recursive rows are advisory**, because a transitive dependency declared as a range is examined at `dist-tags.latest`, which pnpm may not pick and which is often newer than the age gate admits. Each such row says so. Use `node scripts/candidate.mjs` directly for flags such as `--depth`. |
 | `pnpm lockfile-diff [ref] [--strict]` | What entered, left or moved in the resolved graph. `--strict` fails on any movement; use it when a change is meant to be resolution-neutral. |
 | `pnpm check-settings` | Every key in `pnpm-workspace.yaml` must be in `scripts/known-settings.json` with recorded evidence. |
-| `pnpm check-pins` | Every specifier exact, bar enumerated waivers. |
+| `pnpm check-pins` | Every resolution-driving specifier exact, bar enumerated waivers; `peers` is the only named catalog and only peers may use it. |
+| `pnpm check-catalog-drift` | Every published peer range includes the version we pin. |
 | `pnpm check-lockfile` | Every resolved package version is in the reviewed set. |
 | `pnpm check-advisories` | No advisory outside the accepted set. |
 
@@ -174,3 +202,4 @@ both ways.
 - [2026-08-24 — Advisory regressions in tmp and react-router](2026-08-24-advisory-regressions.md)
 - [2026-08-24 — Exact pinning made mandatory and enforced](2026-08-24-exact-pinning-enforced.md)
 - [2026-08-24 — Reviewed-set bootstrap](2026-08-24-reviewed-set-bootstrap.md)
+- [2026-08-24 — Decoupling the published peer contract](2026-08-24-peer-contract-decoupling.md)
