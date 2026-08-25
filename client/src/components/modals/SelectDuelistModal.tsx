@@ -61,8 +61,8 @@ function SelectDuelistModalInner({
 
   const { notDuelingIds } = useDuellingDuelists(duelistIds);
   
-  const { entryTokenAmount, requiresEnlistment } = opener.props?.matchmakingType ? useMatchQueue(opener.props?.matchmakingType) : { entryTokenAmount: 0n, requiresEnlistment: false }  
-  const { rankedCanEnlistIds, canMatchMakeIds } = opener.props?.matchmakingType ? useDuelistsInMatchMaking(opener.props?.matchmakingType) : { rankedCanEnlistIds: [], canMatchMakeIds: [] }
+  const { entryTokenAmount, requiresEnlistment } = useMatchQueue(opener.props?.matchmakingType)
+  const { rankedCanEnlistIds, canMatchMakeIds } = useDuelistsInMatchMaking(opener.props?.matchmakingType)
 
   const [isEnlistMode, setIsEnlistMode] = useState(opener.props?.enlistMode ?? undefined)
 

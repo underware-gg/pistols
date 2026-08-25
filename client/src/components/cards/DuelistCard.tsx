@@ -20,7 +20,8 @@ import { ChallengeTableSelectedDuelist } from '/src/components/ChallengeTable'
 import { DUELIST_CARD_WIDTH } from '/src/data/cardConstants'
 import { emitter } from '/src/three/game'
 import { useDuelistCurrentSeasonScore, useDuelistSeasonScore } from '/src/stores/scoreboardStore'
-import { useCurrentSeason, useSeason } from '/src/stores/seasonStore'
+import { useSeason } from '/src/stores/seasonStore'
+import { useConfig } from '/src/stores/configStore'
 import { QueueTimer } from '/src/components/ui/QueueTimer'
 import { useChallenge } from '/src/stores/challengeStore'
 import { useDuelCallToAction } from '/src/stores/eventsModelStore'
@@ -56,6 +57,7 @@ export interface DuelistCardHandle extends InteractibleComponentHandle {
 
 export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((props: DuelistCardProps, ref: React.Ref<DuelistCardHandle>) => {
   const { aspectWidth } = useGameAspect()
+  const { currentSeasonId } = useConfig()
   const { dispatchSelectPlayerAddress, dispatchSelectDuel } = usePistolsContext()
   
   useFetchDuelist(props.duelistId)
@@ -63,12 +65,12 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
   const { isAlive: isAliveFromBalance, isLoading: isFameLoading } = useDuelistFameBalance(props.duelistId)
   const { stackedDuelistIds, level } = useDuelistStack(props.duelistId)
 
-  const isCallToAction = props.duelId ? useDuelCallToAction(props.duelId) : false;
-  const { isFinished: challengeIsFinished } = props.duelId ? useChallenge(props.duelId) : { isFinished: false }
+  const isCallToAction = useDuelCallToAction(props.duelId)
+  const { isFinished: challengeIsFinished } = useChallenge(props.duelId)
 
   const rewardFetchIds = useMemo(() => [props.duelistId], [props.duelistId])
   const { isLoading: isRewardsLoading } = useFetchChallengeRewardsByDuelistIds(rewardFetchIds);
-  const { fameBefore, fameAfter } = props.duelId ? useDuelistFameOnDuel(props.duelId, props.duelistId) : { fameBefore: 0n, fameAfter: 0n }
+  const { fameBefore, fameAfter } = useDuelistFameOnDuel(props.duelId, props.duelistId)
 
   const shouldShowResults = useMemo(() => {
     return props.duelId ? challengeIsFinished && !isCallToAction : true;
@@ -83,8 +85,14 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
     return isAliveFromBalance || !shouldShowResults;
   }, [shouldShowResults, isAliveFromBalance]);
 
-  const { seasonName } = props.seasonId ? useSeason(props.seasonId) : useCurrentSeason()
-  const { points, position } = props.seasonId ? useDuelistSeasonScore(props.duelistId, props.seasonId) : useDuelistCurrentSeasonScore(props.duelistId)
+  // useCurrentSeason() is useSeason(currentSeasonId), so this is the same call either way.
+  const { seasonName } = useSeason(props.seasonId ?? currentSeasonId)
+  // Not interchangeable: these read different scoreboard sources, so both run and
+  // the result is selected. Calling only one of them varies hook identity between
+  // renders, which is what React forbids.
+  const seasonScore = useDuelistSeasonScore(props.duelistId, props.seasonId ?? currentSeasonId)
+  const currentSeasonScore = useDuelistCurrentSeasonScore(props.duelistId)
+  const { points, position } = props.seasonId ? seasonScore : currentSeasonScore
   // console.log(`DUELIST SCORE:`, props.duelistId, position, points)
 
   // Animation states

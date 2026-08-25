@@ -89,10 +89,14 @@ export const useChallengeRewards = (duel_id: BigNumberish, duelist_id: BigNumber
   }
 }
 
+// Nullish duel_id returns zeros rather than whole-career fame, so callers can
+// invoke this unconditionally. bigintEquals() is null-safe, so without this the
+// duel match never fires and the loop silently totals every event instead.
 export const useDuelistFameOnDuel = (duel_id: BigNumberish, duelist_id: BigNumberish) => {
   const events = useDuelistChallengeRewardsEvents(duelist_id)
 
   const { fameBefore, fameAfter } = useMemo(() => {
+    if (!duel_id) return { fameBefore: 0n, fameAfter: 0n }
     let fameBefore = constants.FAME.MINT_GRANT_AMOUNT;
     let fameAfter = fameBefore
     for (const event of [...events].reverse()) {
@@ -111,7 +115,7 @@ export const useDuelistFameOnDuel = (duel_id: BigNumberish, duelist_id: BigNumbe
       fameBefore = fameAfter
     }
     return { fameBefore, fameAfter }
-  }, [events])
+  }, [events, duel_id])
 
   return {
     fameBefore,

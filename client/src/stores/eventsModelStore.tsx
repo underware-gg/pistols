@@ -68,13 +68,18 @@ export function useCallToChallenges() {
   }
 }
 
+// Nullish duel_id is tolerated so callers can invoke this unconditionally.
+// BigInt(undefined) throws, which forced call sites into `duelId ? useX() : false`
+// - a conditional hook call, and a rules-of-hooks violation.
 export function useDuelCallToAction(duel_id: BigNumberish) {
   const { requiredDuelIds } = useCallToChallenges()
+  if (!duel_id) return false
   return requiredDuelIds.includes(BigInt(duel_id))
 }
 
 export function useDuelCallToActionWithState(duel_id: BigNumberish) {
   const { activeChallenges } = useCallToChallenges()
+  if (!duel_id) return undefined
   return activeChallenges.find((ch) => ch.duelId === BigInt(duel_id))
 }
 
