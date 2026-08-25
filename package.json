@@ -10,7 +10,7 @@
     "sync": "turbo watch watch",
     "dev": "turbo watch dev",
     "devs": "turbo watch devs",
-    "test": "cd sdk && pnpm test",
+    "test": "turbo test",
     "check-pins": "node scripts/check-pins.mjs",
     "check-advisories": "node scripts/check-advisories.mjs",
     "verify": "sh scripts/verify.sh",

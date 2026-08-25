@@ -241,3 +241,4 @@ both ways.
 - [2026-08-25 — Closing the two remaining foundation gaps](2026-08-25-close-foundation-gaps.md)
 - [2026-08-25 — Bringing the SDK into lint coverage](2026-08-25-lint-coverage.md)
 - [2026-08-25 — ESLint 9 to 10](2026-08-25-eslint-10.md)
+- [2026-08-25 — React testing in the client](2026-08-25-client-testing.md)

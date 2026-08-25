@@ -71,6 +71,8 @@
   "devDependencies": {
     "@effect/platform": "catalog:",
     "@opentelemetry/semantic-conventions": "catalog:",
+    "@testing-library/dom": "10.4.1",
+    "@testing-library/react": "16.3.2",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
@@ -81,6 +83,7 @@
     "eslint": "10.8.1",
     "eslint-plugin-react-hooks": "7.1.1",
     "eslint-plugin-react-refresh": "0.5.4",
+    "happy-dom": "20.11.2",
     "sass": "1.93.2",
     "tsx": "4.20.6",
     "typescript": "catalog:",
