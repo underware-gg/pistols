@@ -26,6 +26,7 @@ export const makeControllerConnector = (
   chainId: string,
   rpcUrl: string,
   slot: string,
+  toriiUrl: string,
   policies: SessionPolicies | undefined, // if undefined, use preset 
   tokens: Tokens,
 ): Connector => {
@@ -39,6 +40,12 @@ export const makeControllerConnector = (
     namespace,
     policies,
     slot,
+    // The indexer the Controller reads tokens and collections from. It takes
+    // precedence over `slot`, but every network config sets slotName to
+    // undefined, so this fills a gap rather than overriding anything: without it
+    // the Controller has no indexer configured at all. Points at our own
+    // self-hosted torii.
+    toriiUrl,
     tokens,
   }
   if (typeof window !== 'undefined') console.log(`-------- ControllerOptions:`, options)//, serialize(options))

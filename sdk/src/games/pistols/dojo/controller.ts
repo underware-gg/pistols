@@ -47,6 +47,7 @@ export const makePistolsControllerConnector = (networkId: NetworkId, env?: any):
     networkConfig.chainId,
     networkConfig.rpcUrl,
     networkConfig.slotName,
+    networkConfig.toriiUrl,
     policies,
     tokens,
   );
