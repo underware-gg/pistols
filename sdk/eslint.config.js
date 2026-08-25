@@ -17,7 +17,18 @@ export default [
       'react-hooks': reactHooks,
     },
     rules: {
-      ...reactHooks.configs['recommended-latest'].rules,
+      // Rules are enumerated deliberately rather than spread from
+      // reactHooks.configs['recommended-latest']. That preset grew: plugin v7
+      // added nine React Compiler rules to it, which report 223 violations across
+      // this repository (199 client, 24 sdk) - set-state-in-effect 94,
+      // immutability 57, refs 33, static-components 13, purity 9, use-memo 9,
+      // preserve-manual-memoization 4, set-state-in-render 3, void-use-memo 1.
+      //
+      // Adopting those as a side effect of moving off a deprecated ESLint line
+      // would fold a large code-quality decision into a supply-chain fix. They
+      // are a backlog to take deliberately, like exhaustive-deps. Leaving them
+      // unlisted keeps them off without pinning rule names that only exist in v7.
+      'react-hooks/rules-of-hooks': 'error',
 
       // TODO: 39 violations in sdk/src. Enable with the client's 303.
       'react-hooks/exhaustive-deps': 0,

@@ -147,6 +147,40 @@ That runs the no-install gates plus the canary receipt
 happened; it forces a written claim per task, turning a silent skip into a
 visible one. CI runs the full gate regardless.
 
+## Upgrading a dependency through the resolution gate
+
+`.pnpmfile.cjs` blocks any package version absent from
+`scripts/reviewed-packages.json`, which means a deliberate upgrade cannot
+install until the reviewed set knows about it — and the reviewed set is derived
+from the lockfile, which cannot update while the install is blocked. That is not
+a defect; it is the gate refusing to resolve something unreviewed. The way
+through it is:
+
+```sh
+# 1. Review the intended versions BEFORE touching a manifest.
+pnpm candidate eslint@10.8.1 eslint-plugin-react-hooks@7.1.1
+# 2. Edit the manifests. The install will now be blocked, correctly.
+# 3. Resolve once with the bypass, so the full transitive set becomes knowable.
+PISTOLS_ALLOW_UNREVIEWED=1 pnpm install
+# 4. See exactly what that pulled in, and account for all of it.
+pnpm lockfile-diff
+# 5. Write the record, then admit the resolved set.
+node scripts/generate-reviewed-set.mjs --record docs/dependency-reviews/<file>.md
+# 6. Prove the gate passes on its own.
+pnpm install && pnpm verify
+```
+
+Step 3 is the honest limit of the mechanism: the complete transitive set of an
+upgrade is not knowable until resolution happens, so an upgrade necessarily
+fetches before the set can be regenerated. The guarantee the gate provides is
+therefore **not** "nothing unreviewed is ever fetched" — it is that nothing
+unreviewed is fetched *without a deliberate, auditable act*. Setting that
+environment variable is that act. It is not for making a failing install pass.
+
+Step 5 is the one that can hollow this out. Regenerating before reviewing turns
+the gate into a rubber stamp, which is why `generate-reviewed-set.mjs` requires
+a `--record` argument and why the canary asks about it directly.
+
 ## Verification
 
 ```sh
@@ -206,3 +240,4 @@ both ways.
 - [2026-08-24 — Decoupling the published peer contract](2026-08-24-peer-contract-decoupling.md)
 - [2026-08-25 — Closing the two remaining foundation gaps](2026-08-25-close-foundation-gaps.md)
 - [2026-08-25 — Bringing the SDK into lint coverage](2026-08-25-lint-coverage.md)
+- [2026-08-25 — ESLint 9 to 10](2026-08-25-eslint-10.md)
