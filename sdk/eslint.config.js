@@ -30,6 +30,12 @@ export default [
       // unlisted keeps them off without pinning rule names that only exist in v7.
       'react-hooks/rules-of-hooks': 'error',
 
+      // Enabled after converting the SDK's async fetch hooks to react-query. What
+      // remains are five hooks that are effect-shaped by nature - a frame-skip, a
+      // clock, a localStorage seed, a browser-API poll, and a generic async runner
+      // with opaque deps - each carrying an inline disable and the reason.
+      'react-hooks/set-state-in-effect': 'error',
+
       // TODO: 39 violations in sdk/src. Enable with the client's 303.
       'react-hooks/exhaustive-deps': 0,
     },

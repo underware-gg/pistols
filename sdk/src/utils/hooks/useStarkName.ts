@@ -1,89 +1,62 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { BigNumberish, constants, Provider } from 'starknet'
 import { StarknetIdNavigator, StarkProfile } from "starknetid.js"
 import { bigintToHex, isPositiveBigint } from 'src/utils/misc/types'
+import { QUERY_ONCE } from 'src/utils/hooks/queryOnce'
+
+// All three converted from useEffect + useState + a mounted flag. Keys use rpcUrl
+// rather than the provider instance, because react-query hashes keys with
+// JSON.stringify and a Provider is not serialisable - and rpcUrl is what the
+// provider is derived from, so it carries the same information.
+//
+// The originals swallowed errors with an empty catch, leaving the value
+// undefined. react-query records the error and leaves data undefined, so callers
+// see the same thing; nothing here surfaces the error, which matches before.
+
+const useIdNavigator = (rpcUrl: string) => useMemo(() => {
+  const provider = rpcUrl ? new Provider({ nodeUrl: rpcUrl }) : null
+  return provider ? new StarknetIdNavigator(provider, constants.StarknetChainId.SN_MAIN) : null
+}, [rpcUrl])
 
 export const useAddressFromStarkName = (starkName: string, rpcUrl: string) => {
-  const provider = useMemo(() => (rpcUrl ? new Provider({ nodeUrl: rpcUrl }) : null), [rpcUrl])
-
-  const [address, setAddress] = useState<string>()
-  useEffect(() => {
-    let _mounted = true
-    const _fetch = async () => {
-      try {
-        // https://docs.starknet.id/devs/starknetidjs
-        const starknetIdNavigator = new StarknetIdNavigator(provider, constants.StarknetChainId.SN_MAIN);
-        const result = await starknetIdNavigator.getAddressFromStarkName(starkName);
-        if (_mounted) {
-          setAddress(isPositiveBigint(result) ? result : undefined)
-        }
-      } catch { }
-    }
-    setAddress(undefined)
-    if (starkName && provider) {
-      _fetch()
-    }
-    return () => { _mounted = false }
-  }, [starkName, provider])
-
+  const navigator = useIdNavigator(rpcUrl)
+  const { data: address } = useQuery({
+    ...QUERY_ONCE,
+    queryKey: ['pistols', 'starknetid', 'addressFromStarkName', rpcUrl, starkName],
+    enabled: Boolean(starkName) && Boolean(navigator),
+    queryFn: async () => {
+      // https://docs.starknet.id/devs/starknetidjs
+      const result = await navigator.getAddressFromStarkName(starkName)
+      return isPositiveBigint(result) ? result : undefined
+    },
+  })
   return {
     address,
   }
 }
 
-
 export const useStarkName = (address: BigNumberish, rpcUrl: string) => {
-  const provider = useMemo(() => (rpcUrl ? new Provider({ nodeUrl: rpcUrl }) : null), [rpcUrl])
-
-  const [starkName, setStarkName] = useState<string>()
-  useEffect(() => {
-    let _mounted = true
-    const _fetch = async () => {
-      try {
-        // https://docs.starknet.id/devs/starknetidjs
-        const starknetIdNavigator = new StarknetIdNavigator(provider, constants.StarknetChainId.SN_MAIN);
-        const result = await starknetIdNavigator.getStarkName(bigintToHex(address ?? 0));
-        if (_mounted) {
-          setStarkName(result)
-        }
-      } catch { }
-    }
-    setStarkName(undefined)
-    if (address && provider) {
-      _fetch()
-    }
-    return () => { _mounted = false }
-  }, [address, provider])
-
+  const navigator = useIdNavigator(rpcUrl)
+  const { data: starkName } = useQuery({
+    ...QUERY_ONCE,
+    queryKey: ['pistols', 'starknetid', 'starkName', rpcUrl, String(address)],
+    enabled: Boolean(address) && Boolean(navigator),
+    queryFn: () => navigator.getStarkName(bigintToHex(address ?? 0)),
+  })
   return {
     starkName,
   }
 }
 
-
 export const useStarkProfile = (address: BigNumberish, rpcUrl: string): StarkProfile => {
-  const provider = useMemo(() => (rpcUrl ? new Provider({ nodeUrl: rpcUrl }) : null), [rpcUrl])
-
-  const [starkProfile, setStarkProfile] = useState<StarkProfile>()
-  useEffect(() => {
-    let _mounted = true
-    const _fetch = async () => {
-      try {
-        // https://docs.starknet.id/devs/starknetidjs
-        const starknetIdNavigator = new StarknetIdNavigator(provider, constants.StarknetChainId.SN_MAIN);
-        const result = await starknetIdNavigator.getProfileData(bigintToHex(address ?? 0), false);
-        // console.log(`PROFILE:`, result)
-        if (_mounted) {
-          setStarkProfile(result)
-        }
-      } catch { }
-    }
-    setStarkProfile(undefined)
-    if (address && provider) {
-      _fetch()
-    }
-    return () => { _mounted = false }
-  }, [address, provider])
+  const navigator = useIdNavigator(rpcUrl)
+  const { data: starkProfile } = useQuery({
+    ...QUERY_ONCE,
+    queryKey: ['pistols', 'starknetid', 'profile', rpcUrl, String(address)],
+    enabled: Boolean(address) && Boolean(navigator),
+    queryFn: () => navigator.getProfileData(bigintToHex(address ?? 0), false),
+  })
 
   const { name, profilePicture, discord, twitter, github, proofOfPersonhood } = starkProfile ?? {}
 
@@ -96,4 +69,3 @@ export const useStarkProfile = (address: BigNumberish, rpcUrl: string): StarkPro
     proofOfPersonhood,
   }
 }
-

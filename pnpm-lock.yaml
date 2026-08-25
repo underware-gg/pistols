@@ -382,6 +382,12 @@ importers:
       '@tanstack/react-query':
         specifier: 'catalog:'
         version: 5.90.2(react@18.3.1)
+      '@testing-library/dom':
+        specifier: 10.4.1
+        version: 10.4.1
+      '@testing-library/react':
+        specifier: 16.3.2
+        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@18.3.7(@types/react@18.3.25))(@types/react@18.3.25)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@types/event-emitter':
         specifier: 0.3.5
         version: 0.3.5
@@ -406,6 +412,9 @@ importers:
       graphql:
         specifier: 16.14.2
         version: 16.14.2
+      happy-dom:
+        specifier: 20.11.2
+        version: 20.11.2
       react:
         specifier: 'catalog:'
         version: 18.3.1

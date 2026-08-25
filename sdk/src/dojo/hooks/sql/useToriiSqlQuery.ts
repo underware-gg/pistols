@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import type { NoInfer, UseQueryOptions } from "@tanstack/react-query";
 import { useToriiSQLQuery } from "@dojoengine/sdk/sql";
 import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
 import { poseidonString } from "src/starknet/starknet";
 import { queryToriiSql } from "src/utils/misc/sql";
+import { QUERY_ONCE } from "src/utils/hooks/queryOnce";
 
 
 export type UseSdkSqlQueryProps<Input, Output> = {
@@ -60,55 +62,36 @@ export const useSqlQuery = <Input, Output>({
   formatFn,
   toriiUrl,
 }: UseSdkSqlQueryProps<Input, Output>): UseSdkSqlQueryResult<Output> => {
-  const [data, setData] = useState<Output | undefined>();
-  const [isLoading, setIsLoading] = useState<boolean>();
-  const [latency, setLatency] = useState<number>();
-  const [error, setError] = useState<Error>();
   const { selectedNetworkConfig } = useDojoSetup()
+  const url = toriiUrl || selectedNetworkConfig.toriiUrl
 
-  useEffect(() => {
-    let _mounted = true
-    const _fetch = async () => {
-      setIsLoading(true);
-      setError(undefined);
-      try {
-        const startTime = Date.now();
-        const result = await queryToriiSql<Input, Output>(
-          `${toriiUrl || selectedNetworkConfig.toriiUrl}/sql`,
-          query,
-          formatFn,
-        );
-        const endTime = Date.now();
-        if (_mounted) {
-          setData(result);
-          setIsLoading(false);
-          setLatency(endTime - startTime);
-        }
-      } catch (e) {
-        console.error(e)
-        if (_mounted) {
-          setIsLoading(false);
-          setLatency(0);
-          setError(e as Error);
-        }
-      }
-    }
-    setData(undefined);
-    if (query) {
-      _fetch()
-    }
-    return () => {
-      _mounted = false
-    }
-  }, [query, toriiUrl])
+  // Was a useEffect driving four useState calls. react-query owns the request
+  // lifecycle instead, which is what react-hooks/set-state-in-effect was pointing
+  // at: the mounted-flag dance, the manual loading flag and the reset-on-change
+  // are all things it already does.
+  //
+  // The key deliberately omits formatFn. The effect's dependency list did too, so
+  // including it would change when the query re-runs, not just how it is keyed.
+  const { data, error, isLoading } = useQuery({
+    ...QUERY_ONCE,
+    queryKey: ['pistols', 'sql', url, query],
+    enabled: Boolean(query),
+    queryFn: async () => {
+      const startedAt = Date.now()
+      const result = await queryToriiSql<Input, Output>(`${url}/sql`, query, formatFn)
+      // Latency is part of this hook's published result, and react-query does not
+      // expose timings, so it is carried alongside the payload.
+      return { result, latency: Date.now() - startedAt }
+    },
+  })
 
   const queryHash = useMemo(() => query ? poseidonString(query) : 0n, [query])
 
   return {
-    data,
-    error,
+    data: data?.result,
+    error: error as Error,
     isLoading,
-    latency,
+    latency: data?.latency,
     queryHash,
   }
 }

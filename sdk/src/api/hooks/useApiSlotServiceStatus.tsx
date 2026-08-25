@@ -1,40 +1,19 @@
-import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { apiSlotServiceStatus, SlotServiceStatusResponse } from 'src/api/slotServiceStatus'
+import { QUERY_ONCE } from 'src/utils/hooks/queryOnce'
 
+// Was a useEffect driving three useState calls, with a mounted flag to avoid
+// setting state after unmount. react-query owns that lifecycle; the hook's
+// published shape is unchanged.
 export const useApiSlotServiceStatus = (
   serviceUrl: string,
 ) => {
-  const [status, setStatus] = useState<SlotServiceStatusResponse | undefined>();
-  const [isLoading, setIsLoading] = useState<boolean>();
-  const [isError, setIsError] = useState<boolean>();
-
-  useEffect(() => {
-    let _mounted = true
-    const _fetch = async () => {
-      setIsLoading(true);
-      setIsError(undefined);
-      try {
-        const result = await apiSlotServiceStatus(serviceUrl);  
-        if (_mounted) {
-          setIsLoading(false);
-          setStatus(result);
-        }
-      } catch (e) {
-        console.error(e)
-        if (_mounted) {
-          setIsLoading(false);
-          setIsError(true);
-        }
-      }
-    }
-    setStatus(undefined);
-    if (serviceUrl) {
-      _fetch()
-    }
-    return () => {
-      _mounted = false
-    }
-  }, [serviceUrl])
+  const { data: status, isLoading, isError } = useQuery<SlotServiceStatusResponse>({
+    ...QUERY_ONCE,
+    queryKey: ['pistols', 'api', 'slotServiceStatus', serviceUrl],
+    enabled: Boolean(serviceUrl),
+    queryFn: () => apiSlotServiceStatus(serviceUrl),
+  })
 
   return {
     isLoading,
@@ -42,4 +21,3 @@ export const useApiSlotServiceStatus = (
     status,
   }
 }
-

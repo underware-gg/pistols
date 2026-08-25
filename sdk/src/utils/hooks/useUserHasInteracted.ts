@@ -9,6 +9,9 @@ export const useUserHasInteracted = (autoUpdate: boolean = true) => {
     let _mounted = true
     let _interval: NodeJS.Timeout = undefined
     if (_navigatorHasBeenActive()) {
+      // Reads navigator.userActivation, a browser API that cannot be read during render
+      // and changes outside React's knowledge, so it is polled from an effect.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setUserHasInteracted(true)
     } else if (autoUpdate) {
       _interval = setInterval(() => {

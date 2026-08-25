@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { BigNumberish, CallData, shortString } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { ControllerConnector } from '@cartridge/connector'
@@ -9,6 +10,7 @@ import { KATANA_CLASS_HASH } from '@dojoengine/core'
 import { supportedConnetorIds } from 'src/games/pistols/config/networks'
 import { bigintEquals, bigintToHex, isPositiveBigint } from 'src/utils/misc/types'
 import { feltToString } from 'src/starknet/starknet'
+import { QUERY_ONCE } from 'src/utils/hooks/queryOnce'
 
 // sync from here:
 // https://github.com/cartridge-gg/controller/blob/main/packages/account-wasm/src/constants.rs
@@ -46,13 +48,14 @@ export const useConnectedController = () => {
   ), [connector, connectorId])
 
   // username
-  const [username, setUsername] = useState<string>(undefined)
-  useEffect(() => {
-    setUsername(undefined)
-    if (isConnected && controllerConnector) {
-      controllerConnector.username().then((n) => setUsername((n || 'unknown').toLowerCase()))
-    }
-  }, [controllerConnector, isConnected])
+  // Keyed on the connector id and connection state, matching the original effect's
+  // dependencies; a connector instance is not serialisable.
+  const { data: username } = useQuery<string>({
+    ...QUERY_ONCE,
+    queryKey: ['pistols', 'controller', 'username', connectorId ?? '', String(isConnected)],
+    enabled: Boolean(isConnected) && Boolean(controllerConnector),
+    queryFn: async () => ((await controllerConnector.username()) || 'unknown').toLowerCase(),
+  })
 
   // callbacks
   const openSettings = useCallback((isConnected && controllerConnector) ? async () => {
@@ -103,46 +106,30 @@ export const useControllerAccount = (contractAddress: BigNumberish) => {
 //
 export const useVerifyControllerSignature = (messageHash: BigNumberish, signature: BigNumberish[]) => {
   const { address, account, chainId } = useAccount();
-  const [isLoading, setIsLoading] = useState<boolean>();
-  const [isValid, setIsValid] = useState<boolean>();
 
-  useEffect(() => {
-    let _mounted = true
-    const _fetch = async () => {
-      setIsLoading(true);
-      try {
-        console.log(`useVerifyControllerSignature() chainId:`, feltToString(chainId), address);
-        const res = await account.callContract(
-          {
-            contractAddress: address,
-            entrypoint: "is_valid_signature",
-            calldata: CallData.compile({
-              hash: bigintToHex(messageHash),
-              signature: signature.map(s => bigintToHex(s)),
-            }),
-          },
-          "pending",
-        );
-        if (_mounted) {
-          setIsLoading(false);
-          setIsValid(res[0] === shortString.encodeShortString("VALID"));
-        }
-      } catch (e) {
-        console.error(e)
-        if (_mounted) {
-          setIsLoading(false);
-          setIsValid(false);
-        }
-      }
-    }
-    setIsValid(undefined);
-    if (account && isPositiveBigint(messageHash) && signature?.length > 0) {
-      _fetch()
-    }
-    return () => {
-      _mounted = false
-    }
-  }, [account, messageHash, signature])
+  // Converted from useEffect + useState + a mounted flag. messageHash and
+  // signature are BigNumberish and react-query hashes keys with JSON.stringify,
+  // which throws on a bigint, so both are stringified.
+  const { data: isValid, isLoading } = useQuery<boolean>({
+    ...QUERY_ONCE,
+    queryKey: ['pistols', 'controller', 'verifySignature', String(address), String(messageHash), (signature ?? []).map(String)],
+    enabled: Boolean(account) && isPositiveBigint(messageHash) && signature?.length > 0,
+    queryFn: async () => {
+      console.log(`useVerifyControllerSignature() chainId:`, feltToString(chainId), address);
+      const res = await account.callContract(
+        {
+          contractAddress: address,
+          entrypoint: "is_valid_signature",
+          calldata: CallData.compile({
+            hash: bigintToHex(messageHash),
+            signature: signature.map(s => bigintToHex(s)),
+          }),
+        },
+        "pending",
+      );
+      return res[0] === shortString.encodeShortString("VALID")
+    },
+  })
 
   return {
     isLoading,

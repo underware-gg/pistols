@@ -1,11 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { apiVerifyControllerSignature } from 'src/api/verify'
 import { isPositiveBigint } from 'src/utils/misc/types'
 import { feltToString } from 'src/starknet/starknet'
+import { QUERY_ONCE } from 'src/utils/hooks/queryOnce'
 
-
+// Converted from useEffect + useState. messageHash and signature are
+// BigNumberish, and react-query hashes keys with JSON.stringify which throws on
+// a bigint, so both are stringified into the key.
 export const useApiVerifyControllerSignature = (
   serverUrl: string,
   messageHash: BigNumberish,
@@ -13,45 +16,22 @@ export const useApiVerifyControllerSignature = (
   fromAccount?: string,
 ) => {
   const { address, account, chainId } = useAccount();
-  const [isLoading, setIsLoading] = useState<boolean>();
-  const [isValid, setIsValid] = useState<boolean>();
 
-  useEffect(() => {
-    let _mounted = true
-    const _fetch = async () => {
-      setIsLoading(true);
-      try {
-        const res = await apiVerifyControllerSignature(
-          serverUrl,
-          fromAccount || address,
-          feltToString(chainId),
-          messageHash,
-          signature,
-        )
-        if (_mounted) {
-          setIsLoading(false);
-          setIsValid(res);
-        }
-      } catch (e) {
-        console.error(e)
-        if (_mounted) {
-          setIsLoading(false);
-          setIsValid(false);
-        }
-      }
-    }
-    setIsValid(undefined);
-    if (account && isPositiveBigint(messageHash) && signature?.length > 0) {
-      _fetch()
-    }
-    return () => {
-      _mounted = false
-    }
-  }, [account, messageHash, signature])
+  const { data: isValid, isLoading } = useQuery({
+    ...QUERY_ONCE,
+    queryKey: ['pistols', 'api', 'verifyControllerSignature', serverUrl, String(messageHash), (signature ?? []).map(String)],
+    enabled: Boolean(account) && isPositiveBigint(messageHash) && signature?.length > 0,
+    queryFn: () => apiVerifyControllerSignature(
+      serverUrl,
+      fromAccount || address,
+      feltToString(chainId),
+      messageHash,
+      signature,
+    ),
+  })
 
   return {
     isLoading,
     isValid,
   }
 }
-

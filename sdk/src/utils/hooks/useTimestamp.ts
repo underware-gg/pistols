@@ -37,6 +37,9 @@ export const useClientTimestamp = ({
     // initialize
     if (!enabled) {
       // reset timestamp
+      // A clock. The value is wall-time, not derivable from props or state, and the
+      // interval below has to live in an effect regardless.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       _update(true);
     } else {
       // get current timestamp

@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { BigNumberish } from 'starknet'
 import { useContract, useBalance } from '@starknet-react/core'
 import { bigintToHex, isPositiveBigint } from 'src/utils/misc/types'
 import { weiToEth } from 'src/starknet/starknet'
 import { erc20_abi } from 'src/abis/abis'
+import { QUERY_ONCE } from 'src/utils/hooks/queryOnce'
 
 export const useERC20Balance = (
   contractAddress: BigNumberish,
@@ -50,23 +52,22 @@ export const useERC20TotalSupply = (
     address: contractIsValid ? bigintToHex(contractAddress) : null,
   })
 
-  const [totalSupply, setTotalSupply] = useState<bigint>(null)
-
-  useEffect(() => {
-    if (!contractIsValid) {
-      setTotalSupply(null)
-    }
-  }, [contractIsValid])
-
-  // try ByteArray
-  useEffect(() => {
-    contract?.call('total_supply').then((supply: bigint) => {
-      if (supply) setTotalSupply(supply)
-    })
-  }, [contract])
+  // Was two effects: one fetching total_supply, one resetting the state to null
+  // when the address went invalid. The reset existed only because the value was
+  // held in useState - as a query it is simply disabled, so there is nothing to
+  // reset. That reset was the react-hooks/set-state-in-effect violation.
+  //
+  // Keyed on contractAddress, not the contract instance, which is not
+  // serialisable.
+  const { data: totalSupply } = useQuery<bigint>({
+    ...QUERY_ONCE,
+    queryKey: ['pistols', 'erc20', 'totalSupply', String(contractAddress)],
+    enabled: contractIsValid && Boolean(contract),
+    queryFn: async () => (await contract.call('total_supply')) as bigint,
+  })
 
   return {
-    totalSupply,
+    totalSupply: totalSupply ?? null,
   }
 }
 
@@ -78,45 +79,25 @@ export const useERC20TokenName = (contractAddress: BigNumberish) => {
     address: contractIsValid ? bigintToHex(contractAddress) : null,
   })
 
-  const [tokenName, setTokenName] = useState<string>(null)
-  const [tokenSymbol, setTokenSymbol] = useState<string>(null)
-
-  useEffect(() => {
-    if (!contractIsValid) {
-      setTokenName(null)
-      setTokenSymbol(null)
-    }
-  }, [contractIsValid])
-  
-  // try felt
-  // useEffect(() => {
-  //   contract?.call('name').then((results) => {
-  //     const name = results?.name ? feltToString(results.name) : null
-  //     if (name)setTokenName(name)
-  //   })
-  // }, [contract])
-  // useEffect(() => {
-  //   contract?.call('symbol').then((results) => {
-  //     const symbol = results?.symbol ? feltToString(results.symbol) : null
-  //     if (symbol) setTokenSymbol(symbol)
-  //   })
-  // }, [contract])
-
-  // try ByteArray
-  useEffect(() => {
-    contract?.call('name').then((name: string) => {
-      if (name) setTokenName(name)
-    })
-  }, [contract])
-  useEffect(() => {
-    contract?.call('symbol').then((symbol: string) => {
-      if (symbol) setTokenSymbol(symbol)
-    })
-  }, [contract])
+  // Same shape as totalSupply above: two fetches plus a reset effect, replaced by
+  // two disabled-when-invalid queries. The commented-out felt variants are left
+  // as they were.
+  const { data: tokenName } = useQuery<string>({
+    ...QUERY_ONCE,
+    queryKey: ['pistols', 'erc20', 'name', String(contractAddress)],
+    enabled: contractIsValid && Boolean(contract),
+    queryFn: async () => (await contract.call('name')) as string,
+  })
+  const { data: tokenSymbol } = useQuery<string>({
+    ...QUERY_ONCE,
+    queryKey: ['pistols', 'erc20', 'symbol', String(contractAddress)],
+    enabled: contractIsValid && Boolean(contract),
+    queryFn: async () => (await contract.call('symbol')) as string,
+  })
 
   return {
-    tokenName,
-    tokenSymbol,
+    tokenName: tokenName ?? null,
+    tokenSymbol: tokenSymbol ?? null,
   }
 }
 

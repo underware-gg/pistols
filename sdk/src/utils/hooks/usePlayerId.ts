@@ -18,6 +18,9 @@ export const usePlayerId = () => {
     if (requiresPlayerId) {
       const storedPlayerId = (typeof window !== 'undefined' ? window?.localStorage?.getItem('player_id') : undefined)
       if (storedPlayerId) {
+        // Reads and seeds localStorage, which is not available during render and must not
+        // be written during it. An effect is the correct place for it.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setPlayerId(storedPlayerId)
       } else {
         const newPlayerId = stark.randomAddress()
