@@ -121,6 +121,7 @@ and none can introduce a dependency of its own.
 | `pnpm verify` | The whole gate, in order. Run this before committing. |
 | `pnpm candidate <pkg>@<version>` | **Run this first.** Evidence for a candidate and everything new it would bring in: publish age against the gate, deprecation, install scripts, peers split into required and optional, and every advisory range checked against the target version. Read-only — installs nothing. The named candidate is resolved exactly; **recursive rows are advisory**, because a transitive dependency declared as a range is examined at `dist-tags.latest`, which pnpm may not pick and which is often newer than the age gate admits. Each such row says so. Use `node scripts/candidate.mjs` directly for flags such as `--depth`. |
 | `pnpm lockfile-diff [ref] [--strict]` | What entered, left or moved in the resolved graph. `--strict` fails on any movement; use it when a change is meant to be resolution-neutral. |
+| `pnpm check-package-manager` | The running pnpm is the pinned pnpm. |
 | `pnpm check-settings` | Every key in `pnpm-workspace.yaml` must be in `scripts/known-settings.json` with recorded evidence. |
 | `pnpm check-pins` | Every resolution-driving specifier exact, bar enumerated waivers; `peers` is the only named catalog and only peers may use it. |
 | `pnpm check-catalog-drift` | Every published peer range includes the version we pin. |
@@ -203,3 +204,4 @@ both ways.
 - [2026-08-24 — Exact pinning made mandatory and enforced](2026-08-24-exact-pinning-enforced.md)
 - [2026-08-24 — Reviewed-set bootstrap](2026-08-24-reviewed-set-bootstrap.md)
 - [2026-08-24 — Decoupling the published peer contract](2026-08-24-peer-contract-decoupling.md)
+- [2026-08-25 — Closing the two remaining foundation gaps](2026-08-25-close-foundation-gaps.md)

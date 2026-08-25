@@ -39,9 +39,12 @@ for (const [name, versions] of resolved) {
   }
 }
 
-// Entries in the reviewed set that no longer resolve are not a failure — a
-// package can leave the tree legitimately — but they should not accumulate
-// unnoticed, because a stale allowlist silently re-permits anything that returns.
+// A stale entry — reviewed, but no longer resolved — is a failure, not a note.
+// Left in place it silently re-permits that exact version if the package ever
+// returns to the tree, which defeats the ratchet: the whole point is that a
+// version cannot come back without someone reviewing it again. A package leaving
+// the tree is legitimate; leaving its permission behind is not. Regenerating
+// prunes them, because the set is rebuilt from the lockfile wholesale.
 const stale = Object.entries(reviewed)
   .flatMap(([name, versions]) => versions.filter((v) => !resolved.get(name)?.has(v)).map((v) => `${name}@${v}`))
 
@@ -54,4 +57,14 @@ if (unreviewed.length > 0) {
   process.exit(1)
 }
 
-console.log(`check-lockfile-reviewed: OK — ${[...resolved.values()].reduce((n, s) => n + s.size, 0)} resolved package versions, all reviewed${stale.length ? `; ${stale.length} stale entr${stale.length === 1 ? 'y' : 'ies'} in the reviewed set` : ''}`)
+if (stale.length > 0) {
+  console.error(`check-lockfile-reviewed: FAILED — ${stale.length} reviewed entr${stale.length === 1 ? 'y is' : 'ies are'} no longer resolved:\n`)
+  for (const p of stale.slice(0, 40)) console.error(`  ${p}`)
+  if (stale.length > 40) console.error(`  ... and ${stale.length - 40} more`)
+  console.error('\nEach one is standing permission for a version that is not in the tree, so it')
+  console.error('would return without review. Regenerate to prune them:')
+  console.error('  node scripts/generate-reviewed-set.mjs --record <file>')
+  process.exit(1)
+}
+
+console.log(`check-lockfile-reviewed: OK — ${[...resolved.values()].reduce((n, s) => n + s.size, 0)} resolved package versions, all reviewed, no stale permissions`)

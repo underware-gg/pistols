@@ -11,6 +11,9 @@ cd "$REPO_ROOT"
 
 step() { printf '\n=== %s ===\n' "$1"; }
 
+step 'the running package manager is the pinned one'
+node scripts/check-package-manager.mjs
+
 step 'declared settings are real'
 node scripts/check-settings.mjs
 

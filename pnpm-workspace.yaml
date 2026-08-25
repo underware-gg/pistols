@@ -17,7 +17,6 @@ minimumReleaseAgeStrict: true
 # metadata has no `time` field. That is the hole; false closes it.
 minimumReleaseAgeIgnoreMissingTime: false
 blockExoticSubdeps: true
-packageManagerStrictVersion: true
 
 # Runtime consistency.
 engineStrict: true

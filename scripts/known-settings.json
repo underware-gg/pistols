@@ -45,11 +45,6 @@
       "source": "settings/dependency-resolution",
       "note": "Already defaults to true; stated explicitly."
     },
-    "packageManagerStrictVersion": {
-      "evidence": "unverified",
-      "note": "Not found in the pnpm settings reference. No behavioural difference observed in pnpm 10.34.4 across four configurations: exact mismatched pin, non-existent pin, range pin, and absent packageManager field, with the setting both true and false. pnpm's launcher honours the packageManager field on its own regardless (pnpm --version returned the pinned 10.20.0 in a directory pinning it). Retained rather than deleted because deleting a setting on weak evidence is how minimumReleaseAgeIgnoreMissingTime was lost, but it must not be counted as an active control.",
-      "action": "Confirm against pnpm source or a maintainer, then either document or remove."
-    },
     "engineStrict": {
       "evidence": "documented",
       "source": "settings/cli"
@@ -108,6 +103,7 @@
     "trustPolicy": "Supply-chain trust policy; default off. Assess.",
     "trustLockfile": "Default false. Assess.",
     "minimumReleaseAgeExclude": "Per-package age-gate exemptions. We deliberately have none; leaving it unset is the stricter choice.",
-    "ignoredOptionalDependencies": "Could exclude msgpackr-extract's native binaries outright rather than only denying its build."
+    "ignoredOptionalDependencies": "Could exclude msgpackr-extract's native binaries outright rather than only denying its build.",
+    "packageManagerStrictVersion": "REMOVED 2026-08-25. Could not be shown to be a real setting: absent from the pnpm settings reference, zero hits in a code search of pnpm/pnpm, and no behavioural difference across four configurations with it both true and false. No test available can distinguish it from a fabricated key - `pnpm config get` echoes any key in the file, and pnpm exports any key as an npm_config_* env var, including totallyFakeSettingXyz. It was also redundant: pnpm's launcher already honours the packageManager field. Replaced by scripts/check-package-manager.mjs, which asserts the running pnpm equals the pin. Re-adopt only with positive evidence."
   }
 }

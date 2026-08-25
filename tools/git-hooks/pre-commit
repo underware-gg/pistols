@@ -4,6 +4,7 @@ REPO_ROOT=$(git rev-parse --show-toplevel)
 cd "$REPO_ROOT"
 
 git diff --cached --check
+node scripts/check-package-manager.mjs
 node scripts/check-settings.mjs
 node scripts/check-pins.mjs
 node scripts/check-catalog-drift.mjs

@@ -31,6 +31,7 @@ jobs:
       # anything is fetched. check-lockfile-reviewed is the gate that catches a
       # lockfile containing packages nobody reviewed, which .pnpmfile.cjs cannot
       # see because pnpm skips resolution when the lockfile is already satisfied.
+      - run: node scripts/check-package-manager.mjs
       - run: node scripts/check-settings.mjs
       - run: node scripts/check-pins.mjs
       - run: node scripts/check-catalog-drift.mjs
