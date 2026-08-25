@@ -116,6 +116,16 @@ function satisfies(version, range) {
   const v = parse(version)
   if (!v) return null
   const r = String(range).trim()
+  // A disjunction is satisfied if any branch is. Without this, `^3.25.0 || ^4.0.0`
+  // matched no single-clause pattern and came back unevaluable, which the report
+  // then printed as "does NOT satisfy" — a false statement about zod@3.25.76,
+  // which satisfies it perfectly well.
+  if (r.includes('||')) {
+    const results = r.split('||').map((clause) => satisfies(version, clause))
+    if (results.some((x) => x === true)) return true
+    if (results.every((x) => x === null)) return null
+    return false
+  }
   let m
   if ((m = r.match(/^\^(\d+)\.(\d+)\.(\d+)$/))) {
     const b = { nums: [+m[1], +m[2], +m[3]], pre: null }
@@ -228,13 +238,20 @@ while (queue.length > 0) {
       // declared ^6.0.0 against an installed 7.0.0 means pnpm fetches a new 6.x
       // that nothing has reviewed. Checking the name alone hid exactly that.
       const present = [...(installed.get(dep) ?? [])]
-      const satisfied = present.filter((pv) => satisfies(pv, range) === true)
+      const verdicts = present.map((pv) => satisfies(pv, range))
+      const satisfied = present.filter((pv, i) => verdicts[i] === true)
       if (satisfied.length > 0) {
         console.log(`${indent}  dep ${dep}@${range} — satisfied by ${satisfied.join(', ')} already in tree`)
       } else {
-        const why = present.length > 0
-          ? ` [in tree at ${present.join(', ')}, which does NOT satisfy "${range}"]`
-          : ''
+        // "cannot evaluate" is not "does not satisfy". Both are still treated as
+        // unsatisfied, because assuming satisfaction is how something unreviewed
+        // gets through — but the report must not claim more than it knows.
+        const unevaluable = present.length > 0 && verdicts.every((x) => x === null)
+        const why = present.length === 0
+          ? ''
+          : unevaluable
+            ? ` [in tree at ${present.join(', ')}; could NOT evaluate against "${range}" — check by hand]`
+            : ` [in tree at ${present.join(', ')}, which does NOT satisfy "${range}"]`
         const sub = exact ? '' : ` [SUBSTITUTED: declared "${range}", examining dist-tags.latest; pnpm may resolve otherwise]`
         queue.push({ name: dep, version: target, level: level + 1, via: `${key} -> ${dep}@${range}${why}${sub}` })
       }
