@@ -54,7 +54,10 @@ const _filterItems = (data: PistolsEntity[]): PistolsEntity[] => {
   return data ? data.filter(e => e && e.entityId != '0x0') : []
 }
 
-const _useSdkGet = (prefix: string, {
+// Named so eslint can see this is a hook. The underscore prefix hid it from
+// react-hooks/rules-of-hooks, which cannot tell an internal hook from a plain
+// function that illegally calls hooks.
+const useSdkGetInternal = (prefix: string, {
   fn,
   query,
   enabled,
@@ -141,7 +144,7 @@ export const useSdkEntitiesGet = ({
   const { sdk } = useDojoSetup()
   // const limit = useMemo(() => query?.build().pagination.limit, [query])
 
-  const { isLoading, isFinished } = _useSdkGet('useSdkEntitiesGet()', {
+  const { isLoading, isFinished } = useSdkGetInternal('useSdkEntitiesGet()', {
     fn: sdk.getEntities,
     query,
     resetStore,
@@ -169,7 +172,7 @@ export const useSdkEventsGet = ({
   const historical = useMemo(() => query?.build().historical, [query])
   // const limit = useMemo(() => query?.build().pagination.limit, [query])
 
-  const { isLoading, isFinished } = _useSdkGet(`useSdkEventsGet(${historical})`, {
+  const { isLoading, isFinished } = useSdkGetInternal(`useSdkEventsGet(${historical})`, {
     fn: sdk.getEventMessages,
     query,
     resetStore,

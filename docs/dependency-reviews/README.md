@@ -205,3 +205,4 @@ both ways.
 - [2026-08-24 — Reviewed-set bootstrap](2026-08-24-reviewed-set-bootstrap.md)
 - [2026-08-24 — Decoupling the published peer contract](2026-08-24-peer-contract-decoupling.md)
 - [2026-08-25 — Closing the two remaining foundation gaps](2026-08-25-close-foundation-gaps.md)
+- [2026-08-25 — Bringing the SDK into lint coverage](2026-08-25-lint-coverage.md)

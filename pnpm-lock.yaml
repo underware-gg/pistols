@@ -385,9 +385,18 @@ importers:
       '@types/react':
         specifier: 'catalog:'
         version: 18.3.25
+      '@typescript-eslint/parser':
+        specifier: 8.45.0
+        version: 8.45.0(eslint@9.36.0)(typescript@5.9.3)
       copyfiles:
         specifier: 2.4.1
         version: 2.4.1
+      eslint:
+        specifier: 9.36.0
+        version: 9.36.0
+      eslint-plugin-react-hooks:
+        specifier: 5.2.0
+        version: 5.2.0(eslint@9.36.0)
       graphql:
         specifier: 16.14.2
         version: 16.14.2
@@ -2843,6 +2852,7 @@ packages:
   eslint@9.36.0:
     resolution: {integrity: sha512-hB4FIzXovouYzwzECDcUkJ4OcfOEkXTv2zRY6B9bkwjx/cprAq0uvm1nl7zvQ0/TsUk0zQiN4uPfJpB9m+rPMQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    deprecated: This version is no longer supported. Please see https://eslint.org/version-support for other options.
     hasBin: true
     peerDependencies:
       jiti: '*'
