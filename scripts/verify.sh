@@ -37,6 +37,9 @@ pnpm exec turbo build
 step 'types'
 pnpm exec turbo check-types
 
+step 'lint'
+pnpm exec turbo lint
+
 step 'tests'
 pnpm test
 

@@ -41,6 +41,7 @@ jobs:
       - run: node scripts/check-advisories.mjs
       - run: pnpm exec turbo build
       - run: pnpm exec turbo check-types
+      - run: pnpm exec turbo lint
       - run: pnpm test
 
       # Reports what this push changed in the resolved graph. Informational on
