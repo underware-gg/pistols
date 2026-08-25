@@ -122,7 +122,7 @@ The measurement probe config was temporary and removed; it is not committed.
 - `turbo lint` now runs in **both** packages and exits 0.
 - 273 previously unlinted SDK files are in coverage.
 - Manifest specifiers under `check-pins`: 43 → 46, all exact.
-- `pnpm verify` green across all eleven steps.
+- `pnpm verify` green end to end.
 
 ## Follow-ups
 
