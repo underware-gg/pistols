@@ -116,6 +116,10 @@ function satisfies(version, range) {
   const v = parse(version)
   if (!v) return null
   const r = String(range).trim()
+  // A wildcard matches any version. Treating it as unevaluable made the recursion
+  // substitute dist-tags.latest for "@types/node@*", which then failed the
+  // release-age gate - a finding invented by the tool, not present in the tree.
+  if (r === '' || r === '*' || r === 'x' || r === 'X' || r === 'latest') return true
   // A disjunction is satisfied if any branch is. Without this, `^3.25.0 || ^4.0.0`
   // matched no single-clause pattern and came back unevaluable, which the report
   // then printed as "does NOT satisfy" — a false statement about zod@3.25.76,
@@ -141,6 +145,22 @@ function satisfies(version, range) {
     return v.nums[0] === b.nums[0] && v.nums[1] === b.nums[1]
   }
   if (/^\d/.test(r)) { const b = parse(r); return b ? cmp(v, b) === 0 : null }
+  // Comparator conjunction, e.g. ">=20.0.0" or ">=4.8.4 <6.1.0". Without this,
+  // happy-dom's "@types/node >=20.0.0" came back unevaluable, the recursion
+  // substituted dist-tags.latest, and that substitute then failed the release-age
+  // gate - three spurious findings from a range our tree satisfies comfortably.
+  const parts = r.split(/\s+/).filter(Boolean)
+  if (parts.length > 0 && parts.every((part) => /^(>=|<=|>|<|=)\d/.test(part))) {
+    for (const part of parts) {
+      const c = part.match(/^(>=|<=|>|<|=)(.+)$/)
+      const bound = parse(c[2])
+      if (!bound) return null
+      const d = cmp(v, bound)
+      const ok = c[1] === '>=' ? d >= 0 : c[1] === '<=' ? d <= 0 : c[1] === '>' ? d > 0 : c[1] === '<' ? d < 0 : d === 0
+      if (!ok) return false
+    }
+    return true
+  }
   return null
 }
 
@@ -225,7 +245,20 @@ while (queue.length > 0) {
 
   // recurse into what this would newly bring in
   if (level < depth) {
-    for (const [dep, range] of Object.entries(v.dependencies ?? {})) {
+    for (const [declaredName, declaredRange] of Object.entries(v.dependencies ?? {})) {
+      // An npm alias - "react-is-18": "npm:react-is@^18.3.1" - names the local
+      // key, not the package. Reading the key as a package name fetched a
+      // DIFFERENT, squatted package called react-is-18 whose preinstall is
+      // `echo This package is not installable && exit 1`, and reported that as a
+      // finding against our tree. The alias target is the real dependency.
+      let dep = declaredName
+      let range = declaredRange
+      if (typeof declaredRange === 'string' && declaredRange.startsWith('npm:')) {
+        const target = declaredRange.slice(4)
+        const at = target.lastIndexOf('@')
+        if (at > 0) { dep = target.slice(0, at); range = target.slice(at + 1) }
+        else { dep = target; range = '*' }
+      }
       let dm
       try { dm = await meta(dep) } catch { console.log(`${indent}  (could not resolve ${dep})`); problems++; continue }
       // An exact range is resolved exactly. Anything else is SUBSTITUTED with the
@@ -241,7 +274,7 @@ while (queue.length > 0) {
       const verdicts = present.map((pv) => satisfies(pv, range))
       const satisfied = present.filter((pv, i) => verdicts[i] === true)
       if (satisfied.length > 0) {
-        console.log(`${indent}  dep ${dep}@${range} — satisfied by ${satisfied.join(', ')} already in tree`)
+        console.log(`${indent}  dep ${dep}@${range}${dep === declaredName ? '' : ` (alias ${declaredName})`} — satisfied by ${satisfied.join(', ')} already in tree`)
       } else {
         // "cannot evaluate" is not "does not satisfy". Both are still treated as
         // unsatisfied, because assuming satisfaction is how something unreviewed
