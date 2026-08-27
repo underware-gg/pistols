@@ -10,6 +10,6 @@ export function DojoSetupErrorDetector() {
       navigate('/')
       // location.href = '/'
     }
-  }, [isError])
+  }, [isError, navigate])
   return <></>
 }

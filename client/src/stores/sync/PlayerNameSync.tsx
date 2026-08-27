@@ -23,7 +23,7 @@ export function PlayerNameSync() {
     }, new Map<string, string>())
     updateUsernames(usernames)
     setIsInitialized(true)
-  }, [])
+  }, [updateUsernames])
 
   // fill predeployed accounts
   const { connectorId, isControllerConnected } = useConnectedController()
@@ -38,7 +38,7 @@ export function PlayerNameSync() {
           return acc
         }, new Map<string, string>())
       )    }
-  }, [selectedNetworkConfig])
+  }, [connectorId, selectedNetworkConfig, updateUsernames])
 
   // fetch names for new players
   const { playersAccounts } = usePlayersAccounts()
@@ -59,7 +59,7 @@ export function PlayerNameSync() {
         updateUsernames(result)
       })
     } 
-  }, [isInitialized, isControllerConnected, newPlayerAddresses])
+  }, [isInitialized, isControllerConnected, newPlayerAddresses, updateUsernames])
 
   return (<></>)
 }

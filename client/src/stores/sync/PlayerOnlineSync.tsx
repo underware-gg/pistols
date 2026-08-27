@@ -25,7 +25,7 @@ export function PlayerOnlineSync({
   useEffect(() => {
     // sync client with last timestamp
     updateTimestamp();
-  }, [lastTimestamp])
+  }, [lastTimestamp, updateTimestamp])
 
   // current player online stimestamp
   const secondsSinceLastSeen = useMemo(() => (

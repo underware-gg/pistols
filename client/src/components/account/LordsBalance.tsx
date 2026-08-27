@@ -175,7 +175,7 @@ export function FeesToPay({
   size?: IconSizeProp
 }) {
   const hasFees = useMemo(() => (BigInt(fee ?? 0) > 0), [fee])
-  const pre = useMemo(() => (prefixed ? 'Fee: ' : null), [prefixed, hasFees])
+  const pre = useMemo(() => (prefixed ? 'Fee: ' : null), [prefixed])
   return (
     <span>
       <Balance lords size={size} wei={fee} pre={pre} placeholdder={0} />

@@ -137,7 +137,7 @@ function RingAnimation({ playerName, ringName, ringType, ringImage, onClose, ope
     setShowCloseButton(false)
     onClose()
     opener.close()
-  }, [opener])
+  }, [onClose, opener])
 
   const diamond = useMemo(() => {
     return (
@@ -545,7 +545,7 @@ function TavernRingsModalInner({ opener }: { opener: Opener }) {
         setLastCompletedRingType(null)
       }
     }
-  }, [lastCompletedRingType, ringTypes, ringIds])
+  }, [lastCompletedRingType, ringTypes, ringIds, ringAnimationOpener])
 
   useEffect(() => {
     if (state === 'closing' && textAnimationComplete) {

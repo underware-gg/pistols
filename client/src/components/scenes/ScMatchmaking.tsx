@@ -73,6 +73,8 @@ export default function ScMatchmaking() {
   const totalPages = useMemo(() => Math.max(1, Math.ceil((totalUsedSlowSlots + 1) / duelistsPerPage)), [totalUsedSlowSlots, duelistsPerPage])
 
   const slowSlotsData = useMemo(() => {
+    // The backing duel map is mutated in place; the count is its change signal.
+    void totalUsedSlowSlots
     const slots: Array<{ slotIndex: number; duelistId?: bigint; duelId?: bigint }> = []
     let currentSlotIndex = 0
     
@@ -168,7 +170,7 @@ export default function ScMatchmaking() {
 
   const handleActionComplete = useCallback((status: boolean, duelistId: bigint, error: string | null) => {
     setDuelistInAction({ duelistId, status, error, action: duelistInAction?.action })
-  }, [])
+  }, [duelistInAction?.action])
 
   // Handle scene clicks
   const { value: itemClicked, timestamp } = useGameEvent('scene_click', null)

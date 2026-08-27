@@ -30,7 +30,7 @@ export function useDuelTokenProps(duelId: BigNumberish) {
     username_b: usernameB,
     address_a: bigintToHex(duelistAddressA),
     address_b: bigintToHex(duelistAddressB),
-  }), [duelId, seasonId, premise, message, state, winner, profileTypeA, profilePicA, profileTypeB, profilePicB, usernameA, usernameB, duelistAddressA, duelistAddressB])
+  }), [duelId, duelType, premise, message, state, winner, seasonId, profileTypeA, profileTypeB, profilePicA, profilePicB, usernameA, usernameB, duelistAddressA, duelistAddressB])
 
   return props
 }

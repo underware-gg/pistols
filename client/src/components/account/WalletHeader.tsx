@@ -43,9 +43,9 @@ export default function WalletHeader({
   // console.log(data)
   const data = { name: null, profilePicture: null }
 
-  const connectionName = useMemo(() => (data?.name ?? `Connected to ${selectedNetworkConfig.name}`), [data])
+  const connectionName = useMemo(() => (data?.name ?? `Connected to ${selectedNetworkConfig.name}`), [data?.name, selectedNetworkConfig.name])
   // const imageUrl = useMemo(() => (data?.profilePicture ?? getConnectorIcon(connector) ?? makeProfilePicUrl(0)), [data, connector])
-  const imageUrl = useMemo(() => (avatarUrl ?? getConnectorIcon(connector) ?? makeProfilePicUrl(0)), [data, connector, avatarUrl])
+  const imageUrl = useMemo(() => (avatarUrl ?? getConnectorIcon(connector) ?? makeProfilePicUrl(0)), [connector, avatarUrl])
 
   const { username, openProfile } = useConnectedController()
   

@@ -169,7 +169,7 @@ export const InteractibleComponent = forwardRef<InteractibleComponentHandle, Int
       backgroundRef.current.style.setProperty('--component-width', `${props.width}px`)
       backgroundRef.current.style.setProperty('--component-height', `${props.height}px`)
     }
-  }, [props.width, props.height, boxW, boxH])
+  }, [props.width, props.height, boxW, boxH, randomOffset])
 
   useEffect(() => {
     if (frontRef.current) {
@@ -180,7 +180,7 @@ export const InteractibleComponent = forwardRef<InteractibleComponentHandle, Int
       backgroundRef.current.style.setProperty('--component-border-radius', props.hasBorder ? `${props.width * 0.065}px` : '0px')
       backgroundRef.current.style.setProperty('--component-border-shadow', props.hasBorder ? `${aspectWidth(0.01)}px ${aspectWidth(0.01)}px ${aspectWidth(0.01)}px ${aspectWidth(0.01)}px rgba(20, 20, 20, 0.6)` : 'none')
     }
-  }, [props.hasBorder])
+  }, [aspectWidth, props.hasBorder, props.width])
 
   useEffect(() => {
     if (hangingNailRef.current) {
@@ -210,7 +210,7 @@ export const InteractibleComponent = forwardRef<InteractibleComponentHandle, Int
     if (backgroundRef.current) {
       backgroundRef.current.style.setProperty('--component-cursor', props.mouseDisabled || visibility.dataField1[0] == 0 ? 'default' : 'pointer')
     }
-  }, [props.mouseDisabled, visibility.dataField1[0]])
+  }, [props.mouseDisabled, visibility.dataField1])
 
   useEffect(() => {
     if (frontRef.current) {
@@ -337,12 +337,8 @@ export const InteractibleComponent = forwardRef<InteractibleComponentHandle, Int
   }, [props.isVisible, props.instantVisible])
 
   useEffect(() => {
-    playHanging()
-  }, [props.isHanging])
-
-  useEffect(() => {
     flipComponent(props.isFlipped, props.isLeft, props.instantFlip ? 0 : Constants.CARD_BASE_FLIP_DURATION)
-  }, [props.isFlipped, props.instantFlip])
+  }, [props.isFlipped, props.instantFlip, props.isLeft])
 
   useEffect(() => {
     if (props.startPosition) {
@@ -382,7 +378,7 @@ export const InteractibleComponent = forwardRef<InteractibleComponentHandle, Int
     setIsDefeated(isDefeated)
   }
 
-  const playHanging = () => {
+  const playHanging = useCallback(() => {
     if (!props.isHanging) return
 
     const animateHanging = (startAngle: number) => {
@@ -421,7 +417,11 @@ export const InteractibleComponent = forwardRef<InteractibleComponentHandle, Int
     }
 
     animateHanging(hangRotationRef.current.rotation)
-  }
+  }, [props.isHanging, props.shouldSwing, targetRestAngle])
+
+  useEffect(() => {
+    playHanging()
+  }, [playHanging, props.isHanging])
 
   const toggleIdle = (isPlayingIdle: boolean) => {
     const innerElement = frontRef.current?.querySelector('.component-inner') as HTMLElement
@@ -588,7 +588,7 @@ export const InteractibleComponent = forwardRef<InteractibleComponentHandle, Int
     props.onHover && props.onHover(false)
   }
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+  const handleMouseDown = (e: React.MouseEvent) => {
     const startX = e.clientX - springRef.current.x
     const startY = e.clientY - springRef.current.y
     
@@ -644,11 +644,10 @@ export const InteractibleComponent = forwardRef<InteractibleComponentHandle, Int
 
     document.addEventListener('mousemove', handleMouseMove)
     document.addEventListener('mouseup', handleMouseUp)
-  }, [props.isDraggable, spring, boxW, boxH, props.width, props.height, scale, rotation, props.onClick])
+  }
 
 
-  const component = useMemo(() => {
-    return (
+  const component = (
       <>
         <div className='component-container' ref={backgroundRef}>
           <div className='component-outline'/>
@@ -684,10 +683,8 @@ export const InteractibleComponent = forwardRef<InteractibleComponentHandle, Int
         </div>
       </>
     )
-  }, [props.isDisabled, props.isSelected, isDefeated, props.frontImagePath, props.backgroundImagePath, props.childrenBehindFront, props.childrenInFront, props.childrenInBack, visibility, props.mouseDisabled])
 
-  const hangingNail = useMemo(() => {
-    return (
+  const hangingNail = (
       <div ref={hangingNailRef} className='hanging-nail-container'>
         <div className="nail-container" style={{ 
           width: aspectWidth(0.6),
@@ -717,9 +714,6 @@ export const InteractibleComponent = forwardRef<InteractibleComponentHandle, Int
         </div>
       </div>
     )
-  }, [aspectWidth, props.width, props.height, randomOffset, component])
 
   return props.isHanging ? hangingNail : component
 })
-
-

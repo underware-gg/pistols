@@ -157,7 +157,7 @@ export const useQuizAnswers = (partyId: number, questionId: number) => {
       .filter((model) => Number(model?.party_id ?? 0) == partyId)
       .filter((model) => Number(model?.question_id ?? 0) == questionId)
       .sort((a, b) => (Number(a.timestamp) - Number(b.timestamp)))
-  ), [models, questionId])
+  ), [models, partyId, questionId])
   const playersByAnswer = useMemo(() => (
     answers.reduce((acc, model) => {
       acc[Number(model.answer_number)] = [...(acc[Number(model.answer_number)] ?? []), BigInt(model.player_address)]

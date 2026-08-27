@@ -69,7 +69,7 @@ export const ActionButton = ({
     if (negative) classNames.push('Negative')
     if (className) classNames.push(className)
     return classNames
-  }, [className, important, disabled, large, dimmed, negative])
+  }, [important, disabled, fillParent, large, dimmed, negative, className])
 
   const [isConfirming, setIsConfirming] = useState(false)
   const _click = () => {

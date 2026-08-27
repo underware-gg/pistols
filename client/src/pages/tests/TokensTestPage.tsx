@@ -186,7 +186,7 @@ function TokenContract({
         />
       )
     })
-  }, [tokenIds])
+  }, [attributes, contractAddress, hasFame, renderer, tokenIds])
 
   return (
     <Table attached>

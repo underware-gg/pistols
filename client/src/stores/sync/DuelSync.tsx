@@ -11,7 +11,7 @@ export function DuelSync() {
   const { atDuel } = usePistolsScene()
   const { currentDuel } = usePistolsContext()
   const { duelistIdA, duelistIdB } = useGetChallenge(atDuel ? currentDuel : undefined)
-  const duelistIds = useMemo(() => atDuel ? [duelistIdA, duelistIdB] : [], [duelistIdA, duelistIdB])
+  const duelistIds = useMemo(() => atDuel ? [duelistIdA, duelistIdB] : [], [atDuel, duelistIdA, duelistIdB])
   const { isLoading } = useFetchDuelistsByIds(duelistIds)
   return (<></>)
 }

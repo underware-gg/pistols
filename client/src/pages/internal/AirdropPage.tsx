@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { BigNumberish } from 'starknet'
 import { Button, Container, Dropdown, Icon, Tab, Table, TabPane } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
@@ -108,7 +108,7 @@ function AirDropperDuelists({
   const [packType, setPackType] = useState<constants.PackType>(constants.PackType.FreeDuelist)
   const [collection, setCollection] = useState<constants.DuelistProfile>()
   const [profileKey, setProfileKey] = useState<DuelistProfileKey>()
-  useMemo(() => {
+  useEffect(() => {
     setCollection(undefined);
     setProfileKey(undefined);
   }, [packType])
@@ -126,11 +126,11 @@ function AirDropperDuelists({
 
   const _mintTo = useCallback(() => {
     pack_token.mint_to(account, address)
-  }, [account, address])
+  }, [account, address, pack_token])
 
   const _airdrop = useCallback(() => {
     pack_token.airdrop(account, address, packType, collection, profileKey, quantity)
-  }, [account, address, packType, collection, profileKey, quantity])
+  }, [pack_token, account, address, packType, collection, profileKey, quantity])
 
   return (
     <Table celled striped size='small'>
@@ -226,7 +226,7 @@ function AirDropSignetRings({
 
   const _airdrop = useCallback(() => {
     ring_token.airdrop_ring(account, address, ringType)
-  }, [account, address, ringType])
+  }, [account, address, ringType, ring_token])
 
   return (
     <Table celled striped size='small'>
@@ -485,7 +485,7 @@ function ProfileKeySelector({
         value: `${p}`,
         text: `${p}`,
       })
-      )), [packType, collection])
+      )), [collection])
 
   return (
     <Dropdown

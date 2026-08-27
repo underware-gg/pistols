@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import * as TWEEN from '@tweenjs/tween.js'
 import { useAccount } from '@starknet-react/core'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
@@ -44,50 +44,6 @@ export default function ScDuelists() {
   const { value: itemClicked, timestamp } = useGameEvent('scene_click', null)
   
   useEffect(() => {
-    if (itemClicked) {
-      switch (itemClicked) {
-        case 'left arrow':
-          if (pageNumber > 0) {
-            handlePageChange(pageNumber - 1)
-          }
-          break
-        case 'right arrow':
-          if (pageNumber < pageCount - 1) {
-            handlePageChange(pageNumber + 1)
-          }
-          break
-        case 'pistol':
-          dispatchSetScene(SceneName.DuelsBoard)
-          break
-        case 'matchmaking':
-          // Check if current selectedMode is singleplayer before doing singleplayer logic
-          if (selectedMode === 'singleplayer') {
-            if (!hasPact) {
-              // pick duelist and create a new duel
-              dispatchChallengingPlayerAddress(botPlayerContractAddress);
-              setTimeout(() => {
-                duelistSelectOpener.open();
-              }, 100)
-            } else {
-              // go to existing duel
-              dispatchSelectDuel(pactDuelId);
-            }
-          } else {
-            dispatchSetScene(SceneName.Matchmaking)
-          }
-          break
-        case 'mode':
-          console.log('Mode button clicked! Opening modal...', { opener: modeSelectOpener })
-          modeSelectOpener.open()
-          break
-        case 'tutorial':
-          tutorialOpener.open()
-          break
-      }
-    }
-  }, [itemClicked, timestamp])
-
-  useEffect(() => {
     const timeout = setTimeout(() => {
       if (selectedMode && _currentScene && _currentScene instanceof InteractibleScene) {
         (_currentScene as InteractibleScene).setLayerVariant(TextureName.bg_duelists_matchmaking_unranked, selectedMode)
@@ -100,7 +56,7 @@ export default function ScDuelists() {
     }, 0)
 
     return () => clearTimeout(timeout)
-  }, [selectedMode])
+  }, [botPlayerContractAddress, dispatchChallengingPlayerAddress, duelistSelectOpener, selectedMode])
 
   const [pageNumber, setPageNumber] = useState(0)
   const [isAnimating, setIsAnimating] = useState(false)
@@ -112,7 +68,7 @@ export default function ScDuelists() {
   const playerIdsRef = useRef<string[]>([])
   const initialLoadRef = useRef(true)
 
-  const setPosterData = (poster: any, index: number) => {
+  const setPosterData = useCallback((poster: any, index: number) => {
     const horizontalOffset = (((aspectWidth(60) / 4) - aspectWidth(POSTER_WIDTH_SMALL)) / 2) * (poster.horizontalOffset != 0 ? poster.horizontalOffset : Math.random() * 2 - 1)
     const verticalOffset = (((aspectHeight(70) / 2) - aspectHeight(POSTER_HEIGHT_SMALL)) / 2) * (poster.verticalOffset != 0 ? poster.verticalOffset : Math.random() * 2 - 1)
   
@@ -141,25 +97,27 @@ export default function ScDuelists() {
     poster.startPositionY = moveY
     poster.exitPositionX = exitPositionX
     poster.exitPositionY = exitPositionY
-  }
+  }, [aspectHeight, aspectWidth])
 
-  const getCurrentPagePosters = (ids: string[]) => {
+  const getCurrentPagePosters = useCallback((ids: string[]) => {
     return ids.slice(
       pageNumber * postersPerPage, 
       (pageNumber + 1) * postersPerPage
     )
-  }
+  }, [pageNumber])
 
-  const hasPageContentChanged = (oldIds: string[], newIds: string[]) => {
+  const hasPageContentChanged = useCallback((oldIds: string[], newIds: string[]) => {
     const oldPageContent = getCurrentPagePosters(oldIds)
     const newPageContent = getCurrentPagePosters(newIds)
 
     if (oldPageContent.length !== newPageContent.length) return true
 
     return oldPageContent.some((id, index) => id !== newPageContent[index])
-  }
+  }, [getCurrentPagePosters])
 
   const paginatedPosters = useMemo(() => (
+    // Page changes start the exit animation immediately, but the next page must
+    // not be materialised until that animation flips postersChanged.
     getCurrentPagePosters(playerIds).map((playerAddress, index) => {
       const newPoster = {
         playerAddress,
@@ -174,13 +132,14 @@ export default function ScDuelists() {
       setPosterData(newPoster, index)
       return newPoster
     })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   ), [postersChanged])
 
   useEffect(() => {
     paginatedPosters.forEach((poster, index) => {
       setPosterData(poster, index)
     })
-  }, [aspectWidth, aspectHeight])
+  }, [aspectWidth, aspectHeight, paginatedPosters, setPosterData])
 
 
   //TODO adjust card animations to be more precise and realistic
@@ -190,7 +149,7 @@ export default function ScDuelists() {
   const STATIC_DELAY = 373.75
   const EXIT_COMPLETE_DELAY = ANIMATION_DURATION + DELAY * 5 + STATIC_DELAY
 
-  const playEnterCardsAnimation = () => {
+  const playEnterCardsAnimation = useCallback(() => {
     // Animate throw
     new TWEEN.Tween({ position: 90, rotation: 90 })
       .to({ position: 40, rotation: 20 }, ANIMATION_DURATION_HAND)
@@ -222,9 +181,9 @@ export default function ScDuelists() {
     })
 
     setIsAnimating(false)
-  }
+  }, [paginatedPosters])
 
-  const playExitCardsAnimation = () => {
+  const playExitCardsAnimation = useCallback(() => {
     if (initialLoadRef.current == false) {
       // Animate sweep
       // Rotation and X translation
@@ -273,10 +232,10 @@ export default function ScDuelists() {
       })
 
       setTimeout(() => {
-        setPostersChanged(!postersChanged)
+        setPostersChanged((current) => !current)
       }, EXIT_COMPLETE_DELAY)
     }
-  }
+  }, [EXIT_COMPLETE_DELAY, paginatedPosters])
 
   useEffect(() => {
     if (timeoutRef.current) {
@@ -303,7 +262,7 @@ export default function ScDuelists() {
         clearTimeout(timeoutRef.current)
       }
     }
-  }, [playerIds])
+  }, [hasPageContentChanged, playExitCardsAnimation, playerIds])
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -325,15 +284,56 @@ export default function ScDuelists() {
     }, 100)
 
     return () => clearTimeout(timeoutId)
-  }, [paginatedPosters])
+  }, [isAnimating, paginatedPosters, playEnterCardsAnimation])
 
-  const handlePageChange = (newPage: number) => {
+  const handlePageChange = useCallback((newPage: number) => {
     if (isAnimating) return
     setIsAnimating(true)
     setPageNumber(newPage)
     
     playExitCardsAnimation()
-  }
+  }, [isAnimating, playExitCardsAnimation])
+
+  useEffect(() => {
+    if (itemClicked) {
+      switch (itemClicked) {
+        case 'left arrow':
+          if (pageNumber > 0) {
+            handlePageChange(pageNumber - 1)
+          }
+          break
+        case 'right arrow':
+          if (pageNumber < pageCount - 1) {
+            handlePageChange(pageNumber + 1)
+          }
+          break
+        case 'pistol':
+          dispatchSetScene(SceneName.DuelsBoard)
+          break
+        case 'matchmaking':
+          if (selectedMode === 'singleplayer') {
+            if (!hasPact) {
+              dispatchChallengingPlayerAddress(botPlayerContractAddress)
+              setTimeout(() => {
+                duelistSelectOpener.open()
+              }, 100)
+            } else {
+              dispatchSelectDuel(pactDuelId)
+            }
+          } else {
+            dispatchSetScene(SceneName.Matchmaking)
+          }
+          break
+        case 'mode':
+          console.log('Mode button clicked! Opening modal...', { opener: modeSelectOpener })
+          modeSelectOpener.open()
+          break
+        case 'tutorial':
+          tutorialOpener.open()
+          break
+      }
+    }
+  }, [botPlayerContractAddress, dispatchChallengingPlayerAddress, dispatchSelectDuel, dispatchSetScene, duelistSelectOpener, handlePageChange, hasPact, itemClicked, modeSelectOpener, pactDuelId, pageCount, pageNumber, selectedMode, timestamp, tutorialOpener])
 
   const _selectCallback = (playerAddress: bigint) => {
     if (playerAddress) {

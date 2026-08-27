@@ -43,8 +43,9 @@ export function SeasonChallengeStoreSync() {
       .includeHashedKeys()
   ), [currentSeasonId])
 
-  const challengeState = useChallengeStore((state) => state)
-  const fetchState = useChallengeFetchStore((state) => state)
+  const resetChallenges = useChallengeStore((state) => state.resetStore)
+  const setChallenges = useChallengeStore((state) => state.setEntities)
+  const resetChallengeFetches = useChallengeFetchStore((state) => state.resetStore)
   const updateProgress = useProgressStore((state) => state.updateProgress)
 
   const mounted = useMounted()
@@ -57,12 +58,12 @@ export function SeasonChallengeStoreSync() {
     },
     resetStore: () => {
       debug.log("SeasonEntityStoreSync() RESET =======>")
-      challengeState.resetStore()
-      fetchState.resetStore()
+      resetChallenges()
+      resetChallengeFetches()
     },
     setEntities: (entities: PistolsEntity[]) => {
       debug.log("SeasonEntityStoreSync() SET =======> [entity]:", entities)
-      challengeState.setEntities(entities)
+      setChallenges(entities)
     },
   })
 

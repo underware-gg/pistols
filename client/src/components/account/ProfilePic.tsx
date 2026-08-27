@@ -79,7 +79,7 @@ export function ProfilePic({
     }
     if (!removeShadow) result.push('Shadow')
     return result
-  }, [className, disabled, dimmed, onClick, borderWidth, borderColor, removeShadow])
+  }, [className, _clickable, disabled, dimmed, removeBorder, removeShadow, borderWidth, borderColor])
 
   useEffect(() => {
     if (!imageRef.current) return;

@@ -197,13 +197,13 @@ export const useTransactionStore = createStore()
 
 export const useTransaction = (key: string) => {
   const state = useTransactionStore((state) => state)
-  const transaction = useMemo(() => state.getTransaction(key), [state.transactions, key])
+  const transaction = useMemo(() => state.getTransaction(key), [state, key])
   return transaction
 }
 
 export const useAllTransactions = () => {
   const state = useTransactionStore((state) => state)
-  return useMemo(() => state.getRecentTransactions(), [state.transactions])
+  return useMemo(() => state.getRecentTransactions(), [state])
 }
 
 // Simple hook - call this anywhere to check pending transactions
@@ -218,5 +218,5 @@ export const useCheckPendingTransactions = () => {
       checkPendingTransactions(checkTransactionStatus, account)
       setHasChecked(true)
     }
-  }, [isConnected, account, checkTransactionStatus, checkPendingTransactions])
+  }, [isConnected, account, checkTransactionStatus, checkPendingTransactions, hasChecked])
 } 

@@ -6,6 +6,7 @@ import { SubscriptionCallbackArgs } from '@dojoengine/sdk'
 import { Page } from '@dojoengine/torii-client'
 import * as torii from '@dojoengine/torii-client'
 import { debug } from 'src/games/pistols/misc/debug'
+import { useLatestRef } from 'src/utils/hooks/useLatestRef'
 
 //---------------------------------------
 // Get entities from torii
@@ -48,6 +49,9 @@ export const useSdkTokenBalancesGet = ({
 }: UseSdkTokenBalancesGetProps): UseSdkTokenGetResult => {
   const { sdk } = useDojoSetup()
   const [isLoading, setIsLoading] = useState<boolean>()
+  const initBalancesRef = useLatestRef(initBalances)
+  const setBalancesRef = useLatestRef(setBalances)
+  const updateProgressRef = useLatestRef(updateProgress)
 
   useEffect(() => {
     let _mounted = true
@@ -56,8 +60,8 @@ export const useSdkTokenBalancesGet = ({
       const _accounts = accounts?.map(a => bigintToAddress(a)) ?? []
       debug.log("useSdkTokenBalancesGet() GET........", enabled, _accounts.length, _contract, tokenIds)
       setIsLoading(true)
-      updateProgress?.(0);
-      initBalances?.(_accounts);
+      updateProgressRef.current?.(0);
+      initBalancesRef.current?.(_accounts);
       await sdk.getTokenBalances({
         contractAddresses: [_contract],
         accountAddresses: _accounts,
@@ -65,7 +69,7 @@ export const useSdkTokenBalancesGet = ({
       }).then((balances: Page<torii.TokenBalance>) => {
         // debug.log("useSdkTokenBalancesGet() GOT:", balances)
         if (balances.items.length > 0) {
-          setBalances(balances.items)
+          setBalancesRef.current(balances.items)
         } else if (!tokenIds) {
           // initialize zero balance
           // debug.log("useSdkTokenBalancesGet() initialize balance:", contract, account)
@@ -75,7 +79,7 @@ export const useSdkTokenBalancesGet = ({
             token_id: '0x0',
             balance: '0x0',
           }))
-          setBalances(_balances)
+          setBalancesRef.current(_balances)
         }
         if (balances.next_cursor) {
           console.warn("useSdkTokenBalancesGet() LOST PAGE!!!! ", contract, _accounts, tokenIds)
@@ -84,7 +88,7 @@ export const useSdkTokenBalancesGet = ({
         console.error("useSdkTokenBalancesGet().sdk.get() error:", error, contract, _accounts, tokenIds)
       }).finally(() => {
         if (!_mounted) setIsLoading(false)
-        updateProgress?.(1, true);
+        updateProgressRef.current?.(1, true);
       })
       // debug.log("useSdkTokenBalancesGet() done!", account)
     }
@@ -93,7 +97,7 @@ export const useSdkTokenBalancesGet = ({
     return () => {
       _mounted = false
     }
-  }, [sdk, enabled, contract, accounts, tokenIds])
+  }, [sdk, enabled, contract, accounts, tokenIds, initBalancesRef, setBalancesRef, updateProgressRef])
 
   return {
     isLoading,
@@ -106,6 +110,7 @@ export const useSdkTokenBalancesSub = ({
   enabled = true,
 }: UseSdkTokenBalancesSubProps): UseSdkTokenGetResult => {
   const { sdk } = useDojoSetup()
+  const updateBalanceRef = useLatestRef(updateBalance)
 
   useEffect(() => {
     let _subscription: torii.Subscription = undefined;
@@ -123,7 +128,7 @@ export const useSdkTokenBalancesSub = ({
           if (balance) {
             debug.log("useSdkTokenBalancesSub() SUB:", isPositiveBigint(balance.contract_address), balance);
             if (isPositiveBigint(balance.contract_address)) {
-              updateBalance(balance);
+              updateBalanceRef.current(balance);
             }
           } else if (response.error) {
             console.error("useSdkTokenBalancesSub() SUBSCRIPTION ERROR:", response.error)
@@ -141,7 +146,7 @@ export const useSdkTokenBalancesSub = ({
       _subscription?.cancel()
       _subscription = undefined
     }
-  }, [sdk, enabled, contracts])
+  }, [sdk, enabled, contracts, updateBalanceRef])
 
   return {
     isLoading: false,

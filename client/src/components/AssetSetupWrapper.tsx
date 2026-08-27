@@ -48,6 +48,8 @@ export default function AssetSetupWrapper({ children }: AssetSetupWrapperProps) 
   const progressBucket = Math.floor(assetSetup.progress.percentage / 20);
 
   const loadingMessage = useMemo(() => {
+    // Rotate the flavour text as loading crosses each progress bucket.
+    void progressBucket
     return loadingMessages[Math.floor(Math.random() * loadingMessages.length)]
   }, [progressBucket])
   
@@ -111,4 +113,4 @@ export default function AssetSetupWrapper({ children }: AssetSetupWrapperProps) 
       {children}
     </>
   )
-} 
+}

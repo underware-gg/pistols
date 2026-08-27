@@ -161,6 +161,7 @@ const PROFILE_TYPES = [
   constants.DuelistProfile.Bot,
 ];
 const _randomProfileType = () => PROFILE_TYPES[Math.floor(Math.random() * PROFILE_TYPES.length)];
+const PROFILE_IMAGE_STYLE = { width: 'auto', height: '300px', backgroundColor: 'black' }
 
 function Profiles({
   profiles,
@@ -169,8 +170,6 @@ function Profiles({
   profiles: Profiles,
   profileType: constants.DuelistProfile,
 }) {
-  const style = { width: 'auto', height: '300px', backgroundColor: 'black' }
-
   const props = useMemo(() => {
     return Object.entries(profiles).map(([key, profile], index) => {
       const { archetype, honour } = _randomArchetype()
@@ -200,7 +199,7 @@ function Profiles({
       };
       return { profile, prop }
     })
-  }, [profiles])
+  }, [profileType, profiles])
 
   const rows = useMemo(() => {
     return props.map((e, index) => {
@@ -244,18 +243,18 @@ function Profiles({
             {profile.name}
           </Cell>
           <Cell>
-            <img src={makeProfilePicUrl(prop.profile_id, profileType)} style={style} />
+            <img src={makeProfilePicUrl(prop.profile_id, profileType)} style={PROFILE_IMAGE_STYLE} />
           </Cell>
           <Cell>
-            <DuelistTokenImage props={prop} style={style} />
+            <DuelistTokenImage props={prop} style={PROFILE_IMAGE_STYLE} />
           </Cell>
           <Cell>
-            <DuelTokenImage props={duel_prop} style={style} />
+            <DuelTokenImage props={duel_prop} style={PROFILE_IMAGE_STYLE} />
           </Cell>
         </Row>
       )
     })
-  }, [props])
+  }, [profileType, props])
 
   return (
     <Table attached>

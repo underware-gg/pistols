@@ -213,7 +213,7 @@ export const DuelNotificationItem: React.FC<DuelNotificationItemProps> = ({
         onShow()
       }
     }
-  }, [canShow, onShow, challenge, notification, title, message])
+  }, [canShow, onShow, challenge, notification, title, message, notifications])
 
   const handleClick = (e: React.MouseEvent) => {
     if (onAction && notifications) {

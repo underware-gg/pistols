@@ -365,11 +365,15 @@ export const useFetchChallengeIdsByDuelist = (duelistId: BigNumberish) => {
 
 export const useFetchChallengeIdsByDuelistIds = (duelistIds: BigNumberish[]) => {
   const setEntities = useChallengeStore((state) => state.setEntities);
-  const fetchState = useChallengeFetchStore((state) => state);
+  const fetchedIds = useChallengeFetchStore((state) => state.ids);
+  const setFetchedIds = useChallengeFetchStore((state) => state.setFetchedIds);
 
   const newDuelistIds = useMemo(() => (
-    fetchState.getNewIds(duelistIds)
-  ), [duelistIds, fetchState.ids])
+    duelistIds
+      .filter(isPositiveBigint)
+      .map(BigInt)
+      .filter((id) => !fetchedIds.includes(id))
+  ), [duelistIds, fetchedIds])
 
   const query = useMemo<PistolsQueryBuilder>(() => (
     newDuelistIds.length > 0
@@ -395,7 +399,7 @@ export const useFetchChallengeIdsByDuelistIds = (duelistIds: BigNumberish[]) => 
     // enabled: !result.challengeExists,
     setEntities: (entities: PistolsEntity[]) => {
       debug.log(`useFetchChallengeIdsByDuelist() GOT`, newDuelistIds, entities);
-      fetchState.setFetchedIds(newDuelistIds.map(BigInt));
+      setFetchedIds(newDuelistIds.map(BigInt));
       setEntities(entities);
     },
   })
@@ -422,11 +426,15 @@ export const useFetchChallengeIdsOwnedByAccount = (address: BigNumberish) => {
 
 export const useFetchChallengeIdsOwnedByAccounts = (addresses: BigNumberish[]) => {
   const setEntities = useChallengeStore((state) => state.setEntities);
-  const fetchState = useChallengeFetchStore((state) => state);
+  const fetchedAddresses = useChallengeFetchStore((state) => state.addresses);
+  const setFetchedAddresses = useChallengeFetchStore((state) => state.setFetchedAddresses);
 
   const newAddresses = useMemo(() => (
-    fetchState.getNewAddresses(addresses)
-  ), [addresses, fetchState.addresses])
+    addresses
+      .filter(isPositiveBigint)
+      .map(BigInt)
+      .filter((address) => !fetchedAddresses.includes(address))
+  ), [addresses, fetchedAddresses])
 
   const query = useMemo<PistolsQueryBuilder>(() => (
     newAddresses.length > 0
@@ -452,7 +460,7 @@ export const useFetchChallengeIdsOwnedByAccounts = (addresses: BigNumberish[]) =
     // enabled: !result.challengeExists,
     setEntities: (entities: PistolsEntity[]) => {
       debug.log(`useFetchChallengeIdsOwnedByAccounts() GOT`, newAddresses.map(bigintToHex), entities);
-      fetchState.setFetchedAddresses(newAddresses.map(BigInt));
+      setFetchedAddresses(newAddresses.map(BigInt));
       setEntities(entities);
     },
   })

@@ -3,8 +3,8 @@ import reactHooks from 'eslint-plugin-react-hooks'
 
 // The SDK had no eslint setup at all, so `turbo lint` reached only the client and
 // 273 SDK source files were never linted. rules-of-hooks is on because it catches
-// real state-corruption bugs; exhaustive-deps is off to match the client, where it
-// is a 303-violation backlog rather than a gate. The SDK's own backlog is 39.
+// real state-corruption bugs. exhaustive-deps is also a permanent gate across
+// both packages, with documented inline exceptions for lifecycle-style helpers.
 export default [
   {
     files: ['src/**/*.{ts,tsx}'],
@@ -26,7 +26,7 @@ export default [
       //
       // Adopting those as a side effect of moving off a deprecated ESLint line
       // would fold a large code-quality decision into a supply-chain fix. They
-      // are a backlog to take deliberately, like exhaustive-deps. Leaving them
+      // are a backlog to take deliberately. Leaving them
       // unlisted keeps them off without pinning rule names that only exist in v7.
       'react-hooks/rules-of-hooks': 'error',
 
@@ -36,8 +36,7 @@ export default [
       // with opaque deps - each carrying an inline disable and the reason.
       'react-hooks/set-state-in-effect': 'error',
 
-      // TODO: 39 violations in sdk/src. Enable with the client's 303.
-      'react-hooks/exhaustive-deps': 0,
+      'react-hooks/exhaustive-deps': 'error',
     },
   },
 ]

@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react'
+import React, { useCallback, useMemo, useState, useEffect } from 'react'
 import { Icon, IconGroup, Popup, PopupContent, PopupHeader, SemanticICONS } from 'semantic-ui-react'
 import { IconProps, IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon'
 import { emitter } from '/src/three/game'
@@ -309,16 +309,16 @@ export function CustomIcon({
 
   const [isHovered, setIsHovered] = useState(false)
 
-  const onMouseEnter = () => {
+  const onMouseEnter = useCallback(() => {
     if (tooltip) {
       emitter.emit('hover_description', tooltip)
       setIsHovered(true)
     }
-  }
-  const onMouseLeave = () => {
+  }, [tooltip])
+  const onMouseLeave = useCallback(() => {
     emitter.emit('hover_description', null)
     setIsHovered(false)
-  }
+  }, [])
 
   // Cleanup tooltip on unmount if it's being shown
   useEffect(() => {
@@ -389,7 +389,7 @@ export function CustomIcon({
         {' '}
       </i>
     )
-  }, [icon, logo, png, name, className, size, color, tooltip, onClick])
+  }, [png, logo, name, icon, svg, className, size, disabled, flipped, onClick, onMouseEnter, onMouseLeave, raw, color])
   return component
 }
 

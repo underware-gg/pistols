@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useCallback, useState, useEffect, useMemo } from 'react'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { useConnectedController } from '@underware/pistols-sdk/dojo'
 import { useElizaMessage } from '/src/utils/eliza'
@@ -32,14 +32,14 @@ function BarkeepModalInner({ opener }: { opener: Opener }) {
   // const { username, name } = useConnectedController()
   // const { sendMessage, responses } = useElizaMessage(username, name)
 
-  const openNotifications = () => {
+  const openNotifications = useCallback(() => {
     setStage('notifications')
     setDisplayText(
       sortedNotifications.length > 0
         ? 'Here ya go, ya filthy animal. Don\'t make me regret this...'
         : 'Go play some duels, you scum, before bothering me with your empty woes!'
     )
-  }
+  }, [sortedNotifications.length])
 
   useEffect(() => {
     if (opener.isOpen) {
@@ -62,7 +62,7 @@ function BarkeepModalInner({ opener }: { opener: Opener }) {
       setDisplayText('')
       setStage('intro')
     }
-  }, [opener.isOpen, opener.props.initialStage])
+  }, [openNotifications, opener.isOpen, opener.props.initialStage])
 
   if (!opener.isOpen) return null
 

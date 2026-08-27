@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useCallback, useState, useEffect, useRef } from 'react'
 import { Modal, Grid, Input, TextArea, Icon } from 'semantic-ui-react'
 import { ActionButton } from '/src/components/ui/Buttons'
 import { useGameAspect } from '/src/hooks/useGameAspect'
@@ -271,7 +271,7 @@ export default function BugReportModal({ opener, initialError, initialTitle }: B
   // TODO: File upload ref - requires backend server
   // const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const autoExpandTextArea = (textArea: HTMLTextAreaElement) => {
+  const autoExpandTextArea = useCallback((textArea: HTMLTextAreaElement) => {
     const currentScrollTop = textArea.closest('.content')?.scrollTop || 0
     const minHeight = aspectHeight(4)
     textArea.style.height = `${minHeight}px`
@@ -281,7 +281,7 @@ export default function BugReportModal({ opener, initialError, initialTitle }: B
     if (contentElement) {
       contentElement.scrollTop = currentScrollTop
     }
-  }
+  }, [aspectHeight])
 
   emitter.on('player_username', (username: string | null) => {
     if (username) {
@@ -300,7 +300,7 @@ export default function BugReportModal({ opener, initialError, initialTitle }: B
         }
       }, 100)
     }
-  }, [opener.isOpen, errorDescription, additionalContext])
+  }, [opener.isOpen, errorDescription, additionalContext, autoExpandTextArea])
 
   useEffect(() => {
     if (initialError?.trim()) {
@@ -744,4 +744,4 @@ export default function BugReportModal({ opener, initialError, initialTitle }: B
       />
     </>
   )
-} 
+}

@@ -252,7 +252,8 @@ export const useFetchAccountsBalances = (coinAddress: BigNumberish, accounts: Bi
     setBalances: () => {},
   }
   const newAccounts = useMemo(() => (
-    (enabled && isPositiveBigint(coinAddress))
+    // Balance maps are mutated in place; version is their change signal.
+    (void version, enabled && isPositiveBigint(coinAddress))
       ? accounts.filter((a) => (isPositiveBigint(a) && !hasBalance(a) && !bigintEquals(a, address)))
       : []
   ), [enabled, coinAddress, accounts, hasBalance, address, version])

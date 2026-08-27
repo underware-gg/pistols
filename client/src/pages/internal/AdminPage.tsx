@@ -80,14 +80,14 @@ export function WalletAddressRow({
     if (BigInt(foundAddress ?? 0) !== BigInt(address ?? 0)) {
       setAddress(isPositiveBigint(foundAddress) ? bigintToAddress(foundAddress) : '')
     }
-  }, [username])
+  }, [address, setAddress, username])
   useEffect(() => {
     // find username from address
     const foundUsername = getPlayernameFromAddress(address) || ''
     if (foundUsername && foundUsername !== username) {
       setUsername(foundUsername)
     }
-  }, [address])
+  }, [address, username])
   return (
     <Row>
       <Cell className='ModalText' width={width as SemanticWIDTHS}>

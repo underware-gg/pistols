@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import { type Notification } from '/src/stores/notificationStore'
 import { useAccount } from '@starknet-react/core'
 import { usePlayer } from '/src/stores/playerStore'
@@ -13,6 +13,8 @@ export const PushNotification: React.FC<{
   showNotification: () => void
 }> = ({ notifications, shouldShow, showNotification }) => {
   const { currentDuel, selectedDuelId } = usePistolsContext()
+  const showNotificationRef = useRef(showNotification)
+  showNotificationRef.current = showNotification
 
   const notification = notifications?.[0]
   const { challenge, turnA, turnB, completedStagesA, completedStagesB } = useDuel(notification?.duelId)
@@ -156,23 +158,13 @@ export const PushNotification: React.FC<{
     }
 
     return { title: rawTitle, message: rawMessage }
-  }, [notification, isMeA, isMeB, duelistNameA, duelistNameB, challenge, turnA, turnB, completedStagesA, completedStagesB])
+  }, [notification, challenge, shouldShow, isMeA, isMeB, notifications.length, duelistNameA, duelistNameB, turnA, turnB, completedStagesA, completedStagesB])
 
   //TODO notifications show up behind curtain
   //TODO check notifications working throughout a duel and if they display correct text
   //TODO check all texts states and pushnotifications might not have latest information?
 
-  useEffect(() => {
-    if (notification && notificationData.title && notificationData.message) {
-      if (notifications.some(n => !n.isDisplayed) && Number(selectedDuelId) !== notification.duelId && Number(currentDuel) !== notification.duelId) {
-        sendBrowserNotification()
-      } else if (Number(selectedDuelId) === notification.duelId || Number(currentDuel) === notification.duelId) {
-        showNotification()
-      }
-    }
-  }, [notification, notificationData])
-
-  const sendBrowserNotification = async () => {
+  const sendBrowserNotification = useCallback(async () => {
     if (!("serviceWorker" in navigator)) return
     
     if (Notification.permission !== "granted") {
@@ -188,8 +180,18 @@ export const PushNotification: React.FC<{
         duelIds: notifications.map(n => n.duelId)
       }
     })
-    showNotification()
-  }
+    showNotificationRef.current()
+  }, [notificationData.message, notificationData.title, notifications])
+
+  useEffect(() => {
+    if (notification && notificationData.title && notificationData.message) {
+      if (notifications.some(n => !n.isDisplayed) && Number(selectedDuelId) !== notification.duelId && Number(currentDuel) !== notification.duelId) {
+        sendBrowserNotification()
+      } else if (Number(selectedDuelId) === notification.duelId || Number(currentDuel) === notification.duelId) {
+        showNotificationRef.current()
+      }
+    }
+  }, [currentDuel, notification, notificationData, notifications, selectedDuelId, sendBrowserNotification])
 
   return null
-} 
+}

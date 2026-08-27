@@ -88,7 +88,7 @@ export function Snapshots() {
 
   useEffect(() => {
     state.initialize('', 0)
-  }, [seasonId])
+  }, [seasonId, state])
 
   const _download = useCallback(() => {
     const blob = new Blob([state.formatted], { type: 'application/json' });
@@ -147,7 +147,7 @@ const useSnapping = (name: string, seasonId: number, limit: number) => {
       state.initialize(name, seasonId)
       console.log("______________START:", name)
     }
-  }, [snapping, name])
+  }, [snapping, state, name, seasonId])
 
   const count = useMemo(() => {
     return (state.name == name ? state.length : 0)
@@ -158,7 +158,7 @@ const useSnapping = (name: string, seasonId: number, limit: number) => {
       console.log("______________DONE:", name)
       setSnapping(false)
     }
-  }, [snapping, count, limit])
+  }, [snapping, count, limit, name])
 
   return {
     snapping,
@@ -181,7 +181,7 @@ function SnapshotDuelists({
   const { snapping, count, limit, start } = useSnapping('duelists', seasonId, duelistIds.length)
   const loaders = useMemo(() => (
     snapping ? duelistIds.map(duelistId => <SnapDuelist key={duelistId} seasonId={seasonId} duelistId={duelistId} seasonScoreboard={seasonScoreboard} />) : null
-  ), [snapping, duelistIds])
+  ), [snapping, duelistIds, seasonId, seasonScoreboard])
   return (
     <>
       <Button className='FillParent' disabled={snapping} onClick={() => start()}>
@@ -230,7 +230,7 @@ export function SnapDuelist({
         } : {}),
       })
     }
-  }, [mounted, duelist, seasonId, seasonScoreboard])
+  }, [mounted, duelist, seasonId, seasonScoreboard, insert, duelistId, balance_eth, lives])
   return <></>
 }
 
@@ -276,7 +276,7 @@ export function SnapChallenge({
         needToSyncExpired: undefined,
       })
     }
-  }, [mounted, challenge])
+  }, [mounted, challenge, insert, duelId])
   useEffect(() => {
   }, [mounted, challenge])
   return <></>

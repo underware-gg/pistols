@@ -20,6 +20,6 @@ export function useExplorerContractUrl(address: BigNumberish, explorerType: Expl
         return new VoyagerExplorer(chain).contract(addr)
     }
     return null
-  }, [address])
+  }, [address, chain, explorerType])
   return url
 }

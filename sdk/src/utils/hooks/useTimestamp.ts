@@ -56,7 +56,7 @@ export const useClientTimestamp = ({
       _mounted = false
       clearInterval(_interval)
     }
-  }, [mounted, autoUpdate, updateSeconds, forceUpdate])
+  }, [mounted, autoUpdate, updateSeconds, forceUpdate, enabled])
 
   // useEffect(() => console.log('useClientTimestamp():', clientSeconds, formatTimestampLocal(clientSeconds)), [clientSeconds])
 

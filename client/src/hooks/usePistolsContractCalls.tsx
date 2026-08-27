@@ -27,7 +27,7 @@ export const useDuelProgress = (duel_id: bigint) => {
     enabled,
     defaultValue: null,
     forceCounter,
-  }), [duel_id, enabled, forceCounter])
+  }), [duel_id, enabled, forceCounter, getDuelProgress])
   const { value, isLoading, isError, error } = useSdkCallPromise<any>(options)
   // retry if result is empty...
   // (the block may take some time to confirm...)
@@ -45,7 +45,7 @@ export const useDuelProgress = (duel_id: bigint) => {
     return () => {
       _mounted = false
     }
-  }, [value])
+  }, [forceCounter, success, value])
   // return result when available...
   const duelProgress = useMemo(() => (success === true ? convert_duel_progress(value) : null), [success, value])
   // console.log('duelProgress >>>>', duel_id, isFinished, enabled, state, value, duelProgress)
@@ -64,7 +64,7 @@ export const useGetDuelDeck = (duel_id: bigint) => {
     args: [duel_id],
     enabled: isPositiveBigint(duel_id),
     defaultValue: [],
-  }), [duel_id])
+  }), [duel_id, getDuelDeck])
   const { value, isLoading, isError, error } = useSdkCallPromise<BigNumberish[][]>(options)
   const decks = useMemo(() => (value?.map((vo: BigNumberish[]) => vo.map((vi: BigNumberish) => Number(vi))) ?? null), [value])
   return {
@@ -97,7 +97,7 @@ export const useCalcSeasonReward = (season_id: number, duelist_id: BigNumberish,
     args: [BigInt(season_id ?? 0), BigInt(duelist_id ?? 0), BigInt(lives_staked ?? 1)],
     enabled: isPositiveBigint(season_id) && isPositiveBigint(duelist_id) && isPositiveBigint(lives_staked),
     defaultValue: null,
-  }), [season_id, duelist_id, lives_staked])
+  }), [calcSeasonReward, season_id, duelist_id, lives_staked])
   const { value, isLoading, isError, error } = useSdkCallPromise<any>(options)
   const rewards = useMemo<RewardValues>(() => (value ? {
     win: {
@@ -126,7 +126,7 @@ export const useCanCollectDuel = (duel_id: bigint) => {
     args: [duel_id],
     enabled: isPositiveBigint(duel_id),
     defaultValue: null,
-  }), [duel_id])
+  }), [canCollectDuel, duel_id])
   const { value, isLoading, isError, error } = useSdkCallPromise<boolean>(options)
   return {
     canCollectDuel: value,
@@ -143,7 +143,7 @@ export const useCanCollectSeason = () => {
     args: [],
     enabled: true,
     defaultValue: null,
-  }), [])
+  }), [canCollectSeason])
   const { value, isLoading, isError, error } = useSdkCallPromise<boolean>(options)
   return {
     canCollectSeason: value,
@@ -160,7 +160,7 @@ export const useGameTimestamp = () => {
     args: [],
     enabled: true,
     defaultValue: null,
-  }), [])
+  }), [getTimestamp])
   const { value, isLoading, isError, error } = useSdkCallPromise<bigint>(options)
   return {
     timestamp: value,
@@ -182,7 +182,7 @@ export const useGetMatchMakerEntryFee = (queue_id: constants.QueueId) => {
     args: [makeCustomEnum(queue_id)],
     enabled: Boolean(queue_id),
     defaultValue: [0n, 0n],
-  }), [queue_id])
+  }), [getEntryFee, queue_id])
   const { value, isLoading, isError, error } = useSdkCallPromise<bigint[]>(options)
   return {
     requiresDuelistEnlistment: (isPositiveBigint(value?.[0] ?? 0) && isPositiveBigint(value?.[1] ?? 0)),
@@ -206,7 +206,7 @@ export const useTutorialDuelId = (player_id: BigNumberish, tutorial_id: BigNumbe
     args: [player_id, tutorial_id],
     enabled: isPositiveBigint(player_id) && isPositiveBigint(tutorial_id),
     defaultValue: 0n,
-  }), [player_id, tutorial_id])
+  }), [calcDuelId, player_id, tutorial_id])
   const { value, isLoading, isError, error } = useSdkCallPromise<bigint>(options)
   return {
     duelId: value,
@@ -251,7 +251,7 @@ export const useCanClaimStarterPack = (forceCounter?: number) => {
     enabled: isPositiveBigint(address),
     defaultValue: null,
     forceCounter,
-  }), [address, forceCounter])
+  }), [address, canClaimStarterPack, forceCounter])
   const { value, isLoading, isError, error } = useSdkCallPromise<boolean>(options)
   return {
     canClaimStarterPack: value,
@@ -269,7 +269,7 @@ export const useCanPurchase = (pack_type: constants.PackType) => {
     args: [address, makeCustomEnum(pack_type)],
     enabled: isPositiveBigint(address) && Boolean(pack_type),
     defaultValue: null,
-  }), [address, pack_type])
+  }), [address, canPurchase, pack_type])
   const { value, isLoading, isError, error } = useSdkCallPromise<boolean>(options)
   return {
     canPurchase: value,
@@ -287,7 +287,7 @@ export const useCalcFeePack = (pack_type: constants.PackType) => {
     args: [address, makeCustomEnum(pack_type)],
     enabled: isPositiveBigint(address) && Boolean(pack_type),
     defaultValue: null,
-  }), [address, pack_type])
+  }), [address, calcMintFee, pack_type])
   const { value, isLoading, isError, error } = useSdkCallPromise<bigint>(options)
   return {
     fee: value,
@@ -309,7 +309,7 @@ export const useHasClaimedRing = (address: BigNumberish, ringType: constants.Rin
     args: [address, makeCustomEnum(ringType)],
     enabled: isPositiveBigint(address) && ringType != constants.RingType.Unknown,
     defaultValue: false,
-  }), [address, ringType])
+  }), [address, hasClaimed, ringType])
   const { value, isLoading, isError, error } = useSdkCallPromise<boolean>(options)
   return {
     hasClaimed: value,
@@ -330,7 +330,7 @@ export const useAdminIsOwner = (address: BigNumberish) => {
     call: amIAdmin,
     args: [address],
     enabled: isPositiveBigint(address),
-  }), [address])
+  }), [address, amIAdmin])
   const { value, isLoading, isError, error } = useSdkCallPromise<boolean>(options)
   return {
     isOwner: value,

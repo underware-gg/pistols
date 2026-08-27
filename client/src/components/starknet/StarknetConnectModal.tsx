@@ -26,7 +26,7 @@ export default function StarknetConnectModal({
     if (isConnected) {
       opener.close()
     }
-  }, [isConnected])
+  }, [isConnected, opener])
 
   return (
     <Modal
@@ -67,7 +67,7 @@ function ConnectButtons({
       )
     }
     return acc
-  }, []), [connectors, isConnecting])
+  }, []), [connect, connectors, isConnecting, selectedNetworkConfig.connectorIds])
 
   const buttons = useMemo(() => {
     let buttons = [...connectorsButtons]

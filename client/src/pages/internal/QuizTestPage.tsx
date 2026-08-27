@@ -232,8 +232,8 @@ const COOKIE_QUESTION_ID = 'quiz_question_id'
 
 function useSelectedQuiz() {
   const [cookies, setCookie] = useCookies([COOKIE_PARTY_ID, COOKIE_QUESTION_ID]);
-  const selectedPartyId = useMemo(() => cookies[COOKIE_PARTY_ID], [cookies[COOKIE_PARTY_ID]])
-  const selectedQuestionId = useMemo(() => cookies[COOKIE_QUESTION_ID], [cookies[COOKIE_QUESTION_ID]])
+  const selectedPartyId = useMemo(() => cookies[COOKIE_PARTY_ID], [cookies])
+  const selectedQuestionId = useMemo(() => cookies[COOKIE_QUESTION_ID], [cookies])
   const setSelectedPartyId = (selectedPartyId: number) => {
     setCookie(COOKIE_PARTY_ID, selectedPartyId)
     setCookie(COOKIE_QUESTION_ID, 0)
@@ -457,7 +457,7 @@ function QuizAdminQuestionsPanel() {
     if (selectedQuestionId == 0 && questionIds.length > 0) {
       setSelectedQuestionId(questionIds[0])
     }
-  }, [questionIds])
+  }, [questionIds, selectedQuestionId, setSelectedQuestionId])
 
   // create
   const { account } = useAccount()
@@ -520,7 +520,7 @@ function QuizAdminQuestion({
   const { isOffChain, isOpen } = useQuizQuestion(partyId, questionId)
   const COOKIE_NAME = useMemo(() => _questionCookieName(partyId, questionId), [partyId, questionId]);
   const [cookies, setCookie] = useCookies([COOKIE_NAME]);
-  const fields = useMemo<QuestionFields>(() => (cookies[COOKIE_NAME] ?? EMPTY_QUESTION), [cookies[COOKIE_NAME]]);
+  const fields = useMemo<QuestionFields>(() => (cookies[COOKIE_NAME] ?? EMPTY_QUESTION), [COOKIE_NAME, cookies]);
   const validated = useMemo(() => (
     fields.question.length > 0 && fields.options.length >= 2 && fields.options.every((option) => option.length > 0)
   ), [fields]);
@@ -588,7 +588,7 @@ function QuizAdminQuestionOnChain({
     hint: hint,
     options: options,
     answerNumber: answerNumber || cookies[COOKIE_NAME]?.answerNumber || 0,
-  }), [question, description, options, answerNumber, cookies[COOKIE_NAME]]);
+  }), [question, description, hint, options, answerNumber, cookies, COOKIE_NAME]);
 
   return (
     <>
@@ -625,7 +625,7 @@ function QuizAdminQuestionOffChain({
     } else {
       setFields({ ...EMPTY_QUESTION })
     }
-  }, [cookies[COOKIE_NAME]])
+  }, [COOKIE_NAME, cookies])
   const _setFields = (fields: QuestionFields) => {
     // console.log(`QUIZ[${partyId}][${questionId}] cookie[${COOKIE_NAME}] <<< set:`, fields)
     setCookie(COOKIE_NAME, fields)

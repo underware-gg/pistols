@@ -238,12 +238,6 @@ export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType: packTy
     }
   }, [isClaiming, duelistIds, quantity])
 
-  useEffect(() => {
-    if (newDuelistIds.length > 0) {
-      handleSealClick()
-    }
-  }, [newDuelistIds])
-
   const cardPackRef = useRef<HTMLDivElement>(null)
   const innerBagRef = useRef<HTMLDivElement>(null)
   const frontBagRef = useRef<HTMLDivElement>(null)
@@ -277,7 +271,7 @@ export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType: packTy
       .start()
   }
 
-  const handleMouseMove = (e: MouseEvent) => {
+  const handleMouseMove = useCallback((e: MouseEvent) => {
     if (sealClicked || maxTilt === 0) {
       cardPackRef.current?.style.setProperty('--card-pack-rotate-x', '0deg')
       cardPackRef.current?.style.setProperty('--card-pack-rotate-y', '0deg')
@@ -296,7 +290,7 @@ export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType: packTy
 
     cardPackRef.current.style.setProperty('--card-pack-rotate-x', `${rotateX}deg`)
     cardPackRef.current.style.setProperty('--card-pack-rotate-y', `${rotateY}deg`)
-  }
+  }, [maxTilt, sealClicked])
 
   useEffect(() => {
     window.removeEventListener('mousemove', handleMouseMove);
@@ -316,7 +310,7 @@ export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType: packTy
     };
   }, [clickable, sealClicked, maxTilt, handleMouseMove]);
 
-  const getLinePosition = (index: number, numCards: number) => {
+  const getLinePosition = useCallback((index: number, numCards: number) => {
     const totalWidth = aspectWidth(16 * numCards);
     const sectionWidth = totalWidth / numCards;
     
@@ -335,7 +329,7 @@ export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType: packTy
       x,
       y: aspectWidth(-5)
     }
-  }
+  }, [aspectWidth])
 
   useEffect(() => {
     for (let i = 0; i < 5; i++) {
@@ -347,9 +341,9 @@ export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType: packTy
       cardRef.toggleVisibility(false)
       cardRef.setZIndex(50)
     }
-  }, [cardRefs.current])
+  }, [aspectWidth])
 
-  const spawnCards = () => {
+  const spawnCards = useCallback(() => {
     if (cardsSpawned) return
     setCardsSpawned(true)
 
@@ -401,9 +395,9 @@ export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType: packTy
     setTimeout(() => {
       setShowRevealButton(true)
     }, PACK_ANIMATION_REVEAL_BUTTON_DELAY)
-  }
+  }, [aspectWidth, cardsSpawned, getLinePosition, newDuelistIds])
   
-  const handleSealClick = () => {
+  const handleSealClick = useCallback(() => {
     if (sealClicked) return
     setSealClicked(true)
     
@@ -439,7 +433,13 @@ export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType: packTy
           .start()
       })
       .start()
-  }
+  }, [aspectWidth, sealClicked, spawnCards])
+
+  useEffect(() => {
+    if (newDuelistIds.length > 0) {
+      handleSealClick()
+    }
+  }, [handleSealClick, newDuelistIds])
 
   useEffect(() => {
     let animationFrameId: number
@@ -454,13 +454,12 @@ export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType: packTy
   }, [])
 
   useEffect(() => {
-    if (!cardPackRef.current) return;
+    const pack = cardPackRef.current;
+    if (!pack) return;
 
-    cardPackRef.current.style.setProperty('--card-pack-size', `${cardPackSize}`);
+    pack.style.setProperty('--card-pack-size', `${cardPackSize}`);
 
     return () => {
-      const pack = cardPackRef.current;
-      if (!pack) return;
       pack.style.removeProperty('--card-pack-size');
     };
   }, [cardPackSize]);

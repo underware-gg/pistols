@@ -185,7 +185,7 @@ export const useQueryChallengeIds = (
     return {
       query,
     }
-  }, [filterStates, playerAddress, filterName, filterBookmarked, bookmarkedDuels, filterSeason, filterDuelType, sortColumn, sortDirection, pageSize, pageStartIndex, pageFetchCount, requiredDuelIds])
+  }, [filterStates, requiredDuelIds, filterDuelType, playerAddress, filterSeason, filterBookmarked, filterName, sortColumn, sortDirection, pageSize, currentSeasonId, duelContractAddress, pageFetchCount, pageStartIndex])
 
   const { data, isLoading, queryHash } = useSdkSqlQuery({
     query,

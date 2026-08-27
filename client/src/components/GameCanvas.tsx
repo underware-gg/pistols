@@ -13,7 +13,7 @@ const GameCanvas = () => {
   const { value: animated, timestamp } = useGameEvent('animated', -1)
   useEffect(() => {
     dispatchAnimated(animated)
-  }, [animated, timestamp])
+  }, [animated, dispatchAnimated, timestamp])
 
   useEffect(() => {
     gameImpl?.switchScene(currentScene)

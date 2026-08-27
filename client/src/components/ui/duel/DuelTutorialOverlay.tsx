@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Modal } from 'semantic-ui-react'
 import { DuelTutorialLevel, DUEL_TUTORIAL_LIST, TUTORIAL_DATA } from '/src/data/tutorialConstants'
 import { Opener } from '/src/hooks/useOpener'
@@ -52,7 +52,7 @@ function DuelTutorialOverlayInner({ tutorialType, opener, onComplete }: DuelTuto
     setCurrentDot(0)
   }
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     if (isTransitioning) return
 
     setIsTransitioning(true)
@@ -67,7 +67,7 @@ function DuelTutorialOverlayInner({ tutorialType, opener, onComplete }: DuelTuto
       }
       setIsTransitioning(false)
     }, 300)
-  }
+  }, [currentSlide, currentTutorialIndex, isTransitioning, totalSlides, tutorialParts.length])
 
   const handlePrevious = () => {
     if (isTransitioning) return
@@ -86,11 +86,11 @@ function DuelTutorialOverlayInner({ tutorialType, opener, onComplete }: DuelTuto
     }, 300)
   }
 
-  const _close = () => {
+  const _close = useCallback(() => {
     onComplete?.()
     opener.close()
     setSelectedTutorialType(undefined)
-  }
+  }, [onComplete, opener])
 
   const isLastSlide = currentTutorialIndex === tutorialParts.length - 1 && currentSlide === totalSlides - 1
 

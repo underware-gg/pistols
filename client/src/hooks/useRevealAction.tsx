@@ -35,7 +35,7 @@ export function useSignAndRestoreMovesFromHash(duelId: bigint, duelistId: bigint
       }
       return { salt, moves }
     }
-  }, [account, starknetDomain, duelistId, duelId, hash, decks, canSign])
+  }, [canSign, selectedNetworkConfig.assetsServerUrl, account, starknetDomain, messageToSign, hash, decks])
 
   return {
     canSign,
@@ -82,7 +82,7 @@ export function useRevealAction(duelId: bigint, duelistId: bigint, hash: bigint,
       const { salt, moves } = await sign_and_restore()
       return _reveal(salt, moves)
     }
-  }, [account, duelistId, duelId, canReveal, storedSalt, storedMoves, isSubmitting])
+  }, [storedSalt, storedMoves, canReveal, isSubmitting, duelistId, tutorial, account, duelId, key, game, sign_and_restore])
 
   return {
     canReveal,

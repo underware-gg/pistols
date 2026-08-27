@@ -17,15 +17,17 @@ export function TokenStoreSync() {
   const updateProgress = useProgressStore((state) => state.updateProgress)
 
   // token stores
-  const duelist_state = useDuelistTokenStore((state) => state)
-  const duel_state = useDuelTokenStore((state) => state)
-  const pack_state = usePackTokenStore((state) => state)
-  const ring_state = useRingTokenStore((state) => state)
-  const tournament_state = useTournamentTokenStore((state) => state)
+  const addCachedDuelistTokens = useDuelistTokenStore((state) => state.addCachedPlayerTokens)
+  const addCachedRingTokens = useRingTokenStore((state) => state.addCachedPlayerTokens)
+  const updateDuelistBalance = useDuelistTokenStore((state) => state.updateBalance)
+  const updateDuelBalance = useDuelTokenStore((state) => state.updateBalance)
+  const updatePackBalance = usePackTokenStore((state) => state.updateBalance)
+  const updateRingBalance = useRingTokenStore((state) => state.updateBalance)
+  const updateTournamentBalance = useTournamentTokenStore((state) => state.updateBalance)
   // coin stores
-  const lords_state = useLordsCoinStore((state) => state)
-  const fame_state = useFameCoinStore((state) => state)
-  const fools_state = useFoolsCoinStore((state) => state)
+  const updateLordsBalance = useLordsCoinStore((state) => state.updateBalance)
+  const updateFameBalance = useFameCoinStore((state) => state.updateBalance)
+  const updateFoolsBalance = useFoolsCoinStore((state) => state.updateBalance)
 
   const { allTokens } = useTokenContracts()
 
@@ -56,8 +58,8 @@ export function TokenStoreSync() {
         let iso_timestamp = '';
         Object.keys(cachedPlayerData).forEach(player_address => {
           const playerData = cachedPlayerData[player_address];
-          duelist_state.addCachedPlayerTokens(player_address, playerData.duelist_ids);
-          ring_state.addCachedPlayerTokens(player_address, playerData.ring_ids);
+          addCachedDuelistTokens(player_address, playerData.duelist_ids);
+          addCachedRingTokens(player_address, playerData.ring_ids);
           if (playerData.iso_timestamp > iso_timestamp) {
             iso_timestamp = playerData.iso_timestamp;
           }
@@ -68,7 +70,7 @@ export function TokenStoreSync() {
         setLastIsoTimestamp('0000-00-00')
       }
     }
-  }, [mounted, selectedNetworkId])
+  }, [addCachedDuelistTokens, addCachedRingTokens, mounted, selectedNetworkId])
 
 
   //----------------------------------------
@@ -82,7 +84,7 @@ export function TokenStoreSync() {
       const finished = (isLoading === false);
       updateProgress('token_balances', pageNumber, finished);
     }
-  }, [address, isLoading])
+  }, [address, isLoading, updateProgress])
 
   //----------------------------------------
   // subscribe for updates
@@ -94,21 +96,21 @@ export function TokenStoreSync() {
       const _contract = bigintToAddress(balance.contract_address)
       // debug.log("TOKENS SUB >>>", balance, contracts.includes(_contract), contracts.includes(_contract))
       if (_contract == allTokens.lordsContractAddress) {
-        lords_state.updateBalance(balance)
+        updateLordsBalance(balance)
       } else if (_contract == allTokens.fameContractAddress) {
-        fame_state.updateBalance(balance)
+        updateFameBalance(balance)
       } else if (_contract == allTokens.foolsContractAddress) {
-        fools_state.updateBalance(balance)
+        updateFoolsBalance(balance)
       } else if (_contract == allTokens.duelistContractAddress) {
-        duelist_state.updateBalance(balance)
+        updateDuelistBalance(balance)
       } else if (_contract == allTokens.packContractAddress) {
-        pack_state.updateBalance(balance)
+        updatePackBalance(balance)
       } else if (_contract == allTokens.ringContractAddress) {
-        ring_state.updateBalance(balance)
+        updateRingBalance(balance)
       } else if (_contract == allTokens.duelContractAddress) {
-        duel_state.updateBalance(balance)
+        updateDuelBalance(balance)
       } else if (_contract == allTokens.tournamentContractAddress) {
-        tournament_state.updateBalance(balance)
+        updateTournamentBalance(balance)
       }
     },
     enabled: (mounted && initialTokenBalances?.length > 0),

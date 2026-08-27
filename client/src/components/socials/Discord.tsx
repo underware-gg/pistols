@@ -63,7 +63,7 @@ export function DiscordLinkButton({
         setIsLinking(false)
       }
     }
-  }, [isLinked, isLinking, account, starknetDomain, messageToSign])
+  }, [isLinked, isLinking, selectedNetworkConfig.assetsServerUrl, account, starknetDomain, messageToSign])
 
   //
   // Link step 2: request OAUTH from Discord
@@ -87,7 +87,7 @@ export function DiscordLinkButton({
       console.log('DiscordLinkButton:', url.length, options.state.length, url, options)
       window.open(url, openNewTab ? '_blank' : '_self')
     }
-  }, [isLinking, salt])
+  }, [address, isLinking, openNewTab, salt, selectedNetworkConfig.clientUrl, starknetDomain.chainId])
 
   //
   // Link step 3: was linked from assets server, clear local state
@@ -139,7 +139,7 @@ export function DiscordOptOutButton({
   const { emit_player_setting, isDisabled } = useExecuteEmitPlayerSetting(constants.SocialPlatform.Discord, constants.PlayerSetting.OptOutNotifications, !optedOut)
   const _emit = useCallback(() => {
     emit_player_setting()
-  }, [emit_player_setting, optedOut])
+  }, [emit_player_setting])
 
   return (
     <Button fluid toggle active={!optedOut} className={className} disabled={!isConnected || !isLinked || isDisabled} onClick={() => _emit()}>

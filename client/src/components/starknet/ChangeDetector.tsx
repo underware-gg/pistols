@@ -16,7 +16,7 @@ export function AccountChangeDetector({
     } else if (currentAccount && !bigintEquals(currentAccount, address)) {
       onChange?.()
     }
-  }, [currentAccount, address])
+  }, [currentAccount, address, onChange])
   return <></>
 }
 
@@ -33,6 +33,6 @@ export function ChainChangeDetector({
     } else if (currentChainId && currentChainId != selectedNetworkId) {
       onChange?.()
     }
-  }, [currentChainId, selectedNetworkId])
+  }, [currentChainId, onChange, selectedNetworkId])
   return <></>
 }

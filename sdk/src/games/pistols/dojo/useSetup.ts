@@ -102,7 +102,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedNetworkConfig: Do
     if (!dojoProvider) return (dojoProvider as any) // undefined or null
     if (!contractCalls) return (contractCalls as any) // undefined or null
     return createSystemCalls(dojoProvider, manifest, contractCalls, selectedNetworkConfig) ?? null
-  }, [manifest, dojoProvider, contractCalls, selectedNetworkConfig, chainId])
+  }, [manifest, dojoProvider, contractCalls, selectedNetworkConfig])
 
   //
   // Status

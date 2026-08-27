@@ -171,8 +171,8 @@ function PlayerRow({
   const { username, timestampRegistered, aliveDuelistCount } = usePlayer(address)
   const stateLords = useLordsCoinStore((state) => state)
   const stateFools = useFoolsCoinStore((state) => state)
-  const lordsBalance = useMemo(() => stateLords.getBalance(address), [stateLords.accounts, address])
-  const foolsBalance = useMemo(() => stateFools.getBalance(address), [stateFools.accounts, address])
+  const lordsBalance = useMemo(() => stateLords.getBalance(address), [stateLords, address])
+  const foolsBalance = useMemo(() => stateFools.getBalance(address), [stateFools, address])
   const { userName } = useDiscordSocialLink(address)
   useEffect(() => {
     setRowData(playerIndex, {
@@ -185,7 +185,7 @@ function PlayerRow({
       lordsBalance: Number(weiToEth(lordsBalance ?? 0n)),
       foolsBalance: Number(weiToEth(foolsBalance ?? 0n)),
     });
-  }, [playerIndex, username, timestampRegistered, aliveDuelistCount, address]);
+  }, [playerIndex, username, timestampRegistered, aliveDuelistCount, address, setRowData, userName, lordsBalance, foolsBalance]);
   return (
     <Row className='Number Smaller'>
       <Cell>

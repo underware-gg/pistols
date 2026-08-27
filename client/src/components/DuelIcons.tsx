@@ -145,7 +145,7 @@ export function useDuelIcons({
     }
 
     return { icons }
-  }, [isAwaiting, isInProgress, isFinished, duelStage, isA, isB, isTurn, state1, completedStages, win1, dead, bloodCount, iconSize])
+  }, [isFinished, isAwaiting, isA, isInProgress, isCallToAction, isMyDuelist, iconSize, state1, isTurn, duelStage, completedStages, moves1, round1?.endedInBlades, round1?.endedInAbandon, round1?.unpairedWin, round1?.endedInPaces, dead, win1, bloodCount])
 
   return {
     icons,

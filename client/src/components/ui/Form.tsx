@@ -33,7 +33,7 @@ export function FormInput({
     classNames.push('FormInput')
     if (code) classNames.push('Number')
     return classNames
-  }, [code])
+  }, [className, code])
 
   return (
     <>

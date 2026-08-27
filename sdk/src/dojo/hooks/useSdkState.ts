@@ -33,7 +33,11 @@ export const useSdkEntitiesGetState = ({
   query,
   enabled = true,
 }: Omit<UseSdkGetProps, 'setEntities'>): useSdkStateResult => {
-  const store = useMemo(() => createDojoStore<PistolsSchemaType>(), [query])
+  const store = useMemo(() => {
+    // Query identity defines the lifetime of this isolated result store.
+    void query
+    return createDojoStore<PistolsSchemaType>()
+  }, [query])
   const state = useStore(store, (state) => state)
 
   const { isLoading } = useSdkEntitiesGet({
@@ -57,7 +61,11 @@ export const useSdkEntitiesSubState = ({
   query,
   enabled = true,
 }: Omit<UseSdkSubProps, 'setEntities' | 'updateEntity'>): useSdkStateResult => {
-  const store = useMemo(() => createDojoStore<PistolsSchemaType>(), [query])
+  const store = useMemo(() => {
+    // Query identity defines the lifetime of this isolated result store.
+    void query
+    return createDojoStore<PistolsSchemaType>()
+  }, [query])
   const state = useStore(store, (state) => state)
 
   const { isLoading } = useSdkEntitiesSub({
@@ -95,7 +103,11 @@ export const useSdkEventsGetState = ({
   enabled = true,
   retryInterval = 0,
 }: Omit<UseSdkGetProps, 'setEntities'>): useSdkStateResult => {
-  const store = useMemo(() => createDojoStore<PistolsSchemaType>(), [query])
+  const store = useMemo(() => {
+    // Query identity defines the lifetime of this isolated result store.
+    void query
+    return createDojoStore<PistolsSchemaType>()
+  }, [query])
   const state = useStore(store, (state) => state)
   const historical = useMemo(() => query?.build().historical, [query])
 

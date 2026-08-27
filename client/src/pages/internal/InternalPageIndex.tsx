@@ -93,7 +93,7 @@ export function InternalPageWrapper({ children }: { children?: React.ReactNode }
     || bigintEquals(address, '0x010b685e795f70a7fb32d473878154e38a2668372dfe5d01d6cbdd9309d1be7f') // calc
     || bigintEquals(address, '0x013f1386e3d4267a1502d8ca782d34b63634d969d3c527a511814c2ef67b84c4') // tarrence
     || bigintEquals(address, '0x056c3cd5ed408a22b2932947abfdf69e467cb999d0cde0b51d6055baa009b544') // broody
-  ), [address])
+  ), [address, chainId, connector?.id, isAdmin, isTeamMember])
   if (!isAuthorized) return <h1>No access</h1>
   return children
 }

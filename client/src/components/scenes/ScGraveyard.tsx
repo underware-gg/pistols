@@ -85,46 +85,31 @@ export default function ScGraveyard() {
   const [isAnimating, setIsAnimating] = useState(false)
   const [allPosters, setAllPosters] = useState<Map<bigint, JSX.Element>>(new Map())
   const posterRefs = useRef<{[key: number]: DuelPosterHandle}>({})
+  const isAnimatingRef = useRef(isAnimating)
+  isAnimatingRef.current = isAnimating
 
-  const getDuelsForGrid = (gridIndex: number) => {
+  const getDuelsForGrid = useCallback((gridIndex: number) => {
     if (gridIndex > 2 || gridIndex < 0) return []
     const slicedIds = challengeIds.slice(
       gridIndex * duelsPerPage,
       (gridIndex + 1) * duelsPerPage
     )
     return slicedIds.map(id => allPosters.get(id))
-  }
+  }, [allPosters, challengeIds])
 
-  useEffect(() => {
-    if (itemClicked) {
-      switch (itemClicked) {
-        case 'left arrow':
-          if (pageNumber > 0) {
-            handlePageChange(pageNumber - 1)
-          }
-          break
-        case 'right arrow':
-          if (pageNumber < pageCount - 1) {
-            handlePageChange(pageNumber + 1)
-          }
-          break
-      }
-    }
-  }, [itemClicked, timestamp])
-
-  const handlePosterClick = (duelId: bigint) => {
-    if (duelId && !isAnimating) {
+  const handlePosterClick = useCallback((duelId: bigint) => {
+    if (duelId && !isAnimatingRef.current) {
       dispatchSelectDuel(duelId)
     }
-  }
+  }, [dispatchSelectDuel])
 
-  const handlePosterHover = (isHovering: boolean, duelId: bigint) => {
-    if (!isAnimating) {
+  const handlePosterHover = useCallback((isHovering: boolean, duelId: bigint) => {
+    if (!isAnimatingRef.current) {
       posterRefs.current[Number(duelId)].setScale(isHovering ? 1.1 : 1)
     }
-  }
+  }, [])
 
-  const createPoster = (duel: bigint, isVisible: boolean = false) => (
+  const createPoster = useCallback((duel: bigint, isVisible: boolean = false) => (
     <div 
       key={duel.toString()} 
       id={`poster-${Number(duel)}`} 
@@ -151,29 +136,32 @@ export default function ScGraveyard() {
         onClick={() => handlePosterClick(duel)}
       />
     </div>
-  )
+  ), [aspectHeight, aspectWidth, handlePosterClick, handlePosterHover])
+
+  const createPosterRef = useRef(createPoster)
+  createPosterRef.current = createPoster
+  const challengeIdsRef = useRef(challengeIds)
+  challengeIdsRef.current = challengeIds
 
   useEffect(() => {
-    createPosters(true)
+    void aspectHeight
+    void aspectWidth
+    const posters = new Map<bigint, JSX.Element>()
+    challengeIdsRef.current.forEach(duel => {
+      posters.set(duel, createPosterRef.current(duel, true))
+    })
+    setAllPosters(posters)
   }, [aspectHeight, aspectWidth])
 
   useEffect(() => {
-    createPosters()
-  }, [challengeIds])
-
-  const createPosters = (overrideCreation: boolean = false) => {
-    const posters = new Map<bigint, JSX.Element>()
-
-    challengeIds.forEach(duel => {
-      if (allPosters.has(duel) && !overrideCreation) {
-        posters.set(duel, allPosters.get(duel)!)
-      } else {
-        posters.set(duel, createPoster(duel, overrideCreation))
-      }
+    setAllPosters((currentPosters) => {
+      const posters = new Map<bigint, JSX.Element>()
+      challengeIds.forEach((duel) => {
+        posters.set(duel, currentPosters.get(duel) ?? createPosterRef.current(duel))
+      })
+      return posters
     })
-
-    setAllPosters(posters)
-  }
+  }, [challengeIds])
 
   useEffect(() => {
     if (isAnimating) return
@@ -202,9 +190,9 @@ export default function ScGraveyard() {
     return () => {
       clearTimeout(visibilityTimeout)
     }
-  }, [allPosters, isAnimating])
+  }, [allPosters, getDuelsForGrid, isAnimating, pageNumber])
 
-  const playPageAnimation = (direction: 'left' | 'right', newPage: number) => {
+  const playPageAnimation = useCallback((direction: 'left' | 'right', newPage: number) => {
     const movingGridIndex = direction === 'left' ? gridRefs.current.findIndex(grid => grid.renderOrder === 2) : gridRefs.current.findIndex(grid => grid.renderOrder === 0)
     const centerGridIndex = gridRefs.current.findIndex(grid => grid.renderOrder === 1)
     
@@ -251,14 +239,31 @@ export default function ScGraveyard() {
       .start();
 
     (_currentScene as InteractibleScene)?.shiftImage(direction === 'left', duration)
-  }
+  }, [])
 
-  const handlePageChange = (newPage: number) => {
+  const handlePageChange = useCallback((newPage: number) => {
     if (isAnimating) return
     setIsAnimating(true)
     const direction = newPage > pageNumber ? 'left' : 'right'
     playPageAnimation(direction, newPage)
-  }
+  }, [isAnimating, pageNumber, playPageAnimation])
+
+  useEffect(() => {
+    if (itemClicked) {
+      switch (itemClicked) {
+        case 'left arrow':
+          if (pageNumber > 0) {
+            handlePageChange(pageNumber - 1)
+          }
+          break
+        case 'right arrow':
+          if (pageNumber < pageCount - 1) {
+            handlePageChange(pageNumber + 1)
+          }
+          break
+      }
+    }
+  }, [handlePageChange, itemClicked, pageCount, pageNumber, timestamp])
 
   const posterGrids = useMemo(() => (
     <>

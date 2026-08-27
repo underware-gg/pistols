@@ -27,7 +27,7 @@ export const useChallengeDescription = (duelId: bigint) => {
     }
     return result.replace('Challenger', isTutorial ? nameDuelistA ?? 'Duelist' : nameA ?? 'Duelist')
                 .replace('Challenged', isTutorial ? nameDuelistB ?? 'Duelist' : nameB ?? 'Duelist')
-  }, [state, winnerDuelistId, duelistIdA, duelistIdB, nameA, nameB, isTutorial])
+  }, [state, endedInAbandon, winner, isAwaiting, isMatchmaking, isTutorial, nameDuelistA, nameA, nameDuelistB, nameB, winnerDuelistId, duelistIdA, duelistIdB])
 
   return {
     challengeDescription,

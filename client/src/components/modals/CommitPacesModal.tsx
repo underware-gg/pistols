@@ -122,6 +122,9 @@ function CommitPacesModalInner({
   useEffect(() => {
     clearCardSelections();
     setSelectedStrategy(constants.Archetype.Undefined)
+  // clearCardSelections is stable for the lifetime of an open modal; reopening is
+  // the trigger for resetting the selection state.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen])
 
   const messageToSign = useMemo<CommitMoveMessage>(() => ((duelId && duelistId) ? {
@@ -146,7 +149,7 @@ function CommitPacesModalInner({
         commitPaces(duelistId, duelId, hash)
       }
     }
-  }, [canSubmit, firePaces, dodgePaces, tactics, blades, isSimpleTutorial])
+  }, [canSubmit, isSimpleTutorial, firePaces, dodgePaces, tactics, blades, selectedNetworkConfig.assetsServerUrl, account, starknetDomain, messageToSign, commitPaces, duelistId, duelId])
 
   const points = useMemo(() => {
     if (isSimpleTutorial) {
@@ -293,7 +296,7 @@ function CommitPacesModalInner({
     (cardSectionHeight * (isSimpleTutorial ? 2 : 4)) + 
     statsSectionHeight + actionButtonsHeight +
     pixelsToAspectHeight(2 * 5) //5 times 2 pixels for each divider
-  }, [headerHeight, strategyButtonsHeight, cardSectionHeight, statsSectionHeight, actionButtonsHeight, isSimpleTutorial]);
+  }, [headerHeight, isSimpleTutorial, statsSectionHeight, pixelsToAspectHeight]);
 
   return (
     <Modal
@@ -551,7 +554,7 @@ const CardSelector = React.forwardRef<CardSelectorHandles, {
       card.current.setCardData(Object.values(cards)[index + 1])
       card.current.setRotation(Math.random() * 6 - 3)
     })
-  }, [])
+  }, [cardRefs, cards])
   
   useEffect(() => {
     // Highlight current card if selected
@@ -560,7 +563,7 @@ const CardSelector = React.forwardRef<CardSelectorHandles, {
       selectedCard.toggleHighlight(true)
       selectedCard.toggleIdle(true)
     }
-  }, [currentCard])
+  }, [cardRefs, currentCard])
   
   // Function to unselect the current card
   const unselectCurrentCard = () => {

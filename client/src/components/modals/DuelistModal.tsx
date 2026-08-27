@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState, useEffect } from 'react'
+import React, { useCallback, useMemo, useRef, useState, useEffect } from 'react'
 import { Modal } from 'semantic-ui-react'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { DuelistCard, DuelistCardHandle } from '/src/components/cards/DuelistCard'
@@ -39,19 +39,7 @@ function DuelistModalInner({
   
   const { level } = useDuelistStack(Number(selectedDuelistId))
 
-  const handleShowSouls = (duelistId: number, stackedDuelistIds: number[]) => {
-    if (isAnimating || stackedDuelistIds.length === 0) return
-    
-    setSoulsData({ duelistId, stackedDuelistIds })
-    animateSoulsTransition(true)
-  }
-
-  const handleCloseSouls = () => {
-    if (isAnimating) return
-    animateSoulsTransition(false)
-  }
-
-  const animateSoulsTransition = (show: boolean) => {
+  const animateSoulsTransition = useCallback((show: boolean) => {
     if (isAnimating) return
     setIsAnimating(true)
     
@@ -122,7 +110,19 @@ function DuelistModalInner({
         cardContainerTween.start()
       }, 100)
     }
+  }, [aspectHeight, isAnimating])
+
+  const handleShowSouls = (duelistId: number, stackedDuelistIds: number[]) => {
+    if (isAnimating || stackedDuelistIds.length === 0) return
+
+    setSoulsData({ duelistId, stackedDuelistIds })
+    animateSoulsTransition(true)
   }
+
+  const handleCloseSouls = useCallback(() => {
+    if (isAnimating) return
+    animateSoulsTransition(false)
+  }, [animateSoulsTransition, isAnimating])
 
   const animateFlip = (shouldShowBack: boolean) => {
     // First animation: scale down to 0.8
@@ -232,9 +232,12 @@ function DuelistModalInner({
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
     }
-  }, [showSoulsStack, isAnimating])
+  // _close is declared below but reads only the stable dispatcher; keyboard
+  // registration follows the modal state that changes its behaviour.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showSoulsStack, isAnimating, handleCloseSouls])
 
-  const _close = () => {
+  const _close = useCallback(() => {
     setIsAnimating(true)
     
     new TWEEN.Tween({ y: 0, scale: 1 })
@@ -258,7 +261,7 @@ function DuelistModalInner({
       }
     }
     animate()
-  }
+  }, [dispatchSelectDuelistId])
 
   return (
     <Modal

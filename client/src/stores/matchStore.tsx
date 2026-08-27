@@ -27,7 +27,7 @@ export const useMatchQueue = (queueId: constants.QueueId) => {
 
   const entryTokenAddress = useMemo(() => BigInt(queue?.entry_token_address ?? 0), [queue])
   const entryTokenAmount = useMemo(() => BigInt(queue?.entry_token_amount ?? 0), [queue])
-  const requiresEnlistment = useMemo(() => (entryTokenAddress > 0n && entryTokenAmount > 0n), [queue])
+  const requiresEnlistment = useMemo(() => (entryTokenAddress > 0n && entryTokenAmount > 0n), [entryTokenAddress, entryTokenAmount])
 
   return {
     slotSize,

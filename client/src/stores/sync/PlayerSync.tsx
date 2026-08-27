@@ -23,13 +23,13 @@ export function PlayerSync() {
       updateProgress('player_duelists', 0, false)
       // updateProgress('player_packs', 0, false) // player can have no packs!
     }
-  }, [address])
+  }, [address, updateProgress])
   useEffect(() => {
     if (isFinishedChallenges) updateProgress('player_challenges', 1, true)
-  }, [isFinishedChallenges])
+  }, [isFinishedChallenges, updateProgress])
   useEffect(() => {
     if (isFinishedDuelists) updateProgress('player_duelists', 1, true)
-  }, [isFinishedDuelists])
+  }, [isFinishedDuelists, updateProgress])
   // useEffect(() => {
   //   if (isFinishedPacks) updateProgress('player_packs', 1, true)
   // }, [isFinishedPacks])

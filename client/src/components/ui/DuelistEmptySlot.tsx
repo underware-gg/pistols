@@ -119,7 +119,7 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
     if (duelistIdArg) {
       props.onActionComplete?.(true, duelistIdArg, null);
     }
-  }, [props.onActionComplete, setCommitmentState]);
+  }, [props]);
 
   const {
     call: commitToQueue,
@@ -156,7 +156,7 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
       enlistError: null,
       enlistedDuelistId: duelistIdArg,
     });
-  }, [setEnlistmentState, props.onActionComplete]);
+  }, [props]);
 
   const {
     call: enlistDuelist,
@@ -202,7 +202,7 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
     }));
 
     enlistDuelist(duelistId, props.matchmakingType);
-  }, [account, enlistDuelist, props.matchmakingType, isCommitting, isWaitingForCommit, isEnlisting, isWaitingForEnlistment]);
+  }, [props, isCommitting, isWaitingForCommit, isEnlisting, isWaitingForEnlistment, account, enlistDuelist]);
 
   const handleCommitDuelist = useCallback((duelistId: bigint) => {
     if (!duelistId || !props.matchmakingType || isCommitting || isWaitingForCommit || isEnlisting || isWaitingForEnlistment) return;
@@ -245,7 +245,7 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
     }));
     
     commitToQueue(duelistId, props.matchmakingType, props.queueMode);
-  }, [account, commitToQueue, props.matchmakingType, props.queueMode, isCommitting, isWaitingForCommit, isEnlisting, isWaitingForEnlistment]);
+  }, [props, isCommitting, isWaitingForCommit, isEnlisting, isWaitingForEnlistment, account, enlistmentState.enlistedDuelistId, commitToQueue]);
 
   const handleDuelistSelected = useCallback((rawId: bigint, enlistMode: boolean) => {
     if (enlistMode) {
@@ -282,14 +282,7 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
         }
       },
     });
-  }, [
-    selectionDisabled,
-    props.matchmakingType,
-    props.queueMode,
-    duelistSelectOpener,
-    handleDuelistSelected,
-    canMatchMakeIds,
-  ]);
+  }, [selectionDisabled, props.matchmakingType, props.queueMode, commitmentState.isCommitting, commitmentState.commitError, commitmentState.committedDuelistId, enlistmentState.isEnlisting, enlistmentState.enlistError, enlistmentState.enlistedDuelistId, duelistSelectOpener, canMatchMakeIds.length, handleCommitDuelist, handleEnlistDuelist, handleDuelistSelected]);
 
   const handleRemove = useCallback(() => {
     lockedAccountRef.current = null;
@@ -313,11 +306,7 @@ export const DuelistEmptySlot = forwardRef<DuelistEmptySlotHandle, DuelistEmptyS
         enlistedDuelistId: null,
       }));
     }
-  }, [
-    commitmentState.committedDuelistId,
-    enlistmentState.enlistedDuelistId,
-    props.onDuelistRemoved,
-  ]);
+  }, [commitmentState.committedDuelistId, enlistmentState.enlistedDuelistId, props]);
 
   useImperativeHandle(
     ref,

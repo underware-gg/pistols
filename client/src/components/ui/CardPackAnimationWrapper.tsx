@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import * as TWEEN from '@tweenjs/tween.js'
 import { CardPack, CardPackHandle } from './CardPack'
 import { useGameAspect } from '/src/hooks/useGameAspect'
@@ -275,7 +275,7 @@ export const CardPackAnimationWrapper = forwardRef<CardPackAnimationWrapperHandl
       .start()
   }, [zIndex])
   
-  const toggleFullscreen = (toFullscreen: boolean, duration = DEFAULT_ANIMATION_DURATION, easing = TWEEN.Easing.Cubic.Out) => {
+  const toggleFullscreen = useCallback((toFullscreen: boolean, duration = DEFAULT_ANIMATION_DURATION, easing = TWEEN.Easing.Cubic.Out) => {
     if (isFullscreen === toFullscreen) return
     setIsFullscreen(toFullscreen)
     setIsAnimating(true)
@@ -300,10 +300,10 @@ export const CardPackAnimationWrapper = forwardRef<CardPackAnimationWrapperHandl
     // When going to fullscreen
     if (toFullscreen) {
       // Direct array approach with bezier interpolation
-      setComponentPosition(0, 0, duration, easing)
-      setComponentZIndex(1000, 0, easing)
-      setComponentScale(1, duration, easing)
-      setNewCardPackSize(24, duration, easing)
+      setSpring({ dataField1: [0], dataField2: [0], duration, easing, interpolation: TWEEN.Interpolation.Linear })
+      setZIndex({ dataField1: [1000], duration: 0, easing })
+      setScale({ dataField1: [1], duration, easing, interpolation: TWEEN.Interpolation.Linear })
+      setAnimatedCardPackSize({ dataField1: [24], duration, easing })
     
       sizeTweenRef.current = new TWEEN.Tween(sizeRef.current)
         .to({
@@ -365,20 +365,20 @@ export const CardPackAnimationWrapper = forwardRef<CardPackAnimationWrapperHandl
           })
           .start()
 
-        setNewCardPackSize(props.cardPackSize, duration * 0.66, easing);
+        setAnimatedCardPackSize({ dataField1: [props.cardPackSize], duration: duration * 0.66, easing });
         
-        setComponentPosition(posX, posY, duration * 0.66, easing);
+        setSpring({ dataField1: [posX], dataField2: [posY], duration: duration * 0.66, easing, interpolation: TWEEN.Interpolation.Linear });
       }, duration * 0.5);
       
       setTimeout(() => {
-        setComponentZIndex(props.startZIndex || 1, 0);
+        setZIndex({ dataField1: [props.startZIndex || 1], duration: 0, easing: TWEEN.Easing.Quadratic.Out });
       }, duration * 1.5);
     }
     
     setTimeout(() => {
       setIsAnimating(false)
     }, duration * 1.5)
-  }
+  }, [aspectHeight, aspectWidth, isFullscreen, props.cardPackSize, props.startZIndex])
   
   useEffect(() => {
     if (props.initialFullscreen) {

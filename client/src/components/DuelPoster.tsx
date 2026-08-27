@@ -289,14 +289,14 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
   const _gotoDuel = useCallback(() => {
     dispatchSetScene(SceneName.Duel, { duelId: props.duelId })
     props._close?.()
-  }, [props.duelId, props._close])
+  }, [dispatchSetScene, props])
 
   const onCompleteSubmitCallback = useCallback((result: boolean | Error, [duelId, duelistId, accepted]: [bigint, BigNumberish?, boolean?]) => {
     if (result instanceof Error || !result) return
     console.log(`submitChallengeResponse() =>`, result, [duelId, duelistId, accepted])
     dispatchChallengingDuelistId(0n)
     if (accepted) _gotoDuel()
-  }, [_gotoDuel])
+  }, [_gotoDuel, dispatchChallengingDuelistId])
   
   const { call: submitChallengeResponse, isLoading: isLoadingSubmit, meta } = useTransactionHandler<boolean, [bigint, BigNumberish?, boolean?]>({
     transactionCall: (duelId, duelistId, accepted, key) => duel_token.reply_duel(account, duelId, duelistId, accepted, key),
@@ -334,7 +334,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
         dispatchChallengingDuelistId(meta[1])
       }
     }
-  }, [meta, isSubmitting, challengingDuelistId])
+  }, [meta, isSubmitting, challengingDuelistId, dispatchChallengingDuelistId])
 
   const _collectDuel = () => {
     collectDuel(props.duelId)
@@ -344,7 +344,7 @@ const DuelPosterFull = forwardRef<DuelPosterHandle, DuelPosterProps>((props, ref
     if ((isYouA || isYouB) && account && isCallToAction && isFinished) {
       revalFinalDuelResult(props.duelId)
     }
-  }, [isYouA, isYouB, account, isCallToAction, isFinished, revalFinalDuelResult]);
+  }, [isYouA, isYouB, account, isCallToAction, isFinished, revalFinalDuelResult, props.duelId]);
 
   const _reply = (accepted: boolean) => {
     if (accepted) {

@@ -106,6 +106,6 @@ export const useClearExpiredRankedDuels = (duelIds: BigNumberish[]) => {
     }
 
     processDuelsSequentially()
-  }, [duelsToClear, account, community])
+  }, [duelsToClear, account, community, game])
 }
 

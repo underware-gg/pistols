@@ -226,7 +226,7 @@ export function useAssetSetup() {
     
     loadBackgroundAssets()
     return () => { cancelled = true }
-  }, [mounted, isInitialized, sceneAssetsLoaded])
+  }, [mounted, isInitialized, sceneAssetsLoaded, currentScene])
 
   return {
     manifest: assetCacheManager.getManifest(),

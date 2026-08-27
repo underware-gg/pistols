@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { _currentScene, SCENE_CHANGE_ANIMATION_DURATION } from '/src/three/game'
 import { InteractibleScene } from '/src/three/InteractibleScene'
@@ -99,6 +99,9 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
       setSkipSource(null)
       setIsTransitioning(false)
     }
+  // The scene initializer is a hoisted command, not a reactive input; the scene
+  // key is the complete trigger and restarting it on every render resets progress.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentTutorialScene])
 
   // Text Animation & Progression
@@ -110,7 +113,10 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
     }
 
     handleTextDisplay()
-  }, [currentTextIndex])
+  // The command helpers intentionally read the state represented below. Their
+  // per-render identities must not restart text timers or scene transitions.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canClaimStarterPack, currentSceneData, currentTextIndex, currentTutorialScene, dispatchSetScene, dispatchSetTutorialLevel, duelIdFull, duelIdSimple, tutorialOpener])
 
   useEffect(() => {
     if (currentTutorialScene === SceneName.TutorialScene2 && !duelIdSimple) {
@@ -161,19 +167,26 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
       window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('keyup', handleKeyUp)
     }
-  }, [canSkipText, isHoldingSkip])
+  // Keyboard listeners are refreshed for the state their command helpers read;
+  // depending on the hoisted helper identities would reinstall them every render.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canSkipText, isHoldingSkip, isTransitioning, skipProgress, skipSource])
 
   // Scene-specific Effects
   useEffect(() => {
     if (currentTutorialScene === SceneName.TutorialScene4) {
       handleDemonSceneHover()
     }
-  }, [itemHovered])
+  // The hover command is intentionally keyed by its complete reactive inputs.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentSceneData, currentTutorialScene, displayText, itemHovered])
 
   useEffect(() => {
     if (!itemClicked) return
     handleItemClick()
-  }, [itemClicked, timestamp])
+  // The click command is hoisted for readability; these are all values it reads.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [connect, disconnect, dispatchSetScene, isConnecting, isError, isLoading, itemClicked, timestamp])
 
   const mounted = useMounted()
   const [createdTutorialSimple, setCreatedTutorialSimple] = useState(false)
@@ -188,7 +201,7 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
         setCreatedTutorialFull(true)
       }
     }
-  }, [currentTutorialScene, duelIdSimple, duelIdFull, createdTutorialSimple, createdTutorialFull])
+  }, [currentTutorialScene, duelIdSimple, duelIdFull, createdTutorialSimple, createdTutorialFull, mounted, tutorial, account, playerId])
 
   function goToRealDuel(duelistId?: number) {
     //TODO create challenge against bot with matchmaking and navigatge there with a selected duelist 

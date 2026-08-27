@@ -11,6 +11,8 @@ export const useMounted = (onMount?: Function) => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true)
     onMount?.()
+  // onMount is deliberately mount-only; callback identity is not a rerun signal.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   return mounted
 }

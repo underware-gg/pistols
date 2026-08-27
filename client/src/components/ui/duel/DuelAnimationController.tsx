@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
+import React, { useCallback, useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
 import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
 import { useDuelContext } from '/src/components/ui/duel/DuelContext'
 import { AnimationState } from '/src/three/game'
@@ -96,7 +96,7 @@ export const DuelAnimationController = forwardRef<DuelAnimationControllerRef, Du
         }
       }
     }, 1000);
-  }, [completedStagesLeft, completedStagesRight, leftDuelist?.isYou, rightDuelist?.isYou])
+  }, [cardsRef, completedStagesLeft, completedStagesRight, leftDuelist?.isYou, rightDuelist?.isYou])
 
   // Add initialization check to prevent running animations too early
   useEffect(() => {
@@ -235,10 +235,14 @@ export const DuelAnimationController = forwardRef<DuelAnimationControllerRef, Du
         clearTimeout(initTimer);
       };
     }
-  }, [duelProgress, duelInProgress, gameImpl, leftDuelist?.id, rightDuelist?.id, tutorialLevel, areDuelistsLoaded]);
+  // This initialization sequence intentionally captures the callbacks from the
+  // render that started it; restarting an in-flight duel animation when their
+  // identities change would duplicate timers and card actions.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [duelProgress, duelInProgress, gameImpl, leftDuelist?.id, rightDuelist?.id, tutorialLevel, areDuelistsLoaded, setDuelInProgress, cardsRef, positionToAB, currentStepRef, setStatsLeft, setStatsRight, isPlayingRef]);
 
   // Main function for playing animation steps
-  const playStep = () => {    
+  const playStep = useCallback(() => {
     if (isPlayingRef.current) {
       queuedStepsRef.current = 0;
     }
@@ -436,7 +440,7 @@ export const DuelAnimationController = forwardRef<DuelAnimationControllerRef, Du
       console.error("Error in playStep:", error);
       isAnimatingStepRef.current = false;
     }
-  };
+  }, [cardsRef, currentStepRef, duelProgress, gameImpl, isPlayingRef, positionToAB, setStatsLeft, setStatsRight, tutorialLevel]);
 
   // Clears all animation timeouts
   const resetStep = () => {
@@ -461,27 +465,8 @@ export const DuelAnimationController = forwardRef<DuelAnimationControllerRef, Du
     isAnimatingStepRef.current = false;
   };
 
-  // Reset the entire duel
-  const resetDuel = () => {
-    resetStep();
-    resetEverything();
-    queuedStepsRef.current = 0; // Clear queued steps on reset
-    
-    if (cardsRef.current) {
-      cardsRef.current.resetCards();
-    }
-    
-    if (gameImpl) {
-      gameImpl.resetDuelScene(false, false);
-    }
-    
-    setTimeout(() => {
-      setDuelInProgress(false);
-    }, 1000);
-  };
-
   // Reset to initial state
-  const resetEverything = () => {
+  const resetEverything = useCallback(() => {
     console.log("Performing full duel reset");
     // Reset stats to default
     resetStats();
@@ -501,9 +486,28 @@ export const DuelAnimationController = forwardRef<DuelAnimationControllerRef, Du
     cardRevealTimeoutRef.current = null;
     gameBladeAnimationTimeoutRef.current = null;
     gameAnimationTimeoutRef.current = null;
-  };
+  }, [currentStepRef, resetStats, setDuelistsLoaded]);
 
-  const stepForward = () => {
+  // Reset the entire duel
+  const resetDuel = useCallback(() => {
+    resetStep();
+    resetEverything();
+    queuedStepsRef.current = 0; // Clear queued steps on reset
+
+    if (cardsRef.current) {
+      cardsRef.current.resetCards();
+    }
+
+    if (gameImpl) {
+      gameImpl.resetDuelScene(false, false);
+    }
+
+    setTimeout(() => {
+      setDuelInProgress(false);
+    }, 1000);
+  }, [cardsRef, gameImpl, resetEverything, setDuelInProgress]);
+
+  const stepForward = useCallback(() => {
     if (!duelHasReachedStepsRef.current) return;
     
     if (!isAnimatingStepRef.current) {
@@ -511,7 +515,7 @@ export const DuelAnimationController = forwardRef<DuelAnimationControllerRef, Du
     } else if (!isPlayingRef.current) {
       queuedStepsRef.current += 1;
     }
-  }
+  }, [isPlayingRef, playStep])
   
   // Expose resetDuel function to parent component through ref
   useImperativeHandle(ref, () => ({
@@ -525,7 +529,7 @@ export const DuelAnimationController = forwardRef<DuelAnimationControllerRef, Du
     setCardsSpawnedRight: (right: boolean) => {
       hasSpawnedCardsRightRef.current = right;
     }
-  }), []);
+  }), [resetDuel, stepForward]);
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
@@ -539,7 +543,7 @@ export const DuelAnimationController = forwardRef<DuelAnimationControllerRef, Du
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
     };
-  }, [isPlayingRef, isAnimatingStepRef]);
+  }, [isPlayingRef, isAnimatingStepRef, stepForward]);
 
   return null;
-}); 
+  });

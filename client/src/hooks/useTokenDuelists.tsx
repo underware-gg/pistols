@@ -17,7 +17,7 @@ export const useDuelistTokenCount = () => {
 
 export const useOwnerOfDuelist = (token_id: BigNumberish) => {
   const state = useDuelistTokenStore((state) => state)
-  const owner = useMemo(() => state.getOwnerOfTokenId(token_id), [state.tokens, token_id])
+  const owner = useMemo(() => state.getOwnerOfTokenId(token_id), [state, token_id])
   return {
     owner,
     isLoading: (state.tokens === null),
@@ -31,7 +31,7 @@ export const useDuelistsOwnedByPlayer = () => {
 
 export const useDuelistIdsOwnedByAccount = (owner: BigNumberish) => {
   const state = useDuelistTokenStore((state) => state)
-  const tokenIds = useMemo(() => state.getTokenIdsOwnedByAccount(owner), [state.tokens, owner])
+  const tokenIds = useMemo(() => state.getTokenIdsOwnedByAccount(owner), [state, owner])
   return {
     duelistIds: tokenIds,
     isLoading: (state.tokens === null),
@@ -40,7 +40,7 @@ export const useDuelistIdsOwnedByAccount = (owner: BigNumberish) => {
 
 export const useDuelistIdsOwnedByAccounts = (owners: BigNumberish[]) => {
   const state = useDuelistTokenStore((state) => state)
-  const tokenIds = useMemo(() => state.getTokenIdsOwnedByAccounts(owners), [state.tokens, owners])
+  const tokenIds = useMemo(() => state.getTokenIdsOwnedByAccounts(owners), [state, owners])
   return {
     duelistIds: tokenIds,
     isLoading: (state.tokens === null),

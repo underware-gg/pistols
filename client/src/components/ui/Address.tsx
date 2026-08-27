@@ -24,7 +24,7 @@ function Address({
 
   const display = useMemo(() => (
     isZero ? '0x0' : full ? bigintToAddress(address) : shortAddress(bigintToAddress(address))
-  ), [address, full])
+  ), [address, full, isZero])
 
   const classNames = useMemo(() => {
     let classNames = ['Code']

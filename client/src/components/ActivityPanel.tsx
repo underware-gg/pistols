@@ -22,7 +22,7 @@ const PanelTitle = ({
   setPanelType: (type: PanelType) => void
 }) => {
   const className = useMemo(() => (isActive ? 'Active Anchor' : 'Inactive Anchor ImportantHover'), [isActive])
-  const name = useMemo(() => (panelType == PanelType.Action ? <ActionIcon isActive /> : panelType), [panelType, isActive])
+  const name = useMemo(() => (panelType == PanelType.Action ? <ActionIcon isActive /> : panelType), [panelType])
   // const name = type
   return (
     <span className={className} onClick={() => setPanelType(panelType)}>

@@ -38,7 +38,7 @@ export function usePlayerOnlineSignedMessage(timestamp: number, available: boole
       timestamp: Math.floor(timestamp),
       available,
     }) : null
-  ), [account, timestamp, available])
+  ), [timestamp, selectedNetworkId, account?.address, available])
   // publish...
   const { publish, isPublishing, isSuccess, isError } = useSdkPublishTypedData(account as Account, typedData)
   // store globally
@@ -48,7 +48,7 @@ export function usePlayerOnlineSignedMessage(timestamp: number, available: boole
       // console.log('SET ONLINE>>>>>', isPublishing, isSuccess, isError)
       state.setState(isPublishing, isSuccess, isError)
     }
-  }, [isPublishing, isSuccess, isError])
+  }, [isPublishing, isSuccess, isError, state])
   return {
     publish,
     isPublishing: state.isPublishing,

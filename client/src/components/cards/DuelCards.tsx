@@ -76,7 +76,7 @@ const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: D
         [DuelistCardType.DODGE]: { x: (isLeft ? 1 : -1) * (-aspectW * Constants.GRID_POSITION_RIGHT_OFFSET), y: aspectH * Constants.GRID_POSITION_BOTTOM_OFFSET },
 
     }
-  }, [aspectW])
+  }, [aspectH, aspectW, isLeft])
 
   const originalCardStylesRef = useRef<Record<DuelistCardType, { translateX: number; translateY: number; rotation: number }>>({
     [DuelistCardType.TACTICS]: { translateX: 0, translateY: 0, rotation: 0 },
@@ -133,7 +133,7 @@ const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: D
     }
 
     prevAspectRef.current = { aspectW, aspectH }
-  }, [aspectW, aspectH])
+  }, [aspectW, aspectH, handDetailsShown, gridPositions])
 
   const resetCards = () => {
     const centerX = (isLeft ? -1 : 1) * (aspectW * Constants.CARD_SPAWN_POSITION_X_OFFSET)
@@ -625,7 +625,7 @@ const EnvironmentDeck = forwardRef<EnvironmentDeckHandle, EnvironmentDeckProps>(
       x:  (- aspectW * Constants.CARD_GRID_POSITION_X_OFFSET) + ((aspectW / Constants.DRAW_CARDS_NUMBER) / 2) + ((aspectW / Constants.DRAW_CARDS_NUMBER) * (drawnCardsCount - 1 - index)),
       y: aspectH * Constants.CARD_GRID_POSITION_Y_OFFSET,
     }));
-  }, [aspectW, drawnCardsCount])
+  }, [aspectH, aspectW, drawnCardsCount])
 
   useImperativeHandle(ref, () => ({
     expand,
@@ -669,7 +669,7 @@ const EnvironmentDeck = forwardRef<EnvironmentDeckHandle, EnvironmentDeckProps>(
         }
       });
     }
-  }, [cards]);
+  }, [aspectH, aspectW, cards]);
 
   useEffect(() => {
     const gridPositions = Array.from({ length: Constants.DRAW_CARDS_NUMBER }, (_, index) => ({
@@ -684,7 +684,7 @@ const EnvironmentDeck = forwardRef<EnvironmentDeckHandle, EnvironmentDeckProps>(
         card.current.style.setProperty('--card-translate-y', `${gridPositions[i].y}px`)
       }
     });
-  }, [emptyCards]);
+  }, [aspectH, aspectW, aspectWidth, emptyCards]);
 
   useEffect(() => {
     if (cards.length > 0) {
@@ -719,7 +719,7 @@ const EnvironmentDeck = forwardRef<EnvironmentDeckHandle, EnvironmentDeckProps>(
         }
       });
     }
-  }, [aspectW]);
+  }, [aspectH, aspectW, aspectWidth, cards, drawnCardsCount, expanded, gridPositions]);
 
   const dealCards = () => {
     const left = [];
@@ -1185,24 +1185,6 @@ const Cards = forwardRef<CardsHandle, { duelistIdA: BigNumberish, duelistIdB: Bi
   }
 
 
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      switch (event.key) {
-        case 'Escape':
-          collapse()
-          break;
-        default:
-          break;
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, []);
-
   const setAllEnvCards = (cardsData: CardData[]) => {
     environmentDeck.current?.setCardsData(cardsData)
   }
@@ -1240,9 +1222,9 @@ const Cards = forwardRef<CardsHandle, { duelistIdA: BigNumberish, duelistIdB: Bi
     duelistBHand.current?.returnActiveCard()
     environmentDeck.current?.returnActiveCard()
 
-  }, [duelistAHand, duelistBHand, overlayRef, environmentDeck])
+  }, [duelistAHand, duelistBHand, environmentDeck])
 
-  const collapse = () => {
+  const collapse = useCallback(() => {
     if (!duelistAHand.current?.isReadyToCollapse() || !duelistBHand.current?.isReadyToCollapse() || !environmentDeck.current?.isReadyToCollapse()) return
     duelistAHand.current?.hideHandDetails()
     duelistBHand.current?.hideHandDetails()
@@ -1252,7 +1234,20 @@ const Cards = forwardRef<CardsHandle, { duelistIdA: BigNumberish, duelistIdB: Bi
     setIsOverlayVisible(false)
 
     overlayRef.current?.removeEventListener('click', handleGlobalClick)
-  }
+  }, [handleGlobalClick])
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        collapse()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [collapse])
 
   if (tutorialLevel === DuelTutorialLevel.SIMPLE) return null
 

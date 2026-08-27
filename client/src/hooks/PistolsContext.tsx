@@ -699,7 +699,7 @@ export const usePistolsScene = () => {
       __dispatchResetValues()
     }, SCENE_CHANGE_ANIMATION_DURATION)
     __dispatchSetScene(newScene)
-  }, [location.pathname, navigate, selectedDuelId])
+  }, [__dispatchResetValues, __dispatchSetScene, currentDuel, currentQuizName, dispatchSetDuel, dispatchSetQuizName, location.pathname, navigate])
 
   const dispatchSceneBack = useCallback(() => {
     if (sceneStack.length > 1) {
@@ -726,7 +726,7 @@ export const usePistolsScene = () => {
       
       dispatchSetScene(baseScene);
     }
-  }, [sceneStack, location.pathname, navigate, currentDuel, currentScene])
+  }, [sceneStack, location.pathname, __dispatchSceneBack, currentDuel, currentQuizName, navigate, currentScene, dispatchSetScene])
 
   const sceneTitle = useMemo(() => (sceneRoutes[currentScene]?.title ?? 'Pistols at Dawn'), [currentScene])
 
@@ -815,7 +815,7 @@ export const usePistolsSceneFromRoute = () => {
         }
       }
     }
-  }, [location.pathname, params])
+  }, [__dispatchSetScene, currentScene, dispatchSetDuel, dispatchSetQuizName, location.pathname, params])
 
   return {}
 }
@@ -863,7 +863,7 @@ export const useSyncRouterParams = () => {
         dispatchChallengingDuelistId(searchParams.get('challenging_duelist'))
       }
     }
-  }, [searchParams])
+  }, [dispatchChallengingDuelistId, dispatchChallengingPlayerAddress, dispatchSelectDuel, dispatchSelectDuelistId, dispatchSelectPlayerAddress, searchParams])
 
   //--------------------------------------------
   // Game Context > URL params
@@ -900,13 +900,7 @@ export const useSyncRouterParams = () => {
       // console.log(`params >>>>>`, params)
       return params
     })
-  }, [
-    selectedDuelId, 
-    selectedDuelistId, 
-    selectedPlayerAddress,
-    challengingAddress,
-    challengingDuelistId
-  ])
+  }, [selectedDuelId, selectedDuelistId, selectedPlayerAddress, challengingAddress, challengingDuelistId, setSearchParams])
 
   return {}
 }

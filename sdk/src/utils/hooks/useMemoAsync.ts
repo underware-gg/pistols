@@ -38,6 +38,9 @@ export function useMemoAsync<T>(runner: () => Promise<T> | undefined | null, dep
     return () => {
       _mounted = false
     }
+  // This hook mirrors useEffect: callers own the dependency contract for runner
+  // and its associated values.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps)
   return {
     value,

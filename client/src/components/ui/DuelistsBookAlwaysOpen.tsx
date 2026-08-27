@@ -145,7 +145,7 @@ function BookCoverLayer({
         totalAngle -= alpha;
       }
     }
-  }, [layerColor, layer, aspectWidth, layerGap, coverGap]);
+  }, [layerColor, layer, aspectWidth, layerGap, coverGap, startingAngle]);
   
   return (
     <div ref={coverLayerRef} className="cover-layer">
@@ -284,7 +284,7 @@ function BookSheets({ width, height }: { width?: number; height?: number }) {
     }
 
     return pages;
-  }, [duelistIds, aspectWidth, width, height, maxPages, deadDuelists]);
+  }, [duelistIds, width, height, maxPages, aspectWidth, dispatchSelectDuelistId]);
 
   const handleNextPage = () => {
     if (currentPage < maxPages - 2) {
@@ -330,11 +330,14 @@ function BookSheets({ width, height }: { width?: number; height?: number }) {
       
       updateSheets(targetRotateY, targetCurveRadius);
     }
-  }, []);
+  // updateSheets is a hoisted DOM command keyed by the complete state below.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sheetGap, sheetOrder, width]);
 
   useEffect(() => {
     updateSheets(-90, width * 0.025);
-  }, [sheetOrder]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sheetGap, sheetOrder, width]);
 
   useEffect(() => {
     setSheetGap(width ? width / 5 / (sheetCount - 1) : 0.1);
@@ -511,4 +514,4 @@ function BookSheets({ width, height }: { width?: number; height?: number }) {
       ))}
     </div>
   );
-} 
+}

@@ -139,7 +139,7 @@ export function useTokenIdsOwnedByPlayer(contractAddress: BigNumberish) {
 // get initial tokens of an account
 export function useTokenIdsOwnedByAccount(contractAddress: BigNumberish, accountAddress: BigNumberish) {
   const state = useTokenStore(contractAddress)((state) => state)
-  const tokenIds = useMemo(() => state.getTokenIdsOwnedByAccount(accountAddress), [state.tokens, accountAddress])
+  const tokenIds = useMemo(() => state.getTokenIdsOwnedByAccount(accountAddress), [state, accountAddress])
   const tokenIdsAscending = useMemo(() => ([...tokenIds].sort((a, b) => Number(a - b))), [tokenIds])
   const tokenIdsDescending = useMemo(() => ([...tokenIds].sort((a, b) => Number(b - a))), [tokenIds])
   return {
@@ -151,7 +151,7 @@ export function useTokenIdsOwnedByAccount(contractAddress: BigNumberish, account
 
 export function useOwnerOfTokenId(contractAddress: BigNumberish, tokenId: BigNumberish) {
   const state = useTokenStore(contractAddress)((state) => state)
-  const owner = useMemo(() => state.getOwnerOfTokenId(tokenId), [state.tokens, tokenId])
+  const owner = useMemo(() => state.getOwnerOfTokenId(tokenId), [state, tokenId])
   return {
     owner,
     isLoading: (state.tokens === null),

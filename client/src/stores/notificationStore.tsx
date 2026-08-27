@@ -355,7 +355,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     if (!setsAreEqual(newDuelIds, oldDuelIds)) {
       setNotificationDuelIds(Array.from(newDuelIds))
     }
-  }, [sortedNotifications])
+  }, [notificationDuelIds, sortedNotifications])
 
   const activeDuels = useMyActiveDuels(notificationDuelIds.map(id => BigInt(id)))
 
@@ -376,7 +376,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       }))
 
     batchedAdd(newNotifications)
-  }, [activeDuels, hasInitialized, address])
+  }, [activeDuels, hasInitialized, address, batchedAdd])
 
   const hasUnreadNotifications = useMemo(() => {
     return sortedNotifications.some(n => !n.isRead)

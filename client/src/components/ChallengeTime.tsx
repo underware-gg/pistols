@@ -32,7 +32,7 @@ export function ChallengeTime({
     return (timestampEnd && (isCanceled || isFinished)) ?
       (prefixed ? 'Finished at ' : '') + formatTimestampLocal(timestampEnd)
       : formatTimestampLocal(timestampStart)
-  }, [isCanceled, isFinished, clientSeconds, timestampStart, timestampEnd])
+  }, [timestampEnd, isCanceled, isFinished, prefixed, timestampStart])
 
   // Get timer state based on time remaining
   const getTimerState = (timeLeft: number) => {

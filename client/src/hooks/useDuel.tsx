@@ -92,7 +92,7 @@ export const useAnimatedDuel = (duelId: BigNumberish, enabled: boolean) => {
     if (enabled && currentStage == DuelStage.Finished) {
       dispatchAnimated(AnimationState.Finished)
     }
-  }, [enabled, currentStage])
+  }, [enabled, currentStage, dispatchAnimated])
 
   useEffect(() => {
     if (enabled && gameImpl && isAnimatingRound1 && audioLoaded && round1) {

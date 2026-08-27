@@ -21,7 +21,7 @@ export const usePacksOwnedByPlayer = () => {
 
 export const usePacksOwnedByAccount = (address: BigNumberish) => {
   const state = usePackTokenStore((state) => state)
-  const packIds = useMemo(() => state.getTokenIdsOwnedByAccount(address).map(id => Number(id)), [state.tokens, address])
+  const packIds = useMemo(() => state.getTokenIdsOwnedByAccount(address).map(id => Number(id)), [state, address])
   return {
     packIds,
     isLoading: (state.tokens === null),

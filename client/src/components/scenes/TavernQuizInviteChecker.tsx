@@ -77,7 +77,7 @@ export default function TavernQuizInviteChecker() {
     const isQuizActive = clientSeconds >= timestamp_start && !isPartyClosed
     
     return isWithin30MinBefore || isQuizActive
-  }, [timestamp_start, timestamp_end, isPartyClosed, clientSeconds])
+  }, [timestamp_start, isPartyClosed, clientSeconds])
 
   useEffect(() => {
     if (typeof window === 'undefined' || isInitialized) return
@@ -184,15 +184,7 @@ export default function TavernQuizInviteChecker() {
     }, 1000)
 
     return () => clearTimeout(timeoutId)
-  }, [
-    isInitialized,
-    hasShownInThisSession, 
-    isPartyClosed, 
-    partyId, 
-    showCount,
-    quizInviteOpener,
-    isWithin30Min
-  ])
+  }, [isInitialized, hasShownInThisSession, isPartyClosed, partyId, showCount, quizInviteOpener, isWithin30Min, clientSeconds, lastShowTimestamp])
 
   const handleGoToQuiz = useCallback(() => {
     const newExitCount = 0

@@ -38,7 +38,7 @@ export const useSdkPublishTypedData = (
       setIsPublishing(false);
       // debug.log('SIGNED: done!')
     }
-  }, [sdk, typedData, account, isControllerConnected])
+  }, [sdk, typedData, account, isControllerConnected, isPublishing])
 
   return {
     isPublishing,

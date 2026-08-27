@@ -176,8 +176,8 @@ export const usePlayer = (address: BigNumberish, onlineClientTimestamp?: number)
   const bookmarkedTokens = useMemo(() => (token_bookmarks[playerKey] ?? {}), [token_bookmarks, playerKey])
 
   const { duelContractAddress, duelistContractAddress } = useTokenContracts()
-  const bookmarkedDuels = useMemo(() => (bookmarkedTokens[duelContractAddress as string] ?? []), [bookmarkedTokens])
-  const bookmarkedDuelists = useMemo(() => (bookmarkedTokens[duelistContractAddress as string] ?? []), [bookmarkedTokens])
+  const bookmarkedDuels = useMemo(() => (bookmarkedTokens[duelContractAddress as string] ?? []), [bookmarkedTokens, duelContractAddress])
+  const bookmarkedDuelists = useMemo(() => (bookmarkedTokens[duelistContractAddress as string] ?? []), [bookmarkedTokens, duelistContractAddress])
 
   // player online status
   const players_online = usePlayerDataStore((state) => state.players_online);
@@ -190,7 +190,7 @@ export const usePlayer = (address: BigNumberish, onlineClientTimestamp?: number)
     timestamp: lastSeenTimestamp,
   } = useMemo(() => (
     getPlayerOnlineStatus(players_online[playerKey], onlineClientTimestamp || clientTimestamp)
-  ), [players_online, address, onlineClientTimestamp, clientTimestamp])
+  ), [players_online, playerKey, onlineClientTimestamp, clientTimestamp])
 
   // TODO... check if completed tutorial from Activity events
   const hasFinishedTutorial = false
@@ -234,14 +234,14 @@ export const usePlayerDisplayName = (address: BigNumberish) => {
 export const usePlayerAddressFromUsername = (username: string): BigNumberish | undefined => {
   const players_names = usePlayerDataStore((state) => state.players_names);
   const getAddressFromPlayername = usePlayerDataStore((state) => state.getAddressFromPlayername);
-  const address = useMemo(() => (getAddressFromPlayername(username) as BigNumberish), [players_names, username]);
+  const address = useMemo(() => (getAddressFromPlayername(username) as BigNumberish), [getAddressFromPlayername, username]);
   return address;
 }
 
 export const useUsernameFromPlayerAddress = (address: BigNumberish): string | undefined => {
   const players_names = usePlayerDataStore((state) => state.players_names);
   const getPlayernameFromAddress = usePlayerDataStore((state) => state.getPlayernameFromAddress);
-  const username = useMemo(() => (getPlayernameFromAddress(address) as string), [players_names, address]);
+  const username = useMemo(() => (getPlayernameFromAddress(address) as string), [getPlayernameFromAddress, address]);
   return username;
 }
 
@@ -287,7 +287,7 @@ export const useBlockedPlayersDuelistIds = () => {
   const blockedPlayersDuelistIds = useMemo(() => {
     const allAccounts = [...blockedPlayersAccounts, ...teamMembersAccounts]
     return allAccounts.reduce((acc, account) => [...acc, ...getTokenIdsOwnedByAccount(account)], [] as bigint[])
-  }, [blockedPlayersAccounts, teamMembersAccounts, tokens])
+  }, [blockedPlayersAccounts, getTokenIdsOwnedByAccount, teamMembersAccounts])
 
   return {
     blockedPlayersDuelistIds,
@@ -426,7 +426,7 @@ export const useQueryPlayerIds = (
 
     // return ids only
     return result.map((e) => e.player_address)
-  }, [players, filterName, filterActive, sortColumn, sortDirection, filterBookmarked, bookmarkedDuelists, address, players_online])
+  }, [players, filterName, filterBookmarked, filterActive, bookmarkedDuelists, players_online, clientTimestamp, sortDirection, sortColumn])
 
   return {
     playerIds,

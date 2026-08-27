@@ -36,7 +36,7 @@ export function useDuelistTokenProps(duelistId: BigNumberish) {
     timestamp_active: timestampActive,
     level,
     // is_loading: !!isLoading,
-  }), [name, profileType, profilePic, currentDuelId, currentPassId, balance_eth, lives, owner, totals, level, duelistId])
+  }), [duelistId, owner, name, totals.honour, totals.archetype, totals.total_duels, totals.total_wins, totals.total_losses, totals.total_draws, profileType, profilePic, balance_eth, lives, currentDuelId, currentPassId, timestampRegistered, timestampActive, level])
 
   return props
 }

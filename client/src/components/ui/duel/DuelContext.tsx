@@ -298,7 +298,7 @@ export const DuelContextProvider: React.FC<{
     if ((isYouA || isYouB) && account && isRequired && isFinished) {
       community.clear_call_to_challenge(account, duelId);
     }
-  }, [isYouA, isYouB, account, isRequired, isFinished, community]);
+  }, [isYouA, isYouB, account, isRequired, isFinished, community, duelId]);
 
   // Create a stable function to reset stats
   const resetStats = useCallback(() => {
@@ -354,14 +354,7 @@ export const DuelContextProvider: React.FC<{
     isYou: swapSides ? isYouB : isYouA,
     isCharacter: swapSides ? isCharacterB : isCharacterA,
     isPlayerCharacter: swapSides ? isPlayerCharacterB : isPlayerCharacterA,
-  }), [
-    swapSides, 
-    duelistIdA, duelistIdB, 
-    duelistAddressA, duelistAddressB, 
-    duelistA.name, duelistB.name, 
-    duelistA.characterType, duelistB.characterType, 
-    isYouA, isYouB
-  ]);
+  }), [swapSides, duelistIdB, duelistIdA, duelistAddressB, duelistAddressA, duelistB.name, duelistB.characterType, duelistA.name, duelistA.characterType, isYouB, isYouA, isCharacterB, isCharacterA, isPlayerCharacterB, isPlayerCharacterA]);
 
   const rightDuelist = useMemo(() => ({
     id: swapSides ? duelistIdA : duelistIdB,
@@ -371,14 +364,7 @@ export const DuelContextProvider: React.FC<{
     isYou: swapSides ? isYouA : isYouB,
     isCharacter: swapSides ? isCharacterA : isCharacterB,
     isPlayerCharacter: swapSides ? isPlayerCharacterA : isPlayerCharacterB,
-  }), [
-    swapSides, 
-    duelistIdA, duelistIdB, 
-    duelistAddressA, duelistAddressB, 
-    duelistA.name, duelistB.name, 
-    duelistA.characterType, duelistB.characterType,
-    isYouA, isYouB
-  ]);
+  }), [swapSides, duelistIdA, duelistIdB, duelistAddressA, duelistAddressB, duelistA.name, duelistA.characterType, duelistB.name, duelistB.characterType, isYouA, isYouB, isCharacterA, isCharacterB, isPlayerCharacterA, isPlayerCharacterB]);
 
   // Create the context value as a memoized object to prevent unnecessary re-renders
   const contextValue = useMemo<DuelContextState>(() => ({
@@ -428,16 +414,7 @@ export const DuelContextProvider: React.FC<{
     clearActionFlag,
     resetStats,
     setDuelistsLoaded,
-  }), [
-    duelId, isTutorial, isLoading, isSceneStarted, isDataSet, isPlaying, duelInProgress,
-    swapSides, duelStage, completedStagesLeft, completedStagesRight,
-    canAutoRevealLeft, canAutoRevealRight, leftDuelist, rightDuelist,
-    statsLeft, statsRight, duelProgress, hasWithdrawnOrAbandoned,
-    positionToAB, setSceneStarted, setDataSet, setDuelInProgress, setIsPlaying,
-    setStatsLeft, setStatsRight, clearActionFlag, resetStats, setDuelistsLoaded,
-    timestampStart, timestampEnd, isAwaiting, isInProgress, isFinished, isExpired, isCanceled,
-    areDuelistsLoaded,
-  ]);
+  }), [duelId, isTutorial, isLoading, isSceneStarted, isDataSet, areDuelistsLoaded, isPlaying, duelInProgress, isYouA, isYouB, swapSides, duelStage, completedStagesLeft, completedStagesRight, canAutoRevealLeft, canAutoRevealRight, leftDuelist, rightDuelist, statsLeft, statsRight, duelSpeedFactor, debugMode, timestampStart, timestampEnd, isAwaiting, isInProgress, isFinished, isExpired, isCanceled, duelProgress, hasWithdrawnOrAbandoned, positionToAB, setSceneStarted, setDataSet, clearActionFlag, resetStats]);
 
   return (
     <DuelContext.Provider value={contextValue}>

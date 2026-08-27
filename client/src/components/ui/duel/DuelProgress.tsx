@@ -94,7 +94,9 @@ export default function DuelProgress({
     
     acceptChallenge(duelId, selectedDuelistIdForCheck, true)
     setSelectedDuelistIdForCheck(0n)
-  }, [selectedDuelistIdForCheck, isInAction, lives, livesStaked])
+  // handleDuelistSelectedCallback has no reactive inputs and is declared below.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedDuelistIdForCheck, isInAction, lives, livesStaked, isLoadingAccept, acceptChallenge, duelId, duelistSelectOpener])
   
   const handleDuelistSelectedCallback = useCallback((selectedDuelistId: BigNumberish) => {
     if (!isPositiveBigint(selectedDuelistId)) return
@@ -125,11 +127,11 @@ export default function DuelProgress({
         }
       }
     }
-  }, [isYou, duelistId, isMyDuelist, isConnected, duelStage, completedStages, canReveal, revealFromServer, isLoadingReveal, isLoadingCommit, duelistSelectOpener, handleDuelistSelectedCallback])
+  }, [isYou, duelistId, isConnected, isMyDuelist, completedStages, duelStage, duelistSelectOpener, handleDuelistSelectedCallback, canReveal, isLoadingReveal, isLoadingCommit, revealFromServer, revealMoves])
 
   useEffect(() => {
     gameImpl.setIsLoading(isA, isLoadingAutoReveal || isLoadingCommit || isLoadingReveal)
-  }, [isLoadingAutoReveal, isLoadingCommit, isLoadingReveal, isA])
+  }, [isLoadingAutoReveal, isLoadingCommit, isLoadingReveal, isA, gameImpl])
 
   // Auto-reveal when conditions are met
   // ONLY FOR TUTORIALS
@@ -160,7 +162,7 @@ export default function DuelProgress({
     if (isMyDuelist && canSign) {
       sign_and_restore()
     }
-  }, [canSign, isMyDuelist])
+  }, [canSign, isMyDuelist, sign_and_restore])
 
   // Reveal cards when hand is available
   useEffect(() =>{

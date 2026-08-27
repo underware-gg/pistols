@@ -131,7 +131,7 @@ function Sign({
     game: 'PISTOLS_AT_10_BLOCKS',
     purpose: `SIGN_TEST`,
     nonce: `${nonce}`,
-  }), [])
+  }), [nonce])
   const { typedMessage, messageHash, typeHash } = useTypedMessage({
     account,
     starknetDomain,
@@ -153,7 +153,7 @@ function Sign({
 
   useEffect(() => {
     setSig(signature.map(s => BigInt(s)))
-  }, [signature])
+  }, [setSig, signature])
 
   const { isLoading, isValid, isError } = useVerifyControllerSignature(messageHash, signature)
 

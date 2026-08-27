@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { BigNumberish, CallData, shortString } from 'starknet'
 import { useAccount } from '@starknet-react/core'
@@ -58,10 +58,10 @@ export const useConnectedController = () => {
   })
 
   // callbacks
-  const openSettings = useCallback((isConnected && controllerConnector) ? async () => {
+  const openSettings = useMemo(() => (isConnected && controllerConnector) ? async () => {
     await controllerConnector.controller.openSettings()
   } : null, [controllerConnector, isConnected])
-  const openProfile = useCallback((isConnected && controllerConnector) ? async (tab?: ProfileContextTypeVariant) => {
+  const openProfile = useMemo(() => (isConnected && controllerConnector) ? async (tab?: ProfileContextTypeVariant) => {
     await controllerConnector.controller.openProfile(tab)
   } : null, [controllerConnector, isConnected])
 

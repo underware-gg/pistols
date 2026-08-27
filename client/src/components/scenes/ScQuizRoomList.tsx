@@ -248,7 +248,7 @@ export default function ScQuizRoomList() {
         if (isAdmin || isTeamMember) return true
         return !FILTERED_QUIZ_IDS.includes(party.id)
       })
-  ), [parties])
+  ), [isAdmin, isTeamMember, parties])
 
   // Get all question models to check active questions
   const questionModels = useAllStoreModels<models.QuizQuestion>(entities, 'QuizQuestion')

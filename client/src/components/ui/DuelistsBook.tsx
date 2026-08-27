@@ -147,7 +147,7 @@ export const DuelistsBook: React.FC<DuelistsBookProps> = ({
         })
         .start();
     }
-  }, [opener.isOpen]);
+  }, [aspectWidth, bookRotateXClosed, bookRotateXOpen, bookRotateYClosed, bookRotateYOpen, bookRotateZClosed, bookRotateZOpen, bookTranslateXClosed, bookTranslateXOpen, bookTranslateYClosed, bookTranslateYOpen, isBookOpen, isBookVisible, opener.isOpen, width]);
   
   return (
     <div className={`book-container ${opener.isOpen ? 'YesMouse' : 'NoMouse'} NoDrag`}>
@@ -238,6 +238,8 @@ function BookCoverLayer({
         topTweenRef.current.stop();
       }
     };
+  // updateCover is a hoisted DOM command; these are all reactive values it reads.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, layer, layerGap, aspectWidth, coverGap]);
 
   function updateCover() {
@@ -422,7 +424,7 @@ function BookSheets({ isOpen, width, height }: { isOpen: boolean; width?: number
     }
 
     return pages;
-  }, [duelistIds, aspectWidth, width, height, maxPages, isAnimatingOpen]); // Removed isOpen dependency
+  }, [duelistIds, width, height, maxPages, aspectWidth, dispatchSelectDuelistId]); // Removed isOpen dependency
 
   const handleNextPage = () => {
     if (currentPage < maxPages - 1) {
@@ -502,11 +504,14 @@ function BookSheets({ isOpen, width, height }: { isOpen: boolean; width?: number
         sheetsTweenRef.current.stop();
       }
     };
-  }, [isOpen]);
+  // updateSheets is a hoisted animation command keyed by the state below.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, isOpen, sheetGap, sheetOrder, width]);
 
   useEffect(() => {
     updateSheets(sheetsRotateYRef.current, curveRadiusRef.current, false);
-  }, [sheetOrder]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, sheetGap, sheetOrder]);
 
   function updateSheets(rotateY: number, curveRadius: number, fromOpening: boolean) {
     const currentSheetOrder = sheetOrder;
@@ -571,7 +576,7 @@ function BookSheets({ isOpen, width, height }: { isOpen: boolean; width?: number
         sheet.style.setProperty('--sheet-translate-z', `${aspectWidth(zOffset)}px`);
       }
     });
-  }, [sheetGap, aspectWidth]);
+  }, [sheetGap, aspectWidth, sheetOrder]);
 
   const renderDuelistsForPage = (sheetId: number, isLeft: boolean) => {
     const orderIndex = sheetOrder.indexOf(sheetId);

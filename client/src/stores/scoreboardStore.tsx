@@ -157,12 +157,14 @@ export const useDuelistSeasonScore = (duelist_id: BigNumberish, season_id: numbe
 //
 
 export const useGetSeasonScoreboard = (season_id: number) => {
-  const scoreboardState = useScoreboardStore((state) => state);
-  const fetchState = useScoreboardFetchStore((state) => state);
+  const scoreboard = useScoreboardStore((state) => state.scoreboard);
+  const setEntities = useScoreboardStore((state) => state.setEntities);
+  const fetchedIds = useScoreboardFetchStore((state) => state.ids);
+  const setFetchedIds = useScoreboardFetchStore((state) => state.setFetchedIds);
 
   // fetch only once per season
   const query = useMemo<PistolsQueryBuilder>(() => (
-    (season_id > 0 && fetchState.getNewIds([season_id]).length > 0)
+    (season_id > 0 && !fetchedIds.includes(BigInt(season_id)))
       ? new PistolsQueryBuilder()
         .withClause(
           new PistolsClauseBuilder().keys(
@@ -176,23 +178,23 @@ export const useGetSeasonScoreboard = (season_id: number) => {
         .withLimit(2000)
         .includeHashedKeys()
       : null
-  ), [season_id, fetchState.ids])
+  ), [fetchedIds, season_id])
 
   // add season scores to the store
   const { isLoading, isFinished } = useSdkEntitiesGet({
     query,
     setEntities: (entities: PistolsEntity[]) => {
       debug.log(`useGetSeasonScoreboard() GOT`, season_id, entities);
-      scoreboardState.setEntities(entities);
-      fetchState.setFetchedIds([BigInt(season_id)]);
+      setEntities(entities);
+      setFetchedIds([BigInt(season_id)]);
     },
   })
 
-  const scoreboard = useMemo<DuelistScore[]>(() => (
-    scoreboardState.scoreboard.filter(s => s.seasonId === season_id)
-  ), [scoreboardState.scoreboard, season_id])
+  const seasonScores = useMemo<DuelistScore[]>(() => (
+    scoreboard.filter(s => s.seasonId === season_id)
+  ), [scoreboard, season_id])
 
-  const seasonScoreboard = useMergeScoreboardWithLeaderboardInternal(scoreboard, season_id)
+  const seasonScoreboard = useMergeScoreboardWithLeaderboardInternal(seasonScores, season_id)
 
   return {
     seasonScoreboard,
@@ -200,4 +202,3 @@ export const useGetSeasonScoreboard = (season_id: number) => {
     isFinished,
   }
 }
-

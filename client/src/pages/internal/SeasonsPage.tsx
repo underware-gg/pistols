@@ -293,12 +293,14 @@ function DuelsReport({ seasonId }: { seasonId: number }) {
 
 function PacksReport({ seasonId }: { seasonId: number }) {
   const mounted = useMounted()
-  const query = useMemo<PistolsQueryBuilder>(() => (
-    new PistolsQueryBuilder()
+  const query = useMemo<PistolsQueryBuilder>(() => {
+    // Recreate the report store when navigating between seasons.
+    void seasonId
+    return new PistolsQueryBuilder()
       .withEntityModels(['pistols-Pack'])
       .withLimit(10000)
       .includeHashedKeys()
-  ), [seasonId])
+  }, [seasonId])
   const { entities, isLoading } = useSdkEntitiesGetState({
     query,
     enabled: mounted,
@@ -368,12 +370,14 @@ function PacksReport({ seasonId }: { seasonId: number }) {
 
 function DuelistsReport({ seasonId }: { seasonId: number }) {
   const mounted = useMounted()
-  const query = useMemo<PistolsQueryBuilder>(() => (
-    new PistolsQueryBuilder()
+  const query = useMemo<PistolsQueryBuilder>(() => {
+    // Recreate the report store when navigating between seasons.
+    void seasonId
+    return new PistolsQueryBuilder()
       .withEntityModels(['pistols-Duelist', 'pistols-DuelistMemorial'])
       .withLimit(10000)
       .includeHashedKeys()
-  ), [seasonId])
+  }, [seasonId])
   const { entities, isLoading } = useSdkEntitiesGetState({
     query,
     enabled: mounted,
@@ -529,7 +533,7 @@ function LordsReleaseEvents({
       developerBills,
       consolidatedDeveloperBill
     };
-  }, [bills])
+  }, [bills, seasonId])
   return (
     <Table celled color='green'>
       <Header fullWidth>
@@ -580,4 +584,3 @@ function BillRow({
     </Row>
   )
 }
-

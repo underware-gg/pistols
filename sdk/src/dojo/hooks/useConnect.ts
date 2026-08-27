@@ -1,26 +1,29 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { Connector, useAccount, useConnect, useNetwork } from '@starknet-react/core'
 import { SwitchStarknetChainParameters, AddStarknetChainParameters } from '@starknet-io/get-starknet-core'
 import { useAddStarknetChain, useSwitchStarknetChain } from 'src/utils/hooks/useWalletRequest'
 import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
 import { feltToString } from 'src/starknet/starknet'
+import { useLatestRef } from 'src/utils/hooks/useLatestRef'
 
 
 export const useConnectToSelectedNetwork = (onConnect?: () => void) => {
   const { isConnected, isConnecting } = useAccount()
   const { connect, connectors } = useConnect()
   const { selectedNetworkConfig } = useDojoSetup()
+  const onConnectRef = useLatestRef(onConnect)
 
-  const [requestedConnect, setRequestedConnect] = useState(false)
+  const requestedConnectRef = useRef(false)
   useEffect(() => {
-    if (requestedConnect && isConnected) {
-      onConnect?.()
+    if (requestedConnectRef.current && isConnected) {
+      requestedConnectRef.current = false
+      onConnectRef.current?.()
     }
-  }, [requestedConnect, isConnected])
+  }, [isConnected, onConnectRef])
 
   let _connect = useCallback(() => {
     if (isConnected) {
-      onConnect?.()
+      onConnectRef.current?.()
     } else if (!isConnecting) {
       // get 1st supported connector on this chain
       const connector = selectedNetworkConfig.connectorIds.reduce((acc, id) => {
@@ -28,14 +31,14 @@ export const useConnectToSelectedNetwork = (onConnect?: () => void) => {
       }, undefined as Connector)
       if (connector) {
         console.log(`>> Connecting with [${connector.id}]...`)
-        setRequestedConnect(true)
+        requestedConnectRef.current = true
         connect({ connector })
       } else {
-        setRequestedConnect(false)
+        requestedConnectRef.current = false
         console.warn(`NO CONNECTOR!`)
       }
     }
-  }, [connectors, isConnected, isConnecting])
+  }, [connect, connectors, isConnected, isConnecting, onConnectRef, selectedNetworkConfig.connectorIds])
 
   return {
     connect: _connect,
@@ -85,5 +88,3 @@ export const useChainSwitchCallbacks = () => {
     switch_starknet_chain,
   }
 }
-
-

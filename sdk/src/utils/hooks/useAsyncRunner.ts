@@ -33,7 +33,7 @@ export function useAsyncRunner<T>() {
     return () => {
       _mounted = false
     }
-  }, [])
+  }, [isRunning])
   return {
     run,
     result,

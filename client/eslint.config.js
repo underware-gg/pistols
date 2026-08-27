@@ -30,7 +30,7 @@ export default [
       //
       // Adopting those as a side effect of moving off a deprecated ESLint line
       // would fold a large code-quality decision into a supply-chain fix. They
-      // are a backlog to take deliberately, like exhaustive-deps. Leaving them
+      // are a backlog to take deliberately. Leaving them
       // unlisted keeps them off without pinning rule names that only exist in v7.
       'react-hooks/rules-of-hooks': 'error',
 
@@ -38,8 +38,7 @@ export default [
       '@typescript-eslint/no-duplicate-enum-values': 0,
       'no-mixed-spaces-and-tabs': 0,
 
-      // TODO: uncomment and fix all this...
-      'react-hooks/exhaustive-deps': 0,
+      'react-hooks/exhaustive-deps': 'error',
       'react-refresh/only-export-components': 0,
     },
   },

@@ -21,7 +21,7 @@ export const useRingIdsOwnedByPlayer = () => {
 
 export const useRingIdsOwnedByAccount = (address: BigNumberish) => {
   const state = useRingTokenStore((state) => state)
-  const ringIds = useMemo(() => state.getTokenIdsOwnedByAccount(address).map(id => Number(id)), [state.tokens, address])
+  const ringIds = useMemo(() => state.getTokenIdsOwnedByAccount(address).map(id => Number(id)), [state, address])
   return {
     ringIds,
     isLoading: (state.tokens === null),

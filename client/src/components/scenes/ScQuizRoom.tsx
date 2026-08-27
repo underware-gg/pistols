@@ -112,7 +112,9 @@ export default function ScQuizRoom() {
     } else if (activeQuestionId !== previousActiveQuestionIdRef.current) {
       previousActiveQuestionIdRef.current = activeQuestionId;
     }
-  }, [activeQuestionId, activeQuestionIsOpen, isPartyClosed]);
+  // toggleLeaderboard is stable; these state transitions are the complete trigger.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeQuestionId, activeQuestionIsOpen, isLeaderboardOpen, isPartyClosed]);
 
   const hasTriggeredConfetti = useRef(false);
   useEffect(() => {
@@ -222,7 +224,7 @@ export default function ScQuizRoom() {
       (_currentScene as InteractibleScene)?.setShowHoverDescription(true);
       (_currentScene as InteractibleScene)?.setClickable(true);
     }
-  }, [_currentScene, isQuizNotStarted, shouldShowWinner, isInfoPanelOpen, questionId]);
+  }, [isQuizNotStarted, shouldShowWinner, isInfoPanelOpen, questionId]);
 
   useEffect(() => {
     if (hoveredItem === "cumberlord") {
@@ -339,23 +341,7 @@ export default function ScQuizRoom() {
     }
     
     return "Waiting for next question...";
-  }, [
-    quizName, 
-    partyId, 
-    questionId, 
-    isOpen, 
-    isClosed, 
-    question, 
-    options.length, 
-    isQuizNotStarted, 
-    isPartyClosed,
-    partyTimestampStart, 
-    hasWinner, 
-    winners, 
-    leaderboards, 
-    shouldShowWinner, 
-    clientTimestamp,
-  ]);
+  }, [quizName, partyId, questionId, isOpen, isClosed, question, options.length, isQuizNotStarted, partyTimestampStart, hasWinner, winners, leaderboards, shouldShowWinner, clientTimestamp]);
 
   const titleFontSize = useMemo(() => {
     const length = boardTitle ? boardTitle.length : 0;
@@ -399,17 +385,7 @@ export default function ScQuizRoom() {
     }
 
     return "";
-  }, [
-    quizName,
-    partyId,
-    questionId,
-    question,
-    options.length,
-    description,
-    isPartyClosed,
-    isQuizNotStarted,
-    shouldShowWinner,
-  ]);
+  }, [quizName, partyId, questionId, isQuizNotStarted, question, options.length, shouldShowWinner, isPartyClosed, partyDescription, description]);
 
   return (
     <>

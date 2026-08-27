@@ -29,7 +29,7 @@ const Col = Grid.Column
 
 export default function NewChallengeModal() {
   const { challengingAddress, challengingDuelistId } = usePistolsContext()
-  const isOpen = useMemo(() => (challengingAddress > 0n && challengingDuelistId > 0n), [challengingDuelistId, challengingDuelistId])
+  const isOpen = useMemo(() => (challengingAddress > 0n && challengingDuelistId > 0n), [challengingAddress, challengingDuelistId])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -105,7 +105,7 @@ function NewChallengeModalInner({
     if (hasPact) {
       dispatchSelectDuel(pactDuelId)
     }
-  }, [hasPact])
+  }, [dispatchSelectDuel, hasPact, pactDuelId])
 
   const _create_duel = () => {
     if (args?.canSubmit) {
@@ -406,7 +406,7 @@ function NewChallengeForm({
         dispatchChallengingDuelistId(metaData.duelistId)
       }
     }
-  }, [metaData, isLoading])
+  }, [metaData, isLoading, dispatchChallengingDuelistId])
 
   useEffect(() => {
     setArgs({
@@ -416,7 +416,7 @@ function NewChallengeForm({
       lives_staked: highStakes ? 3 : 1,
       canSubmit: true,
     })
-  }, [premise, message, days, hours, highStakes])
+  }, [premise, message, days, hours, highStakes, setArgs])
 
   const premiseOptions = useMemo(() => Object.keys(constants.Premise).slice(1).map((premise) => ({
     key: `${premise}`,

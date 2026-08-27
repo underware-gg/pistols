@@ -57,7 +57,7 @@ export function useCallToChallenges() {
         }
         return acc;
       }, [] as CallToChallengeDuel[])
-  ), [entities])
+  ), [address, entities])
   const requiredDuelIds = useMemo(() => activeChallenges.filter((ch) => ch.requiresAction).map((ch) => ch.duelId), [activeChallenges])
   const requiresAction = useMemo(() => (requiredDuelIds.length > 0), [requiredDuelIds])
   // useMemo(() => console.log(`[EventsModelStoreSync] useCallToChallenge() =================>`, entities, activeChallenges, requiredDuelIds), [activeChallenges])
@@ -149,11 +149,11 @@ export const useDiscordSocialLink = (address: BigNumberish) => {
   // must be used only if avatarUrl is not available
   const apiAvatarUrl = useMemo(() => (
     (userId ? `${selectedNetworkConfig.assetsServerUrl}/api/discord/avatar/${userId}/` : '')
-  ), [userId])
+  ), [selectedNetworkConfig.assetsServerUrl, userId])
   // get the user data from the assets server
   const apiUserDatarUrl = useMemo(() => (
     (userId ? `${selectedNetworkConfig.assetsServerUrl}/api/discord/user/${userId}/` : '')
-  ), [userId])
+  ), [selectedNetworkConfig.assetsServerUrl, userId])
   return {
     isLinked,
     userName,

@@ -89,7 +89,7 @@ export function Balance({
             : ''
     )
     return fools ? result : ((result == '0' || result == '0.0') ? EMOJIS.ZERO : result)
-  }, [decimals, eth, wei, isLoading])
+  }, [decimals, ether, isLoading, wei, eth, fools])
 
   const classNames = useMemo(() => {
     let result = []
@@ -119,7 +119,7 @@ export function Balance({
     if (fools) return <><FoolsIcon size={null} />{' '}</>
     if (fame) return <><FameIcon size={'small'} />{' '}</>
     return <></>
-  }, [clean, lords, fools, fame, ether])
+  }, [clean, ether, strk, lords, fools, fame])
 
   return (
     <span className={classNames.join(' ')} style={{ fontSize }}>

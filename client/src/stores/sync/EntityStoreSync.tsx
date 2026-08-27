@@ -195,8 +195,8 @@ export function EntityStoreSync() {
   // Keep ID stores updated
   const updateChallengeIdsEntities = useChallengeIdsStore((state) => state.updateEntities)
   const updateDuelistIdsEntities = useDuelistIdsStore((state) => state.updateEntities)
-  useEffect(() => updateChallengeIdsEntities(Object.values(challengeState.entities)), [challengeState.entities])
-  useEffect(() => updateDuelistIdsEntities(Object.values(duelistState.entities)), [duelistState.entities])
+  useEffect(() => updateChallengeIdsEntities(Object.values(challengeState.entities)), [challengeState.entities, updateChallengeIdsEntities])
+  useEffect(() => updateDuelistIdsEntities(Object.values(duelistState.entities)), [duelistState.entities, updateDuelistIdsEntities])
 
   // useEffect(() => debug.log("EntityStoreSync() [configStore.entities] =>", Object.values(configState.entities).length), [configState.entities])
   // useEffect(() => debug.log("EntityStoreSync() [seasonState.entities] =>", Object.values(seasonState.entities).length), [seasonState.entities])

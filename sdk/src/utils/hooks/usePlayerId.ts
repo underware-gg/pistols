@@ -29,7 +29,7 @@ export const usePlayerId = () => {
     } else {
       setPlayerId(undefined)
     }
-  }, [requiresPlayerId])
+  }, [replacePlayerId, requiresPlayerId])
 
   return {
     playerId,

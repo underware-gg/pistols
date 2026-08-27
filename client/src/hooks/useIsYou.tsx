@@ -25,7 +25,7 @@ export const useIsMyDuelist = (otherDuelistId: BigNumberish) => {
   const isMyDuelist = useMemo(() => (
     isPlayerCharacter ||
     (isPositiveBigint(owner) ? bigintEquals(address, owner) : false)
-  ), [address, owner, isPlayerCharacter, otherDuelistId])
+  ), [address, owner, isPlayerCharacter])
   return isMyDuelist
 }
 

@@ -65,7 +65,7 @@ export const DuelistMatchmakingSlot = forwardRef<DuelistMatchmakingSlotHandle, D
   const isMyTurn = useMemo(() => {
     if (!props.duelId || !challenge.duelistAddressA) return false;
     return (animatedDuel.turnA && isYouA) || (animatedDuel.turnB && isYouB);
-  }, [props.duelId, animatedDuel.turnA, animatedDuel.turnB, isYouA, isYouB, challenge.duelistAddressA, challenge.duelistAddressB]);
+  }, [props.duelId, animatedDuel.turnA, animatedDuel.turnB, isYouA, isYouB, challenge.duelistAddressA]);
 
   const showCollectButton = useMemo(() => {
     if (!props.duelId) return false;
@@ -173,40 +173,22 @@ export const DuelistMatchmakingSlot = forwardRef<DuelistMatchmakingSlotHandle, D
 
     // Default waiting state
     return { message: "Waiting in Line...", buttonText: null, color: "#f59e0b", showTimer: false };
-  }, [
-    props.isCommitting,
-    props.isEnlisting,
-    props.isEnlistedButNotCommitted,
-    props.isError,
-    currentDuelistId,
-    inQueueIds,
-    rankedPlayer.duelistId,
-    rankedPlayer.timestampEnter,
-    unrankedPlayer.duelistId,
-    unrankedPlayer.timestampEnter,
-    props.duelId,
-    challenge.isFinished,
-    challenge.isInProgress,
-    challenge.needToSyncExpired,
-    challenge.isSeasonExpired,
-    canCollectDuel,
-    requiresAction,
-  ]);
+  }, [props.isEnlisting, props.isEnlistedButNotCommitted, props.isCommitting, props.isError, props.duelId, canCollectDuel, challenge.needToSyncExpired, challenge.isAwaiting, challenge.isSeasonExpired, challenge.isFinished, challenge.duelistAddressA, challenge.duelistAddressB, challenge.isInProgress, currentDuelistId, rankedPlayer.duelistId, unrankedPlayer.duelistId, inQueueIds, animatedDuel.turnA, animatedDuel.turnB, isYouA, isYouB]);
 
   const handlePromote = useCallback(() => {
     // if (!currentSelectedId) return
     // props.onDuelistPromoted?.(currentSelectedId)
-  }, [props.onDuelistPromoted]);
+  }, []);
 
   const handleGoToDuel = useCallback(() => {
     if (!props.duelId) return;
     dispatchSelectDuel(props.duelId);
-  }, [props.duelId]);
+  }, [dispatchSelectDuel, props.duelId]);
 
   const handleRequeue = useCallback(() => {
     if (!myDuelistIdFromDuel) return;
     props.onRequeueDuelist?.(myDuelistIdFromDuel);
-  }, [myDuelistIdFromDuel, props.onRequeueDuelist]);
+  }, [myDuelistIdFromDuel, props]);
 
   const handleCollect = useCallback(() => {
     if (!props.duelId) return;

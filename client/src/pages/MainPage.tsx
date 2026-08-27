@@ -200,7 +200,7 @@ function MainUI() {
     }, SCENE_CHANGE_ANIMATION_DURATION);
 
     return () => clearTimeout(timer);
-  }, [atGate, atDoor, atDuel, atProfile, atTavern, atDuelsBoard, atDuelists, atMatchmaking, atGraveyard, atBackrooms, atLeaderboards, atQuizRoom, atQuizRoomList, atCardPacks, atDuelistBook, currentDuel, tutorialLevel, sceneComponents]);
+  }, [atGate, atDoor, atDuel, atProfile, atTavern, atDuelsBoard, atDuelists, atMatchmaking, atGraveyard, atBackrooms, atLeaderboards, atQuizRoom, atQuizRoomList, atCardPacks, atDuelistBook, currentDuel, tutorialLevel, sceneComponents, atTutorial, atInvite]);
 
   if (!gameImpl) return <></>
 
@@ -231,7 +231,7 @@ function TutorialUI({
     }
 
     return () => clearTimeout(timer);
-  }, [atTutorial, currentScene]);
+  }, [atTutorial, currentScene, wasLastSceneTutorial]);
 
   if (!gameImpl) return <></>
 
@@ -252,7 +252,7 @@ function Modals() {
 
     window.addEventListener('keydown', handleKeyPress)
     return () => window.removeEventListener('keydown', handleKeyPress)
-  }, [])
+  }, [bugReportOpener])
 
   return (
     <>

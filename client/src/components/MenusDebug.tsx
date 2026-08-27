@@ -225,10 +225,6 @@ function MenuDebugActors({
 }) {
   const { gameImpl } = useThreeJsContext()
 
-  const _play = (key) => {
-    gameImpl?.animateDuelistTest(actorId, key)
-  }
-
   const className = 'PaddedHalf Important Smaller'
 
   const items = useMemo(() => {
@@ -236,13 +232,13 @@ function MenuDebugActors({
     let result = []
     Object.keys(SPRITESHEETS.FEMALE).forEach(key => {
       result.push(
-        <Menu.Item key={key} className={className} onClick={() => _play(key)}>
+        <Menu.Item key={key} className={className} onClick={() => gameImpl.animateDuelistTest(actorId, key as AnimName)}>
           {actorId}:{key}
         </Menu.Item>
       )
     })
     return result
-  }, [gameImpl])
+  }, [actorId, gameImpl])
 
   return (
     <div className='MenuTop AlignCenter' style={{ top: actorId == 'B' ? '50px' : '80px', height: 'auto' }}>
@@ -252,4 +248,3 @@ function MenuDebugActors({
     </div>
   )
 }
-

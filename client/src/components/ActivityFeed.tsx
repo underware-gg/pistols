@@ -44,7 +44,7 @@ export default function ActivityFeed() {
   const { clientSeconds, updateTimestamp } = useClientTimestamp({ autoUpdate: true, updateSeconds: 60 })
   useEffect(() => {
     updateTimestamp()
-  }, [allPlayersActivity])
+  }, [allPlayersActivity, updateTimestamp])
 
   // console.log(`ActivityFeed() =>`, allPlayersActivity.map((a) => a.activity))
 

@@ -79,7 +79,7 @@ export default function ScCardPacks() {
     if (currentPage >= calculatedTotalPages) {
       setCurrentPage(Math.max(0, calculatedTotalPages - 1))
     }
-  }, [packIds, canClaimStarterPack])
+  }, [packIds, canClaimStarterPack, currentPage])
   
   const [allRenderedPacks, setAllRenderedPacks] = useState<number[]>([])
   
@@ -101,7 +101,7 @@ export default function ScCardPacks() {
       newRenderedPacks.push(selectedCardPack)
     }
     setAllRenderedPacks(newRenderedPacks)
-  }, [packIds, currentPage, selectedCardPack, canClaimStarterPack])
+  }, [packIds, currentPage, selectedCardPack, canClaimStarterPack, allRenderedPacks])
   
   const navigateStack = (direction: 'up' | 'down') => {
     if (direction === 'up' && currentPage > 0) {

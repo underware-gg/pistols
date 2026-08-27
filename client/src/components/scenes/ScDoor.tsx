@@ -346,7 +346,7 @@ export function ConnectButton({
       }
     }
 
-  }, [isConnected, isError, canClaimStarterPack, hasClickedButton.current, enterScene])
+  }, [isConnected, isError, canClaimStarterPack, enterScene, onDoorCreak, dispatchSetScene, tutorialPromptOpener, setLoading])
 
   return (
     <ActionButton 

@@ -119,7 +119,7 @@ export const ExclamationIndicator: React.FC<ExclamationIndicatorProps> = ({
         setOpacity(opacity)
       })
       .start()
-  }, [visible, animations.opacity, animationTiming.opacityDuration])
+  }, [visible, animations.opacity, animationTiming.opacityDuration, opacity])
 
   // Pulse and float animations
   useEffect(() => {
@@ -159,7 +159,7 @@ export const ExclamationIndicator: React.FC<ExclamationIndicatorProps> = ({
     } else {
       setVerticalShift(0)
     }
-  }, [opacity, isHovered, animations.pulse, animations.float, animationTiming])
+  }, [opacity, isHovered, animations.pulse, animations.float, animationTiming, pulseIntensity, verticalShift])
 
   const handleMouseEnter = () => {
     setIsHovered(true)

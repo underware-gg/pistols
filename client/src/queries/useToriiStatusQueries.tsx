@@ -12,7 +12,7 @@ export const useToriiBlockHead = ({
 }) => {
   const query = useMemo(() => (
     `select head from contracts where contract_type = "WORLD"`
-  ), [toriiUrl])
+  ), [])
   const { data, isLoading, latency, refetch } = useSqlQuery({
     query: enabled ? query : null,
     formatFn: (rows) => Number(rows[0]?.head ?? 0),
@@ -45,7 +45,7 @@ union all
 select "entities" as type, count(*) as count from entities
 union all
 select "controllers" as type, count(*) as count from controllers
-`), [toriiUrl])
+`), [])
   const { data, isLoading } = useSqlQuery({
     query: enabled ? query : null,
     formatFn: (rows: { type: string, count: string }[]) => rows.map(row => ({

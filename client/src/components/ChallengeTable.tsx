@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState, useRef } from 'react'
+import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react'
 import { ButtonGroup, Grid, SemanticCOLORS, Table } from 'semantic-ui-react'
 import { ChallengeColumn, useQueryParams } from '/src/stores/queryParamsStore'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
@@ -72,15 +72,17 @@ function ChallengeTableByIds({
   // Clear expired ranked duels with call-to-action flags
   useClearExpiredRankedDuels(allDuelIds)
 
-  const toggleSeason = (seasonId: string) => {
-    const newCollapsed = new Set(collapsedSeasons)
-    if (newCollapsed.has(seasonId)) {
-      newCollapsed.delete(seasonId)
-    } else {
-      newCollapsed.add(seasonId)
-    }
-    setCollapsedSeasons(newCollapsed)
-  }
+  const toggleSeason = useCallback((seasonId: string) => {
+    setCollapsedSeasons((current) => {
+      const next = new Set(current)
+      if (next.has(seasonId)) {
+        next.delete(seasonId)
+      } else {
+        next.add(seasonId)
+      }
+      return next
+    })
+  }, [])
 
   const rows = useMemo(() => {
     let result = []
@@ -179,7 +181,7 @@ function ChallengeTableByIds({
             }
           })
     return result
-  }, [challengeIds, compact, collapsedSeasons])
+  }, [challengeIds, collapsedSeasons, aspectWidth, toggleSeason, compact])
 
   const { filters, canAdd, canClear } = useMemo(() => {
     let canAdd = false
@@ -202,7 +204,7 @@ function ChallengeTableByIds({
       )
     })
     return { filters, canAdd, canClear }
-  }, [existingStates, states])
+  }, [existingStates, setStates, states])
 
   return (
     <div>

@@ -124,19 +124,17 @@ const ControlMenuItem = React.memo(({
     }, 200);
   }, [tooltipOpacity]);
   
-  useEffect(() => {
-    return () => {
-      if (tooltipTimeoutRef.current) {
-        clearTimeout(tooltipTimeoutRef.current);
-      }
-      if (leaveTimeoutRef.current) {
-        clearTimeout(leaveTimeoutRef.current);
-      }
-      if (tweenRef.current) {
-        tweenRef.current.stop();
-      }
-    };
-  }, []);
+  const clearPendingTooltipWork = useCallback(() => {
+    if (tooltipTimeoutRef.current) {
+      clearTimeout(tooltipTimeoutRef.current)
+    }
+    if (leaveTimeoutRef.current) {
+      clearTimeout(leaveTimeoutRef.current)
+    }
+    tweenRef.current?.stop()
+  }, [])
+
+  useEffect(() => clearPendingTooltipWork, [clearPendingTooltipWork]);
   
   return (
     <Menu.Item className='button_duel' type='icon-vertical'>
@@ -193,7 +191,7 @@ export function MenuDuelControl({
   const _switchSpeedFactor = useCallback(() => {
     const newSpeed = settings.duelSpeedFactor + 0.5
     dispatchSetting(SettingsActions.DUEL_SPEED_FACTOR, newSpeed > 2.0 ? 0.5 : newSpeed)
-  }, [settings.duelSpeedFactor, dispatchSetting]);
+  }, [settings.duelSpeedFactor, dispatchSetting, SettingsActions.DUEL_SPEED_FACTOR]);
 
   // Memoize the menu items to prevent unnecessary re-renders
   const menuItems = useMemo(() => (

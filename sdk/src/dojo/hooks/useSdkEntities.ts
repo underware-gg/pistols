@@ -18,6 +18,7 @@ import {
 } from 'src/games/pistols/sdk/utils_web'
 import { useEntityId } from 'src/dojo/hooks/useEntityId'
 import { debug } from 'src/games/pistols/misc/debug'
+import { useLatestRef } from 'src/utils/hooks/useLatestRef'
 
 
 //---------------------------------------
@@ -70,50 +71,55 @@ const useSdkGetInternal = (prefix: string, {
 }): UseSdkGetResult => {
   const [isLoading, setIsLoading] = useState<boolean>(undefined)
   const [isFinished, setIsFinished] = useState<boolean>(undefined)
+  const prefixRef = useLatestRef(prefix)
+  const resetStoreRef = useLatestRef(resetStore)
+  const setEntitiesRef = useLatestRef(setEntities)
+  const updateProgressRef = useLatestRef(updateProgress)
 
   useEffect(() => {
     let _mounted = true
+    let paginatedQuery = query
     const _get = async () => {
       setIsLoading(true)
       setIsFinished(false)
       try {
         let pageIndex = 0;
         let lastCursor = undefined;
-        while (query) {
-          updateProgress?.(pageIndex);
-          const response: PistolsToriiResponse = await fn({ query });
+        while (paginatedQuery) {
+          updateProgressRef.current?.(pageIndex);
+          const response: PistolsToriiResponse = await fn({ query: paginatedQuery });
           if (!_mounted) {
-            console.warn(`${prefix} UNMOUNTED GOT:`, response)
+            console.warn(`${prefixRef.current} UNMOUNTED GOT:`, response)
             return
           }
-          debug.log(`${prefix} GOT[page:${pageIndex}]:`, response, query)
+          debug.log(`${prefixRef.current} GOT[page:${pageIndex}]:`, response, paginatedQuery)
           const entities = _filterItems(response.getItems())
-          if (pageIndex == 0 && resetStore) {
+          if (pageIndex == 0 && resetStoreRef.current) {
             // debug.log(`${prefix} RESET>>>>>>>>>>>>`)
-            resetStore?.()
+            resetStoreRef.current()
           }
           if (entities.length > 0) {
             // debug.log(`${prefix} GOT>>>>>>>>>>>>`, entities)
-            setEntities(entities)
-            query = (
+            setEntitiesRef.current(entities)
+            paginatedQuery = (
               response.cursor && // has next cursor
               response.cursor != lastCursor // avoid sdk sending repeated cursor
-            ) ? response.getNextQuery(query) : null
+            ) ? response.getNextQuery(paginatedQuery) : null
             lastCursor = response.cursor
-            debug.log(`${prefix} cursor/query=`, lastCursor, query)
+            debug.log(`${prefixRef.current} cursor/query=`, lastCursor, paginatedQuery)
           } else {
-            setEntities([]); // notify that no events exist to stop trying
-            query = null
+            setEntitiesRef.current([]); // notify that no events exist to stop trying
+            paginatedQuery = null
             if (pageIndex == 0 && retryInterval > 0) {
-              debug.log(`${prefix} retry...`, retryInterval)
+              debug.log(`${prefixRef.current} retry...`, retryInterval)
               setTimeout(() => _get(), retryInterval)
             }
           }
           pageIndex++;
         }
-        updateProgress?.(pageIndex, true);
+        updateProgressRef.current?.(pageIndex, true);
       } catch (error) {
-        console.error(`${prefix} exception:`, error)
+        console.error(`${prefixRef.current} exception:`, error)
       }
       if (_mounted) {
         setIsLoading(undefined)
@@ -125,7 +131,7 @@ const useSdkGetInternal = (prefix: string, {
     return () => {
       _mounted = false
     }
-  }, [enabled, query])
+  }, [enabled, fn, query, retryInterval, prefixRef, resetStoreRef, setEntitiesRef, updateProgressRef])
 
   return {
     isLoading,
@@ -203,6 +209,8 @@ export const useSdkEntitiesSub = ({
   const { sdk } = useDojoSetup()
   const [isLoading, setIsLoading] = useState<boolean>(undefined)
   const [isFinished, setIsFinished] = useState<boolean>(undefined)
+  const setEntitiesRef = useLatestRef(setEntities)
+  const updateEntityRef = useLatestRef(updateEntity)
 
   const limit = useMemo(() => query?.build().pagination.limit, [query])
 
@@ -220,7 +228,7 @@ export const useSdkEntitiesSub = ({
             console.error("useSdkEntitiesSub() callback error:", response.error, query)
           } else {
             debug.log("useSdkEntitiesSub() SUB:", response.data);
-            _filterItems(response.data).forEach(entity => updateEntity(entity))
+            _filterItems(response.data).forEach(entity => updateEntityRef.current(entity))
           }
         },
       }).then((response: SdkSubscribeResponse) => {
@@ -236,7 +244,7 @@ export const useSdkEntitiesSub = ({
         if (!_unsubscribe) {
           _unsubscribe = () => sub.cancel()
           debug.log("useSdkEntitiesSub() ====== initialEntities>>>>>", initialEntities)
-          setEntities(_filterItems(initialEntities.getItems()))
+          setEntitiesRef.current(_filterItems(initialEntities.getItems()))
         }
       }).catch(error => {
         if (!_mounted) return
@@ -256,7 +264,7 @@ export const useSdkEntitiesSub = ({
       _unsubscribe = undefined
       _mounted = false
     }
-  }, [sdk, enabled, query])
+  }, [sdk, enabled, query, setEntitiesRef, updateEntityRef])
 
   return {
     isLoading,
@@ -273,6 +281,8 @@ export const useSdkEventsSub = ({
   const { sdk } = useDojoSetup()
   const [isLoading, setIsLoading] = useState<boolean>(undefined)
   const [isFinished, setIsFinished] = useState<boolean>(undefined)
+  const setEntitiesRef = useLatestRef(setEntities)
+  const updateEntityRef = useLatestRef(updateEntity)
 
   const limit = useMemo(() => query?.build().pagination.limit, [query])
   const historical = useMemo(() => query?.build().historical, [query])
@@ -291,7 +301,7 @@ export const useSdkEventsSub = ({
             console.error("useSdkEventsSub() callback error:", historical, response.error, query)
           } else {
             // debug.log("useSdkEventsSub() SUB:", historical, response.data);
-            _filterItems(response.data).forEach(entity => updateEntity(entity))
+            _filterItems(response.data).forEach(entity => updateEntityRef.current(entity))
           }
         },
       }).then((response: SdkSubscribeResponse) => {
@@ -307,7 +317,7 @@ export const useSdkEventsSub = ({
         if (!_unsubscribe) {
           _unsubscribe = () => sub.cancel()
           debug.log("useSdkEventsSub() ====== initialEntities>>>>>", historical, initialEntities, _filterItems(initialEntities.getItems()))
-          setEntities(_filterItems(initialEntities.getItems()))
+          setEntitiesRef.current(_filterItems(initialEntities.getItems()))
         }
       }).catch(error => {
         if (!_mounted) return
@@ -327,7 +337,7 @@ export const useSdkEventsSub = ({
       _unsubscribe = undefined
       _mounted = false
     }
-  }, [sdk, enabled, query])
+  }, [sdk, enabled, query, historical, setEntitiesRef, updateEntityRef])
 
   return {
     isLoading,
@@ -354,7 +364,7 @@ export const useStoreModelsByKeys = <M extends PistolsModelType>(entitiesMap: Re
   return useStoreModelsById(entitiesMap, modelName, entityId)
 }
 export const useStoreModelsById = <M extends PistolsModelType>(entitiesMap: Record<string, PistolsEntity>, modelName: PistolsSchemaModelNames, entityId: string): M | undefined => {
-  const entity = useMemo(() => entitiesMap[entityId], [entitiesMap[entityId]])
+  const entity = useMemo(() => entitiesMap[entityId], [entitiesMap, entityId])
   return useEntityModel(entity, modelName)
 }
 

@@ -3,7 +3,7 @@ import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
 import { useAllStoreModels, useSdkEventsGet } from '@underware/pistols-sdk/dojo'
 import { PistolsSchemaType, PistolsQueryBuilder, PistolsClauseBuilder, PistolsEntity } from '@underware/pistols-sdk/pistols/sdk'
-import { bigintEquals, bigintToDecimal, bigintToHex128 } from '@underware/pistols-sdk/utils'
+import { bigintEquals, bigintToDecimal, bigintToHex128, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { weiToEth } from '@underware/pistols-sdk/starknet'
 import { useChallengeRewardsFetchStore } from '/src/stores/fetchStore'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
@@ -140,11 +140,15 @@ export const useFetchChallengeRewardsByDuelist = (duelistId: BigNumberish) => {
 
 export const useFetchChallengeRewardsByDuelistIds = (duelistIds: BigNumberish[]) => {
   const setEntities = useChallengeRewardsStore((state) => state.setEntities);
-  const fetchState = useChallengeRewardsFetchStore((state) => state);
+  const fetchedIds = useChallengeRewardsFetchStore((state) => state.ids);
+  const setFetchedIds = useChallengeRewardsFetchStore((state) => state.setFetchedIds);
 
   const newDuelistIds = useMemo(() => (
-    fetchState.getNewIds(duelistIds)
-  ), [duelistIds, fetchState.ids])
+    duelistIds
+      .filter(isPositiveBigint)
+      .map(BigInt)
+      .filter((id) => !fetchedIds.includes(id))
+  ), [duelistIds, fetchedIds])
 
   const query = useMemo<PistolsQueryBuilder>(() => (
     newDuelistIds.length > 0
@@ -170,7 +174,7 @@ export const useFetchChallengeRewardsByDuelistIds = (duelistIds: BigNumberish[])
     // enabled: !result.challengeExists,
     setEntities: (entities: PistolsEntity[]) => {
       debug.log(`useFetchChallengeRewardsByDuelistIds() GOT`, newDuelistIds.map(bigintToDecimal), entities);
-      fetchState.setFetchedIds(newDuelistIds.map(BigInt));
+      setFetchedIds(newDuelistIds.map(BigInt));
       setEntities(entities);
     },
   })
@@ -184,5 +188,3 @@ export const useFetchChallengeRewardsByDuelistIds = (duelistIds: BigNumberish[])
     isFinished,
   }
 }
-
-

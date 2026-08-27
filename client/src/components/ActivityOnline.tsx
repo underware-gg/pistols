@@ -27,7 +27,7 @@ export default function ActivityOnline() {
 
   useEffect(() => {
     updateTimestamp()
-  }, [playersOnline])
+  }, [playersOnline, updateTimestamp])
 
   return (
     <div className='FillParent'>

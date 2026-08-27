@@ -16,7 +16,7 @@ export function useControllerUsername(address: BigNumberish) {
       username: username ?? 'Unknown',
       exists: username !== undefined,
     }
-  }, [usernames, isLoading])
+  }, [isLoading, usernames, address])
   return {
     exists,
     username,

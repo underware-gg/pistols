@@ -123,37 +123,37 @@ export const useFetchTokenBalancesOwnedByAccount = (accountAddress: BigNumberish
 function useAddBalancesToTokenStores(balances: torii.TokenBalance[]) {
   const { allTokens } = useTokenContracts()
   // token stores
-  const duelist_state = useDuelistTokenStore((state) => state)
-  const duel_state = useDuelTokenStore((state) => state)
-  const pack_state = usePackTokenStore((state) => state)
-  const ring_state = useRingTokenStore((state) => state)
-  const tournament_state = useTournamentTokenStore((state) => state)
+  const updateDuelistBalance = useDuelistTokenStore((state) => state.updateBalance)
+  const updateDuelBalance = useDuelTokenStore((state) => state.updateBalance)
+  const updatePackBalance = usePackTokenStore((state) => state.updateBalance)
+  const updateRingBalance = useRingTokenStore((state) => state.updateBalance)
+  const updateTournamentBalance = useTournamentTokenStore((state) => state.updateBalance)
   // coin stores
-  const lords_state = useLordsCoinStore((state) => state)
-  const fame_state = useFameCoinStore((state) => state)
-  const fools_state = useFoolsCoinStore((state) => state)
+  const updateLordsBalance = useLordsCoinStore((state) => state.updateBalance)
+  const updateFameBalance = useFameCoinStore((state) => state.updateBalance)
+  const updateFoolsBalance = useFoolsCoinStore((state) => state.updateBalance)
 
   useEffect(() => {
     // const pageNumber = (balances?.length == 0 ? 0 : 1)
     balances?.forEach(balance => {
       if (balance.contract_address === allTokens.lordsContractAddress) {
-        lords_state.updateBalance(balance)
+        updateLordsBalance(balance)
       } else if (balance.contract_address === allTokens.fameContractAddress) {
-        fame_state.updateBalance(balance)
+        updateFameBalance(balance)
       } else if (balance.contract_address == allTokens.foolsContractAddress) {
-        fools_state.updateBalance(balance)
+        updateFoolsBalance(balance)
       } else if (balance.contract_address == allTokens.duelistContractAddress) {
-        duelist_state.updateBalance(balance)
+        updateDuelistBalance(balance)
       } else if (balance.contract_address == allTokens.packContractAddress) {
-        pack_state.updateBalance(balance)
+        updatePackBalance(balance)
       } else if (balance.contract_address == allTokens.ringContractAddress) {
-        ring_state.updateBalance(balance)
+        updateRingBalance(balance)
       } else if (balance.contract_address == allTokens.duelContractAddress) {
-        duel_state.updateBalance(balance)
+        updateDuelBalance(balance)
       } else if (balance.contract_address == allTokens.tournamentContractAddress) {
-        tournament_state.updateBalance(balance)
+        updateTournamentBalance(balance)
       }
     })
-  }, [balances])
+  }, [allTokens.duelContractAddress, allTokens.duelistContractAddress, allTokens.fameContractAddress, allTokens.foolsContractAddress, allTokens.lordsContractAddress, allTokens.packContractAddress, allTokens.ringContractAddress, allTokens.tournamentContractAddress, balances, updateDuelBalance, updateDuelistBalance, updateFameBalance, updateFoolsBalance, updateLordsBalance, updatePackBalance, updateRingBalance, updateTournamentBalance])
   return {}
 }

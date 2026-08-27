@@ -38,23 +38,7 @@ export default function DuelistProfile({
 
   const { profilePic, profileType, name, nameAndId, totals } = useDuelist(duelistId)
 
-  useEffect(() => {
-    const damageDelta = damage - lastDamage
-    if (damageDelta !== 0) {
-      animateNumber(damageContainerRef, damageNumberRef)
-      setLastDamage(damage)
-    }
-  }, [damage])
-
-  useEffect(() => {
-    const hitChanceDelta = hitChance - lastHitChance
-    if (hitChanceDelta !== 0) {
-      animateNumber(hitChanceContainerRef, hitChanceNumberRef)
-      setLastHitChance(hitChance)
-    }
-  }, [hitChance])
-
-  const animateNumber = (referenceContainer, referenceText) => {
+  const animateNumber = useCallback((referenceContainer, referenceText) => {
     if (tutorialLevel === DuelTutorialLevel.SIMPLE) return
     
     const endRotation = Math.random() * 10 * (floated == "left" ? 1 : -1);
@@ -100,12 +84,28 @@ export default function DuelistProfile({
         })
       )
       .start();
-  }
+  }, [floated, speedFactor, tutorialLevel])
 
   const hitChanceContainerRef = useRef<HTMLDivElement>(null)
   const hitChanceNumberRef = useRef<HTMLDivElement>(null)
   const damageContainerRef = useRef<HTMLDivElement>(null)
   const damageNumberRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const damageDelta = damage - lastDamage
+    if (damageDelta !== 0) {
+      animateNumber(damageContainerRef, damageNumberRef)
+      setLastDamage(damage)
+    }
+  }, [animateNumber, damage, lastDamage])
+
+  useEffect(() => {
+    const hitChanceDelta = hitChance - lastHitChance
+    if (hitChanceDelta !== 0) {
+      animateNumber(hitChanceContainerRef, hitChanceNumberRef)
+      setLastHitChance(hitChance)
+    }
+  }, [animateNumber, hitChance, lastHitChance])
 
   if (tutorialLevel === DuelTutorialLevel.SIMPLE) return null
 

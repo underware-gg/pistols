@@ -22,13 +22,13 @@ export default function InviteModal() {
     if (referrer_username) {
       setCookie(REFERER_USERNAME_COOKIE_NAME, referrer_username, { path: '/' });
     }
-  }, [referrer_username])
+  }, [referrer_username, setCookie])
   
   useEffect(() => {
     if (referrerAddress) {
       setCookie(REFERER_ADDRESS_COOKIE_NAME, referrerAddress, { path: '/' });
     }
-  }, [referrerAddress])
+  }, [referrerAddress, setCookie])
 
   const isOpen = atInvite;
   return <>{isOpen && <InviteModalInner isOpen={isOpen} referrerAddress={referrerAddress} />}</>

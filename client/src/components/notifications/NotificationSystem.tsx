@@ -149,7 +149,7 @@ export default function NotificationSystem() {
     }
     selectedDuelIdRef.current = Number(selectedDuelId)
     currentDuelRef.current = Number(currentDuel)
-  }, [selectedDuelId, currentDuel])
+  }, [selectedDuelId, currentDuel, markAsRead])
 
   // Helper function to play notification sound with cooldown
   const playNotificationSound = (soundType: AudioName) => {
@@ -159,40 +159,6 @@ export default function NotificationSystem() {
       lastSoundTimeRef.current = now
     }
   }
-
-  // Handle notification clicks from service worker
-  useEffect(() => {
-    if (!navigator.serviceWorker) return
-
-    const handleMessage = (event: MessageEvent) => {
-      if (event.data?.type === 'DUEL_NOTIFICATION_CLICK') {
-        const duelIds = event.data.duelIds
-        if (!duelIds) return
-        
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current)
-          timeoutRef.current = undefined
-        }
-
-        if (duelIds.length > 1) {
-          dispatchSetScene(SceneName.Tavern)
-          setTimeout(() => {
-            barkeepModalOpener.open({ initialStage: 'notifications' })
-          }, 200)
-          onNotificationDismissed(false, duelIds)
-        } else {
-          dispatchSelectDuel(duelIds[0])
-          onNotificationDismissed(true, duelIds)
-        }
-      }
-    }
-
-    navigator.serviceWorker.addEventListener('message', handleMessage)
-
-    return () => {
-      navigator.serviceWorker.removeEventListener('message', handleMessage)
-    }
-  }, [])
 
   const showNotification = () => {
     if (notificationsRef.current && notificationsRef.current.length === 1 && (selectedDuelIdRef.current === notificationsRef.current[0]?.duelId || currentDuelRef.current === notificationsRef.current[0]?.duelId)) {
@@ -286,7 +252,7 @@ export default function NotificationSystem() {
       .start()
   }
 
-  const onNotificationDismissed = (hasSeen: boolean, notifications?: Notification[]) => {
+  const onNotificationDismissed = useCallback((hasSeen: boolean, notifications?: Notification[]) => {
     if (hasSeen && notifications) {
       markAsRead(notifications.map(n => n.duelId))
     }
@@ -295,7 +261,40 @@ export default function NotificationSystem() {
     setCurrentNotifications(null)
 
     emitter.emit('hover_description', null)
-  }
+  }, [markAsRead])
+
+  // Handle notification clicks from service worker
+  useEffect(() => {
+    if (!navigator.serviceWorker) return
+
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data?.type === 'DUEL_NOTIFICATION_CLICK') {
+        const duelIds = event.data.duelIds
+        if (!duelIds) return
+
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current)
+          timeoutRef.current = undefined
+        }
+
+        if (duelIds.length > 1) {
+          dispatchSetScene(SceneName.Tavern)
+          setTimeout(() => {
+            barkeepModalOpener.open({ initialStage: 'notifications' })
+          }, 200)
+          onNotificationDismissed(false, duelIds)
+        } else {
+          dispatchSelectDuel(duelIds[0])
+          onNotificationDismissed(true, duelIds)
+        }
+      }
+    }
+
+    navigator.serviceWorker.addEventListener('message', handleMessage)
+    return () => {
+      navigator.serviceWorker.removeEventListener('message', handleMessage)
+    }
+  }, [barkeepModalOpener, dispatchSelectDuel, dispatchSetScene, onNotificationDismissed])
 
   const handleClick = (e?: React.MouseEvent) => {
     const notifications = notificationsRef.current

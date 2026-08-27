@@ -365,7 +365,7 @@ export const BannerButton = memo(function BannerButton({
         .onUpdate(({offset}) => setOffset(offset))
         .start()
     }
-  }, [visible, short, customOffset])
+  }, [visible, short, customOffset, offset])
 
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'absolute', width: aspectWidth(10), height: 'auto', top: aspectWidth(offset), [right ? 'right' : 'left']: aspectWidth(2) }}>
@@ -448,7 +448,7 @@ const CurtainUI = memo(function CurtainUI({
         .onUpdate(({offset}) => setOffset(offset))
         .start()
     }
-  }, [visible, short])
+  }, [visible, short, offset])
 
   const handlePlayerSort = (column: PlayerColumn) => {
     if (filterPlayerSortColumn === column) {

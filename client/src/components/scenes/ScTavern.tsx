@@ -46,7 +46,7 @@ export default function ScTavern() {
           break;
       }
     }
-  }, [itemClicked, timestamp])
+  }, [barkeepModalOpener, dispatchSetScene, itemClicked, timestamp])
 
   useEffect(() => {
     if (!barkeepModalOpener.isOpen && !tavernRingsOpener.isOpen && _currentScene && _currentScene instanceof InteractibleScene) {

@@ -32,7 +32,7 @@ export default function AppDojo({
     const dojoAppConfig = makeDojoAppConfig(_networkId, isDefaultNetwork ? controllerConnector : undefined)
     return { dojoAppConfig, isDefaultNetwork }
   }, [networkId])
-  const env = useMemo(() => (isDefaultNetwork ? ENV : {}), [isDefaultNetwork, ENV])
+  const env = useMemo(() => (isDefaultNetwork ? ENV : {}), [isDefaultNetwork])
   return (
     <App title={title} subtitle={subtitle} backgroundImage={backgroundImage}>
       <Dojo dojoAppConfig={dojoAppConfig} env={env}>
@@ -62,6 +62,6 @@ function AutoDisconnect() {
       // console.log('AutoDisconnect>>>>>', isConnected, connector?.id, connectors)
       disconnect()
     }
-  }, [isConnected, connector, connectors])
+  }, [isConnected, connector, connectors, disconnect])
   return <></>
 }

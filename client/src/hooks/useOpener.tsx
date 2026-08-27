@@ -17,7 +17,7 @@ export function useOpener(defaultOpen = false) {
 
   const toggle = useCallback(() => {
     setIsOpen(!isOpen)
-  }, [])
+  }, [isOpen])
 
   return {
     open,

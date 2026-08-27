@@ -41,8 +41,8 @@ export const useSeason = (season_id: number) => {
   const seasonExists = useMemo(() => Boolean(season), [season])
   const seasonName = useMemo(() => (`Season ${season?.season_id ?? '?'}`), [season])
   const phase = useMemo(() => (parseEnumVariant<constants.SeasonPhase>(season?.phase) ?? null), [season])
-  const isActive = useMemo(() => (phase == constants.SeasonPhase.InProgress), [season])
-  const isFinished = useMemo(() => (phase == constants.SeasonPhase.Ended), [season])
+  const isActive = useMemo(() => (phase == constants.SeasonPhase.InProgress), [phase])
+  const isFinished = useMemo(() => (phase == constants.SeasonPhase.Ended), [phase])
 
   const period = useMemo(() => (season?.period ?? null), [season])
   const timestamp_start = useMemo(() => (period ? Number(period.start) : null), [period])
@@ -95,7 +95,7 @@ export const useLeaderboard = (season_id: number) => {
       }
     }
     return result
-  }, [leaderboard, _duelistIds, _scores])
+  }, [maxPositions, _duelistIds, _scores, season_id])
 
   return {
     seasonId: season_id,

@@ -22,7 +22,7 @@ const useSystem = (namespace: string, systemName: string, manifest: DojoManifest
       contractAddress: (contract ? bigintToHex(contract.address) : null) as BigNumberish,
       abi: (contract?.abi ?? null) as Abi,
     }
-  }, [systemName, manifest])
+  }, [manifest, namespace, systemName])
   return {
     contractAddress,
     abi,

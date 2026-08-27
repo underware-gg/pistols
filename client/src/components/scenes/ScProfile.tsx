@@ -48,7 +48,7 @@ export default function ScProfile() {
           break
       }
     }
-  }, [itemClicked, timestamp])
+  }, [canClaimStarterPack, disconnect, dispatchSetScene, itemClicked, timestamp])
 
   useEffect(() => {
     if (showCardPack) {
@@ -64,7 +64,7 @@ export default function ScProfile() {
     if (itemHovered == 'chest' && canClaimStarterPack) {
       emitter.emit('hover_description', 'Claim your free starter pack!')
     }
-  }, [itemHovered])
+  }, [canClaimStarterPack, itemHovered])
 
   // auto mint mock lords on testnets
   useMintMockLords()

@@ -52,7 +52,7 @@ function GameAudioLoader() {
     } else if (gameImpl && userHasInteracted) {
       _preloadAudio()
     }
-  }, [gameImpl, userHasInteracted])
+  }, [dispatchLoadedAudioAssets, gameImpl, userHasInteracted])
 
   if (!gameImpl) {
     return (
@@ -86,17 +86,17 @@ const GameAudios = ({
   useEffect(() => {
     const _play = (musicEnabled && isVisible && audioLoaded)
     gameImpl?.playAudio(AudioName.MUSIC_INGAME, _play)
-  }, [musicEnabled, isVisible, audioLoaded])
+  }, [musicEnabled, isVisible, audioLoaded, gameImpl])
 
   useEffect(() => {
     if (!isVisible) {
       gameImpl?.stopAudio(AudioName.MUSIC_INGAME)
     }
-  }, [isVisible])
+  }, [gameImpl, isVisible])
 
   useEffect(() => {
     gameImpl?.setSfxEnabled(sfxEnabled)
-  }, [sfxEnabled])
+  }, [gameImpl, sfxEnabled])
 
   return <></>
 }
@@ -114,7 +114,7 @@ export const TavernAudios = () => {
     return () => {
       gameImpl?.stopAudio(AudioName.MUSIC_MENUS)
     }
-  }, [])
+  }, [gameImpl])
 
   useEffect(() => {
     gameImpl?.setVolumeMultiplier(musicVolume)

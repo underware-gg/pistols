@@ -42,7 +42,7 @@ export default function SelectDuelistModal({
     if (!isOpen) {
       opener.close()
     }
-  }, [isOpen])
+  }, [isOpen, opener])
   return <>{opener.isOpen && <SelectDuelistModalInner opener={opener} />}</>
 }
 
@@ -74,13 +74,7 @@ function SelectDuelistModalInner({
     }
 
     return notDuelingIds;
-  }, [
-    isEnlistMode,
-    rankedCanEnlistIds,
-    notDuelingIds,
-    canMatchMakeIds,
-    duelistIds,
-  ]);
+  }, [isEnlistMode, rankedCanEnlistIds, notDuelingIds, canMatchMakeIds]);
 
   const bottomCardRef = useRef<HTMLImageElement>(null)
   const topCardRef = useRef<HTMLImageElement>(null)
@@ -209,6 +203,9 @@ function SelectDuelistModalInner({
     if (isPositiveBigint(selectedDuelistId)) {
       _close()
     }
+  // Selecting a duelist is the sole close trigger here; callback identity changes
+  // must not replay the closing animation.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDuelistId])
 
   // Reset page when switching between modes
@@ -246,7 +243,7 @@ function SelectDuelistModalInner({
       setIsAnimating(false)
       isAnimatingRef.current = false
     })
-  }, [selectedDuelistId, animate, dispatchChallengingPlayerAddress, dispatchChallengingDuelistId, opener])
+  }, [animate, selectedDuelistId, challengingDuelistId, challengingAddress, opener, pendingSelectedDuelistId, dispatchChallengingDuelistId, dispatchChallengingPlayerAddress])
 
   const handlePrevPage = useCallback(() => {
     if (currentPage > 0) setCurrentPage(prev => prev - 1)
@@ -296,7 +293,7 @@ function SelectDuelistModalInner({
     if (pendingSelectedDuelistId) {
       setSelectedDuelistId(pendingSelectedDuelistId)
     }
-  }, [pendingSelectedDuelistId, opener])
+  }, [pendingSelectedDuelistId])
 
   const handleCancelEnlist = useCallback(() => {
     setPendingSelectedDuelistId(0n)
@@ -339,7 +336,7 @@ function SelectDuelistModalInner({
       // Update positions of other cards
       updateAllCardPositions(isHovered ? index : -1)
     }
-  }, [getCardPositioning, updateAllCardPositions, currentDuelists, isAnimating])
+  }, [getCardPositioning, currentDuelists.length, aspectWidth, updateAllCardPositions])
 
   const handleNoDuelistsHover = useCallback((isHovered: boolean) => {
     if (isAnimatingRef.current || !noDuelistsCardRef.current) {
@@ -379,7 +376,7 @@ function SelectDuelistModalInner({
     } else {
       emitter.emit('hover_description', '')
     }
-  }, [getCardPositioning, isAnimating, isEnlistMode, canMatchMakeIds.length, rankedCanEnlistIds.length])
+  }, [getCardPositioning, aspectWidth, isEnlistMode, canMatchMakeIds.length, rankedCanEnlistIds.length])
 
   // Memoize the duelist cards to prevent unnecessary re-renders
   const duelistCardsMemo = useMemo(() => {
@@ -414,13 +411,7 @@ function SelectDuelistModalInner({
         />
       )
     })
-  }, [
-    currentDuelists, 
-    getCardPositioning, 
-    isAnimating, 
-    handleCardHover, 
-    availableDuelists.length
-  ])
+  }, [availableDuelists.length, currentDuelists, getCardPositioning, isAnimating, opener.props?.matchmakingType, handleDuelistClick, handleCardHover])
 
   // Memoize the no duelists slip to prevent unnecessary re-renders
   const noDuelistsSlipMemo = useMemo(() => {
@@ -448,16 +439,7 @@ function SelectDuelistModalInner({
         matchmakingType={opener.props?.matchmakingType}
       />
     )
-  }, [
-    availableDuelists.length, 
-    getCardPositioning, 
-    handleNoDuelistsClick, 
-    handleNoDuelistsHover,
-    isEnlistMode,
-    rankedCanEnlistIds,
-    canMatchMakeIds,
-    opener.props?.matchmakingType,
-  ])
+  }, [availableDuelists.length, getCardPositioning, handleNoDuelistsClick, handleNoDuelistsHover, isEnlistMode, rankedCanEnlistIds, canMatchMakeIds, opener.props?.matchmakingType, notDuelingIds])
 
   return (
     <Modal

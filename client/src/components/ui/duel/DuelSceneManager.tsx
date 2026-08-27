@@ -27,6 +27,7 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
   const { animated, dispatchAnimated } = useGameplayContext();
   const { tutorialOpener } = usePistolsContext();
   const context = useDuelContext();
+  const { setDataSet, setDuelistsLoaded, setSceneStarted } = context
 
   const duelistASVG = useDuelistTokenSvg(context.leftDuelist.id);
   const duelistBSVG = useDuelistTokenSvg(context.rightDuelist.id);
@@ -107,7 +108,7 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
         console.error("Error setting duel time percentage:", error);
       }
     }
-  }, [gameImpl, context.challenge, didSceneInit.current, didPlayersInitA.current, didPlayersInitB.current]);
+  }, [gameImpl, context.challenge]);
 
   // Main initialization effect
   useEffect(() => {
@@ -131,7 +132,7 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
           
           setTimeout(() => {
             try {
-              context.setSceneStarted(true);
+              setSceneStarted(true);
               dispatchAnimated(AnimationState.None);
             } catch (e) {
               console.error("Error updating scene state:", e);
@@ -147,7 +148,7 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
     };
     
     pollForData();
-  }, [duelId, gameImpl, context.leftDuelist.id, context.rightDuelist.id, dispatchAnimated]);
+  }, [duelId, gameImpl, context.leftDuelist.id, context.rightDuelist.id, dispatchAnimated, setSceneStarted]);
 
   useEffect(() => {
     if (!gameImpl || !didSceneInit.current) return;
@@ -162,10 +163,10 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
   useEffect(() => {
     if (gameImpl) {
       gameImpl.setOnLoadComplete(() => {
-        context.setDuelistsLoaded(true);
+        setDuelistsLoaded(true);
       });
     }
-  }, [gameImpl, context.setDuelistsLoaded]);
+  }, [gameImpl, setDuelistsLoaded]);
 
   // Update left duelist info when it changes
   useEffect(() => {
@@ -245,12 +246,12 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
   useEffect(() => {
     setTimeout(() => {
       try {
-        context.setDataSet(true);
+        setDataSet(true);
       } catch (e) {
         console.error("Error updating data state:", e);
       }
     }, 1000);
-  }, [didPlayersInitA.current, didPlayersInitB.current]);
+  }, [setDataSet]);
 
   // Cleanup effect
   useEffect(() => {

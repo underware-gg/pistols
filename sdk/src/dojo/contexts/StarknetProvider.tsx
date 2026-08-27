@@ -29,7 +29,7 @@ export const StarknetProvider = ({
   // Current chain
   const selectedNetworkId = useMemo(() => (dojoAppConfig.selectedNetworkId), [dojoAppConfig])
   const selectedNetworkConfig = useMemo(() => getNetworkConfig(selectedNetworkId, env), [selectedNetworkId, env])
-  useEffect(() => console.log(`Selected network:`, selectedNetworkId, selectedNetworkConfig), [selectedNetworkId])
+  useEffect(() => console.log(`Selected network:`, selectedNetworkId, selectedNetworkConfig), [selectedNetworkConfig, selectedNetworkId])
 
   // Build chains and connectors from selectedNetworkConfig
   const chains: Chain[] = useMemo(() => [selectedNetworkConfig.chain], [selectedNetworkConfig])

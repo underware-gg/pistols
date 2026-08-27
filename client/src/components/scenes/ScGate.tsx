@@ -65,7 +65,7 @@ export default function ScGate() {
           break
       }
     }
-  }, [itemClicked, timestamp, gameImpl])
+  }, [itemClicked, timestamp, gameImpl, dispatchSetScene])
 
   return (
     <>

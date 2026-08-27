@@ -51,7 +51,7 @@ export const useLordsFaucet = (): FaucetInterface => {
         return false;
       }
       return true;
-    }, [write, hasFaucet, faucetUrl, faucetUrl],
+    }, [faucetUrl, hasFaucet, isLoading, write, address],
   )
 
   return {

@@ -206,7 +206,7 @@ export const useDuellingDuelists = (duelistIds: BigNumberish[]) => {
       queuedIds: queuedIds.sort((a, b) => Number(BigInt(a) - BigInt(b))),
       duelPerDuelists,
     }
-  }, [alive_entities])
+  }, [alive_entities, entities])
 
   return {
     notDuelingIds,    // duelist_ids who are not duelling
@@ -494,10 +494,11 @@ const useNormalizedAddresses = (addresses: BigNumberish[]) => (
 export const useFetchDuelistIdsOwnedByAccounts = (addresses: BigNumberish[]) => {
   const normalizedAddresses = useNormalizedAddresses(addresses)
   // dont even try for players already fetched...
-  const fetchState = useDuelistFetchStore((state) => state);
+  const fetchedAddresses = useDuelistFetchStore((state) => state.addresses);
+  const setFetchedAddresses = useDuelistFetchStore((state) => state.setFetchedAddresses);
   const newAddresses = useMemo(() => (
-    fetchState.getNewAddresses(normalizedAddresses)
-  ), [normalizedAddresses, fetchState.addresses])
+    normalizedAddresses.filter((address) => !fetchedAddresses.includes(address))
+  ), [fetchedAddresses, normalizedAddresses])
 
   // fetch duelists...
   const { duelistIds } = useDuelistIdsOwnedByAccounts(newAddresses)
@@ -509,9 +510,9 @@ export const useFetchDuelistIdsOwnedByAccounts = (addresses: BigNumberish[]) => 
   useEffect(() => {
     if (isFinished) {
       debug.log(`useFetchDuelistIdsOwnedByAccounts() FETCHED`, newAddresses.map(bigintToHex));
-      fetchState.setFetchedAddresses(newAddresses.map(BigInt));
+      setFetchedAddresses(newAddresses.map(BigInt));
     }
-  }, [isFinished])
+  }, [isFinished, newAddresses, setFetchedAddresses])
 
   return {
     isLoading,
@@ -524,10 +525,14 @@ const useFetchPlayerDuelistStacks = (addresses: BigNumberish[]) => {
   const setEntities = useDuelistStackStore((state) => state.setEntities);
 
   // dont even try for players already fetched...
-  const fetchState = useDuelistStackFetchStore((state) => state);
+  const fetchedAddresses = useDuelistStackFetchStore((state) => state.addresses);
+  const setFetchedAddresses = useDuelistStackFetchStore((state) => state.setFetchedAddresses);
   const newAddresses = useMemo(() => (
-    fetchState.getNewAddresses(addresses)
-  ), [addresses, fetchState.addresses])
+    addresses
+      .filter(isPositiveBigint)
+      .map(BigInt)
+      .filter((address) => !fetchedAddresses.includes(address))
+  ), [addresses, fetchedAddresses])
 
   const query = useMemo<PistolsQueryBuilder>(() => (
     newAddresses.length > 0
@@ -548,7 +553,7 @@ const useFetchPlayerDuelistStacks = (addresses: BigNumberish[]) => {
     setEntities: (entities: PistolsEntity[]) => {
       debug.log(`useFetchPlayerDuelistStacks() GOT`, newAddresses, entities);
       setEntities(entities);
-      fetchState.setFetchedAddresses(newAddresses.map(BigInt));
+      setFetchedAddresses(newAddresses.map(BigInt));
     },
   })
 

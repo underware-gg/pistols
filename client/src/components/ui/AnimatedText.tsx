@@ -150,7 +150,7 @@ const AnimatedText = forwardRef<AnimatedTextHandle, AnimatedTextProps>(({
         }
       };
     }, 50);
-  }, [text, slideDirection, reverse, delayPerCharacter, animationDuration]);
+  }, [text, slideDirection, reverse, delayPerCharacter, animationDuration, style, onAnimationComplete]);
 
   return (
     <>

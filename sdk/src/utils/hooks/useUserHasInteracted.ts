@@ -27,7 +27,7 @@ export const useUserHasInteracted = (autoUpdate: boolean = true) => {
       _mounted = false
       clearInterval(_interval)
     }
-  }, [])
+  }, [autoUpdate])
 
   return {
     userHasInteracted
