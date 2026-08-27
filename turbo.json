@@ -5,6 +5,9 @@
       "dependsOn": [
         "^build"
       ],
+      "env": [
+        "VITE_*"
+      ],
       "outputs": [
         "dist/**"
       ]
