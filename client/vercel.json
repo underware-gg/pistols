@@ -6,6 +6,7 @@
       "NODE_OPTIONS": "--max-old-space-size=4096"
     }
   },
+  "buildCommand": "NODE_OPTIONS=--max-old-space-size=4096 turbo run build",
   "installCommand": "corepack pnpm install --frozen-lockfile",
   "rewrites": [
     {
