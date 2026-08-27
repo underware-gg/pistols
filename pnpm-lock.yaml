@@ -49,11 +49,11 @@ catalogs:
       specifier: 5.101.4
       version: 5.101.4
     '@types/node':
-      specifier: 22.18.8
-      version: 22.18.8
+      specifier: 22.20.1
+      version: 22.20.1
     '@types/react':
-      specifier: 18.3.25
-      version: 18.3.25
+      specifier: 18.3.31
+      version: 18.3.31
     '@types/react-dom':
       specifier: 18.3.7
       version: 18.3.7
@@ -148,16 +148,16 @@ importers:
     dependencies:
       '@cartridge/connector':
         specifier: 'catalog:'
-        version: 0.13.16(@starknet-react/core@5.0.3(get-starknet-core@4.0.0)(react@18.3.1)(starknet@8.9.2)(typescript@5.9.3))(@types/react@18.3.25)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
+        version: 0.13.16(@starknet-react/core@5.0.3(get-starknet-core@4.0.0)(react@18.3.1)(starknet@8.9.2)(typescript@5.9.3))(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
       '@cartridge/controller':
         specifier: 'catalog:'
-        version: 0.13.16(@types/react@18.3.25)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
+        version: 0.13.16(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
       '@dojoengine/core':
         specifier: 'catalog:'
         version: 1.8.8(typescript@5.9.3)
       '@dojoengine/sdk':
         specifier: 'catalog:'
-        version: 1.9.0(@effect/platform@0.93.8(effect@3.20.0))(@opentelemetry/semantic-conventions@1.43.0)(@tanstack/react-query@5.101.4(react@18.3.1))(@types/react-dom@18.3.7(@types/react@18.3.25))(@types/react@18.3.25)(get-starknet-core@4.0.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(starknet@8.9.2)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(zod@3.25.76)
+        version: 1.9.0(@effect/platform@0.93.8(effect@3.20.0))(@opentelemetry/semantic-conventions@1.43.0)(@tanstack/react-query@5.101.4(react@18.3.1))(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(get-starknet-core@4.0.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(starknet@8.9.2)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(zod@3.25.76)
       '@dojoengine/torii-client':
         specifier: 'catalog:'
         version: 1.8.2
@@ -166,13 +166,13 @@ importers:
         version: 1.8.4(starknet@8.9.2)(typescript@5.9.3)(zod@3.25.76)
       '@emotion/react':
         specifier: 11.14.0
-        version: 11.14.0(@types/react@18.3.25)(react@18.3.1)
+        version: 11.14.0(@types/react@18.3.31)(react@18.3.1)
       '@emotion/styled':
         specifier: 11.14.1
-        version: 11.14.1(@emotion/react@11.14.0(@types/react@18.3.25)(react@18.3.1))(@types/react@18.3.25)(react@18.3.1)
+        version: 11.14.1(@emotion/react@11.14.0(@types/react@18.3.31)(react@18.3.1))(@types/react@18.3.31)(react@18.3.1)
       '@mui/material':
         specifier: 9.3.1
-        version: 9.3.1(@emotion/react@11.14.0(@types/react@18.3.25)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.25)(react@18.3.1))(@types/react@18.3.25)(react@18.3.1))(@types/react@18.3.25)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 9.3.1(@emotion/react@11.14.0(@types/react@18.3.31)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.31)(react@18.3.1))(@types/react@18.3.31)(react@18.3.1))(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@starknet-io/get-starknet-core':
         specifier: 'catalog:'
         version: 4.0.8
@@ -217,7 +217,7 @@ importers:
         version: 2.2.0(react@18.3.1)
       react-cookie:
         specifier: 8.1.2
-        version: 8.1.2(@types/react@18.3.25)(react@18.3.1)
+        version: 8.1.2(@types/react@18.3.31)(react@18.3.1)
       react-dom:
         specifier: 'catalog:'
         version: 18.3.1(react@18.3.1)
@@ -244,13 +244,13 @@ importers:
         version: 8.1.2
       vite-plugin-top-level-await:
         specifier: 1.6.0
-        version: 1.6.0(rollup@4.59.0)(vite@6.4.3(@types/node@22.18.8)(sass@1.103.0)(tsx@4.23.12))
+        version: 1.6.0(rollup@4.59.0)(vite@6.4.3(@types/node@22.20.1)(sass@1.103.0)(tsx@4.23.12))
       vite-plugin-wasm:
         specifier: 3.6.0
-        version: 3.6.0(vite@6.4.3(@types/node@22.18.8)(sass@1.103.0)(tsx@4.23.12))
+        version: 3.6.0(vite@6.4.3(@types/node@22.20.1)(sass@1.103.0)(tsx@4.23.12))
       zustand:
         specifier: 'catalog:'
-        version: 5.0.15(@types/react@18.3.25)(immer@11.1.18)(react@18.3.1)(use-sync-external-store@1.6.0(react@18.3.1))
+        version: 5.0.15(@types/react@18.3.31)(immer@11.1.18)(react@18.3.1)(use-sync-external-store@1.6.0(react@18.3.1))
     devDependencies:
       '@effect/platform':
         specifier: 'catalog:'
@@ -263,16 +263,16 @@ importers:
         version: 10.4.1
       '@testing-library/react':
         specifier: 16.3.2
-        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@18.3.7(@types/react@18.3.25))(@types/react@18.3.25)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@types/node':
         specifier: 'catalog:'
-        version: 22.18.8
+        version: 22.20.1
       '@types/react':
         specifier: 'catalog:'
-        version: 18.3.25
+        version: 18.3.31
       '@types/react-dom':
         specifier: 'catalog:'
-        version: 18.3.7(@types/react@18.3.25)
+        version: 18.3.7(@types/react@18.3.31)
       '@types/three':
         specifier: 0.185.4
         version: 0.185.4
@@ -284,7 +284,7 @@ importers:
         version: 8.67.0(eslint@10.8.1)(typescript@5.9.3)
       '@vitejs/plugin-react':
         specifier: 4.7.0
-        version: 4.7.0(vite@6.4.3(@types/node@22.18.8)(sass@1.103.0)(tsx@4.23.12))
+        version: 4.7.0(vite@6.4.3(@types/node@22.20.1)(sass@1.103.0)(tsx@4.23.12))
       eslint:
         specifier: 10.8.1
         version: 10.8.1
@@ -308,16 +308,16 @@ importers:
         version: 5.9.3
       vite:
         specifier: 6.4.3
-        version: 6.4.3(@types/node@22.18.8)(sass@1.103.0)(tsx@4.23.12)
+        version: 6.4.3(@types/node@22.20.1)(sass@1.103.0)(tsx@4.23.12)
       vite-plugin-glsl:
         specifier: 1.6.1
-        version: 1.6.1(esbuild@0.28.2)(vite@6.4.3(@types/node@22.18.8)(sass@1.103.0)(tsx@4.23.12))
+        version: 1.6.1(esbuild@0.28.2)(vite@6.4.3(@types/node@22.20.1)(sass@1.103.0)(tsx@4.23.12))
       vite-plugin-mkcert:
-        specifier: 1.17.9
-        version: 1.17.9(vite@6.4.3(@types/node@22.18.8)(sass@1.103.0)(tsx@4.23.12))
+        specifier: 1.17.12
+        version: 1.17.12(vite@6.4.3(@types/node@22.20.1)(sass@1.103.0)(tsx@4.23.12))
       vitest:
         specifier: 4.1.11
-        version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@22.18.8)(happy-dom@20.11.6)(sass@1.103.0)(tsx@4.23.12)
+        version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(happy-dom@20.11.6)(sass@1.103.0)(tsx@4.23.12)
 
   sdk:
     dependencies:
@@ -339,10 +339,10 @@ importers:
         version: 4.2.12(graphql@16.14.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
       '@cartridge/connector':
         specifier: 'catalog:'
-        version: 0.13.16(@starknet-react/core@5.0.3(get-starknet-core@4.0.0)(react@18.3.1)(starknet@8.9.2)(typescript@5.9.3))(@types/react@18.3.25)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
+        version: 0.13.16(@starknet-react/core@5.0.3(get-starknet-core@4.0.0)(react@18.3.1)(starknet@8.9.2)(typescript@5.9.3))(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
       '@cartridge/controller':
         specifier: 'catalog:'
-        version: 0.13.16(@types/react@18.3.25)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
+        version: 0.13.16(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
       '@cartridge/presets':
         specifier: 'catalog:'
         version: 0.5.4
@@ -351,7 +351,7 @@ importers:
         version: 1.8.8(typescript@5.9.3)
       '@dojoengine/sdk':
         specifier: 'catalog:'
-        version: 1.9.0(@effect/platform@0.93.8(effect@3.20.0))(@opentelemetry/semantic-conventions@1.43.0)(@tanstack/react-query@5.101.4(react@18.3.1))(@types/react-dom@18.3.7(@types/react@18.3.25))(@types/react@18.3.25)(get-starknet-core@4.0.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(starknet@8.9.2)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(zod@3.25.76)
+        version: 1.9.0(@effect/platform@0.93.8(effect@3.20.0))(@opentelemetry/semantic-conventions@1.43.0)(@tanstack/react-query@5.101.4(react@18.3.1))(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(get-starknet-core@4.0.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(starknet@8.9.2)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(zod@3.25.76)
       '@dojoengine/torii-client':
         specifier: 'catalog:'
         version: 1.8.2
@@ -381,16 +381,16 @@ importers:
         version: 10.4.1
       '@testing-library/react':
         specifier: 16.3.2
-        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@18.3.7(@types/react@18.3.25))(@types/react@18.3.25)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@types/event-emitter':
         specifier: 0.3.5
         version: 0.3.5
       '@types/node':
         specifier: 'catalog:'
-        version: 22.18.8
+        version: 22.20.1
       '@types/react':
         specifier: 'catalog:'
-        version: 18.3.25
+        version: 18.3.31
       '@typescript-eslint/parser':
         specifier: 8.67.0
         version: 8.67.0(eslint@10.8.1)(typescript@5.9.3)
@@ -432,16 +432,16 @@ importers:
         version: 8.1.2
       vitest:
         specifier: 4.1.11
-        version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@22.18.8)(happy-dom@20.11.6)(sass@1.103.0)(tsx@4.23.12)
+        version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(happy-dom@20.11.6)(sass@1.103.0)(tsx@4.23.12)
       zustand:
         specifier: 'catalog:'
-        version: 5.0.15(@types/react@18.3.25)(immer@11.1.18)(react@18.3.1)(use-sync-external-store@1.6.0(react@18.3.1))
+        version: 5.0.15(@types/react@18.3.31)(immer@11.1.18)(react@18.3.1)(use-sync-external-store@1.6.0(react@18.3.1))
 
   verifier:
     dependencies:
       starkscan:
         specifier: 0.0.11
-        version: 0.0.11(@types/node@22.18.8)
+        version: 0.0.11(@types/node@22.20.1)
 
 packages:
 
@@ -2110,8 +2110,8 @@ packages:
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
-  '@types/node@22.18.8':
-    resolution: {integrity: sha512-pAZSHMiagDR7cARo/cch1f3rXy0AEXwsVsVH09FcyeJVAzCnGgmYis7P3JidtTUjyadhTeSo8TgRPswstghDaw==}
+  '@types/node@22.20.1':
+    resolution: {integrity: sha512-EANqOCF9QFyra+4pfxUcX9STKJpCLjMbObVzljIJomAWSnuSIEAvyzEU53GaajbXJEgdh0iEcPL+DGvpUd4k1Q==}
 
   '@types/node@22.7.5':
     resolution: {integrity: sha512-jML7s2NAzMWc//QSJ1a3prpk78cOPchGvXJsC3C6R6PSMoooztvRVQEz89gmBTBY1SPMaqo5teB4uNHPdetShQ==}
@@ -2132,8 +2132,8 @@ packages:
     peerDependencies:
       '@types/react': '*'
 
-  '@types/react@18.3.25':
-    resolution: {integrity: sha512-oSVZmGtDPmRZtVDqvdKUi/qgCsWp5IDY29wp8na8Bj4B3cc99hfNzvNhlMkVVxctkAOGUA3Km7MMpBHAnWfcIA==}
+  '@types/react@18.3.31':
+    resolution: {integrity: sha512-vfEqpXTvwT91yhmwdfouStN2hSKwTvyRs8qpLfADyrq/kxDw0hZM7Wk9Ug1FELj8hIby+S/+kQCSRFF32nv2Qw==}
 
   '@types/stats.js@0.17.4':
     resolution: {integrity: sha512-jIBvWWShCvlBqBNIZt0KAshWpvSjhkwkEu4ZUcASoAvhmrgAUI2t1dXrjSL4xXVLB4FznPrIsX3nKXFl/Dt4vA==}
@@ -2443,10 +2443,6 @@ packages:
   aes-js@4.0.0-beta.5:
     resolution: {integrity: sha512-G965FqalsNyrPqgEGON7nIx1e/OVENSgiEIzyC63haUMuvNnwIgIjMs52hlTCKhkBny7A2ORNlfY9Zu+jmGk1Q==}
 
-  agent-base@6.0.2:
-    resolution: {integrity: sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==}
-    engines: {node: '>= 6.0.0'}
-
   ajv@6.14.0:
     resolution: {integrity: sha512-IWrosm/yrn43eiKqkfkHis7QioDleaXQHdDVPKg0FSwwd/DuvyX79TZnFOnYpB7dcsFAMmtFztZuXPDvSePkFw==}
 
@@ -2523,9 +2519,6 @@ packages:
 
   axios@0.33.0:
     resolution: {integrity: sha512-juz19g7B3UWT9r3+tgRFQf2Bdy6IKDVroiyuVOUrkILVKHpqHL++K1l8ybvfdEP9B/VE72vk8vllbnedVCm/og==}
-
-  axios@1.18.0:
-    resolution: {integrity: sha512-E32NzpYKp++W7XRe52rHiXV2ehxmh3wbdgO7MHeFM+vqxLBYHzt0ElkiImtOBxtOmyp0yoC8C6uESVV84Y2/hw==}
 
   babel-plugin-macros@3.1.0:
     resolution: {integrity: sha512-Cg7TFGpIr01vOQNODXOOaGz2NpCU5gl8x1qJFbb6hbZxR7XrcE2vtbAsTAbJ7/xwJtUuJEw8K8Zr/AE0LHlesg==}
@@ -2809,9 +2802,6 @@ packages:
 
   crossws@0.3.5:
     resolution: {integrity: sha512-ojKiDvcmByhwa8YYqbQI/hg7MEU0NC03+pSdEq4ZUnZR9xXpwk7E43SMNGkn+JxJGPFtNvQ48+vV2p+P1ml5PA==}
-
-  csstype@3.1.3:
-    resolution: {integrity: sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==}
 
   csstype@3.2.3:
     resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
@@ -3320,10 +3310,6 @@ packages:
   hpke-js@1.8.0:
     resolution: {integrity: sha512-N0PFQlUQsIPS9++nUNn2ZsxTPSv8pONyyrXIGZl0iiherRfS0XW1SvTd+RmepD0TN1S9zzTJkEutMIWWYt0/4w==}
     engines: {node: '>=16.0.0'}
-
-  https-proxy-agent@5.0.1:
-    resolution: {integrity: sha512-dFcAjpTQFgoLMzC2VwU+C/CbS7uRL0lWmxDITmqm7C+7F0Odmj6s9l6alZc6AELXhrnggM2CeWSXHGOdX2YtwA==}
-    engines: {node: '>= 6'}
 
   iconv-lite@0.4.24:
     resolution: {integrity: sha512-v3MXnZAcvnywkTUEZomIActle7RXXeedOR31wwl7VlyoXO4Qi9arvSenNQWne1TcRwhCL1HwLI21bEqdpj8/rA==}
@@ -3993,10 +3979,6 @@ packages:
 
   proxy-from-env@1.1.0:
     resolution: {integrity: sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==}
-
-  proxy-from-env@2.1.0:
-    resolution: {integrity: sha512-cJ+oHTW1VAEa8cJslgmUZrc+sjRKgAKl3Zyse6+PV38hZe/V6Z14TbCuXcan9F9ghlz4QrFr2c92TNF82UkYHA==}
-    engines: {node: '>=10'}
 
   punycode@2.3.1:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
@@ -4694,9 +4676,9 @@ packages:
       esbuild:
         optional: true
 
-  vite-plugin-mkcert@1.17.9:
-    resolution: {integrity: sha512-SwI7yqp2Cq4r2XItarnHRCj2uzHPqevbxFNMLpyN+LDXd5w1vmZeM4l5X/wCZoP4mjPQYN+9+4kmE6e3nPO5fg==}
-    engines: {node: '>=v16.7.0'}
+  vite-plugin-mkcert@1.17.12:
+    resolution: {integrity: sha512-HhLyUZnvkKLuk9o+HBaMlGIa6CqPTfLbVlLFBjrkN4mpZ4saYFRfFx5R12a46UxmzWT9dO8fijmblVvCYvCD3A==}
+    engines: {node: '>=v18.0.0'}
     peerDependencies:
       vite: '>=3'
 
@@ -5133,9 +5115,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@cartridge/connector@0.13.16(@starknet-react/core@5.0.3(get-starknet-core@4.0.0)(react@18.3.1)(starknet@8.9.2)(typescript@5.9.3))(@types/react@18.3.25)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)':
+  '@cartridge/connector@0.13.16(@starknet-react/core@5.0.3(get-starknet-core@4.0.0)(react@18.3.1)(starknet@8.9.2)(typescript@5.9.3))(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)':
     dependencies:
-      '@cartridge/controller': 0.13.16(@types/react@18.3.25)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
+      '@cartridge/controller': 0.13.16(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
       '@starknet-react/core': 5.0.3(get-starknet-core@4.0.0)(react@18.3.1)(starknet@8.9.2)(typescript@5.9.3)
     transitivePeerDependencies:
       - '@azure/app-configuration'
@@ -5168,7 +5150,7 @@ snapshots:
 
   '@cartridge/controller-wasm@0.10.1': {}
 
-  '@cartridge/controller@0.13.16(@types/react@18.3.25)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)':
+  '@cartridge/controller@0.13.16(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)':
     dependencies:
       '@cartridge/controller-wasm': 0.10.1
       '@cartridge/penpal': 6.2.4
@@ -5176,7 +5158,7 @@ snapshots:
       '@starknet-io/types-js': 0.9.1
       '@turnkey/sdk-browser': 5.16.1(typescript@5.9.3)(zod@3.25.76)
       '@wallet-standard/wallet': 1.1.0
-      '@walletconnect/ethereum-provider': 2.21.10(@types/react@18.3.25)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
+      '@walletconnect/ethereum-provider': 2.21.10(@types/react@18.3.31)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
       bs58: 6.0.0
       cbor-x: 1.6.0
       ethers: 6.15.0
@@ -5286,26 +5268,26 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@dojoengine/sdk@1.9.0(@effect/platform@0.93.8(effect@3.20.0))(@opentelemetry/semantic-conventions@1.43.0)(@tanstack/react-query@5.101.4(react@18.3.1))(@types/react-dom@18.3.7(@types/react@18.3.25))(@types/react@18.3.25)(get-starknet-core@4.0.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(starknet@8.9.2)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(zod@3.25.76)':
+  '@dojoengine/sdk@1.9.0(@effect/platform@0.93.8(effect@3.20.0))(@opentelemetry/semantic-conventions@1.43.0)(@tanstack/react-query@5.101.4(react@18.3.1))(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(get-starknet-core@4.0.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(starknet@8.9.2)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(zod@3.25.76)':
     dependencies:
       '@dojoengine/core': 1.8.8(typescript@5.9.3)
       '@dojoengine/grpc': 1.8.7(@effect/platform@0.93.8(effect@3.20.0))(@opentelemetry/semantic-conventions@1.43.0)
-      '@dojoengine/state': 1.8.5(@types/react@18.3.25)(react@18.3.1)(starknet@8.9.2)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(zod@3.25.76)
+      '@dojoengine/state': 1.8.5(@types/react@18.3.31)(react@18.3.1)(starknet@8.9.2)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(zod@3.25.76)
       '@dojoengine/torii-client': 1.8.2
       '@dojoengine/torii-wasm': 1.8.2
       '@dojoengine/utils': 1.8.4(starknet@8.9.2)(typescript@5.9.3)(zod@3.25.76)
       '@starknet-react/chains': 5.0.3
       '@starknet-react/core': 5.0.3(get-starknet-core@4.0.0)(react@18.3.1)(starknet@8.9.2)(typescript@5.9.3)
       '@tanstack/react-query': 5.101.4(react@18.3.1)
-      '@types/react': 18.3.25
-      '@types/react-dom': 18.3.7(@types/react@18.3.25)
+      '@types/react': 18.3.31
+      '@types/react-dom': 18.3.7(@types/react@18.3.31)
       effect: 3.20.0
       immer: 10.1.3
       neverthrow: 8.2.0
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
       starknet: 8.9.2
-      zustand: 4.5.7(@types/react@18.3.25)(immer@10.1.3)(react@18.3.1)
+      zustand: 4.5.7(@types/react@18.3.31)(immer@10.1.3)(react@18.3.1)
     transitivePeerDependencies:
       - '@effect/platform'
       - '@opentelemetry/resources'
@@ -5323,13 +5305,13 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@dojoengine/state@1.8.5(@types/react@18.3.25)(react@18.3.1)(starknet@8.9.2)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(zod@3.25.76)':
+  '@dojoengine/state@1.8.5(@types/react@18.3.31)(react@18.3.1)(starknet@8.9.2)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@18.3.1))(zod@3.25.76)':
     dependencies:
       '@dojoengine/recs': 2.0.13(typescript@5.9.3)(zod@3.25.76)
       '@dojoengine/torii-client': 1.8.2
       immer: 10.1.3
       starknet: 8.9.2
-      zustand: 5.0.15(@types/react@18.3.25)(immer@10.1.3)(react@18.3.1)(use-sync-external-store@1.6.0(react@18.3.1))
+      zustand: 5.0.15(@types/react@18.3.31)(immer@10.1.3)(react@18.3.1)(use-sync-external-store@1.6.0(react@18.3.1))
     transitivePeerDependencies:
       - '@types/react'
       - bufferutil
@@ -5405,7 +5387,7 @@ snapshots:
 
   '@emotion/memoize@0.9.0': {}
 
-  '@emotion/react@11.14.0(@types/react@18.3.25)(react@18.3.1)':
+  '@emotion/react@11.14.0(@types/react@18.3.31)(react@18.3.1)':
     dependencies:
       '@babel/runtime': 7.28.4
       '@emotion/babel-plugin': 11.13.5
@@ -5417,7 +5399,7 @@ snapshots:
       hoist-non-react-statics: 3.3.2
       react: 18.3.1
     optionalDependencies:
-      '@types/react': 18.3.25
+      '@types/react': 18.3.31
     transitivePeerDependencies:
       - supports-color
 
@@ -5431,18 +5413,18 @@ snapshots:
 
   '@emotion/sheet@1.4.0': {}
 
-  '@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.25)(react@18.3.1))(@types/react@18.3.25)(react@18.3.1)':
+  '@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.31)(react@18.3.1))(@types/react@18.3.31)(react@18.3.1)':
     dependencies:
       '@babel/runtime': 7.28.4
       '@emotion/babel-plugin': 11.13.5
       '@emotion/is-prop-valid': 1.4.0
-      '@emotion/react': 11.14.0(@types/react@18.3.25)(react@18.3.1)
+      '@emotion/react': 11.14.0(@types/react@18.3.31)(react@18.3.1)
       '@emotion/serialize': 1.3.3
       '@emotion/use-insertion-effect-with-fallbacks': 1.2.0(react@18.3.1)
       '@emotion/utils': 1.4.2
       react: 18.3.1
     optionalDependencies:
-      '@types/react': 18.3.25
+      '@types/react': 18.3.31
     transitivePeerDependencies:
       - supports-color
 
@@ -5727,12 +5709,12 @@ snapshots:
       strip-ansi: 7.1.2
       wrap-ansi: 8.1.0
 
-  '@inquirer/external-editor@1.0.2(@types/node@22.18.8)':
+  '@inquirer/external-editor@1.0.2(@types/node@22.20.1)':
     dependencies:
       chardet: 2.1.0
       iconv-lite: 0.7.0
     optionalDependencies:
-      '@types/node': 22.18.8
+      '@types/node': 22.20.1
 
   '@inquirer/type@0.0.4-alpha.0': {}
 
@@ -5790,9 +5772,9 @@ snapshots:
 
   '@lit-labs/ssr-dom-shim@1.4.0': {}
 
-  '@lit/react@1.0.8(@types/react@18.3.25)':
+  '@lit/react@1.0.8(@types/react@18.3.31)':
     dependencies:
-      '@types/react': 18.3.25
+      '@types/react': 18.3.31
     optional: true
 
   '@lit/reactive-element@2.1.1':
@@ -5842,15 +5824,15 @@ snapshots:
 
   '@mui/core-downloads-tracker@9.3.1': {}
 
-  '@mui/material@9.3.1(@emotion/react@11.14.0(@types/react@18.3.25)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.25)(react@18.3.1))(@types/react@18.3.25)(react@18.3.1))(@types/react@18.3.25)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@mui/material@9.3.1(@emotion/react@11.14.0(@types/react@18.3.31)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.31)(react@18.3.1))(@types/react@18.3.31)(react@18.3.1))(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@babel/runtime': 7.29.7
       '@mui/core-downloads-tracker': 9.3.1
-      '@mui/system': 9.3.0(@emotion/react@11.14.0(@types/react@18.3.25)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.25)(react@18.3.1))(@types/react@18.3.25)(react@18.3.1))(@types/react@18.3.25)(react@18.3.1)
-      '@mui/types': 9.3.0(@types/react@18.3.25)
-      '@mui/utils': 9.3.0(@types/react@18.3.25)(react@18.3.1)
+      '@mui/system': 9.3.0(@emotion/react@11.14.0(@types/react@18.3.31)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.31)(react@18.3.1))(@types/react@18.3.31)(react@18.3.1))(@types/react@18.3.31)(react@18.3.1)
+      '@mui/types': 9.3.0(@types/react@18.3.31)
+      '@mui/utils': 9.3.0(@types/react@18.3.31)(react@18.3.1)
       '@popperjs/core': 2.11.8
-      '@types/react-transition-group': 4.4.12(@types/react@18.3.25)
+      '@types/react-transition-group': 4.4.12(@types/react@18.3.31)
       clsx: 2.1.1
       csstype: 3.2.3
       prop-types: 15.8.1
@@ -5859,20 +5841,20 @@ snapshots:
       react-is: 19.2.8
       react-transition-group: 4.4.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     optionalDependencies:
-      '@emotion/react': 11.14.0(@types/react@18.3.25)(react@18.3.1)
-      '@emotion/styled': 11.14.1(@emotion/react@11.14.0(@types/react@18.3.25)(react@18.3.1))(@types/react@18.3.25)(react@18.3.1)
-      '@types/react': 18.3.25
+      '@emotion/react': 11.14.0(@types/react@18.3.31)(react@18.3.1)
+      '@emotion/styled': 11.14.1(@emotion/react@11.14.0(@types/react@18.3.31)(react@18.3.1))(@types/react@18.3.31)(react@18.3.1)
+      '@types/react': 18.3.31
 
-  '@mui/private-theming@9.3.0(@types/react@18.3.25)(react@18.3.1)':
+  '@mui/private-theming@9.3.0(@types/react@18.3.31)(react@18.3.1)':
     dependencies:
       '@babel/runtime': 7.29.7
-      '@mui/utils': 9.3.0(@types/react@18.3.25)(react@18.3.1)
+      '@mui/utils': 9.3.0(@types/react@18.3.31)(react@18.3.1)
       prop-types: 15.8.1
       react: 18.3.1
     optionalDependencies:
-      '@types/react': 18.3.25
+      '@types/react': 18.3.31
 
-  '@mui/styled-engine@9.3.0(@emotion/react@11.14.0(@types/react@18.3.25)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.25)(react@18.3.1))(@types/react@18.3.25)(react@18.3.1))(react@18.3.1)':
+  '@mui/styled-engine@9.3.0(@emotion/react@11.14.0(@types/react@18.3.31)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.31)(react@18.3.1))(@types/react@18.3.31)(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@babel/runtime': 7.29.7
       '@emotion/cache': 11.14.0
@@ -5882,42 +5864,42 @@ snapshots:
       prop-types: 15.8.1
       react: 18.3.1
     optionalDependencies:
-      '@emotion/react': 11.14.0(@types/react@18.3.25)(react@18.3.1)
-      '@emotion/styled': 11.14.1(@emotion/react@11.14.0(@types/react@18.3.25)(react@18.3.1))(@types/react@18.3.25)(react@18.3.1)
+      '@emotion/react': 11.14.0(@types/react@18.3.31)(react@18.3.1)
+      '@emotion/styled': 11.14.1(@emotion/react@11.14.0(@types/react@18.3.31)(react@18.3.1))(@types/react@18.3.31)(react@18.3.1)
 
-  '@mui/system@9.3.0(@emotion/react@11.14.0(@types/react@18.3.25)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.25)(react@18.3.1))(@types/react@18.3.25)(react@18.3.1))(@types/react@18.3.25)(react@18.3.1)':
+  '@mui/system@9.3.0(@emotion/react@11.14.0(@types/react@18.3.31)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.31)(react@18.3.1))(@types/react@18.3.31)(react@18.3.1))(@types/react@18.3.31)(react@18.3.1)':
     dependencies:
       '@babel/runtime': 7.29.7
-      '@mui/private-theming': 9.3.0(@types/react@18.3.25)(react@18.3.1)
-      '@mui/styled-engine': 9.3.0(@emotion/react@11.14.0(@types/react@18.3.25)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.25)(react@18.3.1))(@types/react@18.3.25)(react@18.3.1))(react@18.3.1)
-      '@mui/types': 9.3.0(@types/react@18.3.25)
-      '@mui/utils': 9.3.0(@types/react@18.3.25)(react@18.3.1)
+      '@mui/private-theming': 9.3.0(@types/react@18.3.31)(react@18.3.1)
+      '@mui/styled-engine': 9.3.0(@emotion/react@11.14.0(@types/react@18.3.31)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.31)(react@18.3.1))(@types/react@18.3.31)(react@18.3.1))(react@18.3.1)
+      '@mui/types': 9.3.0(@types/react@18.3.31)
+      '@mui/utils': 9.3.0(@types/react@18.3.31)(react@18.3.1)
       clsx: 2.1.1
       csstype: 3.2.3
       prop-types: 15.8.1
       react: 18.3.1
     optionalDependencies:
-      '@emotion/react': 11.14.0(@types/react@18.3.25)(react@18.3.1)
-      '@emotion/styled': 11.14.1(@emotion/react@11.14.0(@types/react@18.3.25)(react@18.3.1))(@types/react@18.3.25)(react@18.3.1)
-      '@types/react': 18.3.25
+      '@emotion/react': 11.14.0(@types/react@18.3.31)(react@18.3.1)
+      '@emotion/styled': 11.14.1(@emotion/react@11.14.0(@types/react@18.3.31)(react@18.3.1))(@types/react@18.3.31)(react@18.3.1)
+      '@types/react': 18.3.31
 
-  '@mui/types@9.3.0(@types/react@18.3.25)':
+  '@mui/types@9.3.0(@types/react@18.3.31)':
     dependencies:
       '@babel/runtime': 7.29.7
     optionalDependencies:
-      '@types/react': 18.3.25
+      '@types/react': 18.3.31
 
-  '@mui/utils@9.3.0(@types/react@18.3.25)(react@18.3.1)':
+  '@mui/utils@9.3.0(@types/react@18.3.31)(react@18.3.1)':
     dependencies:
       '@babel/runtime': 7.29.7
-      '@mui/types': 9.3.0(@types/react@18.3.25)
+      '@mui/types': 9.3.0(@types/react@18.3.31)
       '@types/prop-types': 15.7.15
       clsx: 2.1.1
       prop-types: 15.8.1
       react: 18.3.1
       react-is: 19.2.8
     optionalDependencies:
-      '@types/react': 18.3.25
+      '@types/react': 18.3.31
 
   '@noble/ciphers@1.3.0': {}
 
@@ -6205,12 +6187,12 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@reown/appkit-controllers@1.8.1(@types/react@18.3.25)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)':
+  '@reown/appkit-controllers@1.8.1(@types/react@18.3.31)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)':
     dependencies:
       '@reown/appkit-common': 1.8.1(typescript@5.9.3)(zod@3.25.76)
       '@reown/appkit-wallet': 1.8.1(typescript@5.9.3)
       '@walletconnect/universal-provider': 2.21.7(typescript@5.9.3)(zod@3.25.76)
-      valtio: 2.1.5(@types/react@18.3.25)(react@18.3.1)
+      valtio: 2.1.5(@types/react@18.3.31)(react@18.3.1)
       viem: 2.37.9(typescript@5.9.3)(zod@3.25.76)
     transitivePeerDependencies:
       - '@azure/app-configuration'
@@ -6240,14 +6222,14 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@reown/appkit-pay@1.8.1(@types/react@18.3.25)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)':
+  '@reown/appkit-pay@1.8.1(@types/react@18.3.31)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)':
     dependencies:
       '@reown/appkit-common': 1.8.1(typescript@5.9.3)(zod@3.25.76)
-      '@reown/appkit-controllers': 1.8.1(@types/react@18.3.25)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
-      '@reown/appkit-ui': 1.8.1(@types/react@18.3.25)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
-      '@reown/appkit-utils': 1.8.1(@types/react@18.3.25)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
+      '@reown/appkit-controllers': 1.8.1(@types/react@18.3.31)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
+      '@reown/appkit-ui': 1.8.1(@types/react@18.3.31)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
+      '@reown/appkit-utils': 1.8.1(@types/react@18.3.31)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
       lit: 3.3.0
-      valtio: 2.1.5(@types/react@18.3.25)(react@18.3.1)
+      valtio: 2.1.5(@types/react@18.3.31)(react@18.3.1)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -6280,12 +6262,12 @@ snapshots:
     dependencies:
       buffer: 6.0.3
 
-  '@reown/appkit-scaffold-ui@1.8.1(@types/react@18.3.25)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)':
+  '@reown/appkit-scaffold-ui@1.8.1(@types/react@18.3.31)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)':
     dependencies:
       '@reown/appkit-common': 1.8.1(typescript@5.9.3)(zod@3.25.76)
-      '@reown/appkit-controllers': 1.8.1(@types/react@18.3.25)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
-      '@reown/appkit-ui': 1.8.1(@types/react@18.3.25)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
-      '@reown/appkit-utils': 1.8.1(@types/react@18.3.25)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
+      '@reown/appkit-controllers': 1.8.1(@types/react@18.3.31)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
+      '@reown/appkit-ui': 1.8.1(@types/react@18.3.31)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
+      '@reown/appkit-utils': 1.8.1(@types/react@18.3.31)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
       '@reown/appkit-wallet': 1.8.1(typescript@5.9.3)
       lit: 3.3.0
     transitivePeerDependencies:
@@ -6316,11 +6298,11 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@reown/appkit-ui@1.8.1(@types/react@18.3.25)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)':
+  '@reown/appkit-ui@1.8.1(@types/react@18.3.31)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)':
     dependencies:
       '@phosphor-icons/webcomponents': 2.1.5
       '@reown/appkit-common': 1.8.1(typescript@5.9.3)(zod@3.25.76)
-      '@reown/appkit-controllers': 1.8.1(@types/react@18.3.25)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
+      '@reown/appkit-controllers': 1.8.1(@types/react@18.3.31)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
       '@reown/appkit-wallet': 1.8.1(typescript@5.9.3)
       lit: 3.3.0
       qrcode: 1.5.3
@@ -6352,16 +6334,16 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@reown/appkit-utils@1.8.1(@types/react@18.3.25)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)':
+  '@reown/appkit-utils@1.8.1(@types/react@18.3.31)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)':
     dependencies:
       '@reown/appkit-common': 1.8.1(typescript@5.9.3)(zod@3.25.76)
-      '@reown/appkit-controllers': 1.8.1(@types/react@18.3.25)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
+      '@reown/appkit-controllers': 1.8.1(@types/react@18.3.31)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
       '@reown/appkit-polyfills': 1.8.1
       '@reown/appkit-wallet': 1.8.1(typescript@5.9.3)
       '@wallet-standard/wallet': 1.1.0
       '@walletconnect/logger': 2.1.2
       '@walletconnect/universal-provider': 2.21.7(typescript@5.9.3)(zod@3.25.76)
-      valtio: 2.1.5(@types/react@18.3.25)(react@18.3.1)
+      valtio: 2.1.5(@types/react@18.3.31)(react@18.3.1)
       viem: 2.37.9(typescript@5.9.3)(zod@3.25.76)
     transitivePeerDependencies:
       - '@azure/app-configuration'
@@ -6402,23 +6384,23 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@reown/appkit@1.8.1(@types/react@18.3.25)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)':
+  '@reown/appkit@1.8.1(@types/react@18.3.31)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)':
     dependencies:
       '@reown/appkit-common': 1.8.1(typescript@5.9.3)(zod@3.25.76)
-      '@reown/appkit-controllers': 1.8.1(@types/react@18.3.25)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
-      '@reown/appkit-pay': 1.8.1(@types/react@18.3.25)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
+      '@reown/appkit-controllers': 1.8.1(@types/react@18.3.31)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
+      '@reown/appkit-pay': 1.8.1(@types/react@18.3.31)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
       '@reown/appkit-polyfills': 1.8.1
-      '@reown/appkit-scaffold-ui': 1.8.1(@types/react@18.3.25)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
-      '@reown/appkit-ui': 1.8.1(@types/react@18.3.25)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
-      '@reown/appkit-utils': 1.8.1(@types/react@18.3.25)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
+      '@reown/appkit-scaffold-ui': 1.8.1(@types/react@18.3.31)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
+      '@reown/appkit-ui': 1.8.1(@types/react@18.3.31)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
+      '@reown/appkit-utils': 1.8.1(@types/react@18.3.31)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
       '@reown/appkit-wallet': 1.8.1(typescript@5.9.3)
       '@walletconnect/universal-provider': 2.21.7(typescript@5.9.3)(zod@3.25.76)
       bs58: 6.0.0
       semver: 7.7.2
-      valtio: 2.1.5(@types/react@18.3.25)(react@18.3.1)
+      valtio: 2.1.5(@types/react@18.3.31)(react@18.3.1)
       viem: 2.37.9(typescript@5.9.3)(zod@3.25.76)
     optionalDependencies:
-      '@lit/react': 1.0.8(@types/react@18.3.25)
+      '@lit/react': 1.0.8(@types/react@18.3.31)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -6739,15 +6721,15 @@ snapshots:
       picocolors: 1.1.1
       pretty-format: 27.5.1
 
-  '@testing-library/react@16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@18.3.7(@types/react@18.3.25))(@types/react@18.3.25)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@testing-library/react@16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@babel/runtime': 7.28.4
       '@testing-library/dom': 10.4.1
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
     optionalDependencies:
-      '@types/react': 18.3.25
-      '@types/react-dom': 18.3.7(@types/react@18.3.25)
+      '@types/react': 18.3.31
+      '@types/react-dom': 18.3.7(@types/react@18.3.31)
 
   '@turbo/darwin-64@2.10.11':
     optional: true
@@ -6884,14 +6866,14 @@ snapshots:
 
   '@types/event-emitter@0.3.5': {}
 
-  '@types/hoist-non-react-statics@3.3.7(@types/react@18.3.25)':
+  '@types/hoist-non-react-statics@3.3.7(@types/react@18.3.31)':
     dependencies:
-      '@types/react': 18.3.25
+      '@types/react': 18.3.31
       hoist-non-react-statics: 3.3.2
 
   '@types/json-schema@7.0.15': {}
 
-  '@types/node@22.18.8':
+  '@types/node@22.20.1':
     dependencies:
       undici-types: 6.21.0
 
@@ -6903,18 +6885,18 @@ snapshots:
 
   '@types/prop-types@15.7.15': {}
 
-  '@types/react-dom@18.3.7(@types/react@18.3.25)':
+  '@types/react-dom@18.3.7(@types/react@18.3.31)':
     dependencies:
-      '@types/react': 18.3.25
+      '@types/react': 18.3.31
 
-  '@types/react-transition-group@4.4.12(@types/react@18.3.25)':
+  '@types/react-transition-group@4.4.12(@types/react@18.3.31)':
     dependencies:
-      '@types/react': 18.3.25
+      '@types/react': 18.3.31
 
-  '@types/react@18.3.25':
+  '@types/react@18.3.31':
     dependencies:
       '@types/prop-types': 15.7.15
-      csstype: 3.1.3
+      csstype: 3.2.3
 
   '@types/stats.js@0.17.4': {}
 
@@ -6937,7 +6919,7 @@ snapshots:
 
   '@types/ws@8.18.1':
     dependencies:
-      '@types/node': 22.18.8
+      '@types/node': 22.20.1
 
   '@typescript-eslint/eslint-plugin@8.67.0(@typescript-eslint/parser@8.67.0(eslint@10.8.1)(typescript@5.9.3))(eslint@10.8.1)(typescript@5.9.3)':
     dependencies:
@@ -7037,7 +7019,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@vitejs/plugin-react@4.7.0(vite@6.4.3(@types/node@22.18.8)(sass@1.103.0)(tsx@4.23.12))':
+  '@vitejs/plugin-react@4.7.0(vite@6.4.3(@types/node@22.20.1)(sass@1.103.0)(tsx@4.23.12))':
     dependencies:
       '@babel/core': 7.29.6
       '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.29.6)
@@ -7045,7 +7027,7 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-beta.27
       '@types/babel__core': 7.20.5
       react-refresh: 0.17.0
-      vite: 6.4.3(@types/node@22.18.8)(sass@1.103.0)(tsx@4.23.12)
+      vite: 6.4.3(@types/node@22.20.1)(sass@1.103.0)(tsx@4.23.12)
     transitivePeerDependencies:
       - supports-color
 
@@ -7058,13 +7040,13 @@ snapshots:
       chai: 6.2.2
       tinyrainbow: 3.1.1
 
-  '@vitest/mocker@4.1.11(vite@6.4.3(@types/node@22.18.8)(sass@1.103.0)(tsx@4.23.12))':
+  '@vitest/mocker@4.1.11(vite@6.4.3(@types/node@22.20.1)(sass@1.103.0)(tsx@4.23.12))':
     dependencies:
       '@vitest/spy': 4.1.11
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 6.4.3(@types/node@22.18.8)(sass@1.103.0)(tsx@4.23.12)
+      vite: 6.4.3(@types/node@22.20.1)(sass@1.103.0)(tsx@4.23.12)
 
   '@vitest/pretty-format@4.1.11':
     dependencies:
@@ -7194,9 +7176,9 @@ snapshots:
     dependencies:
       tslib: 1.14.1
 
-  '@walletconnect/ethereum-provider@2.21.10(@types/react@18.3.25)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)':
+  '@walletconnect/ethereum-provider@2.21.10(@types/react@18.3.31)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)':
     dependencies:
-      '@reown/appkit': 1.8.1(@types/react@18.3.25)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
+      '@reown/appkit': 1.8.1(@types/react@18.3.31)(react@18.3.1)(typescript@5.9.3)(zod@3.25.76)
       '@walletconnect/jsonrpc-http-connection': 1.0.8
       '@walletconnect/jsonrpc-provider': 1.0.14
       '@walletconnect/jsonrpc-types': 1.0.4
@@ -7705,12 +7687,6 @@ snapshots:
 
   aes-js@4.0.0-beta.5: {}
 
-  agent-base@6.0.2:
-    dependencies:
-      debug: 4.4.3
-    transitivePeerDependencies:
-      - supports-color
-
   ajv@6.14.0:
     dependencies:
       fast-deep-equal: 3.1.3
@@ -7775,21 +7751,11 @@ snapshots:
 
   axios@0.33.0:
     dependencies:
-      follow-redirects: 1.16.0(debug@4.4.3)
+      follow-redirects: 1.16.0
       form-data: 4.0.6
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
       - debug
-
-  axios@1.18.0(debug@4.4.3):
-    dependencies:
-      follow-redirects: 1.16.0(debug@4.4.3)
-      form-data: 4.0.6
-      https-proxy-agent: 5.0.1
-      proxy-from-env: 2.1.0
-    transitivePeerDependencies:
-      - debug
-      - supports-color
 
   babel-plugin-macros@3.1.0:
     dependencies:
@@ -7866,7 +7832,7 @@ snapshots:
 
   buffer-image-size@0.6.4:
     dependencies:
-      '@types/node': 22.18.8
+      '@types/node': 22.20.1
 
   buffer@5.7.1:
     dependencies:
@@ -8075,8 +8041,6 @@ snapshots:
   crossws@0.3.5:
     dependencies:
       uncrypto: 0.1.3
-
-  csstype@3.1.3: {}
 
   csstype@3.2.3: {}
 
@@ -8502,9 +8466,7 @@ snapshots:
 
   flatted@3.4.2: {}
 
-  follow-redirects@1.16.0(debug@4.4.3):
-    optionalDependencies:
-      debug: 4.4.3
+  follow-redirects@1.16.0: {}
 
   foreground-child@3.3.1:
     dependencies:
@@ -8613,7 +8575,7 @@ snapshots:
 
   happy-dom@20.11.6:
     dependencies:
-      '@types/node': 22.18.8
+      '@types/node': 22.20.1
       '@types/whatwg-mimetype': 3.0.2
       '@types/ws': 8.18.1
       buffer-image-size: 0.6.4
@@ -8670,13 +8632,6 @@ snapshots:
       '@hpke/core': 1.9.0
       '@hpke/dhkem-x25519': 1.8.0
       '@hpke/dhkem-x448': 1.8.0
-
-  https-proxy-agent@5.0.1:
-    dependencies:
-      agent-base: 6.0.2
-      debug: 4.4.3
-    transitivePeerDependencies:
-      - supports-color
 
   iconv-lite@0.4.24:
     dependencies:
@@ -8771,9 +8726,9 @@ snapshots:
       strip-ansi: 5.2.0
       through: 2.3.8
 
-  inquirer@8.2.7(@types/node@22.18.8):
+  inquirer@8.2.7(@types/node@22.20.1):
     dependencies:
-      '@inquirer/external-editor': 1.0.2(@types/node@22.18.8)
+      '@inquirer/external-editor': 1.0.2(@types/node@22.20.1)
       ansi-escapes: 4.3.2
       chalk: 4.1.2
       cli-cursor: 3.1.0
@@ -9403,7 +9358,7 @@ snapshots:
       '@protobufjs/path': 1.1.2
       '@protobufjs/pool': 1.1.0
       '@protobufjs/utf8': 1.1.2
-      '@types/node': 22.18.8
+      '@types/node': 22.20.1
       long: 5.3.2
 
   proxy-compare@3.0.1: {}
@@ -9411,8 +9366,6 @@ snapshots:
   proxy-deep@3.1.1: {}
 
   proxy-from-env@1.1.0: {}
-
-  proxy-from-env@2.1.0: {}
 
   punycode@2.3.1: {}
 
@@ -9446,9 +9399,9 @@ snapshots:
     dependencies:
       react: 18.3.1
 
-  react-cookie@8.1.2(@types/react@18.3.25)(react@18.3.1):
+  react-cookie@8.1.2(@types/react@18.3.31)(react@18.3.1):
     dependencies:
-      '@types/hoist-non-react-statics': 3.3.7(@types/react@18.3.25)
+      '@types/hoist-non-react-statics': 3.3.7(@types/react@18.3.31)
       hoist-non-react-statics: 3.3.2
       react: 18.3.1
       universal-cookie: 8.1.2
@@ -9740,14 +9693,14 @@ snapshots:
       '@babel/core': 7.29.6
       starknet: 8.9.2
 
-  starkscan@0.0.11(@types/node@22.18.8):
+  starkscan@0.0.11(@types/node@22.20.1):
     dependencies:
       '@iarna/toml': 2.2.5
       '@inquirer/checkbox': 0.0.30-alpha.0
       axios: 0.33.0
       chalk: 4.1.2
       class-validator: 0.14.2
-      inquirer: 8.2.7(@types/node@22.18.8)
+      inquirer: 8.2.7(@types/node@22.20.1)
       inquirer-fuzzy-path: 2.3.0
       inquirer-search-list: 1.2.6
       ora: 6.3.1
@@ -10030,11 +9983,11 @@ snapshots:
 
   validator@13.15.22: {}
 
-  valtio@2.1.5(@types/react@18.3.25)(react@18.3.1):
+  valtio@2.1.5(@types/react@18.3.31)(react@18.3.1):
     dependencies:
       proxy-compare: 3.0.1
     optionalDependencies:
-      '@types/react': 18.3.25
+      '@types/react': 18.3.31
       react: 18.3.1
 
   viem@2.31.0(typescript@5.9.3)(zod@3.25.76):
@@ -10105,37 +10058,36 @@ snapshots:
       - utf-8-validate
       - zod
 
-  vite-plugin-glsl@1.6.1(esbuild@0.28.2)(vite@6.4.3(@types/node@22.18.8)(sass@1.103.0)(tsx@4.23.12)):
+  vite-plugin-glsl@1.6.1(esbuild@0.28.2)(vite@6.4.3(@types/node@22.20.1)(sass@1.103.0)(tsx@4.23.12)):
     dependencies:
-      vite: 6.4.3(@types/node@22.18.8)(sass@1.103.0)(tsx@4.23.12)
+      vite: 6.4.3(@types/node@22.20.1)(sass@1.103.0)(tsx@4.23.12)
     optionalDependencies:
       esbuild: 0.28.2
 
-  vite-plugin-mkcert@1.17.9(vite@6.4.3(@types/node@22.18.8)(sass@1.103.0)(tsx@4.23.12)):
+  vite-plugin-mkcert@1.17.12(vite@6.4.3(@types/node@22.20.1)(sass@1.103.0)(tsx@4.23.12)):
     dependencies:
-      axios: 1.18.0(debug@4.4.3)
       debug: 4.4.3
       picocolors: 1.1.1
-      vite: 6.4.3(@types/node@22.18.8)(sass@1.103.0)(tsx@4.23.12)
+      vite: 6.4.3(@types/node@22.20.1)(sass@1.103.0)(tsx@4.23.12)
     transitivePeerDependencies:
       - supports-color
 
-  vite-plugin-top-level-await@1.6.0(rollup@4.59.0)(vite@6.4.3(@types/node@22.18.8)(sass@1.103.0)(tsx@4.23.12)):
+  vite-plugin-top-level-await@1.6.0(rollup@4.59.0)(vite@6.4.3(@types/node@22.20.1)(sass@1.103.0)(tsx@4.23.12)):
     dependencies:
       '@rollup/plugin-virtual': 3.0.2(rollup@4.59.0)
       '@swc/core': 1.13.5
       '@swc/wasm': 1.13.20
       uuid: 11.1.1
-      vite: 6.4.3(@types/node@22.18.8)(sass@1.103.0)(tsx@4.23.12)
+      vite: 6.4.3(@types/node@22.20.1)(sass@1.103.0)(tsx@4.23.12)
     transitivePeerDependencies:
       - '@swc/helpers'
       - rollup
 
-  vite-plugin-wasm@3.6.0(vite@6.4.3(@types/node@22.18.8)(sass@1.103.0)(tsx@4.23.12)):
+  vite-plugin-wasm@3.6.0(vite@6.4.3(@types/node@22.20.1)(sass@1.103.0)(tsx@4.23.12)):
     dependencies:
-      vite: 6.4.3(@types/node@22.18.8)(sass@1.103.0)(tsx@4.23.12)
+      vite: 6.4.3(@types/node@22.20.1)(sass@1.103.0)(tsx@4.23.12)
 
-  vite@6.4.3(@types/node@22.18.8)(sass@1.103.0)(tsx@4.23.12):
+  vite@6.4.3(@types/node@22.20.1)(sass@1.103.0)(tsx@4.23.12):
     dependencies:
       esbuild: 0.25.10
       fdir: 6.5.0(picomatch@4.0.4)
@@ -10144,15 +10096,15 @@ snapshots:
       rollup: 4.59.0
       tinyglobby: 0.2.15
     optionalDependencies:
-      '@types/node': 22.18.8
+      '@types/node': 22.20.1
       fsevents: 2.3.3
       sass: 1.103.0
       tsx: 4.23.12
 
-  vitest@4.1.11(@opentelemetry/api@1.9.1)(@types/node@22.18.8)(happy-dom@20.11.6)(sass@1.103.0)(tsx@4.23.12):
+  vitest@4.1.11(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(happy-dom@20.11.6)(sass@1.103.0)(tsx@4.23.12):
     dependencies:
       '@vitest/expect': 4.1.11
-      '@vitest/mocker': 4.1.11(vite@6.4.3(@types/node@22.18.8)(sass@1.103.0)(tsx@4.23.12))
+      '@vitest/mocker': 4.1.11(vite@6.4.3(@types/node@22.20.1)(sass@1.103.0)(tsx@4.23.12))
       '@vitest/pretty-format': 4.1.11
       '@vitest/runner': 4.1.11
       '@vitest/snapshot': 4.1.11
@@ -10169,11 +10121,11 @@ snapshots:
       tinyexec: 1.3.0
       tinyglobby: 0.2.15
       tinyrainbow: 3.1.1
-      vite: 6.4.3(@types/node@22.18.8)(sass@1.103.0)(tsx@4.23.12)
+      vite: 6.4.3(@types/node@22.20.1)(sass@1.103.0)(tsx@4.23.12)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@opentelemetry/api': 1.9.1
-      '@types/node': 22.18.8
+      '@types/node': 22.20.1
       happy-dom: 20.11.6
     transitivePeerDependencies:
       - jiti
@@ -10319,24 +10271,24 @@ snapshots:
 
   zod@3.25.76: {}
 
-  zustand@4.5.7(@types/react@18.3.25)(immer@10.1.3)(react@18.3.1):
+  zustand@4.5.7(@types/react@18.3.31)(immer@10.1.3)(react@18.3.1):
     dependencies:
       use-sync-external-store: 1.5.0(react@18.3.1)
     optionalDependencies:
-      '@types/react': 18.3.25
+      '@types/react': 18.3.31
       immer: 10.1.3
       react: 18.3.1
 
-  zustand@5.0.15(@types/react@18.3.25)(immer@10.1.3)(react@18.3.1)(use-sync-external-store@1.6.0(react@18.3.1)):
+  zustand@5.0.15(@types/react@18.3.31)(immer@10.1.3)(react@18.3.1)(use-sync-external-store@1.6.0(react@18.3.1)):
     optionalDependencies:
-      '@types/react': 18.3.25
+      '@types/react': 18.3.31
       immer: 10.1.3
       react: 18.3.1
       use-sync-external-store: 1.6.0(react@18.3.1)
 
-  zustand@5.0.15(@types/react@18.3.25)(immer@11.1.18)(react@18.3.1)(use-sync-external-store@1.6.0(react@18.3.1)):
+  zustand@5.0.15(@types/react@18.3.31)(immer@11.1.18)(react@18.3.1)(use-sync-external-store@1.6.0(react@18.3.1)):
     optionalDependencies:
-      '@types/react': 18.3.25
+      '@types/react': 18.3.31
       immer: 11.1.18
       react: 18.3.1
       use-sync-external-store: 1.6.0(react@18.3.1)

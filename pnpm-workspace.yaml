@@ -142,7 +142,7 @@ catalog:
   starknet: 8.9.2
   immer: 11.1.18
   zustand: 5.0.15
-  "@types/react": 18.3.25
+  "@types/react": 18.3.31
   "@types/react-dom": 18.3.7
   react: 18.3.1
   react-dom: 18.3.1
@@ -154,7 +154,7 @@ catalog:
   "@cartridge/controller": 0.13.16
   "@cartridge/presets": 0.5.4
   "@apollo/client": 4.2.12
-  "@types/node": 22.18.8
+  "@types/node": 22.20.1
   starknetid.js: 5.0.0
   typescript: 5.9.3
   tsup: 8.5.0

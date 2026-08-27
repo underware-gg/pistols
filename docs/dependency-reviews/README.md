@@ -253,3 +253,4 @@ both ways.
 - [2026-08-28 — Standalone client libraries](2026-08-28-standalone-client-libraries.md)
 - [2026-08-28 — Apollo Client 4 and GraphQL 17 assessment](2026-08-28-apollo-4-graphql-17.md)
 - [2026-08-28 — Zustand 5 and Immer 11](2026-08-28-zustand-5-immer-11.md)
+- [2026-08-28 — Compatible-line cleanup](2026-08-28-compatible-line-cleanup.md)

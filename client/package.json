@@ -86,7 +86,7 @@
     "typescript": "catalog:",
     "vite": "6.4.3",
     "vite-plugin-glsl": "1.6.1",
-    "vite-plugin-mkcert": "1.17.9",
+    "vite-plugin-mkcert": "1.17.12",
     "vitest": "4.1.11"
   },
   "engines": {
