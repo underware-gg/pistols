@@ -61,7 +61,6 @@
     "starknet": "catalog:",
     "starknetid.js": "catalog:",
     "three": "0.180.0",
-    "type-fest": "2.19.0",
     "universal-cookie": "catalog:",
     "vite-plugin-top-level-await": "1.6.0",
     "vite-plugin-wasm": "3.6.0",
