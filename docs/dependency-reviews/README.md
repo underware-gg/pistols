@@ -248,3 +248,4 @@ both ways.
 - [2026-08-27 — Safe incremental updates](2026-08-27-safe-incremental-updates.md)
 - [2026-08-27 — Vitest 4](2026-08-27-vitest-4.md)
 - [2026-08-27 — react-cookie 8](2026-08-27-react-cookie-8.md)
+- [2026-08-27 — Remove unused local-storage-state](2026-08-27-remove-unused-local-storage-state.md)

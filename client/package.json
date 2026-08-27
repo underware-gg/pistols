@@ -63,7 +63,6 @@
     "three": "0.180.0",
     "type-fest": "2.19.0",
     "universal-cookie": "catalog:",
-    "use-local-storage-state": "19.5.0",
     "vite-plugin-top-level-await": "1.6.0",
     "vite-plugin-wasm": "3.6.0",
     "zustand": "catalog:"
