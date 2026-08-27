@@ -153,7 +153,7 @@ catalog:
   "@cartridge/connector": 0.13.16
   "@cartridge/controller": 0.13.16
   "@cartridge/presets": 0.5.4
-  "@apollo/client": 3.14.0
+  "@apollo/client": 4.2.12
   "@types/node": 22.18.8
   starknetid.js: 5.0.0
   typescript: 5.9.3
@@ -190,7 +190,7 @@ catalog:
 # ^0.13.16 means >=0.13.16 <0.14.0.
 catalogs:
   peers:
-    "@apollo/client": "^3.11.8"
+    "@apollo/client": "^3.11.8 || ^4.0.0"
     "@cartridge/connector": "^0.13.16"
     "@cartridge/controller": "^0.13.16"
     "@cartridge/presets": "^0.5.4"

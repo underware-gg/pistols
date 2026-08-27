@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
-import { ApolloClient, InMemoryCache, useQuery } from '@apollo/client'
+import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client'
+import { useQuery } from '@apollo/client/react'
 
 //---------------------------
 // QL Client
@@ -7,7 +8,7 @@ import { ApolloClient, InMemoryCache, useQuery } from '@apollo/client'
 //
 export const ql_client = (GQLUrl: string) => {
   return new ApolloClient({
-    uri: GQLUrl,
+    link: new HttpLink({ uri: GQLUrl }),
     defaultOptions: {
       watchQuery: {
         fetchPolicy: "no-cache",
@@ -20,15 +21,13 @@ export const ql_client = (GQLUrl: string) => {
         fetchPolicy: "no-cache",
       },
     },
-    cache: new InMemoryCache({
-      addTypename: false,
-    }),
+    cache: new InMemoryCache(),
   });
 };
 
 type Variables = Record<string, string | number | number[] | boolean | null | undefined | Date>;
 
-export const useGraphQLQuery = ({
+export const useGraphQLQuery = <TData = unknown>({
   graphqlUrl,
   query,
   variables,
@@ -44,7 +43,7 @@ export const useGraphQLQuery = ({
   pollInterval?: number,
 }) => {
   const client = useMemo(() => ql_client(graphqlUrl), [graphqlUrl]);
-  const { data, loading: isLoading, refetch } = useQuery(query, {
+  const { data, loading: isLoading, refetch } = useQuery<TData>(query, {
     client,
     variables,
     skip: !enabled,

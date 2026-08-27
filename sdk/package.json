@@ -182,6 +182,7 @@
     "graphql": "16.14.2",
     "happy-dom": "20.11.6",
     "react": "catalog:",
+    "rxjs": "7.8.2",
     "starknet": "catalog:",
     "starknetid.js": "catalog:",
     "tsup": "catalog:",

@@ -101,9 +101,27 @@ export type ERC_Tokens = {
   },
 }
 
+type TokenBalancesQuery = {
+  tokenBalances?: {
+    edges: Array<{
+      node: {
+        tokenMetadata: {
+          __typename: ERC_typename
+          contractAddress: BigNumberish
+          symbol: string
+          decimals: number
+          amount: BigNumberish
+          tokenId: BigNumberish
+          metadata: string
+        }
+      }
+    }>
+  }
+}
+
 function useToriiTokenBalancesQL(variables: any, enabled: boolean, watch: boolean) {
   const { selectedNetworkConfig } = useDojoSetup()
-  const { data, isLoading, refetch } = useGraphQLQuery({
+  const { data, isLoading, refetch } = useGraphQLQuery<TokenBalancesQuery>({
     graphqlUrl: selectedNetworkConfig.graphqlUrl,
     query: tokenBalances,
     variables,

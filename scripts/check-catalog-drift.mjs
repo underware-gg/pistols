@@ -24,8 +24,8 @@ function readFlatBlock(startPattern, indent) {
       const depth = line.length - line.trimStart().length
       if (line.length > 0 && depth < indent) break
       if (depth !== indent) continue
-      const m = line.trim().match(/^"?([@\w./-]+)"?:\s*"?([^"#\s]+)"?/)
-      if (m) entries.set(m[1], m[2])
+      const m = line.trim().match(/^"?([@\w./-]+)"?:\s*(?:"([^"]+)"|([^#\s]+))/)
+      if (m) entries.set(m[1], m[2] ?? m[3])
     }
   }
   return entries
@@ -52,7 +52,7 @@ const compare = (a, b) => {
   if (b.pre === null) return -1
   return a.pre < b.pre ? -1 : 1
 }
-function satisfiesPeerRange(version, range) {
+function satisfiesSimplePeerRange(version, range) {
   const target = parse(version)
   if (!target) return null
   const requested = String(range).trim()
@@ -72,6 +72,12 @@ function satisfiesPeerRange(version, range) {
   return exact ? compare(target, exact) === 0 : null
 }
 
+function satisfiesPeerRange(version, range) {
+  const results = String(range).split('||').map((part) => satisfiesSimplePeerRange(version, part.trim()))
+  if (results.some((result) => result === true)) return true
+  return results.some((result) => result === null) ? null : false
+}
+
 const failures = []
 for (const [name, range] of peers) {
   const pinned = defaults.get(name)
@@ -80,7 +86,7 @@ for (const [name, range] of peers) {
     continue
   }
   const ok = satisfiesPeerRange(pinned, range)
-  if (ok === null) failures.push(`${name}: cannot evaluate peer range "${range}" against pinned ${pinned} — express it as a caret, tilde or exact version`)
+  if (ok === null) failures.push(`${name}: cannot evaluate peer range "${range}" against pinned ${pinned} — express each union member as a caret, tilde or exact version`)
   else if (ok === false) failures.push(`${name}: peer range "${range}" EXCLUDES the pinned ${pinned}. Publishing this advertises a contract that excludes the version we build and test against.`)
 }
 
