@@ -13,6 +13,11 @@ import { SceneName  } from '/src/data/assetsTypes'
 import { Divider } from '/src/components/ui/Divider'
 import { LordsBalance } from '/src/components/account/LordsBalance'
 import * as TWEEN from '@tweenjs/tween.js'
+import {
+  getCardPackPageCount,
+  getRenderedCardPackIds,
+  getVisibleCardPackIds,
+} from './cardPackPagination'
 
 // Card pack positioning constants
 const PACK_BASE_X = 12
@@ -40,14 +45,25 @@ export default function ScCardPacks() {
   const { packIds } = usePacksOwnedByPlayer()
   const { canClaimStarterPack } = useCanClaimStarterPack()
   
-  const [visiblePacks, setVisiblePacks] = useState<number[]>([])
   const [currentPage, setCurrentPage] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
   
   const [selectedCardPack, setSelectedCardPack] = useState<number | null>(null)
   const [selectedPackType, setSelectedPackType] = useState(constants.PackType.GenesisDuelists5x)
   
   const { fee } = useCalcFeePack(selectedPackType)
+
+  const totalPages = useMemo(
+    () => getCardPackPageCount(packIds.length, canClaimStarterPack),
+    [canClaimStarterPack, packIds.length],
+  )
+  const visiblePacks = useMemo(
+    () => getVisibleCardPackIds({ packIds, currentPage, canClaimStarterPack }),
+    [canClaimStarterPack, currentPage, packIds],
+  )
+  const allRenderedPacks = useMemo(
+    () => getRenderedCardPackIds(visiblePacks, selectedCardPack),
+    [selectedCardPack, visiblePacks],
+  )
   
   const packRefsMap = useMemo(() => {
     const refsMap = new Map<number, React.RefObject<CardPackAnimationWrapperHandle>>()
@@ -73,35 +89,10 @@ export default function ScCardPacks() {
   }
   
   useEffect(() => {
-    const calculatedTotalPages = Math.ceil((packIds.length + (canClaimStarterPack ? 1 : 0)) / MAX_VISIBLE_PACKS)
-    setTotalPages(calculatedTotalPages)
-    
-    if (currentPage >= calculatedTotalPages) {
-      setCurrentPage(Math.max(0, calculatedTotalPages - 1))
+    if (currentPage >= totalPages) {
+      setCurrentPage(Math.max(0, totalPages - 1))
     }
-  }, [packIds, canClaimStarterPack, currentPage])
-  
-  const [allRenderedPacks, setAllRenderedPacks] = useState<number[]>([])
-  
-  useEffect(() => {
-    const newStartIndex = currentPage * MAX_VISIBLE_PACKS - (canClaimStarterPack && currentPage !== 0 ? 1 : 0)
-    const endIndex = Math.min(newStartIndex + (canClaimStarterPack && currentPage === 0 ? MAX_VISIBLE_PACKS - 1 : MAX_VISIBLE_PACKS), packIds.length)
-    
-    let visible = packIds.slice(newStartIndex, endIndex)
-    if (canClaimStarterPack && currentPage === 0) {
-      visible = [-1, ...visible]
-    }
-    
-    if (visible.every(id => allRenderedPacks.includes(id)) && visible.length === allRenderedPacks.length) return
-    setVisiblePacks(visible)
-    
-    const newRenderedPacks = [...visible]
-    
-    if (selectedCardPack !== null && !newRenderedPacks.includes(selectedCardPack)) {
-      newRenderedPacks.push(selectedCardPack)
-    }
-    setAllRenderedPacks(newRenderedPacks)
-  }, [packIds, currentPage, selectedCardPack, canClaimStarterPack, allRenderedPacks])
+  }, [currentPage, totalPages])
   
   const navigateStack = (direction: 'up' | 'down') => {
     if (direction === 'up' && currentPage > 0) {

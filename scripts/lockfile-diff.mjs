@@ -17,6 +17,7 @@
 
 import { readFileSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
+import { parseResolvedPackages } from './lockfile-packages.mjs'
 
 const args = process.argv.slice(2)
 const strict = args.includes('--strict')
@@ -25,23 +26,6 @@ const ref = args.find((a) => !a.startsWith('--')) ?? 'HEAD'
 // Keys in the `packages:` section are the resolved graph: `'name@version':` or
 // `name@version:`, two spaces of indent. Peer-suffixed snapshot keys live in
 // `snapshots:` and are deliberately not counted — they restate the same versions.
-function parse(text) {
-  const versions = new Map()
-  let inPackages = false
-  for (const line of text.split('\n')) {
-    if (/^packages:\s*$/.test(line)) { inPackages = true; continue }
-    if (inPackages && line.length > 0 && !/^\s/.test(line)) break
-    if (!inPackages) continue
-    const m = line.match(/^ {2}'?((?:@[^/]+\/)?[^@'\s]+)@([^'():\s]+)'?:/)
-    if (m) {
-      const [, name, version] = m
-      if (!versions.has(name)) versions.set(name, new Set())
-      versions.get(name).add(version)
-    }
-  }
-  return versions
-}
-
 let baseText
 try {
   baseText = execFileSync('git', ['show', `${ref}:pnpm-lock.yaml`], { encoding: 'utf8', maxBuffer: 256 * 1024 * 1024 })
@@ -50,10 +34,12 @@ try {
   process.exit(1)
 }
 
-const base = parse(baseText)
-const head = parse(readFileSync('pnpm-lock.yaml', 'utf8'))
-if (base.size === 0 || head.size === 0) {
-  console.error('lockfile-diff: parsed zero packages from one side — the lockfile shape changed and this parser needs updating')
+let base, head
+try {
+  base = parseResolvedPackages(baseText)
+  head = parseResolvedPackages(readFileSync('pnpm-lock.yaml', 'utf8'))
+} catch (error) {
+  console.error(`lockfile-diff: ${error.message}`)
   process.exit(1)
 }
 

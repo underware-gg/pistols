@@ -8,6 +8,7 @@
 
 import { readFileSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
+import { evaluateAdvisories, getAdvisoryId } from './advisory-policy.mjs'
 
 const accepted = JSON.parse(readFileSync('scripts/accepted-advisories.json', 'utf8')).accepted ?? {}
 
@@ -24,23 +25,21 @@ if (!report) {
 }
 
 const advisories = Object.values(JSON.parse(report).advisories ?? {})
-const unexpected = advisories.filter((a) => !Object.hasOwn(accepted, a.module_name))
-const seen = new Set(advisories.map((a) => a.module_name))
-const staleAcceptances = Object.keys(accepted).filter((name) => !seen.has(name))
+const { unexpected, stale: staleAcceptances, matched } = evaluateAdvisories(advisories, accepted)
 
-for (const name of Object.keys(accepted)) {
-  if (seen.has(name)) console.log(`check-advisories: accepted — ${accepted[name].severity} ${name} ${accepted[name].vulnerable}`)
+for (const { id, advisory } of matched) {
+  console.log(`check-advisories: accepted — ${id} ${advisory.severity} ${advisory.module_name} ${advisory.vulnerable_versions}`)
 }
 
 if (staleAcceptances.length > 0) {
   console.error(`\ncheck-advisories: FAILED — ${staleAcceptances.length} acceptance(s) no longer apply; delete them:`)
-  for (const name of staleAcceptances) console.error(`  ${name}`)
+  for (const id of staleAcceptances) console.error(`  ${id}`)
   process.exit(1)
 }
 
 if (unexpected.length > 0) {
   console.error(`\ncheck-advisories: FAILED — ${unexpected.length} unaccepted advisory finding(s):`)
-  for (const a of unexpected) console.error(`  ${a.severity} ${a.module_name} ${a.vulnerable_versions} — ${a.title ?? ''}`)
+  for (const a of unexpected) console.error(`  ${getAdvisoryId(a) ?? '(missing id)'} ${a.severity} ${a.module_name} ${a.vulnerable_versions} — ${a.title ?? ''}`)
   console.error('\nFix it, or add a reviewed acceptance to scripts/accepted-advisories.json.')
   process.exit(1)
 }

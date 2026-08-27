@@ -24,35 +24,42 @@ import {
   resolvePublishedVersion,
   satisfiesVersion,
 } from './package-ranges.mjs'
+import { parseResolvedPackages } from './lockfile-packages.mjs'
+import {
+  candidateReviewFailed,
+  parseCandidateArgs,
+  readMinimumReleaseAgeMinutes,
+  runtimeDependencies,
+} from './candidate-policy.mjs'
 
-const argv = process.argv.slice(2)
-let depth = 3
-const depthAt = argv.indexOf('--depth')
-if (depthAt !== -1) { depth = Number(argv[depthAt + 1]); argv.splice(depthAt, 2) }
-if (argv.length === 0) {
+let parsedArgs
+try {
+  parsedArgs = parseCandidateArgs(process.argv.slice(2))
+} catch (error) {
+  console.error(`candidate: ${error.message}`)
   console.error('usage: node scripts/candidate.mjs <pkg>@<version> [...]  [--depth N]')
   process.exit(2)
 }
+const { candidates, depth, bounded } = parsedArgs
 
 // --- policy: the age gate we must clear -----------------------------------
 const workspace = readFileSync('pnpm-workspace.yaml', 'utf8')
-const minAgeMinutes = Number(workspace.match(/^minimumReleaseAge:\s*(\d+)/m)?.[1] ?? 0)
+let minAgeMinutes
+try {
+  minAgeMinutes = readMinimumReleaseAgeMinutes(workspace)
+} catch (error) {
+  console.error(`candidate: ${error.message} — failing closed`)
+  process.exit(2)
+}
 const minAgeDays = minAgeMinutes / 1440
 
 // --- what is already in our tree -----------------------------------------
-const installed = new Map()
-{
-  let inPackages = false
-  for (const line of readFileSync('pnpm-lock.yaml', 'utf8').split('\n')) {
-    if (/^packages:\s*$/.test(line)) { inPackages = true; continue }
-    if (inPackages && line.length > 0 && !/^\s/.test(line)) break
-    if (!inPackages) continue
-    const m = line.match(/^ {2}'?((?:@[^/]+\/)?[^@'\s]+)@([^'():\s]+)'?:/)
-    if (m) {
-      if (!installed.has(m[1])) installed.set(m[1], new Set())
-      installed.get(m[1]).add(m[2])
-    }
-  }
+let installed
+try {
+  installed = parseResolvedPackages(readFileSync('pnpm-lock.yaml', 'utf8'))
+} catch (error) {
+  console.error(`candidate: ${error.message} — failing closed`)
+  process.exit(2)
 }
 
 // --- registry -------------------------------------------------------------
@@ -86,9 +93,9 @@ function advisories(name) {
 }
 
 // --- report ---------------------------------------------------------------
-let problems = 0, uncertain = 0
+let problems = 0, uncertain = 0, truncated = 0
 const seen = new Set()
-const queue = argv.map((spec) => {
+const queue = candidates.map((spec) => {
   const at = spec.lastIndexOf('@')
   if (at <= 0) { console.error(`candidate: "${spec}" must be name@version`); process.exit(2) }
   return { name: spec.slice(0, at), version: spec.slice(at + 1), level: 0, via: '(requested)' }
@@ -102,7 +109,7 @@ while (queue.length > 0) {
 
   const already = installed.get(name)?.has(version)
   const indent = '  '.repeat(level)
-  console.log(`\n${indent}${'='.repeat(60 - level * 2)}`)
+  console.log(`\n${indent}${'='.repeat(Math.max(1, 60 - level * 2))}`)
   console.log(`${indent}${key}${already ? '   [already in tree at this version]' : ''}`)
   if (level > 0) console.log(`${indent}  brought in by: ${via}`)
 
@@ -164,9 +171,16 @@ while (queue.length > 0) {
     }
   }
 
-  // recurse into what this would newly bring in
-  if (level < depth) {
-    for (const [declaredName, declaredRange] of Object.entries(v.dependencies ?? {})) {
+  // Recurse into every runtime arrival. A bounded review is a diagnostic preview,
+  // not an approval: if it hides children, the command exits non-zero below.
+  const dependencies = runtimeDependencies(v)
+  if (level >= depth) {
+    if (bounded && dependencies.length > 0) {
+      console.log(`${indent}  INCOMPLETE: depth ${depth} hides ${dependencies.length} runtime dependenc${dependencies.length === 1 ? 'y' : 'ies'}`)
+      truncated += dependencies.length
+    }
+  } else {
+    for (const { name: declaredName, range: declaredRange, optional } of dependencies) {
       // An npm alias - "react-is-18": "npm:react-is@^18.3.1" - names the local
       // key, not the package. Reading the key as a package name fetched a
       // DIFFERENT, squatted package called react-is-18 whose preinstall is
@@ -191,7 +205,7 @@ while (queue.length > 0) {
       ))
       const satisfied = present.filter((pv, i) => verdicts[i] === true)
       if (satisfied.length > 0) {
-        console.log(`${indent}  dep ${dep}@${range}${dep === declaredName ? '' : ` (alias ${declaredName})`} — satisfied by ${satisfied.join(', ')} already in tree`)
+        console.log(`${indent}  ${optional ? 'optional dep' : 'dep'} ${dep}@${range}${dep === declaredName ? '' : ` (alias ${declaredName})`} — satisfied by ${satisfied.join(', ')} already in tree`)
       } else {
         // "cannot evaluate" is not "does not satisfy". Both are still treated as
         // unsatisfied, because assuming satisfaction is how something unreviewed
@@ -212,6 +226,6 @@ while (queue.length > 0) {
 }
 
 console.log(`\n${'='.repeat(60)}`)
-console.log(`candidate: ${seen.size} package(s) examined, ${problems} item(s) needing a decision, ${uncertain} needing manual range checks`)
+console.log(`candidate: ${seen.size} package(s) examined, ${problems} item(s) needing a decision, ${uncertain} needing manual range checks, ${truncated} hidden by a depth limit`)
 console.log('Nothing was installed. Record the review before changing any manifest.')
-if (problems > 0) process.exit(1)
+if (candidateReviewFailed({ problems, uncertain, truncated })) process.exit(1)

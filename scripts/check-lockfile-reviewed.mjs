@@ -8,27 +8,22 @@
 // that someone else resolved and committed. This is the static counterpart.
 
 import { readFileSync } from 'node:fs'
+import { packagePair, parseResolvedPackages } from './lockfile-packages.mjs'
+import { validateReviewRecord } from './review-record.mjs'
 
-const reviewed = JSON.parse(readFileSync('scripts/reviewed-packages.json', 'utf8')).packages ?? {}
+const reviewedFile = JSON.parse(readFileSync('scripts/reviewed-packages.json', 'utf8'))
+const reviewed = reviewedFile.packages ?? {}
+const provenance = reviewedFile.provenance ?? {}
 if (Object.keys(reviewed).length === 0) {
   console.error('check-lockfile-reviewed: reviewed set is empty — failing closed')
   process.exit(1)
 }
 
-const resolved = new Map()
-let inPackages = false
-for (const line of readFileSync('pnpm-lock.yaml', 'utf8').split('\n')) {
-  if (/^packages:\s*$/.test(line)) { inPackages = true; continue }
-  if (inPackages && line.length > 0 && !/^\s/.test(line)) break
-  if (!inPackages) continue
-  const m = line.match(/^ {2}'?((?:@[^/]+\/)?[^@'\s]+)@([^'():\s]+)'?:/)
-  if (m) {
-    if (!resolved.has(m[1])) resolved.set(m[1], new Set())
-    resolved.get(m[1]).add(m[2])
-  }
-}
-if (resolved.size === 0) {
-  console.error('check-lockfile-reviewed: parsed zero packages from the lockfile — failing closed')
+let resolved
+try {
+  resolved = parseResolvedPackages(readFileSync('pnpm-lock.yaml', 'utf8'))
+} catch (error) {
+  console.error(`check-lockfile-reviewed: ${error.message} — failing closed`)
   process.exit(1)
 }
 
@@ -47,6 +42,30 @@ for (const [name, versions] of resolved) {
 // prunes them, because the set is rebuilt from the lockfile wholesale.
 const stale = Object.entries(reviewed)
   .flatMap(([name, versions]) => versions.filter((v) => !resolved.get(name)?.has(v)).map((v) => `${name}@${v}`))
+
+const missingProvenance = []
+const staleProvenance = []
+const invalidRecords = []
+for (const [name, versions] of resolved) {
+  for (const version of versions) {
+    if (!provenance[name]?.[version]) missingProvenance.push(packagePair(name, version))
+  }
+}
+for (const [name, versions] of Object.entries(provenance)) {
+  for (const [version, record] of Object.entries(versions)) {
+    if (!resolved.get(name)?.has(version)) {
+      staleProvenance.push(packagePair(name, version))
+    } else if (typeof record !== 'string') {
+      invalidRecords.push(`${packagePair(name, version)}: provenance must be a string`)
+    } else if (!record.startsWith('legacy:')) {
+      try {
+        validateReviewRecord(record)
+      } catch (error) {
+        invalidRecords.push(`${packagePair(name, version)}: ${error.message}`)
+      }
+    }
+  }
+}
 
 if (unreviewed.length > 0) {
   console.error(`check-lockfile-reviewed: FAILED — ${unreviewed.length} package version(s) in the lockfile are not in the reviewed set:\n`)
@@ -67,4 +86,14 @@ if (stale.length > 0) {
   process.exit(1)
 }
 
-console.log(`check-lockfile-reviewed: OK — ${[...resolved.values()].reduce((n, s) => n + s.size, 0)} resolved package versions, all reviewed, no stale permissions`)
+if (missingProvenance.length > 0 || staleProvenance.length > 0 || invalidRecords.length > 0) {
+  console.error('\ncheck-lockfile-reviewed: FAILED — reviewed-set provenance is incomplete or invalid:')
+  for (const pair of missingProvenance.slice(0, 40)) console.error(`  missing: ${pair}`)
+  for (const pair of staleProvenance.slice(0, 40)) console.error(`  stale: ${pair}`)
+  for (const problem of invalidRecords.slice(0, 40)) console.error(`  invalid: ${problem}`)
+  console.error('\nRegenerate with an existing, complete review record:')
+  console.error('  node scripts/generate-reviewed-set.mjs --record docs/dependency-reviews/<file>')
+  process.exit(1)
+}
+
+console.log(`check-lockfile-reviewed: OK — ${[...resolved.values()].reduce((n, s) => n + s.size, 0)} resolved package versions, all reviewed with provenance, no stale permissions`)

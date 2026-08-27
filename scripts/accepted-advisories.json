@@ -6,7 +6,8 @@
     "finding that has a fix available."
   ],
   "accepted": {
-    "elliptic": {
+    "GHSA-848j-6mx2-7j84": {
+      "module": "elliptic",
       "severity": "low",
       "vulnerable": "<=6.6.1",
       "why": "No patched version exists for any release of elliptic. Reached through starknet.",

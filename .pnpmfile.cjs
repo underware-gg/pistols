@@ -1,10 +1,9 @@
 // Fail-closed resolution gate.
 //
-// pnpm calls readPackage for every package it resolves. Throwing here aborts the
-// install during resolveDependency — before the tarball is fetched — so an
-// unreviewed package never reaches this machine's store, let alone node_modules.
-// That is the difference between a policy that documents review and one that
-// enforces it: every other gate in scripts/ runs after the fact.
+// pnpm calls readPackage for every package it resolves. Throwing there aborts
+// during resolveDependency. afterAllResolved then validates the source-aware
+// registry package list, closing readPackage's inability to distinguish linked
+// workspaces from a registry package with the same manifest identity.
 //
 // The permitted set is scripts/reviewed-packages.json. See that file for the
 // honest status of its bootstrap.
@@ -15,36 +14,21 @@
 
 const { readFileSync } = require('node:fs')
 const { join } = require('node:path')
+const { parsePackageKey } = require('./scripts/lockfile-packages.cjs')
+const { readWorkspacePackages } = require('./scripts/workspace-manifests.cjs')
 
 const BYPASS = process.env.PISTOLS_ALLOW_UNREVIEWED === '1'
 let reviewed = null
 let loadError = null
-let workspaceNames = null
+let workspaceVersions = null
 
-// Our own workspace packages have a name and version but no registry identity,
-// so there is nothing to review and they must not be blocked. Read them from the
-// workspace file rather than hardcoding, so adding a member cannot break installs.
-function isWorkspacePackage(name) {
-  if (!workspaceNames) {
-    workspaceNames = new Set()
-    const readName = (dir) => {
-      try {
-        workspaceNames.add(JSON.parse(readFileSync(join(__dirname, dir, 'package.json'), 'utf8')).name)
-      } catch {
-        /* a listed member without a manifest is not our concern here */
-      }
-    }
-    readName('.')
-    const yaml = readFileSync(join(__dirname, 'pnpm-workspace.yaml'), 'utf8')
-    const block = yaml.match(/^packages:\n([\s\S]*?)(?=^\S)/m)
-    if (block) {
-      for (const line of block[1].split('\n')) {
-        const m = line.match(/^\s*-\s*["']?([^"'#\s]+)["']?/)
-        if (m) readName(m[1])
-      }
-    }
+function isWorkspacePackage(name, version) {
+  if (!workspaceVersions) {
+    workspaceVersions = new Map(
+      readWorkspacePackages(__dirname).map((pkg) => [pkg.name, pkg.version]),
+    )
   }
-  return workspaceNames.has(name)
+  return workspaceVersions.get(name) === version
 }
 
 function permitted() {
@@ -68,9 +52,11 @@ function permitted() {
 
 function readPackage(pkg, context) {
   if (BYPASS) return pkg
-  // Workspace packages have no registry identity to review.
   if (!pkg.name || !pkg.version) return pkg
-  if (isWorkspacePackage(pkg.name)) return pkg
+  // readPackage exposes no source path, so this identity match alone cannot
+  // distinguish a linked workspace manifest from a registry spoof. The
+  // source-aware afterAllResolved hook below is the mandatory backstop.
+  if (isWorkspacePackage(pkg.name, pkg.version)) return pkg
 
   const allowed = permitted()[pkg.name]
   if (allowed && allowed.includes(pkg.version)) return pkg
@@ -87,4 +73,25 @@ function readPackage(pkg, context) {
   throw new Error(message)
 }
 
-module.exports = { hooks: { readPackage } }
+function afterAllResolved(lockfile) {
+  if (BYPASS) return lockfile
+  const packageKeys = Object.keys(lockfile.packages ?? {})
+  if (packageKeys.length === 0) {
+    throw new Error('[pistols] resolved lockfile contains no registry packages; failing closed because its shape may have changed')
+  }
+
+  for (const key of packageKeys) {
+    const parsed = parsePackageKey(key)
+    if (!parsed) throw new Error(`[pistols] cannot parse resolved registry package key "${key}"; failing closed`)
+    const allowed = permitted()[parsed.name]
+    if (!allowed?.includes(parsed.version)) {
+      throw new Error(
+        `[pistols] BLOCKED resolved registry package: ${parsed.name}@${parsed.version} is not in the reviewed set. ` +
+        'Linked workspaces do not appear in lockfile.packages, so no workspace-name exemption applies here.'
+      )
+    }
+  }
+  return lockfile
+}
+
+module.exports = { hooks: { afterAllResolved, readPackage } }

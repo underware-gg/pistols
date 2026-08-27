@@ -9,6 +9,8 @@
 // usage: node scripts/generate-reviewed-set.mjs --record docs/dependency-reviews/<file>.md
 
 import { readFileSync, writeFileSync } from 'node:fs'
+import { parseResolvedPackages } from './lockfile-packages.mjs'
+import { validateReviewRecord } from './review-record.mjs'
 
 const argv = process.argv.slice(2)
 const record = argv[argv.indexOf('--record') + 1]
@@ -16,21 +18,43 @@ if (!argv.includes('--record') || !record) {
   console.error('usage: node scripts/generate-reviewed-set.mjs --record docs/dependency-reviews/<file>.md')
   process.exit(2)
 }
+let validatedRecord
+try {
+  validatedRecord = validateReviewRecord(record)
+} catch (error) {
+  console.error(`generate-reviewed-set: ${error.message}`)
+  process.exit(2)
+}
 
 const existing = JSON.parse(readFileSync('scripts/reviewed-packages.json', 'utf8'))
-const packages = {}
-let inPackages = false
-for (const line of readFileSync('pnpm-lock.yaml', 'utf8').split('\n')) {
-  if (/^packages:\s*$/.test(line)) { inPackages = true; continue }
-  if (inPackages && line.length > 0 && !/^\s/.test(line)) break
-  if (!inPackages) continue
-  const m = line.match(/^ {2}'?((?:@[^/]+\/)?[^@'\s]+)@([^'():\s]+)'?:/)
-  if (m) (packages[m[1]] ??= []).push(m[2])
+const resolved = parseResolvedPackages(readFileSync('pnpm-lock.yaml', 'utf8'))
+const packages = Object.fromEntries(
+  [...resolved.entries()].sort(([a], [b]) => a.localeCompare(b))
+    .map(([name, versions]) => [name, [...versions].sort()]),
+)
+const existingPackages = existing.packages ?? {}
+const existingProvenance = existing.provenance ?? {}
+const provenance = {}
+for (const [name, versions] of Object.entries(packages)) {
+  provenance[name] = {}
+  for (const version of versions) {
+    const previous = existingProvenance[name]?.[version]
+    const existedBeforeProvenance = existingPackages[name]?.includes(version)
+    provenance[name][version] = previous ?? (
+      existedBeforeProvenance
+        ? 'legacy:pre-provenance-2026-08-28'
+        : validatedRecord
+    )
+  }
 }
-for (const name of Object.keys(packages)) packages[name] = [...new Set(packages[name])].sort()
 
 const before = Object.values(existing.packages ?? {}).flat().length
 const after = Object.values(packages).flat().length
-writeFileSync('scripts/reviewed-packages.json', JSON.stringify({ ...existing, packages }, null, 2) + '\n')
+writeFileSync('scripts/reviewed-packages.json', JSON.stringify({
+  ...existing,
+  provenanceComment: 'Every permitted name@version has provenance. legacy:* entries predate per-version provenance; new admissions name their validated review record.',
+  packages,
+  provenance,
+}, null, 2) + '\n')
 console.log(`generate-reviewed-set: ${Object.keys(packages).length} packages, ${after} name@version pairs (was ${before})`)
-console.log(`record: ${record}`)
+console.log(`record: ${validatedRecord}`)

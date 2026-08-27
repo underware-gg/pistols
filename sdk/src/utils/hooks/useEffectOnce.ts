@@ -1,13 +1,9 @@
-import { useEffect, useRef, DependencyList } from 'react'
+import { useEffect, DependencyList, EffectCallback } from 'react'
 
-export const useEffectOnce = (effect: () => void, deps: DependencyList) => {
-  const dataFetch = useRef(false)
-  useEffect(() => {
-    if (dataFetch.current) return
-    dataFetch.current = true
-    effect()
-  // The caller owns the trigger contract; the ref guarantees the body can still
-  // run only once even when the supplied dependencies change.
+export const useEffectOnce = (effect: EffectCallback, deps: DependencyList) => {
+  // This remains a named convenience for existing SDK consumers, but lifecycle
+  // semantics belong to React: setup is repeated after a StrictMode probe and
+  // the callback's cleanup is always retained and invoked.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, deps)
+  useEffect(effect, deps)
 }

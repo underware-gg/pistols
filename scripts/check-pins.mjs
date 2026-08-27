@@ -19,15 +19,29 @@
 // consumers about what they may supply, not a resolution we control.
 
 import { readFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
 
-const MANIFESTS = ['package.json', 'sdk/package.json', 'client/package.json', 'verifier/package.json']
+const require = createRequire(import.meta.url)
+const { readWorkspacePackages } = require('./workspace-manifests.cjs')
+
+let MANIFESTS
+try {
+  MANIFESTS = readWorkspacePackages(process.cwd()).map(({ relativePath }) => relativePath)
+} catch (error) {
+  console.error(`check-pins: cannot discover workspace manifests (${error.message}) — failing closed`)
+  process.exit(1)
+}
 const PINNED_SECTIONS = ['dependencies', 'devDependencies', 'optionalDependencies']
 const PASSTHROUGH = /^(catalog:|workspace:|link:|file:)/
 // Allowlist, not a blocklist. A blocklist of range syntaxes lets anything it did
 // not anticipate through — `0.180.x` and `latest` are both ranges and both slip
 // past a "starts with ^ or ~" test. Only a strict semver literal is exact.
 const EXACT = /^\d+\.\d+\.\d+(?:-[\w.-]+)?(?:\+[\w.-]+)?$/
-const isRange = (spec) => !EXACT.test(spec)
+const EXACT_NPM_ALIAS = /^npm:(?:@[\w.-]+\/[\w.-]+|[\w.-]+)@(\d+\.\d+\.\d+(?:-[\w.-]+)?(?:\+[\w.-]+)?)$/
+const isRange = (spec) => {
+  const alias = spec.match(EXACT_NPM_ALIAS)
+  return !EXACT.test(alias?.[1] ?? spec)
+}
 
 const waivers = JSON.parse(readFileSync('scripts/pin-waivers.json', 'utf8'))
 const failures = []

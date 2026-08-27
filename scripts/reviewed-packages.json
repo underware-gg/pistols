@@ -20,6 +20,7 @@
       "1.11.1"
     ],
     "@apollo/client": [
+      "3.14.0",
       "4.2.12"
     ],
     "@babel/code-frame": [
@@ -96,11 +97,11 @@
     "@cartridge/connector": [
       "0.13.16"
     ],
-    "@cartridge/controller-wasm": [
-      "0.10.1"
-    ],
     "@cartridge/controller": [
       "0.13.16"
+    ],
+    "@cartridge/controller-wasm": [
+      "0.10.1"
     ],
     "@cartridge/penpal": [
       "6.2.4"
@@ -114,10 +115,10 @@
     "@cbor-extract/cbor-extract-darwin-x64": [
       "2.2.0"
     ],
-    "@cbor-extract/cbor-extract-linux-arm64": [
+    "@cbor-extract/cbor-extract-linux-arm": [
       "2.2.0"
     ],
-    "@cbor-extract/cbor-extract-linux-arm": [
+    "@cbor-extract/cbor-extract-linux-arm64": [
       "2.2.0"
     ],
     "@cbor-extract/cbor-extract-linux-x64": [
@@ -202,11 +203,11 @@
       "0.25.10",
       "0.28.2"
     ],
-    "@esbuild/android-arm64": [
+    "@esbuild/android-arm": [
       "0.25.10",
       "0.28.2"
     ],
-    "@esbuild/android-arm": [
+    "@esbuild/android-arm64": [
       "0.25.10",
       "0.28.2"
     ],
@@ -230,11 +231,11 @@
       "0.25.10",
       "0.28.2"
     ],
-    "@esbuild/linux-arm64": [
+    "@esbuild/linux-arm": [
       "0.25.10",
       "0.28.2"
     ],
-    "@esbuild/linux-arm": [
+    "@esbuild/linux-arm64": [
       "0.25.10",
       "0.28.2"
     ],
@@ -424,11 +425,11 @@
     "@module-federation/error-codes": [
       "0.12.0"
     ],
-    "@module-federation/runtime-core": [
-      "0.12.0"
-    ],
     "@module-federation/runtime": [
       "0.1.21",
+      "0.12.0"
+    ],
+    "@module-federation/runtime-core": [
       "0.12.0"
     ],
     "@module-federation/sdk": [
@@ -444,10 +445,10 @@
     "@msgpackr-extract/msgpackr-extract-darwin-x64": [
       "3.0.4"
     ],
-    "@msgpackr-extract/msgpackr-extract-linux-arm64": [
+    "@msgpackr-extract/msgpackr-extract-linux-arm": [
       "3.0.4"
     ],
-    "@msgpackr-extract/msgpackr-extract-linux-arm": [
+    "@msgpackr-extract/msgpackr-extract-linux-arm64": [
       "3.0.4"
     ],
     "@msgpackr-extract/msgpackr-extract-linux-x64": [
@@ -509,6 +510,9 @@
     "@opentelemetry/semantic-conventions": [
       "1.43.0"
     ],
+    "@parcel/watcher": [
+      "2.5.1"
+    ],
     "@parcel/watcher-android-arm64": [
       "2.5.1"
     ],
@@ -548,9 +552,6 @@
     "@parcel/watcher-win32-x64": [
       "2.5.1"
     ],
-    "@parcel/watcher": [
-      "2.5.1"
-    ],
     "@peculiar/asn1-cms": [
       "2.9.0"
     ],
@@ -575,10 +576,10 @@
     "@peculiar/asn1-schema": [
       "2.9.0"
     ],
-    "@peculiar/asn1-x509-attr": [
+    "@peculiar/asn1-x509": [
       "2.9.0"
     ],
-    "@peculiar/asn1-x509": [
+    "@peculiar/asn1-x509-attr": [
       "2.9.0"
     ],
     "@peculiar/utils": [
@@ -605,10 +606,10 @@
     "@protobuf-ts/protoc": [
       "2.11.1"
     ],
-    "@protobuf-ts/runtime-rpc": [
+    "@protobuf-ts/runtime": [
       "2.11.1"
     ],
-    "@protobuf-ts/runtime": [
+    "@protobuf-ts/runtime-rpc": [
       "2.11.1"
     ],
     "@protobufjs/aspromise": [
@@ -638,6 +639,9 @@
     "@protobufjs/utf8": [
       "1.1.2"
     ],
+    "@reown/appkit": [
+      "1.8.1"
+    ],
     "@reown/appkit-common": [
       "1.8.1"
     ],
@@ -660,9 +664,6 @@
       "1.8.1"
     ],
     "@reown/appkit-wallet": [
-      "1.8.1"
-    ],
-    "@reown/appkit": [
       "1.8.1"
     ],
     "@rolldown/pluginutils": [
@@ -799,6 +800,9 @@
     "@starknet-react/core": [
       "5.0.3"
     ],
+    "@swc/core": [
+      "1.13.5"
+    ],
     "@swc/core-darwin-arm64": [
       "1.13.5"
     ],
@@ -827,9 +831,6 @@
       "1.13.5"
     ],
     "@swc/core-win32-x64-msvc": [
-      "1.13.5"
-    ],
-    "@swc/core": [
       "1.13.5"
     ],
     "@swc/counter": [
@@ -951,14 +952,14 @@
     "@types/prop-types": [
       "15.7.15"
     ],
+    "@types/react": [
+      "18.3.31"
+    ],
     "@types/react-dom": [
       "18.3.7"
     ],
     "@types/react-transition-group": [
       "4.4.12"
-    ],
-    "@types/react": [
-      "18.3.31"
     ],
     "@types/stats.js": [
       "0.17.4"
@@ -1140,12 +1141,12 @@
       "1.1.0",
       "1.1.1"
     ],
-    "acorn-jsx": [
-      "5.3.2"
-    ],
     "acorn": [
       "8.15.0",
       "8.18.0"
+    ],
+    "acorn-jsx": [
+      "5.3.2"
     ],
     "aes-js": [
       "4.0.0-beta.5"
@@ -1252,12 +1253,12 @@
     "bs58check": [
       "4.0.0"
     ],
-    "buffer-image-size": [
-      "0.6.4"
-    ],
     "buffer": [
       "5.7.1",
       "6.0.3"
+    ],
+    "buffer-image-size": [
+      "0.6.4"
     ],
     "bundle-name": [
       "4.1.0"
@@ -1370,12 +1371,12 @@
       "1.9.0",
       "2.0.0"
     ],
-    "cookie-es": [
-      "1.2.2"
-    ],
     "cookie": [
       "1.0.2",
       "1.1.1"
+    ],
+    "cookie-es": [
+      "1.2.2"
     ],
     "copyfiles": [
       "2.4.1"
@@ -1419,11 +1420,11 @@
     "deep-is": [
       "0.1.4"
     ],
-    "default-browser-id": [
-      "5.0.0"
-    ],
     "default-browser": [
       "5.2.1"
+    ],
+    "default-browser-id": [
+      "5.0.0"
     ],
     "defaults": [
       "1.0.4"
@@ -1538,6 +1539,9 @@
       "4.0.0",
       "5.0.0"
     ],
+    "eslint": [
+      "10.8.1"
+    ],
     "eslint-plugin-react-hooks": [
       "7.1.1"
     ],
@@ -1550,9 +1554,6 @@
     "eslint-visitor-keys": [
       "3.4.3",
       "5.0.1"
-    ],
-    "eslint": [
-      "10.8.1"
     ],
     "esniff": [
       "2.0.1"
@@ -1702,12 +1703,12 @@
     "get-starknet-core": [
       "4.0.0"
     ],
-    "glob-parent": [
-      "6.0.2"
-    ],
     "glob": [
       "10.5.0",
       "7.2.3"
+    ],
+    "glob-parent": [
+      "6.0.2"
     ],
     "google-protobuf": [
       "3.21.4"
@@ -1718,11 +1719,11 @@
     "graceful-fs": [
       "4.2.11"
     ],
-    "graphql-tag": [
-      "2.12.6"
-    ],
     "graphql": [
       "16.14.2"
+    ],
+    "graphql-tag": [
+      "2.12.6"
     ],
     "grpc-web": [
       "1.5.0"
@@ -1798,6 +1799,11 @@
     "inherits": [
       "2.0.4"
     ],
+    "inquirer": [
+      "3.3.0",
+      "6.5.2",
+      "8.2.7"
+    ],
     "inquirer-autocomplete-prompt": [
       "1.4.0"
     ],
@@ -1806,11 +1812,6 @@
     ],
     "inquirer-search-list": [
       "1.2.6"
-    ],
-    "inquirer": [
-      "3.3.0",
-      "6.5.2",
-      "8.2.7"
     ],
     "iron-webcrypto": [
       "1.2.1"
@@ -1928,14 +1929,14 @@
     "lines-and-columns": [
       "1.2.4"
     ],
+    "lit": [
+      "3.3.0"
+    ],
     "lit-element": [
       "4.2.1"
     ],
     "lit-html": [
       "3.3.1"
-    ],
-    "lit": [
-      "3.3.0"
     ],
     "load-tsconfig": [
       "0.2.5"
@@ -1943,6 +1944,9 @@
     "locate-path": [
       "5.0.0",
       "6.0.0"
+    ],
+    "lodash": [
+      "4.18.0"
     ],
     "lodash-es": [
       "4.18.0"
@@ -1952,9 +1956,6 @@
     ],
     "lodash.sortby": [
       "4.7.0"
-    ],
-    "lodash": [
-      "4.18.0"
     ],
     "log-symbols": [
       "4.1.0",
@@ -2040,11 +2041,11 @@
     "ms": [
       "2.1.3"
     ],
-    "msgpackr-extract": [
-      "3.0.4"
-    ],
     "msgpackr": [
       "1.12.1"
+    ],
+    "msgpackr-extract": [
+      "3.0.4"
     ],
     "multiformats": [
       "9.9.0"
@@ -2074,11 +2075,11 @@
     "node-addon-api": [
       "7.1.1"
     ],
-    "node-fetch-native": [
-      "1.6.7"
-    ],
     "node-fetch": [
       "2.7.0"
+    ],
+    "node-fetch-native": [
+      "1.6.7"
     ],
     "node-gyp-build-optional-packages": [
       "5.1.1",
@@ -2185,14 +2186,14 @@
       "2.3.2",
       "4.0.4"
     ],
+    "pino": [
+      "7.11.0"
+    ],
     "pino-abstract-transport": [
       "0.5.0"
     ],
     "pino-std-serializers": [
       "4.0.0"
-    ],
-    "pino": [
-      "7.11.0"
     ],
     "pirates": [
       "4.0.7"
@@ -2203,11 +2204,11 @@
     "pngjs": [
       "5.0.0"
     ],
-    "postcss-load-config": [
-      "6.0.1"
-    ],
     "postcss": [
       "8.5.23"
+    ],
+    "postcss-load-config": [
+      "6.0.1"
     ],
     "prelude-ls": [
       "1.2.1"
@@ -2260,6 +2261,9 @@
     "radix3": [
       "1.1.2"
     ],
+    "react": [
+      "18.3.1"
+    ],
     "react-circular-progressbar": [
       "2.2.0"
     ],
@@ -2290,9 +2294,6 @@
     "react-transition-group": [
       "4.4.5"
     ],
-    "react": [
-      "18.3.1"
-    ],
     "readable-stream": [
       "1.0.34",
       "2.3.8",
@@ -2311,18 +2312,21 @@
     "reflect-metadata": [
       "0.2.2"
     ],
+    "rehackt": [
+      "0.1.0"
+    ],
     "require-directory": [
       "2.1.1"
     ],
     "require-main-filename": [
       "2.0.0"
     ],
+    "resolve": [
+      "1.22.10"
+    ],
     "resolve-from": [
       "4.0.0",
       "5.0.0"
-    ],
-    "resolve": [
-      "1.22.10"
     ],
     "restore-cursor": [
       "2.0.0",
@@ -2338,10 +2342,10 @@
     "run-async": [
       "2.4.1"
     ],
-    "rx-lite-aggregates": [
+    "rx-lite": [
       "4.0.8"
     ],
-    "rx-lite": [
+    "rx-lite-aggregates": [
       "4.0.8"
     ],
     "rxjs": [
@@ -2407,12 +2411,12 @@
     "sonic-boom": [
       "2.8.0"
     ],
-    "source-map-js": [
-      "1.2.1"
-    ],
     "source-map": [
       "0.5.7",
       "0.8.0-beta.0"
+    ],
+    "source-map-js": [
+      "1.2.1"
     ],
     "split-on-first": [
       "1.1.0"
@@ -2445,15 +2449,15 @@
     "strict-uri-encode": [
       "2.0.0"
     ],
-    "string-width": [
-      "2.1.1",
-      "4.2.3",
-      "5.1.2"
-    ],
     "string_decoder": [
       "0.10.31",
       "1.1.1",
       "1.3.0"
+    ],
+    "string-width": [
+      "2.1.1",
+      "4.2.3",
+      "5.1.2"
     ],
     "strip-ansi": [
       "4.0.0",
@@ -2477,11 +2481,14 @@
     "swr": [
       "2.5.1"
     ],
-    "thenify-all": [
-      "1.6.0"
+    "symbol-observable": [
+      "4.0.0"
     ],
     "thenify": [
       "3.3.1"
+    ],
+    "thenify-all": [
+      "1.6.0"
     ],
     "thread-stream": [
       "0.15.2"
@@ -2489,11 +2496,11 @@
     "three": [
       "0.185.1"
     ],
-    "through2": [
-      "2.0.5"
-    ],
     "through": [
       "2.3.8"
+    ],
+    "through2": [
+      "2.0.5"
     ],
     "tiny-emitter": [
       "2.1.0"
@@ -2533,6 +2540,9 @@
     "ts-interface-checker": [
       "0.1.13"
     ],
+    "ts-invariant": [
+      "0.10.3"
+    ],
     "ts-mixer": [
       "6.0.4"
     ],
@@ -2553,14 +2563,14 @@
     "turbo": [
       "2.10.11"
     ],
+    "type": [
+      "2.7.3"
+    ],
     "type-check": [
       "0.4.0"
     ],
     "type-fest": [
       "0.21.3"
-    ],
-    "type": [
-      "2.7.3"
     ],
     "typed-function": [
       "4.2.1"
@@ -2626,6 +2636,9 @@
       "2.37.9",
       "2.9.20"
     ],
+    "vite": [
+      "6.4.3"
+    ],
     "vite-plugin-glsl": [
       "1.6.1"
     ],
@@ -2637,9 +2650,6 @@
     ],
     "vite-plugin-wasm": [
       "3.6.0"
-    ],
-    "vite": [
-      "6.4.3"
     ],
     "vitest": [
       "4.1.11"
@@ -2664,11 +2674,11 @@
       "5.0.0",
       "7.1.0"
     ],
-    "which-module": [
-      "2.0.1"
-    ],
     "which": [
       "2.0.2"
+    ],
+    "which-module": [
+      "2.0.1"
     ],
     "why-is-node-running": [
       "2.3.0"
@@ -2704,29 +2714,2768 @@
     "yaml": [
       "1.10.3"
     ],
-    "yargs-parser": [
-      "18.1.3",
-      "20.2.9",
-      "21.1.1"
-    ],
     "yargs": [
       "15.4.1",
       "16.2.0",
       "17.7.2"
     ],
+    "yargs-parser": [
+      "18.1.3",
+      "20.2.9",
+      "21.1.1"
+    ],
     "yocto-queue": [
       "0.1.0"
     ],
-    "zod-validation-error": [
-      "4.0.2"
+    "zen-observable": [
+      "0.8.15"
+    ],
+    "zen-observable-ts": [
+      "1.2.5"
     ],
     "zod": [
       "3.22.4",
       "3.25.76"
     ],
+    "zod-validation-error": [
+      "4.0.2"
+    ],
     "zustand": [
       "4.5.7",
       "5.0.15"
     ]
+  },
+  "provenanceComment": "Every permitted name@version has provenance. legacy:* entries predate per-version provenance; new admissions name their validated review record.",
+  "provenance": {
+    "@adraffy/ens-normalize": {
+      "1.10.0": "legacy:pre-provenance-2026-08-28",
+      "1.10.1": "legacy:pre-provenance-2026-08-28",
+      "1.11.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@apollo/client": {
+      "3.14.0": "docs/dependency-reviews/2026-08-28-apollo-4-graphql-17.md",
+      "4.2.12": "legacy:pre-provenance-2026-08-28"
+    },
+    "@babel/code-frame": {
+      "7.29.7": "legacy:pre-provenance-2026-08-28"
+    },
+    "@babel/compat-data": {
+      "7.29.7": "legacy:pre-provenance-2026-08-28"
+    },
+    "@babel/core": {
+      "7.29.6": "legacy:pre-provenance-2026-08-28"
+    },
+    "@babel/generator": {
+      "7.29.8": "legacy:pre-provenance-2026-08-28"
+    },
+    "@babel/helper-compilation-targets": {
+      "7.29.7": "legacy:pre-provenance-2026-08-28"
+    },
+    "@babel/helper-globals": {
+      "7.29.7": "legacy:pre-provenance-2026-08-28"
+    },
+    "@babel/helper-module-imports": {
+      "7.27.1": "legacy:pre-provenance-2026-08-28",
+      "7.29.7": "legacy:pre-provenance-2026-08-28"
+    },
+    "@babel/helper-module-transforms": {
+      "7.29.7": "legacy:pre-provenance-2026-08-28"
+    },
+    "@babel/helper-plugin-utils": {
+      "7.27.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@babel/helper-string-parser": {
+      "7.27.1": "legacy:pre-provenance-2026-08-28",
+      "7.29.7": "legacy:pre-provenance-2026-08-28"
+    },
+    "@babel/helper-validator-identifier": {
+      "7.29.7": "legacy:pre-provenance-2026-08-28"
+    },
+    "@babel/helper-validator-option": {
+      "7.29.7": "legacy:pre-provenance-2026-08-28"
+    },
+    "@babel/helpers": {
+      "7.29.7": "legacy:pre-provenance-2026-08-28"
+    },
+    "@babel/parser": {
+      "7.28.4": "legacy:pre-provenance-2026-08-28",
+      "7.29.8": "legacy:pre-provenance-2026-08-28"
+    },
+    "@babel/plugin-transform-react-jsx-self": {
+      "7.27.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@babel/plugin-transform-react-jsx-source": {
+      "7.27.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@babel/runtime": {
+      "7.28.4": "legacy:pre-provenance-2026-08-28",
+      "7.29.7": "legacy:pre-provenance-2026-08-28"
+    },
+    "@babel/template": {
+      "7.29.7": "legacy:pre-provenance-2026-08-28"
+    },
+    "@babel/traverse": {
+      "7.29.8": "legacy:pre-provenance-2026-08-28"
+    },
+    "@babel/types": {
+      "7.28.4": "legacy:pre-provenance-2026-08-28",
+      "7.29.8": "legacy:pre-provenance-2026-08-28"
+    },
+    "@bufbuild/protobuf": {
+      "2.9.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@bufbuild/protoplugin": {
+      "2.9.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@cartridge/connector": {
+      "0.13.16": "legacy:pre-provenance-2026-08-28"
+    },
+    "@cartridge/controller": {
+      "0.13.16": "legacy:pre-provenance-2026-08-28"
+    },
+    "@cartridge/controller-wasm": {
+      "0.10.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@cartridge/penpal": {
+      "6.2.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "@cartridge/presets": {
+      "0.5.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "@cbor-extract/cbor-extract-darwin-arm64": {
+      "2.2.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@cbor-extract/cbor-extract-darwin-x64": {
+      "2.2.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@cbor-extract/cbor-extract-linux-arm": {
+      "2.2.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@cbor-extract/cbor-extract-linux-arm64": {
+      "2.2.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@cbor-extract/cbor-extract-linux-x64": {
+      "2.2.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@cbor-extract/cbor-extract-win32-x64": {
+      "2.2.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@dimforge/rapier3d-compat": {
+      "0.12.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@dojoengine/core": {
+      "1.8.8": "legacy:pre-provenance-2026-08-28"
+    },
+    "@dojoengine/grpc": {
+      "1.8.7": "legacy:pre-provenance-2026-08-28"
+    },
+    "@dojoengine/recs": {
+      "2.0.13": "legacy:pre-provenance-2026-08-28"
+    },
+    "@dojoengine/sdk": {
+      "1.9.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@dojoengine/state": {
+      "1.8.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "@dojoengine/torii-client": {
+      "1.8.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@dojoengine/torii-wasm": {
+      "1.8.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@dojoengine/utils": {
+      "1.8.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "@effect/opentelemetry": {
+      "0.59.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "@effect/platform": {
+      "0.93.8": "legacy:pre-provenance-2026-08-28"
+    },
+    "@emotion/babel-plugin": {
+      "11.13.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "@emotion/cache": {
+      "11.14.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@emotion/hash": {
+      "0.9.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@emotion/is-prop-valid": {
+      "1.4.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@emotion/memoize": {
+      "0.9.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@emotion/react": {
+      "11.14.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@emotion/serialize": {
+      "1.3.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "@emotion/sheet": {
+      "1.4.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@emotion/styled": {
+      "11.14.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@emotion/unitless": {
+      "0.10.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@emotion/use-insertion-effect-with-fallbacks": {
+      "1.2.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@emotion/utils": {
+      "1.4.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@emotion/weak-memoize": {
+      "0.4.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@esbuild/aix-ppc64": {
+      "0.25.10": "legacy:pre-provenance-2026-08-28",
+      "0.28.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@esbuild/android-arm": {
+      "0.25.10": "legacy:pre-provenance-2026-08-28",
+      "0.28.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@esbuild/android-arm64": {
+      "0.25.10": "legacy:pre-provenance-2026-08-28",
+      "0.28.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@esbuild/android-x64": {
+      "0.25.10": "legacy:pre-provenance-2026-08-28",
+      "0.28.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@esbuild/darwin-arm64": {
+      "0.25.10": "legacy:pre-provenance-2026-08-28",
+      "0.28.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@esbuild/darwin-x64": {
+      "0.25.10": "legacy:pre-provenance-2026-08-28",
+      "0.28.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@esbuild/freebsd-arm64": {
+      "0.25.10": "legacy:pre-provenance-2026-08-28",
+      "0.28.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@esbuild/freebsd-x64": {
+      "0.25.10": "legacy:pre-provenance-2026-08-28",
+      "0.28.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@esbuild/linux-arm": {
+      "0.25.10": "legacy:pre-provenance-2026-08-28",
+      "0.28.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@esbuild/linux-arm64": {
+      "0.25.10": "legacy:pre-provenance-2026-08-28",
+      "0.28.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@esbuild/linux-ia32": {
+      "0.25.10": "legacy:pre-provenance-2026-08-28",
+      "0.28.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@esbuild/linux-loong64": {
+      "0.25.10": "legacy:pre-provenance-2026-08-28",
+      "0.28.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@esbuild/linux-mips64el": {
+      "0.25.10": "legacy:pre-provenance-2026-08-28",
+      "0.28.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@esbuild/linux-ppc64": {
+      "0.25.10": "legacy:pre-provenance-2026-08-28",
+      "0.28.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@esbuild/linux-riscv64": {
+      "0.25.10": "legacy:pre-provenance-2026-08-28",
+      "0.28.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@esbuild/linux-s390x": {
+      "0.25.10": "legacy:pre-provenance-2026-08-28",
+      "0.28.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@esbuild/linux-x64": {
+      "0.25.10": "legacy:pre-provenance-2026-08-28",
+      "0.28.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@esbuild/netbsd-arm64": {
+      "0.25.10": "legacy:pre-provenance-2026-08-28",
+      "0.28.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@esbuild/netbsd-x64": {
+      "0.25.10": "legacy:pre-provenance-2026-08-28",
+      "0.28.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@esbuild/openbsd-arm64": {
+      "0.25.10": "legacy:pre-provenance-2026-08-28",
+      "0.28.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@esbuild/openbsd-x64": {
+      "0.25.10": "legacy:pre-provenance-2026-08-28",
+      "0.28.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@esbuild/openharmony-arm64": {
+      "0.25.10": "legacy:pre-provenance-2026-08-28",
+      "0.28.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@esbuild/sunos-x64": {
+      "0.25.10": "legacy:pre-provenance-2026-08-28",
+      "0.28.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@esbuild/win32-arm64": {
+      "0.25.10": "legacy:pre-provenance-2026-08-28",
+      "0.28.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@esbuild/win32-ia32": {
+      "0.25.10": "legacy:pre-provenance-2026-08-28",
+      "0.28.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@esbuild/win32-x64": {
+      "0.25.10": "legacy:pre-provenance-2026-08-28",
+      "0.28.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@eslint-community/eslint-utils": {
+      "4.10.1": "legacy:pre-provenance-2026-08-28",
+      "4.9.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@eslint-community/regexpp": {
+      "4.12.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@eslint/config-array": {
+      "0.23.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "@eslint/config-helpers": {
+      "0.7.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@eslint/core": {
+      "1.2.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@eslint/object-schema": {
+      "3.0.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "@eslint/plugin-kit": {
+      "0.7.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@ethersproject/bytes": {
+      "5.8.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@ethersproject/logger": {
+      "5.8.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@fluentui/react-component-event-listener": {
+      "0.63.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@graphql-typed-document-node/core": {
+      "3.2.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@grpc/grpc-js": {
+      "1.14.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "@grpc/proto-loader": {
+      "0.8.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@hpke/chacha20poly1305": {
+      "1.8.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@hpke/common": {
+      "1.10.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@hpke/core": {
+      "1.9.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@hpke/dhkem-x25519": {
+      "1.8.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@hpke/dhkem-x448": {
+      "1.8.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@humanfs/core": {
+      "0.19.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@humanfs/node": {
+      "0.16.7": "legacy:pre-provenance-2026-08-28"
+    },
+    "@humanwhocodes/module-importer": {
+      "1.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@humanwhocodes/retry": {
+      "0.4.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "@iarna/toml": {
+      "2.2.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "@inquirer/checkbox": {
+      "0.0.30-alpha.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@inquirer/core": {
+      "0.0.30-alpha.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@inquirer/external-editor": {
+      "1.0.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@inquirer/type": {
+      "0.0.4-alpha.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@isaacs/cliui": {
+      "8.0.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@jridgewell/gen-mapping": {
+      "0.3.13": "legacy:pre-provenance-2026-08-28"
+    },
+    "@jridgewell/remapping": {
+      "2.3.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "@jridgewell/resolve-uri": {
+      "3.1.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@jridgewell/sourcemap-codec": {
+      "1.5.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "@jridgewell/trace-mapping": {
+      "0.3.31": "legacy:pre-provenance-2026-08-28"
+    },
+    "@js-sdsl/ordered-map": {
+      "4.4.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@latticexyz/schema-type": {
+      "2.0.12": "legacy:pre-provenance-2026-08-28"
+    },
+    "@latticexyz/utils": {
+      "2.0.12": "legacy:pre-provenance-2026-08-28",
+      "2.2.23": "legacy:pre-provenance-2026-08-28"
+    },
+    "@lit-labs/ssr-dom-shim": {
+      "1.4.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@lit/react": {
+      "1.0.8": "legacy:pre-provenance-2026-08-28"
+    },
+    "@lit/reactive-element": {
+      "2.1.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@module-federation/error-codes": {
+      "0.12.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@module-federation/runtime": {
+      "0.1.21": "legacy:pre-provenance-2026-08-28",
+      "0.12.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@module-federation/runtime-core": {
+      "0.12.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@module-federation/sdk": {
+      "0.1.21": "legacy:pre-provenance-2026-08-28",
+      "0.12.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@msgpack/msgpack": {
+      "3.1.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@msgpackr-extract/msgpackr-extract-darwin-arm64": {
+      "3.0.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "@msgpackr-extract/msgpackr-extract-darwin-x64": {
+      "3.0.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "@msgpackr-extract/msgpackr-extract-linux-arm": {
+      "3.0.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "@msgpackr-extract/msgpackr-extract-linux-arm64": {
+      "3.0.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "@msgpackr-extract/msgpackr-extract-linux-x64": {
+      "3.0.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "@msgpackr-extract/msgpackr-extract-win32-x64": {
+      "3.0.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "@mui/core-downloads-tracker": {
+      "9.3.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@mui/material": {
+      "9.3.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@mui/private-theming": {
+      "9.3.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@mui/styled-engine": {
+      "9.3.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@mui/system": {
+      "9.3.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@mui/types": {
+      "9.3.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@mui/utils": {
+      "9.3.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@noble/ciphers": {
+      "1.3.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@noble/curves": {
+      "1.0.0": "legacy:pre-provenance-2026-08-28",
+      "1.2.0": "legacy:pre-provenance-2026-08-28",
+      "1.7.0": "legacy:pre-provenance-2026-08-28",
+      "1.8.0": "legacy:pre-provenance-2026-08-28",
+      "1.9.0": "legacy:pre-provenance-2026-08-28",
+      "1.9.1": "legacy:pre-provenance-2026-08-28",
+      "1.9.2": "legacy:pre-provenance-2026-08-28",
+      "1.9.7": "legacy:pre-provenance-2026-08-28"
+    },
+    "@noble/hashes": {
+      "1.2.0": "legacy:pre-provenance-2026-08-28",
+      "1.3.0": "legacy:pre-provenance-2026-08-28",
+      "1.3.2": "legacy:pre-provenance-2026-08-28",
+      "1.3.3": "legacy:pre-provenance-2026-08-28",
+      "1.6.0": "legacy:pre-provenance-2026-08-28",
+      "1.6.1": "legacy:pre-provenance-2026-08-28",
+      "1.7.0": "legacy:pre-provenance-2026-08-28",
+      "1.8.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@noble/secp256k1": {
+      "1.7.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@opentelemetry/api": {
+      "1.9.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@opentelemetry/semantic-conventions": {
+      "1.43.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@parcel/watcher": {
+      "2.5.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@parcel/watcher-android-arm64": {
+      "2.5.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@parcel/watcher-darwin-arm64": {
+      "2.5.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@parcel/watcher-darwin-x64": {
+      "2.5.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@parcel/watcher-freebsd-x64": {
+      "2.5.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@parcel/watcher-linux-arm-glibc": {
+      "2.5.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@parcel/watcher-linux-arm-musl": {
+      "2.5.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@parcel/watcher-linux-arm64-glibc": {
+      "2.5.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@parcel/watcher-linux-arm64-musl": {
+      "2.5.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@parcel/watcher-linux-x64-glibc": {
+      "2.5.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@parcel/watcher-linux-x64-musl": {
+      "2.5.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@parcel/watcher-win32-arm64": {
+      "2.5.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@parcel/watcher-win32-ia32": {
+      "2.5.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@parcel/watcher-win32-x64": {
+      "2.5.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@peculiar/asn1-cms": {
+      "2.9.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@peculiar/asn1-csr": {
+      "2.9.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@peculiar/asn1-ecc": {
+      "2.9.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@peculiar/asn1-pfx": {
+      "2.9.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@peculiar/asn1-pkcs8": {
+      "2.9.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@peculiar/asn1-pkcs9": {
+      "2.9.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@peculiar/asn1-rsa": {
+      "2.9.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@peculiar/asn1-schema": {
+      "2.9.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@peculiar/asn1-x509": {
+      "2.9.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@peculiar/asn1-x509-attr": {
+      "2.9.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@peculiar/utils": {
+      "2.0.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "@peculiar/x509": {
+      "1.12.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "@phosphor-icons/webcomponents": {
+      "2.1.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "@pkgjs/parseargs": {
+      "0.11.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@popperjs/core": {
+      "2.11.8": "legacy:pre-provenance-2026-08-28"
+    },
+    "@protobuf-ts/grpcweb-transport": {
+      "2.11.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@protobuf-ts/plugin": {
+      "2.11.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@protobuf-ts/protoc": {
+      "2.11.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@protobuf-ts/runtime": {
+      "2.11.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@protobuf-ts/runtime-rpc": {
+      "2.11.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@protobufjs/aspromise": {
+      "1.1.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@protobufjs/base64": {
+      "1.1.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@protobufjs/codegen": {
+      "2.0.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "@protobufjs/eventemitter": {
+      "1.1.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@protobufjs/fetch": {
+      "1.1.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@protobufjs/float": {
+      "1.0.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@protobufjs/path": {
+      "1.1.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@protobufjs/pool": {
+      "1.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@protobufjs/utf8": {
+      "1.1.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@reown/appkit": {
+      "1.8.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@reown/appkit-common": {
+      "1.8.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@reown/appkit-controllers": {
+      "1.8.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@reown/appkit-pay": {
+      "1.8.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@reown/appkit-polyfills": {
+      "1.8.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@reown/appkit-scaffold-ui": {
+      "1.8.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@reown/appkit-ui": {
+      "1.8.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@reown/appkit-utils": {
+      "1.8.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@reown/appkit-wallet": {
+      "1.8.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@rolldown/pluginutils": {
+      "1.0.0-beta.27": "legacy:pre-provenance-2026-08-28"
+    },
+    "@rollup/plugin-virtual": {
+      "3.0.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@rollup/rollup-android-arm-eabi": {
+      "4.59.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@rollup/rollup-android-arm64": {
+      "4.59.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@rollup/rollup-darwin-arm64": {
+      "4.59.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@rollup/rollup-darwin-x64": {
+      "4.59.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@rollup/rollup-freebsd-arm64": {
+      "4.59.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@rollup/rollup-freebsd-x64": {
+      "4.59.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@rollup/rollup-linux-arm-gnueabihf": {
+      "4.59.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@rollup/rollup-linux-arm-musleabihf": {
+      "4.59.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@rollup/rollup-linux-arm64-gnu": {
+      "4.59.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@rollup/rollup-linux-arm64-musl": {
+      "4.59.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@rollup/rollup-linux-loong64-gnu": {
+      "4.59.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@rollup/rollup-linux-loong64-musl": {
+      "4.59.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@rollup/rollup-linux-ppc64-gnu": {
+      "4.59.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@rollup/rollup-linux-ppc64-musl": {
+      "4.59.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@rollup/rollup-linux-riscv64-gnu": {
+      "4.59.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@rollup/rollup-linux-riscv64-musl": {
+      "4.59.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@rollup/rollup-linux-s390x-gnu": {
+      "4.59.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@rollup/rollup-linux-x64-gnu": {
+      "4.59.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@rollup/rollup-linux-x64-musl": {
+      "4.59.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@rollup/rollup-openbsd-x64": {
+      "4.59.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@rollup/rollup-openharmony-arm64": {
+      "4.59.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@rollup/rollup-win32-arm64-msvc": {
+      "4.59.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@rollup/rollup-win32-ia32-msvc": {
+      "4.59.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@rollup/rollup-win32-x64-gnu": {
+      "4.59.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@rollup/rollup-win32-x64-msvc": {
+      "4.59.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@scure/base": {
+      "1.1.9": "legacy:pre-provenance-2026-08-28",
+      "1.2.6": "legacy:pre-provenance-2026-08-28"
+    },
+    "@scure/bip32": {
+      "1.1.5": "legacy:pre-provenance-2026-08-28",
+      "1.3.2": "legacy:pre-provenance-2026-08-28",
+      "1.7.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@scure/bip39": {
+      "1.1.1": "legacy:pre-provenance-2026-08-28",
+      "1.2.1": "legacy:pre-provenance-2026-08-28",
+      "1.6.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@scure/starknet": {
+      "1.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@semantic-ui-react/event-stack": {
+      "3.1.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "@standard-schema/spec": {
+      "1.0.0": "legacy:pre-provenance-2026-08-28",
+      "1.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@starknet-io/get-starknet-core": {
+      "4.0.8": "legacy:pre-provenance-2026-08-28",
+      "5.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@starknet-io/get-starknet-discovery": {
+      "5.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@starknet-io/get-starknet-virtual-wallet": {
+      "5.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@starknet-io/get-starknet-wallet-standard": {
+      "5.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@starknet-io/get-starknet-wallets": {
+      "5.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@starknet-io/types-js": {
+      "0.7.10": "legacy:pre-provenance-2026-08-28",
+      "0.7.7": "legacy:pre-provenance-2026-08-28",
+      "0.8.4": "legacy:pre-provenance-2026-08-28",
+      "0.9.1": "legacy:pre-provenance-2026-08-28",
+      "0.9.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@starknet-react/chains": {
+      "5.0.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "@starknet-react/core": {
+      "5.0.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "@swc/core": {
+      "1.13.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "@swc/core-darwin-arm64": {
+      "1.13.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "@swc/core-darwin-x64": {
+      "1.13.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "@swc/core-linux-arm-gnueabihf": {
+      "1.13.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "@swc/core-linux-arm64-gnu": {
+      "1.13.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "@swc/core-linux-arm64-musl": {
+      "1.13.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "@swc/core-linux-x64-gnu": {
+      "1.13.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "@swc/core-linux-x64-musl": {
+      "1.13.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "@swc/core-win32-arm64-msvc": {
+      "1.13.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "@swc/core-win32-ia32-msvc": {
+      "1.13.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "@swc/core-win32-x64-msvc": {
+      "1.13.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "@swc/counter": {
+      "0.1.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "@swc/types": {
+      "0.1.25": "legacy:pre-provenance-2026-08-28"
+    },
+    "@swc/wasm": {
+      "1.13.20": "legacy:pre-provenance-2026-08-28"
+    },
+    "@tanstack/query-core": {
+      "5.101.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "@tanstack/react-query": {
+      "5.101.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "@testing-library/dom": {
+      "10.4.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@testing-library/react": {
+      "16.3.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@turbo/darwin-64": {
+      "2.10.11": "legacy:pre-provenance-2026-08-28"
+    },
+    "@turbo/darwin-arm64": {
+      "2.10.11": "legacy:pre-provenance-2026-08-28"
+    },
+    "@turbo/linux-64": {
+      "2.10.11": "legacy:pre-provenance-2026-08-28"
+    },
+    "@turbo/linux-arm64": {
+      "2.10.11": "legacy:pre-provenance-2026-08-28"
+    },
+    "@turbo/windows-64": {
+      "2.10.11": "legacy:pre-provenance-2026-08-28"
+    },
+    "@turbo/windows-arm64": {
+      "2.10.11": "legacy:pre-provenance-2026-08-28"
+    },
+    "@turnkey/api-key-stamper": {
+      "0.6.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "@turnkey/crypto": {
+      "2.8.14": "legacy:pre-provenance-2026-08-28"
+    },
+    "@turnkey/encoding": {
+      "0.6.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@turnkey/http": {
+      "3.18.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@turnkey/iframe-stamper": {
+      "2.11.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@turnkey/indexed-db-stamper": {
+      "1.2.6": "legacy:pre-provenance-2026-08-28"
+    },
+    "@turnkey/sdk-browser": {
+      "5.16.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@turnkey/sdk-types": {
+      "0.14.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@turnkey/wallet-stamper": {
+      "1.1.16": "legacy:pre-provenance-2026-08-28"
+    },
+    "@turnkey/webauthn-stamper": {
+      "0.6.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@tweenjs/tween.js": {
+      "23.1.3": "legacy:pre-provenance-2026-08-28",
+      "25.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@types/aria-query": {
+      "5.0.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "@types/babel__core": {
+      "7.20.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "@types/babel__generator": {
+      "7.27.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@types/babel__template": {
+      "7.4.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "@types/babel__traverse": {
+      "7.28.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@types/chai": {
+      "5.2.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@types/deep-eql": {
+      "4.0.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@types/esrecurse": {
+      "4.3.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@types/estree": {
+      "1.0.8": "legacy:pre-provenance-2026-08-28"
+    },
+    "@types/event-emitter": {
+      "0.3.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "@types/hoist-non-react-statics": {
+      "3.3.7": "legacy:pre-provenance-2026-08-28"
+    },
+    "@types/json-schema": {
+      "7.0.15": "legacy:pre-provenance-2026-08-28"
+    },
+    "@types/node": {
+      "22.20.1": "legacy:pre-provenance-2026-08-28",
+      "22.7.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "@types/parse-json": {
+      "4.0.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@types/prop-types": {
+      "15.7.15": "legacy:pre-provenance-2026-08-28"
+    },
+    "@types/react": {
+      "18.3.31": "legacy:pre-provenance-2026-08-28"
+    },
+    "@types/react-dom": {
+      "18.3.7": "legacy:pre-provenance-2026-08-28"
+    },
+    "@types/react-transition-group": {
+      "4.4.12": "legacy:pre-provenance-2026-08-28"
+    },
+    "@types/stats.js": {
+      "0.17.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "@types/three": {
+      "0.185.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "@types/trusted-types": {
+      "2.0.7": "legacy:pre-provenance-2026-08-28"
+    },
+    "@types/validator": {
+      "13.15.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "@types/webxr": {
+      "0.5.24": "legacy:pre-provenance-2026-08-28"
+    },
+    "@types/whatwg-mimetype": {
+      "3.0.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@types/ws": {
+      "8.18.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@typescript-eslint/eslint-plugin": {
+      "8.67.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@typescript-eslint/parser": {
+      "8.67.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@typescript-eslint/project-service": {
+      "8.67.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@typescript-eslint/scope-manager": {
+      "8.67.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@typescript-eslint/tsconfig-utils": {
+      "8.67.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@typescript-eslint/type-utils": {
+      "8.67.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@typescript-eslint/types": {
+      "8.67.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@typescript-eslint/typescript-estree": {
+      "8.67.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@typescript-eslint/utils": {
+      "8.67.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@typescript-eslint/visitor-keys": {
+      "8.67.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@typescript/vfs": {
+      "1.6.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@vitejs/plugin-react": {
+      "4.7.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@vitest/expect": {
+      "4.1.11": "legacy:pre-provenance-2026-08-28"
+    },
+    "@vitest/mocker": {
+      "4.1.11": "legacy:pre-provenance-2026-08-28"
+    },
+    "@vitest/pretty-format": {
+      "4.1.11": "legacy:pre-provenance-2026-08-28"
+    },
+    "@vitest/runner": {
+      "4.1.11": "legacy:pre-provenance-2026-08-28"
+    },
+    "@vitest/snapshot": {
+      "4.1.11": "legacy:pre-provenance-2026-08-28"
+    },
+    "@vitest/spy": {
+      "4.1.11": "legacy:pre-provenance-2026-08-28"
+    },
+    "@vitest/utils": {
+      "4.1.11": "legacy:pre-provenance-2026-08-28"
+    },
+    "@wallet-standard/base": {
+      "1.1.0": "legacy:pre-provenance-2026-08-28",
+      "1.1.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@wallet-standard/features": {
+      "1.1.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@wallet-standard/wallet": {
+      "1.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@walletconnect/core": {
+      "2.21.10": "legacy:pre-provenance-2026-08-28",
+      "2.21.7": "legacy:pre-provenance-2026-08-28"
+    },
+    "@walletconnect/environment": {
+      "1.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@walletconnect/ethereum-provider": {
+      "2.21.10": "legacy:pre-provenance-2026-08-28"
+    },
+    "@walletconnect/events": {
+      "1.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@walletconnect/heartbeat": {
+      "1.2.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@walletconnect/jsonrpc-http-connection": {
+      "1.0.8": "legacy:pre-provenance-2026-08-28"
+    },
+    "@walletconnect/jsonrpc-provider": {
+      "1.0.14": "legacy:pre-provenance-2026-08-28"
+    },
+    "@walletconnect/jsonrpc-types": {
+      "1.0.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "@walletconnect/jsonrpc-utils": {
+      "1.0.8": "legacy:pre-provenance-2026-08-28"
+    },
+    "@walletconnect/jsonrpc-ws-connection": {
+      "1.0.16": "legacy:pre-provenance-2026-08-28"
+    },
+    "@walletconnect/keyvaluestorage": {
+      "1.1.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@walletconnect/logger": {
+      "2.1.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@walletconnect/relay-api": {
+      "1.0.11": "legacy:pre-provenance-2026-08-28"
+    },
+    "@walletconnect/relay-auth": {
+      "1.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@walletconnect/safe-json": {
+      "1.0.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@walletconnect/sign-client": {
+      "2.21.10": "legacy:pre-provenance-2026-08-28",
+      "2.21.7": "legacy:pre-provenance-2026-08-28"
+    },
+    "@walletconnect/time": {
+      "1.0.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "@walletconnect/types": {
+      "2.21.10": "legacy:pre-provenance-2026-08-28",
+      "2.21.7": "legacy:pre-provenance-2026-08-28"
+    },
+    "@walletconnect/universal-provider": {
+      "2.21.10": "legacy:pre-provenance-2026-08-28",
+      "2.21.7": "legacy:pre-provenance-2026-08-28"
+    },
+    "@walletconnect/utils": {
+      "2.21.10": "legacy:pre-provenance-2026-08-28",
+      "2.21.7": "legacy:pre-provenance-2026-08-28"
+    },
+    "@walletconnect/window-getters": {
+      "1.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@walletconnect/window-metadata": {
+      "1.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@wry/caches": {
+      "1.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "@wry/context": {
+      "0.7.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "@wry/equality": {
+      "0.5.7": "legacy:pre-provenance-2026-08-28"
+    },
+    "@wry/trie": {
+      "0.5.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "abi-wan-kanabi": {
+      "2.2.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "abitype": {
+      "1.0.0": "legacy:pre-provenance-2026-08-28",
+      "1.0.8": "legacy:pre-provenance-2026-08-28",
+      "1.1.0": "legacy:pre-provenance-2026-08-28",
+      "1.1.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "acorn": {
+      "8.15.0": "legacy:pre-provenance-2026-08-28",
+      "8.18.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "acorn-jsx": {
+      "5.3.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "aes-js": {
+      "4.0.0-beta.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "ajv": {
+      "6.14.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "ansi-escapes": {
+      "3.2.0": "legacy:pre-provenance-2026-08-28",
+      "4.3.2": "legacy:pre-provenance-2026-08-28",
+      "6.2.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "ansi-regex": {
+      "3.0.1": "legacy:pre-provenance-2026-08-28",
+      "4.1.1": "legacy:pre-provenance-2026-08-28",
+      "5.0.1": "legacy:pre-provenance-2026-08-28",
+      "6.2.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "ansi-styles": {
+      "3.2.1": "legacy:pre-provenance-2026-08-28",
+      "4.3.0": "legacy:pre-provenance-2026-08-28",
+      "5.2.0": "legacy:pre-provenance-2026-08-28",
+      "6.2.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "ansicolors": {
+      "0.3.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "any-promise": {
+      "1.3.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "anymatch": {
+      "3.1.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "aria-query": {
+      "5.3.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "asn1js": {
+      "3.0.10": "legacy:pre-provenance-2026-08-28"
+    },
+    "async-mutex": {
+      "0.5.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "asynckit": {
+      "0.4.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "atomic-sleep": {
+      "1.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "axios": {
+      "0.33.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "babel-plugin-macros": {
+      "3.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "balanced-match": {
+      "1.0.2": "legacy:pre-provenance-2026-08-28",
+      "4.0.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "base-x": {
+      "5.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "base64-js": {
+      "1.5.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "baseline-browser-mapping": {
+      "2.8.9": "legacy:pre-provenance-2026-08-28"
+    },
+    "big.js": {
+      "6.2.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "bignumber.js": {
+      "9.3.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "bl": {
+      "4.1.0": "legacy:pre-provenance-2026-08-28",
+      "5.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "blakejs": {
+      "1.2.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "bn.js": {
+      "4.12.3": "legacy:pre-provenance-2026-08-28",
+      "5.2.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "borsh": {
+      "2.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "brace-expansion": {
+      "1.1.18": "legacy:pre-provenance-2026-08-28",
+      "5.0.9": "legacy:pre-provenance-2026-08-28"
+    },
+    "braces": {
+      "3.0.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "brorand": {
+      "1.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "browserslist": {
+      "4.26.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "bs58": {
+      "6.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "bs58check": {
+      "4.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "buffer": {
+      "5.7.1": "legacy:pre-provenance-2026-08-28",
+      "6.0.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "buffer-image-size": {
+      "0.6.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "bundle-name": {
+      "4.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "bundle-require": {
+      "5.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "cac": {
+      "6.7.14": "legacy:pre-provenance-2026-08-28"
+    },
+    "call-bind-apply-helpers": {
+      "1.0.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "callsites": {
+      "3.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "camelcase": {
+      "5.3.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "caniuse-lite": {
+      "1.0.30001746": "legacy:pre-provenance-2026-08-28"
+    },
+    "canvas-confetti": {
+      "1.9.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "cardinal": {
+      "2.1.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "cbor-extract": {
+      "2.2.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "cbor-js": {
+      "0.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "cbor-x": {
+      "1.6.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "chai": {
+      "6.2.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "chalk": {
+      "2.4.2": "legacy:pre-provenance-2026-08-28",
+      "4.1.2": "legacy:pre-provenance-2026-08-28",
+      "5.6.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "chardet": {
+      "0.4.2": "legacy:pre-provenance-2026-08-28",
+      "0.7.0": "legacy:pre-provenance-2026-08-28",
+      "2.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "chokidar": {
+      "4.0.3": "legacy:pre-provenance-2026-08-28",
+      "5.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "class-validator": {
+      "0.14.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "cli-cursor": {
+      "2.1.0": "legacy:pre-provenance-2026-08-28",
+      "3.1.0": "legacy:pre-provenance-2026-08-28",
+      "4.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "cli-spinners": {
+      "2.9.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "cli-width": {
+      "2.2.1": "legacy:pre-provenance-2026-08-28",
+      "3.0.0": "legacy:pre-provenance-2026-08-28",
+      "4.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "cliui": {
+      "6.0.0": "legacy:pre-provenance-2026-08-28",
+      "7.0.4": "legacy:pre-provenance-2026-08-28",
+      "8.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "clone": {
+      "1.0.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "clsx": {
+      "1.2.1": "legacy:pre-provenance-2026-08-28",
+      "2.1.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "color-convert": {
+      "1.9.3": "legacy:pre-provenance-2026-08-28",
+      "2.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "color-name": {
+      "1.1.3": "legacy:pre-provenance-2026-08-28",
+      "1.1.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "combined-stream": {
+      "1.0.8": "legacy:pre-provenance-2026-08-28"
+    },
+    "commander": {
+      "4.1.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "complex.js": {
+      "2.4.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "concat-map": {
+      "0.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "confbox": {
+      "0.1.8": "legacy:pre-provenance-2026-08-28"
+    },
+    "consola": {
+      "3.4.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "convert-source-map": {
+      "1.9.0": "legacy:pre-provenance-2026-08-28",
+      "2.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "cookie": {
+      "1.0.2": "legacy:pre-provenance-2026-08-28",
+      "1.1.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "cookie-es": {
+      "1.2.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "copyfiles": {
+      "2.4.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "core-util-is": {
+      "1.0.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "cosmiconfig": {
+      "7.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "cross-fetch": {
+      "3.2.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "cross-spawn": {
+      "7.0.6": "legacy:pre-provenance-2026-08-28"
+    },
+    "crossws": {
+      "0.3.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "csstype": {
+      "3.2.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "d": {
+      "1.0.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "dayjs": {
+      "1.11.13": "legacy:pre-provenance-2026-08-28"
+    },
+    "debug": {
+      "4.4.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "decamelize": {
+      "1.2.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "decimal.js": {
+      "10.6.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "decode-uri-component": {
+      "0.2.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "deep-is": {
+      "0.1.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "default-browser": {
+      "5.2.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "default-browser-id": {
+      "5.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "defaults": {
+      "1.0.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "define-lazy-prop": {
+      "3.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "defu": {
+      "6.1.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "delayed-stream": {
+      "1.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "dequal": {
+      "2.0.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "destr": {
+      "2.0.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "detect-browser": {
+      "5.3.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "detect-libc": {
+      "1.0.3": "legacy:pre-provenance-2026-08-28",
+      "2.1.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "dexie": {
+      "4.4.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "dijkstrajs": {
+      "1.0.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "dom-accessibility-api": {
+      "0.5.16": "legacy:pre-provenance-2026-08-28"
+    },
+    "dom-helpers": {
+      "5.2.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "dunder-proto": {
+      "1.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "duplexify": {
+      "4.1.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "eastasianwidth": {
+      "0.2.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "effect": {
+      "3.20.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "electron-to-chromium": {
+      "1.5.228": "legacy:pre-provenance-2026-08-28"
+    },
+    "elliptic": {
+      "6.6.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "emoji-regex": {
+      "8.0.0": "legacy:pre-provenance-2026-08-28",
+      "9.2.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "encode-utf8": {
+      "1.0.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "end-of-stream": {
+      "1.4.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "entities": {
+      "7.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "error-ex": {
+      "1.3.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "es-define-property": {
+      "1.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "es-errors": {
+      "1.3.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "es-module-lexer": {
+      "2.3.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "es-object-atoms": {
+      "1.1.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "es-set-tostringtag": {
+      "2.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "es-toolkit": {
+      "1.39.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "es5-ext": {
+      "0.10.64": "legacy:pre-provenance-2026-08-28"
+    },
+    "es6-iterator": {
+      "2.0.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "es6-symbol": {
+      "3.1.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "esbuild": {
+      "0.25.10": "legacy:pre-provenance-2026-08-28",
+      "0.28.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "escalade": {
+      "3.2.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "escape-latex": {
+      "1.2.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "escape-string-regexp": {
+      "1.0.5": "legacy:pre-provenance-2026-08-28",
+      "4.0.0": "legacy:pre-provenance-2026-08-28",
+      "5.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "eslint": {
+      "10.8.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "eslint-plugin-react-hooks": {
+      "7.1.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "eslint-plugin-react-refresh": {
+      "0.5.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "eslint-scope": {
+      "9.1.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "eslint-visitor-keys": {
+      "3.4.3": "legacy:pre-provenance-2026-08-28",
+      "5.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "esniff": {
+      "2.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "espree": {
+      "11.2.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "esprima": {
+      "4.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "esquery": {
+      "1.7.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "esrecurse": {
+      "4.3.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "estraverse": {
+      "5.3.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "estree-walker": {
+      "3.0.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "esutils": {
+      "2.0.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "ethereum-cryptography": {
+      "1.2.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "ethers": {
+      "6.15.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "event-emitter": {
+      "0.3.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "eventemitter3": {
+      "5.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "events": {
+      "3.3.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "exenv": {
+      "1.2.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "expect-type": {
+      "1.4.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "ext": {
+      "1.7.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "external-editor": {
+      "2.2.0": "legacy:pre-provenance-2026-08-28",
+      "3.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "fast-check": {
+      "3.23.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "fast-deep-equal": {
+      "3.1.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "fast-json-stable-stringify": {
+      "2.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "fast-levenshtein": {
+      "2.0.6": "legacy:pre-provenance-2026-08-28"
+    },
+    "fast-redact": {
+      "3.5.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "fdir": {
+      "6.5.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "fflate": {
+      "0.8.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "figures": {
+      "2.0.0": "legacy:pre-provenance-2026-08-28",
+      "3.2.0": "legacy:pre-provenance-2026-08-28",
+      "5.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "file-entry-cache": {
+      "8.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "fill-range": {
+      "7.1.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "filter-obj": {
+      "1.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "find-my-way-ts": {
+      "0.1.6": "legacy:pre-provenance-2026-08-28"
+    },
+    "find-root": {
+      "1.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "find-up": {
+      "4.1.0": "legacy:pre-provenance-2026-08-28",
+      "5.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "fix-dts-default-cjs-exports": {
+      "1.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "flat-cache": {
+      "4.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "flatted": {
+      "3.4.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "follow-redirects": {
+      "1.16.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "foreground-child": {
+      "3.3.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "form-data": {
+      "4.0.6": "legacy:pre-provenance-2026-08-28"
+    },
+    "fraction.js": {
+      "4.3.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "fs-extra": {
+      "10.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "fs.realpath": {
+      "1.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "fsevents": {
+      "2.3.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "function-bind": {
+      "1.1.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "fuzzy": {
+      "0.1.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "gensync": {
+      "1.0.0-beta.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "get-caller-file": {
+      "2.0.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "get-intrinsic": {
+      "1.3.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "get-proto": {
+      "1.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "get-starknet-core": {
+      "4.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "glob": {
+      "10.5.0": "legacy:pre-provenance-2026-08-28",
+      "7.2.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "glob-parent": {
+      "6.0.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "google-protobuf": {
+      "3.21.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "gopd": {
+      "1.2.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "graceful-fs": {
+      "4.2.11": "legacy:pre-provenance-2026-08-28"
+    },
+    "graphql": {
+      "16.14.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "graphql-tag": {
+      "2.12.6": "legacy:pre-provenance-2026-08-28"
+    },
+    "grpc-web": {
+      "1.5.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "h3": {
+      "1.15.9": "legacy:pre-provenance-2026-08-28"
+    },
+    "happy-dom": {
+      "20.11.6": "legacy:pre-provenance-2026-08-28"
+    },
+    "has-flag": {
+      "3.0.0": "legacy:pre-provenance-2026-08-28",
+      "4.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "has-symbols": {
+      "1.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "has-tostringtag": {
+      "1.0.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "hash.js": {
+      "1.1.7": "legacy:pre-provenance-2026-08-28"
+    },
+    "hasown": {
+      "2.0.2": "legacy:pre-provenance-2026-08-28",
+      "2.0.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "hermes-estree": {
+      "0.25.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "hermes-parser": {
+      "0.25.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "hmac-drbg": {
+      "1.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "hoist-non-react-statics": {
+      "3.3.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "hpke-js": {
+      "1.8.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "iconv-lite": {
+      "0.4.24": "legacy:pre-provenance-2026-08-28",
+      "0.7.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "idb-keyval": {
+      "6.2.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "ieee754": {
+      "1.2.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "ignore": {
+      "5.3.2": "legacy:pre-provenance-2026-08-28",
+      "7.0.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "immer": {
+      "10.1.3": "legacy:pre-provenance-2026-08-28",
+      "11.1.18": "legacy:pre-provenance-2026-08-28"
+    },
+    "immutable": {
+      "5.1.8": "legacy:pre-provenance-2026-08-28"
+    },
+    "import-fresh": {
+      "3.3.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "imurmurhash": {
+      "0.1.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "inflight": {
+      "1.0.6": "legacy:pre-provenance-2026-08-28"
+    },
+    "inherits": {
+      "2.0.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "inquirer": {
+      "3.3.0": "legacy:pre-provenance-2026-08-28",
+      "6.5.2": "legacy:pre-provenance-2026-08-28",
+      "8.2.7": "legacy:pre-provenance-2026-08-28"
+    },
+    "inquirer-autocomplete-prompt": {
+      "1.4.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "inquirer-fuzzy-path": {
+      "2.3.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "inquirer-search-list": {
+      "1.2.6": "legacy:pre-provenance-2026-08-28"
+    },
+    "iron-webcrypto": {
+      "1.2.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "is-arrayish": {
+      "0.2.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "is-core-module": {
+      "2.16.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "is-docker": {
+      "3.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "is-extglob": {
+      "2.1.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "is-fullwidth-code-point": {
+      "2.0.0": "legacy:pre-provenance-2026-08-28",
+      "3.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "is-glob": {
+      "4.0.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "is-inside-container": {
+      "1.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "is-interactive": {
+      "1.0.0": "legacy:pre-provenance-2026-08-28",
+      "2.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "is-number": {
+      "7.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "is-unicode-supported": {
+      "0.1.0": "legacy:pre-provenance-2026-08-28",
+      "1.3.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "is-wsl": {
+      "3.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "isarray": {
+      "0.0.1": "legacy:pre-provenance-2026-08-28",
+      "1.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "isexe": {
+      "2.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "isomorphic-fetch": {
+      "3.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "isows": {
+      "1.0.3": "legacy:pre-provenance-2026-08-28",
+      "1.0.7": "legacy:pre-provenance-2026-08-28"
+    },
+    "jackspeak": {
+      "3.4.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "javascript-natural-sort": {
+      "0.7.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "joycon": {
+      "3.1.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "jquery": {
+      "3.7.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "js-tokens": {
+      "4.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "jsesc": {
+      "3.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "json-bigint": {
+      "1.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "json-buffer": {
+      "3.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "json-parse-even-better-errors": {
+      "2.3.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "json-schema-traverse": {
+      "0.4.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "json-stable-stringify-without-jsonify": {
+      "1.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "json5": {
+      "2.2.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "jsonfile": {
+      "6.2.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "keyboard-key": {
+      "1.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "keyv": {
+      "4.5.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "keyvaluestorage-interface": {
+      "1.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "levn": {
+      "0.4.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "libphonenumber-js": {
+      "1.12.23": "legacy:pre-provenance-2026-08-28"
+    },
+    "lil-gui": {
+      "0.21.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "lilconfig": {
+      "3.1.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "lines-and-columns": {
+      "1.2.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "lit": {
+      "3.3.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "lit-element": {
+      "4.2.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "lit-html": {
+      "3.3.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "load-tsconfig": {
+      "0.2.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "locate-path": {
+      "5.0.0": "legacy:pre-provenance-2026-08-28",
+      "6.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "lodash": {
+      "4.18.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "lodash-es": {
+      "4.18.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "lodash.camelcase": {
+      "4.3.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "lodash.sortby": {
+      "4.7.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "log-symbols": {
+      "4.1.0": "legacy:pre-provenance-2026-08-28",
+      "5.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "long": {
+      "5.3.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "loose-envify": {
+      "1.4.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "lossless-json": {
+      "4.2.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "lru-cache": {
+      "10.4.3": "legacy:pre-provenance-2026-08-28",
+      "5.1.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "lz-string": {
+      "1.5.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "magic-string": {
+      "0.30.19": "legacy:pre-provenance-2026-08-28",
+      "0.30.21": "legacy:pre-provenance-2026-08-28"
+    },
+    "math-intrinsics": {
+      "1.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "mathjs": {
+      "12.4.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "meshoptimizer": {
+      "1.1.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "micro-packed": {
+      "0.7.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "micro-sol-signer": {
+      "0.5.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "micro-starknet": {
+      "0.2.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "micromatch": {
+      "4.0.8": "legacy:pre-provenance-2026-08-28"
+    },
+    "mime-db": {
+      "1.52.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "mime-types": {
+      "2.1.35": "legacy:pre-provenance-2026-08-28"
+    },
+    "mimic-fn": {
+      "1.2.0": "legacy:pre-provenance-2026-08-28",
+      "2.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "minimalistic-assert": {
+      "1.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "minimalistic-crypto-utils": {
+      "1.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "minimatch": {
+      "10.2.6": "legacy:pre-provenance-2026-08-28",
+      "3.1.4": "legacy:pre-provenance-2026-08-28",
+      "9.0.7": "legacy:pre-provenance-2026-08-28"
+    },
+    "minipass": {
+      "7.1.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "mipd": {
+      "0.0.7": "legacy:pre-provenance-2026-08-28"
+    },
+    "mkdirp": {
+      "1.0.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "mlly": {
+      "1.8.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "mobx": {
+      "6.15.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "ms": {
+      "2.1.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "msgpackr": {
+      "1.12.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "msgpackr-extract": {
+      "3.0.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "multiformats": {
+      "9.9.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "multipasta": {
+      "0.2.8": "legacy:pre-provenance-2026-08-28"
+    },
+    "mute-stream": {
+      "0.0.7": "legacy:pre-provenance-2026-08-28",
+      "0.0.8": "legacy:pre-provenance-2026-08-28"
+    },
+    "mz": {
+      "2.7.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "nanoid": {
+      "3.3.18": "legacy:pre-provenance-2026-08-28"
+    },
+    "natural-compare": {
+      "1.4.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "neverthrow": {
+      "8.2.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "next-tick": {
+      "1.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "node-addon-api": {
+      "7.1.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "node-fetch": {
+      "2.7.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "node-fetch-native": {
+      "1.6.7": "legacy:pre-provenance-2026-08-28"
+    },
+    "node-gyp-build-optional-packages": {
+      "5.1.1": "legacy:pre-provenance-2026-08-28",
+      "5.2.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "node-mock-http": {
+      "1.0.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "node-releases": {
+      "2.0.21": "legacy:pre-provenance-2026-08-28"
+    },
+    "noms": {
+      "0.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "normalize-path": {
+      "3.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "object-assign": {
+      "4.1.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "obug": {
+      "2.1.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "ofetch": {
+      "1.4.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "on-exit-leak-free": {
+      "0.2.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "once": {
+      "1.4.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "onetime": {
+      "2.0.1": "legacy:pre-provenance-2026-08-28",
+      "5.1.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "open": {
+      "10.2.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "optimism": {
+      "0.18.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "optionator": {
+      "0.9.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "ora": {
+      "5.4.1": "legacy:pre-provenance-2026-08-28",
+      "6.3.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "ox": {
+      "0.4.4": "legacy:pre-provenance-2026-08-28",
+      "0.7.1": "legacy:pre-provenance-2026-08-28",
+      "0.9.3": "legacy:pre-provenance-2026-08-28",
+      "0.9.6": "legacy:pre-provenance-2026-08-28"
+    },
+    "p-limit": {
+      "2.3.0": "legacy:pre-provenance-2026-08-28",
+      "3.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "p-locate": {
+      "4.1.0": "legacy:pre-provenance-2026-08-28",
+      "5.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "p-try": {
+      "2.2.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "package-json-from-dist": {
+      "1.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "pako": {
+      "2.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "parent-module": {
+      "1.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "parse-json": {
+      "5.2.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "path-exists": {
+      "4.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "path-is-absolute": {
+      "1.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "path-key": {
+      "3.1.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "path-parse": {
+      "1.0.7": "legacy:pre-provenance-2026-08-28"
+    },
+    "path-scurry": {
+      "1.11.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "path-type": {
+      "4.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "pathe": {
+      "2.0.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "picocolors": {
+      "1.1.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "picomatch": {
+      "2.3.2": "legacy:pre-provenance-2026-08-28",
+      "4.0.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "pino": {
+      "7.11.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "pino-abstract-transport": {
+      "0.5.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "pino-std-serializers": {
+      "4.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "pirates": {
+      "4.0.7": "legacy:pre-provenance-2026-08-28"
+    },
+    "pkg-types": {
+      "1.3.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "pngjs": {
+      "5.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "postcss": {
+      "8.5.23": "legacy:pre-provenance-2026-08-28"
+    },
+    "postcss-load-config": {
+      "6.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "prelude-ls": {
+      "1.2.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "pretty-format": {
+      "27.5.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "process-nextick-args": {
+      "2.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "process-warning": {
+      "1.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "prop-types": {
+      "15.8.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "protobufjs": {
+      "7.6.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "proxy-compare": {
+      "3.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "proxy-deep": {
+      "3.1.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "proxy-from-env": {
+      "1.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "punycode": {
+      "2.3.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "pure-rand": {
+      "6.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "pvtsutils": {
+      "1.3.6": "legacy:pre-provenance-2026-08-28"
+    },
+    "pvutils": {
+      "1.2.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "qrcode": {
+      "1.5.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "query-string": {
+      "7.1.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "quick-format-unescaped": {
+      "4.0.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "radix3": {
+      "1.1.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "react": {
+      "18.3.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "react-circular-progressbar": {
+      "2.2.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "react-cookie": {
+      "8.1.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "react-dom": {
+      "18.3.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "react-fast-compare": {
+      "3.2.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "react-is": {
+      "16.13.1": "legacy:pre-provenance-2026-08-28",
+      "17.0.2": "legacy:pre-provenance-2026-08-28",
+      "18.3.1": "legacy:pre-provenance-2026-08-28",
+      "19.2.8": "legacy:pre-provenance-2026-08-28"
+    },
+    "react-popper": {
+      "2.3.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "react-refresh": {
+      "0.17.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "react-router": {
+      "7.18.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "react-transition-group": {
+      "4.4.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "readable-stream": {
+      "1.0.34": "legacy:pre-provenance-2026-08-28",
+      "2.3.8": "legacy:pre-provenance-2026-08-28",
+      "3.6.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "readdirp": {
+      "4.1.2": "legacy:pre-provenance-2026-08-28",
+      "5.1.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "real-require": {
+      "0.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "redeyed": {
+      "2.1.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "reflect-metadata": {
+      "0.2.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "rehackt": {
+      "0.1.0": "docs/dependency-reviews/2026-08-28-apollo-4-graphql-17.md"
+    },
+    "require-directory": {
+      "2.1.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "require-main-filename": {
+      "2.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "resolve": {
+      "1.22.10": "legacy:pre-provenance-2026-08-28"
+    },
+    "resolve-from": {
+      "4.0.0": "legacy:pre-provenance-2026-08-28",
+      "5.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "restore-cursor": {
+      "2.0.0": "legacy:pre-provenance-2026-08-28",
+      "3.1.0": "legacy:pre-provenance-2026-08-28",
+      "4.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "rollup": {
+      "4.59.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "run-applescript": {
+      "7.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "run-async": {
+      "2.4.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "rx-lite": {
+      "4.0.8": "legacy:pre-provenance-2026-08-28"
+    },
+    "rx-lite-aggregates": {
+      "4.0.8": "legacy:pre-provenance-2026-08-28"
+    },
+    "rxjs": {
+      "6.6.7": "legacy:pre-provenance-2026-08-28",
+      "7.5.5": "legacy:pre-provenance-2026-08-28",
+      "7.8.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "safe-buffer": {
+      "5.1.2": "legacy:pre-provenance-2026-08-28",
+      "5.2.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "safe-stable-stringify": {
+      "2.5.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "safer-buffer": {
+      "2.1.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "sass": {
+      "1.103.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "scheduler": {
+      "0.23.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "seedrandom": {
+      "3.0.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "semantic-ui-css": {
+      "2.5.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "semantic-ui-react": {
+      "3.0.0-beta.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "semver": {
+      "6.3.1": "legacy:pre-provenance-2026-08-28",
+      "7.7.2": "legacy:pre-provenance-2026-08-28",
+      "7.8.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "set-blocking": {
+      "2.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "set-cookie-parser": {
+      "2.7.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "sha256-uint8array": {
+      "0.10.7": "legacy:pre-provenance-2026-08-28"
+    },
+    "shallowequal": {
+      "1.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "shebang-command": {
+      "2.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "shebang-regex": {
+      "3.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "siginfo": {
+      "2.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "signal-exit": {
+      "3.0.7": "legacy:pre-provenance-2026-08-28",
+      "4.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "sonic-boom": {
+      "2.8.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "source-map": {
+      "0.5.7": "legacy:pre-provenance-2026-08-28",
+      "0.8.0-beta.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "source-map-js": {
+      "1.2.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "split-on-first": {
+      "1.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "split2": {
+      "4.2.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "stackback": {
+      "0.0.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "starknet": {
+      "4.22.0": "legacy:pre-provenance-2026-08-28",
+      "8.9.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "starknetid.js": {
+      "5.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "starkscan": {
+      "0.0.11": "legacy:pre-provenance-2026-08-28"
+    },
+    "std-env": {
+      "4.2.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "stdin-discarder": {
+      "0.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "stream-shift": {
+      "1.0.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "strict-uri-encode": {
+      "2.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "string_decoder": {
+      "0.10.31": "legacy:pre-provenance-2026-08-28",
+      "1.1.1": "legacy:pre-provenance-2026-08-28",
+      "1.3.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "string-width": {
+      "2.1.1": "legacy:pre-provenance-2026-08-28",
+      "4.2.3": "legacy:pre-provenance-2026-08-28",
+      "5.1.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "strip-ansi": {
+      "4.0.0": "legacy:pre-provenance-2026-08-28",
+      "5.2.0": "legacy:pre-provenance-2026-08-28",
+      "6.0.1": "legacy:pre-provenance-2026-08-28",
+      "7.1.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "stylis": {
+      "4.2.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "sucrase": {
+      "3.35.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "supports-color": {
+      "5.5.0": "legacy:pre-provenance-2026-08-28",
+      "7.2.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "supports-preserve-symlinks-flag": {
+      "1.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "swr": {
+      "2.5.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "symbol-observable": {
+      "4.0.0": "docs/dependency-reviews/2026-08-28-apollo-4-graphql-17.md"
+    },
+    "thenify": {
+      "3.3.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "thenify-all": {
+      "1.6.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "thread-stream": {
+      "0.15.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "three": {
+      "0.185.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "through": {
+      "2.3.8": "legacy:pre-provenance-2026-08-28"
+    },
+    "through2": {
+      "2.0.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "tiny-emitter": {
+      "2.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "tinybench": {
+      "2.9.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "tinyexec": {
+      "0.3.2": "legacy:pre-provenance-2026-08-28",
+      "1.3.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "tinyglobby": {
+      "0.2.15": "legacy:pre-provenance-2026-08-28"
+    },
+    "tinyrainbow": {
+      "3.1.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "tmp": {
+      "0.2.7": "legacy:pre-provenance-2026-08-28"
+    },
+    "to-regex-range": {
+      "5.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "tr46": {
+      "0.0.3": "legacy:pre-provenance-2026-08-28",
+      "1.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "tree-kill": {
+      "1.2.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "ts-api-utils": {
+      "2.5.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "ts-custom-error": {
+      "3.3.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "ts-interface-checker": {
+      "0.1.13": "legacy:pre-provenance-2026-08-28"
+    },
+    "ts-invariant": {
+      "0.10.3": "docs/dependency-reviews/2026-08-28-apollo-4-graphql-17.md"
+    },
+    "ts-mixer": {
+      "6.0.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "tslib": {
+      "1.14.1": "legacy:pre-provenance-2026-08-28",
+      "2.7.0": "legacy:pre-provenance-2026-08-28",
+      "2.8.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "tsup": {
+      "8.5.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "tsx": {
+      "4.23.12": "legacy:pre-provenance-2026-08-28"
+    },
+    "tsyringe": {
+      "4.10.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "turbo": {
+      "2.10.11": "legacy:pre-provenance-2026-08-28"
+    },
+    "type": {
+      "2.7.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "type-check": {
+      "0.4.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "type-fest": {
+      "0.21.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "typed-function": {
+      "4.2.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "typescript": {
+      "3.9.10": "legacy:pre-provenance-2026-08-28",
+      "5.4.5": "legacy:pre-provenance-2026-08-28",
+      "5.9.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "ufo": {
+      "1.6.1": "legacy:pre-provenance-2026-08-28",
+      "1.6.4": "legacy:pre-provenance-2026-08-28"
+    },
+    "uint8arrays": {
+      "3.1.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "uncrypto": {
+      "0.1.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "undici-types": {
+      "6.19.8": "legacy:pre-provenance-2026-08-28",
+      "6.21.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "universal-cookie": {
+      "8.1.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "universalify": {
+      "2.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "unstorage": {
+      "1.17.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "untildify": {
+      "4.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "update-browserslist-db": {
+      "1.1.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "uri-js": {
+      "4.4.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "url-join": {
+      "4.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "use-sync-external-store": {
+      "1.5.0": "legacy:pre-provenance-2026-08-28",
+      "1.6.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "util-deprecate": {
+      "1.0.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "uuid": {
+      "11.1.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "validator": {
+      "13.15.22": "legacy:pre-provenance-2026-08-28"
+    },
+    "valtio": {
+      "2.1.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "viem": {
+      "2.31.0": "legacy:pre-provenance-2026-08-28",
+      "2.37.9": "legacy:pre-provenance-2026-08-28",
+      "2.9.20": "legacy:pre-provenance-2026-08-28"
+    },
+    "vite": {
+      "6.4.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "vite-plugin-glsl": {
+      "1.6.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "vite-plugin-mkcert": {
+      "1.17.12": "legacy:pre-provenance-2026-08-28"
+    },
+    "vite-plugin-top-level-await": {
+      "1.6.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "vite-plugin-wasm": {
+      "3.6.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "vitest": {
+      "4.1.11": "legacy:pre-provenance-2026-08-28"
+    },
+    "warning": {
+      "4.0.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "wcwidth": {
+      "1.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "webidl-conversions": {
+      "3.0.1": "legacy:pre-provenance-2026-08-28",
+      "4.0.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "whatwg-fetch": {
+      "3.6.20": "legacy:pre-provenance-2026-08-28"
+    },
+    "whatwg-mimetype": {
+      "3.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "whatwg-url": {
+      "5.0.0": "legacy:pre-provenance-2026-08-28",
+      "7.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "which": {
+      "2.0.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "which-module": {
+      "2.0.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "why-is-node-running": {
+      "2.3.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "word-wrap": {
+      "1.2.5": "legacy:pre-provenance-2026-08-28"
+    },
+    "wrap-ansi": {
+      "6.2.0": "legacy:pre-provenance-2026-08-28",
+      "7.0.0": "legacy:pre-provenance-2026-08-28",
+      "8.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "wrappy": {
+      "1.0.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "ws": {
+      "7.5.11": "legacy:pre-provenance-2026-08-28",
+      "8.21.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "wsl-utils": {
+      "0.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "xtend": {
+      "4.0.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "y18n": {
+      "4.0.3": "legacy:pre-provenance-2026-08-28",
+      "5.0.8": "legacy:pre-provenance-2026-08-28"
+    },
+    "yallist": {
+      "3.1.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "yaml": {
+      "1.10.3": "legacy:pre-provenance-2026-08-28"
+    },
+    "yargs": {
+      "15.4.1": "legacy:pre-provenance-2026-08-28",
+      "16.2.0": "legacy:pre-provenance-2026-08-28",
+      "17.7.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "yargs-parser": {
+      "18.1.3": "legacy:pre-provenance-2026-08-28",
+      "20.2.9": "legacy:pre-provenance-2026-08-28",
+      "21.1.1": "legacy:pre-provenance-2026-08-28"
+    },
+    "yocto-queue": {
+      "0.1.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "zen-observable": {
+      "0.8.15": "docs/dependency-reviews/2026-08-28-apollo-4-graphql-17.md"
+    },
+    "zen-observable-ts": {
+      "1.2.5": "docs/dependency-reviews/2026-08-28-apollo-4-graphql-17.md"
+    },
+    "zod": {
+      "3.22.4": "legacy:pre-provenance-2026-08-28",
+      "3.25.76": "legacy:pre-provenance-2026-08-28"
+    },
+    "zod-validation-error": {
+      "4.0.2": "legacy:pre-provenance-2026-08-28"
+    },
+    "zustand": {
+      "4.5.7": "legacy:pre-provenance-2026-08-28",
+      "5.0.15": "legacy:pre-provenance-2026-08-28"
+    }
   }
 }

@@ -121,7 +121,7 @@ reviewing a new candidate in a fresh checkout.
 | Command | What it does |
 |---|---|
 | `pnpm verify` | The whole gate, in order. Run this before committing. |
-| `pnpm candidate <pkg>@<version>` | **Run this first.** Evidence for a candidate and everything new it would bring in: publish age against the gate, deprecation, install scripts, peers split into required and optional, and every advisory range checked against the target version. Read-only — installs nothing. Named candidates resolve exactly; recursive dependencies resolve dist-tags explicitly and semver ranges to the highest published satisfying version, with the chosen resolution shown on each row. Use `node scripts/candidate.mjs` directly for flags such as `--depth`. |
+| `pnpm candidate <pkg>@<version>` | **Run this first.** Evidence for a candidate and its complete required and optional runtime graph: publish age against the gate, deprecation, install scripts, peers split into required and optional, and every advisory range checked against the target version. Read-only — installs nothing. Named candidates resolve exactly; recursive dependencies resolve dist-tags explicitly and semver ranges to the highest published satisfying version, with the chosen resolution shown on each row. Traversal is exhaustive by default. A diagnostic `--depth N` preview exits non-zero whenever it hides children and therefore cannot be mistaken for a completed review. |
 | `pnpm lockfile-diff [ref] [--strict]` | What entered, left or moved in the resolved graph. `--strict` fails on any movement; use it when a change is meant to be resolution-neutral. |
 | `pnpm check-package-manager` | The running pnpm is the pinned pnpm. |
 | `pnpm check-settings` | Every key in `pnpm-workspace.yaml` must be in `scripts/known-settings.json` with recorded evidence. |
@@ -131,12 +131,13 @@ reviewing a new candidate in a fresh checkout.
 | `pnpm check-advisories` | No advisory outside the accepted set. |
 
 `.pnpmfile.cjs` is the strongest of these and the only one that acts *before*
-code arrives: it throws during pnpm's `resolveDependency` step for any package
-version absent from `scripts/reviewed-packages.json`, so nothing unreviewed
-reaches the store. It has one blind spot — pnpm skips resolution entirely when
-the lockfile already satisfies the manifests, so the pnpmfile cannot police a
-lockfile someone else resolved and committed. `pnpm check-lockfile` covers that
-gap, which is why CI runs it before installing.
+code arrives. Its `readPackage` hook rejects an unreviewed package during
+resolution; its source-aware `afterAllResolved` hook checks every registry
+package in the proposed lockfile. Linked workspace packages do not appear in
+that registry list, so a registry tarball cannot borrow a workspace name to
+bypass review. pnpm can skip hooks when an existing lockfile already satisfies
+the manifests; `pnpm check-lockfile` covers that static path, which is why CI
+runs it before installing.
 
 Optional but recommended locally:
 
@@ -180,8 +181,10 @@ unreviewed is fetched *without a deliberate, auditable act*. Setting that
 environment variable is that act. It is not for making a failing install pass.
 
 Step 5 is the one that can hollow this out. Regenerating before reviewing turns
-the gate into a rubber stamp, which is why `generate-reviewed-set.mjs` requires
-a `--record` argument and why the canary asks about it directly.
+the gate into a rubber stamp. `generate-reviewed-set.mjs` therefore requires a
+review record under `docs/dependency-reviews`, validates its required sections,
+and persists that record as provenance for every newly admitted name/version.
+The static gate rejects missing, invalid, and stale provenance.
 
 ## Verification
 

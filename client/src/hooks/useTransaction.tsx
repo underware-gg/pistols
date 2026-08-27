@@ -104,7 +104,7 @@ export function useTransactionHandler<T, Args extends any[] = []>({
         timeoutRef.current = null
       }
     }
-  }, [isWaitingForIndexer, indexerCheck, transaction, onComplete, messageTargetRef, waitingMessage, messageDelay, key, removeTransaction])
+  }, [isWaitingForIndexer, indexerCheck, transaction, messageTargetRef, waitingMessage, messageDelay, key, removeTransaction])
 
   const call = useCallback(async (...args: Args) => {
     setIsLoading(true)
@@ -117,10 +117,8 @@ export function useTransactionHandler<T, Args extends any[] = []>({
       await transactionCall(...args, key)
     } catch (error) {
       setTransactionError(key, error instanceof Error ? error.message : 'Transaction failed')
-      reset()
-      onCompleteRef.current?.(error as Error, args)
     }
-  }, [key, reset, setTransactionError, startTransaction, transactionCall])
+  }, [key, setTransactionError, startTransaction, transactionCall])
 
   return { call, isLoading, isWaitingForIndexer, meta, transaction };
 }

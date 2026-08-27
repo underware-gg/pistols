@@ -31,22 +31,14 @@ const createStore = () => {
     },
     setFetchedIds: (ids: bigint[]) => {
       set((state: ChallengeFetchState) => {
-        state.ids = [
-          ...new Set([
-            ...state.ids,
-            ...ids
-          ])
-        ]
+        const additions = ids.filter((id) => !state.ids.includes(id))
+        if (additions.length > 0) state.ids.push(...additions)
       })
     },
     setFetchedAddresses: (addresses: bigint[]) => {
       set((state: ChallengeFetchState) => {
-        state.addresses = [
-          ...new Set([
-            ...state.addresses,
-            ...addresses
-          ])
-        ]
+        const additions = addresses.filter((address) => !state.addresses.includes(address))
+        if (additions.length > 0) state.addresses.push(...additions)
       })
     },
     getNewIds: (candidateIds: BigNumberish[]) => {
