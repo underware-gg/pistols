@@ -187,7 +187,7 @@
     "tsup": "catalog:",
     "typescript": "catalog:",
     "universal-cookie": "catalog:",
-    "vitest": "3.2.6",
+    "vitest": "4.1.11",
     "zustand": "catalog:"
   },
   "engines": {
