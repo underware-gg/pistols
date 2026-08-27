@@ -6,6 +6,8 @@
         "^build"
       ],
       "env": [
+        "ENABLE_EXPERIMENTAL_COREPACK",
+        "NODE_OPTIONS",
         "VITE_*"
       ],
       "outputs": [
