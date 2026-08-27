@@ -58,8 +58,8 @@ catalogs:
       specifier: 18.3.7
       version: 18.3.7
     immer:
-      specifier: 10.1.3
-      version: 10.1.3
+      specifier: 11.1.18
+      version: 11.1.18
     react:
       specifier: 18.3.1
       version: 18.3.1
@@ -82,8 +82,8 @@ catalogs:
       specifier: 8.1.2
       version: 8.1.2
     zustand:
-      specifier: 4.5.7
-      version: 4.5.7
+      specifier: 5.0.15
+      version: 5.0.15
 
 overrides:
   protobufjs: 7.6.5
@@ -205,7 +205,7 @@ importers:
         version: 4.0.0
       immer:
         specifier: 'catalog:'
-        version: 10.1.3
+        version: 11.1.18
       lil-gui:
         specifier: 0.21.0
         version: 0.21.0
@@ -250,7 +250,7 @@ importers:
         version: 3.6.0(vite@6.4.3(@types/node@22.18.8)(sass@1.103.0)(tsx@4.23.12))
       zustand:
         specifier: 'catalog:'
-        version: 4.5.7(@types/react@18.3.25)(immer@10.1.3)(react@18.3.1)
+        version: 5.0.15(@types/react@18.3.25)(immer@11.1.18)(react@18.3.1)(use-sync-external-store@1.6.0(react@18.3.1))
     devDependencies:
       '@effect/platform':
         specifier: 'catalog:'
@@ -435,7 +435,7 @@ importers:
         version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@22.18.8)(happy-dom@20.11.6)(sass@1.103.0)(tsx@4.23.12)
       zustand:
         specifier: 'catalog:'
-        version: 4.5.7(@types/react@18.3.25)(immer@10.1.3)(react@18.3.1)
+        version: 5.0.15(@types/react@18.3.25)(immer@11.1.18)(react@18.3.1)(use-sync-external-store@1.6.0(react@18.3.1))
 
   verifier:
     dependencies:
@@ -3350,6 +3350,9 @@ packages:
   immer@10.1.3:
     resolution: {integrity: sha512-tmjF/k8QDKydUlm3mZU+tjM6zeq9/fFpPqH9SzWmBnVVKsPBg/V66qsMwb3/Bo90cgUN+ghdVBess+hPsxUyRw==}
 
+  immer@11.1.18:
+    resolution: {integrity: sha512-EQyQtLiYW029lyoczMl/Hh4Xu7cDecSc58JRYpHyL4tIAu3eqd1yJzQX04d2BZHDkzFFvm6qJEJWOtfDSWAXbQ==}
+
   immutable@5.1.8:
     resolution: {integrity: sha512-TM5YqrGeTsVIPPpILzeqZ8D2Zc2TvNgSDi88zPF2a4cyqQdWV/wVWBDRDbNzzrLeRWScrFcOX9lW2iX6GOtUDw==}
 
@@ -4945,8 +4948,8 @@ packages:
       react:
         optional: true
 
-  zustand@5.0.8:
-    resolution: {integrity: sha512-gyPKpIaxY9XcO2vSMrLbiER7QMAMGOQZVRdJ6Zi782jkbzZygq5GI9nG8g+sMgitRtndwaBSl7uiqC49o1SSiw==}
+  zustand@5.0.15:
+    resolution: {integrity: sha512-MpSEjRiBkA9crSYeOUH32rJC7SVqAbm0Fqcqge/bUi2PPoLcBWKOsG+C8mevmpr8TwXHBVkChbbJiyvkE+i/3A==}
     engines: {node: '>=12.20.0'}
     peerDependencies:
       '@types/react': '>=18.0.0'
@@ -5326,7 +5329,7 @@ snapshots:
       '@dojoengine/torii-client': 1.8.2
       immer: 10.1.3
       starknet: 8.9.2
-      zustand: 5.0.8(@types/react@18.3.25)(immer@10.1.3)(react@18.3.1)(use-sync-external-store@1.6.0(react@18.3.1))
+      zustand: 5.0.15(@types/react@18.3.25)(immer@10.1.3)(react@18.3.1)(use-sync-external-store@1.6.0(react@18.3.1))
     transitivePeerDependencies:
       - '@types/react'
       - bufferutil
@@ -8693,6 +8696,8 @@ snapshots:
 
   immer@10.1.3: {}
 
+  immer@11.1.18: {}
+
   immutable@5.1.8: {}
 
   import-fresh@3.3.1:
@@ -10322,9 +10327,16 @@ snapshots:
       immer: 10.1.3
       react: 18.3.1
 
-  zustand@5.0.8(@types/react@18.3.25)(immer@10.1.3)(react@18.3.1)(use-sync-external-store@1.6.0(react@18.3.1)):
+  zustand@5.0.15(@types/react@18.3.25)(immer@10.1.3)(react@18.3.1)(use-sync-external-store@1.6.0(react@18.3.1)):
     optionalDependencies:
       '@types/react': 18.3.25
       immer: 10.1.3
+      react: 18.3.1
+      use-sync-external-store: 1.6.0(react@18.3.1)
+
+  zustand@5.0.15(@types/react@18.3.25)(immer@11.1.18)(react@18.3.1)(use-sync-external-store@1.6.0(react@18.3.1)):
+    optionalDependencies:
+      '@types/react': 18.3.25
+      immer: 11.1.18
       react: 18.3.1
       use-sync-external-store: 1.6.0(react@18.3.1)
