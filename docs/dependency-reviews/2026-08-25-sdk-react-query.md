@@ -24,11 +24,11 @@ Hooks used outside `DojoProvider` would not — none are.
 the SDK at the versions the client already resolves, so **nothing entered the
 tree**: `lockfile-diff --strict` reports 0 entered, 0 left, 0 moved.
 
-## Every public contract is unchanged
+## Published data fields are preserved
 
-Return shapes were preserved exactly — `{ value, isLoading }`,
-`{ isLoading, isError, salt }`, `{ starkName }`, and so on. Only internals moved.
-That constraint drove several decisions:
+Existing data and loading fields remain, with explicit `isError`/`error` fields
+added where RPC failures were previously indistinguishable from domain fallback
+values. That constraint drove several decisions:
 
 - `useSqlQuery` publishes `latency`, which react-query does not expose, so the
   `queryFn` returns `{ result, latency }` and the hook unwraps it.
@@ -46,9 +46,10 @@ Adopting the defaults would have been a behaviour change smuggled in under a lin
 fix — and for `useApiAutoReveal`, which **sends a reveal**, it would re-send the
 request every time the tab regained focus.
 
-So `src/utils/hooks/queryOnce.ts` exports `QUERY_ONCE`, applied to every
-conversion. Turning refetching and retries on is a worthwhile improvement, but
-per hook and deliberately.
+So `src/utils/hooks/queryOnce.ts` disables retries and focus/reconnect refetching
+without making ordinary reads permanently fresh. Inactive entries retain
+TanStack's finite default lifetime and later mounts can observe the boundary
+again. `ACTION_QUERY_ONCE` separately prevents remount refetches for auto-reveal.
 
 ## Query keys
 
@@ -61,11 +62,14 @@ react-query hashes keys with `JSON.stringify`. Two consequences:
   cannot be hashed, so keys use what identifies them instead: `rpcUrl` for the
   starknetid provider, `provider.channel.nodeUrl` for `useContractClassHash`,
   `contractAddress` for the ERC20 contract, `connector.id` for the Controller.
-- `useSdkCallPromise` keys on `call.name`, because a function cannot be hashed.
-  All sixteen call sites pass named imported contract functions
-  (`getDuelProgress`, `calcMintFee`, …), so the name is stable and distinct — but
-  an anonymous function would key as `''` and collide with any other anonymous
-  call sharing the same args. Worth an assert if that becomes possible.
+- `useSdkCallPromise` assigns each function object a weak identity and preserves
+  structured arguments in the key. `CairoCustomEnum` values include their active
+  variant and payload; bigint values are normalized without collapsing objects
+  to `"[object Object]"`.
+- Account-bound API keys contain the effective account and chain/domain identity,
+  so concurrent callers cannot share another wallet's salt or verification.
+- SQL caches raw rows and applies `formatFn` per observer, allowing two consumers
+  to request different output shapes for the same URL/query safely.
 
 ## The five that were not converted
 
@@ -96,18 +100,13 @@ this ordering was meant to avoid, so the SDK got a DOM. Two faults surfaced:
   stays `node`, and hook tests opt in per file with
   `// @vitest-environment happy-dom`.
 
-Four tests now cover `useSdkCallPromise`, the riskiest conversion: disabled means
-no call and `defaultValue`; a null argument means no call and `defaultValue`; an
-enabled call resolves and receives its arguments; bigint arguments are accepted.
-Mutation-checked — removing the null-argument guard fails one, removing the
-`defaultValue` fallback fails two.
+Seven tests now cover `useSdkCallPromise`, including enabled/disabled transitions,
+Cairo enum key isolation, bigint arguments and explicit RPC failure state. Two
+API-hook tests cover account/domain cache isolation, and the SQL hook test proves
+that different formatters share only raw rows rather than formatted output.
 
-**An honest gap.** Removing the args stringification does *not* fail any test,
-even though `hashKey` demonstrably throws on a bigint key. The args are bigints at
-runtime and the raw key works anyway, and I could not account for the difference
-within a reasonable effort. The stringification stays — it is justified by
-`hashKey`'s behaviour — but it is not pinned by a test, and the test comment says
-so rather than implying coverage it does not have.
+Controller API boundary tests also pin HTTP and error-payload failures as rejected
+requests rather than valid-looking boolean or zero sentinels.
 
 ## Release Age / Advisory Review / Lifecycle Scripts
 
@@ -140,8 +139,8 @@ pnpm exec turbo build && pnpm exec turbo lint && sh scripts/verify.sh
   targeted disables plus fixing genuine derived-state mistakes — is the fit
   there, and it wants the component-level tests this change has now made
   possible.
-- `QUERY_ONCE` disables refetching and retries to preserve behaviour. Several of
-  these hooks would genuinely benefit from both; revisit per hook.
+- Focus/reconnect refetching remains disabled by default. Revisit it per read hook
+  where freshness requirements justify the additional boundary calls.
 - `useMemoAsync` remains the SDK's generic async escape hatch. Its callers in
   `useSetup.ts` and the token-image components could move to react-query
   individually, at which point the hook itself may become removable.

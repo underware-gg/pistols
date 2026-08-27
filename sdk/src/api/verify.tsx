@@ -20,40 +20,26 @@ export const apiVerifyControllerSignature = async (
   messageHash: BigNumberish,
   signature: BigNumberish[],
 ): Promise<boolean> => {
-  let result = false
-
-  let params: ControllerVerifyParams = {
+  const params: ControllerVerifyParams = {
     address: bigintToHex(address),
     chainId,
     messageHash: bigintToHex(messageHash),
     signature: signature.map(s => bigintToHex(s)),
   }
 
-  try {
-    const url = `${serverUrl}/api/controller/verify`;
-    console.log(`apiVerifyControllerSignature() URL:`, url, params)
-    const resp = await fetch(url,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(params),
-      }
-    );
-    const response: VerifyResponse = await resp.json();
-    console.log(`apiVerifyControllerSignature() data:`, response)
-    if (response.verified === true || response.verified === false) {
-      result = response.verified;
-      if (response.error) {
-        console.warn("apiVerifyControllerSignature() INVALID:", response.error);
-      }
-    } else if (response.error) {
-      console.error("apiVerifyControllerSignature() ERROR:", response.error);
-    } else {
-      console.error("apiVerifyControllerSignature() Invalid response:", response);
-    }
-  } catch (error) {
-    console.error("apiVerifyControllerSignature() EXCEPTION:", error);
+  const url = `${serverUrl}/api/controller/verify`;
+  console.log(`apiVerifyControllerSignature() URL:`, url, params)
+  const resp = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(params),
+  });
+  if (!resp.ok) {
+    throw new Error(`apiVerifyControllerSignature() ${resp.status} from ${url}`)
   }
-
-  return result;
+  const response: VerifyResponse = await resp.json();
+  console.log(`apiVerifyControllerSignature() data:`, response)
+  if (response.verified === true || response.verified === false) return response.verified
+  if (response.error) throw new Error(`apiVerifyControllerSignature() ${response.error}`)
+  throw new Error(`apiVerifyControllerSignature() invalid response from ${url}`)
 }

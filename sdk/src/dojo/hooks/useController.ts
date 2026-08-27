@@ -39,7 +39,7 @@ export const CONTROLLER_CLASS_HASH = '0x05f0f2ae9301e0468ca3f9218dadd43a448a71ac
 // Interact with connected controller
 //
 export const useConnectedController = () => {
-  const { isConnected, connector } = useAccount()
+  const { address, isConnected, connector } = useAccount()
 
   // connector
   const connectorId = useMemo(() => (connector?.id), [connector])
@@ -52,7 +52,7 @@ export const useConnectedController = () => {
   // dependencies; a connector instance is not serialisable.
   const { data: username } = useQuery<string>({
     ...QUERY_ONCE,
-    queryKey: ['pistols', 'controller', 'username', connectorId ?? '', String(isConnected)],
+    queryKey: ['pistols', 'controller', 'username', connectorId ?? '', String(address ?? ''), String(isConnected)],
     enabled: Boolean(isConnected) && Boolean(controllerConnector),
     queryFn: async () => ((await controllerConnector.username()) || 'unknown').toLowerCase(),
   })
@@ -86,7 +86,7 @@ export const useConnectedController = () => {
 //
 export const useControllerAccount = (contractAddress: BigNumberish) => {
   const { dojoProvider } = useDojoSetup()
-  const { classHash, isDeployed } = useContractClassHash(contractAddress, dojoProvider.provider)
+  const { classHash, isDeployed, isLoading, isError, error } = useContractClassHash(contractAddress, dojoProvider.provider)
   const isControllerAccount = useMemo(() => (classHash && bigintEquals(classHash, CONTROLLER_CLASS_HASH)), [classHash])
   const isKatanaAccount = useMemo(() => (classHash && bigintEquals(classHash, KATANA_CLASS_HASH)), [classHash])
   return {
@@ -94,6 +94,9 @@ export const useControllerAccount = (contractAddress: BigNumberish) => {
     isDeployed,
     isControllerAccount,
     isKatanaAccount,
+    isLoading,
+    isError,
+    error,
   }
 }
 
@@ -110,9 +113,9 @@ export const useVerifyControllerSignature = (messageHash: BigNumberish, signatur
   // Converted from useEffect + useState + a mounted flag. messageHash and
   // signature are BigNumberish and react-query hashes keys with JSON.stringify,
   // which throws on a bigint, so both are stringified.
-  const { data: isValid, isLoading } = useQuery<boolean>({
+  const { data: isValid, isLoading, isError, error } = useQuery<boolean>({
     ...QUERY_ONCE,
-    queryKey: ['pistols', 'controller', 'verifySignature', String(address), String(messageHash), (signature ?? []).map(String)],
+    queryKey: ['pistols', 'controller', 'verifySignature', String(chainId), String(address), String(messageHash), (signature ?? []).map(String)],
     enabled: Boolean(account) && isPositiveBigint(messageHash) && signature?.length > 0,
     queryFn: async () => {
       console.log(`useVerifyControllerSignature() chainId:`, feltToString(chainId), address);
@@ -133,6 +136,8 @@ export const useVerifyControllerSignature = (messageHash: BigNumberish, signatur
 
   return {
     isLoading,
+    isError,
+    error,
     isValid,
   }
 }

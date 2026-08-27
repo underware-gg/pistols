@@ -42,13 +42,26 @@ function WalletFinderModalInner({
 
   const { rpcUrl } = useDojoSetup()
   
-  const { validatedAddress, isStarknetAddress, isEthereumAddress } = useValidateWalletAddressOrName(inputAddress, rpcUrl)
-  const { isDeployed, isControllerAccount, isKatanaAccount } = useControllerAccount(validatedAddress)
+  const {
+    validatedAddress,
+    isStarknetAddress,
+    isEthereumAddress,
+    isLoading: addressIsLoading,
+    isError: addressIsError,
+  } = useValidateWalletAddressOrName(inputAddress, rpcUrl)
+  const {
+    isDeployed,
+    isControllerAccount,
+    isKatanaAccount,
+    isLoading: accountIsLoading,
+    isError: accountIsError,
+  } = useControllerAccount(validatedAddress)
   const { isMyAccount, myAcountAddress } = useIsMyAccount(validatedAddress)
-  const canSubmit = (isStarknetAddress && !isMyAccount && (isControllerAccount || isKatanaAccount))
+  const canSubmit = (!addressIsError && !accountIsError && isStarknetAddress && !isMyAccount && (isControllerAccount || isKatanaAccount))
 
-  const { starkName } = useStarkName(isStarknetAddress ? validatedAddress : null, rpcUrl)
-  const { name: profileName, profilePicture: starkProfilePic } = useStarkProfile(isStarknetAddress ? validatedAddress : null, rpcUrl)
+  const { starkName, isError: starkNameIsError } = useStarkName(isStarknetAddress ? validatedAddress : null, rpcUrl)
+  const { name: profileName, profilePicture: starkProfilePic, isError: profileIsError } = useStarkProfile(isStarknetAddress ? validatedAddress : null, rpcUrl)
+  const lookupIsError = addressIsError || accountIsError || starkNameIsError || profileIsError
 
   return (
     <Modal
@@ -84,9 +97,10 @@ function WalletFinderModalInner({
 
                 <Divider />
                 <div className='ModalText'>
-                  {isStarknetAddress ? <Checked checked={true}>Starknet Address: <span className='Important'><Address address={validatedAddress} /></span></Checked>
+                  {lookupIsError ? <Checked checked={false}>Wallet lookup is unavailable. Please try again.</Checked>
+                    : isStarknetAddress ? <Checked checked={true}>Starknet Address: <span className='Important'><Address address={validatedAddress} /></span></Checked>
                     : isEthereumAddress ? <Checked checked={false}>Ethereum wallets not supported yet</Checked>
-                      : <Checked loading>Enter a valid address or ID</Checked>
+                      : <Checked loading={addressIsLoading}>Enter a valid address or ID</Checked>
                   }
 
                   {(starkName || profileName) &&<>
@@ -95,7 +109,9 @@ function WalletFinderModalInner({
                   </>}
 
                   <br />
-                  {isControllerAccount ? <Checked checked={true}>Controller Account</Checked>
+                  {accountIsLoading ? <Checked loading>Checking account type</Checked>
+                    : lookupIsError ? <></>
+                    : isControllerAccount ? <Checked checked={true}>Controller Account</Checked>
                     : isKatanaAccount ? <Checked checked={true}>Katana Account</Checked>
                       : (isStarknetAddress && isDeployed === false) ? <Checked checked={false}>Undeployed Account</Checked>
                         : isStarknetAddress ? <Checked checked={false}>Unsupported Account</Checked>
@@ -117,7 +133,7 @@ function WalletFinderModalInner({
               <ActionButton large fill label='Close' onClick={() => opener.close()} />
             </Col>
             <Col>
-              <ChallengeButton challengedPlayerAddress={validatedAddress} />
+              <ChallengeButton challengedPlayerAddress={canSubmit ? validatedAddress : null} />
             </Col>
           </Row>
         </Grid>

@@ -3,6 +3,7 @@ import { BigNumberish, StarknetDomain } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { apiGenerateControllerSalt } from 'src/api/salt'
 import { isPositiveBigint } from 'src/utils/misc/types'
+import { feltToString } from 'src/starknet/starknet'
 import { QUERY_ONCE } from 'src/utils/hooks/queryOnce'
 
 // Converted from useEffect + useState. The original treated a non-positive
@@ -19,15 +20,28 @@ export const useApiGenerateControllerSalt = (
   fromAccount?: string,
 ) => {
   const { address, account } = useAccount();
+  const effectiveAddress = fromAccount || address
+  const domainChainId = typeof starknetDomain?.chainId === 'number'
+    ? feltToString(starknetDomain.chainId)
+    : String(starknetDomain?.chainId ?? '')
 
-  const { data: salt, isLoading, isError } = useQuery<bigint>({
+  const { data: salt, isLoading, isError, error } = useQuery<bigint>({
     ...QUERY_ONCE,
-    queryKey: ['pistols', 'api', 'generateControllerSalt', serverUrl, String(messageHash), (signature ?? []).map(String)],
+    queryKey: [
+      'pistols',
+      'api',
+      'generateControllerSalt',
+      serverUrl,
+      String(effectiveAddress ?? ''),
+      domainChainId,
+      String(messageHash),
+      (signature ?? []).map(String),
+    ],
     enabled: Boolean(account) && isPositiveBigint(messageHash) && signature?.length > 0,
     queryFn: async () => {
       const result = await apiGenerateControllerSalt(
         serverUrl,
-        fromAccount || address,
+        effectiveAddress,
         starknetDomain,
         messageHash,
         signature,
@@ -40,6 +54,7 @@ export const useApiGenerateControllerSalt = (
   return {
     isLoading,
     isError,
+    error,
     salt,
   }
 }

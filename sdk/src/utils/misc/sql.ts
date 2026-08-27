@@ -33,6 +33,13 @@ export async function queryToriiSql<ResponseRaw, Response>(
   query: string,
   formatFn: (rows: ResponseRaw) => Response
 ): Promise<Response> {
+  return formatFn(await queryToriiSqlRaw<ResponseRaw>(slqlUrl, query))
+}
+
+export async function queryToriiSqlRaw<ResponseRaw>(
+  slqlUrl: string,
+  query: string,
+): Promise<ResponseRaw> {
   const _query = query.split('\n').join(' ').trim(); // remove newlines
   try {
     const response = await fetch(slqlUrl, {
@@ -46,7 +53,7 @@ export async function queryToriiSql<ResponseRaw, Response>(
       console.error(`queryToriiSql() response not ok:`, response, query);
       throw new Error(`queryToriiSql() response not ok`);
     }
-    return formatFn(await response.json() as ResponseRaw);
+    return await response.json() as ResponseRaw;
   } catch (error) {
     console.error(`queryToriiSql() Error fetching data:`, error, query);
     throw error;

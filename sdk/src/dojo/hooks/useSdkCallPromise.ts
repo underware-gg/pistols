@@ -1,22 +1,40 @@
+import { useEffect, useMemo, useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { CallResult } from 'starknet'
+import { CairoCustomEnum, CallResult } from 'starknet'
 import { arrayHasNullElements } from 'src/utils/misc/types'
 import { QUERY_ONCE } from 'src/utils/hooks/queryOnce'
 
-// Converted from useEffect + useState + a mounted flag. react-query owns the
-// request lifecycle, which is what react-hooks/set-state-in-effect was pointing
-// at. The published shape - { value, isLoading } - is unchanged, and there are
-// sixteen call sites in the client depending on it.
-//
-// Keyed on call.name rather than the function reference, because react-query
-// hashes keys with JSON.stringify and cannot hash a function. Every call site
-// passes a named imported contract function (getDuelProgress, calcMintFee, and
-// so on), so the name is stable and distinct. An anonymous function would key as
-// '' and collide with any other anonymous call sharing the same args - worth an
-// assert if that ever becomes possible.
-//
-// args are stringified: they routinely contain bigints, which JSON.stringify
-// throws on.
+const callIds = new WeakMap<Function, number>()
+let nextCallId = 1
+
+const getCallId = (call: Function) => {
+  let id = callIds.get(call)
+  if (id == null) {
+    id = nextCallId++
+    callIds.set(call, id)
+  }
+  return id
+}
+
+const normalizeQueryValue = (value: unknown): unknown => {
+  if (typeof value === 'bigint') return value.toString()
+  if (Array.isArray(value)) return value.map(normalizeQueryValue)
+  if (value instanceof CairoCustomEnum) {
+    return {
+      variant: value.activeVariant(),
+      value: normalizeQueryValue(value.unwrap()),
+    }
+  }
+  if (value != null && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([key, entry]) => [key, normalizeQueryValue(entry)]),
+    )
+  }
+  return value
+}
+
 export const useSdkCallPromise = <T extends CallResult>({
   call,
   args,
@@ -32,21 +50,35 @@ export const useSdkCallPromise = <T extends CallResult>({
 }): {
   value: typeof defaultValue,
   isLoading: boolean,
+  isError: boolean,
+  error: Error | null,
 } => {
-  const { data, isLoading } = useQuery<T>({
+  const canFetch = Boolean(call) && enabled === true && !arrayHasNullElements(args)
+  const queryKey = useMemo(() => [
+    'pistols',
+    'call',
+    call ? getCallId(call) : 0,
+    normalizeQueryValue(args ?? []),
+  ], [call, args])
+  const { data, isLoading, isError, error, refetch } = useQuery<T>({
     ...QUERY_ONCE,
-    queryKey: ['pistols', 'call', call?.name ?? '', (args ?? []).map(String), forceCounter],
-    // Matches the original guard exactly: no call, not enabled, or any null
-    // argument meant the effect fell through to defaultValue without fetching.
-    enabled: Boolean(call) && enabled === true && !arrayHasNullElements(args),
+    queryKey,
+    enabled: canFetch,
     queryFn: async () => await call(...args) as T,
   })
 
+  const previousForceCounter = useRef(forceCounter)
+  useEffect(() => {
+    if (previousForceCounter.current !== forceCounter) {
+      previousForceCounter.current = forceCounter
+      if (canFetch) void refetch()
+    }
+  }, [canFetch, forceCounter, refetch])
+
   return {
-    // The original set defaultValue whenever it did not fetch, and react-query
-    // reports undefined for a disabled or pending query, so the fallback
-    // reproduces that.
-    value: data ?? defaultValue,
+    value: !canFetch ? defaultValue : isError ? undefined : (data ?? defaultValue),
     isLoading,
+    isError,
+    error,
   }
 }

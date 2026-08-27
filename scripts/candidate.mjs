@@ -19,6 +19,11 @@
 
 import { readFileSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
+import {
+  resolveDependencyAlias,
+  resolvePublishedVersion,
+  satisfiesVersion,
+} from './package-ranges.mjs'
 
 const argv = process.argv.slice(2)
 let depth = 3
@@ -78,90 +83,6 @@ function advisories(name) {
       .map((v) => ({ ghsa: a.ghsa_id, severity: a.severity, summary: a.summary, range: v.vulnerable_version_range, patched: v.first_patched_version })))
   advCache.set(name, list)
   return list
-}
-
-// --- semver: enough to evaluate advisory ranges, honest when unsure -------
-const parse = (v) => {
-  const m = String(v).trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-([\w.-]+))?/)
-  return m ? { nums: [+m[1], +m[2], +m[3]], pre: m[4] ?? null } : null
-}
-const cmp = (a, b) => {
-  for (let i = 0; i < 3; i++) if (a.nums[i] !== b.nums[i]) return a.nums[i] < b.nums[i] ? -1 : 1
-  if (a.pre === b.pre) return 0
-  if (a.pre === null) return 1        // release > prerelease
-  if (b.pre === null) return -1
-  return a.pre < b.pre ? -1 : 1
-}
-// Returns true / false / null (null = could not evaluate; treat as "check by hand")
-function inRange(version, range) {
-  const target = parse(version)
-  if (!target || !range) return null
-  for (const clause of String(range).split(',')) {
-    const m = clause.trim().match(/^(>=|<=|>|<|=)?\s*v?([\w.+-]+)$/)
-    if (!m) return null
-    const bound = parse(m[2])
-    if (!bound) return null
-    const c = cmp(target, bound)
-    const op = m[1] ?? '='
-    const ok = op === '>=' ? c >= 0 : op === '<=' ? c <= 0 : op === '>' ? c > 0 : op === '<' ? c < 0 : c === 0
-    if (!ok) return false
-  }
-  return true
-}
-
-// Does an installed version satisfy a declared range? Returns true / false /
-// null, where null means "could not evaluate" and is treated as NOT satisfied,
-// because assuming satisfaction is how an unreviewed version slips through.
-function satisfies(version, range) {
-  const v = parse(version)
-  if (!v) return null
-  const r = String(range).trim()
-  // A wildcard matches any version. Treating it as unevaluable made the recursion
-  // substitute dist-tags.latest for "@types/node@*", which then failed the
-  // release-age gate - a finding invented by the tool, not present in the tree.
-  if (r === '' || r === '*' || r === 'x' || r === 'X' || r === 'latest') return true
-  // A disjunction is satisfied if any branch is. Without this, `^3.25.0 || ^4.0.0`
-  // matched no single-clause pattern and came back unevaluable, which the report
-  // then printed as "does NOT satisfy" — a false statement about zod@3.25.76,
-  // which satisfies it perfectly well.
-  if (r.includes('||')) {
-    const results = r.split('||').map((clause) => satisfies(version, clause))
-    if (results.some((x) => x === true)) return true
-    if (results.every((x) => x === null)) return null
-    return false
-  }
-  let m
-  if ((m = r.match(/^\^(\d+)\.(\d+)\.(\d+)$/))) {
-    const b = { nums: [+m[1], +m[2], +m[3]], pre: null }
-    if (cmp(v, b) < 0) return false
-    // Caret pins the leftmost non-zero component.
-    if (b.nums[0] !== 0) return v.nums[0] === b.nums[0]
-    if (b.nums[1] !== 0) return v.nums[0] === 0 && v.nums[1] === b.nums[1]
-    return v.nums[0] === 0 && v.nums[1] === 0 && v.nums[2] === b.nums[2]
-  }
-  if ((m = r.match(/^~(\d+)\.(\d+)\.(\d+)$/))) {
-    const b = { nums: [+m[1], +m[2], +m[3]], pre: null }
-    if (cmp(v, b) < 0) return false
-    return v.nums[0] === b.nums[0] && v.nums[1] === b.nums[1]
-  }
-  if (/^\d/.test(r)) { const b = parse(r); return b ? cmp(v, b) === 0 : null }
-  // Comparator conjunction, e.g. ">=20.0.0" or ">=4.8.4 <6.1.0". Without this,
-  // happy-dom's "@types/node >=20.0.0" came back unevaluable, the recursion
-  // substituted dist-tags.latest, and that substitute then failed the release-age
-  // gate - three spurious findings from a range our tree satisfies comfortably.
-  const parts = r.split(/\s+/).filter(Boolean)
-  if (parts.length > 0 && parts.every((part) => /^(>=|<=|>|<|=)\d/.test(part))) {
-    for (const part of parts) {
-      const c = part.match(/^(>=|<=|>|<|=)(.+)$/)
-      const bound = parse(c[2])
-      if (!bound) return null
-      const d = cmp(v, bound)
-      const ok = c[1] === '>=' ? d >= 0 : c[1] === '<=' ? d <= 0 : c[1] === '>' ? d > 0 : c[1] === '<' ? d < 0 : d === 0
-      if (!ok) return false
-    }
-    return true
-  }
-  return null
 }
 
 // --- report ---------------------------------------------------------------
@@ -227,7 +148,7 @@ while (queue.length > 0) {
   } else {
     const hits = [], unsure = []
     for (const a of advs) {
-      const r = inRange(version, a.range)
+      const r = satisfiesVersion(version, a.range)
       if (r === true) hits.push(a)
       else if (r === null) unsure.push(a)
     }
@@ -251,27 +172,23 @@ while (queue.length > 0) {
       // DIFFERENT, squatted package called react-is-18 whose preinstall is
       // `echo This package is not installable && exit 1`, and reported that as a
       // finding against our tree. The alias target is the real dependency.
-      let dep = declaredName
-      let range = declaredRange
-      if (typeof declaredRange === 'string' && declaredRange.startsWith('npm:')) {
-        const target = declaredRange.slice(4)
-        const at = target.lastIndexOf('@')
-        if (at > 0) { dep = target.slice(0, at); range = target.slice(at + 1) }
-        else { dep = target; range = '*' }
-      }
+      const { name: dep, range } = resolveDependencyAlias(declaredName, declaredRange)
       let dm
       try { dm = await meta(dep) } catch { console.log(`${indent}  (could not resolve ${dep})`); problems++; continue }
-      // An exact range is resolved exactly. Anything else is SUBSTITUTED with the
-      // latest published version, which is not necessarily what pnpm would pick
-      // and is often newer than the age gate admits. Say so, so a reader can see
-      // the substitution rather than trusting a row that may not be reachable.
-      const exact = parse(range) && /^\d/.test(range) ? range : null
-      const target = exact ?? dm['dist-tags']?.latest
+      const resolution = resolvePublishedVersion(dm, range)
+      if (!resolution) {
+        console.log(`${indent}  (could not resolve ${dep}@${range} to a published version — failing closed)`)
+        problems++
+        continue
+      }
+      const target = resolution.version
       // Presence of the NAME in our tree is not satisfaction of the RANGE. A
       // declared ^6.0.0 against an installed 7.0.0 means pnpm fetches a new 6.x
       // that nothing has reviewed. Checking the name alone hid exactly that.
       const present = [...(installed.get(dep) ?? [])]
-      const verdicts = present.map((pv) => satisfies(pv, range))
+      const verdicts = present.map((pv) => (
+        resolution.kind === 'tag' ? pv === target : satisfiesVersion(pv, range)
+      ))
       const satisfied = present.filter((pv, i) => verdicts[i] === true)
       if (satisfied.length > 0) {
         console.log(`${indent}  dep ${dep}@${range}${dep === declaredName ? '' : ` (alias ${declaredName})`} — satisfied by ${satisfied.join(', ')} already in tree`)
@@ -285,8 +202,10 @@ while (queue.length > 0) {
           : unevaluable
             ? ` [in tree at ${present.join(', ')}; could NOT evaluate against "${range}" — check by hand]`
             : ` [in tree at ${present.join(', ')}, which does NOT satisfy "${range}"]`
-        const sub = exact ? '' : ` [SUBSTITUTED: declared "${range}", examining dist-tags.latest; pnpm may resolve otherwise]`
-        queue.push({ name: dep, version: target, level: level + 1, via: `${key} -> ${dep}@${range}${why}${sub}` })
+        const resolved = resolution.kind === 'exact'
+          ? ''
+          : ` [RESOLVED ${resolution.kind}: declared "${range}", examining ${target}]`
+        queue.push({ name: dep, version: target, level: level + 1, via: `${key} -> ${dep}@${range}${why}${resolved}` })
       }
     }
   }

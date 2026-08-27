@@ -113,13 +113,15 @@ means something if nothing unreviewed is ever fetched.
 
 ## Tooling
 
-Every script here uses only Node built-ins, so each runs before `pnpm install`
-and none can introduce a dependency of its own.
+The install-enforcement scripts use only Node built-ins, so they run before
+`pnpm install`. `candidate.mjs` additionally uses the repository-pinned semver
+implementation; bootstrap the already-reviewed repository dependencies before
+reviewing a new candidate in a fresh checkout.
 
 | Command | What it does |
 |---|---|
 | `pnpm verify` | The whole gate, in order. Run this before committing. |
-| `pnpm candidate <pkg>@<version>` | **Run this first.** Evidence for a candidate and everything new it would bring in: publish age against the gate, deprecation, install scripts, peers split into required and optional, and every advisory range checked against the target version. Read-only — installs nothing. The named candidate is resolved exactly; **recursive rows are advisory**, because a transitive dependency declared as a range is examined at `dist-tags.latest`, which pnpm may not pick and which is often newer than the age gate admits. Each such row says so. Use `node scripts/candidate.mjs` directly for flags such as `--depth`. |
+| `pnpm candidate <pkg>@<version>` | **Run this first.** Evidence for a candidate and everything new it would bring in: publish age against the gate, deprecation, install scripts, peers split into required and optional, and every advisory range checked against the target version. Read-only — installs nothing. Named candidates resolve exactly; recursive dependencies resolve dist-tags explicitly and semver ranges to the highest published satisfying version, with the chosen resolution shown on each row. Use `node scripts/candidate.mjs` directly for flags such as `--depth`. |
 | `pnpm lockfile-diff [ref] [--strict]` | What entered, left or moved in the resolved graph. `--strict` fails on any movement; use it when a change is meant to be resolution-neutral. |
 | `pnpm check-package-manager` | The running pnpm is the pinned pnpm. |
 | `pnpm check-settings` | Every key in `pnpm-workspace.yaml` must be in `scripts/known-settings.json` with recorded evidence. |

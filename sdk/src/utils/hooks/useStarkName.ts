@@ -21,7 +21,7 @@ const useIdNavigator = (rpcUrl: string) => useMemo(() => {
 
 export const useAddressFromStarkName = (starkName: string, rpcUrl: string) => {
   const navigator = useIdNavigator(rpcUrl)
-  const { data: address } = useQuery({
+  const { data: address, isLoading, isError, error } = useQuery({
     ...QUERY_ONCE,
     queryKey: ['pistols', 'starknetid', 'addressFromStarkName', rpcUrl, starkName],
     enabled: Boolean(starkName) && Boolean(navigator),
@@ -33,12 +33,15 @@ export const useAddressFromStarkName = (starkName: string, rpcUrl: string) => {
   })
   return {
     address,
+    isLoading,
+    isError,
+    error,
   }
 }
 
 export const useStarkName = (address: BigNumberish, rpcUrl: string) => {
   const navigator = useIdNavigator(rpcUrl)
-  const { data: starkName } = useQuery({
+  const { data: starkName, isLoading, isError, error } = useQuery({
     ...QUERY_ONCE,
     queryKey: ['pistols', 'starknetid', 'starkName', rpcUrl, String(address)],
     enabled: Boolean(address) && Boolean(navigator),
@@ -46,12 +49,19 @@ export const useStarkName = (address: BigNumberish, rpcUrl: string) => {
   })
   return {
     starkName,
+    isLoading,
+    isError,
+    error,
   }
 }
 
-export const useStarkProfile = (address: BigNumberish, rpcUrl: string): StarkProfile => {
+export const useStarkProfile = (address: BigNumberish, rpcUrl: string): StarkProfile & {
+  isLoading: boolean,
+  isError: boolean,
+  error: Error | null,
+} => {
   const navigator = useIdNavigator(rpcUrl)
-  const { data: starkProfile } = useQuery({
+  const { data: starkProfile, isLoading, isError, error } = useQuery({
     ...QUERY_ONCE,
     queryKey: ['pistols', 'starknetid', 'profile', rpcUrl, String(address)],
     enabled: Boolean(address) && Boolean(navigator),
@@ -67,5 +77,8 @@ export const useStarkProfile = (address: BigNumberish, rpcUrl: string): StarkPro
     twitter,
     github,
     proofOfPersonhood,
+    isLoading,
+    isError,
+    error,
   }
 }

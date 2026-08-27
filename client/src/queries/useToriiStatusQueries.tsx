@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useSqlQuery } from '@underware/pistols-sdk/dojo/sql';
 
 export const useToriiBlockHead = ({
@@ -11,13 +11,20 @@ export const useToriiBlockHead = ({
   enabled?: boolean,
 }) => {
   const query = useMemo(() => (
-    `select head from contracts where contract_type = "WORLD" and contract_type != "${blockNumber}"`
-  ), [toriiUrl, blockNumber])
-  const { data, isLoading, latency } = useSqlQuery({
+    `select head from contracts where contract_type = "WORLD"`
+  ), [toriiUrl])
+  const { data, isLoading, latency, refetch } = useSqlQuery({
     query: enabled ? query : null,
     formatFn: (rows) => Number(rows[0]?.head ?? 0),
     toriiUrl,
   });
+  const previousBlockNumber = useRef(blockNumber)
+  useEffect(() => {
+    if (previousBlockNumber.current !== blockNumber) {
+      previousBlockNumber.current = blockNumber
+      if (enabled) refetch?.()
+    }
+  }, [blockNumber, enabled, refetch])
   return {
     blockHead: data,
     isLoading,

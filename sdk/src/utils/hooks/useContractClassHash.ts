@@ -12,7 +12,7 @@ import { QUERY_ONCE } from 'src/utils/hooks/queryOnce'
 export const useContractClassHash = (contractAddress: BigNumberish, provider: RpcProvider) => {
   const nodeUrl = useMemo(() => (provider?.channel?.nodeUrl ?? ''), [provider])
 
-  const { data: classHash } = useQuery<BigNumberish>({
+  const { data: classHash, isLoading, isError, error } = useQuery<BigNumberish>({
     ...QUERY_ONCE,
     queryKey: ['pistols', 'classHashAt', nodeUrl, String(contractAddress)],
     enabled: Boolean(contractAddress) && Boolean(provider),
@@ -24,5 +24,8 @@ export const useContractClassHash = (contractAddress: BigNumberish, provider: Rp
   return {
     classHash,
     isDeployed,
+    isLoading,
+    isError,
+    error,
   }
 }

@@ -23,7 +23,12 @@ export const useValidateWalletName = (stark_or_ens_name: string, rpcUrl: string)
   const isStarkName = useMemo(() => (extension === 'stark'), [extension])
   const isEnsName = useMemo(() => (extension === 'eth'), [extension])
 
-  const { address: resolvedStarkAddress } = useAddressFromStarkName(isStarkName ? stark_or_ens_name : null, rpcUrl)
+  const {
+    address: resolvedStarkAddress,
+    isLoading,
+    isError,
+    error,
+  } = useAddressFromStarkName(isStarkName ? stark_or_ens_name : null, rpcUrl)
 
   const resolvedEnsAddress: string = null // TODO
   const resolvedAddress = useMemo(() => (resolvedStarkAddress ?? resolvedEnsAddress), [resolvedStarkAddress, resolvedEnsAddress])
@@ -32,6 +37,9 @@ export const useValidateWalletName = (stark_or_ens_name: string, rpcUrl: string)
     isStarkName,
     isEnsName,
     resolvedAddress,
+    isLoading,
+    isError,
+    error,
   }
 }
 
@@ -46,11 +54,17 @@ export const useValidateWalletAddressOrName = (address_or_name: BigNumberish | s
     isStarkName,
     isEnsName,
     resolvedAddress,
+    isLoading,
+    isError,
+    error,
   } = useValidateWalletName(typeof address_or_name == 'string' ? address_or_name : null, rpcUrl)
 
   return {
     isStarknetAddress: (isStarknetAddress || (isStarkName && resolvedAddress)),
     isEthereumAddress: (isEthereumAddress || (isEnsName && resolvedAddress)),
     validatedAddress: (validatedAddress ?? resolvedAddress),
+    isLoading,
+    isError,
+    error,
   }
 }

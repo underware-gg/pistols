@@ -137,6 +137,9 @@ importers:
 
   .:
     devDependencies:
+      semver:
+        specifier: 7.8.5
+        version: 7.8.5
       turbo:
         specifier: 2.9.14
         version: 2.9.14

@@ -28,7 +28,7 @@ export const useDuelProgress = (duel_id: bigint) => {
     defaultValue: null,
     forceCounter,
   }), [duel_id, enabled, forceCounter])
-  const { value, isLoading } = useSdkCallPromise<any>(options)
+  const { value, isLoading, isError, error } = useSdkCallPromise<any>(options)
   // retry if result is empty...
   // (the block may take some time to confirm...)
   const success = useMemo(() => (value?.steps != undefined ? (value.steps.length > 0) : undefined), [value])
@@ -52,6 +52,8 @@ export const useDuelProgress = (duel_id: bigint) => {
   return {
     duelProgress,
     isLoading,
+    isError,
+    error,
   }
 }
 
@@ -63,11 +65,13 @@ export const useGetDuelDeck = (duel_id: bigint) => {
     enabled: isPositiveBigint(duel_id),
     defaultValue: [],
   }), [duel_id])
-  const { value, isLoading } = useSdkCallPromise<BigNumberish[][]>(options)
+  const { value, isLoading, isError, error } = useSdkCallPromise<BigNumberish[][]>(options)
   const decks = useMemo(() => (value?.map((vo: BigNumberish[]) => vo.map((vi: BigNumberish) => Number(vi))) ?? null), [value])
   return {
     decks,
     isLoading,
+    isError,
+    error,
   }
 }
 
@@ -94,7 +98,7 @@ export const useCalcSeasonReward = (season_id: number, duelist_id: BigNumberish,
     enabled: isPositiveBigint(season_id) && isPositiveBigint(duelist_id) && isPositiveBigint(lives_staked),
     defaultValue: null,
   }), [season_id, duelist_id, lives_staked])
-  const { value, isLoading } = useSdkCallPromise<any>(options)
+  const { value, isLoading, isError, error } = useSdkCallPromise<any>(options)
   const rewards = useMemo<RewardValues>(() => (value ? {
     win: {
       fame_gained: value.fame_gained,
@@ -109,6 +113,8 @@ export const useCalcSeasonReward = (season_id: number, duelist_id: BigNumberish,
   return {
     rewards,
     isLoading,
+    isError,
+    error,
   }
 }
 
@@ -121,10 +127,12 @@ export const useCanCollectDuel = (duel_id: bigint) => {
     enabled: isPositiveBigint(duel_id),
     defaultValue: null,
   }), [duel_id])
-  const { value, isLoading } = useSdkCallPromise<boolean>(options)
+  const { value, isLoading, isError, error } = useSdkCallPromise<boolean>(options)
   return {
     canCollectDuel: value,
     isLoading,
+    isError,
+    error,
   }
 }
 
@@ -136,10 +144,12 @@ export const useCanCollectSeason = () => {
     enabled: true,
     defaultValue: null,
   }), [])
-  const { value, isLoading } = useSdkCallPromise<boolean>(options)
+  const { value, isLoading, isError, error } = useSdkCallPromise<boolean>(options)
   return {
     canCollectSeason: value,
     isLoading,
+    isError,
+    error,
   }
 }
 
@@ -151,10 +161,12 @@ export const useGameTimestamp = () => {
     enabled: true,
     defaultValue: null,
   }), [])
-  const { value, isLoading } = useSdkCallPromise<bigint>(options)
+  const { value, isLoading, isError, error } = useSdkCallPromise<bigint>(options)
   return {
     timestamp: value,
     isLoading,
+    isError,
+    error,
   }
 }
 
@@ -171,12 +183,14 @@ export const useGetMatchMakerEntryFee = (queue_id: constants.QueueId) => {
     enabled: Boolean(queue_id),
     defaultValue: [0n, 0n],
   }), [queue_id])
-  const { value, isLoading } = useSdkCallPromise<bigint[]>(options)
+  const { value, isLoading, isError, error } = useSdkCallPromise<bigint[]>(options)
   return {
     requiresDuelistEnlistment: (isPositiveBigint(value?.[0] ?? 0) && isPositiveBigint(value?.[1] ?? 0)),
     tokenContractAddress: value?.[0],
     tokenAmount: value?.[1],
     isLoading,
+    isError,
+    error,
   }
 }
 
@@ -193,10 +207,12 @@ export const useTutorialDuelId = (player_id: BigNumberish, tutorial_id: BigNumbe
     enabled: isPositiveBigint(player_id) && isPositiveBigint(tutorial_id),
     defaultValue: 0n,
   }), [player_id, tutorial_id])
-  const { value, isLoading } = useSdkCallPromise<bigint>(options)
+  const { value, isLoading, isError, error } = useSdkCallPromise<bigint>(options)
   return {
     duelId: value,
     isLoading,
+    isError,
+    error,
   }
 }
 
@@ -236,10 +252,12 @@ export const useCanClaimStarterPack = (forceCounter?: number) => {
     defaultValue: null,
     forceCounter,
   }), [address, forceCounter])
-  const { value, isLoading } = useSdkCallPromise<boolean>(options)
+  const { value, isLoading, isError, error } = useSdkCallPromise<boolean>(options)
   return {
     canClaimStarterPack: value,
     isLoading,
+    isError,
+    error,
   }
 }
 
@@ -252,10 +270,12 @@ export const useCanPurchase = (pack_type: constants.PackType) => {
     enabled: isPositiveBigint(address) && Boolean(pack_type),
     defaultValue: null,
   }), [address, pack_type])
-  const { value, isLoading } = useSdkCallPromise<boolean>(options)
+  const { value, isLoading, isError, error } = useSdkCallPromise<boolean>(options)
   return {
     canPurchase: value,
     isLoading,
+    isError,
+    error,
   }
 }
 
@@ -268,10 +288,12 @@ export const useCalcFeePack = (pack_type: constants.PackType) => {
     enabled: isPositiveBigint(address) && Boolean(pack_type),
     defaultValue: null,
   }), [address, pack_type])
-  const { value, isLoading } = useSdkCallPromise<bigint>(options)
+  const { value, isLoading, isError, error } = useSdkCallPromise<bigint>(options)
   return {
     fee: value,
     isLoading,
+    isError,
+    error,
   }
 }
 
@@ -288,10 +310,12 @@ export const useHasClaimedRing = (address: BigNumberish, ringType: constants.Rin
     enabled: isPositiveBigint(address) && ringType != constants.RingType.Unknown,
     defaultValue: false,
   }), [address, ringType])
-  const { value, isLoading } = useSdkCallPromise<boolean>(options)
+  const { value, isLoading, isError, error } = useSdkCallPromise<boolean>(options)
   return {
     hasClaimed: value,
     isLoading,
+    isError,
+    error,
   }
 }
 
@@ -307,10 +331,12 @@ export const useAdminIsOwner = (address: BigNumberish) => {
     args: [address],
     enabled: isPositiveBigint(address),
   }), [address])
-  const { value, isLoading } = useSdkCallPromise<boolean>(options)
+  const { value, isLoading, isError, error } = useSdkCallPromise<boolean>(options)
   return {
     isOwner: value,
     isLoading,
+    isError,
+    error,
   }
 }
 
@@ -322,4 +348,3 @@ export const useAdminAmIOwner = () => {
     isLoading,
   }
 }
-

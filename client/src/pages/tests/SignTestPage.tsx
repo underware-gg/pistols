@@ -99,8 +99,8 @@ function Sign({
     setSignature(signature ?? [])
     setIsSigning(false)
   }
-  const { isLoading, isValid } = useVerifyControllerSignature(messageHash, signature)
-  const { isLoading: isLoadingApi, isValid: isValidApi } = useApiVerifyControllerSignature(selectedNetworkConfig.assetsServerUrl, messageHash, signature, fromAccount)
+  const { isLoading, isValid, isError } = useVerifyControllerSignature(messageHash, signature)
+  const { isLoading: isLoadingApi, isValid: isValidApi, isError: isErrorApi } = useApiVerifyControllerSignature(selectedNetworkConfig.assetsServerUrl, messageHash, signature, fromAccount)
   const { isLoading: isLoadingSalt, isError: isErrorSalt, salt } = useApiGenerateControllerSalt(selectedNetworkConfig.assetsServerUrl, starknetDomain, messageHash, signature, fromAccount)
 
   return (
@@ -161,7 +161,7 @@ function Sign({
               Verified (on-chain)
             </Cell>
             <Cell className={`Code ${isValid === true ? 'Darkest BgPositive' : isValid === false ? 'BgNegative' : ''}`}>
-              {isLoading ? 'verifying...' : isValid === true ? 'VALIDATED' : isValid === false ? 'INVALID' : '?'}
+              {isLoading ? 'verifying...' : isError ? 'ERROR' : isValid === true ? 'VALIDATED' : isValid === false ? 'INVALID' : '?'}
             </Cell>
           </Row>
 
@@ -170,7 +170,7 @@ function Sign({
               Verified (API)
             </Cell>
             <Cell className={`Code ${isValidApi === true ? 'Darkest BgPositive' : isValidApi === false ? 'BgNegative' : ''}`}>
-              {isLoadingApi ? 'verifying...' : isValidApi === true ? 'VALIDATED' : isValidApi === false ? 'INVALID' : '?'}
+              {isLoadingApi ? 'verifying...' : isErrorApi ? 'ERROR' : isValidApi === true ? 'VALIDATED' : isValidApi === false ? 'INVALID' : '?'}
             </Cell>
           </Row>
 

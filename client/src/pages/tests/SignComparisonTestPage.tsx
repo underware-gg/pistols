@@ -155,11 +155,12 @@ function Sign({
     setSig(signature.map(s => BigInt(s)))
   }, [signature])
 
-  const { isLoading, isValid } = useVerifyControllerSignature(messageHash, signature)
+  const { isLoading, isValid, isError } = useVerifyControllerSignature(messageHash, signature)
 
   return (
     <>
       <Button disabled={!isConnected || isSigning} onClick={() => _sign()}>Sign Nonce {nonce}</Button>
+      {isError && <div className='Negative'>Signature verification is unavailable.</div>}
       <Table celled striped size='small' color={isValid === true ? 'green' : isValid === false ? 'red' : 'orange'}>
         <Body className='Smaller'>
           <Row columns={'equal'} verticalAlign='top'>

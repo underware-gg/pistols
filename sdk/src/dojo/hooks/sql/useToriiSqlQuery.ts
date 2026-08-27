@@ -1,10 +1,10 @@
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { NoInfer, UseQueryOptions } from "@tanstack/react-query";
 import { useToriiSQLQuery } from "@dojoengine/sdk/sql";
 import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
 import { poseidonString } from "src/starknet/starknet";
-import { queryToriiSql } from "src/utils/misc/sql";
+import { queryToriiSqlRaw } from "src/utils/misc/sql";
 import { QUERY_ONCE } from "src/utils/hooks/queryOnce";
 
 
@@ -20,6 +20,7 @@ export type UseSdkSqlQueryResult<Output> = {
   isRefetching?: boolean,
   latency?: number,
   queryHash: bigint,
+  refetch?: () => void,
 }
 
 
@@ -70,20 +71,20 @@ export const useSqlQuery = <Input, Output>({
   // at: the mounted-flag dance, the manual loading flag and the reset-on-change
   // are all things it already does.
   //
-  // The key deliberately omits formatFn. The effect's dependency list did too, so
-  // including it would change when the query re-runs, not just how it is keyed.
-  const { data, error, isLoading } = useQuery({
+  // Raw rows are cached by request identity. Formatting stays observer-local so
+  // two consumers can safely use different output types for the same SQL.
+  const { data, error, isLoading, refetch } = useQuery({
     ...QUERY_ONCE,
     queryKey: ['pistols', 'sql', url, query],
     enabled: Boolean(query),
     queryFn: async () => {
       const startedAt = Date.now()
-      const result = await queryToriiSql<Input, Output>(`${url}/sql`, query, formatFn)
-      // Latency is part of this hook's published result, and react-query does not
-      // expose timings, so it is carried alongside the payload.
-      return { result, latency: Date.now() - startedAt }
+      const rows = await queryToriiSqlRaw<Input>(`${url}/sql`, query)
+      return { rows, latency: Date.now() - startedAt }
     },
+    select: ({ rows, latency }) => ({ result: formatFn(rows), latency }),
   })
+  const refresh = useCallback(() => { void refetch() }, [refetch])
 
   const queryHash = useMemo(() => query ? poseidonString(query) : 0n, [query])
 
@@ -93,5 +94,6 @@ export const useSqlQuery = <Input, Output>({
     isLoading,
     latency: data?.latency,
     queryHash,
+    refetch: refresh,
   }
 }

@@ -16,15 +16,26 @@ export const useApiVerifyControllerSignature = (
   fromAccount?: string,
 ) => {
   const { address, account, chainId } = useAccount();
+  const effectiveAddress = fromAccount || address
+  const chainName = chainId == null ? '' : feltToString(chainId)
 
-  const { data: isValid, isLoading } = useQuery({
+  const { data: isValid, isLoading, isError, error } = useQuery({
     ...QUERY_ONCE,
-    queryKey: ['pistols', 'api', 'verifyControllerSignature', serverUrl, String(messageHash), (signature ?? []).map(String)],
+    queryKey: [
+      'pistols',
+      'api',
+      'verifyControllerSignature',
+      serverUrl,
+      String(effectiveAddress ?? ''),
+      chainName,
+      String(messageHash),
+      (signature ?? []).map(String),
+    ],
     enabled: Boolean(account) && isPositiveBigint(messageHash) && signature?.length > 0,
     queryFn: () => apiVerifyControllerSignature(
       serverUrl,
-      fromAccount || address,
-      feltToString(chainId),
+      effectiveAddress,
+      chainName,
       messageHash,
       signature,
     ),
@@ -32,6 +43,8 @@ export const useApiVerifyControllerSignature = (
 
   return {
     isLoading,
+    isError,
+    error,
     isValid,
   }
 }

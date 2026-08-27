@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { BigNumberish } from 'starknet'
-import { useContract, useBalance } from '@starknet-react/core'
+import { useAccount, useContract, useBalance } from '@starknet-react/core'
 import { bigintToHex, isPositiveBigint } from 'src/utils/misc/types'
 import { weiToEth } from 'src/starknet/starknet'
 import { erc20_abi } from 'src/abis/abis'
@@ -45,6 +45,7 @@ export const useERC20TotalSupply = (
   contractAddress: BigNumberish,
   watch: boolean = false,
 ) => {
+  const { chainId } = useAccount()
   const contractIsValid = useMemo(() => (isPositiveBigint(contractAddress)), [contractAddress])
 
   const { contract } = useContract({
@@ -59,19 +60,23 @@ export const useERC20TotalSupply = (
   //
   // Keyed on contractAddress, not the contract instance, which is not
   // serialisable.
-  const { data: totalSupply } = useQuery<bigint>({
+  const { data: totalSupply, isLoading, isError, error } = useQuery<bigint>({
     ...QUERY_ONCE,
-    queryKey: ['pistols', 'erc20', 'totalSupply', String(contractAddress)],
+    queryKey: ['pistols', 'erc20', 'totalSupply', String(chainId), String(contractAddress)],
     enabled: contractIsValid && Boolean(contract),
     queryFn: async () => (await contract.call('total_supply')) as bigint,
   })
 
   return {
     totalSupply: totalSupply ?? null,
+    isLoading,
+    isError,
+    error,
   }
 }
 
 export const useERC20TokenName = (contractAddress: BigNumberish) => {
+  const { chainId } = useAccount()
   const contractIsValid = useMemo(() => (isPositiveBigint(contractAddress)), [contractAddress])
 
   const { contract } = useContract({
@@ -82,15 +87,15 @@ export const useERC20TokenName = (contractAddress: BigNumberish) => {
   // Same shape as totalSupply above: two fetches plus a reset effect, replaced by
   // two disabled-when-invalid queries. The commented-out felt variants are left
   // as they were.
-  const { data: tokenName } = useQuery<string>({
+  const { data: tokenName, isLoading: nameIsLoading, isError: nameIsError, error: nameError } = useQuery<string>({
     ...QUERY_ONCE,
-    queryKey: ['pistols', 'erc20', 'name', String(contractAddress)],
+    queryKey: ['pistols', 'erc20', 'name', String(chainId), String(contractAddress)],
     enabled: contractIsValid && Boolean(contract),
     queryFn: async () => (await contract.call('name')) as string,
   })
-  const { data: tokenSymbol } = useQuery<string>({
+  const { data: tokenSymbol, isLoading: symbolIsLoading, isError: symbolIsError, error: symbolError } = useQuery<string>({
     ...QUERY_ONCE,
-    queryKey: ['pistols', 'erc20', 'symbol', String(contractAddress)],
+    queryKey: ['pistols', 'erc20', 'symbol', String(chainId), String(contractAddress)],
     enabled: contractIsValid && Boolean(contract),
     queryFn: async () => (await contract.call('symbol')) as string,
   })
@@ -98,6 +103,8 @@ export const useERC20TokenName = (contractAddress: BigNumberish) => {
   return {
     tokenName: tokenName ?? null,
     tokenSymbol: tokenSymbol ?? null,
+    isLoading: nameIsLoading || symbolIsLoading,
+    isError: nameIsError || symbolIsError,
+    error: nameError ?? symbolError,
   }
 }
-

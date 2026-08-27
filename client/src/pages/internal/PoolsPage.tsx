@@ -161,7 +161,7 @@ function Bank() {
 function Pools() {
   // FAME supply
   const { fameContractAddress } = useTokenContracts()
-  const { totalSupply: fameSupply } = useERC20TotalSupply(fameContractAddress)
+  const { totalSupply: fameSupply, isError: fameSupplyIsError } = useERC20TotalSupply(fameContractAddress)
 
   // Bank balances
   const { contractAddress: bankContractAddress } = useDojoSystem('bank')
@@ -194,6 +194,10 @@ function Pools() {
 
   console.log("bank: diffLords", _formatWei(diffLords))
   console.log("bank: diffFame", _formatWei(diffFame))
+
+  if (fameSupplyIsError) {
+    return <div className='Negative'>FAME supply is unavailable. Pool figures cannot be calculated safely.</div>
+  }
 
   return (
     <Table celled striped size='small' color='green'>

@@ -10,7 +10,7 @@
     "sync": "turbo watch watch",
     "dev": "turbo watch dev",
     "devs": "turbo watch devs",
-    "test": "turbo test",
+    "test": "node --test scripts/package-ranges.test.mjs && turbo test",
     "check-pins": "node scripts/check-pins.mjs",
     "check-advisories": "node scripts/check-advisories.mjs",
     "verify": "sh scripts/verify.sh",
@@ -22,10 +22,11 @@
     "check-package-manager": "node scripts/check-package-manager.mjs"
   },
   "devDependencies": {
+    "semver": "7.8.5",
     "turbo": "2.9.14"
   },
   "packageManager": "pnpm@10.34.4",
   "engines": {
-    "node": ">=22"
+    "node": "^22.13.0 || >=24"
   }
 }
