@@ -113,6 +113,12 @@ export class ReflectorMaterial extends Reflector {
   constructor(shaderType, geometry, parameters) {
     super(geometry, parameters);
 
+    const disposeReflector = this.dispose;
+    this.dispose = () => {
+      this.geometry.dispose();
+      disposeReflector();
+    };
+
     (this.material as ShaderMaterial).fragmentShader = ShaderManager.shaderCode[shaderType].fsh;
     (this.material as ShaderMaterial).vertexShader = ShaderManager.shaderCode[shaderType].vsh;
 
@@ -127,16 +133,6 @@ export class ReflectorMaterial extends Reflector {
     return (this.material as ShaderMaterial).uniforms
   }
 
-  dispose() {
-    if (this.material) {
-      (this.material as ShaderMaterial).dispose();
-    }
-    if (this.geometry) {
-      this.geometry.dispose();
-    }
-    // Call parent dispose method which handles the render target
-    super.dispose();
-  }
 }
 
 export class NonReflectorMaterial extends THREE.Mesh {
@@ -185,4 +181,3 @@ export class NonReflectorMaterial extends THREE.Mesh {
     }
   }
 }
-

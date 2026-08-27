@@ -250,3 +250,4 @@ both ways.
 - [2026-08-27 — react-cookie 8](2026-08-27-react-cookie-8.md)
 - [2026-08-27 — Remove unused local-storage-state](2026-08-27-remove-unused-local-storage-state.md)
 - [2026-08-27 — Remove unused type-fest](2026-08-27-remove-unused-type-fest.md)
+- [2026-08-28 — Standalone client libraries](2026-08-28-standalone-client-libraries.md)
