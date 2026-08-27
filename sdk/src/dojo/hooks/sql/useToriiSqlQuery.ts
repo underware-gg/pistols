@@ -1,6 +1,5 @@
 import { useCallback, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import type { NoInfer, UseQueryOptions } from "@tanstack/react-query";
 import { useToriiSQLQuery } from "@dojoengine/sdk/sql";
 import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
 import { poseidonString } from "src/starknet/starknet";

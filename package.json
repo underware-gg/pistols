@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "semver": "7.8.5",
-    "turbo": "2.9.14"
+    "turbo": "2.10.11"
   },
   "packageManager": "pnpm@10.34.4",
   "engines": {
