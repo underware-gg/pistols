@@ -19,10 +19,10 @@ export default function BarkeepModal() {
   return <>{isOpen && <BarkeepModalInner opener={barkeepModalOpener} />}</>
 }
 
-function BarkeepModalInner({ opener }: { opener: Opener }) {  
+function BarkeepModalInner({ opener }: { opener: Opener }) {
   const { dispatchSetScene } = usePistolsScene()
   const { tutorialOpener, tavernRingsOpener, dispatchSelectDuel } = usePistolsContext()
-  
+
   const { sortedNotifications, hasUnreadNotifications, markAllAsRead } = useNotifications()
   const { address } = useAccount()
 
