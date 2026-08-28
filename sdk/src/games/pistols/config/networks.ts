@@ -1,7 +1,7 @@
 import {
   Chain, NativeCurrency,
   mainnet, sepolia,
-} from '@starknet-react/chains'
+} from '@starknet-start/chains'
 import {
   LOCAL_KATANA,
   LOCAL_TORII,

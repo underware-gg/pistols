@@ -1,7 +1,7 @@
 import React, { ReactElement, useEffect, useMemo, useRef, useState } from 'react'
 import { Menu, Button, Confirm, SemanticICONS, Icon } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
 import { useFoolsBalance, useLordsBalance } from '/src/stores/coinStore'

@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { useTokenConfig } from '/src/stores/tokenConfigStore'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { usePackTokenStore } from '/src/stores/tokenStore'

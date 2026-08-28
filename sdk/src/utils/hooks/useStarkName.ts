@@ -1,7 +1,6 @@
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { BigNumberish, constants, Provider } from 'starknet'
-import { StarknetIdNavigator, StarkProfile } from "starknetid.js"
+import { BigNumberish, Provider, StarknetIdImpl, StarkProfile } from 'starknet'
 import { bigintToHex, isPositiveBigint } from 'src/utils/misc/types'
 import { QUERY_ONCE } from 'src/utils/hooks/queryOnce'
 
@@ -14,20 +13,18 @@ import { QUERY_ONCE } from 'src/utils/hooks/queryOnce'
 // undefined. react-query records the error and leaves data undefined, so callers
 // see the same thing; nothing here surfaces the error, which matches before.
 
-const useIdNavigator = (rpcUrl: string) => useMemo(() => {
-  const provider = rpcUrl ? new Provider({ nodeUrl: rpcUrl }) : null
-  return provider ? new StarknetIdNavigator(provider, constants.StarknetChainId.SN_MAIN) : null
+const useStarknetProvider = (rpcUrl: string) => useMemo(() => {
+  return rpcUrl ? new Provider({ nodeUrl: rpcUrl }) : null
 }, [rpcUrl])
 
 export const useAddressFromStarkName = (starkName: string, rpcUrl: string) => {
-  const navigator = useIdNavigator(rpcUrl)
+  const provider = useStarknetProvider(rpcUrl)
   const { data: address, isLoading, isError, error } = useQuery({
     ...QUERY_ONCE,
     queryKey: ['pistols', 'starknetid', 'addressFromStarkName', rpcUrl, starkName],
-    enabled: Boolean(starkName) && Boolean(navigator),
+    enabled: Boolean(starkName) && Boolean(provider),
     queryFn: async () => {
-      // https://docs.starknet.id/devs/starknetidjs
-      const result = await navigator.getAddressFromStarkName(starkName)
+      const result = await StarknetIdImpl.getAddressFromStarkName(provider, starkName)
       return isPositiveBigint(result) ? result : undefined
     },
   })
@@ -40,12 +37,12 @@ export const useAddressFromStarkName = (starkName: string, rpcUrl: string) => {
 }
 
 export const useStarkName = (address: BigNumberish, rpcUrl: string) => {
-  const navigator = useIdNavigator(rpcUrl)
+  const provider = useStarknetProvider(rpcUrl)
   const { data: starkName, isLoading, isError, error } = useQuery({
     ...QUERY_ONCE,
     queryKey: ['pistols', 'starknetid', 'starkName', rpcUrl, String(address)],
-    enabled: Boolean(address) && Boolean(navigator),
-    queryFn: () => navigator.getStarkName(bigintToHex(address ?? 0)),
+    enabled: Boolean(address) && Boolean(provider),
+    queryFn: () => StarknetIdImpl.getStarkName(provider, bigintToHex(address ?? 0)),
   })
   return {
     starkName,
@@ -60,12 +57,12 @@ export const useStarkProfile = (address: BigNumberish, rpcUrl: string): StarkPro
   isError: boolean,
   error: Error | null,
 } => {
-  const navigator = useIdNavigator(rpcUrl)
+  const provider = useStarknetProvider(rpcUrl)
   const { data: starkProfile, isLoading, isError, error } = useQuery({
     ...QUERY_ONCE,
     queryKey: ['pistols', 'starknetid', 'profile', rpcUrl, String(address)],
-    enabled: Boolean(address) && Boolean(navigator),
-    queryFn: () => navigator.getProfileData(bigintToHex(address ?? 0), false),
+    enabled: Boolean(address) && Boolean(provider),
+    queryFn: () => StarknetIdImpl.getStarkProfile(provider, bigintToHex(address ?? 0)),
   })
 
   const { name, profilePicture, discord, twitter, github, proofOfPersonhood } = starkProfile ?? {}

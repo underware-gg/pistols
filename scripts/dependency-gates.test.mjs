@@ -79,13 +79,13 @@ test('advisory acceptances bind exact identity and reviewed metadata', () => {
 test('workspace discovery is canonical and registry sources cannot use the workspace exemption', () => {
   assert.deepEqual(parseWorkspacePackageDirs('packages:\n  - "sdk"\n  - client\ncatalog:\n'), ['sdk', 'client'])
   assert.throws(() => parseWorkspacePackageDirs('packages:\n  - "packages/*"\n'), /globs are not supported/)
-  assert.doesNotThrow(() => hooks.readPackage({ name: '@underware/pistols-sdk', version: '1.3.12' }))
+  assert.doesNotThrow(() => hooks.readPackage({ name: '@underware/pistols-sdk', version: '2.0.0' }))
   assert.throws(
     () => hooks.readPackage({ name: '@underware/pistols-sdk', version: '999.0.0' }),
     /BLOCKED/,
   )
   assert.throws(
-    () => hooks.afterAllResolved({ packages: { '@underware/pistols-sdk@1.3.12': {} } }),
+    () => hooks.afterAllResolved({ packages: { '@underware/pistols-sdk@2.0.0': {} } }),
     /BLOCKED resolved registry package/,
   )
 

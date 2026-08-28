@@ -3,7 +3,7 @@ import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import Dexie, { Table } from 'dexie'
 import { emitter, useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 
 export type TransactionStatus = 'pending' | 'completed' | 'failed'
 
@@ -219,4 +219,4 @@ export const useCheckPendingTransactions = () => {
       setHasChecked(true)
     }
   }, [isConnected, account, checkTransactionStatus, checkPendingTransactions, hasChecked])
-} 
+}

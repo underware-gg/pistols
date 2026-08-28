@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useAccount, useContract } from '@starknet-react/core'
+import { useContract } from '@starknet-start/react'
+import { useAccount } from 'src/utils/hooks/useAccount'
 import { Abi, BigNumberish, CairoVersion, CompilerVersion } from 'starknet'
 import { bigintToHex, isPositiveBigint } from 'src/utils/misc/types'
 

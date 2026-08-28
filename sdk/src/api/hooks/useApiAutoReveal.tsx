@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { BigNumberish } from 'starknet'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@starknet-start/react'
 import { isPositiveBigint } from 'src/utils/misc/types'
 import { feltToString } from 'src/starknet/starknet'
 import { apiAutoReveal } from 'src/api/reveal'

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { useDojoSetup } from '@underware/pistols-sdk/dojo'
 import { bigintEquals, bigintToHex } from '@underware/pistols-sdk/utils'
 

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import * as TWEEN from '@tweenjs/tween.js'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { useGameEvent } from '/src/hooks/useGameEvent'
@@ -64,7 +64,7 @@ export default function ScDuelists() {
   const postersPerPage = 4
   const pageCount = useMemo(() => Math.ceil(playerIds.length / postersPerPage), [playerIds])
   const posterRefs = useRef<{[key: number]: ProfilePosterHandle}>({})
-  const timeoutRef = useRef<NodeJS.Timeout>()
+  const timeoutRef = useRef<NodeJS.Timeout>(null)
   const playerIdsRef = useRef<string[]>([])
   const initialLoadRef = useRef(true)
 

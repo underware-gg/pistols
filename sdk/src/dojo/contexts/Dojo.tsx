@@ -1,6 +1,6 @@
 import React, { ReactNode, useEffect, useMemo } from 'react'
 import { StarknetDomain, TypedData } from 'starknet'
-import { Connector } from '@starknet-react/core'
+import type { Connector } from 'src/starknet/wallet'
 import { Method } from '@cartridge/controller'
 import { NetworkId } from 'src/games/pistols/config/networks'
 import { StarknetProvider, useStarknetContext } from 'src/dojo/contexts/StarknetProvider'

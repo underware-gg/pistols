@@ -1,9 +1,14 @@
-import React, { ReactNode, createContext, useContext, useEffect, useMemo } from 'react'
-import { Chain } from '@starknet-react/chains'
-import { Connector, StarknetConfig, jsonRpcProvider } from '@starknet-react/core'
+import React, { ReactNode, createContext, useContext, useEffect, useMemo, useRef } from 'react'
+import { Chain } from '@starknet-start/chains'
+import { StarknetConfig, useAccount, useConnect } from '@starknet-start/react'
+import { jsonRpcProvider } from '@starknet-start/providers'
 import { NetworkId, DojoNetworkConfig, getNetworkConfig, DojoNetworkEnv } from 'src/games/pistols/config/networks'
 import { useChainConnectors } from 'src/games/pistols/dojo/connectors'
 import { DojoAppConfig } from 'src/dojo/contexts/Dojo'
+import type { Connector } from 'src/starknet/wallet'
+import { getConnectorId } from 'src/starknet/wallet'
+
+const LAST_CONNECTED_WALLET_KEY = 'get-starknet.last-connected-wallet'
 
 
 interface StarknetContextType {
@@ -36,13 +41,9 @@ export const StarknetProvider = ({
   const connectors: Connector[] = useChainConnectors(dojoAppConfig, selectedNetworkConfig);
 
   // RPC
-  function rpc(chain: Chain) {
-    const nodeUrl = chain.rpcUrls.default.http[0]
-    return {
-      nodeUrl,
-    }
-  }
-  const provider = jsonRpcProvider({ rpc })
+  const provider = useMemo(() => jsonRpcProvider({
+    rpc: (chain: Chain) => ({ nodeUrl: chain.rpcUrls.default.http[0] }),
+  }), [])
 
   return (
     <StarknetContext.Provider
@@ -54,15 +55,38 @@ export const StarknetProvider = ({
     >
       <StarknetConfig
         chains={chains}
-        provider={() => provider(selectedNetworkConfig.chain)}
-        connectors={connectors}
-        autoConnect={true}
+        provider={provider}
+        extraWallets={connectors}
       // explorer={explorer}
       >
+        <AutoReconnect />
         {children}
       </StarknetConfig>
     </StarknetContext.Provider>
   )
+}
+
+function AutoReconnect(): React.JSX.Element | null {
+  const attempted = useRef(false)
+  const { isConnected, isConnecting } = useAccount()
+  const { connectAsync, connectors } = useConnect()
+
+  useEffect(() => {
+    if (attempted.current || isConnected || isConnecting || typeof window === 'undefined') return
+
+    const lastConnectedId = window.localStorage.getItem(LAST_CONNECTED_WALLET_KEY)
+    if (!lastConnectedId) return
+
+    const connector = connectors.find((candidate) => getConnectorId(candidate) === lastConnectedId)
+    if (!connector) return
+
+    attempted.current = true
+    void connectAsync({ connector }).catch((error) => {
+      console.warn(`Could not reconnect wallet [${lastConnectedId}]`, error)
+    })
+  }, [connectAsync, connectors, isConnected, isConnecting])
+
+  return null
 }
 
 

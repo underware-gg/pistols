@@ -8,10 +8,6 @@ vi.mock('@underware/pistols-sdk/dojo', () => ({
   useDojoSystemCalls: vi.fn(),
 }))
 
-vi.mock('@starknet-react/core', () => ({
-  useAccount: vi.fn(),
-}))
-
 vi.mock('dexie', () => {
   class DexieMock {
     version() {

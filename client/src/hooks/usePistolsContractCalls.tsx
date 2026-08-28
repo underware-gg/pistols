@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { BigNumberish } from 'starknet'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { useDelay } from '@underware/pistols-sdk/utils/hooks'
 import { useSdkCallPromise, useDojoContractCalls } from '@underware/pistols-sdk/dojo'
 import { useChallenge } from '/src/stores/challengeStore'

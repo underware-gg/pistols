@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { useDojoSetup, useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { signAndRestoreMovesFromHash, movesToHand } from '@underware/pistols-sdk/pistols'
 import { CommitMoveMessage } from '@underware/pistols-sdk/pistols/config'
@@ -89,4 +89,3 @@ export function useRevealAction(duelId: bigint, duelistId: bigint, hash: bigint,
     reveal,
   }
 }
-

@@ -53,7 +53,7 @@ const ThreeJsContext = createContext<{
 // Provider
 //
 interface ThreeJsProviderProps {
-  children: string | JSX.Element | JSX.Element[] | ReactNode
+  children: string | React.JSX.Element | React.JSX.Element[] | ReactNode
 }
 const ThreeJsProvider = ({
   children,
@@ -116,4 +116,3 @@ export const useThreeJsContext = () => {
     dispatchLoadedAudioAssets,
   }
 }
-

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import { type Notification } from '/src/stores/notificationStore'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { usePlayer } from '/src/stores/playerStore'
 import { DuelStage, useDuel } from '/src/hooks/useDuel'
 import { useIsMyAccount } from '/src/hooks/useIsYou'

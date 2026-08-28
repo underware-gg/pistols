@@ -1,5 +1,4 @@
 import { InterfaceAbi } from 'starknet'
-import { Connector } from '@starknet-react/core'
 import { ControllerConnector } from '@cartridge/connector'
 import type { ControllerOptions, Tokens } from '@cartridge/controller'
 import type { SessionPolicies, ContractPolicies, SignMessagePolicy, Method } from '@cartridge/presets'
@@ -11,6 +10,7 @@ import { bigintToAddress, bigintToHex } from 'src/utils/misc/types'
 import { assert } from 'src/utils/misc/math'
 import { getContractByName } from '@dojoengine/core'
 import { INTERFACE_DESCRIPTIONS } from 'src/games/pistols/generated/constants'
+import { getConnectorId, type Connector } from 'src/starknet/wallet'
 
 
 
@@ -53,8 +53,9 @@ export const makeControllerConnector = (
   // create connector
   let connector: Connector | undefined
   try {
-    connector = new ControllerConnector(options) as never as Connector
-    assert(connector.id == supportedConnetorIds.CONTROLLER, `ControllerConnector id does not match [${connector.id}/${supportedConnetorIds.CONTROLLER}]`)
+    connector = new ControllerConnector(options).asWalletStandard()
+    const connectorId = getConnectorId(connector)
+    assert(connectorId == supportedConnetorIds.CONTROLLER, `ControllerConnector id does not match [${connectorId}/${supportedConnetorIds.CONTROLLER}]`)
   } catch(e) {
     console.warn(`makeControllerConnector() ERROR:`, e)
   }
@@ -211,4 +212,3 @@ const _makeControllerSignMessagePolicies = (
   })
   return messages
 }
-

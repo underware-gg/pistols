@@ -1,5 +1,5 @@
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef } from 'react'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { DuelistCard, DuelistCardHandle } from '/src/components/cards/DuelistCard'
 import { ActionButton } from '/src/components/ui/Buttons'

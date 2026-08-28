@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { BigNumberish } from 'starknet'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { useAsyncRunner } from '@underware/pistols-sdk/utils/hooks'
 import { constants } from '@underware/pistols-sdk/pistols/gen'

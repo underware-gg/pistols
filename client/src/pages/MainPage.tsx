@@ -156,7 +156,7 @@ function MainUI() {
     );
   }, [gameImpl, qualityConfig]);
 
-  const [currentScene, setCurrentScene] = useState<JSX.Element | null>(null);
+  const [currentScene, setCurrentScene] = useState<React.JSX.Element | null>(null);
   
   // Memoize scene components to prevent unnecessary re-renders
   const sceneComponents = useMemo(() => ({

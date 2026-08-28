@@ -26,7 +26,7 @@ export default function NotificationSystem() {
   const [unreadNotifications, setUnreadNotifications] = useState<Notification[]>([])
   
   const bubbleRef = useRef<HTMLDivElement>(null)
-  const timeoutRef = useRef<NodeJS.Timeout>()
+  const timeoutRef = useRef<NodeJS.Timeout>(null)
   
   const notificationsRef = useRef<Notification[] | null>(null)
   const selectedDuelIdRef = useRef<number | null>(null)

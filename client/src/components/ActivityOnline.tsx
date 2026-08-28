@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from 'react'
 import { BigNumberish } from 'starknet'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { usePlayer, useAllPlayersOnlineState } from '/src/stores/playerStore'
 import { formatTimestampDeltaElapsed } from '@underware/pistols-sdk/utils'
 import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'

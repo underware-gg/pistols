@@ -1,10 +1,12 @@
 import React, { useMemo, useState } from 'react'
 import { EthSigner, Signature } from 'starknet'
 import { Container, Table, Button, Grid } from 'semantic-ui-react'
-import { useAccount, useConnect, useDisconnect, useNetwork } from '@starknet-react/core'
+import { useConnect, useDisconnect, useNetwork } from '@starknet-start/react'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { useDojoSetup, useConnectedController } from '@underware/pistols-sdk/dojo'
 import { getConnectorIcon } from '@underware/pistols-sdk/pistols/dojo'
+import { getConnectorId } from '@underware/pistols-sdk/pistols/dojo'
 import { useTypedMessage, useMemoAsync } from '@underware/pistols-sdk/utils/hooks'
 import { Messages, splitSignature, feltToString } from '@underware/pistols-sdk/starknet'
 import { bigintToHex, shortAddress } from '@underware/pistols-sdk/utils'
@@ -120,7 +122,7 @@ export function Connect({ children }: { children?: React.ReactNode }) {
                   {Boolean(openProfile) && <Button size='tiny' onClick={() => openProfile()}>Profile</Button>}
                 </Grid.Row>
               </Grid>}
-              {!connector && JSON.stringify(connectors.map(c => c.id))}
+              {!connector && JSON.stringify(connectors.map(getConnectorId))}
             </Cell>
             <Cell></Cell>
           </Row>

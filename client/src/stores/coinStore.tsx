@@ -11,7 +11,7 @@ import { bigintEquals, bigintToAddress, isPositiveBigint } from '@underware/pist
 import { weiToEth } from '@underware/pistols-sdk/starknet'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import * as torii from '@dojoengine/torii-client'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 
 // interface totii.TokenBalance {
 //   balance: string;

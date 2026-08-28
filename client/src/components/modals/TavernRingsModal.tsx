@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import * as TWEEN from '@tweenjs/tween.js'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { useTransactionHandler } from '/src/hooks/useTransaction'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
@@ -625,4 +625,4 @@ function TavernRingsModalInner({ opener }: { opener: Opener }) {
       />
     </>
   )
-} 
+}

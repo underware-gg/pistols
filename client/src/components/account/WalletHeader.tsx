@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react'
 import { Grid, Image } from 'semantic-ui-react'
-import { useAccount, useDisconnect } from '@starknet-react/core'
+import { useDisconnect } from '@starknet-start/react'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { useDojoSetup, useConnectedController } from '@underware/pistols-sdk/dojo'
 import { getConnectorIcon } from '@underware/pistols-sdk/pistols/dojo'
@@ -175,5 +176,3 @@ export default function WalletHeader({
     </>
   )
 }
-
-

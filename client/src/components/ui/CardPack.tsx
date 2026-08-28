@@ -22,7 +22,7 @@ import {
   CARD_PACK_CARD_SCALE_DURATION,
   CARD_PACK_REVEAL_DELAY,
 } from '/src/data/cardConstants';
-import { useAccount } from '@starknet-react/core';
+import { useAccount } from '@underware/pistols-sdk/utils/hooks';
 import { useDuelistsOwnedByPlayer } from '/src/hooks/useTokenDuelists';
 import { useFetchDuelistIdsOwnedByAccount } from '/src/stores/duelistStore';
 import { useFetchTokenBalancesOwnedByAccount } from '/src/queries/useTokenBalancesQuery';

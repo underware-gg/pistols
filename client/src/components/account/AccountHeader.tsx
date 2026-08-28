@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { useConnectedController } from '@underware/pistols-sdk/dojo'
 import { usePistolsScene } from '/src/hooks/PistolsContext'
 import { ProfilePic } from '/src/components/account/ProfilePic'
@@ -138,4 +138,3 @@ export default function AccountHeader() {
 //     </div>
 //   )
 // }
-

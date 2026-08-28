@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Container, Tab, Table, TabPane } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { useMatchQueue, useMatchPlayer, useDuelistsInMatchMakingByAddressInternal } from '/src/stores/matchStore'
 import { usePlayersAvailableForMatchmaking, getPlayernameFromAddress, useUsernameFromPlayerAddress } from '/src/stores/playerStore'

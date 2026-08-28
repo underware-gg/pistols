@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { BigNumberish, Abi, Account } from 'starknet'
-import { useAccount, useContract, useSendTransaction } from '@starknet-react/core'
+import { useContract, useSendTransaction } from '@starknet-start/react'
+import { useAccount } from 'src/utils/hooks/useAccount'
 import { bigintToHex, isPositiveBigint } from 'src/utils/misc/types'
 import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
 

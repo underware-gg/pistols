@@ -632,7 +632,7 @@ fn test_duelist_sacrifice_paid_OK() {
 }
 
 #[test]
-#[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
+#[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED'))]
 fn test_duelist_sacrifice_twice() {
     let mut sys: TestSystems = setup(0); // minted starter pack
     let token_id: u128 = TOKEN_ID_1_1.low;
@@ -641,7 +641,7 @@ fn test_duelist_sacrifice_twice() {
 }
 
 #[test]
-#[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED'))]
+#[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
 fn test_duelist_sacrifice_cant_play() {
     let mut sys: TestSystems = setup(FLAGS::GAME); // minted starter pack
     let token_id: u128 = TOKEN_ID_1_1.low;

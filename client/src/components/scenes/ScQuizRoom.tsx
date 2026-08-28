@@ -6,7 +6,7 @@ import React, {
   useState,
 } from "react";
 import { useParams } from "react-router";
-import { useAccount } from "@starknet-react/core";
+import { useAccount } from "@underware/pistols-sdk/utils/hooks";
 import { useDojoSystemCalls } from "@underware/pistols-sdk/dojo";
 import { useTransactionHandler } from "/src/hooks/useTransaction";
 import { useGameAspect } from "/src/hooks/useGameAspect";

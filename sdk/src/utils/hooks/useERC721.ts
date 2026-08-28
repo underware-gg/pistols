@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { BigNumberish, BlockTag } from 'starknet'
-import { useReadContract } from '@starknet-react/core'
+import { useReadContract } from '@starknet-start/react'
 import { bigintToHex, isPositiveBigint } from 'src/utils/misc/types'
 import { decodeMetadata } from 'src/utils/misc/decoder'
 import { erc721_abi } from 'src/abis/abis'

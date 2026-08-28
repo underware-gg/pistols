@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Button, Container, Grid, Table } from 'semantic-ui-react'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { useDojoSetup, useVerifyControllerSignature } from '@underware/pistols-sdk/dojo'
 import { useTypedMessage } from '@underware/pistols-sdk/utils/hooks'
 import { Messages, poseidon } from '@underware/pistols-sdk/starknet'

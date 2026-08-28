@@ -3,14 +3,14 @@ import { useGameAspect } from '/src/hooks/useGameAspect'
 import { _currentScene } from '/src/three/game'
 
 export interface PosterGridHandle {
-  setPostersData: (posters: JSX.Element[]) => void
+  setPostersData: (posters: React.JSX.Element[]) => void
   setTransformX: (x: number) => void
 }
 
 export const PosterGrid = forwardRef<PosterGridHandle, { small?: boolean }>(({ small }, ref) => {
   const { aspectWidth, aspectHeight } = useGameAspect()
 
-  const [duelPosters, setDuelPosters] = useState<JSX.Element[]>([])
+  const [duelPosters, setDuelPosters] = useState<React.JSX.Element[]>([])
   const [translateX, setTranslateX] = useState(0)
   const gridRef = useRef<HTMLDivElement>(null)
 
@@ -18,7 +18,7 @@ export const PosterGrid = forwardRef<PosterGridHandle, { small?: boolean }>(({ s
     setTranslateX(x)
   }
 
-  const setPostersData = (posters: JSX.Element[]) => {
+  const setPostersData = (posters: React.JSX.Element[]) => {
     setDuelPosters(prev => posters)
   }
 

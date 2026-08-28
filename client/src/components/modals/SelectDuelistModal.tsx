@@ -20,7 +20,7 @@ import { Balance } from '/src/components/account/Balance'
 import { ActionButton, BalanceRequiredButton } from '/src/components/ui/Buttons'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { COLORS } from '@underware/pistols-sdk/pistols/constants'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 
 const HAND_CARD_WIDTH = 110
 const HAND_CARD_HEIGHT = HAND_CARD_WIDTH * (1080/1920)
@@ -300,7 +300,7 @@ function SelectDuelistModalInner({
     setShowConfirmation(false)
   }, [])
 
-  const hoverTimeout = useRef<NodeJS.Timeout>()
+  const hoverTimeout = useRef<NodeJS.Timeout>(null)
 
   const handleCardHover = useCallback((isHovered: boolean, index: number) => {
     if (isAnimatingRef.current) {
@@ -388,7 +388,7 @@ function SelectDuelistModalInner({
       return (
         <DuelistCard
           key={duelist}
-          ref={el => duelistCardRefs.current[index] = el}
+          ref={el => { duelistCardRefs.current[index] = el }}
           duelistId={Number(duelist)}
           isSmall={true}
           isLeft={true}

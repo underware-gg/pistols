@@ -105,7 +105,7 @@ interface ActivityItemProps {
 const _ActivityItem = ({
   activity,
   isRequired,
-}: ActivityItemProps): JSX.Element | null => {
+}: ActivityItemProps): React.JSX.Element | null => {
   if (!activity.is_public) {
     return null
   }

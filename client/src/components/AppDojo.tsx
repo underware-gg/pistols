@@ -1,7 +1,8 @@
 import React, { ReactNode, useEffect, useMemo } from 'react'
-import { useAccount, useConnect, useDisconnect } from '@starknet-react/core'
+import { useConnect, useDisconnect } from '@starknet-start/react'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { NetworkId, getNetworkConfig } from '@underware/pistols-sdk/pistols/config'
-import { makeDojoAppConfig, makePistolsControllerConnector } from '@underware/pistols-sdk/pistols/dojo'
+import { getConnectorId, makeDojoAppConfig, makePistolsControllerConnector } from '@underware/pistols-sdk/pistols/dojo'
 import { useEffectOnce } from '@underware/pistols-sdk/utils/hooks'
 import { Dojo } from '@underware/pistols-sdk/dojo'
 import App, { AppProps } from '/src/components/App'
@@ -58,8 +59,8 @@ function AutoDisconnect() {
   const { disconnect } = useDisconnect()
   useEffect(() => {
     // disconnect if not connected to a supported connector
-    if (isConnected && connector && !connectors.some(c => c.id === connector?.id)) {
-      // console.log('AutoDisconnect>>>>>', isConnected, connector?.id, connectors)
+    if (isConnected && connector && !connectors.some(c => getConnectorId(c) === getConnectorId(connector))) {
+      // console.log('AutoDisconnect>>>>>', isConnected, getConnectorId(connector), connectors)
       disconnect()
     }
   }, [isConnected, connector, connectors, disconnect])

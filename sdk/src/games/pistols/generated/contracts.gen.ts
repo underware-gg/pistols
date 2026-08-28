@@ -3419,7 +3419,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-  const build_pack_token_airdrop_calldata = (recipient: string, packType: CairoCustomEnum, duelistProfile: CairoOption<CairoCustomEnum>, quantity: BigNumberish): DojoCall => {
+	const build_pack_token_airdrop_calldata = (recipient: string, packType: CairoCustomEnum, duelistProfile: CairoOption<CairoCustomEnum>, quantity: BigNumberish): DojoCall => {
 		return {
 			contractName: "pack_token",
 			entrypoint: "airdrop",
@@ -3427,7 +3427,7 @@ export function setupWorld(provider: DojoProvider) {
 		};
 	};
 
-  const pack_token_airdrop = async (snAccount: Account | AccountInterface, recipient: string, packType: CairoCustomEnum, duelistProfile: CairoOption<CairoCustomEnum>, quantity: BigNumberish) => {
+	const pack_token_airdrop = async (snAccount: Account | AccountInterface, recipient: string, packType: CairoCustomEnum, duelistProfile: CairoOption<CairoCustomEnum>, quantity: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,

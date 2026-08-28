@@ -14,7 +14,7 @@ import {
   make_typed_data_GeneralPurposeMessage,
   make_typed_data_PlayerOnline,
 } from './signed_messages'
-import { Connector } from '@starknet-react/core'
+import type { Connector } from 'src/starknet/wallet'
 
 
 //----------------------------------------

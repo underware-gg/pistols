@@ -7,7 +7,7 @@ import { parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/starkn
 import { useDuelistsOrganizedByAddress, useDuelistStore, useFetchDuelistIdsOwnedByAccount } from '/src/stores/duelistStore'
 import { DuelistProfileKey } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { arrayUnique, bigintToNumber } from '@underware/pistols-sdk/utils'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 

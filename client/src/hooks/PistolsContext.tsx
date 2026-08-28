@@ -177,7 +177,7 @@ const restoreFromHistory = (state: PistolsContextStateType): PistolsContextState
 // Provider
 //
 interface PistolsProviderProps {
-  children: string | JSX.Element | JSX.Element[] | ReactNode
+  children: string | React.JSX.Element | React.JSX.Element[] | ReactNode
 }
 const PistolsProvider = ({
   children,

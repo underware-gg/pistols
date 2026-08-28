@@ -49,7 +49,7 @@ const GameplayContext = createContext<{
 // Provider
 //
 interface GameplayProviderProps {
-  children: string | JSX.Element | JSX.Element[] | ReactNode
+  children: string | React.JSX.Element | React.JSX.Element[] | ReactNode
 }
 const GameplayProvider = ({
   children,
@@ -115,4 +115,3 @@ export const useGameplayContext = () => {
     dispatchAnimated,
   }
 }
-

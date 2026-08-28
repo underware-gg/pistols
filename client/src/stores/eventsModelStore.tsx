@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import { BigNumberish } from 'starknet';
-import { useAccount } from '@starknet-react/core';
+import { useAccount } from '@underware/pistols-sdk/utils/hooks';
 import { createDojoStore } from '@dojoengine/sdk/react'
 import { PistolsSchemaType } from '@underware/pistols-sdk/pistols/sdk'
 import { useAllStoreModels, useDojoSetup, useStoreModelsByKeys } from '@underware/pistols-sdk/dojo';

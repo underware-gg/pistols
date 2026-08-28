@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
-import { useNetwork, CartridgeExplorer, StarkscanExplorer, ViewblockExplorer, VoyagerExplorer } from '@starknet-react/core'
+import { useNetwork } from '@starknet-start/react'
 import { bigintToAddress } from '../misc/types'
 
 export type ExplorerType = 'cartridge' | 'starkscan' | 'viewblock' | 'voyager'
@@ -9,17 +9,8 @@ export function useExplorerContractUrl(address: BigNumberish, explorerType: Expl
   const { chain } = useNetwork()
   const url = useMemo(() => {
     const addr = bigintToAddress(address)
-    switch (explorerType) {
-      case 'cartridge':
-        return new CartridgeExplorer(chain).contract(addr)
-      case 'starkscan':
-        return new StarkscanExplorer(chain).contract(addr)
-      case 'viewblock':
-        return new ViewblockExplorer(chain).contract(addr)
-      case 'voyager':
-        return new VoyagerExplorer(chain).contract(addr)
-    }
-    return null
+    const explorerUrl = chain.explorers?.[explorerType]?.toString()
+    return explorerUrl ? `${explorerUrl}/contract/${addr}` : null
   }, [address, chain, explorerType])
   return url
 }

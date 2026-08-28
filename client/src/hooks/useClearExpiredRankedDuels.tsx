@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { BigNumberish } from 'starknet'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { useChallengeStore } from '/src/stores/challengeStore'
 import { useCallToChallenges } from '/src/stores/eventsModelStore'
@@ -108,4 +108,3 @@ export const useClearExpiredRankedDuels = (duelIds: BigNumberish[]) => {
     processDuelsSequentially()
   }, [duelsToClear, account, community, game])
 }
-

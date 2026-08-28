@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { create } from 'zustand'
 import { Account } from 'starknet'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { useSdkPublishTypedData, useDojoSetup } from '@underware/pistols-sdk/dojo'
 import { make_typed_data_PlayerOnline } from '@underware/pistols-sdk/pistols/dojo'
 

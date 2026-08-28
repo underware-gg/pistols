@@ -1,6 +1,6 @@
 import React, { forwardRef, useImperativeHandle, useRef, useState, useMemo, useEffect } from 'react'
 import { BigNumberish } from 'starknet'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { DUELIST_CARD_WIDTH, DUELIST_CARD_HEIGHT } from '/src/data/cardConstants'
 import { DuelistCard, DuelistCardHandle } from '/src/components/cards/DuelistCard'

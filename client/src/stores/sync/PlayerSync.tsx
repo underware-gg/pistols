@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { useFetchChallengeIdsOwnedByAccount } from '/src/stores/challengeStore'
 import { useFetchDuelistIdsOwnedByAccount } from '/src/stores/duelistStore'
 import { useFetchPacksOwnedByPlayer } from '/src/stores/packStore'

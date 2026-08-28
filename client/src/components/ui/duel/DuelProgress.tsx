@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Image } from 'semantic-ui-react'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { BigNumberish } from 'starknet'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { useThreeJsContext } from '/src/hooks/ThreeJsContext'

@@ -1,4 +1,5 @@
 export * from '../starknet/starknet'
 export * from '../starknet/starknet_enum'
 export * from '../starknet/starknet_sign'
+export * from '../starknet/wallet'
 // export * from '../starknet/predeployed'

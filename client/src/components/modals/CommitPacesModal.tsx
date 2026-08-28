@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react'
 import { Divider, Grid, Modal } from 'semantic-ui-react'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { useDojoSetup, useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { useGameAspect } from '/src/hooks/useGameAspect'

@@ -74,7 +74,7 @@ const SettingsContext = createContext<{
 // Provider
 //
 interface SettingsProviderProps {
-  children: string | JSX.Element | JSX.Element[] | ReactNode
+  children: string | React.JSX.Element | React.JSX.Element[] | ReactNode
 }
 const SettingsProvider = ({
   children,
@@ -222,4 +222,3 @@ export const useSettings = () => {
     dispatchSetting,
   }
 }
-

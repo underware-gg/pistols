@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useAccount } from '@starknet-react/core';
+import { useAccount } from '@underware/pistols-sdk/utils/hooks';
 import { useSdkSqlQuery } from '@underware/pistols-sdk/dojo/sql';
 import { bigintToAddress } from '@underware/pistols-sdk/utils';
 import { constants } from '@underware/pistols-sdk/pistols/gen';

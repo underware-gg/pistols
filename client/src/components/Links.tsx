@@ -6,7 +6,7 @@ import { formatTimestampDeltaElapsed, bigintToDecimal, shortAddress, bigintEqual
 import { useDuelist } from '/src/stores/duelistStore'
 import { useOwnerOfDuelist } from '../hooks/useTokenDuelists'
 import { useChallenge } from '../stores/challengeStore'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 
 export const PlayerLink = ({
   address,

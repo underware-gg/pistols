@@ -1,5 +1,5 @@
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { useTransactionHandler } from '/src/hooks/useTransaction'

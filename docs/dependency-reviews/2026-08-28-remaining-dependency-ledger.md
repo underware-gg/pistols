@@ -41,6 +41,24 @@ including replacement of the React-18-only connector layer and the deprecated
 unscoped get-starknet package, then migrate this group and its public SDK types
 together. This is a product/platform migration, not Torii maintenance.
 
+### Planning refinement — 2026-08-28
+
+The executable plan is now recorded in
+[Starknet / Dojo.js / React Rubicon Migration](../migrations/2026-08-28-starknet-dojo-react-rubicon.md).
+It corrects and narrows four assumptions that were still implicit here:
+
+- Dojo.js 2 is the JavaScript client boundary. The Cairo world and current
+  Dojo/Sozo toolchain remain on 1.8.x; installing that toolchain is required to
+  prove baseline binding generation, not to authorize an on-chain migration.
+- `starknetid.js` is an exact Starknet 8 peer, not a bundled Starknet runtime.
+  It will be removed because Starknet.js 10 now provides the three naming and
+  profile operations Pistols uses directly.
+- `semantic-ui-react` stays for this migration. React 19 compatibility requires
+  scoped peer decisions and interaction proof around its Portal, Dropdown and
+  Popup paths, not a broad UI rewrite or an untested global suppression.
+- The migrated published SDK is a 2.0.0 line. React Compiler, React Router,
+  Vite and TypeScript migrations remain separate follow-ups.
+
 ## Toolchain migration boundaries
 
 | Retained | Registry target | Blocking evidence | Retirement condition |
@@ -91,6 +109,7 @@ Vite 6, and TypeScript 5 were also checked and are already at their line tops.
 
 Related detailed reviews:
 
+- [Rubicon migration execution plan](../migrations/2026-08-28-starknet-dojo-react-rubicon.md)
 - [dojo.js to the top of the old side](2026-08-24-dojo-js-old-side-top.md)
 - [Safe incremental updates](2026-08-27-safe-incremental-updates.md)
 - [Apollo Client 4 and GraphQL 17 assessment](2026-08-28-apollo-4-graphql-17.md)

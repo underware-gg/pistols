@@ -19,11 +19,10 @@
 |                                  | `/utils` | `/abis`  | `/dojo` | `/dojo/graphql` | `/pistols/config` | `/pistols` |
 |----------------------------------|:--------:|:--------:|:-------:|:---------------:|:-----------------:|:----------:|
 | `starknet`                       | ✅       | ✅        | ✅      | ✅             |  ✅               |  ✅        |
-| `starknetid.js`                  | ✅       |           |         |                |                   |            |
 | `@starknet-io/get-starknet-core` | ✅       |           | ✅      |                |                   |            |
 | `react`                          | ✅       |           | ✅      | ✅             |                   |            |
-| `@starknet-react/chains`         |          |           | ✅      |                | ✅                |            |
-| `@starknet-react/core`           | ✅       |           | ✅      | ✅             |                   |            |
+| `@starknet-start/chains`         |          |           | ✅      |                | ✅                |            |
+| `@starknet-start/react`          | ✅       |           | ✅      | ✅             |                   |            |
 | `@cartridge/controller`          |          |           | ✅      |                |                   | ✅         |
 | `@cartridge/connector`           |          |           | ✅      |                |                   |            |
 | `@dojoengine/core`               |          |           | ✅      |                | ✅                | ✅         |

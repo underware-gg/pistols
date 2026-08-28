@@ -26,7 +26,7 @@ export function createSystemCalls(
 
   // Transaction status checker - can be used by transaction store
   const checkTransactionStatus = async (signer: AccountInterface, hash: string, calls?: DojoCalls, key?: string, shouldEmit: boolean = true): Promise<boolean> => {
-    const receipt = await signer.waitForTransaction(hash, {
+    const receipt = await signer.provider.waitForTransaction(hash, {
       retryInterval: 200,
       successStates: ["PRE_CONFIRMED", "ACCEPTED_ON_L2", "ACCEPTED_ON_L1"],
     })
@@ -619,4 +619,3 @@ function getReceiptStatus(receipt: any, shouldEmit: boolean = true): boolean {
   }
   return true
 }
-

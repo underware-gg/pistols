@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo } from 'react'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { useDojoSetup } from '@underware/pistols-sdk/dojo'
 import { bigintToU256, ethToWei } from '@underware/pistols-sdk/starknet'
 import { bigintToHex } from '@underware/pistols-sdk/utils'

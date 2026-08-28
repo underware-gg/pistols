@@ -259,3 +259,8 @@ both ways.
 - [2026-08-28 — Compatible-line cleanup](2026-08-28-compatible-line-cleanup.md)
 - [2026-08-28 — Remaining dependency ledger](2026-08-28-remaining-dependency-ledger.md)
 - [2026-08-28 — Enforce exhaustive React hook dependencies](2026-08-28-exhaustive-deps.md)
+- [2026-08-28 — React / Starknet / Dojo.js Rubicon candidate graph](2026-08-28-rubicon-candidate-graph.md)
+
+## Execution plans
+
+- [2026-08-28 — Starknet / Dojo.js / React Rubicon migration](../migrations/2026-08-28-starknet-dojo-react-rubicon.md)

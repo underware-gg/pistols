@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useRef, useCallback } from 'react'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { useGetChallenge } from '/src/stores/challengeStore'
@@ -421,4 +421,4 @@ export const DuelContextProvider: React.FC<{
       {children}
     </DuelContext.Provider>
   );
-} 
+}

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Grid, Modal, Form, Dropdown } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { usePactSubscription } from '/src/queries/usePact'

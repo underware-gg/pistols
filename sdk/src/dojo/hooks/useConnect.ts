@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react'
-import { Connector, useAccount, useConnect, useNetwork } from '@starknet-react/core'
-import { SwitchStarknetChainParameters, AddStarknetChainParameters } from '@starknet-io/get-starknet-core'
-import { useAddStarknetChain, useSwitchStarknetChain } from 'src/utils/hooks/useWalletRequest'
+import { useAccount, useConnect, useNetwork } from '@starknet-start/react'
+import { SwitchStarknetChainParameters } from '@starknet-io/types-js'
+import { useSwitchStarknetChain } from 'src/utils/hooks/useWalletRequest'
 import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
 import { feltToString } from 'src/starknet/starknet'
 import { useLatestRef } from 'src/utils/hooks/useLatestRef'
+import { getConnectorId, type Connector } from 'src/starknet/wallet'
 
 
 export const useConnectToSelectedNetwork = (onConnect?: () => void) => {
@@ -27,10 +28,10 @@ export const useConnectToSelectedNetwork = (onConnect?: () => void) => {
     } else if (!isConnecting) {
       // get 1st supported connector on this chain
       const connector = selectedNetworkConfig.connectorIds.reduce((acc, id) => {
-        return acc ?? connectors.find((connector) => (connector.id == id))
+        return acc ?? connectors.find((connector) => (getConnectorId(connector) == id))
       }, undefined as Connector)
       if (connector) {
-        console.log(`>> Connecting with [${connector.id}]...`)
+        console.log(`>> Connecting with [${getConnectorId(connector)}]...`)
         requestedConnectRef.current = true
         connect({ connector })
       } else {
@@ -78,7 +79,7 @@ export const useChainSwitchCallbacks = () => {
 
   const switch_params = useMemo(() => {
     const params: SwitchStarknetChainParameters = {
-      chainId: selectedNetworkConfig.chainId,
+      chainId: `0x${selectedNetworkConfig.chain.id.toString(16)}`,
     }
     return params
   }, [selectedNetworkConfig])

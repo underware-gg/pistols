@@ -1,6 +1,7 @@
 import React from 'react'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { useDojoSetup } from '@underware/pistols-sdk/dojo'
+import { getConnectorId } from '@underware/pistols-sdk/pistols/dojo'
 import { useConfig } from '/src/stores/configStore'
 import { PACKAGE_VERSION } from '/src/utils/constants'
 
@@ -17,7 +18,7 @@ export default function CurrentChainHint() {
         {'/'}
         {selectedNetworkConfig.slotName}
         {'/'}
-        {connector?.id ?? 'disconnected'}
+        {getConnectorId(connector) ?? 'disconnected'}
       </div>
     </>
   )

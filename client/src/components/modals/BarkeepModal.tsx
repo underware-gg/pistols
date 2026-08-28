@@ -9,7 +9,7 @@ import { BarkeepMenuItem } from '/src/components/ui/BarkeepMenuItem'
 import { SceneName  } from '/src/data/assetsTypes'
 import DuelTutorialOverlay from '../ui/duel/DuelTutorialOverlay'
 import { Opener } from '/src/hooks/useOpener'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 
 type ModalStage = 'intro' | 'menu' | 'notifications'
 

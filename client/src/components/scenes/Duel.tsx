@@ -278,7 +278,7 @@ const DuelContent: React.FC<{
 
 
 // import React, { useEffect, useRef, useState } from 'react'
-// import { useAccount } from '@starknet-react/core'
+// import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 // import { useMounted, useClientTimestamp, useEffectOnce } from '@underware/pistols-sdk/utils/hooks'
 // import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 // import { usePistolsContext } from '/src/hooks/PistolsContext'

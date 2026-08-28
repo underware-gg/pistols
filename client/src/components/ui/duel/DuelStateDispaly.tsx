@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Grid, Segment, Divider, Icon } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { useGameplayContext } from '/src/hooks/GameplayContext'
 import { useGetChallenge } from '/src/stores/challengeStore'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'

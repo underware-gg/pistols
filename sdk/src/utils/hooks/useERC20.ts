@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { BigNumberish } from 'starknet'
-import { useAccount, useContract, useBalance } from '@starknet-react/core'
+import { useAccount, useContract, useBalance } from '@starknet-start/react'
 import { bigintToHex, isPositiveBigint } from 'src/utils/misc/types'
 import { weiToEth } from 'src/starknet/starknet'
 import { erc20_abi } from 'src/abis/abis'

@@ -4,7 +4,7 @@ import { immer } from 'zustand/middleware/immer'
 import Dexie, { Table } from 'dexie'
 import { useMyActiveDuels } from '/src/stores/challengeStore'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 
 const STORAGE_KEY = 'pistols_notifications'
 

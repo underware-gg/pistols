@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import * as TWEEN from '@tweenjs/tween.js'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { useQueryParams } from '/src/stores/queryParamsStore'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { useGameEvent } from '/src/hooks/useGameEvent'
@@ -88,7 +88,7 @@ export default function ScDuelsBoard() {
   const secondTween = useRef<TWEEN.Tween<{ x: number }> | null>(null)
 
   const [isAnimating, setIsAnimating] = useState(false)
-  const [allPosters, setAllPosters] = useState<Map<bigint, JSX.Element>>(new Map())
+  const [allPosters, setAllPosters] = useState<Map<bigint, React.JSX.Element>>(new Map())
   const posterRefs = useRef<{[key: number]: DuelPosterHandle}>({})
   const isAnimatingRef = useRef(isAnimating)
   isAnimatingRef.current = isAnimating
@@ -172,7 +172,7 @@ export default function ScDuelsBoard() {
     // Aspect changes reposition every poster and make the rebuilt set visible.
     void aspectHeight
     void aspectWidth
-    const posters = new Map<bigint, JSX.Element>()
+    const posters = new Map<bigint, React.JSX.Element>()
     challengeIdsRef.current.forEach(duel => {
       posters.set(duel, createPosterRef.current(duel, true))
     })
@@ -183,7 +183,7 @@ export default function ScDuelsBoard() {
     // Preserve existing poster instances; newly arrived duels start hidden so
     // the visibility effect can reveal them in sequence.
     setAllPosters((currentPosters) => {
-      const posters = new Map<bigint, JSX.Element>()
+      const posters = new Map<bigint, React.JSX.Element>()
       challengeIds.forEach((duel) => {
         posters.set(duel, currentPosters.get(duel) ?? createPosterRef.current(duel))
       })

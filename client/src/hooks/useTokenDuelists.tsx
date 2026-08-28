@@ -3,7 +3,7 @@ import { BigNumberish } from 'starknet'
 import { useDuelistTokenStore } from '/src/stores/tokenStore'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { useTokenConfig } from '/src/stores/tokenConfigStore'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 
 
 export const useDuelistTokenCount = () => {

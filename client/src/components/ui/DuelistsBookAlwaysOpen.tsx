@@ -461,7 +461,7 @@ function BookSheets({ width, height }: { width?: number; height?: number }) {
         <div
           id={`sheet-${i}`}
           key={i}
-          ref={el => sheetRefs.current[i] = el}
+          ref={el => { sheetRefs.current[i] = el }}
           className="paper-sheet"
         >
           {isPageVisible(i) && (

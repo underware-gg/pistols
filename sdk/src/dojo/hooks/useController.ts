@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { BigNumberish, CallData, shortString } from 'starknet'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from 'src/utils/hooks/useAccount'
 import { ControllerConnector } from '@cartridge/connector'
 import { ProfileContextTypeVariant } from '@cartridge/controller'
 import { useContractClassHash } from 'src/utils/hooks/useContractClassHash'
@@ -11,6 +11,7 @@ import { supportedConnetorIds } from 'src/games/pistols/config/networks'
 import { bigintEquals, bigintToHex, isPositiveBigint } from 'src/utils/misc/types'
 import { feltToString } from 'src/starknet/starknet'
 import { QUERY_ONCE } from 'src/utils/hooks/queryOnce'
+import { getConnectorId } from 'src/starknet/wallet'
 
 // sync from here:
 // https://github.com/cartridge-gg/controller/blob/main/packages/account-wasm/src/constants.rs
@@ -42,9 +43,11 @@ export const useConnectedController = () => {
   const { address, isConnected, connector } = useAccount()
 
   // connector
-  const connectorId = useMemo(() => (connector?.id), [connector])
+  const connectorId = useMemo(() => getConnectorId(connector), [connector])
   const controllerConnector = useMemo<ControllerConnector>(() => (
-    connectorId == supportedConnetorIds.CONTROLLER ? connector as unknown as ControllerConnector : undefined
+    connectorId == supportedConnetorIds.CONTROLLER
+      ? ControllerConnector.fromConnectors([connector])
+      : undefined
   ), [connector, connectorId])
 
   // username
@@ -119,7 +122,7 @@ export const useVerifyControllerSignature = (messageHash: BigNumberish, signatur
     enabled: Boolean(account) && isPositiveBigint(messageHash) && signature?.length > 0,
     queryFn: async () => {
       console.log(`useVerifyControllerSignature() chainId:`, feltToString(chainId), address);
-      const res = await account.callContract(
+      const res = await account.provider.callContract(
         {
           contractAddress: address,
           entrypoint: "is_valid_signature",

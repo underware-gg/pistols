@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder, entityContainsModels, getEntityModel } from '@underware/pistols-sdk/pistols/sdk'
 import { filterEntitiesByModels, useSdkEventsGet, useSdkEventsSub } from '@underware/pistols-sdk/dojo'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'

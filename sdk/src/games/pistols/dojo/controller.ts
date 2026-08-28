@@ -1,4 +1,4 @@
-import { Connector } from '@starknet-react/core'
+import type { Connector } from 'src/starknet/wallet'
 import type { Tokens, Token } from '@cartridge/controller'
 import { getNetworkConfig, NetworkId } from 'src/games/pistols/config/networks'
 import { makeControllerConnector } from 'src/games/pistols/dojo/controller_connector'

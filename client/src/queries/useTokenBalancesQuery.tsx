@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useAccount } from '@starknet-react/core';
+import { useAccount } from '@underware/pistols-sdk/utils/hooks';
 import { useMounted } from '@underware/pistols-sdk/utils/hooks';
 import { useSdkSqlQuery, useSqlQuery } from '@underware/pistols-sdk/dojo/sql';
 import { useTokenContracts } from '/src/hooks/useTokenContracts'

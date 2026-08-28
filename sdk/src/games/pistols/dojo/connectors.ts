@@ -1,17 +1,12 @@
 import { useMemo } from 'react'
-import {
-  Connector,
-  // injected,
-  // argent, braavos,
-} from '@starknet-react/core'
+import type { Connector } from 'src/starknet/wallet'
 import { usePredeployedConnector } from 'src/utils/hooks/usePredeployedConnector'
 import { DojoAppConfig } from 'src/dojo/contexts/Dojo'
 import { DojoNetworkConfig, supportedConnetorIds } from 'src/games/pistols/config/networks'
 
 export const getConnectorIcon = (connector: Connector): string  => {
   if (!connector) return null
-  if (typeof connector.icon === 'string') return connector.icon
-  return connector.icon.dark
+  return connector.icon
 }
 
 export const useChainConnectors = (dojoAppConfig: DojoAppConfig, chainConfig: DojoNetworkConfig) => {

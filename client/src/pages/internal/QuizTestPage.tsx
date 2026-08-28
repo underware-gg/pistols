@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Button, Container, Dropdown, Input, Tab, Table, TabPane } from 'semantic-ui-react'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { useCookies } from 'react-cookie'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { useQuizConfig } from '/src/stores/configStore'

@@ -81,6 +81,11 @@
       "evidence": "documented",
       "source": "settings/dependency-resolution"
     },
+    "patchedDependencies": {
+      "evidence": "tested",
+      "source": "settings/dependency-resolution",
+      "note": "pnpm patch-commit records the patch hash in the lockfile; changing the setting triggers ERR_PNPM_VERIFY_DEPS_BEFORE_RUN. A frozen install applies the exact Semantic UI patch, and the React 19 Portal tests prove the patched element-ref path."
+    },
     "packages": {
       "evidence": "documented",
       "source": "workspace file",

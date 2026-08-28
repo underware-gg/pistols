@@ -6,8 +6,8 @@ import { expect, test, vi } from 'vitest'
 // hook is stubbed rather than a provider tree stood up.
 // importOriginal matters: the SDK imports other things from this module, so
 // replacing it wholesale breaks the import graph rather than the wallet hook.
-vi.mock('@starknet-react/core', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@starknet-react/core')>()),
+vi.mock('@underware/pistols-sdk/utils/hooks', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@underware/pistols-sdk/utils/hooks')>()),
   useAccount: () => ({ address: undefined }),
 }))
 

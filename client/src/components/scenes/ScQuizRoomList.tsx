@@ -19,7 +19,7 @@ import { InteractibleScene } from '/src/three/InteractibleScene'
 import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
 import { AudioName, AUDIO_ASSETS } from '/src/data/audioAssets'
 import { usePlayer } from '/src/stores/playerStore'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 
 type QuizPartyListItem = {
   id: number

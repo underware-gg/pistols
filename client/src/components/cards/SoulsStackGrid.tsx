@@ -90,7 +90,7 @@ const SoulsStackGrid: React.FC<SoulsStackGridProps> = ({
         >
           {hasCard ? (
             <DuelistCard
-              ref={el => stackedCardRefs.current[startIndex + idx] = el}
+              ref={el => { stackedCardRefs.current[startIndex + idx] = el }}
               duelistId={duelistId}
               isSmall={true}
               isLeft={true}
@@ -196,4 +196,4 @@ const SoulsStackGrid: React.FC<SoulsStackGridProps> = ({
   )
 }
 
-export default SoulsStackGrid 
+export default SoulsStackGrid

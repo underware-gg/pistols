@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { BigNumberish } from 'starknet'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from 'src/utils/hooks/useAccount'
 import { apiVerifyControllerSignature } from 'src/api/verify'
 import { isPositiveBigint } from 'src/utils/misc/types'
 import { feltToString } from 'src/starknet/starknet'

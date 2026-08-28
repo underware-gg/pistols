@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { Container, Table } from 'semantic-ui-react'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { useDojoSystem, useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { usePool, useSeasonPool, UsePoolResult, usePurchasedUnopenedDuelistPackCount, useFundedPackCount } from '/src/stores/bankStore'
 import { useFameBalance, useFetchAccountsBalances, useLordsBalance } from '/src/stores/coinStore'

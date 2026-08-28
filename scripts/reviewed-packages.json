@@ -95,10 +95,10 @@
       "2.9.0"
     ],
     "@cartridge/connector": [
-      "0.13.16"
+      "0.14.0"
     ],
     "@cartridge/controller": [
-      "0.13.16"
+      "0.14.0"
     ],
     "@cartridge/controller-wasm": [
       "0.10.1"
@@ -109,41 +109,23 @@
     "@cartridge/presets": [
       "0.5.4"
     ],
-    "@cbor-extract/cbor-extract-darwin-arm64": [
-      "2.2.0"
-    ],
-    "@cbor-extract/cbor-extract-darwin-x64": [
-      "2.2.0"
-    ],
-    "@cbor-extract/cbor-extract-linux-arm": [
-      "2.2.0"
-    ],
-    "@cbor-extract/cbor-extract-linux-arm64": [
-      "2.2.0"
-    ],
-    "@cbor-extract/cbor-extract-linux-x64": [
-      "2.2.0"
-    ],
-    "@cbor-extract/cbor-extract-win32-x64": [
-      "2.2.0"
-    ],
     "@dimforge/rapier3d-compat": [
       "0.12.0"
     ],
     "@dojoengine/core": [
-      "1.8.8"
+      "2.0.0"
     ],
     "@dojoengine/grpc": [
-      "1.8.7"
+      "2.0.0"
     ],
     "@dojoengine/recs": [
       "2.0.13"
     ],
     "@dojoengine/sdk": [
-      "1.9.0"
+      "2.0.0"
     ],
     "@dojoengine/state": [
-      "1.8.5"
+      "2.0.0"
     ],
     "@dojoengine/torii-client": [
       "1.8.2"
@@ -152,7 +134,7 @@
       "1.8.2"
     ],
     "@dojoengine/utils": [
-      "1.8.4"
+      "2.0.0"
     ],
     "@effect/opentelemetry": [
       "0.59.3"
@@ -343,21 +325,6 @@
     "@grpc/proto-loader": [
       "0.8.0"
     ],
-    "@hpke/chacha20poly1305": [
-      "1.8.0"
-    ],
-    "@hpke/common": [
-      "1.10.1"
-    ],
-    "@hpke/core": [
-      "1.9.0"
-    ],
-    "@hpke/dhkem-x25519": [
-      "1.8.0"
-    ],
-    "@hpke/dhkem-x448": [
-      "1.8.0"
-    ],
     "@humanfs/core": [
       "0.19.1"
     ],
@@ -413,31 +380,17 @@
       "2.0.12",
       "2.2.23"
     ],
-    "@lit-labs/ssr-dom-shim": [
-      "1.4.0"
-    ],
-    "@lit/react": [
-      "1.0.8"
-    ],
-    "@lit/reactive-element": [
-      "2.1.1"
-    ],
     "@module-federation/error-codes": [
       "0.12.0"
     ],
     "@module-federation/runtime": [
-      "0.1.21",
       "0.12.0"
     ],
     "@module-federation/runtime-core": [
       "0.12.0"
     ],
     "@module-federation/sdk": [
-      "0.1.21",
       "0.12.0"
-    ],
-    "@msgpack/msgpack": [
-      "3.1.2"
     ],
     "@msgpackr-extract/msgpackr-extract-darwin-arm64": [
       "3.0.4"
@@ -485,10 +438,7 @@
       "1.0.0",
       "1.2.0",
       "1.7.0",
-      "1.8.0",
-      "1.9.0",
       "1.9.1",
-      "1.9.2",
       "1.9.7"
     ],
     "@noble/hashes": [
@@ -498,7 +448,6 @@
       "1.3.3",
       "1.6.0",
       "1.6.1",
-      "1.7.0",
       "1.8.0"
     ],
     "@noble/secp256k1": [
@@ -552,45 +501,6 @@
     "@parcel/watcher-win32-x64": [
       "2.5.1"
     ],
-    "@peculiar/asn1-cms": [
-      "2.9.0"
-    ],
-    "@peculiar/asn1-csr": [
-      "2.9.0"
-    ],
-    "@peculiar/asn1-ecc": [
-      "2.9.0"
-    ],
-    "@peculiar/asn1-pfx": [
-      "2.9.0"
-    ],
-    "@peculiar/asn1-pkcs8": [
-      "2.9.0"
-    ],
-    "@peculiar/asn1-pkcs9": [
-      "2.9.0"
-    ],
-    "@peculiar/asn1-rsa": [
-      "2.9.0"
-    ],
-    "@peculiar/asn1-schema": [
-      "2.9.0"
-    ],
-    "@peculiar/asn1-x509": [
-      "2.9.0"
-    ],
-    "@peculiar/asn1-x509-attr": [
-      "2.9.0"
-    ],
-    "@peculiar/utils": [
-      "2.0.3"
-    ],
-    "@peculiar/x509": [
-      "1.12.3"
-    ],
-    "@phosphor-icons/webcomponents": [
-      "2.1.5"
-    ],
     "@pkgjs/parseargs": [
       "0.11.0"
     ],
@@ -638,33 +548,6 @@
     ],
     "@protobufjs/utf8": [
       "1.1.2"
-    ],
-    "@reown/appkit": [
-      "1.8.1"
-    ],
-    "@reown/appkit-common": [
-      "1.8.1"
-    ],
-    "@reown/appkit-controllers": [
-      "1.8.1"
-    ],
-    "@reown/appkit-pay": [
-      "1.8.1"
-    ],
-    "@reown/appkit-polyfills": [
-      "1.8.1"
-    ],
-    "@reown/appkit-scaffold-ui": [
-      "1.8.1"
-    ],
-    "@reown/appkit-ui": [
-      "1.8.1"
-    ],
-    "@reown/appkit-utils": [
-      "1.8.1"
-    ],
-    "@reown/appkit-wallet": [
-      "1.8.1"
     ],
     "@rolldown/pluginutils": [
       "1.0.0-beta.27"
@@ -768,14 +651,15 @@
       "3.1.3"
     ],
     "@standard-schema/spec": [
-      "1.0.0",
       "1.1.0"
     ],
     "@starknet-io/get-starknet-core": [
-      "4.0.8",
       "5.0.0"
     ],
     "@starknet-io/get-starknet-discovery": [
+      "5.0.0"
+    ],
+    "@starknet-io/get-starknet-modal": [
       "5.0.0"
     ],
     "@starknet-io/get-starknet-virtual-wallet": [
@@ -788,17 +672,25 @@
       "5.0.0"
     ],
     "@starknet-io/types-js": [
+      "0.10.2",
       "0.7.10",
       "0.7.7",
-      "0.8.4",
-      "0.9.1",
       "0.9.2"
     ],
-    "@starknet-react/chains": [
-      "5.0.3"
+    "@starknet-start/chains": [
+      "1.0.7"
     ],
-    "@starknet-react/core": [
-      "5.0.3"
+    "@starknet-start/explorers": [
+      "1.0.7"
+    ],
+    "@starknet-start/providers": [
+      "1.0.7"
+    ],
+    "@starknet-start/query": [
+      "1.0.7"
+    ],
+    "@starknet-start/react": [
+      "1.0.8"
     ],
     "@swc/core": [
       "1.13.5"
@@ -872,36 +764,6 @@
     "@turbo/windows-arm64": [
       "2.10.11"
     ],
-    "@turnkey/api-key-stamper": [
-      "0.6.5"
-    ],
-    "@turnkey/crypto": [
-      "2.8.14"
-    ],
-    "@turnkey/encoding": [
-      "0.6.0"
-    ],
-    "@turnkey/http": [
-      "3.18.1"
-    ],
-    "@turnkey/iframe-stamper": [
-      "2.11.0"
-    ],
-    "@turnkey/indexed-db-stamper": [
-      "1.2.6"
-    ],
-    "@turnkey/sdk-browser": [
-      "5.16.1"
-    ],
-    "@turnkey/sdk-types": [
-      "0.14.0"
-    ],
-    "@turnkey/wallet-stamper": [
-      "1.1.16"
-    ],
-    "@turnkey/webauthn-stamper": [
-      "0.6.0"
-    ],
     "@tweenjs/tween.js": [
       "23.1.3",
       "25.0.0"
@@ -953,10 +815,10 @@
       "15.7.15"
     ],
     "@types/react": [
-      "18.3.31"
+      "19.2.18"
     ],
     "@types/react-dom": [
-      "18.3.7"
+      "19.2.4"
     ],
     "@types/react-transition-group": [
       "4.4.12"
@@ -966,9 +828,6 @@
     ],
     "@types/three": [
       "0.185.4"
-    ],
-    "@types/trusted-types": [
-      "2.0.7"
     ],
     "@types/validator": [
       "13.15.3"
@@ -1040,7 +899,6 @@
       "4.1.11"
     ],
     "@wallet-standard/base": [
-      "1.1.0",
       "1.1.1"
     ],
     "@wallet-standard/features": [
@@ -1048,77 +906,6 @@
     ],
     "@wallet-standard/wallet": [
       "1.1.0"
-    ],
-    "@walletconnect/core": [
-      "2.21.10",
-      "2.21.7"
-    ],
-    "@walletconnect/environment": [
-      "1.0.1"
-    ],
-    "@walletconnect/ethereum-provider": [
-      "2.21.10"
-    ],
-    "@walletconnect/events": [
-      "1.0.1"
-    ],
-    "@walletconnect/heartbeat": [
-      "1.2.2"
-    ],
-    "@walletconnect/jsonrpc-http-connection": [
-      "1.0.8"
-    ],
-    "@walletconnect/jsonrpc-provider": [
-      "1.0.14"
-    ],
-    "@walletconnect/jsonrpc-types": [
-      "1.0.4"
-    ],
-    "@walletconnect/jsonrpc-utils": [
-      "1.0.8"
-    ],
-    "@walletconnect/jsonrpc-ws-connection": [
-      "1.0.16"
-    ],
-    "@walletconnect/keyvaluestorage": [
-      "1.1.1"
-    ],
-    "@walletconnect/logger": [
-      "2.1.2"
-    ],
-    "@walletconnect/relay-api": [
-      "1.0.11"
-    ],
-    "@walletconnect/relay-auth": [
-      "1.1.0"
-    ],
-    "@walletconnect/safe-json": [
-      "1.0.2"
-    ],
-    "@walletconnect/sign-client": [
-      "2.21.10",
-      "2.21.7"
-    ],
-    "@walletconnect/time": [
-      "1.0.2"
-    ],
-    "@walletconnect/types": [
-      "2.21.10",
-      "2.21.7"
-    ],
-    "@walletconnect/universal-provider": [
-      "2.21.10",
-      "2.21.7"
-    ],
-    "@walletconnect/utils": [
-      "2.21.10",
-      "2.21.7"
-    ],
-    "@walletconnect/window-getters": [
-      "1.0.1"
-    ],
-    "@walletconnect/window-metadata": [
-      "1.0.1"
     ],
     "@wry/caches": [
       "1.0.1"
@@ -1137,7 +924,6 @@
     ],
     "abitype": [
       "1.0.0",
-      "1.0.8",
       "1.1.0",
       "1.1.1"
     ],
@@ -1177,23 +963,14 @@
     "any-promise": [
       "1.3.0"
     ],
-    "anymatch": [
-      "3.1.3"
-    ],
     "aria-query": [
       "5.3.0"
-    ],
-    "asn1js": [
-      "3.0.10"
     ],
     "async-mutex": [
       "0.5.0"
     ],
     "asynckit": [
       "0.4.0"
-    ],
-    "atomic-sleep": [
-      "1.0.0"
     ],
     "axios": [
       "0.33.0"
@@ -1214,9 +991,6 @@
     "baseline-browser-mapping": [
       "2.8.9"
     ],
-    "big.js": [
-      "6.2.2"
-    ],
     "bignumber.js": [
       "9.3.1"
     ],
@@ -1224,15 +998,9 @@
       "4.1.0",
       "5.1.0"
     ],
-    "blakejs": [
-      "1.2.1"
-    ],
     "bn.js": [
       "4.12.3",
       "5.2.3"
-    ],
-    "borsh": [
-      "2.0.0"
     ],
     "brace-expansion": [
       "1.1.18",
@@ -1250,18 +1018,12 @@
     "bs58": [
       "6.0.0"
     ],
-    "bs58check": [
-      "4.0.0"
-    ],
     "buffer": [
       "5.7.1",
       "6.0.3"
     ],
     "buffer-image-size": [
       "0.6.4"
-    ],
-    "bundle-name": [
-      "4.1.0"
     ],
     "bundle-require": [
       "5.1.0"
@@ -1275,9 +1037,6 @@
     "callsites": [
       "3.1.0"
     ],
-    "camelcase": [
-      "5.3.1"
-    ],
     "caniuse-lite": [
       "1.0.30001746"
     ],
@@ -1286,15 +1045,6 @@
     ],
     "cardinal": [
       "2.1.1"
-    ],
-    "cbor-extract": [
-      "2.2.0"
-    ],
-    "cbor-js": [
-      "0.1.0"
-    ],
-    "cbor-x": [
-      "1.6.0"
     ],
     "chai": [
       "6.2.2"
@@ -1330,7 +1080,6 @@
       "4.1.0"
     ],
     "cliui": [
-      "6.0.0",
       "7.0.4",
       "8.0.1"
     ],
@@ -1375,9 +1124,6 @@
       "1.0.2",
       "1.1.1"
     ],
-    "cookie-es": [
-      "1.2.2"
-    ],
     "copyfiles": [
       "2.4.1"
     ],
@@ -1387,14 +1133,8 @@
     "cosmiconfig": [
       "7.1.0"
     ],
-    "cross-fetch": [
-      "3.2.0"
-    ],
     "cross-spawn": [
       "7.0.6"
-    ],
-    "crossws": [
-      "0.3.5"
     ],
     "csstype": [
       "3.2.3"
@@ -1402,38 +1142,17 @@
     "d": [
       "1.0.2"
     ],
-    "dayjs": [
-      "1.11.13"
-    ],
     "debug": [
       "4.4.3"
-    ],
-    "decamelize": [
-      "1.2.0"
     ],
     "decimal.js": [
       "10.6.0"
     ],
-    "decode-uri-component": [
-      "0.2.2"
-    ],
     "deep-is": [
       "0.1.4"
     ],
-    "default-browser": [
-      "5.2.1"
-    ],
-    "default-browser-id": [
-      "5.0.0"
-    ],
     "defaults": [
       "1.0.4"
-    ],
-    "define-lazy-prop": [
-      "3.0.0"
-    ],
-    "defu": [
-      "6.1.5"
     ],
     "delayed-stream": [
       "1.0.0"
@@ -1441,21 +1160,12 @@
     "dequal": [
       "2.0.3"
     ],
-    "destr": [
-      "2.0.5"
-    ],
-    "detect-browser": [
-      "5.3.0"
-    ],
     "detect-libc": [
       "1.0.3",
       "2.1.1"
     ],
     "dexie": [
       "4.4.5"
-    ],
-    "dijkstrajs": [
-      "1.0.3"
     ],
     "dom-accessibility-api": [
       "0.5.16"
@@ -1465,9 +1175,6 @@
     ],
     "dunder-proto": [
       "1.0.1"
-    ],
-    "duplexify": [
-      "4.1.3"
     ],
     "eastasianwidth": [
       "0.2.0"
@@ -1484,12 +1191,6 @@
     "emoji-regex": [
       "8.0.0",
       "9.2.2"
-    ],
-    "encode-utf8": [
-      "1.0.3"
-    ],
-    "end-of-stream": [
-      "1.4.5"
     ],
     "entities": [
       "7.0.1"
@@ -1511,9 +1212,6 @@
     ],
     "es-set-tostringtag": [
       "2.1.0"
-    ],
-    "es-toolkit": [
-      "1.39.3"
     ],
     "es5-ext": [
       "0.10.64"
@@ -1591,9 +1289,6 @@
     "eventemitter3": [
       "5.0.1"
     ],
-    "events": [
-      "3.3.0"
-    ],
     "exenv": [
       "1.2.2"
     ],
@@ -1619,9 +1314,6 @@
     "fast-levenshtein": [
       "2.0.6"
     ],
-    "fast-redact": [
-      "3.5.0"
-    ],
     "fdir": [
       "6.5.0"
     ],
@@ -1639,9 +1331,6 @@
     "fill-range": [
       "7.1.1"
     ],
-    "filter-obj": [
-      "1.1.0"
-    ],
     "find-my-way-ts": [
       "0.1.6"
     ],
@@ -1649,7 +1338,6 @@
       "1.1.0"
     ],
     "find-up": [
-      "4.1.0",
       "5.0.0"
     ],
     "fix-dts-default-cjs-exports": [
@@ -1700,9 +1388,6 @@
     "get-proto": [
       "1.0.1"
     ],
-    "get-starknet-core": [
-      "4.0.0"
-    ],
     "glob": [
       "10.5.0",
       "7.2.3"
@@ -1727,9 +1412,6 @@
     ],
     "grpc-web": [
       "1.5.0"
-    ],
-    "h3": [
-      "1.15.9"
     ],
     "happy-dom": [
       "20.11.6"
@@ -1763,15 +1445,9 @@
     "hoist-non-react-statics": [
       "3.3.2"
     ],
-    "hpke-js": [
-      "1.8.0"
-    ],
     "iconv-lite": [
       "0.4.24",
       "0.7.0"
-    ],
-    "idb-keyval": [
-      "6.2.2"
     ],
     "ieee754": [
       "1.2.1"
@@ -1813,17 +1489,11 @@
     "inquirer-search-list": [
       "1.2.6"
     ],
-    "iron-webcrypto": [
-      "1.2.1"
-    ],
     "is-arrayish": [
       "0.2.1"
     ],
     "is-core-module": [
       "2.16.1"
-    ],
-    "is-docker": [
-      "3.0.0"
     ],
     "is-extglob": [
       "2.1.1"
@@ -1835,9 +1505,6 @@
     "is-glob": [
       "4.0.3"
     ],
-    "is-inside-container": [
-      "1.0.0"
-    ],
     "is-interactive": [
       "1.0.0",
       "2.0.0"
@@ -1848,9 +1515,6 @@
     "is-unicode-supported": [
       "0.1.0",
       "1.3.0"
-    ],
-    "is-wsl": [
-      "3.1.0"
     ],
     "isarray": [
       "0.0.1",
@@ -1911,9 +1575,6 @@
     "keyv": [
       "4.5.4"
     ],
-    "keyvaluestorage-interface": [
-      "1.0.0"
-    ],
     "levn": [
       "0.4.1"
     ],
@@ -1929,20 +1590,10 @@
     "lines-and-columns": [
       "1.2.4"
     ],
-    "lit": [
-      "3.3.0"
-    ],
-    "lit-element": [
-      "4.2.1"
-    ],
-    "lit-html": [
-      "3.3.1"
-    ],
     "load-tsconfig": [
       "0.2.5"
     ],
     "locate-path": [
-      "5.0.0",
       "6.0.0"
     ],
     "lodash": [
@@ -1968,7 +1619,8 @@
       "1.4.0"
     ],
     "lossless-json": [
-      "4.2.0"
+      "4.2.0",
+      "4.3.1"
     ],
     "lru-cache": [
       "10.4.3",
@@ -2047,9 +1699,6 @@
     "msgpackr-extract": [
       "3.0.4"
     ],
-    "multiformats": [
-      "9.9.0"
-    ],
     "multipasta": [
       "0.2.8"
     ],
@@ -2078,15 +1727,8 @@
     "node-fetch": [
       "2.7.0"
     ],
-    "node-fetch-native": [
-      "1.6.7"
-    ],
     "node-gyp-build-optional-packages": [
-      "5.1.1",
       "5.2.2"
-    ],
-    "node-mock-http": [
-      "1.0.5"
     ],
     "node-releases": [
       "2.0.21"
@@ -2094,20 +1736,11 @@
     "noms": [
       "0.0.0"
     ],
-    "normalize-path": [
-      "3.0.0"
-    ],
     "object-assign": [
       "4.1.1"
     ],
     "obug": [
       "2.1.4"
-    ],
-    "ofetch": [
-      "1.4.1"
-    ],
-    "on-exit-leak-free": [
-      "0.2.0"
     ],
     "once": [
       "1.4.0"
@@ -2115,9 +1748,6 @@
     "onetime": [
       "2.0.1",
       "5.1.2"
-    ],
-    "open": [
-      "10.2.0"
     ],
     "optimism": [
       "0.18.1"
@@ -2131,20 +1761,13 @@
     ],
     "ox": [
       "0.4.4",
-      "0.7.1",
-      "0.9.3",
       "0.9.6"
     ],
     "p-limit": [
-      "2.3.0",
       "3.1.0"
     ],
     "p-locate": [
-      "4.1.0",
       "5.0.0"
-    ],
-    "p-try": [
-      "2.2.0"
     ],
     "package-json-from-dist": [
       "1.0.1"
@@ -2186,23 +1809,11 @@
       "2.3.2",
       "4.0.4"
     ],
-    "pino": [
-      "7.11.0"
-    ],
-    "pino-abstract-transport": [
-      "0.5.0"
-    ],
-    "pino-std-serializers": [
-      "4.0.0"
-    ],
     "pirates": [
       "4.0.7"
     ],
     "pkg-types": [
       "1.3.1"
-    ],
-    "pngjs": [
-      "5.0.0"
     ],
     "postcss": [
       "8.5.23"
@@ -2219,17 +1830,11 @@
     "process-nextick-args": [
       "2.0.1"
     ],
-    "process-warning": [
-      "1.0.0"
-    ],
     "prop-types": [
       "15.8.1"
     ],
     "protobufjs": [
       "7.6.5"
-    ],
-    "proxy-compare": [
-      "3.0.1"
     ],
     "proxy-deep": [
       "3.1.1"
@@ -2243,26 +1848,8 @@
     "pure-rand": [
       "6.1.0"
     ],
-    "pvtsutils": [
-      "1.3.6"
-    ],
-    "pvutils": [
-      "1.2.0"
-    ],
-    "qrcode": [
-      "1.5.3"
-    ],
-    "query-string": [
-      "7.1.3"
-    ],
-    "quick-format-unescaped": [
-      "4.0.4"
-    ],
-    "radix3": [
-      "1.1.2"
-    ],
     "react": [
-      "18.3.1"
+      "19.2.8"
     ],
     "react-circular-progressbar": [
       "2.2.0"
@@ -2271,7 +1858,7 @@
       "8.1.2"
     ],
     "react-dom": [
-      "18.3.1"
+      "19.2.8"
     ],
     "react-fast-compare": [
       "3.2.2"
@@ -2303,23 +1890,14 @@
       "4.1.2",
       "5.1.1"
     ],
-    "real-require": [
-      "0.1.0"
-    ],
     "redeyed": [
       "2.1.1"
-    ],
-    "reflect-metadata": [
-      "0.2.2"
     ],
     "rehackt": [
       "0.1.0"
     ],
     "require-directory": [
       "2.1.1"
-    ],
-    "require-main-filename": [
-      "2.0.0"
     ],
     "resolve": [
       "1.22.10"
@@ -2335,9 +1913,6 @@
     ],
     "rollup": [
       "4.59.0"
-    ],
-    "run-applescript": [
-      "7.1.0"
     ],
     "run-async": [
       "2.4.1"
@@ -2357,9 +1932,6 @@
       "5.1.2",
       "5.2.1"
     ],
-    "safe-stable-stringify": [
-      "2.5.0"
-    ],
     "safer-buffer": [
       "2.1.2"
     ],
@@ -2367,7 +1939,7 @@
       "1.103.0"
     ],
     "scheduler": [
-      "0.23.2"
+      "0.27.0"
     ],
     "seedrandom": [
       "3.0.5"
@@ -2380,17 +1952,10 @@
     ],
     "semver": [
       "6.3.1",
-      "7.7.2",
       "7.8.5"
-    ],
-    "set-blocking": [
-      "2.0.0"
     ],
     "set-cookie-parser": [
       "2.7.1"
-    ],
-    "sha256-uint8array": [
-      "0.10.7"
     ],
     "shallowequal": [
       "1.1.0"
@@ -2408,9 +1973,6 @@
       "3.0.7",
       "4.1.0"
     ],
-    "sonic-boom": [
-      "2.8.0"
-    ],
     "source-map": [
       "0.5.7",
       "0.8.0-beta.0"
@@ -2418,21 +1980,12 @@
     "source-map-js": [
       "1.2.1"
     ],
-    "split-on-first": [
-      "1.1.0"
-    ],
-    "split2": [
-      "4.2.0"
-    ],
     "stackback": [
       "0.0.2"
     ],
     "starknet": [
-      "4.22.0",
-      "8.9.2"
-    ],
-    "starknetid.js": [
-      "5.0.0"
+      "10.0.2",
+      "4.22.0"
     ],
     "starkscan": [
       "0.0.11"
@@ -2442,12 +1995,6 @@
     ],
     "stdin-discarder": [
       "0.1.0"
-    ],
-    "stream-shift": [
-      "1.0.3"
-    ],
-    "strict-uri-encode": [
-      "2.0.0"
     ],
     "string_decoder": [
       "0.10.31",
@@ -2489,9 +2036,6 @@
     ],
     "thenify-all": [
       "1.6.0"
-    ],
-    "thread-stream": [
-      "0.15.2"
     ],
     "three": [
       "0.185.1"
@@ -2543,9 +2087,6 @@
     "ts-invariant": [
       "0.10.3"
     ],
-    "ts-mixer": [
-      "6.0.4"
-    ],
     "tslib": [
       "1.14.1",
       "2.7.0",
@@ -2556,9 +2097,6 @@
     ],
     "tsx": [
       "4.23.12"
-    ],
-    "tsyringe": [
-      "4.10.0"
     ],
     "turbo": [
       "2.10.11"
@@ -2581,14 +2119,7 @@
       "5.9.3"
     ],
     "ufo": [
-      "1.6.1",
-      "1.6.4"
-    ],
-    "uint8arrays": [
-      "3.1.1"
-    ],
-    "uncrypto": [
-      "0.1.3"
+      "1.6.1"
     ],
     "undici-types": [
       "6.19.8",
@@ -2599,9 +2130,6 @@
     ],
     "universalify": [
       "2.0.1"
-    ],
-    "unstorage": [
-      "1.17.1"
     ],
     "untildify": [
       "4.0.0"
@@ -2616,7 +2144,6 @@
       "4.0.1"
     ],
     "use-sync-external-store": [
-      "1.5.0",
       "1.6.0"
     ],
     "util-deprecate": [
@@ -2628,11 +2155,7 @@
     "validator": [
       "13.15.22"
     ],
-    "valtio": [
-      "2.1.5"
-    ],
     "viem": [
-      "2.31.0",
       "2.37.9",
       "2.9.20"
     ],
@@ -2677,9 +2200,6 @@
     "which": [
       "2.0.2"
     ],
-    "which-module": [
-      "2.0.1"
-    ],
     "why-is-node-running": [
       "2.3.0"
     ],
@@ -2695,17 +2215,12 @@
       "1.0.2"
     ],
     "ws": [
-      "7.5.11",
       "8.21.0"
-    ],
-    "wsl-utils": [
-      "0.1.0"
     ],
     "xtend": [
       "4.0.2"
     ],
     "y18n": [
-      "4.0.3",
       "5.0.8"
     ],
     "yallist": [
@@ -2715,12 +2230,10 @@
       "1.10.3"
     ],
     "yargs": [
-      "15.4.1",
       "16.2.0",
       "17.7.2"
     ],
     "yargs-parser": [
-      "18.1.3",
       "20.2.9",
       "21.1.1"
     ],
@@ -2734,7 +2247,6 @@
       "1.2.5"
     ],
     "zod": [
-      "3.22.4",
       "3.25.76"
     ],
     "zod-validation-error": [
@@ -2828,10 +2340,10 @@
       "2.9.0": "legacy:pre-provenance-2026-08-28"
     },
     "@cartridge/connector": {
-      "0.13.16": "legacy:pre-provenance-2026-08-28"
+      "0.14.0": "docs/dependency-reviews/2026-08-28-rubicon-candidate-graph.md"
     },
     "@cartridge/controller": {
-      "0.13.16": "legacy:pre-provenance-2026-08-28"
+      "0.14.0": "docs/dependency-reviews/2026-08-28-rubicon-candidate-graph.md"
     },
     "@cartridge/controller-wasm": {
       "0.10.1": "legacy:pre-provenance-2026-08-28"
@@ -2842,41 +2354,23 @@
     "@cartridge/presets": {
       "0.5.4": "legacy:pre-provenance-2026-08-28"
     },
-    "@cbor-extract/cbor-extract-darwin-arm64": {
-      "2.2.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "@cbor-extract/cbor-extract-darwin-x64": {
-      "2.2.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "@cbor-extract/cbor-extract-linux-arm": {
-      "2.2.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "@cbor-extract/cbor-extract-linux-arm64": {
-      "2.2.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "@cbor-extract/cbor-extract-linux-x64": {
-      "2.2.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "@cbor-extract/cbor-extract-win32-x64": {
-      "2.2.0": "legacy:pre-provenance-2026-08-28"
-    },
     "@dimforge/rapier3d-compat": {
       "0.12.0": "legacy:pre-provenance-2026-08-28"
     },
     "@dojoengine/core": {
-      "1.8.8": "legacy:pre-provenance-2026-08-28"
+      "2.0.0": "docs/dependency-reviews/2026-08-28-rubicon-candidate-graph.md"
     },
     "@dojoengine/grpc": {
-      "1.8.7": "legacy:pre-provenance-2026-08-28"
+      "2.0.0": "docs/dependency-reviews/2026-08-28-rubicon-candidate-graph.md"
     },
     "@dojoengine/recs": {
       "2.0.13": "legacy:pre-provenance-2026-08-28"
     },
     "@dojoengine/sdk": {
-      "1.9.0": "legacy:pre-provenance-2026-08-28"
+      "2.0.0": "docs/dependency-reviews/2026-08-28-rubicon-candidate-graph.md"
     },
     "@dojoengine/state": {
-      "1.8.5": "legacy:pre-provenance-2026-08-28"
+      "2.0.0": "docs/dependency-reviews/2026-08-28-rubicon-candidate-graph.md"
     },
     "@dojoengine/torii-client": {
       "1.8.2": "legacy:pre-provenance-2026-08-28"
@@ -2885,7 +2379,7 @@
       "1.8.2": "legacy:pre-provenance-2026-08-28"
     },
     "@dojoengine/utils": {
-      "1.8.4": "legacy:pre-provenance-2026-08-28"
+      "2.0.0": "docs/dependency-reviews/2026-08-28-rubicon-candidate-graph.md"
     },
     "@effect/opentelemetry": {
       "0.59.3": "legacy:pre-provenance-2026-08-28"
@@ -3076,21 +2570,6 @@
     "@grpc/proto-loader": {
       "0.8.0": "legacy:pre-provenance-2026-08-28"
     },
-    "@hpke/chacha20poly1305": {
-      "1.8.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "@hpke/common": {
-      "1.10.1": "legacy:pre-provenance-2026-08-28"
-    },
-    "@hpke/core": {
-      "1.9.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "@hpke/dhkem-x25519": {
-      "1.8.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "@hpke/dhkem-x448": {
-      "1.8.0": "legacy:pre-provenance-2026-08-28"
-    },
     "@humanfs/core": {
       "0.19.1": "legacy:pre-provenance-2026-08-28"
     },
@@ -3146,31 +2625,17 @@
       "2.0.12": "legacy:pre-provenance-2026-08-28",
       "2.2.23": "legacy:pre-provenance-2026-08-28"
     },
-    "@lit-labs/ssr-dom-shim": {
-      "1.4.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "@lit/react": {
-      "1.0.8": "legacy:pre-provenance-2026-08-28"
-    },
-    "@lit/reactive-element": {
-      "2.1.1": "legacy:pre-provenance-2026-08-28"
-    },
     "@module-federation/error-codes": {
       "0.12.0": "legacy:pre-provenance-2026-08-28"
     },
     "@module-federation/runtime": {
-      "0.1.21": "legacy:pre-provenance-2026-08-28",
       "0.12.0": "legacy:pre-provenance-2026-08-28"
     },
     "@module-federation/runtime-core": {
       "0.12.0": "legacy:pre-provenance-2026-08-28"
     },
     "@module-federation/sdk": {
-      "0.1.21": "legacy:pre-provenance-2026-08-28",
       "0.12.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "@msgpack/msgpack": {
-      "3.1.2": "legacy:pre-provenance-2026-08-28"
     },
     "@msgpackr-extract/msgpackr-extract-darwin-arm64": {
       "3.0.4": "legacy:pre-provenance-2026-08-28"
@@ -3218,10 +2683,7 @@
       "1.0.0": "legacy:pre-provenance-2026-08-28",
       "1.2.0": "legacy:pre-provenance-2026-08-28",
       "1.7.0": "legacy:pre-provenance-2026-08-28",
-      "1.8.0": "legacy:pre-provenance-2026-08-28",
-      "1.9.0": "legacy:pre-provenance-2026-08-28",
       "1.9.1": "legacy:pre-provenance-2026-08-28",
-      "1.9.2": "legacy:pre-provenance-2026-08-28",
       "1.9.7": "legacy:pre-provenance-2026-08-28"
     },
     "@noble/hashes": {
@@ -3231,7 +2693,6 @@
       "1.3.3": "legacy:pre-provenance-2026-08-28",
       "1.6.0": "legacy:pre-provenance-2026-08-28",
       "1.6.1": "legacy:pre-provenance-2026-08-28",
-      "1.7.0": "legacy:pre-provenance-2026-08-28",
       "1.8.0": "legacy:pre-provenance-2026-08-28"
     },
     "@noble/secp256k1": {
@@ -3285,45 +2746,6 @@
     "@parcel/watcher-win32-x64": {
       "2.5.1": "legacy:pre-provenance-2026-08-28"
     },
-    "@peculiar/asn1-cms": {
-      "2.9.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "@peculiar/asn1-csr": {
-      "2.9.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "@peculiar/asn1-ecc": {
-      "2.9.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "@peculiar/asn1-pfx": {
-      "2.9.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "@peculiar/asn1-pkcs8": {
-      "2.9.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "@peculiar/asn1-pkcs9": {
-      "2.9.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "@peculiar/asn1-rsa": {
-      "2.9.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "@peculiar/asn1-schema": {
-      "2.9.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "@peculiar/asn1-x509": {
-      "2.9.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "@peculiar/asn1-x509-attr": {
-      "2.9.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "@peculiar/utils": {
-      "2.0.3": "legacy:pre-provenance-2026-08-28"
-    },
-    "@peculiar/x509": {
-      "1.12.3": "legacy:pre-provenance-2026-08-28"
-    },
-    "@phosphor-icons/webcomponents": {
-      "2.1.5": "legacy:pre-provenance-2026-08-28"
-    },
     "@pkgjs/parseargs": {
       "0.11.0": "legacy:pre-provenance-2026-08-28"
     },
@@ -3371,33 +2793,6 @@
     },
     "@protobufjs/utf8": {
       "1.1.2": "legacy:pre-provenance-2026-08-28"
-    },
-    "@reown/appkit": {
-      "1.8.1": "legacy:pre-provenance-2026-08-28"
-    },
-    "@reown/appkit-common": {
-      "1.8.1": "legacy:pre-provenance-2026-08-28"
-    },
-    "@reown/appkit-controllers": {
-      "1.8.1": "legacy:pre-provenance-2026-08-28"
-    },
-    "@reown/appkit-pay": {
-      "1.8.1": "legacy:pre-provenance-2026-08-28"
-    },
-    "@reown/appkit-polyfills": {
-      "1.8.1": "legacy:pre-provenance-2026-08-28"
-    },
-    "@reown/appkit-scaffold-ui": {
-      "1.8.1": "legacy:pre-provenance-2026-08-28"
-    },
-    "@reown/appkit-ui": {
-      "1.8.1": "legacy:pre-provenance-2026-08-28"
-    },
-    "@reown/appkit-utils": {
-      "1.8.1": "legacy:pre-provenance-2026-08-28"
-    },
-    "@reown/appkit-wallet": {
-      "1.8.1": "legacy:pre-provenance-2026-08-28"
     },
     "@rolldown/pluginutils": {
       "1.0.0-beta.27": "legacy:pre-provenance-2026-08-28"
@@ -3501,15 +2896,16 @@
       "3.1.3": "legacy:pre-provenance-2026-08-28"
     },
     "@standard-schema/spec": {
-      "1.0.0": "legacy:pre-provenance-2026-08-28",
       "1.1.0": "legacy:pre-provenance-2026-08-28"
     },
     "@starknet-io/get-starknet-core": {
-      "4.0.8": "legacy:pre-provenance-2026-08-28",
       "5.0.0": "legacy:pre-provenance-2026-08-28"
     },
     "@starknet-io/get-starknet-discovery": {
       "5.0.0": "legacy:pre-provenance-2026-08-28"
+    },
+    "@starknet-io/get-starknet-modal": {
+      "5.0.0": "docs/dependency-reviews/2026-08-28-rubicon-candidate-graph.md"
     },
     "@starknet-io/get-starknet-virtual-wallet": {
       "5.0.0": "legacy:pre-provenance-2026-08-28"
@@ -3521,17 +2917,25 @@
       "5.0.0": "legacy:pre-provenance-2026-08-28"
     },
     "@starknet-io/types-js": {
+      "0.10.2": "docs/dependency-reviews/2026-08-28-rubicon-candidate-graph.md",
       "0.7.10": "legacy:pre-provenance-2026-08-28",
       "0.7.7": "legacy:pre-provenance-2026-08-28",
-      "0.8.4": "legacy:pre-provenance-2026-08-28",
-      "0.9.1": "legacy:pre-provenance-2026-08-28",
       "0.9.2": "legacy:pre-provenance-2026-08-28"
     },
-    "@starknet-react/chains": {
-      "5.0.3": "legacy:pre-provenance-2026-08-28"
+    "@starknet-start/chains": {
+      "1.0.7": "docs/dependency-reviews/2026-08-28-rubicon-candidate-graph.md"
     },
-    "@starknet-react/core": {
-      "5.0.3": "legacy:pre-provenance-2026-08-28"
+    "@starknet-start/explorers": {
+      "1.0.7": "docs/dependency-reviews/2026-08-28-rubicon-candidate-graph.md"
+    },
+    "@starknet-start/providers": {
+      "1.0.7": "docs/dependency-reviews/2026-08-28-rubicon-candidate-graph.md"
+    },
+    "@starknet-start/query": {
+      "1.0.7": "docs/dependency-reviews/2026-08-28-rubicon-candidate-graph.md"
+    },
+    "@starknet-start/react": {
+      "1.0.8": "docs/dependency-reviews/2026-08-28-rubicon-candidate-graph.md"
     },
     "@swc/core": {
       "1.13.5": "legacy:pre-provenance-2026-08-28"
@@ -3605,36 +3009,6 @@
     "@turbo/windows-arm64": {
       "2.10.11": "legacy:pre-provenance-2026-08-28"
     },
-    "@turnkey/api-key-stamper": {
-      "0.6.5": "legacy:pre-provenance-2026-08-28"
-    },
-    "@turnkey/crypto": {
-      "2.8.14": "legacy:pre-provenance-2026-08-28"
-    },
-    "@turnkey/encoding": {
-      "0.6.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "@turnkey/http": {
-      "3.18.1": "legacy:pre-provenance-2026-08-28"
-    },
-    "@turnkey/iframe-stamper": {
-      "2.11.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "@turnkey/indexed-db-stamper": {
-      "1.2.6": "legacy:pre-provenance-2026-08-28"
-    },
-    "@turnkey/sdk-browser": {
-      "5.16.1": "legacy:pre-provenance-2026-08-28"
-    },
-    "@turnkey/sdk-types": {
-      "0.14.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "@turnkey/wallet-stamper": {
-      "1.1.16": "legacy:pre-provenance-2026-08-28"
-    },
-    "@turnkey/webauthn-stamper": {
-      "0.6.0": "legacy:pre-provenance-2026-08-28"
-    },
     "@tweenjs/tween.js": {
       "23.1.3": "legacy:pre-provenance-2026-08-28",
       "25.0.0": "legacy:pre-provenance-2026-08-28"
@@ -3686,10 +3060,10 @@
       "15.7.15": "legacy:pre-provenance-2026-08-28"
     },
     "@types/react": {
-      "18.3.31": "legacy:pre-provenance-2026-08-28"
+      "19.2.18": "docs/dependency-reviews/2026-08-28-rubicon-candidate-graph.md"
     },
     "@types/react-dom": {
-      "18.3.7": "legacy:pre-provenance-2026-08-28"
+      "19.2.4": "docs/dependency-reviews/2026-08-28-rubicon-candidate-graph.md"
     },
     "@types/react-transition-group": {
       "4.4.12": "legacy:pre-provenance-2026-08-28"
@@ -3699,9 +3073,6 @@
     },
     "@types/three": {
       "0.185.4": "legacy:pre-provenance-2026-08-28"
-    },
-    "@types/trusted-types": {
-      "2.0.7": "legacy:pre-provenance-2026-08-28"
     },
     "@types/validator": {
       "13.15.3": "legacy:pre-provenance-2026-08-28"
@@ -3773,7 +3144,6 @@
       "4.1.11": "legacy:pre-provenance-2026-08-28"
     },
     "@wallet-standard/base": {
-      "1.1.0": "legacy:pre-provenance-2026-08-28",
       "1.1.1": "legacy:pre-provenance-2026-08-28"
     },
     "@wallet-standard/features": {
@@ -3781,77 +3151,6 @@
     },
     "@wallet-standard/wallet": {
       "1.1.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "@walletconnect/core": {
-      "2.21.10": "legacy:pre-provenance-2026-08-28",
-      "2.21.7": "legacy:pre-provenance-2026-08-28"
-    },
-    "@walletconnect/environment": {
-      "1.0.1": "legacy:pre-provenance-2026-08-28"
-    },
-    "@walletconnect/ethereum-provider": {
-      "2.21.10": "legacy:pre-provenance-2026-08-28"
-    },
-    "@walletconnect/events": {
-      "1.0.1": "legacy:pre-provenance-2026-08-28"
-    },
-    "@walletconnect/heartbeat": {
-      "1.2.2": "legacy:pre-provenance-2026-08-28"
-    },
-    "@walletconnect/jsonrpc-http-connection": {
-      "1.0.8": "legacy:pre-provenance-2026-08-28"
-    },
-    "@walletconnect/jsonrpc-provider": {
-      "1.0.14": "legacy:pre-provenance-2026-08-28"
-    },
-    "@walletconnect/jsonrpc-types": {
-      "1.0.4": "legacy:pre-provenance-2026-08-28"
-    },
-    "@walletconnect/jsonrpc-utils": {
-      "1.0.8": "legacy:pre-provenance-2026-08-28"
-    },
-    "@walletconnect/jsonrpc-ws-connection": {
-      "1.0.16": "legacy:pre-provenance-2026-08-28"
-    },
-    "@walletconnect/keyvaluestorage": {
-      "1.1.1": "legacy:pre-provenance-2026-08-28"
-    },
-    "@walletconnect/logger": {
-      "2.1.2": "legacy:pre-provenance-2026-08-28"
-    },
-    "@walletconnect/relay-api": {
-      "1.0.11": "legacy:pre-provenance-2026-08-28"
-    },
-    "@walletconnect/relay-auth": {
-      "1.1.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "@walletconnect/safe-json": {
-      "1.0.2": "legacy:pre-provenance-2026-08-28"
-    },
-    "@walletconnect/sign-client": {
-      "2.21.10": "legacy:pre-provenance-2026-08-28",
-      "2.21.7": "legacy:pre-provenance-2026-08-28"
-    },
-    "@walletconnect/time": {
-      "1.0.2": "legacy:pre-provenance-2026-08-28"
-    },
-    "@walletconnect/types": {
-      "2.21.10": "legacy:pre-provenance-2026-08-28",
-      "2.21.7": "legacy:pre-provenance-2026-08-28"
-    },
-    "@walletconnect/universal-provider": {
-      "2.21.10": "legacy:pre-provenance-2026-08-28",
-      "2.21.7": "legacy:pre-provenance-2026-08-28"
-    },
-    "@walletconnect/utils": {
-      "2.21.10": "legacy:pre-provenance-2026-08-28",
-      "2.21.7": "legacy:pre-provenance-2026-08-28"
-    },
-    "@walletconnect/window-getters": {
-      "1.0.1": "legacy:pre-provenance-2026-08-28"
-    },
-    "@walletconnect/window-metadata": {
-      "1.0.1": "legacy:pre-provenance-2026-08-28"
     },
     "@wry/caches": {
       "1.0.1": "legacy:pre-provenance-2026-08-28"
@@ -3870,7 +3169,6 @@
     },
     "abitype": {
       "1.0.0": "legacy:pre-provenance-2026-08-28",
-      "1.0.8": "legacy:pre-provenance-2026-08-28",
       "1.1.0": "legacy:pre-provenance-2026-08-28",
       "1.1.1": "legacy:pre-provenance-2026-08-28"
     },
@@ -3910,23 +3208,14 @@
     "any-promise": {
       "1.3.0": "legacy:pre-provenance-2026-08-28"
     },
-    "anymatch": {
-      "3.1.3": "legacy:pre-provenance-2026-08-28"
-    },
     "aria-query": {
       "5.3.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "asn1js": {
-      "3.0.10": "legacy:pre-provenance-2026-08-28"
     },
     "async-mutex": {
       "0.5.0": "legacy:pre-provenance-2026-08-28"
     },
     "asynckit": {
       "0.4.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "atomic-sleep": {
-      "1.0.0": "legacy:pre-provenance-2026-08-28"
     },
     "axios": {
       "0.33.0": "legacy:pre-provenance-2026-08-28"
@@ -3947,9 +3236,6 @@
     "baseline-browser-mapping": {
       "2.8.9": "legacy:pre-provenance-2026-08-28"
     },
-    "big.js": {
-      "6.2.2": "legacy:pre-provenance-2026-08-28"
-    },
     "bignumber.js": {
       "9.3.1": "legacy:pre-provenance-2026-08-28"
     },
@@ -3957,15 +3243,9 @@
       "4.1.0": "legacy:pre-provenance-2026-08-28",
       "5.1.0": "legacy:pre-provenance-2026-08-28"
     },
-    "blakejs": {
-      "1.2.1": "legacy:pre-provenance-2026-08-28"
-    },
     "bn.js": {
       "4.12.3": "legacy:pre-provenance-2026-08-28",
       "5.2.3": "legacy:pre-provenance-2026-08-28"
-    },
-    "borsh": {
-      "2.0.0": "legacy:pre-provenance-2026-08-28"
     },
     "brace-expansion": {
       "1.1.18": "legacy:pre-provenance-2026-08-28",
@@ -3983,18 +3263,12 @@
     "bs58": {
       "6.0.0": "legacy:pre-provenance-2026-08-28"
     },
-    "bs58check": {
-      "4.0.0": "legacy:pre-provenance-2026-08-28"
-    },
     "buffer": {
       "5.7.1": "legacy:pre-provenance-2026-08-28",
       "6.0.3": "legacy:pre-provenance-2026-08-28"
     },
     "buffer-image-size": {
       "0.6.4": "legacy:pre-provenance-2026-08-28"
-    },
-    "bundle-name": {
-      "4.1.0": "legacy:pre-provenance-2026-08-28"
     },
     "bundle-require": {
       "5.1.0": "legacy:pre-provenance-2026-08-28"
@@ -4008,9 +3282,6 @@
     "callsites": {
       "3.1.0": "legacy:pre-provenance-2026-08-28"
     },
-    "camelcase": {
-      "5.3.1": "legacy:pre-provenance-2026-08-28"
-    },
     "caniuse-lite": {
       "1.0.30001746": "legacy:pre-provenance-2026-08-28"
     },
@@ -4019,15 +3290,6 @@
     },
     "cardinal": {
       "2.1.1": "legacy:pre-provenance-2026-08-28"
-    },
-    "cbor-extract": {
-      "2.2.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "cbor-js": {
-      "0.1.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "cbor-x": {
-      "1.6.0": "legacy:pre-provenance-2026-08-28"
     },
     "chai": {
       "6.2.2": "legacy:pre-provenance-2026-08-28"
@@ -4063,7 +3325,6 @@
       "4.1.0": "legacy:pre-provenance-2026-08-28"
     },
     "cliui": {
-      "6.0.0": "legacy:pre-provenance-2026-08-28",
       "7.0.4": "legacy:pre-provenance-2026-08-28",
       "8.0.1": "legacy:pre-provenance-2026-08-28"
     },
@@ -4108,9 +3369,6 @@
       "1.0.2": "legacy:pre-provenance-2026-08-28",
       "1.1.1": "legacy:pre-provenance-2026-08-28"
     },
-    "cookie-es": {
-      "1.2.2": "legacy:pre-provenance-2026-08-28"
-    },
     "copyfiles": {
       "2.4.1": "legacy:pre-provenance-2026-08-28"
     },
@@ -4120,14 +3378,8 @@
     "cosmiconfig": {
       "7.1.0": "legacy:pre-provenance-2026-08-28"
     },
-    "cross-fetch": {
-      "3.2.0": "legacy:pre-provenance-2026-08-28"
-    },
     "cross-spawn": {
       "7.0.6": "legacy:pre-provenance-2026-08-28"
-    },
-    "crossws": {
-      "0.3.5": "legacy:pre-provenance-2026-08-28"
     },
     "csstype": {
       "3.2.3": "legacy:pre-provenance-2026-08-28"
@@ -4135,38 +3387,17 @@
     "d": {
       "1.0.2": "legacy:pre-provenance-2026-08-28"
     },
-    "dayjs": {
-      "1.11.13": "legacy:pre-provenance-2026-08-28"
-    },
     "debug": {
       "4.4.3": "legacy:pre-provenance-2026-08-28"
-    },
-    "decamelize": {
-      "1.2.0": "legacy:pre-provenance-2026-08-28"
     },
     "decimal.js": {
       "10.6.0": "legacy:pre-provenance-2026-08-28"
     },
-    "decode-uri-component": {
-      "0.2.2": "legacy:pre-provenance-2026-08-28"
-    },
     "deep-is": {
       "0.1.4": "legacy:pre-provenance-2026-08-28"
     },
-    "default-browser": {
-      "5.2.1": "legacy:pre-provenance-2026-08-28"
-    },
-    "default-browser-id": {
-      "5.0.0": "legacy:pre-provenance-2026-08-28"
-    },
     "defaults": {
       "1.0.4": "legacy:pre-provenance-2026-08-28"
-    },
-    "define-lazy-prop": {
-      "3.0.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "defu": {
-      "6.1.5": "legacy:pre-provenance-2026-08-28"
     },
     "delayed-stream": {
       "1.0.0": "legacy:pre-provenance-2026-08-28"
@@ -4174,21 +3405,12 @@
     "dequal": {
       "2.0.3": "legacy:pre-provenance-2026-08-28"
     },
-    "destr": {
-      "2.0.5": "legacy:pre-provenance-2026-08-28"
-    },
-    "detect-browser": {
-      "5.3.0": "legacy:pre-provenance-2026-08-28"
-    },
     "detect-libc": {
       "1.0.3": "legacy:pre-provenance-2026-08-28",
       "2.1.1": "legacy:pre-provenance-2026-08-28"
     },
     "dexie": {
       "4.4.5": "legacy:pre-provenance-2026-08-28"
-    },
-    "dijkstrajs": {
-      "1.0.3": "legacy:pre-provenance-2026-08-28"
     },
     "dom-accessibility-api": {
       "0.5.16": "legacy:pre-provenance-2026-08-28"
@@ -4198,9 +3420,6 @@
     },
     "dunder-proto": {
       "1.0.1": "legacy:pre-provenance-2026-08-28"
-    },
-    "duplexify": {
-      "4.1.3": "legacy:pre-provenance-2026-08-28"
     },
     "eastasianwidth": {
       "0.2.0": "legacy:pre-provenance-2026-08-28"
@@ -4217,12 +3436,6 @@
     "emoji-regex": {
       "8.0.0": "legacy:pre-provenance-2026-08-28",
       "9.2.2": "legacy:pre-provenance-2026-08-28"
-    },
-    "encode-utf8": {
-      "1.0.3": "legacy:pre-provenance-2026-08-28"
-    },
-    "end-of-stream": {
-      "1.4.5": "legacy:pre-provenance-2026-08-28"
     },
     "entities": {
       "7.0.1": "legacy:pre-provenance-2026-08-28"
@@ -4244,9 +3457,6 @@
     },
     "es-set-tostringtag": {
       "2.1.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "es-toolkit": {
-      "1.39.3": "legacy:pre-provenance-2026-08-28"
     },
     "es5-ext": {
       "0.10.64": "legacy:pre-provenance-2026-08-28"
@@ -4324,9 +3534,6 @@
     "eventemitter3": {
       "5.0.1": "legacy:pre-provenance-2026-08-28"
     },
-    "events": {
-      "3.3.0": "legacy:pre-provenance-2026-08-28"
-    },
     "exenv": {
       "1.2.2": "legacy:pre-provenance-2026-08-28"
     },
@@ -4352,9 +3559,6 @@
     "fast-levenshtein": {
       "2.0.6": "legacy:pre-provenance-2026-08-28"
     },
-    "fast-redact": {
-      "3.5.0": "legacy:pre-provenance-2026-08-28"
-    },
     "fdir": {
       "6.5.0": "legacy:pre-provenance-2026-08-28"
     },
@@ -4372,9 +3576,6 @@
     "fill-range": {
       "7.1.1": "legacy:pre-provenance-2026-08-28"
     },
-    "filter-obj": {
-      "1.1.0": "legacy:pre-provenance-2026-08-28"
-    },
     "find-my-way-ts": {
       "0.1.6": "legacy:pre-provenance-2026-08-28"
     },
@@ -4382,7 +3583,6 @@
       "1.1.0": "legacy:pre-provenance-2026-08-28"
     },
     "find-up": {
-      "4.1.0": "legacy:pre-provenance-2026-08-28",
       "5.0.0": "legacy:pre-provenance-2026-08-28"
     },
     "fix-dts-default-cjs-exports": {
@@ -4433,9 +3633,6 @@
     "get-proto": {
       "1.0.1": "legacy:pre-provenance-2026-08-28"
     },
-    "get-starknet-core": {
-      "4.0.0": "legacy:pre-provenance-2026-08-28"
-    },
     "glob": {
       "10.5.0": "legacy:pre-provenance-2026-08-28",
       "7.2.3": "legacy:pre-provenance-2026-08-28"
@@ -4460,9 +3657,6 @@
     },
     "grpc-web": {
       "1.5.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "h3": {
-      "1.15.9": "legacy:pre-provenance-2026-08-28"
     },
     "happy-dom": {
       "20.11.6": "legacy:pre-provenance-2026-08-28"
@@ -4496,15 +3690,9 @@
     "hoist-non-react-statics": {
       "3.3.2": "legacy:pre-provenance-2026-08-28"
     },
-    "hpke-js": {
-      "1.8.0": "legacy:pre-provenance-2026-08-28"
-    },
     "iconv-lite": {
       "0.4.24": "legacy:pre-provenance-2026-08-28",
       "0.7.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "idb-keyval": {
-      "6.2.2": "legacy:pre-provenance-2026-08-28"
     },
     "ieee754": {
       "1.2.1": "legacy:pre-provenance-2026-08-28"
@@ -4546,17 +3734,11 @@
     "inquirer-search-list": {
       "1.2.6": "legacy:pre-provenance-2026-08-28"
     },
-    "iron-webcrypto": {
-      "1.2.1": "legacy:pre-provenance-2026-08-28"
-    },
     "is-arrayish": {
       "0.2.1": "legacy:pre-provenance-2026-08-28"
     },
     "is-core-module": {
       "2.16.1": "legacy:pre-provenance-2026-08-28"
-    },
-    "is-docker": {
-      "3.0.0": "legacy:pre-provenance-2026-08-28"
     },
     "is-extglob": {
       "2.1.1": "legacy:pre-provenance-2026-08-28"
@@ -4568,9 +3750,6 @@
     "is-glob": {
       "4.0.3": "legacy:pre-provenance-2026-08-28"
     },
-    "is-inside-container": {
-      "1.0.0": "legacy:pre-provenance-2026-08-28"
-    },
     "is-interactive": {
       "1.0.0": "legacy:pre-provenance-2026-08-28",
       "2.0.0": "legacy:pre-provenance-2026-08-28"
@@ -4581,9 +3760,6 @@
     "is-unicode-supported": {
       "0.1.0": "legacy:pre-provenance-2026-08-28",
       "1.3.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "is-wsl": {
-      "3.1.0": "legacy:pre-provenance-2026-08-28"
     },
     "isarray": {
       "0.0.1": "legacy:pre-provenance-2026-08-28",
@@ -4644,9 +3820,6 @@
     "keyv": {
       "4.5.4": "legacy:pre-provenance-2026-08-28"
     },
-    "keyvaluestorage-interface": {
-      "1.0.0": "legacy:pre-provenance-2026-08-28"
-    },
     "levn": {
       "0.4.1": "legacy:pre-provenance-2026-08-28"
     },
@@ -4662,20 +3835,10 @@
     "lines-and-columns": {
       "1.2.4": "legacy:pre-provenance-2026-08-28"
     },
-    "lit": {
-      "3.3.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "lit-element": {
-      "4.2.1": "legacy:pre-provenance-2026-08-28"
-    },
-    "lit-html": {
-      "3.3.1": "legacy:pre-provenance-2026-08-28"
-    },
     "load-tsconfig": {
       "0.2.5": "legacy:pre-provenance-2026-08-28"
     },
     "locate-path": {
-      "5.0.0": "legacy:pre-provenance-2026-08-28",
       "6.0.0": "legacy:pre-provenance-2026-08-28"
     },
     "lodash": {
@@ -4701,7 +3864,8 @@
       "1.4.0": "legacy:pre-provenance-2026-08-28"
     },
     "lossless-json": {
-      "4.2.0": "legacy:pre-provenance-2026-08-28"
+      "4.2.0": "legacy:pre-provenance-2026-08-28",
+      "4.3.1": "docs/dependency-reviews/2026-08-28-rubicon-candidate-graph.md"
     },
     "lru-cache": {
       "10.4.3": "legacy:pre-provenance-2026-08-28",
@@ -4780,9 +3944,6 @@
     "msgpackr-extract": {
       "3.0.4": "legacy:pre-provenance-2026-08-28"
     },
-    "multiformats": {
-      "9.9.0": "legacy:pre-provenance-2026-08-28"
-    },
     "multipasta": {
       "0.2.8": "legacy:pre-provenance-2026-08-28"
     },
@@ -4811,15 +3972,8 @@
     "node-fetch": {
       "2.7.0": "legacy:pre-provenance-2026-08-28"
     },
-    "node-fetch-native": {
-      "1.6.7": "legacy:pre-provenance-2026-08-28"
-    },
     "node-gyp-build-optional-packages": {
-      "5.1.1": "legacy:pre-provenance-2026-08-28",
       "5.2.2": "legacy:pre-provenance-2026-08-28"
-    },
-    "node-mock-http": {
-      "1.0.5": "legacy:pre-provenance-2026-08-28"
     },
     "node-releases": {
       "2.0.21": "legacy:pre-provenance-2026-08-28"
@@ -4827,20 +3981,11 @@
     "noms": {
       "0.0.0": "legacy:pre-provenance-2026-08-28"
     },
-    "normalize-path": {
-      "3.0.0": "legacy:pre-provenance-2026-08-28"
-    },
     "object-assign": {
       "4.1.1": "legacy:pre-provenance-2026-08-28"
     },
     "obug": {
       "2.1.4": "legacy:pre-provenance-2026-08-28"
-    },
-    "ofetch": {
-      "1.4.1": "legacy:pre-provenance-2026-08-28"
-    },
-    "on-exit-leak-free": {
-      "0.2.0": "legacy:pre-provenance-2026-08-28"
     },
     "once": {
       "1.4.0": "legacy:pre-provenance-2026-08-28"
@@ -4848,9 +3993,6 @@
     "onetime": {
       "2.0.1": "legacy:pre-provenance-2026-08-28",
       "5.1.2": "legacy:pre-provenance-2026-08-28"
-    },
-    "open": {
-      "10.2.0": "legacy:pre-provenance-2026-08-28"
     },
     "optimism": {
       "0.18.1": "legacy:pre-provenance-2026-08-28"
@@ -4864,20 +4006,13 @@
     },
     "ox": {
       "0.4.4": "legacy:pre-provenance-2026-08-28",
-      "0.7.1": "legacy:pre-provenance-2026-08-28",
-      "0.9.3": "legacy:pre-provenance-2026-08-28",
       "0.9.6": "legacy:pre-provenance-2026-08-28"
     },
     "p-limit": {
-      "2.3.0": "legacy:pre-provenance-2026-08-28",
       "3.1.0": "legacy:pre-provenance-2026-08-28"
     },
     "p-locate": {
-      "4.1.0": "legacy:pre-provenance-2026-08-28",
       "5.0.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "p-try": {
-      "2.2.0": "legacy:pre-provenance-2026-08-28"
     },
     "package-json-from-dist": {
       "1.0.1": "legacy:pre-provenance-2026-08-28"
@@ -4919,23 +4054,11 @@
       "2.3.2": "legacy:pre-provenance-2026-08-28",
       "4.0.4": "legacy:pre-provenance-2026-08-28"
     },
-    "pino": {
-      "7.11.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "pino-abstract-transport": {
-      "0.5.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "pino-std-serializers": {
-      "4.0.0": "legacy:pre-provenance-2026-08-28"
-    },
     "pirates": {
       "4.0.7": "legacy:pre-provenance-2026-08-28"
     },
     "pkg-types": {
       "1.3.1": "legacy:pre-provenance-2026-08-28"
-    },
-    "pngjs": {
-      "5.0.0": "legacy:pre-provenance-2026-08-28"
     },
     "postcss": {
       "8.5.23": "legacy:pre-provenance-2026-08-28"
@@ -4952,17 +4075,11 @@
     "process-nextick-args": {
       "2.0.1": "legacy:pre-provenance-2026-08-28"
     },
-    "process-warning": {
-      "1.0.0": "legacy:pre-provenance-2026-08-28"
-    },
     "prop-types": {
       "15.8.1": "legacy:pre-provenance-2026-08-28"
     },
     "protobufjs": {
       "7.6.5": "legacy:pre-provenance-2026-08-28"
-    },
-    "proxy-compare": {
-      "3.0.1": "legacy:pre-provenance-2026-08-28"
     },
     "proxy-deep": {
       "3.1.1": "legacy:pre-provenance-2026-08-28"
@@ -4976,26 +4093,8 @@
     "pure-rand": {
       "6.1.0": "legacy:pre-provenance-2026-08-28"
     },
-    "pvtsutils": {
-      "1.3.6": "legacy:pre-provenance-2026-08-28"
-    },
-    "pvutils": {
-      "1.2.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "qrcode": {
-      "1.5.3": "legacy:pre-provenance-2026-08-28"
-    },
-    "query-string": {
-      "7.1.3": "legacy:pre-provenance-2026-08-28"
-    },
-    "quick-format-unescaped": {
-      "4.0.4": "legacy:pre-provenance-2026-08-28"
-    },
-    "radix3": {
-      "1.1.2": "legacy:pre-provenance-2026-08-28"
-    },
     "react": {
-      "18.3.1": "legacy:pre-provenance-2026-08-28"
+      "19.2.8": "docs/dependency-reviews/2026-08-28-rubicon-candidate-graph.md"
     },
     "react-circular-progressbar": {
       "2.2.0": "legacy:pre-provenance-2026-08-28"
@@ -5004,7 +4103,7 @@
       "8.1.2": "legacy:pre-provenance-2026-08-28"
     },
     "react-dom": {
-      "18.3.1": "legacy:pre-provenance-2026-08-28"
+      "19.2.8": "docs/dependency-reviews/2026-08-28-rubicon-candidate-graph.md"
     },
     "react-fast-compare": {
       "3.2.2": "legacy:pre-provenance-2026-08-28"
@@ -5036,23 +4135,14 @@
       "4.1.2": "legacy:pre-provenance-2026-08-28",
       "5.1.1": "legacy:pre-provenance-2026-08-28"
     },
-    "real-require": {
-      "0.1.0": "legacy:pre-provenance-2026-08-28"
-    },
     "redeyed": {
       "2.1.1": "legacy:pre-provenance-2026-08-28"
-    },
-    "reflect-metadata": {
-      "0.2.2": "legacy:pre-provenance-2026-08-28"
     },
     "rehackt": {
       "0.1.0": "docs/dependency-reviews/2026-08-28-apollo-4-graphql-17.md"
     },
     "require-directory": {
       "2.1.1": "legacy:pre-provenance-2026-08-28"
-    },
-    "require-main-filename": {
-      "2.0.0": "legacy:pre-provenance-2026-08-28"
     },
     "resolve": {
       "1.22.10": "legacy:pre-provenance-2026-08-28"
@@ -5068,9 +4158,6 @@
     },
     "rollup": {
       "4.59.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "run-applescript": {
-      "7.1.0": "legacy:pre-provenance-2026-08-28"
     },
     "run-async": {
       "2.4.1": "legacy:pre-provenance-2026-08-28"
@@ -5090,9 +4177,6 @@
       "5.1.2": "legacy:pre-provenance-2026-08-28",
       "5.2.1": "legacy:pre-provenance-2026-08-28"
     },
-    "safe-stable-stringify": {
-      "2.5.0": "legacy:pre-provenance-2026-08-28"
-    },
     "safer-buffer": {
       "2.1.2": "legacy:pre-provenance-2026-08-28"
     },
@@ -5100,7 +4184,7 @@
       "1.103.0": "legacy:pre-provenance-2026-08-28"
     },
     "scheduler": {
-      "0.23.2": "legacy:pre-provenance-2026-08-28"
+      "0.27.0": "docs/dependency-reviews/2026-08-28-rubicon-candidate-graph.md"
     },
     "seedrandom": {
       "3.0.5": "legacy:pre-provenance-2026-08-28"
@@ -5113,17 +4197,10 @@
     },
     "semver": {
       "6.3.1": "legacy:pre-provenance-2026-08-28",
-      "7.7.2": "legacy:pre-provenance-2026-08-28",
       "7.8.5": "legacy:pre-provenance-2026-08-28"
-    },
-    "set-blocking": {
-      "2.0.0": "legacy:pre-provenance-2026-08-28"
     },
     "set-cookie-parser": {
       "2.7.1": "legacy:pre-provenance-2026-08-28"
-    },
-    "sha256-uint8array": {
-      "0.10.7": "legacy:pre-provenance-2026-08-28"
     },
     "shallowequal": {
       "1.1.0": "legacy:pre-provenance-2026-08-28"
@@ -5141,9 +4218,6 @@
       "3.0.7": "legacy:pre-provenance-2026-08-28",
       "4.1.0": "legacy:pre-provenance-2026-08-28"
     },
-    "sonic-boom": {
-      "2.8.0": "legacy:pre-provenance-2026-08-28"
-    },
     "source-map": {
       "0.5.7": "legacy:pre-provenance-2026-08-28",
       "0.8.0-beta.0": "legacy:pre-provenance-2026-08-28"
@@ -5151,21 +4225,12 @@
     "source-map-js": {
       "1.2.1": "legacy:pre-provenance-2026-08-28"
     },
-    "split-on-first": {
-      "1.1.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "split2": {
-      "4.2.0": "legacy:pre-provenance-2026-08-28"
-    },
     "stackback": {
       "0.0.2": "legacy:pre-provenance-2026-08-28"
     },
     "starknet": {
-      "4.22.0": "legacy:pre-provenance-2026-08-28",
-      "8.9.2": "legacy:pre-provenance-2026-08-28"
-    },
-    "starknetid.js": {
-      "5.0.0": "legacy:pre-provenance-2026-08-28"
+      "10.0.2": "docs/dependency-reviews/2026-08-28-rubicon-candidate-graph.md",
+      "4.22.0": "legacy:pre-provenance-2026-08-28"
     },
     "starkscan": {
       "0.0.11": "legacy:pre-provenance-2026-08-28"
@@ -5175,12 +4240,6 @@
     },
     "stdin-discarder": {
       "0.1.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "stream-shift": {
-      "1.0.3": "legacy:pre-provenance-2026-08-28"
-    },
-    "strict-uri-encode": {
-      "2.0.0": "legacy:pre-provenance-2026-08-28"
     },
     "string_decoder": {
       "0.10.31": "legacy:pre-provenance-2026-08-28",
@@ -5222,9 +4281,6 @@
     },
     "thenify-all": {
       "1.6.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "thread-stream": {
-      "0.15.2": "legacy:pre-provenance-2026-08-28"
     },
     "three": {
       "0.185.1": "legacy:pre-provenance-2026-08-28"
@@ -5276,9 +4332,6 @@
     "ts-invariant": {
       "0.10.3": "docs/dependency-reviews/2026-08-28-apollo-4-graphql-17.md"
     },
-    "ts-mixer": {
-      "6.0.4": "legacy:pre-provenance-2026-08-28"
-    },
     "tslib": {
       "1.14.1": "legacy:pre-provenance-2026-08-28",
       "2.7.0": "legacy:pre-provenance-2026-08-28",
@@ -5289,9 +4342,6 @@
     },
     "tsx": {
       "4.23.12": "legacy:pre-provenance-2026-08-28"
-    },
-    "tsyringe": {
-      "4.10.0": "legacy:pre-provenance-2026-08-28"
     },
     "turbo": {
       "2.10.11": "legacy:pre-provenance-2026-08-28"
@@ -5314,14 +4364,7 @@
       "5.9.3": "legacy:pre-provenance-2026-08-28"
     },
     "ufo": {
-      "1.6.1": "legacy:pre-provenance-2026-08-28",
-      "1.6.4": "legacy:pre-provenance-2026-08-28"
-    },
-    "uint8arrays": {
-      "3.1.1": "legacy:pre-provenance-2026-08-28"
-    },
-    "uncrypto": {
-      "0.1.3": "legacy:pre-provenance-2026-08-28"
+      "1.6.1": "legacy:pre-provenance-2026-08-28"
     },
     "undici-types": {
       "6.19.8": "legacy:pre-provenance-2026-08-28",
@@ -5332,9 +4375,6 @@
     },
     "universalify": {
       "2.0.1": "legacy:pre-provenance-2026-08-28"
-    },
-    "unstorage": {
-      "1.17.1": "legacy:pre-provenance-2026-08-28"
     },
     "untildify": {
       "4.0.0": "legacy:pre-provenance-2026-08-28"
@@ -5349,7 +4389,6 @@
       "4.0.1": "legacy:pre-provenance-2026-08-28"
     },
     "use-sync-external-store": {
-      "1.5.0": "legacy:pre-provenance-2026-08-28",
       "1.6.0": "legacy:pre-provenance-2026-08-28"
     },
     "util-deprecate": {
@@ -5361,11 +4400,7 @@
     "validator": {
       "13.15.22": "legacy:pre-provenance-2026-08-28"
     },
-    "valtio": {
-      "2.1.5": "legacy:pre-provenance-2026-08-28"
-    },
     "viem": {
-      "2.31.0": "legacy:pre-provenance-2026-08-28",
       "2.37.9": "legacy:pre-provenance-2026-08-28",
       "2.9.20": "legacy:pre-provenance-2026-08-28"
     },
@@ -5410,9 +4445,6 @@
     "which": {
       "2.0.2": "legacy:pre-provenance-2026-08-28"
     },
-    "which-module": {
-      "2.0.1": "legacy:pre-provenance-2026-08-28"
-    },
     "why-is-node-running": {
       "2.3.0": "legacy:pre-provenance-2026-08-28"
     },
@@ -5428,17 +4460,12 @@
       "1.0.2": "legacy:pre-provenance-2026-08-28"
     },
     "ws": {
-      "7.5.11": "legacy:pre-provenance-2026-08-28",
       "8.21.0": "legacy:pre-provenance-2026-08-28"
-    },
-    "wsl-utils": {
-      "0.1.0": "legacy:pre-provenance-2026-08-28"
     },
     "xtend": {
       "4.0.2": "legacy:pre-provenance-2026-08-28"
     },
     "y18n": {
-      "4.0.3": "legacy:pre-provenance-2026-08-28",
       "5.0.8": "legacy:pre-provenance-2026-08-28"
     },
     "yallist": {
@@ -5448,12 +4475,10 @@
       "1.10.3": "legacy:pre-provenance-2026-08-28"
     },
     "yargs": {
-      "15.4.1": "legacy:pre-provenance-2026-08-28",
       "16.2.0": "legacy:pre-provenance-2026-08-28",
       "17.7.2": "legacy:pre-provenance-2026-08-28"
     },
     "yargs-parser": {
-      "18.1.3": "legacy:pre-provenance-2026-08-28",
       "20.2.9": "legacy:pre-provenance-2026-08-28",
       "21.1.1": "legacy:pre-provenance-2026-08-28"
     },
@@ -5467,7 +4492,6 @@
       "1.2.5": "docs/dependency-reviews/2026-08-28-apollo-4-graphql-17.md"
     },
     "zod": {
-      "3.22.4": "legacy:pre-provenance-2026-08-28",
       "3.25.76": "legacy:pre-provenance-2026-08-28"
     },
     "zod-validation-error": {

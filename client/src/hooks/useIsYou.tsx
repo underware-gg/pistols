@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { useOwnerOfDuelist } from '/src/hooks/useTokenDuelists'
 import { bigintEquals, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { PLAYER_CHARACTER_ID } from '/src/utils/pistols'

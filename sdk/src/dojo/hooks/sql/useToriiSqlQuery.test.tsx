@@ -5,7 +5,7 @@ import { renderHook, waitFor } from '@testing-library/react'
 import { expect, test, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => ({
-  queryRaw: vi.fn(async () => [{ count: '2' }]),
+  queryRaw: vi.fn(async (..._args: unknown[]) => [{ count: '2' }]),
 }))
 
 vi.mock('src/dojo/contexts/DojoContext', () => ({

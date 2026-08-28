@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
+import { getConnectorId } from '@underware/pistols-sdk/pistols/dojo'
 import { useLocation, useNavigate } from 'react-router'
 import { Container, Menu, MenuItem } from 'semantic-ui-react'
 import { TestPageMainMenu } from '/src/pages/tests/TestPageIndex'
@@ -82,7 +83,7 @@ export function InternalPageWrapper({ children }: { children?: React.ReactNode }
   const { address, connector, chainId } = useAccount()
   const { isAdmin, isTeamMember } = usePlayer(address)
   const isAuthorized = useMemo(() => (
-    connector?.id === 'predeployed'
+    getConnectorId(connector) === 'predeployed'
     || (chainId && chainId != stringToFelt(ChainId.SN_MAIN))
     || isAdmin || isTeamMember
     || bigintEquals(address, '0x0550212d3f13a373dfe9e3ef6aa41fba4124bde63fd7955393f879de19f3f47f') // mata
@@ -93,7 +94,7 @@ export function InternalPageWrapper({ children }: { children?: React.ReactNode }
     || bigintEquals(address, '0x010b685e795f70a7fb32d473878154e38a2668372dfe5d01d6cbdd9309d1be7f') // calc
     || bigintEquals(address, '0x013f1386e3d4267a1502d8ca782d34b63634d969d3c527a511814c2ef67b84c4') // tarrence
     || bigintEquals(address, '0x056c3cd5ed408a22b2932947abfdf69e467cb999d0cde0b51d6055baa009b544') // broody
-  ), [address, chainId, connector?.id, isAdmin, isTeamMember])
+  ), [address, chainId, connector, isAdmin, isTeamMember])
   if (!isAuthorized) return <h1>No access</h1>
   return children
 }

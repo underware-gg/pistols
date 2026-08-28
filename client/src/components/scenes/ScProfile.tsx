@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useDisconnect } from '@starknet-react/core'
+import { useDisconnect } from '@starknet-start/react'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { usePistolsScene } from '/src/hooks/PistolsContext'
 import { useMintMockLords } from '/src/hooks/useLordsFaucet'

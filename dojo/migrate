@@ -103,6 +103,7 @@ if [[ "$PROFILE" == "dev" ]]; then
   # copy typescript bindings
   if [[ -n "$ARG_BINDINGS" ]]; then # if is set
     cp -R $BINDINGS_PATH/typescript/* $SDK_GAME_PATH/generated/
+    node scripts/fix_generated_bindings.mjs "$SDK_GAME_PATH/generated"
   fi
   #
   # run generators...

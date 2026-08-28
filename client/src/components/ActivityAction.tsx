@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { BigNumberish } from 'starknet'
 import { useCallToChallenges } from '/src/stores/eventsModelStore'
 import { useDuelistsOwnedByPlayer } from '/src/hooks/useTokenDuelists'
@@ -206,4 +206,3 @@ const ActionItem = ({
 
   return <></>
 }
-

@@ -27,7 +27,7 @@ const AnimatedText = forwardRef<AnimatedTextHandle, AnimatedTextProps>(({
 }, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const ghostRef = useRef<HTMLDivElement>(null);
-  const [lines, setLines] = useState<JSX.Element[][]>([]);
+  const [lines, setLines] = useState<React.JSX.Element[][]>([]);
   const lastText = useRef(text);
   const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -82,8 +82,8 @@ const AnimatedText = forwardRef<AnimatedTextHandle, AnimatedTextProps>(({
         });
       });
 
-      const lines: JSX.Element[][] = [];
-      let currentLine: JSX.Element[] = [];
+      const lines: React.JSX.Element[][] = [];
+      let currentLine: React.JSX.Element[] = [];
       let currentTop = charSpans[0]?.top ?? 0;
 
       charSpans.forEach(({ char, top, index }) => {

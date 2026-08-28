@@ -4,7 +4,7 @@ import { RowDivider, VStack } from '/src/components/ui/Stack'
 import { ActionButton } from '/src/components/ui/Buttons'
 import { Divider } from '/src/components/ui/Divider'
 import { CustomIcon } from '/src/components/ui/Icons'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 
 const Row = Grid.Row
 const Col = Grid.Column

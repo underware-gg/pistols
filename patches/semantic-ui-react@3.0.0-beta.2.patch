@@ -1,0 +1,76 @@
+diff --git a/dist/commonjs/addons/Portal/usePortalElement.js b/dist/commonjs/addons/Portal/usePortalElement.js
+index d27661e65c406416782b86c1c9ada026833a7a19..1e719791f7c71df6ddf04c8d1829a867e68831d7 100644
+--- a/dist/commonjs/addons/Portal/usePortalElement.js
++++ b/dist/commonjs/addons/Portal/usePortalElement.js
+@@ -15,7 +15,8 @@ var _lib = require("../../lib");
+  * @param {React.Ref} userRef
+  */
+ function usePortalElement(node, userRef) {
+-  var ref = (0, _lib.useMergedRefs)(node.ref, userRef);
++  var _node$props;
++  var ref = (0, _lib.useMergedRefs)(node == null || (_node$props = node.props) == null ? void 0 : _node$props.ref, userRef);
+   if ( /*#__PURE__*/React.isValidElement(node)) {
+     if (_reactIs.default.isForwardRef(node)) {
+       return /*#__PURE__*/React.cloneElement(node, {
+diff --git a/dist/commonjs/addons/Portal/utils/useTrigger.js b/dist/commonjs/addons/Portal/utils/useTrigger.js
+index 294c35f613318c41c53d68f0ccc3edcef37257b1..be9228d1b991404787b3782b85ee88a95d785701 100644
+--- a/dist/commonjs/addons/Portal/utils/useTrigger.js
++++ b/dist/commonjs/addons/Portal/utils/useTrigger.js
+@@ -13,7 +13,8 @@ var _validateTrigger = _interopRequireDefault(require("./validateTrigger"));
+  * @param {React.Ref} triggerRef
+  */
+ function useTrigger(trigger, triggerRef) {
+-  var ref = (0, _lib.useMergedRefs)(trigger == null ? void 0 : trigger.ref, triggerRef);
++  var _trigger$props;
++  var ref = (0, _lib.useMergedRefs)(trigger == null || (_trigger$props = trigger.props) == null ? void 0 : _trigger$props.ref, triggerRef);
+   if (trigger) {
+     /* istanbul ignore else */
+     if (process.env.NODE_ENV !== 'production') {
+diff --git a/dist/es/addons/Portal/usePortalElement.js b/dist/es/addons/Portal/usePortalElement.js
+index 1fa9727448df402c92cf06c6f73a9509ea9c4ebe..9a022e2cb66fb137aa8466008bb618ef56741bac 100644
+--- a/dist/es/addons/Portal/usePortalElement.js
++++ b/dist/es/addons/Portal/usePortalElement.js
+@@ -11,7 +11,8 @@ import { useMergedRefs } from '../../lib';
+  * @param {React.Ref} userRef
+  */
+ export default function usePortalElement(node, userRef) {
+-  var ref = useMergedRefs(node.ref, userRef);
++  var _node$props;
++  var ref = useMergedRefs(node == null || (_node$props = node.props) == null ? void 0 : _node$props.ref, userRef);
+   if ( /*#__PURE__*/React.isValidElement(node)) {
+     if (ReactIs.isForwardRef(node)) {
+       return /*#__PURE__*/React.cloneElement(node, {
+diff --git a/dist/es/addons/Portal/utils/useTrigger.js b/dist/es/addons/Portal/utils/useTrigger.js
+index dd38728c5c66693500d59fc282c05d82ac406a2b..89be27930508c76f06ff526120fcf82a788d8a6d 100644
+--- a/dist/es/addons/Portal/utils/useTrigger.js
++++ b/dist/es/addons/Portal/utils/useTrigger.js
+@@ -9,7 +9,8 @@ import validateTrigger from './validateTrigger';
+  * @param {React.Ref} triggerRef
+  */
+ function useTrigger(trigger, triggerRef) {
+-  var ref = useMergedRefs(trigger == null ? void 0 : trigger.ref, triggerRef);
++  var _trigger$props;
++  var ref = useMergedRefs(trigger == null || (_trigger$props = trigger.props) == null ? void 0 : _trigger$props.ref, triggerRef);
+   if (trigger) {
+     /* istanbul ignore else */
+     if (process.env.NODE_ENV !== 'production') {
+diff --git a/src/addons/Portal/usePortalElement.js b/src/addons/Portal/usePortalElement.js
+index 02c95027b3d7536260d9f58814b3a7369110f693..3b95fe0db00cb5245e62afc89496355b251d6dce 100644
+--- a/src/addons/Portal/usePortalElement.js
++++ b/src/addons/Portal/usePortalElement.js
+@@ -10,4 +10,4 @@ import { useMergedRefs } from '../../lib'
+  * @param {React.Ref} userRef
+  */
+ export default function usePortalElement(node, userRef) {
+-  const ref = useMergedRefs(node.ref, userRef)
++  const ref = useMergedRefs(node?.props?.ref, userRef)
+diff --git a/src/addons/Portal/utils/useTrigger.js b/src/addons/Portal/utils/useTrigger.js
+index 020e4ecddb4d0e7395b7b789cb716ca30366cdda..397342feb25251474e08b5be4c4002cd6926cd07 100644
+--- a/src/addons/Portal/utils/useTrigger.js
++++ b/src/addons/Portal/utils/useTrigger.js
+@@ -8,4 +8,4 @@ import validateTrigger from './validateTrigger'
+  * @param {React.Ref} triggerRef
+  */
+ function useTrigger(trigger, triggerRef) {
+-  const ref = useMergedRefs(trigger?.ref, triggerRef)
++  const ref = useMergedRefs(trigger?.props?.ref, triggerRef)

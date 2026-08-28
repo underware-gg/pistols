@@ -14,8 +14,7 @@ const mocks = vi.hoisted(() => ({
   verifySignature: vi.fn(),
 }))
 
-vi.mock('@starknet-react/core', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@starknet-react/core')>()),
+vi.mock('src/utils/hooks/useAccount', () => ({
   useAccount: () => mocks.accountState,
 }))
 vi.mock('src/api/salt', () => ({

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { BigNumberish } from 'starknet'
 import { Button, Container, Dropdown, Icon, Tab, Table, TabPane } from 'semantic-ui-react'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { bigintToDecimal, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { useValidateWalletAddress } from '@underware/pistols-sdk/utils/hooks'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'

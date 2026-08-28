@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useAccount } from "@starknet-react/core";
+import { useAccount } from "@underware/pistols-sdk/utils/hooks";
 import { BigNumberish } from "starknet";
 import { QuizPlayer, useQuizQuestion, useQuizPlayerAnswer, useQuizQuestionWinners, useActiveQuizQuestionsByParty, useQuizAnswers } from "/src/stores/quizStore";
 import { usePistolsContext } from "/src/hooks/PistolsContext";
@@ -244,4 +244,3 @@ export const QuizAnswerGrid = ({
     </div>
   );
 };
-

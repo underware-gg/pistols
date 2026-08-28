@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react'
 import { Button } from 'semantic-ui-react'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { useDojoSetup } from '@underware/pistols-sdk/dojo'
 import { usePlayerDiscordSocialLink } from '/src/stores/eventsModelStore'
 import { useExecuteClearPlayerSocialLink, useExecuteEmitPlayerSetting } from '/src/hooks/usePistolsSystemCalls'

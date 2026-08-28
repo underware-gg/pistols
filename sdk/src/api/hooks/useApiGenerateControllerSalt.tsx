@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { BigNumberish, StarknetDomain } from 'starknet'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from 'src/utils/hooks/useAccount'
 import { apiGenerateControllerSalt } from 'src/api/salt'
 import { isPositiveBigint } from 'src/utils/misc/types'
 import { feltToString } from 'src/starknet/starknet'

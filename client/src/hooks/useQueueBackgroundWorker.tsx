@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback, useState } from 'react'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { useMatchPlayer } from '/src/stores/matchStore'

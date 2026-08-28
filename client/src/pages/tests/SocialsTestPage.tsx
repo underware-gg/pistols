@@ -11,7 +11,7 @@ import { EventsModelStoreSync } from '/src/stores/sync/EventsModelStoreSync'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppDojo from '/src/components/AppDojo'
 import { BigNumberish } from 'starknet'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { WalletAddressRow } from '../internal/AdminPage'
 import { bigintEquals } from '@underware/pistols-sdk/utils'
 
@@ -221,4 +221,3 @@ function DiscordSocialPlatform({
 //     </>
 //   )
 // }
-

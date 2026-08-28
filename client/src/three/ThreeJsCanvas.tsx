@@ -15,7 +15,7 @@ export const ThreeJsCanvas = ({
   } = useThreeJsContext()
   const { framerate, debugScene } = useSettings()
   const [isLoading, setIsLoading] = useState(false)
-  const canvasRef = useRef()
+  const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffectOnce(() => {
     let _mounted = true

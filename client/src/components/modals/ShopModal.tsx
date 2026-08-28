@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Modal, Grid, ButtonGroup, Button } from 'semantic-ui-react'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { useCalcFeePack, useCanPurchase } from '/src/hooks/usePistolsContractCalls'
 import { usePacksOwnedByPlayer } from '/src/hooks/useTokenPacks'

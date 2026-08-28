@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { BigNumberish } from 'starknet';
-import { useAccount } from '@starknet-react/core';
+import { useAccount } from '@underware/pistols-sdk/utils/hooks';
 import { useSdkSqlQuery } from '@underware/pistols-sdk/dojo/sql';
 import { useTokenContracts } from '../hooks/useTokenContracts';
 import { useFetchChallengeIds } from './challengeStore';

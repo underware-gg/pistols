@@ -63,7 +63,7 @@ export const DuelistsBook: React.FC<DuelistsBookProps> = ({
     scale: 0.3,
     opacity: 0
   });
-  const bookTweenRef = useRef<TWEEN.Tween<any>>();
+  const bookTweenRef = useRef<TWEEN.Tween<any>>(null);
 
   useEffect(() => {
     if (bookBackfillRef.current) {
@@ -611,7 +611,7 @@ function BookSheets({ isOpen, width, height }: { isOpen: boolean; width?: number
         <div
           id={`sheet-${i}`}
           key={i}
-          ref={el => sheetRefs.current[i] = el}
+          ref={el => { sheetRefs.current[i] = el }}
           className="paper-sheet"
         >
           {isPageVisible(i) && (

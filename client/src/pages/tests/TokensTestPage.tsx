@@ -15,7 +15,7 @@ import { DuelistTokenArt } from '/src/components/cards/DuelistTokenArt'
 import { DuelTokenArt } from '/src/components/cards/DuelTokenArt'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { useCanClaimStarterPack, useHasClaimedRing } from '/src/hooks/usePistolsContractCalls'
 import { LordsFaucet } from '/src/components/account/LordsFaucet'
 import { FameBalanceDuelist, FameLivesDuelist, LordsBalance } from '/src/components/account/LordsBalance'
@@ -393,4 +393,3 @@ function TestImages() {
     </Table>
   )
 }
-

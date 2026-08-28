@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Modal, Button, Image } from 'semantic-ui-react'
-import { useConnect, Connector, useAccount } from '@starknet-react/core'
+import { useConnect } from '@starknet-start/react'
+import { useAccount } from '@underware/pistols-sdk/utils/hooks'
 import { useChainSwitchCallbacks, useDojoSetup, useIsConnectedToSelectedNetwork } from '@underware/pistols-sdk/dojo'
-import { getConnectorIcon } from '@underware/pistols-sdk/pistols/dojo'
+import { getConnectorIcon, getConnectorId, type Connector } from '@underware/pistols-sdk/pistols/dojo'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { Opener } from '/src/hooks/useOpener'
 import { VStack } from '/src/components/ui/Stack'
@@ -55,10 +56,11 @@ function ConnectButtons({
   const { isConnecting } = useAccount()
 
   let connectorsButtons = useMemo(() => connectors.reduce((acc, connector: Connector) => {
-    if (selectedNetworkConfig.connectorIds.includes(connector.id)) {
+    const connectorId = getConnectorId(connector)
+    if (selectedNetworkConfig.connectorIds.includes(connectorId)) {
       acc.push(
-        <Button key={connector.id} fluid size='huge'
-          disabled={!connector.available() || isConnecting}
+        <Button key={connectorId} fluid size='huge'
+          disabled={isConnecting}
           onClick={() => connect({ connector })}
         >
           {connector.name}
