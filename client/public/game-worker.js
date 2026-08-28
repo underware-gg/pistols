@@ -97,9 +97,13 @@ class AssetCache extends Dexie {
 const assetCache = new AssetCache();
 
 // Helper functions
-function shouldInterceptRequest(url) {
-    const urlObj = new URL(url);
-    const pathname = urlObj.pathname;
+function shouldInterceptRequest(request) {
+  const urlObj = new URL(request.url);
+  const pathname = urlObj.pathname;
+
+  if (request.mode === 'navigate' || urlObj.origin !== self.location.origin) {
+    return false;
+  }
     
   // Exclude specific paths that are definitely not assets
   if (pathname.startsWith('/api/') || 
@@ -263,7 +267,7 @@ self.addEventListener('fetch', (event) => {
     event.waitUntil(queueManifestRefresh(reloadReason));
   }
   
-  if (request.method !== 'GET' || !shouldInterceptRequest(url)) {
+  if (request.method !== 'GET' || !shouldInterceptRequest(request)) {
     return;
   }
   

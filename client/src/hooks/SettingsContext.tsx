@@ -1,5 +1,5 @@
 import React, { ReactNode, createContext, useReducer, useContext, useState, useCallback, useMemo } from 'react'
-import { useCookies } from 'react-cookie'
+import { CookiesProvider, useCookies } from 'react-cookie'
 import { BigNumberish } from 'starknet'
 import { useEffectOnce } from '@underware/pistols-sdk/utils/hooks'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
@@ -76,7 +76,7 @@ const SettingsContext = createContext<{
 interface SettingsProviderProps {
   children: string | React.JSX.Element | React.JSX.Element[] | ReactNode
 }
-const SettingsProvider = ({
+const SettingsStateProvider = ({
   children,
 }: SettingsProviderProps) => {
   const [cookies, setCookie] = useCookies(Object.values(SettingsActions));
@@ -192,6 +192,12 @@ const SettingsProvider = ({
     </SettingsContext.Provider>
   )
 }
+
+const SettingsProvider = ({ children }: SettingsProviderProps) => (
+  <CookiesProvider>
+    <SettingsStateProvider>{children}</SettingsStateProvider>
+  </CookiesProvider>
+)
 
 export { SettingsProvider, SettingsContext, SettingsActions }
 
