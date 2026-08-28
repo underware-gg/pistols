@@ -18,8 +18,8 @@ export const useClientTimestamp = ({
   // force update
   const [forceUpdate, setForceUpdate] = useState(0)
   const updateTimestamp = useCallback(() => {
-    setForceUpdate(forceUpdate + 1)
-  }, [forceUpdate])
+    setForceUpdate((current) => current + 1)
+  }, [])
 
   // avoid starting timer twice on strict mode
   const mounted = useMounted()
