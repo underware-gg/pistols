@@ -6,9 +6,10 @@ Move the client and published SDK together from React 18, Starknet.js 8 and
 Dojo.js 1 to React 19, Starknet.js 10 and Dojo.js 2 without deploying production
 or changing the on-chain world schema.
 
-The validated starting point is `wip/rob` at `d00a4d9f`. GitHub CI and both
-Vercel preview projects passed for that exact commit. Work remains on
-`wip/rob`; `main`, remote `dev`, Sepolia and mainnet are not migration targets.
+The validated starting point is `wip/rob` at `d00a4d9f`. The completed
+migration is `wip/rob` at `74505f49`; GitHub CI and both Vercel preview
+deployments passed for that exact commit. `main`, remote `dev`, Sepolia and
+mainnet are not migration targets.
 
 ## Decisions already made
 
@@ -269,14 +270,25 @@ Exit criteria:
 - No push or merge to `main`, no push to remote `dev`, and no production or
   remote-world deployment has occurred.
 
-Local completion evidence — 2026-08-28:
+Completion evidence — 2026-08-28:
 
 - Frozen install, reviewed-lock checks, advisories, production builds,
   typechecks, lint and all JavaScript/TypeScript tests pass locally.
 - The clean SDK consumer fixture and full local Katana/Torii integration proof
   pass.
-- Remote CI, Vercel previews and browser observation remain deliberately
-  pending until this work is committed and the user authorizes a push.
+- Commit `74505f49` is pushed only to `wip/rob`. GitHub `verify` passed its
+  frozen install, policy gates, production build, typechecks, lint and tests.
+- Both `pistols` and `pistols-prerelease` Vercel deployments completed
+  successfully for `74505f49`.
+- The public preview returned the application HTML, entry JavaScript, CSS and a
+  representative Starknet account WASM asset with HTTP 200 and the expected
+  content types. The prerelease preview correctly redirected unauthenticated
+  requests to Vercel SSO.
+- A visual/authenticated browser walkthrough remains unobserved because no
+  browser-control session was available. Do not treat the HTTP checks as
+  evidence for wallet interaction or rendered UI behaviour.
+- `main`, remote `dev`, production deployments and remote worlds remain
+  untouched.
 
 ## Commit checkpoints
 
