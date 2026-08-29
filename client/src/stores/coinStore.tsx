@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react'
-import { create } from 'zustand'
+import { create, useStore } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
 import { useERC20Balance } from '@underware/pistols-sdk/utils/hooks'
@@ -119,6 +119,7 @@ const useNormalizedTokenIds = (tokenIds: BigNumberish[]) => (
 export const useFameCoinStore = createStore('fame', true);
 export const useFoolsCoinStore = createStore('fools', true);
 export const useLordsCoinStore = createStore('lords', true);
+const fallbackCoinStore = createStore('unsupported', false);
 
 export function useCoinStore(contractAddress: BigNumberish) {
   const {
@@ -234,23 +235,11 @@ export const useFetchTokenboundAccountsBalances = (coinAddress: BigNumberish, to
 
 export const useFetchAccountsBalances = (coinAddress: BigNumberish, accounts: BigNumberish[], enabled: boolean) => {
   const { address } = useAccount() // do not fetch connected player (done by sql)
-  const store = useCoinStore(coinAddress)
-  const {
-    version,
-    hasBalance,
-    initBalances,
-    setBalances,
-  } = store ? store((state: State) => ({
-    version: state.version,
-    hasBalance: state.hasBalance,
-    initBalances: state.initBalances,
-    setBalances: state.setBalances,
-  })) : {
-    version: 0,
-    hasBalance: () => false,
-    initBalances: () => {},
-    setBalances: () => {},
-  }
+  const selectedStore = useCoinStore(coinAddress) ?? fallbackCoinStore
+  const version = useStore(selectedStore, (state: State) => state.version)
+  const hasBalance = useStore(selectedStore, (state: State) => state.hasBalance)
+  const initBalances = useStore(selectedStore, (state: State) => state.initBalances)
+  const setBalances = useStore(selectedStore, (state: State) => state.setBalances)
   const newAccounts = useMemo(() => (
     // Balance maps are mutated in place; version is their change signal.
     (void version, enabled && isPositiveBigint(coinAddress))
