@@ -1,4 +1,4 @@
-import React, { ReactNode, createContext, useReducer, useContext, useMemo } from 'react'
+import React, { ReactNode, createContext, useReducer, useContext, useMemo, useCallback } from 'react'
 import * as game from '/src/three/game'
 
 type ThreeJsGame = typeof game;
@@ -25,10 +25,10 @@ type ThreeJsContextState = {
 const ThreeJsActions = {
   SET_GAME_IMPL: 'SET_GAME_IMPL',
   SET_LOADED_AUDIO_ASSETS: 'SET_LOADED_AUDIO_ASSETS',
-}
+} as const
 
 type ActionType =
-  | { type: 'SET_GAME_IMPL', payload: ThreeJsGame }
+  | { type: 'SET_GAME_IMPL', payload: ThreeJsGame | null }
   | { type: 'SET_LOADED_AUDIO_ASSETS', payload: boolean }
 
 
@@ -42,7 +42,7 @@ type ActionType =
 
 const ThreeJsContext = createContext<{
   state: ThreeJsContextState
-  dispatch: React.Dispatch<any>
+  dispatch: React.Dispatch<ActionType>
 }>({
   state: initialState,
   dispatch: () => null,
@@ -62,7 +62,7 @@ const ThreeJsProvider = ({
     let newState = { ...state }
     switch (action.type) {
       case ThreeJsActions.SET_GAME_IMPL: {
-        newState.gameImpl = action.payload as ThreeJsGame
+        newState.gameImpl = action.payload
         break
       }
       case ThreeJsActions.SET_LOADED_AUDIO_ASSETS: {
@@ -70,7 +70,6 @@ const ThreeJsProvider = ({
         break
       }
       default:
-        console.warn(`ThreeJsProvider: Unknown action [${action.type}]`)
         return state
     }
     return newState
@@ -100,14 +99,14 @@ export const useThreeJsContext = () => {
   if (!context) throw new Error("The `useThreeJsContext` hook must be used within a `ThreeJsProvider`");
   const { state, dispatch } = context
 
-  const dispatchGameImpl = (gameImpl: ThreeJsGame) => {
+  const dispatchGameImpl = useCallback((gameImpl: ThreeJsGame | null) => {
     dispatch({ type: ThreeJsActions.SET_GAME_IMPL, payload: gameImpl })
     ;(window as any).__gameImpl = gameImpl
-  }
+  }, [dispatch])
 
-  const dispatchLoadedAudioAssets = (loaded: boolean) => {
+  const dispatchLoadedAudioAssets = useCallback((loaded: boolean) => {
     dispatch({ type: ThreeJsActions.SET_LOADED_AUDIO_ASSETS, payload: loaded })
-  }
+  }, [dispatch])
 
   return {
     state,

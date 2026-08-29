@@ -312,6 +312,14 @@ checkpoint, not at handoff.
 
 After the Rubicon is remotely validated, reassess independently:
 
+- Controller policy-source cleanup: make the hosted `pistols` preset the sole
+  policy source for both `SN_MAIN` and `SN_SEPOLIA`, and only generate/pass
+  manual policies for `KATANA_LOCAL`. Do not enable
+  `shouldOverridePresetPolicies`: Controller 0.14 would replace the preset,
+  while the live preset currently applies tighter `amount` and `spender`
+  constraints to FOOLS `approve`. Before the next preset regeneration, teach
+  the generator those constraints and sync `generated/preset.json` so it cannot
+  accidentally broaden the live policy.
 - React Compiler rule backlog under React 19.
 - React Router 8 together with its Node floor.
 - Vite 8 and its plugin/release-age boundary.

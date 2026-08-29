@@ -1,5 +1,4 @@
-import { useState, useRef } from 'react'
-import { useEffectOnce } from '@underware/pistols-sdk/utils/hooks'
+import { useEffect, useRef } from 'react'
 import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
 import { useSettings } from '/src/hooks/SettingsContext'
 
@@ -10,47 +9,52 @@ export const ThreeJsCanvas = ({
 }) => {
   const {
     game,     // raw game module (game.tsx)
-    gameImpl, // initialized module (playable)
     dispatchGameImpl,
   } = useThreeJsContext()
   const { framerate, debugScene } = useSettings()
-  const [isLoading, setIsLoading] = useState(false)
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const initializationRef = useRef<Promise<void> | null>(null)
+  const activeRef = useRef(false)
+  const initializedRef = useRef(false)
+  const initializationOptionsRef = useRef({
+    framerate,
+    statsEnabled: guiEnabled || debugScene,
+  })
 
-  useEffectOnce(() => {
-    let _mounted = true
-    const _initialize = async () => {
-      await game.init(canvasRef.current, framerate, guiEnabled || debugScene)
-      if (_mounted) {
-        game.animate()
-        // game.resetGameParams(gameParams)
-        setIsLoading(false)
-        dispatchGameImpl(game)
-        //@ts-ignore
-        canvasRef.current?.focus()
-      }
-    }
+  useEffect(() => {
+    activeRef.current = true
+    const canvas = canvasRef.current
 
-    // runs once on mount
-    if (canvasRef.current && !isLoading && !gameImpl) {
-      if (gameImpl) { // should never happen, but lets keep it for now
-        gameImpl.dispose()
-        dispatchGameImpl(null)
-      }
-      setIsLoading(true)
-      _initialize()
+    if (canvas && !initializationRef.current) {
+      const { framerate: initialFramerate, statsEnabled } = initializationOptionsRef.current
+      initializationRef.current = game.init(canvas, initialFramerate, statsEnabled)
+        .then(() => {
+          initializedRef.current = true
+          if (!activeRef.current) {
+            game.dispose()
+            initializedRef.current = false
+            return
+          }
+
+          game.animate()
+          dispatchGameImpl(game)
+          canvas.focus()
+        })
+        .catch((error) => {
+          console.error('Three.js renderer initialization failed:', error)
+        })
     }
 
     return () => {
       console.warn(`🧹 UNMOUNTING ThreeJsCanvas - cleaning up game resources`)
-      _mounted = false
-      // CRITICAL: Dispose of game resources to prevent memory leaks
-      if (gameImpl) {
-        gameImpl.dispose()
+      activeRef.current = false
+      if (initializedRef.current) {
+        initializedRef.current = false
+        game.dispose()
         dispatchGameImpl(null)
       }
     }
-  }, [canvasRef.current, gameImpl, dispatchGameImpl])
+  }, [dispatchGameImpl, game])
 
   return (
     <div>
