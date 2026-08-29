@@ -209,8 +209,8 @@ const snSepoliaConfig: DojoNetworkConfig = {
   rpcUrl: 'https://api.cartridge.gg/x/starknet/sepolia/rpc/v0_9',
   toriiUrl: 'https://pistols-solitaire-sepolia.up.railway.app',
   // toriiUrl: 'http://127.0.0.1:8080',
-  graphqlUrl: 'https://pistols-solitaire-sepolia.up.railway.app/sql',
-  sqlUrl: 'https://pistols-solitaire-sepolia.up.railway.app/graphql',
+  graphqlUrl: 'https://pistols-solitaire-sepolia.up.railway.app/graphql',
+  sqlUrl: 'https://pistols-solitaire-sepolia.up.railway.app/sql',
   etherAddress: sepolia.nativeCurrency.address,
   lordsFaucet: true,
   // lordsFaucet: 'https://sepolia.voyager.online/contract/0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210#writeContract',
@@ -234,8 +234,8 @@ const snMainnetConfig: DojoNetworkConfig = {
   slotName: undefined,
   rpcUrl: 'https://api.cartridge.gg/x/starknet/mainnet/rpc/v0_9',
   toriiUrl: 'https://pistols-solitaire-mainnet.up.railway.app',
-  graphqlUrl: 'https://pistols-solitaire-mainnet.up.railway.app/sql',
-  sqlUrl: 'https://pistols-solitaire-mainnet.up.railway.app/graphql',
+  graphqlUrl: 'https://pistols-solitaire-mainnet.up.railway.app/graphql',
+  sqlUrl: 'https://pistols-solitaire-mainnet.up.railway.app/sql',
   etherAddress: mainnet.nativeCurrency.address,
   lordsFaucet: 'https://app.ekubo.org/?inputCurrency=ETH&outputCurrency=LORDS',
   lordsAddress: '0x124aeb495b947201f5fac96fd1138e326ad86195b98df6dec9009158a533b49',
@@ -283,8 +283,8 @@ export const getNetworkConfig = (networkId: NetworkId, env?: DojoNetworkEnv): Do
   result.slotName = (env?.SLOT_NAME || result.slotName);
   result.rpcUrl = (env?.RPC_URL || result.rpcUrl);
   result.toriiUrl = (env?.TORII_URL || result.toriiUrl || `https://api.cartridge.gg/x/${result.slotName}/torii`);
-  result.graphqlUrl = (env?.TORII_GRAPHQL_URL || result.graphqlUrl || `https://api.cartridge.gg/x/${result.slotName}/torii/graphql`);
-  result.sqlUrl = (env?.TORII_SQL_URL || result.sqlUrl || `https://api.cartridge.gg/x/${result.slotName}/torii/sql`);
+  result.graphqlUrl = (env?.TORII_GRAPHQL_URL || `${result.toriiUrl}/graphql`);
+  result.sqlUrl = (env?.TORII_SQL_URL || `${result.toriiUrl}/sql`);
 
   if (!result.rpcUrl) {
     throw new Error(`Network [${networkId}] and .env missing: RPC_URL`);
