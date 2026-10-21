@@ -73,7 +73,7 @@ Pistols at Dawn is an onchain game, in which you face off against another Lord i
 * `/client`: Main game web client (typescript, Vite)
 * `/dojo`: Dojo contracts (cairo)
 * `/sdk`: Pistols at Dawm SDK (typescript)
-* `/dreams`: [Daydreams](https://www.dreams.fun/) AI agents (typescript)
+* `/dreams`: [Daydreams](https://www.daydreams.systems/) AI agents (typescript)
 * `/gamejam`: Original [Dojo Game Jam #3](https://twitter.com/ohayo_dojo/status/1747626446720258059) contents 
 * `/assets`: Assorted test assets
 * `/verifier`: Contracts verifier
